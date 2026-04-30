@@ -20,8 +20,9 @@ recommendation. It declares the user's goals, strategy, constraints, and
 exclusions. **Every skill and subagent must load it before reasoning about
 allocations.**
 
-If `investor_profile.md` is missing or empty, stop and run `/init-profile` —
-do not fall back to a default profile.
+If `investor_profile.md` is missing or empty, stop and tell the user to
+copy `investor_profile.example.md` to `investor_profile.md` and edit
+it — do not fall back to a default profile.
 
 A second user-authored file, `news_sources.md`, lists preferred news
 sources grouped by the technology waves named in the profile. The
@@ -42,24 +43,27 @@ The user decides. Never silently clamp a recommendation to fit the profile.
 
 ## Architecture
 
-- **Subagents** live in `.claude/agents/`. Each is a specialist with a
-  narrow tool allowlist and its own context. They don't talk to each
-  other — they return structured summaries to the orchestrating skill.
-- **Skills** live in `.claude/skills/`. A skill is the top-level
-  workflow a user invokes: `/init-profile`, `/optimize-portfolio`,
-  `/rebalance`. Skills orchestrate subagents and produce the final
-  report.
+- **Subagents** (`.claude/agents/`) — two LLM specialists with narrow
+  tool allowlists:
+  - `news-researcher` — picks wave-aligned news per ticker, classifies
+    each wave's stage, returns a `wave_views` mapping the optimizer
+    consumes as a tilt on expected returns.
+  - `report-writer` — synthesizes the analysis + news payloads into the
+    final markdown report.
+- **Skills** (`.claude/skills/`) — one slash command:
+  - `/review-portfolio` — orchestrates the news-researcher, runs the
+    `analyze` CLI, then invokes the report-writer and refreshes the
+    dashboard.
 - **All Python lives in two files**:
-  - `src/portfolio.py` — every math function (fetch, compute_returns,
-    optimize_portfolio, risk_metrics, backtest, snapshot_holdings,
-    recommend_portfolio) plus a tiny disk-backed handle store.
-  - `src/cli.py` — one entry point with subcommands (`fetch-data`,
-    `optimize`, `risk`, `backtest`, `snapshot`, `recommend`) that
-    subagents and cron jobs invoke via Bash.
-- **State** is persisted under `data/state/` as pickle files keyed by
-  handles (`prices_1`, `returns_1`). This lets separate Python
-  processes share DataFrames.
+  - `src/portfolio.py` — every math function (fetch_prices,
+    compute_returns, optimize_portfolio, risk_metrics, analyze,
+    snapshot_holdings, recommend_portfolio, build_dashboard).
+  - `src/cli.py` — one entry point with four subcommands (`analyze`,
+    `snapshot`, `recommend`, `dashboard`) that the skill and cron jobs
+    invoke via Bash.
 - **Reports** are written to `data/reports/YYYY-MM-DD-<skill>.md`.
+- **Dashboard** is a single static `data/dashboard.html` regenerated
+  after each snapshot/recommend run and at the end of `/review-portfolio`.
 
 ## User-maintained inputs
 
@@ -87,12 +91,14 @@ keep existing ones.
 Two launchd plists live at `~/Library/LaunchAgents/`:
 
 - `com.user.portfolio-snapshot.plist` — Mon–Fri 16:30 local, runs
-  `python -m src.cli snapshot`. Logs to `data/snapshot.log`.
+  `python -m src.cli snapshot && python -m src.cli dashboard`.
+  Logs to `data/snapshot.log`.
 - `com.user.portfolio-recommend.plist` — Fri 17:00 local, runs
-  `python -m src.cli recommend`. Logs to `data/recommend.log`.
+  `python -m src.cli recommend && python -m src.cli dashboard`.
+  Logs to `data/recommend.log`.
 
 The weekly `recommend` is the **lightweight** sibling of
-`/optimize-portfolio` — pure Python, no news-researcher, no wave-stage
+`/review-portfolio` — pure Python, no news-researcher, no wave-stage
 tilts. Use the full skill when the user wants fresh wave classification
 and a written report.
 
@@ -103,10 +109,10 @@ and a written report.
   number, it must have come from a `src.cli` invocation in the same turn.
 - Don't modify `investor_profile.md` or `holdings.csv` without the
   user's explicit consent.
-- Reports and handles under `data/` are session artifacts; gitignored
-  and safe to delete. The two appended CSVs (`snapshots.csv`,
-  `recommendations.csv`) are also under `data/` but are the user's
-  history — don't truncate them without consent.
+- Reports and the dashboard under `data/` are session artifacts;
+  gitignored and safe to regenerate. The two appended CSVs
+  (`snapshots.csv`, `recommendations.csv`) are also under `data/` but
+  are the user's history — don't truncate them without consent.
 
 ## Running Python
 

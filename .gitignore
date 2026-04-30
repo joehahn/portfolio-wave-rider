@@ -12,9 +12,8 @@ htmlcov/
 .DS_Store
 *.log
 data_cache/
-data/state/
-data/weights/
 data/reports/
+data/dashboard.html
 
 # personal data — never push
 .claude/settings.local.json

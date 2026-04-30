@@ -76,9 +76,9 @@ Then derive a per-ticker `wave_views` mapping by copying each ticker's
 wave stage from the wave-level call. `general_markets` tickers get
 `neutral`.
 
-The orchestrating skill passes this mapping to the optimizer as
-`--wave-views`, which tilts expected returns: +20%/+10% for
-buildup/surge, -20%/-10% for peak/digestion, 0 for neutral. Small
+The orchestrating skill passes this mapping to `python -m src.cli
+analyze --wave-views <json>`, which tilts expected returns: +20%/+10%
+for buildup/surge, -20%/-10% for peak/digestion, 0 for neutral. Small
 and symmetric by design — the tilt nudges weights, it does not dictate
 them.
 

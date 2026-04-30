@@ -9,77 +9,56 @@ Audience: technical users new to skills/subagents.
 
 ## What it does
 
-Three things, on three cadences:
+Three cadences, plus a dashboard:
 
 | Cadence | Mechanism | What runs | Output |
 |---|---|---|---|
-| **Daily** (Mon–Fri 16:30 local) | macOS launchd | `python -m src.cli snapshot` — fetch close prices, compute $ values per holding | `data/snapshots.csv` (long format) |
-| **Weekly** (Fri 17:00 local) | macOS launchd | `python -m src.cli recommend` — re-optimize over the holdings universe | `data/recommendations.csv` |
-| **Monthly** (you decide) | You run `/rebalance` in Claude Code | Multi-agent: target weights → trade list with profile checks | `data/reports/YYYY-MM-DD-rebalance.md` |
+| **Daily** (Mon–Fri 16:30 local) | macOS launchd | `snapshot && dashboard` — fetch close prices, append $ values per holding, refresh dashboard | `data/snapshots.csv`, `data/dashboard.html` |
+| **Weekly** (Fri 17:00 local) | macOS launchd | `recommend && dashboard` — re-optimize over the holdings universe, refresh dashboard | `data/recommendations.csv`, `data/dashboard.html` |
+| **Monthly** (you decide) | You run `/review-portfolio` in Claude Code | Full LLM run: news + analyze + report + dashboard refresh | `data/reports/YYYY-MM-DD-review-portfolio.md`, `data/dashboard.html` |
 
-Plus the flagship one-off: **`/optimize-portfolio`** — full multi-agent
-run with live wave-stage classification from current news, written
-report, profile conflict flags. Run this whenever you want a refreshed
-narrative (the weekly cron is the lightweight Python-only sibling — no
-news, no wave tilts).
+The weekly cron is the **lightweight Python-only sibling** of
+`/review-portfolio` — no news, no wave tilts. Run the skill when you
+want a fresh wave-stage read and a written narrative.
 
 ## How it's built
 
-- **Skills** (`.claude/skills/*/SKILL.md`) — slash commands you invoke:
-  `/init-profile`, `/optimize-portfolio`, `/rebalance`. They orchestrate
-  subagents and produce a markdown report.
-- **Subagents** (`.claude/agents/*.md`) — specialists, each with their
-  own context and tool allowlist:
-  - `market-data-fetcher` — pulls prices, computes returns
-  - `optimizer` — mean-variance solver, honors profile constraints
-  - `risk-analyst` — Sharpe, vol, drawdown, VaR/CVaR + backtest
+- **Skill** (`.claude/skills/review-portfolio/SKILL.md`) — the one slash
+  command you invoke: `/review-portfolio`. It orchestrates the
+  subagents and produces a markdown report + refreshed dashboard.
+- **Subagents** (`.claude/agents/*.md`) — two LLM specialists:
   - `news-researcher` — headlines per ticker; classifies wave stages
   - `report-writer` — synthesizes the final markdown
 - **Python** (`src/portfolio.py` + `src/cli.py`) — all math in two
-  files. Subagents invoke the CLI via Bash; LLMs never compute numbers.
-- **Profile** (`investor_profile.md`) — the source of truth. Every
-  agent reads it before recommending anything. When the optimal
-  numerical answer violates a constraint, the report **flags the
-  conflict** rather than silently clamping. That's the demo's punchline.
+  files; one `analyze` CLI call does fetch + optimize + risk in one shot.
+  The skill invokes the CLI via Bash; LLMs never compute numbers.
+- **Profile** (`investor_profile.md`) — the source of truth. The skill
+  reads it before recommending anything. When the optimal numerical
+  answer violates a constraint, the report **flags the conflict**
+  rather than silently clamping. That's the demo's punchline.
 
-The flagship `/optimize-portfolio` flow:
+The flagship `/review-portfolio` flow:
 
 ```mermaid
 flowchart TD
-    user([User]) -->|/optimize-portfolio| skill[Skill: optimize-portfolio]
+    user([User]) -->|/review-portfolio| skill[Skill: review-portfolio]
     profile[(investor_profile.md)] -.read.-> skill
-
-    skill --> par{Step 1 — parallel}
-    par --> fetcher[market-data-fetcher]
-    par --> news[news-researcher]
-
-    fetcher -->|src.cli fetch-data| handle[(returns_handle)]
+    skill --> news[news-researcher]
     sources[(news_sources.md)] -.read.-> news
-    news --> waveviews[wave_views + bullets + exclusion_conflicts]
-
-    handle --> optimizer[optimizer]
-    waveviews -->|--wave-views tilt expected returns| optimizer
-    optimizer -->|src.cli optimize| weights[weights + profile_conflicts]
-
-    weights --> risk[risk-analyst]
-    handle --> risk
-    risk -->|src.cli risk + backtest| metrics[risk + backtest metrics]
-
-    weights --> writer[report-writer]
-    metrics --> writer
-    waveviews --> writer
-    profile -.read.-> writer
-    writer --> report[/data/reports/YYYY-MM-DD-optimize-portfolio.md/]
+    skill -->|src.cli analyze --wave-views| analyze[Python: fetch + optimize + risk]
+    news --> writer[report-writer]
+    analyze --> writer
+    writer --> out[/report.md + dashboard.html/]
 
     classDef agent fill:#e1f0ff,stroke:#3b82f6
     classDef cli fill:#fef3c7,stroke:#d97706
     classDef file fill:#f3f4f6,stroke:#6b7280
-    class fetcher,news,optimizer,risk,writer agent
-    class handle,weights,metrics file
+    class news,writer agent
+    class analyze cli
+    class out file
 ```
 
-Subagents (blue) are LLM specialists; they call the Python CLI for every
-number. Files in grey are the artifacts that flow between steps. The
+Two LLM specialists (blue) bracket one Python call (yellow). The
 profile and `news_sources.md` are read-only inputs.
 
 ## Initial setup
@@ -89,11 +68,12 @@ python3.12 -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
 
-# Inside Claude Code, write your profile (one-time interview):
-> /init-profile
+# Copy the example profile and holdings, then edit them:
+cp investor_profile.example.md investor_profile.md
+cp holdings.example.csv holdings.csv
 ```
 
-Then edit two files:
+The two files you maintain:
 
 - **`investor_profile.md`** — goals, risk tolerance, concentration cap,
   exclusions, asset-class targets. Every recommendation cites lines from
@@ -109,17 +89,14 @@ open search).
 ## Daily / weekly / monthly: what you do
 
 - **Daily** — nothing. The launchd job appends a row per ticker to
-  `data/snapshots.csv` at 16:30 local. Glance at `data/snapshot.log` if
-  something looks wrong.
+  `data/snapshots.csv` and refreshes `data/dashboard.html` at 16:30 local.
 - **Weekly** — nothing. Friday 17:00 local appends one optimization run
-  to `data/recommendations.csv`. Inspect for trends (does the optimizer
-  keep wanting more equities? gold weight rising?).
-- **Monthly** — run `/rebalance` in Claude Code with your current
-  holdings + a target. Read the report, decide, execute trades in your
-  brokerage, then update `holdings.csv` to match.
-- **As needed** — run `/optimize-portfolio` for a fresh wave-stage
-  read from current news + a written report. This is the one to demo;
-  it's also the one to consult when news has shifted materially.
+  to `data/recommendations.csv` and refreshes the dashboard.
+- **Monthly** — run `/review-portfolio` in Claude Code. Read the report,
+  decide on rebalances, execute trades in your brokerage, then update
+  `holdings.csv` to match.
+- **Whenever** — open `data/dashboard.html` in a browser to see
+  portfolio value, weight drift, and the latest recommended weights.
 - **When trading** — edit `holdings.csv` to reflect new share counts.
   The snapshot picks up the new positions on its next run.
 
@@ -127,9 +104,10 @@ open search).
 
 | File | What's in it | When to look |
 |---|---|---|
-| `data/snapshots.csv` | Daily $ value per ticker + total | Plot to see portfolio trajectory |
-| `data/recommendations.csv` | Weekly optimization weights + Sharpe | Plot to see weights drift |
-| `data/reports/*.md` | Multi-agent narrative reports | After each `/optimize-portfolio` or `/rebalance` |
+| `data/dashboard.html` | Three Plotly charts: portfolio value, weight drift, latest weights | Open in a browser any time |
+| `data/snapshots.csv` | Daily $ value per ticker + total | If you want raw history |
+| `data/recommendations.csv` | Weekly optimization weights + Sharpe | If you want raw history |
+| `data/reports/*.md` | LLM-written narrative reports | After each `/review-portfolio` |
 | `data/snapshot.log` / `data/recommend.log` | launchd stdout/stderr | If a scheduled run looks missing |
 
 The **"Profile conflicts"** section of any report is the most important
@@ -149,7 +127,7 @@ forbids.
 - **Estimation error.** Mean-variance amplifies small errors in
   expected-return estimates. Heavy weight at the concentration cap is
   often a symptom, not signal.
-- **Wave-stage tilts.** The full `/optimize-portfolio` skill applies
+- **Wave-stage tilts.** The `/review-portfolio` skill applies
   multipliers (buildup 1.20x, surge 1.10x, peak 0.80x, etc.) based on
   the news-researcher's read. These tilts are conditional — track the
   realized vs. tilted Sharpe gap (the "views premium") to see if they
@@ -159,16 +137,19 @@ forbids.
 
 ## CLI reference
 
-```bash
-# Data + optimization
-.venv/bin/python -m src.cli fetch-data --tickers AAPL MSFT NVDA --period 3y
-.venv/bin/python -m src.cli optimize   --returns-handle returns_1 --objective max_sharpe --max-weight 0.25
-.venv/bin/python -m src.cli risk       --returns-handle returns_1 --weights '{"AAPL":0.5,"MSFT":0.5}'
-.venv/bin/python -m src.cli backtest   --returns-handle returns_1 --weights weights.json
+Four subcommands. The skill calls `analyze`; the cron jobs call the
+other three.
 
-# Time-series logging (the cron jobs call these)
+```bash
+# One-shot analysis (fetch + optimize + risk in a single call)
+.venv/bin/python -m src.cli analyze --tickers AAPL MSFT NVDA --period 3y --max-weight 0.25
+
+# Time-series logging
 .venv/bin/python -m src.cli snapshot   [--date YYYY-MM-DD] [--force]
 .venv/bin/python -m src.cli recommend  [--max-weight 0.25] [--force]
+
+# Static dashboard (reads the two CSVs above; writes data/dashboard.html)
+.venv/bin/python -m src.cli dashboard
 ```
 
 ## launchd management
@@ -188,25 +169,27 @@ time the job runs on wake; if powered off the run is missed (use
 ## Layout
 
 ```
-portfolio-wave_rider/
-├── investor_profile.md      # your north star (you write this)
-├── holdings.csv             # ticker,shares (you maintain this)
+portfolio-wave-rider/
+├── investor_profile.md      # your north star (you write this; gitignored)
+├── investor_profile.example.md  # template to copy
+├── holdings.csv             # ticker,shares (you maintain this; gitignored)
+├── holdings.example.csv     # template to copy
 ├── news_sources.md          # optional curated sources per wave
 ├── CLAUDE.md                # rules for Claude operating in this repo
 ├── .claude/
-│   ├── agents/              # 5 subagent specs
-│   ├── skills/              # 3 skills
+│   ├── agents/              # 2 subagent specs (news-researcher, report-writer)
+│   ├── skills/              # 1 skill (review-portfolio)
 │   └── settings.json        # tool allowlist
 ├── src/
 │   ├── portfolio.py         # all math
-│   └── cli.py               # one CLI, all subcommands
+│   └── cli.py               # one CLI, four subcommands
 ├── tests/
-└── data/                    # gitignored
-    ├── snapshots.csv        # daily, appended
-    ├── recommendations.csv  # weekly, appended
-    ├── reports/             # multi-agent reports
-    ├── state/               # pickle handles between Python processes
-    └── *.log                # launchd output
+└── data/
+    ├── snapshots.csv        # daily, appended (your history)
+    ├── recommendations.csv  # weekly, appended (your history)
+    ├── dashboard.html       # static Plotly dashboard (gitignored, regenerated)
+    ├── reports/             # LLM-written reports (gitignored)
+    └── *.log                # launchd output (gitignored)
 ```
 
 ## Testing

@@ -1,23 +1,23 @@
 """All portfolio math in one file.
 
-Five functions that the Claude Code subagents call through ``src/cli.py``:
+Six public functions plus one orchestrator:
 
 - ``fetch_prices`` — download adjusted-close prices from yfinance
 - ``compute_returns`` — log-returns + annualized mean + covariance matrix
 - ``optimize_portfolio`` — mean-variance optimization via scipy
 - ``risk_metrics`` — Sharpe, vol, max drawdown, VaR, CVaR for a weight vector
-- ``backtest`` — naive in-sample / out-of-sample split check
+- ``analyze`` — one-shot: fetch + returns + optimize + risk in one call
+- ``snapshot_holdings`` — append daily $ values to data/snapshots.csv
+- ``recommend_portfolio`` — append weekly weights to data/recommendations.csv
+- ``build_dashboard`` — render a static HTML dashboard from the two CSVs
 
-A tiny disk-backed ``put`` / ``get`` store at the top lets these functions
-share DataFrames across separate Python processes (one per subagent CLI
-call). The alternative — passing DataFrames through stdout — would blow
-up the subagents' context.
+Functions pass DataFrames in-memory; there is no on-disk handle store. The
+CLI calls ``analyze`` (or ``snapshot``/``recommend``/``dashboard``) once
+per invocation.
 """
 
 from __future__ import annotations
 
-import os
-import pickle
 from pathlib import Path
 from typing import Any
 
@@ -43,11 +43,7 @@ WAVE_STAGE_TILT = {
 
 
 def apply_wave_tilt(mu: pd.Series, wave_views: dict[str, str]) -> pd.Series:
-    """Multiply annualized mean returns by each ticker's stage tilt.
-
-    Tickers absent from `wave_views` (or tagged with an unknown stage) are
-    left unchanged.
-    """
+    """Multiply annualized mean returns by each ticker's stage tilt."""
     tilted = mu.copy()
     for ticker, stage in wave_views.items():
         if ticker in tilted.index:
@@ -56,42 +52,10 @@ def apply_wave_tilt(mu: pd.Series, wave_views: dict[str, str]) -> pd.Series:
 
 
 # ---------------------------------------------------------------------------
-# Disk-backed handle store.
-# Each ``put`` writes a pickle file under data/state/ and returns a handle
-# like "prices_1" or "returns_1". Subsequent ``get`` calls load it back.
-# ---------------------------------------------------------------------------
-
-def _state_dir() -> Path:
-    root = Path(os.environ.get("PORTFOLIO_STATE_DIR") or "data/state")
-    root.mkdir(parents=True, exist_ok=True)
-    return root
-
-
-def put(prefix: str, obj: Any) -> str:
-    """Save `obj` under a fresh handle with the given prefix; return the handle."""
-    existing = [int(p.stem.rpartition("_")[2]) for p in _state_dir().glob(f"{prefix}_*.pkl")
-                if p.stem.rpartition("_")[2].isdigit()]
-    idx = (max(existing) + 1) if existing else 1
-    handle = f"{prefix}_{idx}"
-    with (_state_dir() / f"{handle}.pkl").open("wb") as f:
-        pickle.dump(obj, f)
-    return handle
-
-
-def get(handle: str) -> Any:
-    """Load the object stored under `handle`. Raises KeyError if missing."""
-    path = _state_dir() / f"{handle}.pkl"
-    if not path.exists():
-        raise KeyError(f"Unknown handle: {handle!r}. Looked in {_state_dir()}.")
-    with path.open("rb") as f:
-        return pickle.load(f)
-
-
-# ---------------------------------------------------------------------------
 # Market data: fetch prices and turn them into a returns bundle.
 # ---------------------------------------------------------------------------
 
-def fetch_prices(tickers: list[str], period: str = "3y", interval: str = "1d") -> dict[str, Any]:
+def fetch_prices(tickers: list[str], period: str = "3y", interval: str = "1d") -> pd.DataFrame:
     """Download adjusted-close prices for the given tickers via yfinance."""
     if not tickers:
         raise ValueError("tickers must be non-empty")
@@ -104,39 +68,18 @@ def fetch_prices(tickers: list[str], period: str = "3y", interval: str = "1d") -
     # yfinance returns a MultiIndex when there are 2+ tickers, a flat index for 1.
     prices = data["Close"] if isinstance(data.columns, pd.MultiIndex) \
         else data[["Close"]].rename(columns={"Close": clean[0]})
-    prices = prices.dropna(how="all").ffill().dropna()
-
-    handle = put("prices", prices)
-    return {
-        "prices_handle": handle,
-        "tickers": list(prices.columns),
-        "start": str(prices.index[0].date()),
-        "end": str(prices.index[-1].date()),
-        "n_observations": len(prices),
-        "last_prices": {t: float(prices[t].iloc[-1]) for t in prices.columns},
-    }
+    return prices.dropna(how="all").ffill().dropna()
 
 
-def compute_returns(prices_handle: str, frequency: str = "daily") -> dict[str, Any]:
-    """Compute log-returns + annualized mean + covariance from a prices handle."""
+def compute_returns(prices: pd.DataFrame, frequency: str = "daily") -> dict[str, Any]:
+    """Compute log-returns + annualized mean + covariance from a prices frame."""
     factor = {"daily": TRADING_DAYS, "weekly": 52, "monthly": 12}[frequency]
-    prices = get(prices_handle)
     log_returns = np.log(prices / prices.shift(1)).dropna()
-    mean_annual = log_returns.mean() * factor
-    cov_annual = log_returns.cov() * factor
-
-    handle = put("returns", {
-        "log_returns": log_returns,
-        "mean": mean_annual,
-        "cov": cov_annual,
-        "annualization": factor,
-    })
     return {
-        "returns_handle": handle,
-        "tickers": list(log_returns.columns),
-        "n_observations": len(log_returns),
-        "annualized_mean_return": {k: float(v) for k, v in mean_annual.items()},
-        "annualized_volatility": {t: float(np.sqrt(cov_annual.loc[t, t])) for t in cov_annual.index},
+        "log_returns": log_returns,
+        "mean": log_returns.mean() * factor,
+        "cov": log_returns.cov() * factor,
+        "annualization": factor,
     }
 
 
@@ -146,7 +89,7 @@ def compute_returns(prices_handle: str, frequency: str = "daily") -> dict[str, A
 # ---------------------------------------------------------------------------
 
 def optimize_portfolio(
-    returns_handle: str,
+    returns: dict[str, Any],
     objective: str = "max_sharpe",
     risk_free_rate: float = 0.04,
     target_return: float | None = None,
@@ -160,11 +103,10 @@ def optimize_portfolio(
     if objective == "target_return" and target_return is None:
         raise ValueError("target_return is required when objective='target_return'")
 
-    bundle = get(returns_handle)
-    tickers = list(bundle["mean"].index)
-    mean_series = apply_wave_tilt(bundle["mean"], wave_views) if wave_views else bundle["mean"]
+    tickers = list(returns["mean"].index)
+    mean_series = apply_wave_tilt(returns["mean"], wave_views) if wave_views else returns["mean"]
     mu = mean_series.to_numpy(dtype=float)
-    sigma = bundle["cov"].to_numpy(dtype=float)
+    sigma = returns["cov"].to_numpy(dtype=float)
     n = len(tickers)
 
     # Weights must sum to 1; target-return adds a second equality constraint.
@@ -214,132 +156,90 @@ def optimize_portfolio(
 
 
 # ---------------------------------------------------------------------------
-# Risk metrics + backtest. Both apply a weight vector to a returns bundle.
+# Risk metrics. Apply a weight vector to a returns bundle.
 # ---------------------------------------------------------------------------
 
-def _summary(port_returns: pd.Series, risk_free_rate: float) -> dict[str, Any]:
-    """Shared summary stats for a portfolio return series."""
-    ann_ret = float(port_returns.mean() * TRADING_DAYS)
-    ann_vol = float(port_returns.std() * np.sqrt(TRADING_DAYS))
-    sharpe = (ann_ret - risk_free_rate) / ann_vol if ann_vol > 1e-10 else None
-    equity = (1 + port_returns).cumprod()
-    max_dd = float(((equity - equity.cummax()) / equity.cummax()).min())
-    return {
-        "annual_return": ann_ret,
-        "annual_volatility": ann_vol,
-        "sharpe_ratio": float(sharpe) if sharpe is not None else None,
-        "max_drawdown": max_dd,
-        "n_observations": len(port_returns),
-        "period_start": str(port_returns.index[0].date()),
-        "period_end": str(port_returns.index[-1].date()),
-    }
-
-
-def _portfolio_series(returns_handle: str, weights: dict[str, float]) -> pd.Series:
-    """Apply the weights to a returns bundle and return the portfolio return series."""
-    bundle = get(returns_handle)
-    returns = bundle["log_returns"]
-    missing = [t for t in returns.columns if t not in weights]
-    if missing:
-        raise ValueError(f"weights missing for tickers: {missing}")
-    w = np.array([weights[t] for t in returns.columns], dtype=float)
-    return pd.Series(returns.values @ w, index=returns.index)
-
-
 def risk_metrics(
-    returns_handle: str,
+    returns: dict[str, Any],
     weights: dict[str, float],
     risk_free_rate: float = 0.04,
     var_confidence: float = 0.95,
 ) -> dict[str, Any]:
     """Portfolio Sharpe, vol, max drawdown, VaR, CVaR for the given weights."""
-    port = _portfolio_series(returns_handle, weights)
-    out = _summary(port, risk_free_rate)
+    log_returns = returns["log_returns"]
+    missing = [t for t in log_returns.columns if t not in weights]
+    if missing:
+        raise ValueError(f"weights missing for tickers: {missing}")
+    w = np.array([weights[t] for t in log_returns.columns], dtype=float)
+    port = pd.Series(log_returns.values @ w, index=log_returns.index)
+
+    ann_ret = float(port.mean() * TRADING_DAYS)
+    ann_vol = float(port.std() * np.sqrt(TRADING_DAYS))
+    sharpe = (ann_ret - risk_free_rate) / ann_vol if ann_vol > 1e-10 else None
+    equity = (1 + port).cumprod()
+    max_dd = float(((equity - equity.cummax()) / equity.cummax()).min())
+
     alpha = 1 - var_confidence
     var = float(np.quantile(port.values, alpha))
     below_var = port.values[port.values <= var]
-    out["var_1d"] = var
-    out["cvar_1d"] = float(below_var.mean()) if below_var.size else var
-    out["var_confidence"] = var_confidence
-    return out
-
-
-def recommend_portfolio(
-    holdings_path: str = "holdings.csv",
-    out_path: str = "data/recommendations.csv",
-    period: str = "3y",
-    max_weight: float = 0.25,
-    risk_free_rate: float = 0.04,
-    objective: str = "max_sharpe",
-    date: str | None = None,
-    force: bool = False,
-) -> dict[str, Any]:
-    """Run a lightweight optimization and append per-ticker weights to a CSV.
-
-    The "automation" sibling of the /optimize-portfolio skill: pure
-    Python, no news-researcher, no wave-stage tilts. Universe = the
-    tickers listed in `holdings_path`. Schema appended to `out_path`:
-        date, ticker, weight, expected_return, annual_volatility,
-        sharpe_ratio, objective
-
-    Idempotent on date (skip unless force=True). Run the full
-    /optimize-portfolio skill when you want fresh wave-stage tilts
-    and a written report.
-    """
-    h_path = Path(holdings_path)
-    if not h_path.exists():
-        raise FileNotFoundError(f"holdings file not found: {h_path}")
-    holdings = pd.read_csv(h_path)
-    if "ticker" not in holdings.columns:
-        raise ValueError(f"{h_path} must have a 'ticker' column")
-    tickers = holdings["ticker"].str.upper().str.strip().tolist()
-
-    rec_date = pd.Timestamp(date).date() if date else pd.Timestamp.today().date()
-    o_path = Path(out_path)
-    existing = pd.read_csv(o_path) if o_path.exists() else None
-    if existing is not None and (existing["date"] == str(rec_date)).any():
-        if not force:
-            return {"skipped": True, "date": str(rec_date),
-                    "reason": "recommendation already exists; pass force=True to overwrite"}
-        existing = existing[existing["date"] != str(rec_date)]
-
-    prices = fetch_prices(tickers, period=period)
-    returns = compute_returns(prices["prices_handle"])
-    opt = optimize_portfolio(
-        returns["returns_handle"], objective=objective,
-        risk_free_rate=risk_free_rate, max_weight=max_weight,
-    )
-    if not opt.get("success"):
-        raise RuntimeError(f"optimization failed: {opt.get('message')}")
-
-    rows = [
-        {
-            "date": str(rec_date),
-            "ticker": ticker,
-            "weight": weight,
-            "expected_return": opt["expected_annual_return"],
-            "annual_volatility": opt["annual_volatility"],
-            "sharpe_ratio": opt["sharpe_ratio"],
-            "objective": objective,
-        }
-        for ticker, weight in opt["weights"].items()
-    ]
-    new_rows = pd.DataFrame(rows)
-    out = pd.concat([existing, new_rows], ignore_index=True) if existing is not None else new_rows
-    o_path.parent.mkdir(parents=True, exist_ok=True)
-    out.to_csv(o_path, index=False)
 
     return {
-        "date": str(rec_date),
-        "tickers": tickers,
-        "weights": opt["weights"],
-        "expected_annual_return": opt["expected_annual_return"],
-        "annual_volatility": opt["annual_volatility"],
-        "sharpe_ratio": opt["sharpe_ratio"],
-        "n_rows_appended": len(new_rows),
-        "out_path": str(o_path),
+        "annual_return": ann_ret,
+        "annual_volatility": ann_vol,
+        "sharpe_ratio": float(sharpe) if sharpe is not None else None,
+        "max_drawdown": max_dd,
+        "var_1d": var,
+        "cvar_1d": float(below_var.mean()) if below_var.size else var,
+        "var_confidence": var_confidence,
+        "n_observations": len(port),
+        "period_start": str(port.index[0].date()),
+        "period_end": str(port.index[-1].date()),
     }
 
+
+# ---------------------------------------------------------------------------
+# One-shot orchestrator: fetch + returns + optimize + risk in one call.
+# This is what the /review-portfolio skill calls via Bash.
+# ---------------------------------------------------------------------------
+
+def analyze(
+    tickers: list[str],
+    period: str = "3y",
+    objective: str = "max_sharpe",
+    max_weight: float = 0.25,
+    risk_free_rate: float = 0.04,
+    wave_views: dict[str, str] | None = None,
+) -> dict[str, Any]:
+    """Run the full pipeline and return a single JSON-serializable dict."""
+    prices = fetch_prices(tickers, period=period)
+    returns = compute_returns(prices)
+    opt = optimize_portfolio(
+        returns, objective=objective, risk_free_rate=risk_free_rate,
+        max_weight=max_weight, wave_views=wave_views,
+    )
+    risk = risk_metrics(returns, opt["weights"], risk_free_rate=risk_free_rate) \
+        if opt.get("success") else None
+
+    return {
+        "tickers": list(prices.columns),
+        "period": {
+            "start": str(prices.index[0].date()),
+            "end": str(prices.index[-1].date()),
+            "n_observations": len(prices),
+        },
+        "last_prices": {t: float(prices[t].iloc[-1]) for t in prices.columns},
+        "annualized_mean_return": {k: float(v) for k, v in returns["mean"].items()},
+        "annualized_volatility": {
+            t: float(np.sqrt(returns["cov"].loc[t, t])) for t in returns["cov"].index
+        },
+        "optimization": opt,
+        "risk": risk,
+    }
+
+
+# ---------------------------------------------------------------------------
+# Time-series writers. snapshot = daily, recommend = weekly.
+# ---------------------------------------------------------------------------
 
 def snapshot_holdings(
     holdings_path: str = "holdings.csv",
@@ -356,8 +256,7 @@ def snapshot_holdings(
 
     Tickers with shares=0 are still recorded so the file doubles as a
     price log before the user actually invests. If `date` already
-    appears in the snapshot file, the call is a no-op unless force=True
-    (in which case existing rows for that date are dropped first).
+    appears in the snapshot file, the call is a no-op unless force=True.
     """
     h_path = Path(holdings_path)
     if not h_path.exists():
@@ -413,29 +312,159 @@ def snapshot_holdings(
     }
 
 
-def backtest(
-    returns_handle: str,
-    weights: dict[str, float],
-    train_fraction: float = 0.7,
+def recommend_portfolio(
+    holdings_path: str = "holdings.csv",
+    out_path: str = "data/recommendations.csv",
+    period: str = "3y",
+    max_weight: float = 0.25,
     risk_free_rate: float = 0.04,
+    objective: str = "max_sharpe",
+    date: str | None = None,
+    force: bool = False,
 ) -> dict[str, Any]:
-    """Split the return series in two, report in-sample vs out-of-sample stats."""
-    if not 0.1 < train_fraction < 0.95:
-        raise ValueError("train_fraction must be between 0.1 and 0.95")
-    port = _portfolio_series(returns_handle, weights)
-    split = int(len(port) * train_fraction)
-    train_stats = _summary(port.iloc[:split], risk_free_rate)
-    test_stats = _summary(port.iloc[split:], risk_free_rate)
+    """Run a lightweight optimization and append per-ticker weights to a CSV.
 
-    # Sharpe degradation: a large drop suggests the in-sample result was partly luck.
-    degradation = (
-        test_stats["sharpe_ratio"] - train_stats["sharpe_ratio"]
-        if train_stats["sharpe_ratio"] is not None and test_stats["sharpe_ratio"] is not None
-        else None
-    )
+    The "automation" sibling of /review-portfolio: pure Python, no news,
+    no wave-stage tilts. Universe = the tickers listed in `holdings_path`.
+    Schema appended to `out_path`:
+        date, ticker, weight, expected_return, annual_volatility,
+        sharpe_ratio, objective
+
+    Idempotent on date (skip unless force=True). Run /review-portfolio
+    when you want fresh wave-stage tilts and a written report.
+    """
+    h_path = Path(holdings_path)
+    if not h_path.exists():
+        raise FileNotFoundError(f"holdings file not found: {h_path}")
+    holdings = pd.read_csv(h_path)
+    if "ticker" not in holdings.columns:
+        raise ValueError(f"{h_path} must have a 'ticker' column")
+    tickers = holdings["ticker"].str.upper().str.strip().tolist()
+
+    rec_date = pd.Timestamp(date).date() if date else pd.Timestamp.today().date()
+    o_path = Path(out_path)
+    existing = pd.read_csv(o_path) if o_path.exists() else None
+    if existing is not None and (existing["date"] == str(rec_date)).any():
+        if not force:
+            return {"skipped": True, "date": str(rec_date),
+                    "reason": "recommendation already exists; pass force=True to overwrite"}
+        existing = existing[existing["date"] != str(rec_date)]
+
+    result = analyze(tickers, period=period, objective=objective,
+                     max_weight=max_weight, risk_free_rate=risk_free_rate)
+    opt = result["optimization"]
+    if not opt.get("success"):
+        raise RuntimeError(f"optimization failed: {opt.get('message')}")
+
+    rows = [
+        {
+            "date": str(rec_date),
+            "ticker": ticker,
+            "weight": weight,
+            "expected_return": opt["expected_annual_return"],
+            "annual_volatility": opt["annual_volatility"],
+            "sharpe_ratio": opt["sharpe_ratio"],
+            "objective": objective,
+        }
+        for ticker, weight in opt["weights"].items()
+    ]
+    new_rows = pd.DataFrame(rows)
+    out = pd.concat([existing, new_rows], ignore_index=True) if existing is not None else new_rows
+    o_path.parent.mkdir(parents=True, exist_ok=True)
+    out.to_csv(o_path, index=False)
+
     return {
-        "in_sample": train_stats,
-        "out_of_sample": test_stats,
-        "sharpe_degradation": degradation,
-        "note": "A drop below -0.5 in Sharpe suggests estimation luck rather than signal.",
+        "date": str(rec_date),
+        "tickers": tickers,
+        "weights": opt["weights"],
+        "expected_annual_return": opt["expected_annual_return"],
+        "annual_volatility": opt["annual_volatility"],
+        "sharpe_ratio": opt["sharpe_ratio"],
+        "n_rows_appended": len(new_rows),
+        "out_path": str(o_path),
+    }
+
+
+# ---------------------------------------------------------------------------
+# Static HTML dashboard. Reads the two append-only CSVs and emits one file
+# the user can open in a browser. No server, no Streamlit.
+# ---------------------------------------------------------------------------
+
+def build_dashboard(
+    snapshots_path: str = "data/snapshots.csv",
+    recommendations_path: str = "data/recommendations.csv",
+    out_path: str = "data/dashboard.html",
+) -> dict[str, Any]:
+    """Render three Plotly charts into a single self-contained HTML file."""
+    import plotly.graph_objects as go
+    from plotly.subplots import make_subplots
+
+    snap_path = Path(snapshots_path)
+    rec_path = Path(recommendations_path)
+    if not snap_path.exists() and not rec_path.exists():
+        raise FileNotFoundError(
+            f"neither {snap_path} nor {rec_path} exists; run snapshot/recommend first"
+        )
+
+    fig = make_subplots(
+        rows=3, cols=1,
+        subplot_titles=(
+            "Portfolio value over time",
+            "Recommended weights drift over time",
+            "Latest recommended weights",
+        ),
+        vertical_spacing=0.10,
+    )
+
+    # 1. Portfolio total value over time (from snapshots.csv).
+    if snap_path.exists():
+        snaps = pd.read_csv(snap_path, parse_dates=["date"])
+        totals = snaps.groupby("date")["total_value"].first().sort_index()
+        fig.add_trace(
+            go.Scatter(x=totals.index, y=totals.values, mode="lines+markers",
+                       name="Total $", line={"width": 2}),
+            row=1, col=1,
+        )
+
+    # 2. Weight drift over time (one line per ticker, from recommendations.csv).
+    latest_weights: pd.DataFrame | None = None
+    if rec_path.exists():
+        recs = pd.read_csv(rec_path, parse_dates=["date"])
+        for ticker, sub in recs.groupby("ticker"):
+            sub = sub.sort_values("date")
+            fig.add_trace(
+                go.Scatter(x=sub["date"], y=sub["weight"], mode="lines+markers",
+                           name=ticker, legendgroup="drift",
+                           legendgrouptitle_text="Weight drift"),
+                row=2, col=1,
+            )
+        latest_date = recs["date"].max()
+        latest_weights = recs[recs["date"] == latest_date].sort_values("weight", ascending=False)
+
+    # 3. Latest recommended weights (bar chart).
+    if latest_weights is not None and not latest_weights.empty:
+        fig.add_trace(
+            go.Bar(x=latest_weights["ticker"], y=latest_weights["weight"],
+                   name=f"As of {latest_weights['date'].iloc[0].date()}",
+                   showlegend=False),
+            row=3, col=1,
+        )
+
+    fig.update_layout(
+        height=900,
+        title_text="Portfolio Wave Rider — dashboard",
+        hovermode="x unified",
+    )
+    fig.update_yaxes(title_text="$", row=1, col=1)
+    fig.update_yaxes(title_text="weight", row=2, col=1)
+    fig.update_yaxes(title_text="weight", row=3, col=1)
+
+    o_path = Path(out_path)
+    o_path.parent.mkdir(parents=True, exist_ok=True)
+    fig.write_html(str(o_path), include_plotlyjs="cdn")
+
+    return {
+        "out_path": str(o_path),
+        "snapshots_rows": int(len(pd.read_csv(snap_path))) if snap_path.exists() else 0,
+        "recommendations_rows": int(len(pd.read_csv(rec_path))) if rec_path.exists() else 0,
     }
