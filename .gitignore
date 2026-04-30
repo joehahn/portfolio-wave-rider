@@ -1,0 +1,24 @@
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.coverage
+htmlcov/
+.ruff_cache/
+.DS_Store
+*.log
+data_cache/
+data/state/
+data/weights/
+data/reports/
+
+# personal data — never push
+.claude/settings.local.json
+holdings.csv
+investor_profile.md
+data/snapshots.csv
+data/recommendations.csv

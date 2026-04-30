@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(.venv/bin/python -m src.cli:*)",
+      "Bash(.venv/bin/pytest:*)",
+      "Bash(mkdir -p data/*)",
+      "Bash(rm -f data/state/*.pkl)",
+      "Read(//**)",
+      "Write(investor_profile.md)",
+      "Write(data/**)"
+    ]
+  }
+}
