@@ -1,6 +1,9 @@
 # Portfolio Wave Rider
 
-**Author:** Joe Hahn (jmh.datasciences@gmail.com)
+**Author:** Joe Hahn  
+**Email:** jmh.datasciences@gmail.com  
+**Date:** 2026-April-30 <br>
+**branch:** main
 
 A Claude Code demo: optimize a long-horizon stock and ETF portfolio against a user-authored investor profile. One slash command, two LLM subagents, four Python CLI subcommands, and a static dashboard.
 

@@ -3,7 +3,7 @@
 **Author:** Joe Hahn  
 **Email:** jmh.datasciences@gmail.com  
 **Date:** 2026-April-30 <br>
-**branch** main
+**branch:** main
 
 This repository is a Claude Code demo: optimize a long-horizon stock and ETF portfolio against a user-authored investor profile. The README has the user-facing tour. This file is the rules Claude follows when operating in this repo.
 
