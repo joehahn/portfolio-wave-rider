@@ -42,20 +42,45 @@ news, no wave tilts).
   numerical answer violates a constraint, the report **flags the
   conflict** rather than silently clamping. That's the demo's punchline.
 
+The flagship `/optimize-portfolio` flow:
+
+```mermaid
+flowchart TD
+    user([User]) -->|/optimize-portfolio| skill[Skill: optimize-portfolio]
+    profile[(investor_profile.md)] -.read.-> skill
+
+    skill --> par{Step 1 — parallel}
+    par --> fetcher[market-data-fetcher]
+    par --> news[news-researcher]
+
+    fetcher -->|src.cli fetch-data| handle[(returns_handle)]
+    sources[(news_sources.md)] -.read.-> news
+    news --> waveviews[wave_views + bullets + exclusion_conflicts]
+
+    handle --> optimizer[optimizer]
+    waveviews -->|--wave-views tilt expected returns| optimizer
+    optimizer -->|src.cli optimize| weights[weights + profile_conflicts]
+
+    weights --> risk[risk-analyst]
+    handle --> risk
+    risk -->|src.cli risk + backtest| metrics[risk + backtest metrics]
+
+    weights --> writer[report-writer]
+    metrics --> writer
+    waveviews --> writer
+    profile -.read.-> writer
+    writer --> report[/data/reports/YYYY-MM-DD-optimize-portfolio.md/]
+
+    classDef agent fill:#e1f0ff,stroke:#3b82f6
+    classDef cli fill:#fef3c7,stroke:#d97706
+    classDef file fill:#f3f4f6,stroke:#6b7280
+    class fetcher,news,optimizer,risk,writer agent
+    class handle,weights,metrics file
 ```
-user
- │  /skill
- ▼
-skill ── reads ──► investor_profile.md
- │
- ├── Task(market-data-fetcher)  ─┐
- ├── Task(optimizer)              │  ─►  python -m src.cli ...
- ├── Task(risk-analyst)    ┐      │
- └── Task(news-researcher) ┘ par  │
- │
- ▼
-Task(report-writer) ──► data/reports/YYYY-MM-DD-<skill>.md
-```
+
+Subagents (blue) are LLM specialists; they call the Python CLI for every
+number. Files in grey are the artifacts that flow between steps. The
+profile and `news_sources.md` are read-only inputs.
 
 ## Initial setup
 
