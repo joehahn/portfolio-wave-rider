@@ -57,12 +57,19 @@ The user decides. Never silently clamp a recommendation to fit the profile.
 
 These are the user's history. Don't break their schemas. If you must extend them, add columns at the end and keep existing ones.
 
-## Automation (macOS launchd)
+## Automation (cron, cross-platform)
 
-Two launchd plists live at `~/Library/LaunchAgents/`:
+Two cron entries handle the daily and weekly automation. The exact crontab installed on the author's machine:
 
-- `com.user.portfolio-snapshot.plist`: Mon-Fri 16:30 local. Runs `python -m src.cli snapshot && python -m src.cli dashboard`. Logs to `data/snapshot.log`.
-- `com.user.portfolio-recommend.plist`: Fri 17:00 local. Runs `python -m src.cli recommend && python -m src.cli dashboard`. Logs to `data/recommend.log`.
+```cron
+PROJ=/Users/joehahn/Library/CloudStorage/Dropbox/prog/claude/portfolio-wave-rider
+# Daily snapshot + dashboard refresh, Mon-Fri 16:30 local
+30 16 * * 1-5  cd $PROJ && .venv/bin/python -m src.cli snapshot && .venv/bin/python -m src.cli dashboard >> data/snapshot.log 2>&1
+# Weekly recommend + dashboard refresh, Fri 17:00 local
+0  17 * * 5    cd $PROJ && .venv/bin/python -m src.cli recommend && .venv/bin/python -m src.cli dashboard >> data/recommend.log 2>&1
+```
+
+Set `PROJ` to wherever you cloned the repo, then `crontab -e` and paste. Works the same on macOS and Linux. cron only fires when the machine is awake at the trigger time; missed runs do not auto-replay. Use `--date YYYY-MM-DD` to backfill.
 
 The weekly `recommend` is the lightweight sibling of `/review-portfolio`: pure Python, no news-researcher, no wave-stage tilts. Use the full skill when the user wants fresh wave classification and a written report.
 

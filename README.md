@@ -13,8 +13,8 @@ Three cadences:
 
 | Cadence | Mechanism | What runs | Output |
 |---|---|---|---|
-| Daily, Mon-Fri 16:30 local | macOS launchd | `snapshot && dashboard`. Fetches close prices, appends $ values per holding, refreshes the dashboard. | `data/snapshots.csv`, `data/dashboard.html` |
-| Weekly, Fri 17:00 local | macOS launchd | `recommend && dashboard`. Re-optimizes over the holdings universe, refreshes the dashboard. | `data/recommendations.csv`, `data/dashboard.html` |
+| Daily, Mon-Fri 16:30 local | cron | `snapshot && dashboard`. Fetches close prices, appends $ values per holding, refreshes the dashboard. | `data/snapshots.csv`, `data/dashboard.html` |
+| Weekly, Fri 17:00 local | cron | `recommend && dashboard`. Re-optimizes over the holdings universe, refreshes the dashboard. | `data/recommendations.csv`, `data/dashboard.html` |
 | Monthly, you decide | You run `/review-portfolio` in Claude Code | Full LLM run: news plus analyze plus report plus dashboard refresh. | `data/reports/YYYY-MM-DD-review-portfolio.md`, `data/dashboard.html` |
 
 The weekly cron is the lightweight Python-only sibling of `/review-portfolio`: pure Python, no news, no wave tilts. Run the skill when you want a fresh wave-stage read and a written narrative.
@@ -70,7 +70,7 @@ Optional: `news_sources.md`, a curated list of sources per technology wave. Impr
 
 ## Operations
 
-- Daily: nothing. The launchd job appends a row per ticker to `data/snapshots.csv` and refreshes `data/dashboard.html`.
+- Daily: nothing. The cron job appends a row per ticker to `data/snapshots.csv` and refreshes `data/dashboard.html`.
 - Weekly: nothing. Friday 17:00 local appends one optimization run to `data/recommendations.csv` and refreshes the dashboard.
 - Monthly: run `/review-portfolio` in Claude Code. Read the report, decide on rebalances, execute trades in your brokerage, then update `holdings.csv`.
 - Anytime: open `data/dashboard.html` in a browser.
@@ -84,7 +84,7 @@ Optional: `news_sources.md`, a curated list of sources per technology wave. Impr
 | `data/snapshots.csv` | Daily $ value per ticker plus total | If you want raw history |
 | `data/recommendations.csv` | Weekly optimization weights and Sharpe | If you want raw history |
 | `data/reports/*.md` | LLM-written narrative reports | After each `/review-portfolio` |
-| `data/snapshot.log`, `data/recommend.log` | launchd stdout/stderr | If a scheduled run looks missing |
+| `data/snapshot.log`, `data/recommend.log` | cron stdout/stderr | If a scheduled run looks missing |
 
 The "Profile conflicts" section of any report is the most important thing to read. It tells you when the math wants something the profile forbids.
 
@@ -112,16 +112,19 @@ Four subcommands. The skill calls `analyze`. The cron jobs call the other three.
 .venv/bin/python -m src.cli dashboard
 ```
 
-## launchd management
+## cron setup
 
-```bash
-launchctl list | grep portfolio                              # status
-launchctl start com.user.portfolio-snapshot                  # run snapshot now
-launchctl start com.user.portfolio-recommend                 # run recommend now
-launchctl unload ~/Library/LaunchAgents/com.user.portfolio-snapshot.plist   # disable
+Two cron entries cover the daily and weekly automation. Works on macOS and Linux:
+
+```cron
+PROJ=/path/to/portfolio-wave-rider
+# Daily snapshot + dashboard refresh, Mon-Fri 16:30 local
+30 16 * * 1-5  cd $PROJ && .venv/bin/python -m src.cli snapshot && .venv/bin/python -m src.cli dashboard >> data/snapshot.log 2>&1
+# Weekly recommend + dashboard refresh, Fri 17:00 local
+0  17 * * 5    cd $PROJ && .venv/bin/python -m src.cli recommend && .venv/bin/python -m src.cli dashboard >> data/recommend.log 2>&1
 ```
 
-Plists live at `~/Library/LaunchAgents/com.user.portfolio-{snapshot,recommend}.plist`. launchd runs only while logged in. If the Mac is asleep at trigger time the job runs on wake. If powered off the run is missed. Use `--date YYYY-MM-DD` to backfill.
+Install with `crontab -e` and paste. Adjust `PROJ` to your clone path. Verify with `crontab -l`. cron fires only while the machine is awake; missed runs do not auto-replay. Use `--date YYYY-MM-DD` on either subcommand to backfill.
 
 ## Layout
 
@@ -146,7 +149,7 @@ portfolio-wave-rider/
     ├── recommendations.csv     # weekly, appended (your history)
     ├── dashboard.html          # static Plotly dashboard (gitignored, regenerated)
     ├── reports/                # LLM-written reports (gitignored)
-    └── *.log                   # launchd output (gitignored)
+    └── *.log                   # cron output (gitignored)
 ```
 
 ## Testing
