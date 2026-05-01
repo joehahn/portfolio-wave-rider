@@ -238,6 +238,58 @@ def analyze(
 
 
 # ---------------------------------------------------------------------------
+# Day 0 setup. Convert a thesis-driven dollar allocation to shares and write
+# the initial holdings.csv. Pure function: prices are passed in so the unit
+# test stays offline.
+# ---------------------------------------------------------------------------
+
+def initialize_holdings(
+    allocations: dict[str, float],
+    prices: dict[str, float],
+    holdings_path: str = "holdings.csv",
+) -> dict[str, Any]:
+    """Convert ticker -> dollars + ticker -> price into ticker -> shares,
+    then overwrite ``holdings_path`` with a fresh ``ticker, shares`` CSV.
+
+    Allocations and prices must cover the same tickers. Shares are stored
+    as floats (4 decimals) since most modern brokers support fractional
+    shares. Tickers with $0 allocated keep shares=0 (still appear in the
+    file as a watchlist entry).
+    """
+    if not allocations:
+        raise ValueError("allocations must be non-empty")
+    missing = [t for t in allocations if t not in prices]
+    if missing:
+        raise ValueError(f"prices missing for tickers: {missing}")
+    if any(d < 0 for d in allocations.values()):
+        raise ValueError("allocations must be non-negative")
+
+    rows = []
+    total = 0.0
+    for ticker, dollars in allocations.items():
+        price = float(prices[ticker])
+        shares = round(dollars / price, 4) if price > 0 and dollars > 0 else 0.0
+        value = round(shares * price, 2)
+        total += value
+        rows.append({"ticker": ticker.upper(), "shares": shares,
+                     "dollars_allocated": float(dollars), "price": price, "value": value})
+
+    df = pd.DataFrame(rows)
+    o_path = Path(holdings_path)
+    o_path.parent.mkdir(parents=True, exist_ok=True)
+    df[["ticker", "shares"]].to_csv(o_path, index=False)
+
+    return {
+        "out_path": str(o_path),
+        "total_invested": round(total, 2),
+        "total_requested": round(sum(allocations.values()), 2),
+        "holdings": {r["ticker"]: {"shares": r["shares"], "price": r["price"],
+                                   "value": r["value"], "dollars_allocated": r["dollars_allocated"]}
+                     for r in rows},
+    }
+
+
+# ---------------------------------------------------------------------------
 # Time-series writers. snapshot = daily, recommend = weekly.
 # ---------------------------------------------------------------------------
 

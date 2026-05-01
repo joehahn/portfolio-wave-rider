@@ -1,4 +1,5 @@
 ---
+initial_investment_usd: 50000     # total dollars to allocate on day 0
 concentration_cap: 0.25           # no single position > 25% of portfolio
 min_trade_size_usd: 500           # don't propose trades smaller than this
 exclusions:                       # sector / theme exclusions

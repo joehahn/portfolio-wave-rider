@@ -82,3 +82,40 @@ def test_risk_metrics_basic_shape(returns: dict) -> None:
     assert "sharpe_ratio" in out
     assert out["max_drawdown"] <= 0
     assert out["n_observations"] > 0
+
+
+def test_initialize_holdings(tmp_path) -> None:
+    allocations = {"AAA": 5000.0, "BBB": 3000.0, "CCC": 2000.0}
+    prices = {"AAA": 100.0, "BBB": 50.0, "CCC": 20.0}
+    out_path = tmp_path / "holdings.csv"
+    result = portfolio.initialize_holdings(allocations, prices, str(out_path))
+
+    # Resulting CSV has the expected schema and shares.
+    df = pd.read_csv(out_path)
+    assert list(df.columns) == ["ticker", "shares"]
+    assert df.set_index("ticker")["shares"].to_dict() == {
+        "AAA": 50.0, "BBB": 60.0, "CCC": 100.0,
+    }
+    # Total invested matches the sum of allocations within rounding.
+    assert result["total_invested"] == pytest.approx(10000.0, abs=0.01)
+    assert result["total_requested"] == pytest.approx(10000.0, abs=0.01)
+
+
+def test_initialize_holdings_zero_allocation_keeps_zero_shares(tmp_path) -> None:
+    allocations = {"AAA": 1000.0, "BBB": 0.0}
+    prices = {"AAA": 100.0, "BBB": 50.0}
+    out_path = tmp_path / "holdings.csv"
+    portfolio.initialize_holdings(allocations, prices, str(out_path))
+    df = pd.read_csv(out_path).set_index("ticker")
+    assert df.loc["AAA", "shares"] == 10.0
+    assert df.loc["BBB", "shares"] == 0.0
+
+
+def test_initialize_holdings_rejects_missing_prices() -> None:
+    with pytest.raises(ValueError, match="prices missing"):
+        portfolio.initialize_holdings({"AAA": 100.0}, {"BBB": 50.0})
+
+
+def test_initialize_holdings_rejects_negative_allocation() -> None:
+    with pytest.raises(ValueError, match="non-negative"):
+        portfolio.initialize_holdings({"AAA": -100.0}, {"AAA": 50.0})

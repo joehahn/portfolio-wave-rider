@@ -1,14 +1,15 @@
 """Single CLI for every portfolio operation.
 
-Four subcommands. Each calls one function in ``src/portfolio.py`` and
-prints the result as JSON to stdout. The /review-portfolio skill invokes
-``analyze`` via Bash; the launchd jobs invoke ``snapshot``, ``recommend``,
-and ``dashboard``.
+Five subcommands. Each calls one function in ``src/portfolio.py`` and
+prints the result as JSON to stdout. The /initialize-portfolio skill
+invokes ``init-holdings``; /review-portfolio invokes ``analyze``; the
+cron jobs invoke ``snapshot``, ``recommend``, and ``dashboard``.
 
 Usage:
-    python -m src.cli analyze   --tickers AAPL MSFT NVDA --period 3y --max-weight 0.25
-    python -m src.cli snapshot  [--date YYYY-MM-DD] [--force]
-    python -m src.cli recommend [--max-weight 0.25] [--force]
+    python -m src.cli init-holdings --allocations '{"AAPL": 5000, ...}' --out holdings.csv
+    python -m src.cli analyze       --tickers AAPL MSFT NVDA --period 3y --max-weight 0.25
+    python -m src.cli snapshot      [--date YYYY-MM-DD] [--force]
+    python -m src.cli recommend     [--max-weight 0.25] [--force]
     python -m src.cli dashboard
 """
 
@@ -28,9 +29,21 @@ def _load_wave_views(arg: str) -> dict[str, str]:
     return {str(k).upper(): str(v) for k, v in raw.items()}
 
 
+def _load_allocations(arg: str) -> dict[str, float]:
+    """Accept either a JSON literal or a path to a JSON file mapping ticker -> dollars."""
+    raw = json.loads(arg) if arg.startswith("{") else json.loads(Path(arg).read_text())
+    return {str(k).upper(): float(v) for k, v in raw.items()}
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="src.cli", description="Portfolio CLI.")
     sub = parser.add_subparsers(dest="cmd", required=True)
+
+    p_init = sub.add_parser("init-holdings",
+                             help="convert a thesis-driven dollar allocation into shares; overwrite holdings.csv")
+    p_init.add_argument("--allocations", required=True,
+                        help="JSON literal or path mapping ticker -> dollars")
+    p_init.add_argument("--out", default="holdings.csv")
 
     p_an = sub.add_parser("analyze", help="fetch + optimize + risk in one call")
     p_an.add_argument("--tickers", nargs="+", required=True)
@@ -69,7 +82,12 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     try:
-        if args.cmd == "analyze":
+        if args.cmd == "init-holdings":
+            allocations = _load_allocations(args.allocations)
+            prices_df = portfolio.fetch_prices(list(allocations.keys()), period="7d")
+            last_prices = {t: float(prices_df[t].iloc[-1]) for t in prices_df.columns}
+            result = portfolio.initialize_holdings(allocations, last_prices, holdings_path=args.out)
+        elif args.cmd == "analyze":
             result = portfolio.analyze(
                 args.tickers, period=args.period, objective=args.objective,
                 max_weight=args.max_weight, risk_free_rate=args.risk_free_rate,

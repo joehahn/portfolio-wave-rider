@@ -5,7 +5,7 @@
 **Date:** 2026-April-30 <br>
 **branch:** main
 
-A Claude Code demo: optimize a long-horizon stock and ETF portfolio against a user-authored investor profile. One slash command, two LLM subagents, four Python CLI subcommands, and a static dashboard.
+A Claude Code demo: optimize a long-horizon stock and ETF portfolio against a user-authored investor profile. Two slash commands, two LLM subagents, five Python CLI subcommands, and a static dashboard.
 
 ## What it does
 
@@ -21,11 +21,13 @@ The weekly cron is the lightweight Python-only sibling of `/review-portfolio`: p
 
 ## How it's built
 
-- One skill, `.claude/skills/review-portfolio/SKILL.md`. Reads the profile, calls the two subagents and the Python CLI, writes the report and refreshes the dashboard.
+- Two skills at `.claude/skills/`:
+  - `/initialize-portfolio`: one-time day 0 setup. Translates the user's wave thesis into an initial dollar allocation across the watchlist. Pre-math.
+  - `/review-portfolio`: monthly review. Mean-variance optimization with wave-stage tilts plus a written report.
 - Two subagents at `.claude/agents/`:
   - `news-researcher`: picks wave-aligned news per ticker, classifies each wave's stage, returns a `wave_views` mapping.
   - `report-writer`: synthesizes the analysis and news into the final markdown report.
-- All Python in two files: `src/portfolio.py` (math) and `src/cli.py` (one entry point with four subcommands).
+- All Python in two files: `src/portfolio.py` (math) and `src/cli.py` (one entry point with five subcommands).
 - The user-authored `investor_profile.md` is the source of truth. Every recommendation cites lines from it. When the optimal numerical answer violates a profile constraint, the report flags the conflict; it does not silently clamp.
 
 ```mermaid
@@ -63,10 +65,30 @@ cp holdings.example.csv holdings.csv
 
 The two files you maintain:
 
-- `investor_profile.md`: goals, risk tolerance, concentration cap, exclusions, asset-class targets. Every recommendation cites lines from this file.
-- `holdings.csv`: `ticker,shares` for everything you want tracked. Set `shares` to 0 for tickers you watch but do not yet own; the daily snapshot still logs prices.
+- `investor_profile.md`: `initial_investment_usd`, concentration cap, exclusions, asset-class targets, and the wave-thesis prose. Every recommendation cites lines from this file.
+- `holdings.csv`: `ticker,shares` watchlist. Pre-day-0 you can leave every `shares` at 0; that's the universe `/initialize-portfolio` will allocate across.
 
 Optional: `news_sources.md`, a curated list of sources per technology wave. Improves the news-researcher's signal. Missing is fine; falls back to open search.
+
+### Day 0: thesis-driven allocation
+
+In Claude Code, run:
+
+```
+/initialize-portfolio
+```
+
+The skill reads the profile, proposes a thesis-driven dollar allocation across the watchlist (no math, just wave thesis plus asset-class targets), converts dollars to shares using current prices, overwrites `holdings.csv`, records day 0 via `snapshot`, and writes `data/reports/YYYY-MM-DD-initialize-portfolio.md`. This is the user's beliefs in dollar form.
+
+### Day 1: optimized allocation
+
+Run:
+
+```
+/review-portfolio
+```
+
+This is the mean-variance optimization with wave-stage tilts and a written report. The gap between day 0 and day 1 is the marginal contribution of the optimizer relative to the user's stated beliefs.
 
 ## Operations
 
@@ -98,10 +120,13 @@ The "Profile conflicts" section of any report is the most important thing to rea
 
 ## CLI reference
 
-Four subcommands. The skill calls `analyze`. The cron jobs call the other three.
+Five subcommands. `/initialize-portfolio` calls `init-holdings`. `/review-portfolio` calls `analyze`. The cron jobs call the other three.
 
 ```bash
-# One-shot analysis (fetch + optimize + risk in a single call)
+# Day 0: convert a thesis-driven dollar allocation into shares
+.venv/bin/python -m src.cli init-holdings --allocations '{"NVDA": 5000, "MSFT": 5000, ...}' --out holdings.csv
+
+# Day 1: one-shot analysis (fetch + optimize + risk in a single call)
 .venv/bin/python -m src.cli analyze --tickers AAPL MSFT NVDA --period 3y --max-weight 0.25
 
 # Time-series logging
@@ -138,11 +163,11 @@ portfolio-wave-rider/
 ├── CLAUDE.md                   # rules for Claude operating in this repo
 ├── .claude/
 │   ├── agents/                 # 2 subagent specs (news-researcher, report-writer)
-│   ├── skills/                 # 1 skill (review-portfolio)
+│   ├── skills/                 # 2 skills (initialize-portfolio, review-portfolio)
 │   └── settings.json           # tool allowlist
 ├── src/
 │   ├── portfolio.py            # all math
-│   └── cli.py                  # one CLI, four subcommands
+│   └── cli.py                  # one CLI, five subcommands
 ├── tests/
 └── data/
     ├── snapshots.csv           # daily, appended (your history)
