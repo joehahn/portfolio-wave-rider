@@ -13,6 +13,8 @@ This project was developed using Claude Code. The github is at https://github.co
 
 Keep everything as simple and explainable as possible. Fewest files, least code, fewest functions. Write simple code that is well commented and understood at a glance. This is a demo, not a production system.
 
+**Audience for any prose you generate** (READMEs, reports, code comments): data-science-savvy reader with modest finance and investing knowledge. When prose introduces a finance term, gloss it briefly in plain math or stats terms (e.g., "Sharpe ratio = `(E[r] − r_free) / σ`, signal-to-noise on returns"). The README has a glossary near the top; mirror that level when in doubt.
+
 ## The source of truth: `investor_profile.md`
 
 `investor_profile.md` at the repo root is the source of truth for every recommendation. It declares the user's goals, strategy, constraints, and exclusions. Every skill and subagent must load it before reasoning about allocations.
