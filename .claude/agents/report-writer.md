@@ -37,7 +37,9 @@ Write to `data/reports/YYYY-MM-DD-<skill-name>.md` with this outline:
 # <Skill name> — <date>
 
 ## The ask
-<one paragraph: what the user asked for>
+<one paragraph: what the user asked for. End with one line:
+"For interactive charts of portfolio value, weight drift, and the
+latest weights, open `data/dashboard.html` in a browser.">
 
 ## Recommended allocation
 <a weights table, plus expected return, annual vol, Sharpe.
@@ -45,7 +47,29 @@ Every table that lists tickers (recommended allocation, current vs
 target, trades, per-ticker tilts, etc.) must include an "Asset name"
 column with the issuer's full name (e.g. AGG → "iShares Core U.S.
 Aggregate Bond ETF", GOOGL → "Alphabet Inc. Class A"). Place it
-immediately after the Ticker column.>
+immediately after the Ticker column.
+
+After the table, render the same weights as a Unicode bar chart in a
+fenced code block. Sort tickers by weight descending. Use one full
+block character (█) per 5 percentage points, and Unicode partial
+blocks (▏▎▍▌▋▊▉) for the remainder. Show the percentage as a
+right-aligned number before the bar. Example:
+
+  ```
+  Day 1 recommended weights (concentration cap 25%):
+
+    BIL   cash       25.0% █████
+    IAU   metals     25.0% █████
+    GOOGL equities   18.3% ███▋
+    AGG   bonds      18.2% ███▋
+    RKLB  equities    8.7% █▊
+    NVDA  equities    4.8% █
+    MSFT  equities    0.0%
+    IBIT  crypto      0.0%
+  ```
+
+The bar chart and the table show the same data; the chart makes
+relative magnitudes scannable at a glance. Do not skip the table.>
 
 ## Day 0 baseline
 <INCLUDE THIS SECTION ONLY when the input dict has a non-null
@@ -54,6 +78,31 @@ the optimizer's recommended weights, and explain the gap.
 
 A side-by-side table with columns:
 ticker | asset name | day 0 $ | day 0 % | day 1 % (recommended) | delta (pp)
+
+Follow the table with a paired Unicode bar chart in a fenced code
+block. Two bars per ticker (day 0 above day 1), labeled. Same scale
+convention as the weights chart. Example:
+
+  ```
+  Day 0 (beliefs) vs Day 1 (optimizer), in % of portfolio:
+
+    NVDA  d0 22.0% ████▍
+          d1  4.8% █
+    RKLB  d0 19.0% ███▊
+          d1  8.7% █▊
+    MSFT  d0 15.0% ███
+          d1  0.0%
+    GOOGL d0 14.0% ██▊
+          d1 18.3% ███▋
+    AGG   d0 10.0% ██
+          d1 18.2% ███▋
+    IAU   d0 10.0% ██
+          d1 25.0% █████
+    BIL   d0  5.0% █
+          d1 25.0% █████
+    IBIT  d0  5.0% █
+          d1  0.0%
+  ```
 
 Then a one-paragraph interpretation of the gap. Frame the day 0
 allocation as the user's beliefs in dollar form (no math) and the day
@@ -73,11 +122,32 @@ how the recommendation honors it>
 in the recommended allocation into an asset class and compare the
 resulting breakdown to the targets. Render a table with columns:
 asset class | recommended % | target % | drift (pp). Flag any class
-off by more than ±5pp. If the universe looks like a single-sleeve
-run (e.g. only equities), frame drift as informational, not a
-conflict — "this run covers the equities sleeve; other asset classes
-are managed outside this portfolio." If `asset_class_targets` is
-absent, skip the section with one line: "Not declared in profile.">
+off by more than ±5pp.
+
+Follow the table with a paired bar chart in a fenced code block:
+two bars per asset class (target above recommended) so the drift is
+visually obvious. Example:
+
+  ```
+  Asset-class drift: target vs recommended, in % of portfolio:
+
+    equities         target 70.0% ██████████████
+                     recom  31.8% ██████▍
+    precious metals  target 10.0% ██
+                     recom  25.0% █████
+    bonds            target 10.0% ██
+                     recom  18.2% ███▋
+    cash             target  5.0% █
+                     recom  25.0% █████
+    cryptocurrencies target  5.0% █
+                     recom   0.0%
+  ```
+
+If the universe looks like a single-sleeve run (e.g. only equities),
+frame drift as informational, not a conflict — "this run covers the
+equities sleeve; other asset classes are managed outside this
+portfolio." If `asset_class_targets` is absent, skip the section with
+one line: "Not declared in profile.">
 
 ## Profile conflicts
 <empty if none. Otherwise: for each conflict, state the constraint
