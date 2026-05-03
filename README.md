@@ -120,6 +120,20 @@ Same command:
 
 Now `holdings.csv` has real positions, so the first-run branch is skipped. The skill runs news + analyze + report + dashboard against your current holdings. Run it monthly, or whenever wave-stage news has shifted materially.
 
+## Optional: cron automation
+
+If you want the daily snapshot and weekly recommend to run automatically, install these two cron entries. Skip if you'd rather invoke the commands by hand. The two entries work the same on macOS and Linux:
+
+```cron
+PROJ=/path/to/portfolio-wave-rider
+# Daily snapshot + dashboard refresh, Mon-Fri 16:30 local
+30 16 * * 1-5  cd $PROJ && .venv/bin/python -m src.cli snapshot && .venv/bin/python -m src.cli dashboard >> data/snapshot.log 2>&1
+# Weekly recommend + dashboard refresh, Fri 17:00 local
+0  17 * * 5    cd $PROJ && .venv/bin/python -m src.cli recommend && .venv/bin/python -m src.cli dashboard >> data/recommend.log 2>&1
+```
+
+Install with `crontab -e` and paste. Adjust `PROJ` to your clone path. Verify with `crontab -l`. cron only fires while the machine is awake; missed runs do not auto-replay. Use `--date YYYY-MM-DD` on either subcommand to backfill.
+
 ## Operations
 
 - Daily: nothing. The cron job appends a row per ticker to `data/snapshots.csv` and refreshes `data/dashboard.html`.
@@ -168,20 +182,6 @@ Five subcommands. `/review-portfolio` calls `init-holdings` (first-run branch on
 # Static dashboard (reads the two CSVs above; writes data/dashboard.html)
 .venv/bin/python -m src.cli dashboard
 ```
-
-## cron setup
-
-Two cron entries cover the daily and weekly automation. Works on macOS and Linux:
-
-```cron
-PROJ=/path/to/portfolio-wave-rider
-# Daily snapshot + dashboard refresh, Mon-Fri 16:30 local
-30 16 * * 1-5  cd $PROJ && .venv/bin/python -m src.cli snapshot && .venv/bin/python -m src.cli dashboard >> data/snapshot.log 2>&1
-# Weekly recommend + dashboard refresh, Fri 17:00 local
-0  17 * * 5    cd $PROJ && .venv/bin/python -m src.cli recommend && .venv/bin/python -m src.cli dashboard >> data/recommend.log 2>&1
-```
-
-Install with `crontab -e` and paste. Adjust `PROJ` to your clone path. Verify with `crontab -l`. cron only fires while the machine is awake; missed runs do not auto-replay. Use `--date YYYY-MM-DD` on either subcommand to backfill.
 
 ## Layout
 
