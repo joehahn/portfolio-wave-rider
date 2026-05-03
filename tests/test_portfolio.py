@@ -125,28 +125,32 @@ def test_render_news_html_returns_empty_when_file_missing(tmp_path) -> None:
     assert portfolio._render_news_html(tmp_path / "missing.json") == ""
 
 
-def test_render_news_html_emits_clickable_headlines(tmp_path) -> None:
+def test_render_news_html_emits_expandable_headlines(tmp_path) -> None:
+    import json
     news = {
         "date": "2026-05-02",
         "per_ticker": {
             "NVDA": {
                 "wave_bucket": "AI",
                 "bullets": [
-                    {"summary": "NVDA Q1 revenue up 69%", "source": "NVIDIA",
+                    {"headline": "NVDA Q1 revenue +69% YoY",
+                     "summary": "Revenue $44.1B, Data Center $39.1B...",
+                     "source": "NVIDIA",
                      "url": "https://example.com/nvda", "date": "2025-05-28"},
                 ],
             },
             "AGG": {
                 "wave_bucket": "general_markets",
                 "bullets": [
-                    {"summary": "Fed held rates at 3.5-3.75%", "source": "CNBC",
+                    {"headline": "Fed holds rates at 3.50-3.75%",
+                     "summary": "Powell's final FOMC; sticky inflation...",
+                     "source": "CNBC",
                      "url": "https://example.com/agg", "date": "2026-04-29"},
                 ],
             },
         },
     }
     p = tmp_path / "news.json"
-    import json
     p.write_text(json.dumps(news))
     out = portfolio._render_news_html(p)
     # Date appears in header.
@@ -154,8 +158,42 @@ def test_render_news_html_emits_clickable_headlines(tmp_path) -> None:
     # Both tickers and their wave buckets appear as headers.
     assert "NVDA" in out and "AI" in out
     assert "AGG" in out and "general_markets" in out
-    # Headlines are clickable links to the source URLs.
+    # Each bullet is wrapped in <details> so headlines are click-to-expand.
+    assert out.count("<details") == 2
+    assert out.count("<summary") == 2
+    # Headlines are the click target (visible in the summary tag).
+    assert "NVDA Q1 revenue +69% YoY" in out
+    assert "Fed holds rates at 3.50-3.75%" in out
+    # The expanded body contains the longer summary text and a "Read full article" link.
+    assert "Revenue $44.1B, Data Center $39.1B" in out
+    assert "Read full article" in out
     assert 'href="https://example.com/nvda"' in out
-    assert 'href="https://example.com/agg"' in out
     # AI bucket is rendered before general_markets per the wave display order.
     assert out.index("NVDA") < out.index("AGG")
+
+
+def test_render_news_html_falls_back_when_headline_missing(tmp_path) -> None:
+    """Older news_latest.json without a headline field still renders cleanly."""
+    import json
+    news = {
+        "date": "2026-05-02",
+        "per_ticker": {
+            "NVDA": {
+                "wave_bucket": "AI",
+                "bullets": [
+                    {"summary": "Revenue jumped 69 percent year over year. Other context follows.",
+                     "source": "NVIDIA",
+                     "url": "https://example.com/nvda", "date": "2025-05-28"},
+                ],
+            },
+        },
+    }
+    p = tmp_path / "news.json"
+    p.write_text(json.dumps(news))
+    out = portfolio._render_news_html(p)
+    # Click target (the <summary>) falls back to the first sentence of the body.
+    assert "Revenue jumped 69 percent year over year" in out
+    # Full body still appears in the expanded section.
+    assert "Other context follows" in out
+    # Click-to-expand wrapper is still present.
+    assert "<details" in out

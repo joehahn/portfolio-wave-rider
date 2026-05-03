@@ -487,9 +487,9 @@ def _render_news_html(news_path: Path) -> str:
         f'Latest news <span style="color:#888;font-weight:normal;font-size:0.7em;">'
         f'(last reviewed {_html.escape(str(run_date))})</span></h2>',
         '<p style="color:#666;font-size:0.9em;">Headlines from the most recent '
-        '<code>/review-portfolio</code> run, grouped by ticker. Click any '
-        'headline to open the source. The dashboard updates this section '
-        'each time the skill runs.</p>',
+        '<code>/review-portfolio</code> run, grouped by ticker. '
+        'Click a headline to expand a portfolio-relevant summary plus a '
+        'link to the source. Updated each time the skill runs.</p>',
     ]
 
     for ticker in ordered_tickers:
@@ -502,19 +502,31 @@ def _render_news_html(news_path: Path) -> str:
             f'<h3 style="margin-top:1.5em;color:#222;">{_html.escape(ticker)} '
             f'<small style="color:#999;font-weight:normal;">({_html.escape(wave)})</small></h3>'
         )
-        parts.append('<ul style="line-height:1.55;padding-left:1.2em;">')
         for b in bullets:
-            summary = _html.escape(str(b.get("summary", "")))
+            summary_text = str(b.get("summary", ""))
+            # Headline: prefer the explicit field; fall back to a truncated summary.
+            headline = str(b.get("headline") or "").strip()
+            if not headline:
+                trimmed = summary_text.strip().split(". ")[0]
+                headline = (trimmed[:100] + "…") if len(trimmed) > 100 else trimmed
             url = _html.escape(str(b.get("url", "#")), quote=True)
             source = _html.escape(str(b.get("source", "")))
             date = _html.escape(str(b.get("date", "")))
             meta = " · ".join(x for x in (source, date) if x)
             parts.append(
-                f'<li><a href="{url}" target="_blank" rel="noopener" '
-                f'style="color:#1a73e8;text-decoration:none;">{summary}</a> '
-                f'<small style="color:#999;">{meta}</small></li>'
+                '<details style="margin:0.5em 0;padding:0.4em 0.6em;'
+                'border-left:3px solid #e0e0e0;">'
+                '<summary style="cursor:pointer;line-height:1.4;color:#222;">'
+                f'<span style="font-weight:600;">{_html.escape(headline)}</span>'
+                f' <small style="color:#999;font-weight:normal;">{meta}</small>'
+                '</summary>'
+                '<div style="margin:0.6em 0 0.4em;line-height:1.55;color:#333;">'
+                f'<p style="margin:0 0 0.5em;">{_html.escape(summary_text)}</p>'
+                f'<a href="{url}" target="_blank" rel="noopener" '
+                'style="color:#1a73e8;text-decoration:none;font-size:0.9em;">'
+                'Read full article →</a>'
+                '</div></details>'
             )
-        parts.append('</ul>')
 
     parts.append('</div>')
     return "\n".join(parts)

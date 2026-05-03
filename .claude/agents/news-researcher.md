@@ -51,8 +51,23 @@ Note in the output that you fell back.
 
 For each ticker, produce 2-4 bullets covering earnings, guidance
 changes, regulatory action, M&A, leadership changes, or wave-relevant
-product/research milestones. Include the source (name + URL) next to
-each bullet.
+product/research milestones. Each bullet has two text fields:
+
+- **`headline`**: 5-12 words. A scannable one-line distillation of the
+  news item, biased toward the portfolio-relevant angle (numbers,
+  policy events, deal terms, specific risks). This is what the
+  dashboard shows as the click target. Examples: "NVDA cuts Q2
+  guidance by $8B on H20 export ban"; "Microsoft Azure +40% YoY,
+  $190B FY26 capex flagged as overbuilding risk"; "Rocket Lab's
+  Neutron debut slips to Q4 2026 after tank rupture".
+- **`summary`**: 2-4 sentences. The longer-form context that explains
+  *why this matters for a portfolio holding the ticker*. Cite
+  numbers, dates, and the wave-thesis implication where applicable.
+  This is the body text shown when the dashboard reader expands the
+  headline.
+
+Also include `source` (name) and `url`, plus an item `date`
+(YYYY-MM-DD).
 
 ### Step 5 — call the wave cycle
 
@@ -92,7 +107,7 @@ them.
       "wave_bucket": "<AI | robotics | rockets_spacecraft | nuclear_fusion | quantum | engineered_biology | general_markets>",
       "used_fallback": <bool>,
       "bullets": [
-        { "summary": "...", "source": "<name>", "url": "<url>", "date": "<YYYY-MM-DD>" },
+        { "headline": "...", "summary": "...", "source": "<name>", "url": "<url>", "date": "<YYYY-MM-DD>" },
         ...
       ]
     },
