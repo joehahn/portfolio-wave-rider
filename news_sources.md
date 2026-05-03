@@ -2,7 +2,9 @@
 
 Curated list of news sources the `news-researcher` subagent consults
 first when researching a ticker. Grouped by the technology waves named
-in `investor_profile.md`.
+in `investor_profile.md`. Sections appear in the same order the profile
+lists them: the current wave (AI) first, then the next waves in
+nearest-term-impact order, with general markets last as a catch-all.
 
 **How this is used.** For each ticker, the news-researcher picks the
 most relevant wave bucket (or `general_markets`) and tries the curated
@@ -29,14 +31,6 @@ For LLM / ML platform / semiconductor coverage.
 - **Anthropic blog** — https://www.anthropic.com/news — primary source for Claude models and research.
 - **OpenAI blog** — https://openai.com/news/ — primary source for GPT models and research.
 
-## Robotics
-
-Humanoids, industrial automation, autonomy.
-
-- **IEEE Spectrum — Robotics** — https://spectrum.ieee.org/robotics — long-running, technical.
-- **The Robot Report** — https://www.therobotreport.com — industry news, funding rounds, product launches.
-- **Robotics Business Review** — https://www.roboticsbusinessreview.com — business and market coverage.
-
 ## Rockets & spacecraft
 
 Launch, satellites, space-economy.
@@ -46,22 +40,13 @@ Launch, satellites, space-economy.
 - **Payload** — https://payloadspace.com — newsletter-style; strong on space-economy deals.
 - **NASASpaceflight** — https://www.nasaspaceflight.com — launch-operations coverage.
 
-## Nuclear fusion
+## Robotics
 
-Pre-commercial; expect slow cadence and peer-reviewed results.
+Humanoids, industrial automation, autonomy.
 
-- **Fusion Industry Association** — https://www.fusionindustryassociation.org — trade-body briefings and state-of-industry reports.
-- **Nature — Fusion** — https://www.nature.com/subjects/nuclear-fusion-and-fission — peer-reviewed milestones.
-- **World Nuclear News** — https://www.world-nuclear-news.org — includes fusion alongside fission news.
-
-## Quantum computing
-
-Also pre-commercial but with rapid research-cadence.
-
-- **Quantum Computing Report** — https://quantumcomputingreport.com — industry news and vendor tracker.
-- **Nature — Quantum Information** — https://www.nature.com/npjqi/ — peer-reviewed results.
-- **IBM Quantum blog** — https://www.ibm.com/quantum/blog — primary source for IBM's roadmap.
-- **Google Quantum AI** — https://quantumai.google — primary source for Google's quantum research.
+- **IEEE Spectrum — Robotics** — https://spectrum.ieee.org/robotics — long-running, technical.
+- **The Robot Report** — https://www.therobotreport.com — industry news, funding rounds, product launches.
+- **Robotics Business Review** — https://www.roboticsbusinessreview.com — business and market coverage.
 
 ## Engineered biology
 
@@ -72,6 +57,23 @@ Gene editing, engineered cells, mRNA platforms, cellular agriculture, longevity 
 - **BioPharma Dive** — https://www.biopharmadive.com — pharma and biotech industry news.
 - **Nature Biotechnology** — https://www.nature.com/nbt/ — peer-reviewed research and reviews.
 - **SynBioBeta** — https://www.synbiobeta.com — synthetic biology industry community and conference coverage.
+
+## Quantum computing
+
+Pre-commercial but with rapid research-cadence.
+
+- **Quantum Computing Report** — https://quantumcomputingreport.com — industry news and vendor tracker.
+- **Nature — Quantum Information** — https://www.nature.com/npjqi/ — peer-reviewed results.
+- **IBM Quantum blog** — https://www.ibm.com/quantum/blog — primary source for IBM's roadmap.
+- **Google Quantum AI** — https://quantumai.google — primary source for Google's quantum research.
+
+## Nuclear fusion
+
+Pre-commercial; expect slow cadence and peer-reviewed results.
+
+- **Fusion Industry Association** — https://www.fusionindustryassociation.org — trade-body briefings and state-of-industry reports.
+- **Nature — Fusion** — https://www.nature.com/subjects/nuclear-fusion-and-fission — peer-reviewed milestones.
+- **World Nuclear News** — https://www.world-nuclear-news.org — includes fusion alongside fission news.
 
 ## General markets
 
