@@ -9,7 +9,7 @@ A Claude Code demo: optimize a long-horizon portfolio of stocks and ETFs against
 
 ## Glossary (skip if you do this for a living)
 
-This README leans on a handful of finance terms. For a data-science reader they map cleanly onto familiar math.
+This README leans on a handful of finance terms.
 
 **Symbols used below:**
 - `r` = return (typically a daily log return); `E[r]` = expected (mean) return.
