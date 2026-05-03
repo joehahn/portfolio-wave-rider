@@ -37,7 +37,7 @@ This README leans on a handful of finance terms.
 | **Asset-class drift** | Deviation of recommended weights summed by class from the user's declared target percentages. Reported but not enforced. |
 | **Wave-stage tilt** | Multiplicative scaling on `μ` (the expected-return vector) before optimization. `μ_tilted[i] = stage_multiplier × μ[i]`. The five stages and their multipliers are in `src/portfolio.py:WAVE_STAGE_TILT`. |
 | **Rebalance** | Execute trades to move current portfolio weights back toward target weights. This project produces recommendations; the user does the trading. |
-| **Wave thesis** | The user's belief that long technology waves drive returns: enter early in a wave (buildup, surge), trim near the crest (peak), avoid the hangover (digestion). The profile prose names the current wave (AI) and the next ones (robotics, rockets/spacecraft, nuclear fusion, quantum computing, synthetic biology). |
+| **Wave thesis** | The user's belief that long technology waves drive returns: enter early in a wave (buildup, surge), trim near the crest (peak), avoid the hangover (digestion). The profile prose names the current wave (AI) and the next ones (rockets/spacecraft, robotics, engineered biology, quantum computing, nuclear fusion). |
 
 ## What it does
 

@@ -38,6 +38,6 @@ Listed roughly in order of when material commercial impact is likely to land:
 
 - **Rockets & spacecraft**: will make space resources (asteroids, satellite services) accessible and commercially usable.
 - **Robotics**: will lower labor costs across physical industries.
-- **Synthetic biology**: will lower the cost of engineering biology (gene editing, designer proteins, programmable cells), with payoffs across medicine, agriculture, and bio-manufacturing.
+- **Engineered biology**: will lower the cost of programming biology (gene editing, designer proteins, programmable cells), with payoffs across medicine, agriculture, and bio-manufacturing.
 - **Quantum computing**: will make hard computations faster and cheaper.
 - **Nuclear fusion**: will make energy abundant and lower-cost.

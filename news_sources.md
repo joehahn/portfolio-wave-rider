@@ -63,9 +63,9 @@ Also pre-commercial but with rapid research-cadence.
 - **IBM Quantum blog** — https://www.ibm.com/quantum/blog — primary source for IBM's roadmap.
 - **Google Quantum AI** — https://quantumai.google — primary source for Google's quantum research.
 
-## Synthetic biology
+## Engineered biology
 
-Gene editing, engineered cells, mRNA platforms, cellular agriculture, longevity research.
+Gene editing, engineered cells, mRNA platforms, cellular agriculture, longevity research. (Sometimes called synthetic biology.)
 
 - **Endpoints News** — https://endpts.com — biotech business news; deals, trials, FDA actions.
 - **STAT News** — https://www.statnews.com — biotech and health reporting; strong on biotech IPOs and clinical readouts.
