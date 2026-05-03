@@ -5,7 +5,7 @@
 **Date:** 2026-May-02 <br>
 **branch:** main
 
-A Claude Code demo: optimize a long-horizon portfolio of stocks and ETFs against a user-authored investor profile. Two slash commands, two LLM subagents, five Python CLI subcommands, and a static dashboard. Stack: yfinance for prices, scipy.optimize for the QP solver, pandas for everything in between, Plotly for the dashboard.
+A Claude Code demo: optimize a long-horizon portfolio of stocks and ETFs against a user-authored investor profile. One slash command, two LLM subagents, five Python CLI subcommands, and a static dashboard. Stack: yfinance for prices, scipy.optimize for the QP solver, pandas for everything in between, Plotly for the dashboard.
 
 ## Glossary (skip if you do this for a living)
 
@@ -47,15 +47,13 @@ Three cadences:
 |---|---|---|---|
 | Daily, Mon-Fri 16:30 local | cron | `snapshot && dashboard`. Fetches the latest close price for every ticker in `holdings.csv`, multiplies by `shares`, appends one row per ticker to `data/snapshots.csv`. Then refreshes the dashboard. | `data/snapshots.csv`, `data/dashboard.html` |
 | Weekly, Fri 17:00 local | cron | `recommend && dashboard`. Re-runs the mean-variance optimizer over the holdings universe, appends new target weights to `data/recommendations.csv`, refreshes the dashboard. No news, no wave tilts. | `data/recommendations.csv`, `data/dashboard.html` |
-| Monthly, you decide | You run `/review-portfolio` in Claude Code | LLM subagents gather wave-aligned news, classify each wave's stage, pass `wave_views` to the optimizer (which scales `μ` accordingly), then write a profile-aware report and refresh the dashboard. | `data/reports/YYYY-MM-DD-review-portfolio.md`, `data/dashboard.html` |
+| Monthly, you decide | You run `/review-portfolio` in Claude Code | LLM subagents gather wave-aligned news, classify each wave's stage, pass `wave_views` to the optimizer (which scales `μ` accordingly), then write a profile-aware report and refresh the dashboard. The first run additionally does a thesis-driven day 0 allocation before optimizing. | `data/reports/YYYY-MM-DD-review-portfolio.md`, `data/dashboard.html` |
 
 The weekly cron is the lightweight Python-only sibling of `/review-portfolio`: pure Python, no LLM, no wave tilts. Run the skill when you want a fresh wave-stage read and a written narrative.
 
 ## How it's built
 
-- Two skills at `.claude/skills/`:
-  - `/initialize-portfolio`: one-time day 0 setup. Translates the user's wave thesis into an initial dollar allocation across the watchlist. Pre-math.
-  - `/review-portfolio`: monthly review. Mean-variance optimization with wave-stage tilts plus a written report.
+- One skill at `.claude/skills/review-portfolio/`. Reads the profile and holdings, gathers news, runs the optimizer with wave-stage tilts, writes a report, refreshes the dashboard. On a first run (when `holdings.csv` has all-zero shares) it first does a thesis-driven dollar allocation so the user's beliefs become the day 0 baseline; the same report then shows beliefs and math side-by-side.
 - Two subagents at `.claude/agents/`:
   - `news-researcher`: picks wave-aligned news per ticker (web search scoped to `news_sources.md` first, open search as fallback), classifies each wave's stage, returns a `wave_views` mapping `{ticker: stage}`.
   - `report-writer`: synthesizes the analysis and news into the final markdown report.
@@ -98,29 +96,29 @@ cp holdings.example.csv holdings.csv
 The two files you maintain:
 
 - `investor_profile.md`: `initial_investment_usd`, `concentration_cap`, `exclusions`, `asset_class_targets`, and the wave-thesis prose. Every recommendation cites lines from this file.
-- `holdings.csv`: a two-column CSV (`ticker,shares`) acting as your watchlist. Pre-day-0 you can leave every `shares` at 0; that's the universe `/initialize-portfolio` will allocate dollars across.
+- `holdings.csv`: a two-column CSV (`ticker,shares`) acting as your watchlist. Pre-day-0 you can leave every `shares` at 0; that's the universe `/review-portfolio` will allocate dollars across on its first run.
 
 Optional: `news_sources.md`, a curated list of sources per technology wave. Improves the news-researcher's signal. Missing is fine; the agent falls back to open web search.
 
-### Day 0: thesis-driven allocation
+### First run
 
 In Claude Code, run:
-
-```
-/initialize-portfolio
-```
-
-The skill reads the profile, proposes a thesis-driven dollar allocation across the watchlist (no math, just the wave thesis plus asset-class targets), converts dollars to shares using current prices (`shares = dollars / price`), overwrites `holdings.csv`, records day 0 via `snapshot`, and writes `data/reports/YYYY-MM-DD-initialize-portfolio.md`. This is the user's beliefs in dollar form. Think of it as a strong prior.
-
-### Day 1: optimized allocation
-
-Run:
 
 ```
 /review-portfolio
 ```
 
-This runs the mean-variance optimizer with wave-stage tilts and writes a report. The first run after `/initialize-portfolio` produces what we call the day 1 distribution. The gap between day 0 and day 1 is the marginal contribution of the optimizer relative to the user's stated beliefs: how much does formal mean-variance with current data move you off your prior?
+On the first run (when `holdings.csv` still has all-zero shares), the skill detects the empty state, does a thesis-driven dollar allocation across the watchlist (no math, just the wave thesis plus `asset_class_targets`), converts dollars to shares using current prices, populates `holdings.csv`, records the initial state via `snapshot`, and *then* runs the mean-variance optimizer with wave-stage tilts. The resulting report shows the **day 0 baseline** (beliefs in dollar form) alongside the **day 1 recommendation** (mean-variance optimum) so you can see both at once. The gap between them is the marginal contribution of the optimizer relative to your prior.
+
+### Subsequent runs
+
+Same command:
+
+```
+/review-portfolio
+```
+
+Now `holdings.csv` has real positions, so the first-run branch is skipped. The skill runs news + analyze + report + dashboard against your current holdings. Run it monthly, or whenever wave-stage news has shifted materially.
 
 ## Operations
 
@@ -152,13 +150,15 @@ The "Profile conflicts" section of any report is the most important thing to rea
 
 ## CLI reference
 
-Five subcommands. `/initialize-portfolio` calls `init-holdings`. `/review-portfolio` calls `analyze`. The cron jobs call the other three. Every subcommand prints a single JSON blob to stdout.
+Five subcommands. `/review-portfolio` calls `init-holdings` (first-run branch only) and `analyze`. The cron jobs call `snapshot`, `recommend`, and `dashboard`. Every subcommand prints a single JSON blob to stdout.
 
 ```bash
-# Day 0: convert a thesis-driven dollar allocation into shares
+# Convert a thesis-driven dollar allocation into shares (used internally by the
+# skill's first-run branch; runnable directly if you ever want to redo a day 0
+# allocation, e.g. after expanding the watchlist)
 .venv/bin/python -m src.cli init-holdings --allocations '{"NVDA": 5000, "MSFT": 5000, ...}' --out holdings.csv
 
-# Day 1: one-shot analysis (fetch prices + compute log-returns + optimize + risk metrics)
+# One-shot analysis (fetch prices + compute log-returns + optimize + risk metrics)
 .venv/bin/python -m src.cli analyze --tickers AAPL MSFT NVDA --period 3y --max-weight 0.25
 
 # Time-series logging
@@ -195,7 +195,7 @@ portfolio-wave-rider/
 ├── CLAUDE.md                   # rules for Claude operating in this repo
 ├── .claude/
 │   ├── agents/                 # 2 subagent specs (news-researcher, report-writer)
-│   ├── skills/                 # 2 skills (initialize-portfolio, review-portfolio)
+│   ├── skills/                 # 1 skill (review-portfolio)
 │   └── settings.json           # tool allowlist
 ├── src/
 │   ├── portfolio.py            # all math

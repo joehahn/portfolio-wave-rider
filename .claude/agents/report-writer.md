@@ -19,6 +19,10 @@ From the orchestrating skill, a dict containing:
   `optimization` and `risk` sub-dicts)
 - `news`: the news-researcher's return payload (optional)
 - `profile_conflicts`: any conflicts surfaced by the skill or news-researcher
+- `day_0_baseline`: optional; present only on a first run. Contains
+  `allocations_usd` (ticker -> dollars), `reasoning` (thesis-driven prose),
+  and `holdings` (per-ticker price/shares/value as written to holdings.csv).
+  When present, include the "Day 0 baseline" section described below.
 
 ## Read the profile
 
@@ -42,6 +46,23 @@ target, trades, per-ticker tilts, etc.) must include an "Asset name"
 column with the issuer's full name (e.g. AGG → "iShares Core U.S.
 Aggregate Bond ETF", GOOGL → "Alphabet Inc. Class A"). Place it
 immediately after the Ticker column.>
+
+## Day 0 baseline
+<INCLUDE THIS SECTION ONLY when the input dict has a non-null
+`day_0_baseline`. Show the thesis-driven dollar allocation alongside
+the optimizer's recommended weights, and explain the gap.
+
+A side-by-side table with columns:
+ticker | asset name | day 0 $ | day 0 % | day 1 % (recommended) | delta (pp)
+
+Then a one-paragraph interpretation of the gap. Frame the day 0
+allocation as the user's beliefs in dollar form (no math) and the day
+1 allocation as the mean-variance optimizer's preferred weights with
+wave-stage tilts. The gap measures the marginal contribution of
+optimization relative to the user's stated beliefs. Quote one or two
+lines from the day 0 reasoning to ground the comparison.
+
+If `day_0_baseline` is null or absent, OMIT this section entirely.>
 
 ## How this maps to the profile
 <bulleted list: each bullet cites a specific profile line and explains

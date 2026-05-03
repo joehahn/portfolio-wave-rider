@@ -1,8 +1,8 @@
 """Single CLI for every portfolio operation.
 
 Five subcommands. Each calls one function in ``src/portfolio.py`` and
-prints the result as JSON to stdout. The /initialize-portfolio skill
-invokes ``init-holdings``; /review-portfolio invokes ``analyze``; the
+prints the result as JSON to stdout. The /review-portfolio skill
+invokes ``init-holdings`` (first-run branch only) and ``analyze``; the
 cron jobs invoke ``snapshot``, ``recommend``, and ``dashboard``.
 
 Usage:

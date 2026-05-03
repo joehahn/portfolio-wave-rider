@@ -38,12 +38,11 @@ The user decides. Never silently clamp a recommendation to fit the profile.
 - Subagents (`.claude/agents/`): two LLM specialists with narrow tool allowlists.
   - `news-researcher`: picks wave-aligned news per ticker, classifies each wave's stage, returns a `wave_views` mapping that the optimizer consumes as a tilt on expected returns.
   - `report-writer`: synthesizes the analysis and news payloads into the final markdown report.
-- Skills (`.claude/skills/`): two slash commands.
-  - `/initialize-portfolio`: one-time day 0 setup. Reads `initial_investment_usd` from the profile and proposes a thesis-driven dollar allocation across the watchlist using the wave thesis, asset-class targets, and exclusions. Writes shares to `holdings.csv` and records day 0 via snapshot. Intentionally pre-math.
-  - `/review-portfolio`: orchestrates the news-researcher, runs the `analyze` CLI with wave tilts, then invokes the report-writer and refreshes the dashboard. The first run after `/initialize-portfolio` produces the day 1 (mean-variance optimized) distribution.
+- Skill (`.claude/skills/`): one slash command.
+  - `/review-portfolio`: orchestrates the news-researcher, runs the `analyze` CLI with wave tilts, invokes the report-writer, and refreshes the dashboard. On a first run (when `holdings.csv` has all-zero shares), the skill first does a thesis-driven dollar allocation: it reads `initial_investment_usd` from the profile, proposes a dollar split across the watchlist using the wave thesis, asset-class targets, and exclusions, calls `init-holdings` to convert dollars to shares, runs `snapshot --force` to record day 0, and passes a `day_0_baseline` payload to the report-writer so the report shows beliefs and math side-by-side. On subsequent runs the first-run branch is skipped.
 - All Python in two files:
   - `src/portfolio.py`: every math function (fetch_prices, compute_returns, optimize_portfolio, risk_metrics, analyze, initialize_holdings, snapshot_holdings, recommend_portfolio, build_dashboard).
-  - `src/cli.py`: one entry point with five subcommands (`init-holdings`, `analyze`, `snapshot`, `recommend`, `dashboard`) that the skills and cron jobs invoke via Bash.
+  - `src/cli.py`: one entry point with five subcommands (`init-holdings`, `analyze`, `snapshot`, `recommend`, `dashboard`) that the skill and cron jobs invoke via Bash.
 - Reports are written to `data/reports/YYYY-MM-DD-<skill>.md`.
 - Dashboard is a single static `data/dashboard.html`, regenerated after each snapshot or recommend run and at the end of `/review-portfolio`.
 
