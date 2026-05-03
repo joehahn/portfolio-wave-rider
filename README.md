@@ -5,7 +5,7 @@
 **Date:** 2026-May-02 <br>
 **branch:** main
 
-A Claude Code demo: optimize a long-horizon portfolio of stocks and ETFs against a user-authored investor profile. One slash command, two LLM subagents, five Python CLI subcommands, and a static dashboard. Stack: yfinance for prices (free Python wrapper around Yahoo Finance's historical close-price API), scipy.optimize for the QP solver (`scipy.optimize.minimize` with the SLSQP method, which solves the constrained quadratic program at the heart of mean-variance optimization), pandas for everything in between, Plotly for the dashboard.
+A Claude Code demo: optimize a long-horizon portfolio of stocks and ETFs against a user-authored investor profile. One slash command, two LLM subagents, five Python CLI subcommands, and a static dashboard. Stack: yfinance for prices (free Python wrapper around Yahoo Finance's historical close-price API), scipy.optimize for picking portfolio weights (maximizes risk-adjusted return subject to no-shorting and a per-asset weight cap), pandas for everything in between, Plotly for the dashboard.
 
 ## Glossary (skip if you do this for a living)
 
