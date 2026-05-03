@@ -74,9 +74,10 @@ def main(argv: list[str] | None = None) -> int:
     p_rec.add_argument("--date", default=None)
     p_rec.add_argument("--force", action="store_true")
 
-    p_dash = sub.add_parser("dashboard", help="generate data/dashboard.html from snapshots + recommendations")
+    p_dash = sub.add_parser("dashboard", help="generate data/dashboard.html from snapshots + recommendations + news")
     p_dash.add_argument("--snapshots", default="data/snapshots.csv")
     p_dash.add_argument("--recommendations", default="data/recommendations.csv")
+    p_dash.add_argument("--news", default="data/news_latest.json")
     p_dash.add_argument("--out", default="data/dashboard.html")
 
     args = parser.parse_args(argv)
@@ -110,6 +111,7 @@ def main(argv: list[str] | None = None) -> int:
                 snapshots_path=args.snapshots,
                 recommendations_path=args.recommendations,
                 out_path=args.out,
+                news_path=args.news,
             )
     except Exception as e:  # noqa: BLE001 — surface any failure as a JSON error line
         print(json.dumps({"error": f"{type(e).__name__}: {e}"}), file=sys.stderr)

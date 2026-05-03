@@ -146,7 +146,7 @@ Install with `crontab -e` and paste. Adjust `PROJ` to your clone path. Verify wi
 
 | File | What's in it | When to look |
 |---|---|---|
-| `data/dashboard.html` | Three Plotly charts: portfolio value over time (long-format snapshots aggregated to a daily total), per-ticker recommended-weight trajectories, and the latest weights as a bar chart | Open in a browser any time |
+| `data/dashboard.html` | Three Plotly charts (portfolio value over time, per-ticker recommended-weight trajectories, latest weights as a bar chart) plus a "Latest news" section with clickable headlines from the most recent `/review-portfolio` run | Open in a browser any time |
 | `data/snapshots.csv` | Long-format daily snapshots: `date, ticker, shares, price, value, total_value` | Raw history; load with pandas |
 | `data/recommendations.csv` | Long-format weekly optimizer output: `date, ticker, weight, expected_return, annual_volatility, sharpe_ratio, objective` | Raw history; load with pandas |
 | `data/reports/*.md` | LLM-written narrative reports, one per `/review-portfolio` run | After each `/review-portfolio` |
@@ -204,7 +204,8 @@ portfolio-wave-rider/
 └── data/
     ├── snapshots.csv           # daily, appended (your history)
     ├── recommendations.csv     # weekly, appended (your history)
-    ├── dashboard.html          # static Plotly dashboard (gitignored, regenerated)
+    ├── dashboard.html          # static Plotly + news dashboard (gitignored, regenerated)
+    ├── news_latest.json        # latest news payload from /review-portfolio (gitignored)
     ├── reports/                # LLM-written reports (gitignored)
     └── *.log                   # cron output (gitignored)
 ```

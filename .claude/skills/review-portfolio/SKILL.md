@@ -46,6 +46,8 @@ Inspect `holdings.csv`. If **every** row has `shares == 0`, this is a first run.
 
 Pass the ticker list. Get back: `wave_views` (ticker → stage), bullets, `wave_stages` (per-wave call with rationale + evidence), and `exclusion_conflicts`.
 
+After the agent returns, write the full payload (with an added top-level `date` field set to today's date in `YYYY-MM-DD` form) to `data/news_latest.json`. The dashboard reads this file to render the "Latest news" headlines section. The file is overwritten on each run (no history kept).
+
 ### Step 2 — run analysis (Bash)
 
 ```

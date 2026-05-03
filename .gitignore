@@ -14,6 +14,7 @@ htmlcov/
 data_cache/
 data/reports/
 data/dashboard.html
+data/news_latest.json
 
 # personal data — never push
 .claude/settings.local.json

@@ -119,3 +119,43 @@ def test_initialize_holdings_rejects_missing_prices() -> None:
 def test_initialize_holdings_rejects_negative_allocation() -> None:
     with pytest.raises(ValueError, match="non-negative"):
         portfolio.initialize_holdings({"AAA": -100.0}, {"AAA": 50.0})
+
+
+def test_render_news_html_returns_empty_when_file_missing(tmp_path) -> None:
+    assert portfolio._render_news_html(tmp_path / "missing.json") == ""
+
+
+def test_render_news_html_emits_clickable_headlines(tmp_path) -> None:
+    news = {
+        "date": "2026-05-02",
+        "per_ticker": {
+            "NVDA": {
+                "wave_bucket": "AI",
+                "bullets": [
+                    {"summary": "NVDA Q1 revenue up 69%", "source": "NVIDIA",
+                     "url": "https://example.com/nvda", "date": "2025-05-28"},
+                ],
+            },
+            "AGG": {
+                "wave_bucket": "general_markets",
+                "bullets": [
+                    {"summary": "Fed held rates at 3.5-3.75%", "source": "CNBC",
+                     "url": "https://example.com/agg", "date": "2026-04-29"},
+                ],
+            },
+        },
+    }
+    p = tmp_path / "news.json"
+    import json
+    p.write_text(json.dumps(news))
+    out = portfolio._render_news_html(p)
+    # Date appears in header.
+    assert "2026-05-02" in out
+    # Both tickers and their wave buckets appear as headers.
+    assert "NVDA" in out and "AI" in out
+    assert "AGG" in out and "general_markets" in out
+    # Headlines are clickable links to the source URLs.
+    assert 'href="https://example.com/nvda"' in out
+    assert 'href="https://example.com/agg"' in out
+    # AI bucket is rendered before general_markets per the wave display order.
+    assert out.index("NVDA") < out.index("AGG")

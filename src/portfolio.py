@@ -9,7 +9,7 @@ Six public functions plus one orchestrator:
 - ``analyze`` — one-shot: fetch + returns + optimize + risk in one call
 - ``snapshot_holdings`` — append daily $ values to data/snapshots.csv
 - ``recommend_portfolio`` — append weekly weights to data/recommendations.csv
-- ``build_dashboard`` — render a static HTML dashboard from the two CSVs
+- ``build_dashboard`` — render a static HTML dashboard from the two CSVs plus the latest news payload
 
 Functions pass DataFrames in-memory; there is no on-disk handle store. The
 CLI calls ``analyze`` (or ``snapshot``/``recommend``/``dashboard``) once
@@ -18,6 +18,8 @@ per invocation.
 
 from __future__ import annotations
 
+import html as _html
+import json
 from pathlib import Path
 from typing import Any
 
@@ -442,12 +444,89 @@ def recommend_portfolio(
 # the user can open in a browser. No server, no Streamlit.
 # ---------------------------------------------------------------------------
 
+# Wave bucket display order for the news section. Matches the profile's
+# nearest-impact-first convention (rockets > robotics > engineered biology >
+# quantum > fusion), with the current AI wave first and general_markets last.
+_WAVE_DISPLAY_ORDER = [
+    "AI", "rockets_spacecraft", "robotics", "engineered_biology",
+    "quantum", "nuclear_fusion", "general_markets",
+]
+
+
+def _render_news_html(news_path: Path) -> str:
+    """Render data/news_latest.json as a clickable HTML headlines block.
+
+    Returns an empty string if the file does not exist or is empty. The
+    block is plain HTML (no Plotly) so it appends cleanly after Plotly's
+    write_html output.
+    """
+    if not news_path.exists():
+        return ""
+    try:
+        data = json.loads(news_path.read_text())
+    except (json.JSONDecodeError, OSError):
+        return ""
+
+    per_ticker = data.get("per_ticker") or {}
+    if not per_ticker:
+        return ""
+
+    run_date = data.get("date") or "unknown date"
+
+    def _wave_rank(ticker: str) -> tuple[int, str]:
+        wave = per_ticker[ticker].get("wave_bucket", "general_markets")
+        rank = _WAVE_DISPLAY_ORDER.index(wave) if wave in _WAVE_DISPLAY_ORDER else 99
+        return (rank, ticker)
+
+    ordered_tickers = sorted(per_ticker.keys(), key=_wave_rank)
+
+    parts = [
+        '<div style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;'
+        'max-width:980px;margin:1.5em auto 3em;padding:0 1.5em;color:#222;">',
+        '<h2 style="border-bottom:1px solid #ddd;padding-bottom:0.3em;">'
+        f'Latest news <span style="color:#888;font-weight:normal;font-size:0.7em;">'
+        f'(last reviewed {_html.escape(str(run_date))})</span></h2>',
+        '<p style="color:#666;font-size:0.9em;">Headlines from the most recent '
+        '<code>/review-portfolio</code> run, grouped by ticker. Click any '
+        'headline to open the source. The dashboard updates this section '
+        'each time the skill runs.</p>',
+    ]
+
+    for ticker in ordered_tickers:
+        info = per_ticker[ticker]
+        bullets = info.get("bullets") or []
+        if not bullets:
+            continue
+        wave = info.get("wave_bucket", "general_markets")
+        parts.append(
+            f'<h3 style="margin-top:1.5em;color:#222;">{_html.escape(ticker)} '
+            f'<small style="color:#999;font-weight:normal;">({_html.escape(wave)})</small></h3>'
+        )
+        parts.append('<ul style="line-height:1.55;padding-left:1.2em;">')
+        for b in bullets:
+            summary = _html.escape(str(b.get("summary", "")))
+            url = _html.escape(str(b.get("url", "#")), quote=True)
+            source = _html.escape(str(b.get("source", "")))
+            date = _html.escape(str(b.get("date", "")))
+            meta = " · ".join(x for x in (source, date) if x)
+            parts.append(
+                f'<li><a href="{url}" target="_blank" rel="noopener" '
+                f'style="color:#1a73e8;text-decoration:none;">{summary}</a> '
+                f'<small style="color:#999;">{meta}</small></li>'
+            )
+        parts.append('</ul>')
+
+    parts.append('</div>')
+    return "\n".join(parts)
+
+
 def build_dashboard(
     snapshots_path: str = "data/snapshots.csv",
     recommendations_path: str = "data/recommendations.csv",
     out_path: str = "data/dashboard.html",
+    news_path: str = "data/news_latest.json",
 ) -> dict[str, Any]:
-    """Render three Plotly charts into a single self-contained HTML file."""
+    """Render three Plotly charts plus a Latest-news headlines block into one HTML file."""
     import plotly.graph_objects as go
     from plotly.subplots import make_subplots
 
@@ -515,8 +594,16 @@ def build_dashboard(
     o_path.parent.mkdir(parents=True, exist_ok=True)
     fig.write_html(str(o_path), include_plotlyjs="cdn")
 
+    # Append the Latest-news headlines block after Plotly's HTML, if present.
+    news_html = _render_news_html(Path(news_path))
+    news_included = bool(news_html)
+    if news_included:
+        with o_path.open("a", encoding="utf-8") as f:
+            f.write("\n" + news_html + "\n")
+
     return {
         "out_path": str(o_path),
         "snapshots_rows": int(len(pd.read_csv(snap_path))) if snap_path.exists() else 0,
         "recommendations_rows": int(len(pd.read_csv(rec_path))) if rec_path.exists() else 0,
+        "news_included": news_included,
     }
