@@ -63,6 +63,16 @@ Also pre-commercial but with rapid research-cadence.
 - **IBM Quantum blog** — https://www.ibm.com/quantum/blog — primary source for IBM's roadmap.
 - **Google Quantum AI** — https://quantumai.google — primary source for Google's quantum research.
 
+## Synthetic biology
+
+Gene editing, engineered cells, mRNA platforms, cellular agriculture, longevity research.
+
+- **Endpoints News** — https://endpts.com — biotech business news; deals, trials, FDA actions.
+- **STAT News** — https://www.statnews.com — biotech and health reporting; strong on biotech IPOs and clinical readouts.
+- **BioPharma Dive** — https://www.biopharmadive.com — pharma and biotech industry news.
+- **Nature Biotechnology** — https://www.nature.com/nbt/ — peer-reviewed research and reviews.
+- **SynBioBeta** — https://www.synbiobeta.com — synthetic biology industry community and conference coverage.
+
 ## General markets
 
 For tickers that don't map cleanly to a single wave, or for macro context.

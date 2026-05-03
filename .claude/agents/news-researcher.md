@@ -25,8 +25,9 @@ the user has curated, and flag anything that clashes with the profile.
 ### Step 1 — route the ticker to a wave
 
 Use the profile's wave vocabulary (AI, robotics, rockets/spacecraft,
-nuclear fusion, quantum computing) and your own domain knowledge to
-pick the most relevant bucket in `news_sources.md`. If the ticker's
+nuclear fusion, quantum computing, synthetic biology) and your own
+domain knowledge to pick the most relevant bucket in `news_sources.md`.
+If the ticker's
 business doesn't map cleanly to a single wave, use `general_markets`.
 If the ticker spans two waves (e.g. a hyperscaler with both AI and
 quantum exposure), pick the primary one and note the secondary.
@@ -88,7 +89,7 @@ them.
 {
   "per_ticker": {
     "<TICKER>": {
-      "wave_bucket": "<AI | robotics | rockets_spacecraft | nuclear_fusion | quantum | general_markets>",
+      "wave_bucket": "<AI | robotics | rockets_spacecraft | nuclear_fusion | quantum | synthetic_biology | general_markets>",
       "used_fallback": <bool>,
       "bullets": [
         { "summary": "...", "source": "<name>", "url": "<url>", "date": "<YYYY-MM-DD>" },

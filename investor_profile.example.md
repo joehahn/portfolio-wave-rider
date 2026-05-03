@@ -34,7 +34,8 @@ Investment returns are shaped by long technology waves. Each wave follows a roug
 
 ## Likely next waves (where I want early exposure)
 
-- **Robotics**: lowers labor costs across physical industries.
-- **Rockets & spacecraft**: makes space resources (asteroids, satellite services) accessible and commercially usable.
-- **Nuclear fusion**: makes energy abundant and lower-cost.
-- **Quantum computing**: makes hard computations faster and cheaper.
+- **Robotics**: will lower labor costs across physical industries.
+- **Rockets & spacecraft**: will make space resources (asteroids, satellite services) accessible and commercially usable.
+- **Nuclear fusion**: will make energy abundant and lower-cost.
+- **Quantum computing**: will make hard computations faster and cheaper.
+- **Synthetic biology**: will lower the cost of designing molecules, cells, and tissues the way silicon lowered the cost of computation.
