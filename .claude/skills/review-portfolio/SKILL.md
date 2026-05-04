@@ -39,12 +39,15 @@ Inspect `holdings.csv`. If **every** row has `shares == 0`, this is a first run.
    ```
    Records day 0.
 6. Save `day_0_baseline = { allocations_usd: <step 2 JSON>, reasoning: <step 3 prose>, holdings: <step 4 return> }` for the report-writer.
+7. Set `news_lookback_days = 60` for Step 1. The default is 30 days; on a first run we widen the window to 60 days so the day-1 wave-stage call has roughly two months of context, since `wave_history.csv` is empty and provides no longer-horizon trajectory yet.
 
 ## Orchestration
 
 ### Step 1 — gather news (Task → news-researcher)
 
-Pass the ticker list. Get back: `wave_views` (ticker → stage), bullets, `wave_stages` (per-wave call with rationale + evidence), and `exclusion_conflicts`.
+Pass the ticker list and `lookback_days`. Use `news_lookback_days` (60) if Step 0 fired this run; otherwise use the default 30 days. State the lookback explicitly in the Task prompt so the agent uses it.
+
+Get back: `wave_views` (ticker → stage), bullets, `wave_stages` (per-wave call with rationale + evidence), and `exclusion_conflicts`.
 
 After the agent returns, write the full payload (with an added top-level `date` field set to today's date in `YYYY-MM-DD` form) to `data/news_latest.json`. The dashboard reads this file to render the "Latest news" headlines section. The file is overwritten on each run (no history kept).
 
