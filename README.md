@@ -148,6 +148,7 @@ Install with `crontab -e` and paste. Adjust `PROJ` to your clone path. Verify wi
 |---|---|---|
 | `data/dashboard.html` | Four Plotly charts (portfolio value over time; per-ticker recommended-weight trajectories; latest weights as a bar chart; per-wave stage trajectories accumulating across `/review-portfolio` runs) plus a "Latest news" section with clickable headlines from the most recent run | Open in a browser any time |
 | `data/wave_history.csv` | Long-format per-wave stage history: `date, wave, stage, evidence_tickers, rationale`. One row per wave per `/review-portfolio` run. Drives the wave-stage trajectory chart on the dashboard. | If you want raw history of how the LLM has classified each wave over time |
+| `data/news/YYYY-MM-DD-news.json` | Full archived news payload from each `/review-portfolio` run (per-ticker bullets with headline + summary). About 25 KB per run; accumulates with no pruning. | When the dashboard chart shows a wave-stage shift and you want to re-read what news was driving the LLM's call on that date |
 | `data/snapshots.csv` | Long-format daily snapshots: `date, ticker, shares, price, value, total_value` | Raw history; load with pandas |
 | `data/recommendations.csv` | Long-format weekly optimizer output: `date, ticker, weight, expected_return, annual_volatility, sharpe_ratio, objective` | Raw history; load with pandas |
 | `data/reports/*.md` | LLM-written narrative reports, one per `/review-portfolio` run | After each `/review-portfolio` |
@@ -212,6 +213,7 @@ portfolio-wave-rider/
     ├── wave_history.csv        # per-/review-portfolio run, appended (gitignored)
     ├── dashboard.html          # static Plotly + news dashboard (gitignored, regenerated)
     ├── news_latest.json        # latest news payload from /review-portfolio (gitignored)
+    ├── news/                   # archived news payloads, one per run (gitignored)
     ├── reports/                # LLM-written reports (gitignored)
     └── *.log                   # cron output (gitignored)
 ```

@@ -56,6 +56,14 @@ python -m src.cli wave-history
 
 This reads `data/news_latest.json` and appends today's per-wave stage classifications to `data/wave_history.csv` so the dashboard's wave-stage trajectory chart accumulates a time-series across runs. Idempotent on date; pass `--force` to overwrite if needed (e.g., if you re-run on the same day).
 
+Then Bash again, to archive the full news payload for forensic re-reading later:
+
+```
+mkdir -p data/news && cp data/news_latest.json "data/news/$(date -I)-news.json"
+```
+
+Each archived file is a snapshot of the full per-ticker bullets the news-researcher produced on that date. Files accumulate (no pruning); about 25 KB per run.
+
 ### Step 2 — run analysis (Bash)
 
 ```
