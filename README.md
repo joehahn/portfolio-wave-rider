@@ -7,6 +7,8 @@
 
 A Claude Code demo: optimize a long-horizon portfolio of stocks and ETFs against a user-authored investor profile. One slash command, two LLM subagents, six Python CLI subcommands, and a static dashboard. Stack: yfinance for prices (free Python wrapper around Yahoo Finance's historical close-price API), scipy.optimize for picking portfolio weights (maximizes risk-adjusted return subject to no-shorting and a per-asset weight cap), pandas for everything in between, Plotly for the dashboard.
 
+**Live demo:** [joehahn.github.io/portfolio-wave-rider](https://joehahn.github.io/portfolio-wave-rider/) — a snapshot of the dashboard generated against the example profile and watchlist. Refreshed manually; the timestamp inside the "Latest news" section tells you the date.
+
 ## Glossary (skip if you do this for a living)
 
 This README leans on a handful of finance terms.
@@ -141,6 +143,7 @@ Install with `crontab -e` and paste. Adjust `PROJ` to your clone path. Verify wi
 - Monthly: run `/review-portfolio` in Claude Code. Read the report, decide on rebalances, execute trades in your brokerage, then update `holdings.csv`.
 - Anytime: open `data/dashboard.html` in a browser.
 - After trading: edit `holdings.csv` to reflect new share counts. The next snapshot picks up the new positions.
+- Refreshing the public demo dashboard at `joehahn.github.io/portfolio-wave-rider`: run `/review-portfolio` against the **example** state (a clean clone of `holdings.example.csv` with all-zero shares; a clean copy of `investor_profile.example.md`), then `cp data/dashboard.html docs/index.html`, commit, and push. Do this when the example watchlist or profile changes, not when your personal `holdings.csv` changes (since the published demo should reflect the example state, not your real portfolio dollar values).
 
 ## Outputs to monitor
 
