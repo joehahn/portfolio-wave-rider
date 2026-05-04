@@ -9,7 +9,8 @@ Six public functions plus one orchestrator:
 - ``analyze`` — one-shot: fetch + returns + optimize + risk in one call
 - ``snapshot_holdings`` — append daily $ values to data/snapshots.csv
 - ``recommend_portfolio`` — append weekly weights to data/recommendations.csv
-- ``build_dashboard`` — render a static HTML dashboard from the two CSVs plus the latest news payload
+- ``append_wave_history`` — append per-wave stage classifications to data/wave_history.csv
+- ``build_dashboard`` — render a static HTML dashboard from the CSVs plus the latest news payload
 
 Functions pass DataFrames in-memory; there is no on-disk handle store. The
 CLI calls ``analyze`` (or ``snapshot``/``recommend``/``dashboard``) once
@@ -440,6 +441,74 @@ def recommend_portfolio(
 
 
 # ---------------------------------------------------------------------------
+# Wave-stage history. Appended each /review-portfolio run so the dashboard
+# can chart how each wave's stage classification evolves between rebalances.
+# ---------------------------------------------------------------------------
+
+# Stage rank used for the trajectory chart. Monotonic in cycle position so
+# a rising line means the wave is heating up; a falling line after the peak
+# row means digestion. neutral = 0 because general_markets tickers carry no
+# wave thesis and shouldn't visually bias the chart.
+WAVE_STAGE_RANK = {
+    "neutral":   0,
+    "buildup":   1,
+    "surge":     2,
+    "peak":      3,
+    "digestion": 4,
+}
+
+
+def append_wave_history(
+    wave_stages: dict[str, dict[str, Any]],
+    date: str,
+    out_path: str = "data/wave_history.csv",
+    force: bool = False,
+) -> dict[str, Any]:
+    """Append today's wave-stage classifications to wave_history.csv.
+
+    Schema: date, wave, stage, evidence_tickers, rationale.
+    `evidence_tickers` is semicolon-joined inside the cell so the file
+    stays a flat 2D CSV. Idempotent on (date, wave): if rows already exist
+    for ``date``, the call is a no-op unless force=True (in which case
+    existing rows for that date are dropped first).
+    """
+    if not wave_stages:
+        return {"skipped": True, "reason": "wave_stages is empty"}
+    if not date:
+        raise ValueError("date is required")
+
+    o_path = Path(out_path)
+    existing = pd.read_csv(o_path) if o_path.exists() else None
+    if existing is not None and (existing["date"] == str(date)).any():
+        if not force:
+            return {"skipped": True, "date": str(date),
+                    "reason": "wave-history rows already exist for this date; pass force=True to overwrite"}
+        existing = existing[existing["date"] != str(date)]
+
+    rows = []
+    for wave, info in wave_stages.items():
+        rows.append({
+            "date": str(date),
+            "wave": wave,
+            "stage": info.get("stage", "neutral"),
+            "evidence_tickers": ";".join(info.get("evidence_tickers") or []),
+            "rationale": (info.get("rationale") or "").replace("\n", " ").strip(),
+        })
+
+    new_rows = pd.DataFrame(rows)
+    out = pd.concat([existing, new_rows], ignore_index=True) if existing is not None else new_rows
+    o_path.parent.mkdir(parents=True, exist_ok=True)
+    out.to_csv(o_path, index=False)
+
+    return {
+        "date": str(date),
+        "waves": list(wave_stages.keys()),
+        "n_rows_appended": len(new_rows),
+        "out_path": str(o_path),
+    }
+
+
+# ---------------------------------------------------------------------------
 # Static HTML dashboard. Reads the two append-only CSVs and emits one file
 # the user can open in a browser. No server, no Streamlit.
 # ---------------------------------------------------------------------------
@@ -537,26 +606,29 @@ def build_dashboard(
     recommendations_path: str = "data/recommendations.csv",
     out_path: str = "data/dashboard.html",
     news_path: str = "data/news_latest.json",
+    wave_history_path: str = "data/wave_history.csv",
 ) -> dict[str, Any]:
-    """Render three Plotly charts plus a Latest-news headlines block into one HTML file."""
+    """Render four Plotly charts plus a Latest-news headlines block into one HTML file."""
     import plotly.graph_objects as go
     from plotly.subplots import make_subplots
 
     snap_path = Path(snapshots_path)
     rec_path = Path(recommendations_path)
+    wh_path = Path(wave_history_path)
     if not snap_path.exists() and not rec_path.exists():
         raise FileNotFoundError(
             f"neither {snap_path} nor {rec_path} exists; run snapshot/recommend first"
         )
 
     fig = make_subplots(
-        rows=3, cols=1,
+        rows=4, cols=1,
         subplot_titles=(
             "Portfolio value over time",
             "Recommended weights drift over time",
             "Latest recommended weights",
+            "Wave-stage trajectories (0=neutral, 1=buildup, 2=surge, 3=peak, 4=digestion)",
         ),
-        vertical_spacing=0.10,
+        vertical_spacing=0.08,
     )
 
     # 1. Portfolio total value over time (from snapshots.csv).
@@ -593,14 +665,38 @@ def build_dashboard(
             row=3, col=1,
         )
 
+    # 4. Wave-stage trajectories (one line per wave, from wave_history.csv).
+    if wh_path.exists():
+        wh = pd.read_csv(wh_path, parse_dates=["date"])
+        wh["stage_rank"] = wh["stage"].map(WAVE_STAGE_RANK).fillna(0).astype(int)
+        # Order legend by display priority so AI is at the top, general_markets last.
+        ordered = sorted(
+            wh["wave"].unique(),
+            key=lambda w: _WAVE_DISPLAY_ORDER.index(w) if w in _WAVE_DISPLAY_ORDER else 99,
+        )
+        for wave in ordered:
+            sub = wh[wh["wave"] == wave].sort_values("date")
+            # Hover shows the actual stage label, not just the rank.
+            hover = [f"{wave}<br>stage: {s}<br>tickers: {t}"
+                     for s, t in zip(sub["stage"], sub["evidence_tickers"].fillna(""))]
+            fig.add_trace(
+                go.Scatter(x=sub["date"], y=sub["stage_rank"], mode="lines+markers",
+                           name=wave, legendgroup="waves",
+                           legendgrouptitle_text="Wave stages",
+                           hovertext=hover, hoverinfo="text+x"),
+                row=4, col=1,
+            )
+
     fig.update_layout(
-        height=900,
+        height=1200,
         title_text="Portfolio Wave Rider — dashboard",
         hovermode="x unified",
     )
     fig.update_yaxes(title_text="$", row=1, col=1)
     fig.update_yaxes(title_text="weight", row=2, col=1)
     fig.update_yaxes(title_text="weight", row=3, col=1)
+    fig.update_yaxes(title_text="stage rank", row=4, col=1,
+                     range=[-0.3, 4.3], dtick=1)
 
     o_path = Path(out_path)
     o_path.parent.mkdir(parents=True, exist_ok=True)
@@ -617,5 +713,6 @@ def build_dashboard(
         "out_path": str(o_path),
         "snapshots_rows": int(len(pd.read_csv(snap_path))) if snap_path.exists() else 0,
         "recommendations_rows": int(len(pd.read_csv(rec_path))) if rec_path.exists() else 0,
+        "wave_history_rows": int(len(pd.read_csv(wh_path))) if wh_path.exists() else 0,
         "news_included": news_included,
     }

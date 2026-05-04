@@ -172,6 +172,55 @@ def test_render_news_html_emits_expandable_headlines(tmp_path) -> None:
     assert out.index("NVDA") < out.index("AGG")
 
 
+def test_append_wave_history_writes_one_row_per_wave(tmp_path) -> None:
+    out = tmp_path / "wave_history.csv"
+    wave_stages = {
+        "AI": {"stage": "surge", "rationale": "Real revenue compounding.",
+               "evidence_tickers": ["NVDA", "MSFT", "GOOGL"]},
+        "rockets_spacecraft": {"stage": "buildup", "rationale": "RKLB pre-Neutron.",
+                                "evidence_tickers": ["RKLB"]},
+        "general_markets": {"stage": "neutral", "rationale": "Macro instruments.",
+                            "evidence_tickers": ["AGG", "BIL", "IAU", "IBIT"]},
+    }
+    result = portfolio.append_wave_history(wave_stages, date="2026-05-04",
+                                            out_path=str(out))
+    assert result["n_rows_appended"] == 3
+    df = pd.read_csv(out)
+    assert list(df.columns) == ["date", "wave", "stage", "evidence_tickers", "rationale"]
+    ai_row = df[df["wave"] == "AI"].iloc[0]
+    assert ai_row["stage"] == "surge"
+    assert ai_row["evidence_tickers"] == "NVDA;MSFT;GOOGL"
+
+
+def test_append_wave_history_idempotent_on_date(tmp_path) -> None:
+    out = tmp_path / "wave_history.csv"
+    wave_stages = {"AI": {"stage": "surge", "rationale": "Same.", "evidence_tickers": ["NVDA"]}}
+    portfolio.append_wave_history(wave_stages, date="2026-05-04", out_path=str(out))
+    second = portfolio.append_wave_history(wave_stages, date="2026-05-04", out_path=str(out))
+    assert second.get("skipped") is True
+    # Force overwrite produces same row count, not duplicated.
+    portfolio.append_wave_history(wave_stages, date="2026-05-04",
+                                   out_path=str(out), force=True)
+    df = pd.read_csv(out)
+    assert len(df) == 1
+
+
+def test_append_wave_history_appends_across_dates(tmp_path) -> None:
+    out = tmp_path / "wave_history.csv"
+    portfolio.append_wave_history(
+        {"AI": {"stage": "surge", "rationale": "...", "evidence_tickers": ["NVDA"]}},
+        date="2026-04-15", out_path=str(out),
+    )
+    portfolio.append_wave_history(
+        {"AI": {"stage": "peak", "rationale": "...", "evidence_tickers": ["NVDA"]}},
+        date="2026-05-15", out_path=str(out),
+    )
+    df = pd.read_csv(out).sort_values("date").reset_index(drop=True)
+    assert len(df) == 2
+    assert df.loc[0, "stage"] == "surge"
+    assert df.loc[1, "stage"] == "peak"
+
+
 def test_render_news_html_falls_back_when_headline_missing(tmp_path) -> None:
     """Older news_latest.json without a headline field still renders cleanly."""
     import json

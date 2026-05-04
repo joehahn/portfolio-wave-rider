@@ -1,15 +1,17 @@
 """Single CLI for every portfolio operation.
 
-Five subcommands. Each calls one function in ``src/portfolio.py`` and
+Six subcommands. Each calls one function in ``src/portfolio.py`` and
 prints the result as JSON to stdout. The /review-portfolio skill
-invokes ``init-holdings`` (first-run branch only) and ``analyze``; the
-cron jobs invoke ``snapshot``, ``recommend``, and ``dashboard``.
+invokes ``init-holdings`` (first-run branch only), ``wave-history``
+(after each news pass), and ``analyze``; the cron jobs invoke
+``snapshot``, ``recommend``, and ``dashboard``.
 
 Usage:
-    python -m src.cli init-holdings --allocations '{"AAPL": 5000, ...}' --out holdings.csv
-    python -m src.cli analyze       --tickers AAPL MSFT NVDA --period 3y --max-weight 0.25
-    python -m src.cli snapshot      [--date YYYY-MM-DD] [--force]
-    python -m src.cli recommend     [--max-weight 0.25] [--force]
+    python -m src.cli init-holdings  --allocations '{"AAPL": 5000, ...}' --out holdings.csv
+    python -m src.cli wave-history   [--news data/news_latest.json] [--force]
+    python -m src.cli analyze        --tickers AAPL MSFT NVDA --period 3y --max-weight 0.25
+    python -m src.cli snapshot       [--date YYYY-MM-DD] [--force]
+    python -m src.cli recommend      [--max-weight 0.25] [--force]
     python -m src.cli dashboard
 """
 
@@ -45,6 +47,14 @@ def main(argv: list[str] | None = None) -> int:
                         help="JSON literal or path mapping ticker -> dollars")
     p_init.add_argument("--out", default="holdings.csv")
 
+    p_wh = sub.add_parser("wave-history",
+                          help="append wave-stage classifications from news_latest.json to data/wave_history.csv")
+    p_wh.add_argument("--news", default="data/news_latest.json",
+                      help="path to news_latest.json (must contain top-level `date` and `wave_stages`)")
+    p_wh.add_argument("--out", default="data/wave_history.csv")
+    p_wh.add_argument("--force", action="store_true",
+                      help="overwrite any existing rows for the news file's date")
+
     p_an = sub.add_parser("analyze", help="fetch + optimize + risk in one call")
     p_an.add_argument("--tickers", nargs="+", required=True)
     p_an.add_argument("--period", default="3y")
@@ -74,10 +84,11 @@ def main(argv: list[str] | None = None) -> int:
     p_rec.add_argument("--date", default=None)
     p_rec.add_argument("--force", action="store_true")
 
-    p_dash = sub.add_parser("dashboard", help="generate data/dashboard.html from snapshots + recommendations + news")
+    p_dash = sub.add_parser("dashboard", help="generate data/dashboard.html from snapshots + recommendations + news + wave history")
     p_dash.add_argument("--snapshots", default="data/snapshots.csv")
     p_dash.add_argument("--recommendations", default="data/recommendations.csv")
     p_dash.add_argument("--news", default="data/news_latest.json")
+    p_dash.add_argument("--wave-history", default="data/wave_history.csv")
     p_dash.add_argument("--out", default="data/dashboard.html")
 
     args = parser.parse_args(argv)
@@ -88,6 +99,18 @@ def main(argv: list[str] | None = None) -> int:
             prices_df = portfolio.fetch_prices(list(allocations.keys()), period="7d")
             last_prices = {t: float(prices_df[t].iloc[-1]) for t in prices_df.columns}
             result = portfolio.initialize_holdings(allocations, last_prices, holdings_path=args.out)
+        elif args.cmd == "wave-history":
+            news_path = Path(args.news)
+            if not news_path.exists():
+                raise FileNotFoundError(f"news file not found: {news_path}")
+            news = json.loads(news_path.read_text())
+            wave_stages = news.get("wave_stages") or {}
+            news_date = news.get("date") or ""
+            if not news_date:
+                raise ValueError(f"{news_path} has no top-level `date` field")
+            result = portfolio.append_wave_history(
+                wave_stages, date=news_date, out_path=args.out, force=args.force,
+            )
         elif args.cmd == "analyze":
             result = portfolio.analyze(
                 args.tickers, period=args.period, objective=args.objective,
@@ -112,6 +135,7 @@ def main(argv: list[str] | None = None) -> int:
                 recommendations_path=args.recommendations,
                 out_path=args.out,
                 news_path=args.news,
+                wave_history_path=args.wave_history,
             )
     except Exception as e:  # noqa: BLE001 — surface any failure as a JSON error line
         print(json.dumps({"error": f"{type(e).__name__}: {e}"}), file=sys.stderr)

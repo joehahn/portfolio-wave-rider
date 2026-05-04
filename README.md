@@ -146,7 +146,8 @@ Install with `crontab -e` and paste. Adjust `PROJ` to your clone path. Verify wi
 
 | File | What's in it | When to look |
 |---|---|---|
-| `data/dashboard.html` | Three Plotly charts (portfolio value over time, per-ticker recommended-weight trajectories, latest weights as a bar chart) plus a "Latest news" section with clickable headlines from the most recent `/review-portfolio` run | Open in a browser any time |
+| `data/dashboard.html` | Four Plotly charts (portfolio value over time; per-ticker recommended-weight trajectories; latest weights as a bar chart; per-wave stage trajectories accumulating across `/review-portfolio` runs) plus a "Latest news" section with clickable headlines from the most recent run | Open in a browser any time |
+| `data/wave_history.csv` | Long-format per-wave stage history: `date, wave, stage, evidence_tickers, rationale`. One row per wave per `/review-portfolio` run. Drives the wave-stage trajectory chart on the dashboard. | If you want raw history of how the LLM has classified each wave over time |
 | `data/snapshots.csv` | Long-format daily snapshots: `date, ticker, shares, price, value, total_value` | Raw history; load with pandas |
 | `data/recommendations.csv` | Long-format weekly optimizer output: `date, ticker, weight, expected_return, annual_volatility, sharpe_ratio, objective` | Raw history; load with pandas |
 | `data/reports/*.md` | LLM-written narrative reports, one per `/review-portfolio` run | After each `/review-portfolio` |
@@ -164,13 +165,17 @@ The "Profile conflicts" section of any report is the most important thing to rea
 
 ## CLI reference
 
-Five subcommands. `/review-portfolio` calls `init-holdings` (first-run branch only) and `analyze`. The cron jobs call `snapshot`, `recommend`, and `dashboard`. Every subcommand prints a single JSON blob to stdout.
+Six subcommands. `/review-portfolio` calls `init-holdings` (first-run branch only), `wave-history` (after each news pass), and `analyze`. The cron jobs call `snapshot`, `recommend`, and `dashboard`. Every subcommand prints a single JSON blob to stdout.
 
 ```bash
 # Convert a thesis-driven dollar allocation into shares (used internally by the
 # skill's first-run branch; runnable directly if you ever want to redo a day 0
 # allocation, e.g. after expanding the watchlist)
 .venv/bin/python -m src.cli init-holdings --allocations '{"NVDA": 5000, "MSFT": 5000, ...}' --out holdings.csv
+
+# Append today's per-wave stage classifications (read from data/news_latest.json)
+# to data/wave_history.csv so the dashboard can plot stage trajectories
+.venv/bin/python -m src.cli wave-history [--news data/news_latest.json] [--force]
 
 # One-shot analysis (fetch prices + compute log-returns + optimize + risk metrics)
 .venv/bin/python -m src.cli analyze --tickers AAPL MSFT NVDA --period 3y --max-weight 0.25
@@ -179,7 +184,7 @@ Five subcommands. `/review-portfolio` calls `init-holdings` (first-run branch on
 .venv/bin/python -m src.cli snapshot   [--date YYYY-MM-DD] [--force]
 .venv/bin/python -m src.cli recommend  [--max-weight 0.25] [--force]
 
-# Static dashboard (reads the two CSVs above; writes data/dashboard.html)
+# Static dashboard (reads the CSVs above plus news_latest.json; writes data/dashboard.html)
 .venv/bin/python -m src.cli dashboard
 ```
 
@@ -204,6 +209,7 @@ portfolio-wave-rider/
 └── data/
     ├── snapshots.csv           # daily, appended (your history)
     ├── recommendations.csv     # weekly, appended (your history)
+    ├── wave_history.csv        # per-/review-portfolio run, appended (gitignored)
     ├── dashboard.html          # static Plotly + news dashboard (gitignored, regenerated)
     ├── news_latest.json        # latest news payload from /review-portfolio (gitignored)
     ├── reports/                # LLM-written reports (gitignored)

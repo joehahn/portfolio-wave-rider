@@ -48,6 +48,14 @@ Pass the ticker list. Get back: `wave_views` (ticker → stage), bullets, `wave_
 
 After the agent returns, write the full payload (with an added top-level `date` field set to today's date in `YYYY-MM-DD` form) to `data/news_latest.json`. The dashboard reads this file to render the "Latest news" headlines section. The file is overwritten on each run (no history kept).
 
+Then Bash:
+
+```
+python -m src.cli wave-history
+```
+
+This reads `data/news_latest.json` and appends today's per-wave stage classifications to `data/wave_history.csv` so the dashboard's wave-stage trajectory chart accumulates a time-series across runs. Idempotent on date; pass `--force` to overwrite if needed (e.g., if you re-run on the same day).
+
 ### Step 2 — run analysis (Bash)
 
 ```
