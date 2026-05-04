@@ -15,6 +15,7 @@ data_cache/
 data/reports/
 data/dashboard.html
 data/news_latest.json
+data/news_feed.json
 data/wave_history.csv
 data/news/
 

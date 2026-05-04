@@ -441,6 +441,80 @@ def recommend_portfolio(
 
 
 # ---------------------------------------------------------------------------
+# Daily news feed. Cron-friendly, no LLM. Uses yfinance's per-ticker news
+# (Yahoo Finance) to keep the dashboard's "Today's headlines" section fresh
+# between manual /review-portfolio runs.
+# ---------------------------------------------------------------------------
+
+def fetch_news_feed(
+    holdings_path: str = "holdings.csv",
+    out_path: str = "data/news_feed.json",
+    per_ticker_limit: int = 5,
+    date: str | None = None,
+) -> dict[str, Any]:
+    """Pull recent Yahoo Finance headlines for each ticker in holdings.csv,
+    write a JSON payload shaped like ``data/news_latest.json`` (so the
+    dashboard's existing news-rendering code can consume it without
+    branching).
+
+    yfinance returns up to ~10 items per ticker; we keep the most recent
+    ``per_ticker_limit`` of them. No wave-stage classification; this is
+    raw "what happened today" surfacing, not the LLM's interpretation.
+    """
+    h_path = Path(holdings_path)
+    if not h_path.exists():
+        raise FileNotFoundError(f"holdings file not found: {h_path}")
+    holdings = pd.read_csv(h_path)
+    if "ticker" not in holdings.columns:
+        raise ValueError(f"{h_path} must have a 'ticker' column")
+    tickers = holdings["ticker"].str.upper().str.strip().tolist()
+
+    feed_date = pd.Timestamp(date).date() if date else pd.Timestamp.today().date()
+
+    per_ticker: dict[str, dict[str, Any]] = {}
+    for ticker in tickers:
+        items = yf.Ticker(ticker).news or []
+        bullets = []
+        for item in items[:per_ticker_limit]:
+            content = item.get("content") or {}
+            title = (content.get("title") or "").strip()
+            summary = (content.get("summary") or "").strip()
+            url_obj = content.get("canonicalUrl") or content.get("clickThroughUrl") or {}
+            url = (url_obj.get("url") if isinstance(url_obj, dict) else "") or ""
+            provider = content.get("provider") or {}
+            source = (provider.get("displayName") if isinstance(provider, dict) else "") or ""
+            pub_iso = content.get("pubDate") or ""
+            pub_date = pub_iso[:10] if pub_iso else ""
+            if not title or not url:
+                continue
+            bullets.append({
+                "headline": title,
+                "summary": summary,
+                "source": source,
+                "url": url,
+                "date": pub_date,
+            })
+        per_ticker[ticker] = {"bullets": bullets}
+
+    payload = {
+        "date": str(feed_date),
+        "per_ticker": per_ticker,
+    }
+
+    o_path = Path(out_path)
+    o_path.parent.mkdir(parents=True, exist_ok=True)
+    o_path.write_text(json.dumps(payload, indent=2))
+
+    n_bullets = sum(len(v.get("bullets") or []) for v in per_ticker.values())
+    return {
+        "date": str(feed_date),
+        "tickers": tickers,
+        "n_bullets": n_bullets,
+        "out_path": str(o_path),
+    }
+
+
+# ---------------------------------------------------------------------------
 # Wave-stage history. Appended each /review-portfolio run so the dashboard
 # can chart how each wave's stage classification evolves between rebalances.
 # ---------------------------------------------------------------------------
@@ -522,25 +596,20 @@ _WAVE_DISPLAY_ORDER = [
 ]
 
 
-def _render_news_html(news_path: Path) -> str:
-    """Render data/news_latest.json as a clickable HTML headlines block.
+def _render_news_section(payload: dict, title: str, intro: str) -> str:
+    """Render one news section (title + intro + per-ticker click-to-expand bullets).
 
-    Returns an empty string if the file does not exist or is empty. The
-    block is plain HTML (no Plotly) so it appends cleanly after Plotly's
-    write_html output.
+    Returns an empty string if payload has no per_ticker bullets. Used by
+    `_render_news_html` for both the daily yfinance feed and the monthly
+    /review-portfolio rich payload; the two sections share the same
+    schema (per_ticker -> {bullets: [{headline, summary, source, url, date,
+    optional wave_bucket}]}) so the same renderer fits both.
     """
-    if not news_path.exists():
-        return ""
-    try:
-        data = json.loads(news_path.read_text())
-    except (json.JSONDecodeError, OSError):
-        return ""
-
-    per_ticker = data.get("per_ticker") or {}
+    per_ticker = payload.get("per_ticker") or {}
     if not per_ticker:
         return ""
 
-    run_date = data.get("date") or "unknown date"
+    run_date = payload.get("date") or "unknown date"
 
     def _wave_rank(ticker: str) -> tuple[int, str]:
         wave = per_ticker[ticker].get("wave_bucket", "general_markets")
@@ -549,16 +618,14 @@ def _render_news_html(news_path: Path) -> str:
 
     ordered_tickers = sorted(per_ticker.keys(), key=_wave_rank)
 
+    # Titles and intros are caller-controlled constants, not user input,
+    # so they're rendered as-is. Only date and bullet fields are escaped.
     parts = [
-        '<div style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;'
-        'max-width:980px;margin:1.5em auto 3em;padding:0 1.5em;color:#222;">',
-        '<h2 style="border-bottom:1px solid #ddd;padding-bottom:0.3em;">'
-        f'Latest news <span style="color:#888;font-weight:normal;font-size:0.7em;">'
-        f'(last reviewed {_html.escape(str(run_date))})</span></h2>',
-        '<p style="color:#666;font-size:0.9em;">Headlines from the most recent '
-        '<code>/review-portfolio</code> run, grouped by ticker. '
-        'Click a headline to expand a portfolio-relevant summary plus a '
-        'link to the source. Updated each time the skill runs.</p>',
+        '<h2 style="border-bottom:1px solid #ddd;padding-bottom:0.3em;margin-top:1.5em;">'
+        f'{title} '
+        f'<span style="color:#888;font-weight:normal;font-size:0.7em;">'
+        f'({_html.escape(str(run_date))})</span></h2>',
+        f'<p style="color:#666;font-size:0.9em;">{intro}</p>',
     ]
 
     for ticker in ordered_tickers:
@@ -566,10 +633,15 @@ def _render_news_html(news_path: Path) -> str:
         bullets = info.get("bullets") or []
         if not bullets:
             continue
-        wave = info.get("wave_bucket", "general_markets")
+        wave = info.get("wave_bucket")
+        if wave:
+            ticker_html = (f'{_html.escape(ticker)} '
+                           f'<small style="color:#999;font-weight:normal;">'
+                           f'({_html.escape(wave)})</small>')
+        else:
+            ticker_html = _html.escape(ticker)
         parts.append(
-            f'<h3 style="margin-top:1.5em;color:#222;">{_html.escape(ticker)} '
-            f'<small style="color:#999;font-weight:normal;">({_html.escape(wave)})</small></h3>'
+            f'<h3 style="margin-top:1.5em;color:#222;">{ticker_html}</h3>'
         )
         for b in bullets:
             summary_text = str(b.get("summary", ""))
@@ -597,8 +669,63 @@ def _render_news_html(news_path: Path) -> str:
                 '</div></details>'
             )
 
-    parts.append('</div>')
     return "\n".join(parts)
+
+
+def _render_news_html(news_path: Path, news_feed_path: Path | None = None) -> str:
+    """Render the dashboard's news area as up to two sections.
+
+    Top section ("Today's headlines") comes from ``news_feed_path``
+    (the daily yfinance scrape) when present. Bottom section
+    ("In-depth news from last /review-portfolio") comes from
+    ``news_path`` (the monthly LLM-driven payload) when present.
+
+    Returns "" if neither file exists / has content.
+    """
+    sections: list[str] = []
+
+    if news_feed_path is not None and news_feed_path.exists():
+        try:
+            feed = json.loads(news_feed_path.read_text())
+            section = _render_news_section(
+                feed,
+                title="Today's headlines",
+                intro="Refreshed daily by cron via Yahoo Finance "
+                      "(<code>yfinance.Ticker(t).news</code>). Each entry's "
+                      "summary is the article's lead paragraph from the source. "
+                      "Surface-level coverage; for portfolio-relevant analysis "
+                      "see the section below.",
+            )
+            if section:
+                sections.append(section)
+        except (json.JSONDecodeError, OSError):
+            pass
+
+    if news_path.exists():
+        try:
+            latest = json.loads(news_path.read_text())
+            section = _render_news_section(
+                latest,
+                title="In-depth news from last /review-portfolio",
+                intro="Click any headline to expand the LLM-written, "
+                      "portfolio-relevance summary plus a link to the source. "
+                      "Refreshed when you run <code>/review-portfolio</code> "
+                      "(typically monthly). Tickers are grouped by wave bucket.",
+            )
+            if section:
+                sections.append(section)
+        except (json.JSONDecodeError, OSError):
+            pass
+
+    if not sections:
+        return ""
+
+    return "\n".join([
+        '<div style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;'
+        'max-width:980px;margin:1.5em auto 3em;padding:0 1.5em;color:#222;">',
+        *sections,
+        '</div>',
+    ])
 
 
 def build_dashboard(
@@ -606,9 +733,11 @@ def build_dashboard(
     recommendations_path: str = "data/recommendations.csv",
     out_path: str = "data/dashboard.html",
     news_path: str = "data/news_latest.json",
+    news_feed_path: str = "data/news_feed.json",
     wave_history_path: str = "data/wave_history.csv",
 ) -> dict[str, Any]:
-    """Render four Plotly charts plus a Latest-news headlines block into one HTML file."""
+    """Render four Plotly charts plus the news area (daily yfinance feed
+    + the most recent /review-portfolio payload) into one HTML file."""
     import plotly.graph_objects as go
     from plotly.subplots import make_subplots
 
@@ -702,8 +831,10 @@ def build_dashboard(
     o_path.parent.mkdir(parents=True, exist_ok=True)
     fig.write_html(str(o_path), include_plotlyjs="cdn")
 
-    # Append the Latest-news headlines block after Plotly's HTML, if present.
-    news_html = _render_news_html(Path(news_path))
+    # Append the news area (daily feed + latest /review-portfolio payload)
+    # after Plotly's HTML, if either file is present.
+    nf_path = Path(news_feed_path)
+    news_html = _render_news_html(Path(news_path), news_feed_path=nf_path)
     news_included = bool(news_html)
     if news_included:
         with o_path.open("a", encoding="utf-8") as f:
@@ -714,5 +845,6 @@ def build_dashboard(
         "snapshots_rows": int(len(pd.read_csv(snap_path))) if snap_path.exists() else 0,
         "recommendations_rows": int(len(pd.read_csv(rec_path))) if rec_path.exists() else 0,
         "wave_history_rows": int(len(pd.read_csv(wh_path))) if wh_path.exists() else 0,
+        "news_feed_included": nf_path.exists(),
         "news_included": news_included,
     }

@@ -221,6 +221,54 @@ def test_append_wave_history_appends_across_dates(tmp_path) -> None:
     assert df.loc[1, "stage"] == "peak"
 
 
+def test_render_news_html_renders_both_sections_when_both_paths_provided(tmp_path) -> None:
+    """The two news files render as two sections in the same HTML block."""
+    import json
+    feed = {
+        "date": "2026-05-04",
+        "per_ticker": {
+            "NVDA": {"bullets": [
+                {"headline": "Yahoo headline for NVDA", "summary": "Yahoo lead.",
+                 "source": "Yahoo Finance", "url": "https://example.com/yf-nvda",
+                 "date": "2026-05-04"},
+            ]},
+        },
+    }
+    latest = {
+        "date": "2026-05-02",
+        "per_ticker": {
+            "NVDA": {"wave_bucket": "AI", "bullets": [
+                {"headline": "LLM headline for NVDA", "summary": "Portfolio-relevance summary.",
+                 "source": "SemiAnalysis", "url": "https://example.com/llm-nvda",
+                 "date": "2026-04-23"},
+            ]},
+        },
+    }
+    feed_path = tmp_path / "news_feed.json"
+    latest_path = tmp_path / "news_latest.json"
+    feed_path.write_text(json.dumps(feed))
+    latest_path.write_text(json.dumps(latest))
+
+    out = portfolio._render_news_html(latest_path, news_feed_path=feed_path)
+
+    # Both section titles appear, daily-feed first.
+    assert "Today's headlines" in out
+    assert "In-depth news from last /review-portfolio" in out
+    assert out.index("Today's headlines") < out.index("In-depth news from last /review-portfolio")
+
+    # Both source URLs render.
+    assert 'href="https://example.com/yf-nvda"' in out
+    assert 'href="https://example.com/llm-nvda"' in out
+
+    # Daily section omits wave_bucket label since yfinance doesn't classify;
+    # in-depth section keeps the (AI) label from wave_bucket.
+    feed_section_end = out.index("In-depth news from last /review-portfolio")
+    feed_section = out[:feed_section_end]
+    indepth_section = out[feed_section_end:]
+    assert "(AI)" not in feed_section
+    assert "(AI)" in indepth_section
+
+
 def test_render_news_html_falls_back_when_headline_missing(tmp_path) -> None:
     """Older news_latest.json without a headline field still renders cleanly."""
     import json

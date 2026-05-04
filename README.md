@@ -5,9 +5,9 @@
 **Date:** 2026-May-02 <br>
 **branch:** main
 
-A Claude Code demo: optimize a long-horizon portfolio of stocks and ETFs against a user-authored investor profile. One slash command, two LLM subagents, six Python CLI subcommands, and a static dashboard. Stack: yfinance for prices (free Python wrapper around Yahoo Finance's historical close-price API), scipy.optimize for picking portfolio weights (maximizes risk-adjusted return subject to no-shorting and a per-asset weight cap), pandas for everything in between, Plotly for the dashboard.
+A Claude Code demo: optimize a long-horizon portfolio of stocks and ETFs against a user-authored investor profile. One slash command, two LLM subagents, seven Python CLI subcommands, and a static dashboard. Stack: yfinance for prices (free Python wrapper around Yahoo Finance's historical close-price API), scipy.optimize for picking portfolio weights (maximizes risk-adjusted return subject to no-shorting and a per-asset weight cap), pandas for everything in between, Plotly for the dashboard.
 
-**Live demo:** [joehahn.github.io/portfolio-wave-rider](https://joehahn.github.io/portfolio-wave-rider/) — a snapshot of the dashboard generated against the example profile and watchlist. Refreshed manually; the timestamp inside the "Latest news" section tells you the date.
+**Live demo:** [joehahn.github.io/portfolio-wave-rider](https://joehahn.github.io/portfolio-wave-rider/). A snapshot of the dashboard generated against the example profile and watchlist. Refreshed manually; the timestamp inside the "Latest news" section tells you the date.
 
 ## Glossary (skip if you do this for a living)
 
@@ -47,7 +47,7 @@ Three cadences:
 
 | Cadence | Mechanism | What runs | Output |
 |---|---|---|---|
-| Daily, Mon-Fri 16:30 local | cron | `snapshot && dashboard`. Fetches the latest close price for every ticker in `holdings.csv`, multiplies by `shares`, appends one row per ticker to `data/snapshots.csv`. Then refreshes the dashboard. | `data/snapshots.csv`, `data/dashboard.html` |
+| Daily, Mon-Fri 16:30 local | cron | `snapshot && news-feed && dashboard`. Fetches the latest close price for every ticker in `holdings.csv`, multiplies by `shares`, appends one row per ticker to `data/snapshots.csv`. Then pulls fresh Yahoo Finance headlines per ticker into `data/news_feed.json`. Then refreshes the dashboard. | `data/snapshots.csv`, `data/news_feed.json`, `data/dashboard.html` |
 | Weekly, Fri 17:00 local | cron | `recommend && dashboard`. Re-runs the mean-variance optimizer over the holdings universe, appends new target weights to `data/recommendations.csv`, refreshes the dashboard. No news, no wave tilts. | `data/recommendations.csv`, `data/dashboard.html` |
 | Monthly, you decide | You run `/review-portfolio` in Claude Code | LLM subagents gather wave-aligned news (60-day lookback on the first run, 30-day default thereafter), classify each wave's stage, pass `wave_views` to the optimizer (which scales `μ` accordingly), then write a profile-aware report and refresh the dashboard. The run also appends today's wave-stage classifications to `data/wave_history.csv` (drives the trajectory chart) and archives the full news payload to `data/news/<date>-news.json`. The first run additionally does a thesis-driven day 0 allocation before optimizing. | `data/reports/YYYY-MM-DD-review-portfolio.md`, `data/dashboard.html`, `data/wave_history.csv` (appended), `data/news/<date>-news.json` |
 
@@ -59,7 +59,7 @@ The weekly cron is the lightweight Python-only sibling of `/review-portfolio`: p
 - Two subagents at `.claude/agents/`:
   - `news-researcher`: picks wave-aligned news per ticker (web search scoped to `news_sources.md` first, open search as fallback), classifies each wave's stage, returns a `wave_views` mapping `{ticker: stage}`.
   - `report-writer`: synthesizes the analysis and news into the final markdown report.
-- All Python in two files: `src/portfolio.py` (math) and `src/cli.py` (one entry point with six subcommands).
+- All Python in two files: `src/portfolio.py` (math) and `src/cli.py` (one entry point with seven subcommands).
 - The user-authored `investor_profile.md` is the source of truth. Every recommendation cites lines from it. When the optimal numerical answer violates a profile constraint, the report flags the conflict; it does not silently clamp.
 
 ```mermaid
@@ -128,8 +128,8 @@ If you want the daily snapshot and weekly recommend to run automatically, instal
 
 ```cron
 PROJ=/path/to/portfolio-wave-rider
-# Daily snapshot + dashboard refresh, Mon-Fri 16:30 local
-30 16 * * 1-5  cd $PROJ && .venv/bin/python -m src.cli snapshot && .venv/bin/python -m src.cli dashboard >> data/snapshot.log 2>&1
+# Daily snapshot + news-feed + dashboard refresh, Mon-Fri 16:30 local
+30 16 * * 1-5  cd $PROJ && .venv/bin/python -m src.cli snapshot && .venv/bin/python -m src.cli news-feed && .venv/bin/python -m src.cli dashboard >> data/snapshot.log 2>&1
 # Weekly recommend + dashboard refresh, Fri 17:00 local
 0  17 * * 5    cd $PROJ && .venv/bin/python -m src.cli recommend && .venv/bin/python -m src.cli dashboard >> data/recommend.log 2>&1
 ```
@@ -149,7 +149,8 @@ Install with `crontab -e` and paste. Adjust `PROJ` to your clone path. Verify wi
 
 | File | What's in it | When to look |
 |---|---|---|
-| `data/dashboard.html` | Four Plotly charts (portfolio value over time; per-ticker recommended-weight trajectories; latest weights as a bar chart; per-wave stage trajectories accumulating across `/review-portfolio` runs) plus a "Latest news" section with clickable headlines from the most recent run | Open in a browser any time |
+| `data/dashboard.html` | Four Plotly charts (portfolio value over time; per-ticker recommended-weight trajectories; latest weights as a bar chart; per-wave stage trajectories accumulating across `/review-portfolio` runs) plus two news sections: "Today's headlines" (refreshed daily by cron from yfinance) and "In-depth news from last `/review-portfolio`" (LLM portfolio-relevance summaries with wave-stage classification, refreshed monthly) | Open in a browser any time |
+| `data/news_feed.json` | Daily Yahoo Finance headlines per ticker (refreshed by cron). Headline + first-paragraph summary + source + URL + date. ~5 bullets per ticker. Drives the dashboard's "Today's headlines" section. | If you want raw daily headline coverage |
 | `data/wave_history.csv` | Long-format per-wave stage history: `date, wave, stage, evidence_tickers, rationale`. One row per wave per `/review-portfolio` run. Drives the wave-stage trajectory chart on the dashboard. | If you want raw history of how the LLM has classified each wave over time |
 | `data/news/YYYY-MM-DD-news.json` | Full archived news payload from each `/review-portfolio` run (per-ticker bullets with headline + summary). About 25 KB per run; accumulates with no pruning. | When the dashboard chart shows a wave-stage shift and you want to re-read what news was driving the LLM's call on that date |
 | `data/snapshots.csv` | Long-format daily snapshots: `date, ticker, shares, price, value, total_value` | Raw history; load with pandas |
@@ -170,7 +171,7 @@ The "Profile conflicts" section of any report is the most important thing to rea
 
 ## CLI reference
 
-Six subcommands. `/review-portfolio` calls `init-holdings` (first-run branch only), `wave-history` (after each news pass), and `analyze`. The cron jobs call `snapshot`, `recommend`, and `dashboard`. Every subcommand prints a single JSON blob to stdout.
+Seven subcommands. `/review-portfolio` calls `init-holdings` (first-run branch only), `wave-history` (after each news pass), and `analyze`. The cron jobs call `snapshot`, `news-feed`, `recommend`, and `dashboard`. Every subcommand prints a single JSON blob to stdout.
 
 ```bash
 # Convert a thesis-driven dollar allocation into shares (used internally by the
@@ -182,6 +183,9 @@ Six subcommands. `/review-portfolio` calls `init-holdings` (first-run branch onl
 # to data/wave_history.csv so the dashboard can plot stage trajectories
 .venv/bin/python -m src.cli wave-history [--news data/news_latest.json] [--force]
 
+# Pull recent Yahoo Finance headlines per ticker into data/news_feed.json (cron, no LLM)
+.venv/bin/python -m src.cli news-feed [--per-ticker-limit 5]
+
 # One-shot analysis (fetch prices + compute log-returns + optimize + risk metrics)
 .venv/bin/python -m src.cli analyze --tickers AAPL MSFT NVDA --period 3y --max-weight 0.25
 
@@ -189,7 +193,7 @@ Six subcommands. `/review-portfolio` calls `init-holdings` (first-run branch onl
 .venv/bin/python -m src.cli snapshot   [--date YYYY-MM-DD] [--force]
 .venv/bin/python -m src.cli recommend  [--max-weight 0.25] [--force]
 
-# Static dashboard (reads the CSVs above plus news_latest.json; writes data/dashboard.html)
+# Static dashboard (reads the CSVs above plus both news files; writes data/dashboard.html)
 .venv/bin/python -m src.cli dashboard
 ```
 
@@ -216,6 +220,7 @@ portfolio-wave-rider/
     ├── recommendations.csv     # weekly, appended (your history)
     ├── wave_history.csv        # per-/review-portfolio run, appended (gitignored)
     ├── dashboard.html          # static Plotly + news dashboard (gitignored, regenerated)
+    ├── news_feed.json          # daily yfinance headlines (gitignored)
     ├── news_latest.json        # latest news payload from /review-portfolio (gitignored)
     ├── news/                   # archived news payloads, one per run (gitignored)
     ├── reports/                # LLM-written reports (gitignored)

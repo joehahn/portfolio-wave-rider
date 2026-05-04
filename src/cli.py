@@ -1,14 +1,15 @@
 """Single CLI for every portfolio operation.
 
-Six subcommands. Each calls one function in ``src/portfolio.py`` and
+Seven subcommands. Each calls one function in ``src/portfolio.py`` and
 prints the result as JSON to stdout. The /review-portfolio skill
 invokes ``init-holdings`` (first-run branch only), ``wave-history``
 (after each news pass), and ``analyze``; the cron jobs invoke
-``snapshot``, ``recommend``, and ``dashboard``.
+``snapshot``, ``news-feed``, ``recommend``, and ``dashboard``.
 
 Usage:
     python -m src.cli init-holdings  --allocations '{"AAPL": 5000, ...}' --out holdings.csv
     python -m src.cli wave-history   [--news data/news_latest.json] [--force]
+    python -m src.cli news-feed      [--holdings holdings.csv] [--per-ticker-limit 5]
     python -m src.cli analyze        --tickers AAPL MSFT NVDA --period 3y --max-weight 0.25
     python -m src.cli snapshot       [--date YYYY-MM-DD] [--force]
     python -m src.cli recommend      [--max-weight 0.25] [--force]
@@ -55,6 +56,14 @@ def main(argv: list[str] | None = None) -> int:
     p_wh.add_argument("--force", action="store_true",
                       help="overwrite any existing rows for the news file's date")
 
+    p_nf = sub.add_parser("news-feed",
+                          help="pull recent Yahoo Finance headlines per holdings ticker into data/news_feed.json")
+    p_nf.add_argument("--holdings", default="holdings.csv")
+    p_nf.add_argument("--out", default="data/news_feed.json")
+    p_nf.add_argument("--per-ticker-limit", type=int, default=5,
+                      help="max headlines per ticker (default 5; yfinance typically returns ~10)")
+    p_nf.add_argument("--date", default=None, help="YYYY-MM-DD; defaults to today")
+
     p_an = sub.add_parser("analyze", help="fetch + optimize + risk in one call")
     p_an.add_argument("--tickers", nargs="+", required=True)
     p_an.add_argument("--period", default="3y")
@@ -88,6 +97,7 @@ def main(argv: list[str] | None = None) -> int:
     p_dash.add_argument("--snapshots", default="data/snapshots.csv")
     p_dash.add_argument("--recommendations", default="data/recommendations.csv")
     p_dash.add_argument("--news", default="data/news_latest.json")
+    p_dash.add_argument("--news-feed", default="data/news_feed.json")
     p_dash.add_argument("--wave-history", default="data/wave_history.csv")
     p_dash.add_argument("--out", default="data/dashboard.html")
 
@@ -110,6 +120,11 @@ def main(argv: list[str] | None = None) -> int:
                 raise ValueError(f"{news_path} has no top-level `date` field")
             result = portfolio.append_wave_history(
                 wave_stages, date=news_date, out_path=args.out, force=args.force,
+            )
+        elif args.cmd == "news-feed":
+            result = portfolio.fetch_news_feed(
+                holdings_path=args.holdings, out_path=args.out,
+                per_ticker_limit=args.per_ticker_limit, date=args.date,
             )
         elif args.cmd == "analyze":
             result = portfolio.analyze(
@@ -135,6 +150,7 @@ def main(argv: list[str] | None = None) -> int:
                 recommendations_path=args.recommendations,
                 out_path=args.out,
                 news_path=args.news,
+                news_feed_path=args.news_feed,
                 wave_history_path=args.wave_history,
             )
     except Exception as e:  # noqa: BLE001 — surface any failure as a JSON error line
