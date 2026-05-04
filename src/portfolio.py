@@ -459,6 +459,7 @@ def backtest(
     max_weight: float = 0.25,
     objective: str = "max_sharpe",
     risk_free_rate: float = 0.04,
+    benchmarks: list[str] | None = None,
 ) -> dict[str, Any]:
     """Walk-forward weekly-rebalance backtest of the lightweight Python-only path.
 
@@ -615,11 +616,31 @@ def backtest(
     }
     bnh_total = sum(bnh_per_ticker.values())
 
+    # Benchmark realized returns over the same window. Skip on yfinance failure.
+    if benchmarks is None:
+        benchmarks = ["SPY"]
+    benchmark_returns: dict[str, float] = {}
+    if benchmarks:
+        b_curves = _fetch_benchmark_curves(
+            benchmarks, totals.index[0], totals.index[-1], 1.0,
+        )
+        for b, curve in b_curves.items():
+            benchmark_returns[b] = float(curve.iloc[-1] - 1.0)
+
+    bench_lines = "".join(
+        f"| {b} (over the same window) | {ret * 100:+.2f}% |\n"
+        for b, ret in benchmark_returns.items()
+    )
+    bench_active_lines = "".join(
+        f"| Active return vs {b} | {(realized_return - ret) * 100:+.2f}pp |\n"
+        for b, ret in benchmark_returns.items()
+    )
     report = (
         f"# Backtest report\n\n"
         f"**Window:** {totals.index[0]} to {totals.index[-1]} ({days} calendar days, "
         f"{len(totals)} trading days)\n"
         f"**Tickers:** {', '.join(tickers)}\n"
+        f"**Benchmarks:** {', '.join(benchmarks) if benchmarks else 'none'}\n"
         f"**Optimizer:** `{objective}`, lookback {lookback_years}y, max_weight {max_weight:.2f}\n"
         f"**Rebalance cadence:** weekly (Friday close)\n"
         f"**Transaction costs:** none modeled\n\n"
@@ -631,7 +652,9 @@ def backtest(
         f"| Annualized return | {annualized_return * 100:+.2f}% |\n"
         f"| Max drawdown | {max_drawdown * 100:.2f}% |\n"
         f"| Buy-and-hold return (start-date weights) | {bnh_total * 100:+.2f}% |\n"
-        f"| Active return vs buy-and-hold | {(realized_return - bnh_total) * 100:+.2f}pp |\n\n"
+        f"| Active return vs buy-and-hold | {(realized_return - bnh_total) * 100:+.2f}pp |\n"
+        f"{bench_lines}"
+        f"{bench_active_lines}\n"
         f"## Weight stability\n\n"
         f"**Rebalance count:** {n_rebalances}\n"
         f"**Mean week-over-week L1 distance between weight vectors:** "
@@ -660,6 +683,7 @@ def backtest(
         "annualized_return": round(annualized_return, 4),
         "max_drawdown": round(max_drawdown, 4),
         "weight_stability_l1": round(weight_stability, 4),
+        "benchmark_returns": {b: round(r, 4) for b, r in benchmark_returns.items()},
     }
 
 
@@ -951,6 +975,50 @@ def _render_news_html(news_path: Path, news_feed_path: Path | None = None) -> st
     ])
 
 
+def _fetch_benchmark_curves(
+    benchmarks: list[str],
+    start: pd.Timestamp | str,
+    end: pd.Timestamp | str,
+    starting_value: float,
+) -> dict[str, pd.Series]:
+    """Fetch benchmark prices via yfinance and rescale each to start at
+    ``starting_value`` so the curve is comparable to a portfolio that
+    began at the same dollar level on ``start``.
+
+    Returns ``{benchmark_ticker: pd.Series indexed by date}``. Tickers
+    that fail to download are silently skipped so a benchmark outage
+    doesn't break the dashboard. ``start`` and ``end`` may be Timestamps
+    or any string yfinance accepts (e.g. ``"2025-11-04"``).
+    """
+    if not benchmarks:
+        return {}
+    start_ts = pd.Timestamp(start)
+    end_ts = pd.Timestamp(end)
+    try:
+        raw = yf.download(benchmarks, start=start_ts, end=end_ts + pd.Timedelta(days=1),
+                          auto_adjust=True, progress=False, group_by="column")
+    except Exception:  # noqa: BLE001 - yfinance can raise many errors; be permissive.
+        return {}
+    if raw.empty:
+        return {}
+    closes = raw["Close"] if isinstance(raw.columns, pd.MultiIndex) \
+        else raw[["Close"]].rename(columns={"Close": benchmarks[0]})
+    closes = closes.dropna(how="all").ffill().dropna(how="all")
+
+    curves: dict[str, pd.Series] = {}
+    for b in benchmarks:
+        if b not in closes.columns:
+            continue
+        series = closes[b].dropna()
+        if series.empty:
+            continue
+        first = float(series.iloc[0])
+        if first <= 0:
+            continue
+        curves[b] = (series / first) * starting_value
+    return curves
+
+
 def build_dashboard(
     snapshots_path: str = "data/snapshots.csv",
     recommendations_path: str = "data/recommendations.csv",
@@ -958,9 +1026,16 @@ def build_dashboard(
     news_path: str = "data/news_latest.json",
     news_feed_path: str = "data/news_feed.json",
     wave_history_path: str = "data/wave_history.csv",
+    benchmarks: list[str] | None = None,
 ) -> dict[str, Any]:
     """Render four Plotly charts plus the news area (daily yfinance feed
-    + the most recent /review-portfolio payload) into one HTML file."""
+    + the most recent /review-portfolio payload) into one HTML file.
+
+    If ``benchmarks`` is provided (or defaulted to ``["SPY"]``), each
+    benchmark ticker's price curve is fetched via yfinance for the
+    snapshot date range and overlaid on the portfolio-value chart,
+    normalized so that benchmark and portfolio share a starting value.
+    Pass an empty list to suppress benchmark overlays."""
     import plotly.graph_objects as go
     from plotly.subplots import make_subplots
 
@@ -984,14 +1059,28 @@ def build_dashboard(
     )
 
     # 1. Portfolio total value over time (from snapshots.csv).
+    benchmark_curves: dict[str, pd.Series] = {}
+    if benchmarks is None:
+        benchmarks = ["SPY"]
     if snap_path.exists():
         snaps = pd.read_csv(snap_path, parse_dates=["date"])
         totals = snaps.groupby("date")["total_value"].first().sort_index()
         fig.add_trace(
             go.Scatter(x=totals.index, y=totals.values, mode="lines+markers",
-                       name="Total $", line={"width": 2}),
+                       name="Portfolio $", line={"width": 2}),
             row=1, col=1,
         )
+        # Benchmark overlays normalized to the portfolio's starting value.
+        if benchmarks and len(totals) > 1:
+            benchmark_curves = _fetch_benchmark_curves(
+                benchmarks, totals.index[0], totals.index[-1], float(totals.iloc[0]),
+            )
+            for b, curve in benchmark_curves.items():
+                fig.add_trace(
+                    go.Scatter(x=curve.index, y=curve.values, mode="lines",
+                               name=f"{b} (rebased)", line={"width": 1, "dash": "dash"}),
+                    row=1, col=1,
+                )
 
     # 2. Weight drift over time (one line per ticker, from recommendations.csv).
     latest_weights: pd.DataFrame | None = None
@@ -1068,6 +1157,7 @@ def build_dashboard(
         "snapshots_rows": int(len(pd.read_csv(snap_path))) if snap_path.exists() else 0,
         "recommendations_rows": int(len(pd.read_csv(rec_path))) if rec_path.exists() else 0,
         "wave_history_rows": int(len(pd.read_csv(wh_path))) if wh_path.exists() else 0,
+        "benchmarks_overlaid": list(benchmark_curves.keys()),
         "news_feed_included": nf_path.exists(),
         "news_included": news_included,
     }

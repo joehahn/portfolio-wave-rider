@@ -278,6 +278,39 @@ def test_backtest_runs_against_seeded_prices(tmp_path, monkeypatch) -> None:
     assert 0 <= result["weight_stability_l1"] <= 2
 
 
+def test_fetch_benchmark_curves_normalizes_to_starting_value(monkeypatch) -> None:
+    """The benchmark curve should start at exactly `starting_value`."""
+    dates = pd.date_range("2025-11-04", periods=10, freq="B")
+    spy_close = pd.Series([400.0, 402.0, 404.0, 406.0, 408.0,
+                           410.0, 412.0, 414.0, 416.0, 418.0], index=dates)
+
+    def fake_download(tickers, start, end, **kwargs):
+        cols = pd.MultiIndex.from_product([["Close"], tickers])
+        df = pd.DataFrame({("Close", "SPY"): spy_close})
+        return df.loc[start:end]
+
+    monkeypatch.setattr(portfolio.yf, "download", fake_download)
+    curves = portfolio._fetch_benchmark_curves(
+        ["SPY"], dates[0], dates[-1], starting_value=50000.0,
+    )
+    assert "SPY" in curves
+    # First value rebased to starting_value; final value scales proportionally.
+    assert curves["SPY"].iloc[0] == pytest.approx(50000.0)
+    # SPY went 400 -> 418 (+4.5%); curve should reflect the same percentage.
+    assert curves["SPY"].iloc[-1] == pytest.approx(50000.0 * (418.0 / 400.0))
+
+
+def test_fetch_benchmark_curves_returns_empty_on_yfinance_failure(monkeypatch) -> None:
+    """A yfinance error must not break the dashboard - skip the benchmark instead."""
+    def boom(*args, **kwargs):
+        raise RuntimeError("yfinance unavailable")
+    monkeypatch.setattr(portfolio.yf, "download", boom)
+    curves = portfolio._fetch_benchmark_curves(
+        ["SPY"], pd.Timestamp("2025-11-04"), pd.Timestamp("2025-11-15"), 50000.0,
+    )
+    assert curves == {}
+
+
 def test_render_news_html_renders_both_sections_when_both_paths_provided(tmp_path) -> None:
     """The two news files render as two sections in the same HTML block."""
     import json

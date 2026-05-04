@@ -149,7 +149,7 @@ Install with `crontab -e` and paste. Adjust `PROJ` to your clone path. Verify wi
 
 | File | What's in it | When to look |
 |---|---|---|
-| `data/dashboard.html` | Four Plotly charts (portfolio value over time; per-ticker recommended-weight trajectories; latest weights as a bar chart; per-wave stage trajectories accumulating across `/review-portfolio` runs) plus two news sections: "Today's headlines" (refreshed daily by cron from yfinance) and "In-depth news from last `/review-portfolio`" (LLM portfolio-relevance summaries with wave-stage classification, refreshed monthly) | Open in a browser any time |
+| `data/dashboard.html` | Four Plotly charts (portfolio value over time **with SPY overlay** for comparison; per-ticker recommended-weight trajectories; latest weights as a bar chart; per-wave stage trajectories accumulating across `/review-portfolio` runs) plus two news sections: "Today's headlines" (refreshed daily by cron from yfinance) and "In-depth news from last `/review-portfolio`" (LLM portfolio-relevance summaries with wave-stage classification, refreshed monthly) | Open in a browser any time |
 | `data/news_feed.json` | Daily Yahoo Finance headlines per ticker (refreshed by cron). Headline + first-paragraph summary + source + URL + date. ~5 bullets per ticker. Drives the dashboard's "Today's headlines" section. | If you want raw daily headline coverage |
 | `data/wave_history.csv` | Long-format per-wave stage history: `date, wave, stage, evidence_tickers, rationale`. One row per wave per `/review-portfolio` run. Drives the wave-stage trajectory chart on the dashboard. | If you want raw history of how the LLM has classified each wave over time |
 | `data/news/YYYY-MM-DD-news.json` | Full archived news payload from each `/review-portfolio` run (per-ticker bullets with headline + summary). About 25 KB per run; accumulates with no pruning. | When the dashboard chart shows a wave-stage shift and you want to re-read what news was driving the LLM's call on that date |
@@ -195,11 +195,13 @@ Eight subcommands. `/review-portfolio` calls `init-holdings` (first-run branch o
 
 # Walk-forward backtest of the cron 'recommend' path over a historical window
 # (math-only; no news, no LLM cost). Writes data/backtest/{snapshots,recommendations}.csv
-# plus data/backtest/report.md with realized return, max drawdown, weight stability.
-.venv/bin/python -m src.cli backtest [--start-date YYYY-MM-DD] [--end-date YYYY-MM-DD] [--initial-usd 50000]
+# plus data/backtest/report.md with realized return, max drawdown, weight stability,
+# and per-benchmark active-return comparison (default SPY).
+.venv/bin/python -m src.cli backtest [--start-date YYYY-MM-DD] [--end-date YYYY-MM-DD] [--initial-usd 50000] [--benchmarks SPY DIA QQQ]
 
-# Static dashboard (reads the CSVs above plus both news files; writes data/dashboard.html)
-.venv/bin/python -m src.cli dashboard
+# Static dashboard (reads the CSVs above plus both news files; writes data/dashboard.html;
+# overlays each --benchmarks ticker on the portfolio-value chart, default SPY)
+.venv/bin/python -m src.cli dashboard [--benchmarks SPY]
 ```
 
 To inspect the backtest visually, point the dashboard at the backtest CSVs:

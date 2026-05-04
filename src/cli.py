@@ -112,6 +112,9 @@ def main(argv: list[str] | None = None) -> int:
     p_bt.add_argument("--objective", default="max_sharpe",
                       choices=["max_sharpe", "min_variance"])
     p_bt.add_argument("--risk-free-rate", type=float, default=0.04)
+    p_bt.add_argument("--benchmarks", nargs="*", default=["SPY"],
+                      help="benchmark tickers compared against the backtest's realized return "
+                           "(default: SPY). Pass an empty list to skip the benchmark section.")
 
     p_dash = sub.add_parser("dashboard", help="generate data/dashboard.html from snapshots + recommendations + news + wave history")
     p_dash.add_argument("--snapshots", default="data/snapshots.csv")
@@ -119,6 +122,9 @@ def main(argv: list[str] | None = None) -> int:
     p_dash.add_argument("--news", default="data/news_latest.json")
     p_dash.add_argument("--news-feed", default="data/news_feed.json")
     p_dash.add_argument("--wave-history", default="data/wave_history.csv")
+    p_dash.add_argument("--benchmarks", nargs="*", default=["SPY"],
+                        help="benchmark tickers to overlay on the portfolio-value chart "
+                             "(default: SPY). Pass an empty list to suppress overlays.")
     p_dash.add_argument("--out", default="data/dashboard.html")
 
     args = parser.parse_args(argv)
@@ -154,6 +160,7 @@ def main(argv: list[str] | None = None) -> int:
                 lookback_years=args.lookback_years,
                 max_weight=args.max_weight, objective=args.objective,
                 risk_free_rate=args.risk_free_rate,
+                benchmarks=args.benchmarks,
             )
         elif args.cmd == "analyze":
             result = portfolio.analyze(
@@ -181,6 +188,7 @@ def main(argv: list[str] | None = None) -> int:
                 news_path=args.news,
                 news_feed_path=args.news_feed,
                 wave_history_path=args.wave_history,
+                benchmarks=args.benchmarks,
             )
     except Exception as e:  # noqa: BLE001 — surface any failure as a JSON error line
         print(json.dumps({"error": f"{type(e).__name__}: {e}"}), file=sys.stderr)
