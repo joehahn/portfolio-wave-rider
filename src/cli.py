@@ -1,10 +1,11 @@
 """Single CLI for every portfolio operation.
 
-Seven subcommands. Each calls one function in ``src/portfolio.py`` and
+Eight subcommands. Each calls one function in ``src/portfolio.py`` and
 prints the result as JSON to stdout. The /review-portfolio skill
 invokes ``init-holdings`` (first-run branch only), ``wave-history``
 (after each news pass), and ``analyze``; the cron jobs invoke
 ``snapshot``, ``news-feed``, ``recommend``, and ``dashboard``.
+``backtest`` is a one-off spot-check tool, not part of any cron flow.
 
 Usage:
     python -m src.cli init-holdings  --allocations '{"AAPL": 5000, ...}' --out holdings.csv
@@ -13,6 +14,7 @@ Usage:
     python -m src.cli analyze        --tickers AAPL MSFT NVDA --period 3y --max-weight 0.25
     python -m src.cli snapshot       [--date YYYY-MM-DD] [--force]
     python -m src.cli recommend      [--max-weight 0.25] [--force]
+    python -m src.cli backtest       [--start-date YYYY-MM-DD] [--end-date YYYY-MM-DD] [--initial-usd 50000]
     python -m src.cli dashboard
 """
 
@@ -93,6 +95,24 @@ def main(argv: list[str] | None = None) -> int:
     p_rec.add_argument("--date", default=None)
     p_rec.add_argument("--force", action="store_true")
 
+    p_bt = sub.add_parser("backtest",
+                           help="walk-forward weekly-rebalance backtest of the cron 'recommend' path; outputs to data/backtest/")
+    p_bt.add_argument("--holdings", default="holdings.csv",
+                      help="watchlist source; only the ticker column is used")
+    p_bt.add_argument("--start-date", default=None,
+                      help="YYYY-MM-DD; defaults to 6 months before --end-date")
+    p_bt.add_argument("--end-date", default=None,
+                      help="YYYY-MM-DD; defaults to yesterday")
+    p_bt.add_argument("--initial-usd", type=float, default=50000.0,
+                      help="starting portfolio value in dollars")
+    p_bt.add_argument("--out-dir", default="data/backtest/")
+    p_bt.add_argument("--lookback-years", type=int, default=3,
+                      help="optimizer lookback window in years; default 3 matches the live system")
+    p_bt.add_argument("--max-weight", type=float, default=0.25)
+    p_bt.add_argument("--objective", default="max_sharpe",
+                      choices=["max_sharpe", "min_variance"])
+    p_bt.add_argument("--risk-free-rate", type=float, default=0.04)
+
     p_dash = sub.add_parser("dashboard", help="generate data/dashboard.html from snapshots + recommendations + news + wave history")
     p_dash.add_argument("--snapshots", default="data/snapshots.csv")
     p_dash.add_argument("--recommendations", default="data/recommendations.csv")
@@ -125,6 +145,15 @@ def main(argv: list[str] | None = None) -> int:
             result = portfolio.fetch_news_feed(
                 holdings_path=args.holdings, out_path=args.out,
                 per_ticker_limit=args.per_ticker_limit, date=args.date,
+            )
+        elif args.cmd == "backtest":
+            result = portfolio.backtest(
+                holdings_path=args.holdings,
+                start_date=args.start_date, end_date=args.end_date,
+                initial_usd=args.initial_usd, out_dir=args.out_dir,
+                lookback_years=args.lookback_years,
+                max_weight=args.max_weight, objective=args.objective,
+                risk_free_rate=args.risk_free_rate,
             )
         elif args.cmd == "analyze":
             result = portfolio.analyze(

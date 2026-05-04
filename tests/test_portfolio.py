@@ -221,6 +221,63 @@ def test_append_wave_history_appends_across_dates(tmp_path) -> None:
     assert df.loc[1, "stage"] == "peak"
 
 
+def test_backtest_runs_against_seeded_prices(tmp_path, monkeypatch) -> None:
+    """End-to-end backtest test against synthetic prices via a yf.download monkeypatch."""
+    import json
+    rng = np.random.default_rng(0)
+    # Synthetic 4-year daily price series for 3 tickers (long enough for a 3y lookback).
+    dates = pd.date_range("2022-05-01", periods=1040, freq="B")
+    daily = rng.normal(loc=[0.0004, 0.0002, 0.0006], scale=[0.011, 0.008, 0.018], size=(1040, 3))
+    prices = pd.DataFrame(
+        100 * np.exp(daily.cumsum(axis=0)),
+        index=dates,
+        columns=["AAA", "BBB", "CCC"],
+    )
+
+    # Mock yf.download to return our synthetic prices in the shape the backtest expects.
+    def fake_download(tickers, start, end, **kwargs):
+        cols = pd.MultiIndex.from_product([["Close"], tickers])
+        df = pd.DataFrame(prices.values, index=prices.index,
+                          columns=pd.MultiIndex.from_product([["Close"], list(prices.columns)]))
+        return df.loc[start:end]
+    monkeypatch.setattr(portfolio.yf, "download", fake_download)
+
+    holdings_path = tmp_path / "holdings.csv"
+    holdings_path.write_text("ticker,shares\nAAA,0\nBBB,0\nCCC,0\n")
+
+    out_dir = tmp_path / "backtest"
+    result = portfolio.backtest(
+        holdings_path=str(holdings_path),
+        start_date="2025-11-03", end_date="2026-04-20",
+        initial_usd=10000.0, out_dir=str(out_dir),
+        # max_weight >= 1/n_tickers required for feasibility; with 3 tickers, 0.25 would be infeasible.
+        max_weight=0.5,
+    )
+
+    # Output files exist.
+    assert (out_dir / "snapshots.csv").exists()
+    assert (out_dir / "recommendations.csv").exists()
+    assert (out_dir / "report.md").exists()
+
+    # Schemas match the live snapshots/recommendations files so the dashboard CLI
+    # can render them with --snapshots / --recommendations overrides.
+    snaps = pd.read_csv(out_dir / "snapshots.csv")
+    assert list(snaps.columns) == ["date", "ticker", "shares", "price", "value", "total_value"]
+    recs = pd.read_csv(out_dir / "recommendations.csv")
+    assert list(recs.columns) == [
+        "date", "ticker", "weight", "expected_return", "annual_volatility",
+        "sharpe_ratio", "objective",
+    ]
+
+    # Sanity: starting value matches initial_usd; weights sum to ~1.0 each rebalance.
+    assert result["initial_value"] == pytest.approx(10000.0, abs=0.01)
+    for d, sub in recs.groupby("date"):
+        assert abs(sub["weight"].sum() - 1.0) < 1e-4
+
+    # Weight stability is finite and within [0, 2] (the L1 distance bounds).
+    assert 0 <= result["weight_stability_l1"] <= 2
+
+
 def test_render_news_html_renders_both_sections_when_both_paths_provided(tmp_path) -> None:
     """The two news files render as two sections in the same HTML block."""
     import json

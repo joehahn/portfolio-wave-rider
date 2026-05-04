@@ -41,8 +41,8 @@ The user decides. Never silently clamp a recommendation to fit the profile.
 - Skill (`.claude/skills/`): one slash command.
   - `/review-portfolio`: orchestrates the news-researcher, runs the `analyze` CLI with wave tilts, invokes the report-writer, and refreshes the dashboard. On a first run (when `holdings.csv` has all-zero shares), the skill first does a thesis-driven dollar allocation: it reads `initial_investment_usd` from the profile, proposes a dollar split across the watchlist using the wave thesis, asset-class targets, and exclusions, calls `init-holdings` to convert dollars to shares, runs `snapshot --force` to record day 0, and passes a `day_0_baseline` payload to the report-writer so the report shows beliefs and math side-by-side. On subsequent runs the first-run branch is skipped.
 - All Python in two files:
-  - `src/portfolio.py`: every math function (fetch_prices, compute_returns, optimize_portfolio, risk_metrics, analyze, initialize_holdings, snapshot_holdings, recommend_portfolio, append_wave_history, fetch_news_feed, build_dashboard).
-  - `src/cli.py`: one entry point with seven subcommands (`init-holdings`, `wave-history`, `news-feed`, `analyze`, `snapshot`, `recommend`, `dashboard`) that the skill and cron jobs invoke via Bash.
+  - `src/portfolio.py`: every math function (fetch_prices, compute_returns, optimize_portfolio, risk_metrics, analyze, initialize_holdings, snapshot_holdings, recommend_portfolio, append_wave_history, fetch_news_feed, backtest, build_dashboard).
+  - `src/cli.py`: one entry point with eight subcommands (`init-holdings`, `wave-history`, `news-feed`, `analyze`, `snapshot`, `recommend`, `backtest`, `dashboard`) that the skill and cron jobs invoke via Bash. `backtest` is a one-off spot-check tool, not part of any cron flow.
 - Reports are written to `data/reports/YYYY-MM-DD-<skill>.md`.
 - Dashboard is a single static `data/dashboard.html`, regenerated after each snapshot or recommend run and at the end of `/review-portfolio`.
 

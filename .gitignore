@@ -18,6 +18,7 @@ data/news_latest.json
 data/news_feed.json
 data/wave_history.csv
 data/news/
+data/backtest/
 
 # personal data — never push
 .claude/settings.local.json

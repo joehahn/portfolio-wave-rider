@@ -441,6 +441,229 @@ def recommend_portfolio(
 
 
 # ---------------------------------------------------------------------------
+# Walk-forward backtest. Replays the lightweight Python-only weekly path
+# (the cron `recommend` cadence) over a historical window so we can spot-
+# check whether the optimizer's recommendations are stable and whether
+# rebalancing to them would have produced a reasonable realized return.
+# No news, no wave tilts, no LLM cost. Output files go into a separate
+# data/backtest/ directory so they don't disturb the live time-series.
+# ---------------------------------------------------------------------------
+
+def backtest(
+    holdings_path: str = "holdings.csv",
+    start_date: str | None = None,
+    end_date: str | None = None,
+    initial_usd: float = 50000.0,
+    out_dir: str = "data/backtest/",
+    lookback_years: int = 3,
+    max_weight: float = 0.25,
+    objective: str = "max_sharpe",
+    risk_free_rate: float = 0.04,
+) -> dict[str, Any]:
+    """Walk-forward weekly-rebalance backtest of the lightweight Python-only path.
+
+    For each Friday in [start_date, end_date], runs the optimizer with a
+    `lookback_years`-long window ending that Friday and rebalances the
+    portfolio to those weights. Daily snapshots in between record the
+    drifting value. No transaction costs are modeled. No news, no wave
+    tilts. The point is to verify that the math-only system produces
+    stable, profitable recommendations on real historical data.
+
+    Outputs (under ``out_dir``):
+      - snapshots.csv (same schema as live data/snapshots.csv)
+      - recommendations.csv (same schema as live data/recommendations.csv)
+      - report.md (realized return, max drawdown, weight-stability metric)
+    """
+    out = Path(out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+
+    # Date window (default: 6 months back to yesterday).
+    end = pd.Timestamp(end_date) if end_date else pd.Timestamp.today().normalize() - pd.Timedelta(days=1)
+    start = pd.Timestamp(start_date) if start_date else end - pd.Timedelta(days=180)
+    if start >= end:
+        raise ValueError(f"start_date ({start.date()}) must be before end_date ({end.date()})")
+
+    # Tickers from the holdings file (we don't care about its current shares).
+    h_path = Path(holdings_path)
+    if not h_path.exists():
+        raise FileNotFoundError(f"holdings file not found: {h_path}")
+    tickers = pd.read_csv(h_path)["ticker"].str.upper().str.strip().tolist()
+
+    # Feasibility: weights must sum to 1 with each <= max_weight, so max_weight * n >= 1.
+    if max_weight * len(tickers) < 1.0 - 1e-9:
+        raise ValueError(
+            f"infeasible: max_weight ({max_weight}) * n_tickers ({len(tickers)}) "
+            f"= {max_weight * len(tickers):.3f} < 1. Either lower the cap or "
+            f"add more tickers."
+        )
+
+    # One bulk yfinance call covering the optimizer's longest lookback through end.
+    fetch_start = start - pd.Timedelta(days=365 * lookback_years + 30)  # padding for weekends
+    raw = yf.download(tickers, start=fetch_start, end=end + pd.Timedelta(days=1),
+                      auto_adjust=True, progress=False, group_by="column")
+    if raw.empty:
+        raise RuntimeError(f"yfinance returned no data for {tickers} between {fetch_start.date()} and {end.date()}")
+    full_prices = raw["Close"] if isinstance(raw.columns, pd.MultiIndex) \
+        else raw[["Close"]].rename(columns={"Close": tickers[0]})
+    full_prices = full_prices.dropna(how="all").ffill().dropna()
+
+    # Trading days inside the backtest window.
+    daily_dates = full_prices.loc[start:end].index
+    if len(daily_dates) < 5:
+        raise RuntimeError(f"only {len(daily_dates)} trading days in [{start.date()}, {end.date()}]")
+
+    # Iterate. Friday = rebalance; every trading day = snapshot.
+    snap_rows: list[dict[str, Any]] = []
+    rec_rows: list[dict[str, Any]] = []
+    current_shares: dict[str, float] | None = None
+    last_weights: dict[str, float] | None = None
+    weight_l1_distances: list[float] = []
+
+    for date in daily_dates:
+        is_friday = date.weekday() == 4
+        is_first_day = date == daily_dates[0]
+
+        if is_friday or (is_first_day and current_shares is None):
+            # Run optimizer with a `lookback_years`-long window ending today.
+            lookback_start = date - pd.Timedelta(days=365 * lookback_years)
+            slice_prices = full_prices.loc[lookback_start:date]
+            if len(slice_prices) < 30:
+                continue
+            returns = compute_returns(slice_prices)
+            opt = optimize_portfolio(
+                returns, objective=objective, risk_free_rate=risk_free_rate,
+                max_weight=max_weight,
+            )
+            if not opt.get("success"):
+                continue
+            weights = opt["weights"]
+
+            # Track week-over-week weight stability (L1 distance between weight vectors).
+            if last_weights is not None:
+                l1 = sum(abs(weights[t] - last_weights.get(t, 0)) for t in weights)
+                weight_l1_distances.append(l1)
+            last_weights = weights
+
+            # Compute current portfolio value, then rebalance to the new weights.
+            if current_shares is None:
+                portfolio_value = initial_usd
+            else:
+                portfolio_value = sum(
+                    current_shares[t] * float(full_prices.loc[date, t]) for t in tickers
+                )
+            current_shares = {
+                t: (weights[t] * portfolio_value) / float(full_prices.loc[date, t])
+                for t in tickers
+            }
+
+            for t in tickers:
+                rec_rows.append({
+                    "date": str(date.date()),
+                    "ticker": t,
+                    "weight": weights[t],
+                    "expected_return": opt["expected_annual_return"],
+                    "annual_volatility": opt["annual_volatility"],
+                    "sharpe_ratio": opt["sharpe_ratio"],
+                    "objective": objective,
+                })
+
+        # Daily snapshot (always, once we have shares).
+        if current_shares is not None:
+            day_total = sum(
+                current_shares[t] * float(full_prices.loc[date, t]) for t in tickers
+            )
+            for t in tickers:
+                px = float(full_prices.loc[date, t])
+                snap_rows.append({
+                    "date": str(date.date()),
+                    "ticker": t,
+                    "shares": round(current_shares[t], 4),
+                    "price": px,
+                    "value": round(current_shares[t] * px, 2),
+                    "total_value": round(day_total, 2),
+                })
+
+    if not snap_rows:
+        raise RuntimeError("backtest produced no snapshots; the optimizer never converged")
+
+    snap_df = pd.DataFrame(snap_rows)
+    rec_df = pd.DataFrame(rec_rows)
+    snap_df.to_csv(out / "snapshots.csv", index=False)
+    rec_df.to_csv(out / "recommendations.csv", index=False)
+
+    # Summary metrics for the report.
+    totals = snap_df.groupby("date")["total_value"].first().sort_index()
+    initial_v = float(totals.iloc[0])
+    final_v = float(totals.iloc[-1])
+    realized_return = (final_v / initial_v) - 1.0
+    days = (pd.Timestamp(totals.index[-1]) - pd.Timestamp(totals.index[0])).days or 1
+    annualized_return = (final_v / initial_v) ** (365.0 / days) - 1.0
+    equity = totals.values
+    peak = np.maximum.accumulate(equity)
+    drawdown = (equity - peak) / peak
+    max_drawdown = float(drawdown.min())
+    weight_stability = float(np.mean(weight_l1_distances)) if weight_l1_distances else 0.0
+    n_rebalances = len(weight_l1_distances) + 1
+
+    # Realized-return per ticker if the user had bought-and-held the start-date weights.
+    start_weights = {r["ticker"]: r["weight"] for r in rec_rows[:len(tickers)]}
+    end_prices = {t: float(full_prices.loc[totals.index[-1], t]) for t in tickers}
+    start_prices_row = full_prices.loc[totals.index[0]]
+    bnh_per_ticker = {
+        t: ((end_prices[t] / float(start_prices_row[t])) - 1.0) * start_weights.get(t, 0.0)
+        for t in tickers
+    }
+    bnh_total = sum(bnh_per_ticker.values())
+
+    report = (
+        f"# Backtest report\n\n"
+        f"**Window:** {totals.index[0]} to {totals.index[-1]} ({days} calendar days, "
+        f"{len(totals)} trading days)\n"
+        f"**Tickers:** {', '.join(tickers)}\n"
+        f"**Optimizer:** `{objective}`, lookback {lookback_years}y, max_weight {max_weight:.2f}\n"
+        f"**Rebalance cadence:** weekly (Friday close)\n"
+        f"**Transaction costs:** none modeled\n\n"
+        f"## Realized performance\n\n"
+        f"| Metric | Value |\n|---|---|\n"
+        f"| Starting value | ${initial_v:,.2f} |\n"
+        f"| Ending value | ${final_v:,.2f} |\n"
+        f"| Realized return | {realized_return * 100:+.2f}% |\n"
+        f"| Annualized return | {annualized_return * 100:+.2f}% |\n"
+        f"| Max drawdown | {max_drawdown * 100:.2f}% |\n"
+        f"| Buy-and-hold return (start-date weights) | {bnh_total * 100:+.2f}% |\n"
+        f"| Active return vs buy-and-hold | {(realized_return - bnh_total) * 100:+.2f}pp |\n\n"
+        f"## Weight stability\n\n"
+        f"**Rebalance count:** {n_rebalances}\n"
+        f"**Mean week-over-week L1 distance between weight vectors:** "
+        f"{weight_stability:.4f}\n"
+        f"(Lower is more stable. 0 = same weights every week. 2 = full portfolio "
+        f"flipped between two disjoint sets every week.)\n\n"
+        f"## Caveats\n\n"
+        f"- No transaction costs, taxes, or market-impact slippage.\n"
+        f"- No news, no wave-stage tilts. This is the cron `recommend` "
+        f"path's behavior, not `/review-portfolio`'s.\n"
+        f"- Look-ahead-bias-free: each Friday's optimizer sees only prices "
+        f"up to that Friday.\n"
+        f"- The 3-year lookback is the same window the live system uses, so "
+        f"this backtest reflects how the live system would have decided.\n"
+    )
+    (out / "report.md").write_text(report)
+
+    return {
+        "out_dir": str(out),
+        "window": {"start": str(totals.index[0]), "end": str(totals.index[-1]), "days": int(days)},
+        "n_rebalances": n_rebalances,
+        "n_snapshots": len(snap_rows) // len(tickers),
+        "initial_value": round(initial_v, 2),
+        "final_value": round(final_v, 2),
+        "realized_return": round(realized_return, 4),
+        "annualized_return": round(annualized_return, 4),
+        "max_drawdown": round(max_drawdown, 4),
+        "weight_stability_l1": round(weight_stability, 4),
+    }
+
+
+# ---------------------------------------------------------------------------
 # Daily news feed. Cron-friendly, no LLM. Uses yfinance's per-ticker news
 # (Yahoo Finance) to keep the dashboard's "Today's headlines" section fresh
 # between manual /review-portfolio runs.

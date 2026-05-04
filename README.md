@@ -5,7 +5,7 @@
 **Date:** 2026-May-02 <br>
 **branch:** main
 
-A Claude Code demo: optimize a long-horizon portfolio of stocks and ETFs against a user-authored investor profile. One slash command, two LLM subagents, seven Python CLI subcommands, and a static dashboard. Stack: yfinance for prices (free Python wrapper around Yahoo Finance's historical close-price API), scipy.optimize for picking portfolio weights (maximizes risk-adjusted return subject to no-shorting and a per-asset weight cap), pandas for everything in between, Plotly for the dashboard.
+A Claude Code demo: optimize a long-horizon portfolio of stocks and ETFs against a user-authored investor profile. One slash command, two LLM subagents, eight Python CLI subcommands, and a static dashboard. Stack: yfinance for prices (free Python wrapper around Yahoo Finance's historical close-price API), scipy.optimize for picking portfolio weights (maximizes risk-adjusted return subject to no-shorting and a per-asset weight cap), pandas for everything in between, Plotly for the dashboard.
 
 **Live demo:** [joehahn.github.io/portfolio-wave-rider](https://joehahn.github.io/portfolio-wave-rider/). A snapshot of the dashboard generated against the example profile and watchlist. Refreshed manually; the timestamp inside the "Latest news" section tells you the date.
 
@@ -59,7 +59,7 @@ The weekly cron is the lightweight Python-only sibling of `/review-portfolio`: p
 - Two subagents at `.claude/agents/`:
   - `news-researcher`: picks wave-aligned news per ticker (web search scoped to `news_sources.md` first, open search as fallback), classifies each wave's stage, returns a `wave_views` mapping `{ticker: stage}`.
   - `report-writer`: synthesizes the analysis and news into the final markdown report.
-- All Python in two files: `src/portfolio.py` (math) and `src/cli.py` (one entry point with seven subcommands).
+- All Python in two files: `src/portfolio.py` (math) and `src/cli.py` (one entry point with eight subcommands).
 - The user-authored `investor_profile.md` is the source of truth. Every recommendation cites lines from it. When the optimal numerical answer violates a profile constraint, the report flags the conflict; it does not silently clamp.
 
 ```mermaid
@@ -171,7 +171,7 @@ The "Profile conflicts" section of any report is the most important thing to rea
 
 ## CLI reference
 
-Seven subcommands. `/review-portfolio` calls `init-holdings` (first-run branch only), `wave-history` (after each news pass), and `analyze`. The cron jobs call `snapshot`, `news-feed`, `recommend`, and `dashboard`. Every subcommand prints a single JSON blob to stdout.
+Eight subcommands. `/review-portfolio` calls `init-holdings` (first-run branch only), `wave-history` (after each news pass), and `analyze`. The cron jobs call `snapshot`, `news-feed`, `recommend`, and `dashboard`. `backtest` is a one-off spot-check tool, not part of any cron flow. Every subcommand prints a single JSON blob to stdout.
 
 ```bash
 # Convert a thesis-driven dollar allocation into shares (used internally by the
@@ -193,8 +193,22 @@ Seven subcommands. `/review-portfolio` calls `init-holdings` (first-run branch o
 .venv/bin/python -m src.cli snapshot   [--date YYYY-MM-DD] [--force]
 .venv/bin/python -m src.cli recommend  [--max-weight 0.25] [--force]
 
+# Walk-forward backtest of the cron 'recommend' path over a historical window
+# (math-only; no news, no LLM cost). Writes data/backtest/{snapshots,recommendations}.csv
+# plus data/backtest/report.md with realized return, max drawdown, weight stability.
+.venv/bin/python -m src.cli backtest [--start-date YYYY-MM-DD] [--end-date YYYY-MM-DD] [--initial-usd 50000]
+
 # Static dashboard (reads the CSVs above plus both news files; writes data/dashboard.html)
 .venv/bin/python -m src.cli dashboard
+```
+
+To inspect the backtest visually, point the dashboard at the backtest CSVs:
+
+```bash
+.venv/bin/python -m src.cli dashboard \
+  --snapshots data/backtest/snapshots.csv \
+  --recommendations data/backtest/recommendations.csv \
+  --out data/backtest/dashboard.html
 ```
 
 ## Layout
@@ -224,6 +238,7 @@ portfolio-wave-rider/
     ├── news_latest.json        # latest news payload from /review-portfolio (gitignored)
     ├── news/                   # archived news payloads, one per run (gitignored)
     ├── reports/                # LLM-written reports (gitignored)
+    ├── backtest/               # output of `cli backtest` runs (gitignored)
     └── *.log                   # cron output (gitignored)
 ```
 
