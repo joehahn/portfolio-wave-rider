@@ -866,6 +866,7 @@ TICKER_ASSET_CLASS: dict[str, str] = {
     "ARKG": "equity ETF", "ARKK": "equity ETF",
     "AIQ": "equity ETF",
     "QTUM": "equity ETF", "NUKZ": "equity ETF",
+    "VIG": "equity ETF",
 }
 
 # Map raw asset-class labels to the broader buckets shown on the
@@ -915,6 +916,10 @@ TICKER_WAVE: dict[str, str] = {
     "ETHA": "general_markets", "FETH": "general_markets",
     "VTI": "general_markets", "VOO": "general_markets",
     "SPY": "general_markets", "VXUS": "general_markets",
+    # Defensive / dividend-quality equity (broad market with a quality tilt;
+    # not a wave bet, so general_markets bucket).
+    "VIG": "general_markets", "DVY": "general_markets",
+    "XLU": "general_markets", "XLP": "general_markets",
 }
 
 
