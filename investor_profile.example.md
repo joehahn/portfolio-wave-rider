@@ -6,11 +6,10 @@ exclusions:                       # sector / theme exclusions
   - tobacco
   - private_prisons
 asset_class_targets:              # rough guide, not a hard constraint
-  equities: 0.70
-  precious metals: 0.1
-  bonds: 0.1
+  equities: 0.75
+  precious metals: 0.10
+  bonds: 0.10
   cash: 0.05
-  cryptocurrencies: 0.05
 ---
 
 # Goals
