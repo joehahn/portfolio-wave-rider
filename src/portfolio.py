@@ -1298,16 +1298,17 @@ def build_dashboard(
         )
 
     fig = make_subplots(
-        rows=6, cols=1,
+        rows=7, cols=1,
         subplot_titles=(
             "Portfolio value over time",
             "Recommended portfolio % drift over time",
             "Latest recommended portfolio %",
+            "Cumulative $ gain per holding over the snapshot window",
             "Wave-stage trajectories (0=neutral, 1=buildup, 2=surge, 3=peak, 4=digestion)",
             "$ by asset class over time",
             "$ by wave over time",
         ),
-        vertical_spacing=0.06,
+        vertical_spacing=0.05,
     )
 
     # 1. Portfolio total value over time (from snapshots.csv).
@@ -1352,6 +1353,20 @@ def build_dashboard(
         latest_date = recs["date"].max()
         latest_weights = recs[recs["date"] == latest_date].sort_values("weight", ascending=False)
 
+    # Label helper used by chart 3 (Latest recommended portfolio %) and
+    # chart 4 (Cumulative $ gain per holding). Equities get "TICKER /
+    # wave"; equity ETFs get "TICKER / wave ETF"; non-equities get
+    # "TICKER / asset class".
+    def _ticker_label(t: str) -> str:
+        cls = TICKER_ASSET_CLASS.get(t, "equity")
+        if cls == "equity":
+            wave = WAVE_DISPLAY_LABEL.get(TICKER_WAVE.get(t, "general_markets"), "")
+            return f"{t}<br><sub>{wave}</sub>"
+        if cls == "equity ETF":
+            wave = WAVE_DISPLAY_LABEL.get(TICKER_WAVE.get(t, "general_markets"), "")
+            return f"{t}<br><sub>{wave} ETF</sub>"
+        return f"{t}<br><sub>{cls}</sub>"
+
     # 3. Latest recommended weights (bar chart). The x-axis tick text
     # shows ticker plus a small asset-class label so a reader can scan
     # "what kind of thing is this" without consulting the holdings file.
@@ -1361,19 +1376,7 @@ def build_dashboard(
     # asset class already says everything.
     if latest_weights is not None and not latest_weights.empty:
         tickers_in_chart = latest_weights["ticker"].tolist()
-        def _label_chart3(t: str) -> str:
-            cls = TICKER_ASSET_CLASS.get(t, "equity")
-            if cls == "equity":
-                # Individual stocks: "TICKER / wave"
-                wave = WAVE_DISPLAY_LABEL.get(TICKER_WAVE.get(t, "general_markets"), "")
-                return f"{t}<br><sub>{wave}</sub>"
-            if cls == "equity ETF":
-                # ETFs: "TICKER / wave ETF" (e.g., "BOTZ / robotics ETF")
-                wave = WAVE_DISPLAY_LABEL.get(TICKER_WAVE.get(t, "general_markets"), "")
-                return f"{t}<br><sub>{wave} ETF</sub>"
-            # Non-equities (bond, cash, gold, ...): "TICKER / asset class"
-            return f"{t}<br><sub>{cls}</sub>"
-        ticktext_3 = [_label_chart3(t) for t in tickers_in_chart]
+        ticktext_3 = [_ticker_label(t) for t in tickers_in_chart]
         fig.add_trace(
             go.Bar(x=tickers_in_chart, y=latest_weights["weight"],
                    name=f"As of {latest_weights['date'].iloc[0].date()}",
@@ -1388,7 +1391,49 @@ def build_dashboard(
             row=3, col=1,
         )
 
-    # 4. Wave-stage trajectories (one line per wave, from wave_history.csv).
+    # 4. Cumulative $ gain per holding over the snapshot window. For each
+    # ticker, daily P&L = shares_t * (price_t - price_{t-1}); cumulative
+    # gain = sum across the window. This properly attributes gain when the
+    # optimizer rebalances (shares change weekly), since each day's price
+    # change is multiplied by that day's share count. Sums to the
+    # portfolio's total realized gain (modulo numerical noise).
+    if snap_path.exists():
+        snaps_full = pd.read_csv(snap_path, parse_dates=["date"]).sort_values(["ticker", "date"])
+        gain_by_ticker: dict[str, float] = {}
+        for ticker, sub in snaps_full.groupby("ticker"):
+            sub = sub.sort_values("date").reset_index(drop=True)
+            price_change = sub["price"].diff()
+            # On rebalance days the prior-day shares are what earned the price
+            # change; using sub["shares"].shift(1) avoids attributing a price
+            # move to the new (post-rebalance) share count. On the very first
+            # day (NaN diff) contribution is zero, which is correct.
+            prior_shares = sub["shares"].shift(1)
+            daily_pnl = (prior_shares * price_change).fillna(0.0)
+            gain_by_ticker[ticker] = float(daily_pnl.sum())
+        # Sort tickers by gain descending. Use the same x-axis labels as
+        # chart 3 so the reader can scan the two side by side.
+        gain_items = sorted(gain_by_ticker.items(), key=lambda kv: kv[1], reverse=True)
+        gain_tickers = [t for t, _ in gain_items]
+        gain_values = [v for _, v in gain_items]
+        ticktext_4 = [_ticker_label(t) for t in gain_tickers]
+        # Color positive bars green, negative red so a glance reads
+        # winners vs losers without consulting the y-axis number.
+        bar_colors = ["#2ca02c" if v >= 0 else "#d62728" for v in gain_values]
+        fig.add_trace(
+            go.Bar(x=gain_tickers, y=gain_values,
+                   marker_color=bar_colors,
+                   name="Cumulative $ gain", showlegend=False),
+            row=4, col=1,
+        )
+        fig.update_xaxes(
+            tickmode="array",
+            tickvals=gain_tickers,
+            ticktext=ticktext_4,
+            tickangle=0,
+            row=4, col=1,
+        )
+
+    # 5. Wave-stage trajectories (one line per wave, from wave_history.csv).
     if wh_path.exists():
         wh = pd.read_csv(wh_path, parse_dates=["date"])
         wh["stage_rank"] = wh["stage"].map(WAVE_STAGE_RANK).fillna(0).astype(int)
@@ -1407,10 +1452,10 @@ def build_dashboard(
                            name=wave, legendgroup="waves",
                            legendgrouptitle_text="Wave stages",
                            hovertext=hover, hoverinfo="text+x"),
-                row=4, col=1,
+                row=5, col=1,
             )
 
-    # 5. $ by asset class over time and 6. $ by wave over time. Both
+    # 6. $ by asset class over time and 7. $ by wave over time. Both
     # roll up the per-ticker per-day $ values from snapshots.csv. Each
     # ticker contributes to exactly one bucket in each chart, so the sum
     # of all lines in either chart equals the portfolio total.
@@ -1423,7 +1468,7 @@ def build_dashboard(
             lambda t: TICKER_WAVE.get(t, "general_markets")
         )
 
-        # Asset-class chart (row 5). Sum $ per (date, bucket).
+        # Asset-class chart (row 6). Sum $ per (date, bucket).
         ac = snaps_full.groupby(["date", "asset_bucket"])["value"].sum().unstack(fill_value=0)
         # Stable, intuitive ordering.
         ac_order = [c for c in ["equities", "bonds", "cash", "precious metals", "crypto"]
@@ -1432,10 +1477,10 @@ def build_dashboard(
             fig.add_trace(
                 go.Scatter(x=ac.index, y=ac[bucket], mode="lines",
                            name=bucket, legend="legend2"),
-                row=5, col=1,
+                row=6, col=1,
             )
 
-        # Wave chart (row 6). Same shape, different grouping.
+        # Wave chart (row 7). Same shape, different grouping.
         wv = snaps_full.groupby(["date", "wave_bucket"])["value"].sum().unstack(fill_value=0)
         # Use the same display order as elsewhere in the dashboard.
         wv_order = [w for w in _WAVE_DISPLAY_ORDER if w in wv.columns]
@@ -1443,49 +1488,51 @@ def build_dashboard(
             fig.add_trace(
                 go.Scatter(x=wv.index, y=wv[wave], mode="lines",
                            name=wave, legend="legend3"),
-                row=6, col=1,
+                row=7, col=1,
             )
 
     fig.update_layout(
-        height=1700,
+        height=2000,
         title_text="Portfolio Wave Rider — dashboard",
         # `closest` shows one trace's popup at a time, so hovering chart 1
         # shows portfolio $ OR SPY but not both (and chart 2 shows one
         # ticker's portfolio % at a time, which is cleaner with 7+ lines).
         hovermode="closest",
-        # Per-subplot legends for charts 5 and 6, pinned to the right of
+        # Per-subplot legends for charts 6 and 7, pinned to the right of
         # each subplot in paper coordinates. The default global legend
-        # handles charts 1-4. Subplot row tops with 6 rows and
-        # vertical_spacing=0.06: row 5 top ~0.293, row 6 top ~0.117.
+        # handles charts 1-5. Subplot row tops with 7 rows and
+        # vertical_spacing=0.05: row 6 top ~0.25, row 7 top ~0.10.
         legend2=dict(
             title_text="Asset class $",
             xref="paper", x=1.02,
-            yref="paper", y=0.293, yanchor="top",
+            yref="paper", y=0.25, yanchor="top",
         ),
         legend3=dict(
             title_text="Wave $",
             xref="paper", x=1.02,
-            yref="paper", y=0.117, yanchor="top",
+            yref="paper", y=0.10, yanchor="top",
         ),
     )
     fig.update_yaxes(title_text="$", row=1, col=1)
     fig.update_yaxes(title_text="portfolio %", row=2, col=1, tickformat=".0%")
     fig.update_yaxes(title_text="portfolio %", row=3, col=1, tickformat=".0%")
-    # Chart 4: y-axis ticks show stage names alongside the numeric rank
+    fig.update_yaxes(title_text="$ gain", row=4, col=1, zeroline=True,
+                     zerolinewidth=1, zerolinecolor="#888")
+    # Chart 5: y-axis ticks show stage names alongside the numeric rank
     # so a reader can read the trajectory directly without remembering
     # 0=neutral, 1=buildup, 2=surge, etc.
     rank_to_stage = {v: k for k, v in WAVE_STAGE_RANK.items()}
     stage_ticktext = [f"{r} {rank_to_stage.get(r, '')}" for r in range(5)]
-    fig.update_yaxes(title_text="stage", row=4, col=1,
+    fig.update_yaxes(title_text="stage", row=5, col=1,
                      range=[-0.3, 4.3],
                      tickmode="array",
                      tickvals=list(range(5)),
                      ticktext=stage_ticktext)
-    fig.update_yaxes(title_text="$", row=5, col=1)
-    # Log scale on chart 6 so small wave allocations (e.g., zero-weighted
+    fig.update_yaxes(title_text="$", row=6, col=1)
+    # Log scale on chart 7 so small wave allocations (e.g., zero-weighted
     # robotics/biology lines hovering near a few hundred dollars) don't
     # collapse to the floor next to the dominant general_markets line.
-    fig.update_yaxes(title_text="$ (log)", row=6, col=1, type="log")
+    fig.update_yaxes(title_text="$ (log)", row=7, col=1, type="log")
 
     o_path = Path(out_path)
     o_path.parent.mkdir(parents=True, exist_ok=True)
