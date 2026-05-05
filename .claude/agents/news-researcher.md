@@ -98,6 +98,33 @@ for buildup/surge, -20%/-10% for peak/digestion, 0 for neutral. Small
 and symmetric by design — the tilt nudges weights, it does not dictate
 them.
 
+### Step 6 — flag uncovered waves and suggest candidate tickers
+
+For each named wave in the profile (the current AI wave plus the
+named next waves: rockets/spacecraft, robotics, engineered biology,
+quantum computing, nuclear fusion):
+
+1. Determine whether the user's current watchlist has a **pure-play**
+   ticker for that wave. A pure-play means the ticker's primary
+   business maps directly to the wave (e.g., RKLB for rockets, NVDA
+   for AI). A ticker that incidentally touches the wave as a
+   secondary exposure (e.g., GOOGL's Quantum AI research is secondary
+   to its primary AI/Search business) does **not** count as
+   pure-play; flag the wave as thinly covered, not uncovered.
+2. If the wave is uncovered or thinly covered, suggest 2-3 candidate
+   tickers from your general knowledge of public US-listed markets.
+   Prefer liquid stocks and ETFs. Each candidate gets a one-line
+   `fit` rationale. If no public pure-play exists for a wave (this
+   is currently true for nuclear fusion), say so explicitly rather
+   than inventing one.
+3. Skip suggestions for waves classified `neutral` or `digestion` —
+   the user has no thesis-driven reason to add exposure to a wave
+   that's not heating up.
+
+The skill renders these suggestions in a "Watchlist coverage
+suggestions" section of the final report. The user evaluates each
+candidate and decides whether to add it to `holdings.csv`.
+
 ## Output shape
 
 ```
@@ -130,6 +157,17 @@ them.
   ],
   "thematic_concerns": [
     { "ticker": "...", "concern": "...", "evidence": "..." }
+  ],
+  "watchlist_suggestions": [
+    {
+      "wave": "<wave_name>",
+      "stage": "<buildup | surge | peak>",
+      "coverage": "<uncovered | thinly_covered>",
+      "rationale": "one sentence on why exposure to this wave is worth considering now",
+      "candidates": [
+        { "ticker": "...", "name": "<issuer name>", "fit": "one-line thesis-fit rationale" }
+      ]
+    }
   ]
 }
 ```

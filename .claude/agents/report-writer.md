@@ -17,7 +17,10 @@ From the orchestrating skill, a dict containing:
 - `user_request`: the original prompt
 - `analysis`: the `python -m src.cli analyze ...` JSON payload (contains
   `optimization` and `risk` sub-dicts)
-- `news`: the news-researcher's return payload (optional)
+- `news`: the news-researcher's return payload (optional). May include a
+  `watchlist_suggestions` list with candidate tickers for waves the user's
+  current watchlist underrepresents; render those in the matching report
+  section described below.
 - `profile_conflicts`: any conflicts surfaced by the skill or news-researcher
 - `day_0_baseline`: optional; present only on a first run. Contains
   `allocations_usd` (ticker -> dollars), `reasoning` (thesis-driven prose),
@@ -171,6 +174,25 @@ expected returns.">
 ## News context
 <if news-researcher ran: 1-2 bullets per ticker of material items and
 any exclusion_conflicts. If not, say "not requested.">
+
+## Watchlist coverage suggestions
+<INCLUDE THIS SECTION ONLY when the news-researcher payload contains
+a non-empty `watchlist_suggestions` list. For each entry, render:
+
+- A subheading naming the wave, its stage, and whether the watchlist
+  coverage is `uncovered` or `thinly_covered`.
+- A one-sentence rationale (verbatim from the entry's `rationale`).
+- A small table with columns: ticker | issuer name | thesis fit.
+
+End the section with one paragraph framing these as candidates the
+user should research, not buy recommendations: "These are tickers
+the news-researcher flagged as plausible exposure to waves the
+current watchlist underrepresents. Each is a starting point for the
+user's own research, not a buy recommendation. To add one, append
+`<ticker>,0` to `holdings.csv`; the next /review-portfolio run picks
+it up."
+
+If `watchlist_suggestions` is empty or absent, OMIT this section.>
 
 ## Caveats
 <standard caveats: sample bias, look-ahead, regime shift, mean-variance
