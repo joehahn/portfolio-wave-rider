@@ -116,8 +116,8 @@ def optimize_portfolio(
         raise ValueError(f"unknown objective: {objective}")
     if objective == "target_return" and target_return is None:
         raise ValueError("target_return is required when objective='target_return'")
-    if objective == "mean_variance" and risk_aversion <= 0:
-        raise ValueError("risk_aversion (lambda) must be > 0 for mean_variance objective")
+    if objective == "mean_variance" and risk_aversion < 0:
+        raise ValueError("risk_aversion (lambda) must be >= 0 for mean_variance objective")
 
     tickers = list(returns["mean"].index)
     mean_series = apply_wave_tilt(returns["mean"], wave_views) if wave_views else returns["mean"]
