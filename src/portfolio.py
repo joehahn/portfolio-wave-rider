@@ -1076,8 +1076,8 @@ def build_dashboard(
         rows=4, cols=1,
         subplot_titles=(
             "Portfolio value over time",
-            "Recommended weights drift over time",
-            "Latest recommended weights",
+            "Recommended portfolio % drift over time",
+            "Latest recommended portfolio %",
             "Wave-stage trajectories (0=neutral, 1=buildup, 2=surge, 3=peak, 4=digestion)",
         ),
         vertical_spacing=0.08,
@@ -1119,7 +1119,7 @@ def build_dashboard(
             fig.add_trace(
                 go.Scatter(x=sub["date"], y=sub["weight"], mode="lines+markers",
                            name=f"{ticker} ({cls})", legendgroup="drift",
-                           legendgrouptitle_text="Weight drift"),
+                           legendgrouptitle_text="Portfolio % drift"),
                 row=2, col=1,
             )
         latest_date = recs["date"].max()
@@ -1174,12 +1174,12 @@ def build_dashboard(
         title_text="Portfolio Wave Rider — dashboard",
         # `closest` shows one trace's popup at a time, so hovering chart 1
         # shows portfolio $ OR SPY but not both (and chart 2 shows one
-        # ticker's weight at a time, which is cleaner with 7+ lines).
+        # ticker's portfolio % at a time, which is cleaner with 7+ lines).
         hovermode="closest",
     )
     fig.update_yaxes(title_text="$", row=1, col=1)
-    fig.update_yaxes(title_text="weight", row=2, col=1)
-    fig.update_yaxes(title_text="weight", row=3, col=1)
+    fig.update_yaxes(title_text="portfolio %", row=2, col=1, tickformat=".0%")
+    fig.update_yaxes(title_text="portfolio %", row=3, col=1, tickformat=".0%")
     # Chart 4: y-axis ticks show stage names alongside the numeric rank
     # so a reader can read the trajectory directly without remembering
     # 0=neutral, 1=buildup, 2=surge, etc.
