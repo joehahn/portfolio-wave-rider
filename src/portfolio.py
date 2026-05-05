@@ -1131,7 +1131,10 @@ def build_dashboard(
     fig.update_layout(
         height=1200,
         title_text="Portfolio Wave Rider — dashboard",
-        hovermode="x unified",
+        # `closest` shows one trace's popup at a time, so hovering chart 1
+        # shows portfolio $ OR SPY but not both (and chart 2 shows one
+        # ticker's weight at a time, which is cleaner with 7+ lines).
+        hovermode="closest",
     )
     fig.update_yaxes(title_text="$", row=1, col=1)
     fig.update_yaxes(title_text="weight", row=2, col=1)
