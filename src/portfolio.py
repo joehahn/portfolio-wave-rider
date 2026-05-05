@@ -858,9 +858,13 @@ TICKER_ASSET_CLASS: dict[str, str] = {
     # Cryptocurrencies (spot ETFs)
     "IBIT": "crypto", "FBTC": "crypto", "BITB": "crypto",
     "ETHA": "crypto", "FETH": "crypto",
-    # Broad-market equity ETFs (called out so they don't all look identical)
+    # Broad-market and themed equity ETFs (called out so they don't all
+    # look identical to single-stock equity tickers in the dashboard).
     "VTI": "equity ETF", "VOO": "equity ETF", "SPY": "equity ETF",
     "QQQ": "equity ETF", "VXUS": "equity ETF",
+    "BOTZ": "equity ETF", "ROBO": "equity ETF",
+    "ARKG": "equity ETF", "ARKK": "equity ETF",
+    "AIQ": "equity ETF",
 }
 
 
