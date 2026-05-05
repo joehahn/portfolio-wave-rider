@@ -123,7 +123,9 @@ def main(argv: list[str] | None = None) -> int:
                       help="optimizer lookback window in years; default 3 matches the live system")
     p_bt.add_argument("--max-weight", type=float, default=0.25)
     p_bt.add_argument("--objective", default="max_sharpe",
-                      choices=["max_sharpe", "min_variance"])
+                      choices=["max_sharpe", "min_variance", "mean_variance"])
+    p_bt.add_argument("--risk-aversion", type=float, default=1.0,
+                      help="lambda in mean_variance objective; see analyze --risk-aversion")
     p_bt.add_argument("--risk-free-rate", type=float, default=0.04)
     p_bt.add_argument("--benchmarks", nargs="*", default=["SPY"],
                       help="benchmark tickers compared against the backtest's realized return "
@@ -174,6 +176,7 @@ def main(argv: list[str] | None = None) -> int:
                 initial_usd=args.initial_usd, out_dir=args.out_dir,
                 lookback_years=args.lookback_years,
                 max_weight=args.max_weight, objective=args.objective,
+                risk_aversion=args.risk_aversion,
                 risk_free_rate=args.risk_free_rate,
                 benchmarks=args.benchmarks,
             )

@@ -479,6 +479,7 @@ def backtest(
     lookback_years: int = 3,
     max_weight: float = 0.25,
     objective: str = "max_sharpe",
+    risk_aversion: float = 1.0,
     risk_free_rate: float = 0.04,
     benchmarks: list[str] | None = None,
 ) -> dict[str, Any]:
@@ -557,7 +558,7 @@ def backtest(
             returns = compute_returns(slice_prices)
             opt = optimize_portfolio(
                 returns, objective=objective, risk_free_rate=risk_free_rate,
-                max_weight=max_weight,
+                max_weight=max_weight, risk_aversion=risk_aversion,
             )
             if not opt.get("success"):
                 continue
