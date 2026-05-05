@@ -1,20 +1,22 @@
 """Single CLI for every portfolio operation.
 
-Eight subcommands. Each calls one function in ``src/portfolio.py`` and
+Nine subcommands. Each calls one function in ``src/portfolio.py`` and
 prints the result as JSON to stdout. The /review-portfolio skill
 invokes ``init-holdings`` (first-run branch only), ``wave-history``
 (after each news pass), and ``analyze``; the cron jobs invoke
 ``snapshot``, ``news-feed``, ``recommend``, and ``dashboard``.
 ``backtest`` is a one-off spot-check tool, not part of any cron flow.
+``seed-wave-history`` is a one-time backfill for chart 4 trajectories.
 
 Usage:
-    python -m src.cli init-holdings  --allocations '{"AAPL": 5000, ...}' --out holdings.csv
-    python -m src.cli wave-history   [--news data/news_latest.json] [--force]
-    python -m src.cli news-feed      [--holdings holdings.csv] [--per-ticker-limit 5]
-    python -m src.cli analyze        --tickers AAPL MSFT NVDA --period 3y --max-weight 0.25
-    python -m src.cli snapshot       [--date YYYY-MM-DD] [--force]
-    python -m src.cli recommend      [--max-weight 0.25] [--force]
-    python -m src.cli backtest       [--start-date YYYY-MM-DD] [--end-date YYYY-MM-DD] [--initial-usd 50000]
+    python -m src.cli init-holdings      --allocations '{"AAPL": 5000, ...}' --out holdings.csv
+    python -m src.cli wave-history       [--news data/news_latest.json] [--force]
+    python -m src.cli seed-wave-history  [--force]
+    python -m src.cli news-feed          [--holdings holdings.csv] [--per-ticker-limit 5]
+    python -m src.cli analyze            --tickers AAPL MSFT NVDA --period 3y --max-weight 0.25
+    python -m src.cli snapshot           [--date YYYY-MM-DD] [--force]
+    python -m src.cli recommend          [--max-weight 0.25] [--force]
+    python -m src.cli backtest           [--start-date YYYY-MM-DD] [--end-date YYYY-MM-DD] [--initial-usd 50000]
     python -m src.cli dashboard
 """
 
@@ -57,6 +59,12 @@ def main(argv: list[str] | None = None) -> int:
     p_wh.add_argument("--out", default="data/wave_history.csv")
     p_wh.add_argument("--force", action="store_true",
                       help="overwrite any existing rows for the news file's date")
+
+    p_seed = sub.add_parser("seed-wave-history",
+                            help="backfill wave_history.csv with 12 months of post-hoc monthly classifications (seeded=True)")
+    p_seed.add_argument("--out", default="data/wave_history.csv")
+    p_seed.add_argument("--force", action="store_true",
+                        help="overwrite any existing rows for the seeded dates")
 
     p_nf = sub.add_parser("news-feed",
                           help="pull recent Yahoo Finance headlines per holdings ticker into data/news_feed.json")
@@ -147,6 +155,8 @@ def main(argv: list[str] | None = None) -> int:
             result = portfolio.append_wave_history(
                 wave_stages, date=news_date, out_path=args.out, force=args.force,
             )
+        elif args.cmd == "seed-wave-history":
+            result = portfolio.seed_wave_history(out_path=args.out, force=args.force)
         elif args.cmd == "news-feed":
             result = portfolio.fetch_news_feed(
                 holdings_path=args.holdings, out_path=args.out,

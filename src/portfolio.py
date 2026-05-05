@@ -787,13 +787,16 @@ def append_wave_history(
     date: str,
     out_path: str = "data/wave_history.csv",
     force: bool = False,
+    seeded: bool = False,
 ) -> dict[str, Any]:
     """Append today's wave-stage classifications to wave_history.csv.
 
-    Schema: date, wave, stage, evidence_tickers, rationale.
+    Schema: date, wave, stage, evidence_tickers, rationale, seeded.
     `evidence_tickers` is semicolon-joined inside the cell so the file
-    stays a flat 2D CSV. Idempotent on (date, wave): if rows already exist
-    for ``date``, the call is a no-op unless force=True (in which case
+    stays a flat 2D CSV. `seeded` is True for synthetic backfill rows
+    (from `seed_wave_history`) and False for organic /review-portfolio
+    output. Idempotent on (date, wave): if rows already exist for
+    ``date``, the call is a no-op unless force=True (in which case
     existing rows for that date are dropped first).
     """
     if not wave_stages:
@@ -817,6 +820,7 @@ def append_wave_history(
             "stage": info.get("stage", "neutral"),
             "evidence_tickers": ";".join(info.get("evidence_tickers") or []),
             "rationale": (info.get("rationale") or "").replace("\n", " ").strip(),
+            "seeded": bool(seeded),
         })
 
     new_rows = pd.DataFrame(rows)
@@ -828,6 +832,105 @@ def append_wave_history(
         "date": str(date),
         "waves": list(wave_stages.keys()),
         "n_rows_appended": len(new_rows),
+        "out_path": str(o_path),
+    }
+
+
+# ---------------------------------------------------------------------------
+# Seeded historical wave-stage classifications. Used once on a fresh repo
+# to populate ~12 months of trajectory so the dashboard's chart 4 isn't
+# empty. These are post-hoc judgments grounded in real news flow over
+# 2025-2026 (AI revenue compounding mid-2025, humanoid surge late 2025,
+# nuclear-energy run-up Q4 2025 then digestion in Q1 2026, etc.).
+# Tagged seeded=True so they're distinguishable from organic /review-
+# portfolio output. Rationales are keyed by (wave, stage) and reused
+# across months in the same stage.
+# ---------------------------------------------------------------------------
+
+# Twelve end-of-month classifications, May 2025 through April 2026.
+# Each entry is (date, {wave: stage}).
+_SEEDED_MONTHLY_STAGES: list[tuple[str, dict[str, str]]] = [
+    ("2025-05-31", {"AI": "buildup", "rockets_spacecraft": "buildup", "robotics": "buildup", "engineered_biology": "buildup", "quantum": "buildup", "nuclear_fusion": "buildup", "general_markets": "neutral"}),
+    ("2025-06-30", {"AI": "surge",   "rockets_spacecraft": "buildup", "robotics": "buildup", "engineered_biology": "buildup", "quantum": "buildup", "nuclear_fusion": "buildup", "general_markets": "neutral"}),
+    ("2025-07-31", {"AI": "surge",   "rockets_spacecraft": "buildup", "robotics": "buildup", "engineered_biology": "buildup", "quantum": "buildup", "nuclear_fusion": "buildup", "general_markets": "neutral"}),
+    ("2025-08-31", {"AI": "surge",   "rockets_spacecraft": "buildup", "robotics": "buildup", "engineered_biology": "buildup", "quantum": "buildup", "nuclear_fusion": "buildup", "general_markets": "neutral"}),
+    ("2025-09-30", {"AI": "surge",   "rockets_spacecraft": "buildup", "robotics": "buildup", "engineered_biology": "buildup", "quantum": "buildup", "nuclear_fusion": "buildup", "general_markets": "neutral"}),
+    ("2025-10-31", {"AI": "surge",   "rockets_spacecraft": "buildup", "robotics": "surge",   "engineered_biology": "buildup", "quantum": "buildup", "nuclear_fusion": "surge",   "general_markets": "neutral"}),
+    ("2025-11-30", {"AI": "surge",   "rockets_spacecraft": "buildup", "robotics": "surge",   "engineered_biology": "buildup", "quantum": "buildup", "nuclear_fusion": "surge",   "general_markets": "neutral"}),
+    ("2025-12-31", {"AI": "surge",   "rockets_spacecraft": "buildup", "robotics": "surge",   "engineered_biology": "buildup", "quantum": "buildup", "nuclear_fusion": "surge",   "general_markets": "neutral"}),
+    ("2026-01-31", {"AI": "surge",   "rockets_spacecraft": "buildup", "robotics": "surge",   "engineered_biology": "buildup", "quantum": "surge",   "nuclear_fusion": "buildup", "general_markets": "neutral"}),
+    ("2026-02-28", {"AI": "surge",   "rockets_spacecraft": "buildup", "robotics": "surge",   "engineered_biology": "buildup", "quantum": "surge",   "nuclear_fusion": "buildup", "general_markets": "neutral"}),
+    ("2026-03-31", {"AI": "surge",   "rockets_spacecraft": "buildup", "robotics": "surge",   "engineered_biology": "buildup", "quantum": "surge",   "nuclear_fusion": "buildup", "general_markets": "neutral"}),
+    ("2026-04-30", {"AI": "surge",   "rockets_spacecraft": "buildup", "robotics": "surge",   "engineered_biology": "buildup", "quantum": "buildup", "nuclear_fusion": "buildup", "general_markets": "neutral"}),
+]
+
+# Rationale keyed by (wave, stage). Same text repeats across months in
+# the same stage. Phrased as a brief post-hoc summary, not pretending
+# to be a real-time classification.
+_SEEDED_RATIONALES: dict[tuple[str, str], str] = {
+    ("AI", "buildup"): "Pre-mid-2025: AI capex still primarily speculative; revenue compounding had not yet broadly shown up in hyperscaler results.",
+    ("AI", "surge"): "Mid-2025 onward: GOOGL Cloud, MSFT Azure, NVDA datacenter all growing 30-70% YoY; enterprise AI revenue compounding, hyperscalers competing to buy capacity.",
+    ("rockets_spacecraft", "buildup"): "RKLB Electron cadence growing throughout 2025 ($1.85B backlog by year-end); Neutron pre-launch the entire window. Real commercial revenue from a small base.",
+    ("robotics", "buildup"): "Industrial automation steady through mid-2025; humanoid programs raising capital but pre-deployment.",
+    ("robotics", "surge"): "Late-2025 onward: Tesla Optimus Fremont production announced for Q2 2026, Figure AI $700M raise, humanoid demos dominate CES 2026. Adoption beginning to catch up with hype.",
+    ("engineered_biology", "buildup"): "Gene-editing therapies clearing clinical milestones (Casgevy commercial; Intellia Phase 3 in vivo CRISPR April 2026), but ARKG ~80% below 2021 peak. Wave under-owned and cheap relative to scientific trajectory.",
+    ("quantum", "buildup"): "Hardware milestones (Willow, Majorana 1, IBM Chicago hub) but no commercial deployment at scale. QCR 2026 explicitly forecasts no commercial scale this year.",
+    ("quantum", "surge"): "Q1 2026 inflection: QTUM hit $4B AUM with 5-star Morningstar; +77% trailing year; March 20 rebalance toward hardware specialists. Quantinuum IPO catalyst flagged.",
+    ("nuclear_fusion", "buildup"): "Private investment growing, IEA 2030 first-plant target, regulatory frameworks being built. Pure-play fusion still pre-IPO.",
+    ("nuclear_fusion", "surge"): "Q4 2025 nuclear-energy run-up: NUKZ ran from ~$42 to $75 on AI-data-center electricity demand narrative (Meta 6.6 GW PPAs, Microsoft Three Mile Island). Adjacent, not pure fusion.",
+    ("general_markets", "neutral"): "AGG/BIL/IAU/VIG are macro instruments, no wave attachment. Always neutral by construction.",
+}
+
+
+def seed_wave_history(
+    out_path: str = "data/wave_history.csv",
+    force: bool = False,
+) -> dict[str, Any]:
+    """Backfill wave_history.csv with 12 months of post-hoc classifications.
+
+    Writes one row per (date, wave) for the 12 end-of-month dates in
+    `_SEEDED_MONTHLY_STAGES`, using rationales from `_SEEDED_RATIONALES`.
+    All rows are tagged `seeded=True`. Run once on a fresh repo so chart
+    4 (wave-stage trajectories) renders meaningfully before /review-
+    portfolio has had time to accumulate organic history.
+
+    Idempotent on date: if a date already exists in the CSV (organic or
+    seeded), the call skips it unless force=True.
+    """
+    o_path = Path(out_path)
+    existing = pd.read_csv(o_path) if o_path.exists() else None
+    existing_dates = set(existing["date"].astype(str)) if existing is not None else set()
+
+    rows = []
+    for date, stages in _SEEDED_MONTHLY_STAGES:
+        if date in existing_dates and not force:
+            continue
+        for wave, stage in stages.items():
+            rows.append({
+                "date": date,
+                "wave": wave,
+                "stage": stage,
+                "evidence_tickers": "",
+                "rationale": _SEEDED_RATIONALES.get((wave, stage), ""),
+                "seeded": True,
+            })
+
+    if not rows:
+        return {"skipped": True, "reason": "all seeded dates already present; pass force=True to overwrite"}
+
+    new_rows = pd.DataFrame(rows)
+    if force and existing is not None:
+        existing = existing[~existing["date"].astype(str).isin(
+            {d for d, _ in _SEEDED_MONTHLY_STAGES}
+        )]
+    out = pd.concat([existing, new_rows], ignore_index=True) if existing is not None else new_rows
+    out = out.sort_values(["date", "wave"]).reset_index(drop=True)
+    o_path.parent.mkdir(parents=True, exist_ok=True)
+    out.to_csv(o_path, index=False)
+
+    return {
+        "n_rows_appended": len(new_rows),
+        "n_dates": len({r["date"] for r in rows}),
         "out_path": str(o_path),
     }
 

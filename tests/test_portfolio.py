@@ -186,7 +186,7 @@ def test_append_wave_history_writes_one_row_per_wave(tmp_path) -> None:
                                             out_path=str(out))
     assert result["n_rows_appended"] == 3
     df = pd.read_csv(out)
-    assert list(df.columns) == ["date", "wave", "stage", "evidence_tickers", "rationale"]
+    assert list(df.columns) == ["date", "wave", "stage", "evidence_tickers", "rationale", "seeded"]
     ai_row = df[df["wave"] == "AI"].iloc[0]
     assert ai_row["stage"] == "surge"
     assert ai_row["evidence_tickers"] == "NVDA;MSFT;GOOGL"

@@ -202,12 +202,12 @@ The "Profile conflicts" section of any report is the most important thing to rea
 - **Sample bias.** The realized Sharpe on any 2-3 year window is usually optimistic vs the forward-looking distribution. Returns are non-stationary; vol clusters; means are noisy.
 - **Estimation error in `μ`.** Mean-variance amplifies small errors in the expected-return estimate. A weight pinned at the concentration cap is often a symptom of estimation noise, not a real signal. This is the well-known Markowitz blow-up. Run `python -m src.cli backtest` to walk the optimizer forward on real historical data; if the weight-stability L1 metric is small (~0.02 means weights barely move week to week) the estimation noise isn't driving the solution.
 - **Wave-stage tilts.** Multipliers are deliberately small and symmetric: 1.20 / 1.10 / 1.00 / 0.90 / 0.80. The tilt nudges the optimizer; it does not dictate. Track the realized vs tilted Sharpe gap (the "views premium") to see whether the news-researcher's classifications add information.
-- **Wave-stage trajectories.** The dashboard's fourth chart plots each wave's stage rank over time as `wave_history.csv` accumulates. The chart is sparse for the first few months; it becomes informative around 6 months and genuinely useful around 12+ months. Watch for sustained climbs (buildup → surge → peak) as a rebalance trigger and for sustained drops (peak → digestion) as a trim signal.
+- **Wave-stage trajectories.** The dashboard's fourth chart plots each wave's stage rank over time as `wave_history.csv` accumulates. Organic accumulation is slow (one row per wave per `/review-portfolio` run, monthly cadence), so a fresh repo runs `python -m src.cli seed-wave-history` once to backfill 12 months of post-hoc monthly classifications grounded in the news flow over 2025-2026 (AI revenue compounding mid-2025, humanoid surge late 2025, nuclear-energy run-up Q4 2025 then digestion in Q1 2026). Seeded rows carry `seeded=True` so they're distinguishable from organic output. Watch for sustained climbs (buildup → surge → peak) as a rebalance trigger and sustained drops (peak → digestion) as a trim signal.
 - **Numbers come from Python.** If a figure in a report did not come from `src.cli`, that's a bug. The LLM is allowed to write prose; it is not allowed to do arithmetic.
 
 ## CLI reference
 
-Eight subcommands. `/review-portfolio` calls `init-holdings` (first-run branch only), `wave-history` (after each news pass), and `analyze`. The cron jobs call `snapshot`, `news-feed`, `recommend`, and `dashboard`. `backtest` is a one-off spot-check tool, not part of any cron flow. Every subcommand prints a single JSON blob to stdout.
+Nine subcommands. `/review-portfolio` calls `init-holdings` (first-run branch only), `wave-history` (after each news pass), and `analyze`. The cron jobs call `snapshot`, `news-feed`, `recommend`, and `dashboard`. `backtest` is a one-off spot-check tool, not part of any cron flow. `seed-wave-history` is a one-time backfill for chart 4 trajectories. Every subcommand prints a single JSON blob to stdout.
 
 ```bash
 # Convert a thesis-driven dollar allocation into shares (used internally by the
@@ -218,6 +218,11 @@ Eight subcommands. `/review-portfolio` calls `init-holdings` (first-run branch o
 # Append today's per-wave stage classifications (read from data/news_latest.json)
 # to data/wave_history.csv so the dashboard can plot stage trajectories
 .venv/bin/python -m src.cli wave-history [--news data/news_latest.json] [--force]
+
+# Backfill 12 months of post-hoc monthly wave-stage classifications, tagged
+# seeded=True. Run once on a fresh repo so chart 4 is informative before
+# /review-portfolio has had time to accumulate organic history.
+.venv/bin/python -m src.cli seed-wave-history [--force]
 
 # Pull recent Yahoo Finance headlines per ticker into data/news_feed.json (cron, no LLM)
 .venv/bin/python -m src.cli news-feed [--per-ticker-limit 5]
