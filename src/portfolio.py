@@ -842,6 +842,27 @@ _WAVE_DISPLAY_ORDER = [
     "quantum", "nuclear_fusion", "general_markets",
 ]
 
+# Asset-class labels for the dashboard's "Latest recommended weights" bar chart.
+# Each ticker gets a small secondary label under its name so a reader can
+# scan "what kind of thing am I looking at" at a glance. Unknown tickers
+# default to "equity" since that's the most common case for retail watchlists.
+TICKER_ASSET_CLASS: dict[str, str] = {
+    # Bonds
+    "AGG": "bond", "BND": "bond", "TLT": "bond", "IEF": "bond",
+    "SHY": "bond", "MUB": "bond", "LQD": "bond", "HYG": "bond",
+    # Cash / ultra-short Treasuries
+    "BIL": "cash", "SGOV": "cash", "SPAXX": "cash", "VMFXX": "cash",
+    # Precious metals
+    "IAU": "gold", "GLD": "gold", "SLV": "silver",
+    "PPLT": "platinum", "PALL": "palladium",
+    # Cryptocurrencies (spot ETFs)
+    "IBIT": "crypto", "FBTC": "crypto", "BITB": "crypto",
+    "ETHA": "crypto", "FETH": "crypto",
+    # Broad-market equity ETFs (called out so they don't all look identical)
+    "VTI": "equity ETF", "VOO": "equity ETF", "SPY": "equity ETF",
+    "QQQ": "equity ETF", "VXUS": "equity ETF",
+}
+
 
 def _render_news_section(payload: dict, title: str, intro: str) -> str:
     """Render one news section (title + intro + per-ticker click-to-expand bullets).
@@ -1097,12 +1118,25 @@ def build_dashboard(
         latest_date = recs["date"].max()
         latest_weights = recs[recs["date"] == latest_date].sort_values("weight", ascending=False)
 
-    # 3. Latest recommended weights (bar chart).
+    # 3. Latest recommended weights (bar chart). The x-axis tick text
+    # shows ticker plus a small asset-class label so a reader can scan
+    # "what kind of thing is this" without consulting the holdings file.
     if latest_weights is not None and not latest_weights.empty:
+        tickers_in_chart = latest_weights["ticker"].tolist()
+        ticktext_3 = [
+            f"{t}<br><sub>{TICKER_ASSET_CLASS.get(t, 'equity')}</sub>"
+            for t in tickers_in_chart
+        ]
         fig.add_trace(
-            go.Bar(x=latest_weights["ticker"], y=latest_weights["weight"],
+            go.Bar(x=tickers_in_chart, y=latest_weights["weight"],
                    name=f"As of {latest_weights['date'].iloc[0].date()}",
                    showlegend=False),
+            row=3, col=1,
+        )
+        fig.update_xaxes(
+            tickmode="array",
+            tickvals=tickers_in_chart,
+            ticktext=ticktext_3,
             row=3, col=1,
         )
 
@@ -1139,8 +1173,16 @@ def build_dashboard(
     fig.update_yaxes(title_text="$", row=1, col=1)
     fig.update_yaxes(title_text="weight", row=2, col=1)
     fig.update_yaxes(title_text="weight", row=3, col=1)
-    fig.update_yaxes(title_text="stage rank", row=4, col=1,
-                     range=[-0.3, 4.3], dtick=1)
+    # Chart 4: y-axis ticks show stage names alongside the numeric rank
+    # so a reader can read the trajectory directly without remembering
+    # 0=neutral, 1=buildup, 2=surge, etc.
+    rank_to_stage = {v: k for k, v in WAVE_STAGE_RANK.items()}
+    stage_ticktext = [f"{r} {rank_to_stage.get(r, '')}" for r in range(5)]
+    fig.update_yaxes(title_text="stage", row=4, col=1,
+                     range=[-0.3, 4.3],
+                     tickmode="array",
+                     tickvals=list(range(5)),
+                     ticktext=stage_ticktext)
 
     o_path = Path(out_path)
     o_path.parent.mkdir(parents=True, exist_ok=True)
