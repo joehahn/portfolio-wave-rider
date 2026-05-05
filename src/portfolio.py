@@ -482,6 +482,7 @@ def backtest(
     risk_aversion: float = 1.0,
     risk_free_rate: float = 0.04,
     benchmarks: list[str] | None = None,
+    wave_history_path: str | None = None,
 ) -> dict[str, Any]:
     """Walk-forward weekly-rebalance backtest of the lightweight Python-only path.
 
@@ -538,6 +539,31 @@ def backtest(
     if len(daily_dates) < 5:
         raise RuntimeError(f"only {len(daily_dates)} trading days in [{start.date()}, {end.date()}]")
 
+    # Time-varying wave views, if a wave_history file is given. At each
+    # rebalance we look up the most recent classification at or before
+    # that date, then map each ticker to its wave's stage. Tickers whose
+    # wave_bucket isn't classified yet (or whose wave is missing) get
+    # `neutral` (no tilt).
+    wh_df = None
+    if wave_history_path is not None:
+        wh_path_obj = Path(wave_history_path)
+        if wh_path_obj.exists():
+            wh_df = pd.read_csv(wh_path_obj, parse_dates=["date"])
+
+    def _wave_views_at(date: pd.Timestamp) -> dict[str, str] | None:
+        if wh_df is None:
+            return None
+        relevant = wh_df[wh_df["date"] <= date]
+        if relevant.empty:
+            return None
+        latest_date = relevant["date"].max()
+        latest = relevant[relevant["date"] == latest_date]
+        wave_to_stage = dict(zip(latest["wave"], latest["stage"]))
+        return {
+            t: wave_to_stage.get(TICKER_WAVE.get(t, "general_markets"), "neutral")
+            for t in tickers
+        }
+
     # Iterate. Friday = rebalance; every trading day = snapshot.
     snap_rows: list[dict[str, Any]] = []
     rec_rows: list[dict[str, Any]] = []
@@ -559,6 +585,7 @@ def backtest(
             opt = optimize_portfolio(
                 returns, objective=objective, risk_free_rate=risk_free_rate,
                 max_weight=max_weight, risk_aversion=risk_aversion,
+                wave_views=_wave_views_at(date),
             )
             if not opt.get("success"):
                 continue

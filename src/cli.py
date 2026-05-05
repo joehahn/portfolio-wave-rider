@@ -126,6 +126,10 @@ def main(argv: list[str] | None = None) -> int:
                       choices=["max_sharpe", "min_variance", "mean_variance"])
     p_bt.add_argument("--risk-aversion", type=float, default=1.0,
                       help="lambda in mean_variance objective; see analyze --risk-aversion")
+    p_bt.add_argument("--wave-history", default=None,
+                      help="path to wave_history.csv; if given, the optimizer applies "
+                           "time-varying wave-stage tilts at each rebalance based on the "
+                           "most recent classification at or before that date")
     p_bt.add_argument("--risk-free-rate", type=float, default=0.04)
     p_bt.add_argument("--benchmarks", nargs="*", default=["SPY"],
                       help="benchmark tickers compared against the backtest's realized return "
@@ -179,6 +183,7 @@ def main(argv: list[str] | None = None) -> int:
                 risk_aversion=args.risk_aversion,
                 risk_free_rate=args.risk_free_rate,
                 benchmarks=args.benchmarks,
+                wave_history_path=args.wave_history,
             )
         elif args.cmd == "analyze":
             result = portfolio.analyze(
