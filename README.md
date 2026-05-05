@@ -31,6 +31,7 @@ This README leans on a handful of finance terms.
 | **Mean-variance optimization** | Markowitz framework. Convex quadratic program: pick weights `w` that minimize `wᵀΣw` (variance) subject to `wᵀμ = target` (target return) and `Σw = 1`, `w ≥ 0`. We use `scipy.optimize.minimize(SLSQP)`. |
 | **Risk-free rate (`r_free`)** | The return you can earn with effectively zero risk by parking money in short-term US Treasuries or a money-market fund. Default in the code is `0.04` (4% annualized, roughly a 1-year Treasury yield). Adjustable via `--risk-free-rate` on `analyze` and `recommend`. |
 | **Sharpe ratio** | Signal-to-noise on returns: `(E[r] − r_free) / σ`. The numerator is the **excess return** (return above what's free). The denominator is the standard deviation of returns. You only get credit for the risk-bearing part of `E[r]`. Higher is better; values above 1 are good for a long-horizon portfolio. |
+| **Risk aversion (`λ`)** | Scalar coefficient in the mean-variance utility `μᵀw − λ·wᵀΣw`. The `analyze` CLI exposes it as `--risk-aversion` when `--objective mean_variance`. Small `λ` (≤ 1) favors expected return → equity-heavy portfolios; large `λ` (≥ 5) favors variance reduction → bond/cash-heavy. Sliding `λ` traces the efficient frontier; `max_sharpe` picks one specific point on it (the tangent). |
 | **Max drawdown** | Worst observed peak-to-trough decline of cumulative value: `min_t (V_t − cummax(V)_t) / cummax(V)_t`. A max drawdown of `-0.30` means at some point the portfolio lost 30% from a prior high. |
 | **VaR_α** | Value-at-risk: the α-quantile of the daily return distribution. `VaR_0.05 = -0.02` means there's a 5% chance of losing more than 2% on a given day (under the empirical distribution). |
 | **CVaR_α** | Conditional VaR: the expected return conditioned on being below `VaR_α`. Tail-loss expectation. |
@@ -227,8 +228,15 @@ Nine subcommands. `/review-portfolio` calls `init-holdings` (first-run branch on
 # Pull recent Yahoo Finance headlines per ticker into data/news_feed.json (cron, no LLM)
 .venv/bin/python -m src.cli news-feed [--per-ticker-limit 5]
 
-# One-shot analysis (fetch prices + compute log-returns + optimize + risk metrics)
+# One-shot analysis (fetch prices + compute log-returns + optimize + risk metrics).
+# Three objectives:
+#   max_sharpe    - default; maximize (μᵀw - r_free) / √(wᵀΣw). Risk-adjusted optimum.
+#   min_variance  - minimize wᵀΣw. Lowest-vol point on the frontier.
+#   mean_variance - maximize μᵀw - λ·wᵀΣw. λ (`--risk-aversion`) slides along the
+#                   frontier: small λ favors return (more equity-heavy), large λ
+#                   favors variance reduction (more bond/cash-heavy).
 .venv/bin/python -m src.cli analyze --tickers AAPL MSFT NVDA --period 3y --max-weight 0.25
+.venv/bin/python -m src.cli analyze --tickers AAPL MSFT NVDA --objective mean_variance --risk-aversion 1.0
 
 # Time-series logging
 .venv/bin/python -m src.cli snapshot   [--date YYYY-MM-DD] [--force]

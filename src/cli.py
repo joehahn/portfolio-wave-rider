@@ -78,9 +78,12 @@ def main(argv: list[str] | None = None) -> int:
     p_an.add_argument("--tickers", nargs="+", required=True)
     p_an.add_argument("--period", default="3y")
     p_an.add_argument("--objective", default="max_sharpe",
-                      choices=["max_sharpe", "min_variance"])
+                      choices=["max_sharpe", "min_variance", "mean_variance"])
     p_an.add_argument("--max-weight", type=float, default=0.25)
     p_an.add_argument("--risk-free-rate", type=float, default=0.04)
+    p_an.add_argument("--risk-aversion", type=float, default=1.0,
+                      help="lambda in mean_variance objective (μᵀw - λ·wᵀΣw); "
+                           "small λ favors return, large λ favors variance reduction")
     p_an.add_argument("--wave-views", default=None,
                       help="JSON literal or path mapping ticker -> wave stage "
                            "(buildup|surge|peak|digestion|neutral). Tilts expected returns.")
@@ -176,6 +179,7 @@ def main(argv: list[str] | None = None) -> int:
             result = portfolio.analyze(
                 args.tickers, period=args.period, objective=args.objective,
                 max_weight=args.max_weight, risk_free_rate=args.risk_free_rate,
+                risk_aversion=args.risk_aversion,
                 wave_views=_load_wave_views(args.wave_views) if args.wave_views else None,
             )
         elif args.cmd == "snapshot":

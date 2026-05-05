@@ -99,12 +99,25 @@ def optimize_portfolio(
     max_weight: float = 1.0,
     min_weight: float = 0.0,
     wave_views: dict[str, str] | None = None,
+    risk_aversion: float = 1.0,
 ) -> dict[str, Any]:
-    """Solve the mean-variance problem and return weights + summary stats."""
-    if objective not in {"max_sharpe", "min_variance", "target_return"}:
+    """Solve the mean-variance problem and return weights + summary stats.
+
+    Objectives:
+      - ``max_sharpe`` (default): maximize (μᵀw - r_free) / √(wᵀΣw).
+        Picks the tangent portfolio on the efficient frontier.
+      - ``min_variance``: minimize wᵀΣw. Lowest-vol point on the frontier.
+      - ``mean_variance``: maximize μᵀw - λ·wᵀΣw. Slides along the frontier
+        as ``risk_aversion`` (λ) changes; small λ favors return, large λ
+        favors variance reduction.
+      - ``target_return``: minimize wᵀΣw subject to μᵀw = target_return.
+    """
+    if objective not in {"max_sharpe", "min_variance", "target_return", "mean_variance"}:
         raise ValueError(f"unknown objective: {objective}")
     if objective == "target_return" and target_return is None:
         raise ValueError("target_return is required when objective='target_return'")
+    if objective == "mean_variance" and risk_aversion <= 0:
+        raise ValueError("risk_aversion (lambda) must be > 0 for mean_variance objective")
 
     tickers = list(returns["mean"].index)
     mean_series = apply_wave_tilt(returns["mean"], wave_views) if wave_views else returns["mean"]
@@ -126,6 +139,10 @@ def optimize_portfolio(
             vol = float(np.sqrt(w @ sigma @ w))
             return 0.0 if vol < 1e-10 else -(float(w @ mu) - risk_free_rate) / vol
         result = minimize(neg_sharpe, w0, method="SLSQP", bounds=bounds, constraints=constraints)
+    elif objective == "mean_variance":
+        # Maximize μᵀw - λ·wᵀΣw, equivalently minimize -μᵀw + λ·wᵀΣw.
+        result = minimize(lambda w: -(w @ mu) + risk_aversion * (w @ sigma @ w),
+                          w0, method="SLSQP", bounds=bounds, constraints=constraints)
     else:
         # min_variance and target_return both minimize portfolio variance.
         result = minimize(lambda w: w @ sigma @ w, w0, method="SLSQP",
@@ -212,6 +229,7 @@ def analyze(
     max_weight: float = 0.25,
     risk_free_rate: float = 0.04,
     wave_views: dict[str, str] | None = None,
+    risk_aversion: float = 1.0,
 ) -> dict[str, Any]:
     """Run the full pipeline and return a single JSON-serializable dict."""
     prices = fetch_prices(tickers, period=period)
@@ -219,6 +237,7 @@ def analyze(
     opt = optimize_portfolio(
         returns, objective=objective, risk_free_rate=risk_free_rate,
         max_weight=max_weight, wave_views=wave_views,
+        risk_aversion=risk_aversion,
     )
     risk = risk_metrics(returns, opt["weights"], risk_free_rate=risk_free_rate) \
         if opt.get("success") else None
