@@ -1211,9 +1211,15 @@ def build_dashboard(
         tickers_in_chart = latest_weights["ticker"].tolist()
         def _label_chart3(t: str) -> str:
             cls = TICKER_ASSET_CLASS.get(t, "equity")
-            if cls.startswith("equity"):
-                wave = TICKER_WAVE.get(t, "general_markets")
-                return f"{t}<br><sub>{cls}<br>{WAVE_DISPLAY_LABEL.get(wave, wave)}</sub>"
+            if cls == "equity":
+                # Individual stocks: "TICKER / wave"
+                wave = WAVE_DISPLAY_LABEL.get(TICKER_WAVE.get(t, "general_markets"), "")
+                return f"{t}<br><sub>{wave}</sub>"
+            if cls == "equity ETF":
+                # ETFs: "TICKER / wave ETF" (e.g., "BOTZ / robotics ETF")
+                wave = WAVE_DISPLAY_LABEL.get(TICKER_WAVE.get(t, "general_markets"), "")
+                return f"{t}<br><sub>{wave} ETF</sub>"
+            # Non-equities (bond, cash, gold, ...): "TICKER / asset class"
             return f"{t}<br><sub>{cls}</sub>"
         ticktext_3 = [_label_chart3(t) for t in tickers_in_chart]
         fig.add_trace(

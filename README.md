@@ -116,6 +116,28 @@ Optional: `news_sources.md`, a curated list of sources per technology wave. Impr
 
 The optimizer respects two profile-level constraints when allocating across this universe: `concentration_cap` (no single ticker exceeds that fraction) and `exclusions` (a ticker tagged with an excluded sector is flagged in "Profile conflicts" if it gets non-zero weight). Constraints come from the profile; the universe comes from `holdings.csv`.
 
+### How wave-stage tilts enter the math
+
+The news-researcher's only job that touches the optimizer is to assign each ticker a wave stage (`buildup`, `surge`, `neutral`, `digestion`, `peak`). The skill then passes these classifications to `analyze`, which scales each ticker's expected return by the stage's multiplier *before* running the optimizer. The math is one line:
+
+```
+μ_tilted[i] = stage_multiplier[stage(i)] × μ[i]
+```
+
+with the multipliers fixed in `src/portfolio.py:WAVE_STAGE_TILT`:
+
+| Stage | Multiplier | Plain reading |
+|---|---|---|
+| `buildup` | **1.20** | quiet, cheap, under-owned: nudge μ up 20% |
+| `surge` | **1.10** | adoption compounding, room to run: nudge μ up 10% |
+| `neutral` | **1.00** | no view |
+| `digestion` | **0.90** | post-crest hangover: nudge μ down 10% |
+| `peak` | **0.80** | enthusiasm is the story, valuations stretched: nudge μ down 20% |
+
+`μ` (mu) is the expected-return vector — historical mean of daily log returns over the lookback window, annualized. The optimizer maximizes Sharpe `(μ_tiltedᵀw − r_free) / √(wᵀΣw)` using the tilted version. Note that `Σ` (the covariance matrix) is **not** tilted — only the expected returns. So a ticker with a bullish wave view doesn't get blindly upweighted: the optimizer still discounts it for volatility and correlation with the rest of the portfolio.
+
+This is why the optimizer often zeros tickers with bullish wave views (BOTZ, ARKG, MSFT in recent runs). The tilt isn't strong enough to override the volatility / covariance penalty for those tickers given the 3y lookback. The "Profile conflicts" section of the report flags exactly that gap — the wave-thesis prior pulled one direction; the data pulled another. A ±20% bump in μ is meaningful but deliberately modest: a single news pass plus an LLM judgment is fairly weak evidence, so the tilts nudge weights rather than dictate them.
+
 ### First run
 
 In Claude Code, run:
