@@ -867,6 +867,49 @@ TICKER_ASSET_CLASS: dict[str, str] = {
     "AIQ": "equity ETF",
 }
 
+# Map raw asset-class labels to the broader buckets shown on the
+# "$ by asset class" chart. Equity singles and equity ETFs collapse to
+# "equities"; precious metals collapse to one bucket. Anything not in
+# this map falls back to "equities" (the most common single-stock case).
+ASSET_CLASS_BUCKET: dict[str, str] = {
+    "equity": "equities",
+    "equity ETF": "equities",
+    "bond": "bonds",
+    "cash": "cash",
+    "gold": "precious metals",
+    "silver": "precious metals",
+    "platinum": "precious metals",
+    "palladium": "precious metals",
+    "crypto": "crypto",
+}
+
+# Wave-bucket mapping for the "$ by wave" chart. Slow-moving fact about
+# what each ticker is fundamentally a play on. Anything not in this map
+# falls back to "general_markets".
+TICKER_WAVE: dict[str, str] = {
+    # AI
+    "GOOGL": "AI", "NVDA": "AI", "MSFT": "AI",
+    "AIQ": "AI", "ARKK": "AI", "QQQ": "AI",
+    # Robotics
+    "BOTZ": "robotics", "ROBO": "robotics",
+    # Rockets / spacecraft
+    "RKLB": "rockets_spacecraft",
+    # Engineered biology
+    "ARKG": "engineered_biology",
+    # General markets (broad ETFs, bonds, cash, metals, crypto)
+    "AGG": "general_markets", "BND": "general_markets", "TLT": "general_markets",
+    "IEF": "general_markets", "SHY": "general_markets", "MUB": "general_markets",
+    "LQD": "general_markets", "HYG": "general_markets",
+    "BIL": "general_markets", "SGOV": "general_markets",
+    "SPAXX": "general_markets", "VMFXX": "general_markets",
+    "IAU": "general_markets", "GLD": "general_markets", "SLV": "general_markets",
+    "PPLT": "general_markets", "PALL": "general_markets",
+    "IBIT": "general_markets", "FBTC": "general_markets", "BITB": "general_markets",
+    "ETHA": "general_markets", "FETH": "general_markets",
+    "VTI": "general_markets", "VOO": "general_markets",
+    "SPY": "general_markets", "VXUS": "general_markets",
+}
+
 
 def _render_news_section(payload: dict, title: str, intro: str) -> str:
     """Render one news section (title + intro + per-ticker click-to-expand bullets).
@@ -1073,14 +1116,16 @@ def build_dashboard(
         )
 
     fig = make_subplots(
-        rows=4, cols=1,
+        rows=6, cols=1,
         subplot_titles=(
             "Portfolio value over time",
             "Recommended portfolio % drift over time",
             "Latest recommended portfolio %",
             "Wave-stage trajectories (0=neutral, 1=buildup, 2=surge, 3=peak, 4=digestion)",
+            "$ by asset class over time",
+            "$ by wave over time",
         ),
-        vertical_spacing=0.08,
+        vertical_spacing=0.06,
     )
 
     # 1. Portfolio total value over time (from snapshots.csv).
@@ -1169,8 +1214,46 @@ def build_dashboard(
                 row=4, col=1,
             )
 
+    # 5. $ by asset class over time and 6. $ by wave over time. Both
+    # roll up the per-ticker per-day $ values from snapshots.csv. Each
+    # ticker contributes to exactly one bucket in each chart, so the sum
+    # of all lines in either chart equals the portfolio total.
+    if snap_path.exists():
+        snaps_full = pd.read_csv(snap_path, parse_dates=["date"])
+        snaps_full["asset_bucket"] = snaps_full["ticker"].map(
+            lambda t: ASSET_CLASS_BUCKET.get(TICKER_ASSET_CLASS.get(t, "equity"), "equities")
+        )
+        snaps_full["wave_bucket"] = snaps_full["ticker"].map(
+            lambda t: TICKER_WAVE.get(t, "general_markets")
+        )
+
+        # Asset-class chart (row 5). Sum $ per (date, bucket).
+        ac = snaps_full.groupby(["date", "asset_bucket"])["value"].sum().unstack(fill_value=0)
+        # Stable, intuitive ordering.
+        ac_order = [c for c in ["equities", "bonds", "cash", "precious metals", "crypto"]
+                    if c in ac.columns]
+        for bucket in ac_order:
+            fig.add_trace(
+                go.Scatter(x=ac.index, y=ac[bucket], mode="lines",
+                           name=bucket, legendgroup="asset_class",
+                           legendgrouptitle_text="Asset class $"),
+                row=5, col=1,
+            )
+
+        # Wave chart (row 6). Same shape, different grouping.
+        wv = snaps_full.groupby(["date", "wave_bucket"])["value"].sum().unstack(fill_value=0)
+        # Use the same display order as elsewhere in the dashboard.
+        wv_order = [w for w in _WAVE_DISPLAY_ORDER if w in wv.columns]
+        for wave in wv_order:
+            fig.add_trace(
+                go.Scatter(x=wv.index, y=wv[wave], mode="lines",
+                           name=wave, legendgroup="wave_dollars",
+                           legendgrouptitle_text="Wave $"),
+                row=6, col=1,
+            )
+
     fig.update_layout(
-        height=1200,
+        height=1700,
         title_text="Portfolio Wave Rider — dashboard",
         # `closest` shows one trace's popup at a time, so hovering chart 1
         # shows portfolio $ OR SPY but not both (and chart 2 shows one
@@ -1190,6 +1273,8 @@ def build_dashboard(
                      tickmode="array",
                      tickvals=list(range(5)),
                      ticktext=stage_ticktext)
+    fig.update_yaxes(title_text="$", row=5, col=1)
+    fig.update_yaxes(title_text="$", row=6, col=1)
 
     o_path = Path(out_path)
     o_path.parent.mkdir(parents=True, exist_ok=True)
