@@ -1213,7 +1213,7 @@ def build_dashboard(
             cls = TICKER_ASSET_CLASS.get(t, "equity")
             if cls.startswith("equity"):
                 wave = TICKER_WAVE.get(t, "general_markets")
-                return f"{t}<br><sub>{cls}, {WAVE_DISPLAY_LABEL.get(wave, wave)}</sub>"
+                return f"{t}<br><sub>{cls}<br>{WAVE_DISPLAY_LABEL.get(wave, wave)}</sub>"
             return f"{t}<br><sub>{cls}</sub>"
         ticktext_3 = [_label_chart3(t) for t in tickers_in_chart]
         fig.add_trace(
@@ -1226,6 +1226,7 @@ def build_dashboard(
             tickmode="array",
             tickvals=tickers_in_chart,
             ticktext=ticktext_3,
+            tickangle=0,
             row=3, col=1,
         )
 
