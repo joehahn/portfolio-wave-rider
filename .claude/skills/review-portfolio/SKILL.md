@@ -10,7 +10,7 @@ Holdings in, profile-aware report out. Run this monthly to get a fresh wave-stag
 ## Before you start
 
 1. Read `investor_profile.md`. If missing or empty, stop and tell the user to copy `investor_profile.example.md` to `investor_profile.md` and edit. Never fall back to a default.
-2. Read `holdings.csv` for the ticker universe.
+2. Read `holdings.csv` for the ticker universe. Every ticker in this file is passed to the news-researcher (Step 1) and to `analyze` (Step 2). The optimizer can only assign weight to tickers in this file. Rows with `shares=0` are part of the universe just like populated rows — they get news and they get a weight slot.
 3. Parse the user's request. Optional overrides: objective (default `max_sharpe`), period (default `3y`), max_weight (default = profile's `concentration_cap`).
 
 ## Step 0 — first-run check (conditional)

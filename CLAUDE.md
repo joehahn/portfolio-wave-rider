@@ -2,7 +2,7 @@
 
 **Author:** Joe Hahn  
 **Email:** jmh.datasciences@gmail.com  
-**Date:** 2026-April-30 <br>
+**Date:** 2026-May-04 <br>
 **branch:** main
 
 This repository is a Claude Code demo: optimize a long-horizon stock and ETF portfolio against a user-authored investor profile. The README has the user-facing tour. This file is the rules Claude follows when operating in this repo.
@@ -49,7 +49,7 @@ The user decides. Never silently clamp a recommendation to fit the profile.
 ## User-maintained inputs
 
 - `investor_profile.md`: goals, constraints, exclusions.
-- `holdings.csv`: `ticker,shares` for every ticker the user wants tracked. shares=0 is valid (price-only history before the user buys in).
+- `holdings.csv`: `ticker,shares` for every ticker the user wants tracked. This file is the **watchlist universe** — the set of tickers passed to both the news-researcher (so news is harvested only for these tickers) and to `optimize_portfolio` (so the optimizer can only assign weight to these tickers). `shares=0` is valid: it adds the ticker to the universe for news and optimization without representing a real position. To add a ticker, append `<TICKER>,0` and the next run picks it up; to remove one, delete the row.
 - `news_sources.md`: optional curated wave sources.
 
 ## Time-series outputs (appended, not overwritten)

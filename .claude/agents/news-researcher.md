@@ -11,7 +11,7 @@ the user has curated, and flag anything that clashes with the profile.
 
 ## Inputs you expect
 
-- `tickers` (required): list of symbols.
+- `tickers` (required): list of symbols. The orchestrating skill reads this list from `holdings.csv` (one row per ticker, including `shares=0` rows). The list defines the news scope: you fetch headlines only for these tickers and skip any ticker not in the list.
 - `lookback_days` (optional, default 30).
 
 ## Read both guide files

@@ -2,7 +2,7 @@
 
 **Author:** Joe Hahn  
 **Email:** jmh.datasciences@gmail.com  
-**Date:** 2026-May-02 <br>
+**Date:** 2026-May-04 <br>
 **branch:** main
 
 A Claude Code demo: optimize a long-horizon portfolio of stocks and ETFs against a user-authored investor profile. One slash command, two LLM subagents, eight Python CLI subcommands, and a static dashboard. Stack: yfinance for prices (free Python wrapper around Yahoo Finance's historical close-price API), scipy.optimize for picking portfolio weights (maximizes risk-adjusted return subject to no-shorting and a per-asset weight cap), pandas for everything in between, Plotly for the dashboard.
@@ -35,11 +35,13 @@ This README leans on a handful of finance terms.
 | **VaR_α** | Value-at-risk: the α-quantile of the daily return distribution. `VaR_0.05 = -0.02` means there's a 5% chance of losing more than 2% on a given day (under the empirical distribution). |
 | **CVaR_α** | Conditional VaR: the expected return conditioned on being below `VaR_α`. Tail-loss expectation. |
 | **Concentration cap** | Box constraint on the optimizer: `w_i ≤ max_weight` for every asset. Profile default 0.25. |
-| **Asset class** | Coarse bucket: equities, bonds, precious metals, cash, cryptocurrencies. |
+| **Asset class** | Coarse bucket: equities, bonds, precious metals, cash. |
 | **Asset-class drift** | Deviation of recommended weights summed by class from the user's declared target percentages. Reported but not enforced. |
 | **Wave-stage tilt** | Multiplicative scaling on `μ` (the expected-return vector) before optimization. `μ_tilted[i] = stage_multiplier × μ[i]`. The five stages and their multipliers are in `src/portfolio.py:WAVE_STAGE_TILT`. |
 | **Rebalance** | Execute trades to move current portfolio weights back toward target weights. This project produces recommendations; the user does the trading. |
 | **Wave thesis** | The user's belief that long technology waves drive returns: enter early in a wave (buildup, surge), trim near the crest (peak), avoid the hangover (digestion). The profile prose names the current wave (AI) and the next ones (rockets/spacecraft, robotics, engineered biology, quantum computing, nuclear fusion). |
+| **`general_markets` bucket** | Catch-all wave bucket for tickers not tied to a specific technology wave (broad-market ETFs, bonds, cash, gold). Always classified `neutral` — no tilt applied. Acts as ballast for diversification rather than a wave bet. |
+| **Watchlist universe** | The set of tickers in `holdings.csv`. Both the news-researcher and the optimizer operate on exactly this set: news is harvested only for these tickers, and the optimizer can only assign weight to these tickers. Adding a ticker with `shares=0` adds it to the universe without owning it; deleting a row removes it from future runs. |
 
 ## What it does
 
@@ -102,6 +104,18 @@ The two files you maintain:
 
 Optional: `news_sources.md`, a curated list of sources per technology wave. Improves the news-researcher's signal. Missing is fine; the agent falls back to open web search.
 
+### How `holdings.csv` shapes a run
+
+`holdings.csv` is the watchlist universe. Both LLM subagents and the optimizer operate on exactly the set of tickers in this file:
+
+- **News scope.** The `news-researcher` is invoked with the ticker list from `holdings.csv` and only fetches headlines for those tickers. The daily yfinance `news-feed` cron does the same.
+- **Optimizer eligibility.** `analyze` and the weekly `recommend` cron pass the same ticker list to `optimize_portfolio`, which builds a covariance matrix and an expected-return vector over only that set. The optimizer cannot assign weight to a ticker that isn't in the file.
+- **`shares = 0` is meaningful.** A row with zero shares puts the ticker on the watchlist (news is fetched, the optimizer can assign weight, the dashboard tracks its price) without representing an actual position. Use this when researching a candidate before buying, or when you want price-only history for context.
+- **To add a ticker:** append a row `<TICKER>,0` and run `/review-portfolio` (or wait for the next cron). The next run picks it up automatically — no other config changes needed.
+- **To remove a ticker:** delete the row. Subsequent runs skip it. The historical rows in `data/snapshots.csv` and `data/recommendations.csv` are not pruned (so old charts still render correctly), but no new rows accumulate.
+
+The optimizer respects two profile-level constraints when allocating across this universe: `concentration_cap` (no single ticker exceeds that fraction) and `exclusions` (a ticker tagged with an excluded sector is flagged in "Profile conflicts" if it gets non-zero weight). Constraints come from the profile; the universe comes from `holdings.csv`.
+
 ### First run
 
 In Claude Code, run:
@@ -149,7 +163,7 @@ Install with `crontab -e` and paste. Adjust `PROJ` to your clone path. Verify wi
 
 | File | What's in it | When to look |
 |---|---|---|
-| `data/dashboard.html` | Four Plotly charts (portfolio value over time **with SPY overlay** for comparison; per-ticker recommended-weight trajectories; latest weights as a bar chart; per-wave stage trajectories accumulating across `/review-portfolio` runs) plus two news sections: "Today's headlines" (refreshed daily by cron from yfinance) and "In-depth news from last `/review-portfolio`" (LLM portfolio-relevance summaries with wave-stage classification, refreshed monthly) | Open in a browser any time |
+| `data/dashboard.html` | Six Plotly charts (1: portfolio value over time **with SPY overlay**; 2: per-ticker recommended portfolio % drift; 3: latest recommended portfolio % bar chart; 4: per-wave stage trajectories accumulating across `/review-portfolio` runs; 5: $ allocated by asset class over time; 6: $ allocated by wave over time, log y-axis) plus two news sections: "Today's headlines" (refreshed daily by cron from yfinance) and "In-depth news from last `/review-portfolio`" (LLM portfolio-relevance summaries with wave-stage classification, refreshed monthly) | Open in a browser any time |
 | `data/news_feed.json` | Daily Yahoo Finance headlines per ticker (refreshed by cron). Headline + first-paragraph summary + source + URL + date. ~5 bullets per ticker. Drives the dashboard's "Today's headlines" section. | If you want raw daily headline coverage |
 | `data/wave_history.csv` | Long-format per-wave stage history: `date, wave, stage, evidence_tickers, rationale`. One row per wave per `/review-portfolio` run. Drives the wave-stage trajectory chart on the dashboard. | If you want raw history of how the LLM has classified each wave over time |
 | `data/news/YYYY-MM-DD-news.json` | Full archived news payload from each `/review-portfolio` run (per-ticker bullets with headline + summary). About 25 KB per run; accumulates with no pruning. | When the dashboard chart shows a wave-stage shift and you want to re-read what news was driving the LLM's call on that date |
