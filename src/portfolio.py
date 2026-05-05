@@ -865,6 +865,7 @@ TICKER_ASSET_CLASS: dict[str, str] = {
     "BOTZ": "equity ETF", "ROBO": "equity ETF",
     "ARKG": "equity ETF", "ARKK": "equity ETF",
     "AIQ": "equity ETF",
+    "QTUM": "equity ETF", "NUKZ": "equity ETF",
 }
 
 # Map raw asset-class labels to the broader buckets shown on the
@@ -896,6 +897,12 @@ TICKER_WAVE: dict[str, str] = {
     "RKLB": "rockets_spacecraft",
     # Engineered biology
     "ARKG": "engineered_biology",
+    # Quantum computing
+    "QTUM": "quantum",
+    # Nuclear fusion (NUKZ is a fission-heavy nuclear-energy ETF used as a
+    # proxy until pure-play fusion firms like Commonwealth Fusion Systems
+    # or Helion go public).
+    "NUKZ": "nuclear_fusion",
     # General markets (broad ETFs, bonds, cash, metals, crypto)
     "AGG": "general_markets", "BND": "general_markets", "TLT": "general_markets",
     "IEF": "general_markets", "SHY": "general_markets", "MUB": "general_markets",
@@ -1235,8 +1242,7 @@ def build_dashboard(
         for bucket in ac_order:
             fig.add_trace(
                 go.Scatter(x=ac.index, y=ac[bucket], mode="lines",
-                           name=bucket, legendgroup="asset_class",
-                           legendgrouptitle_text="Asset class $"),
+                           name=bucket, legend="legend2"),
                 row=5, col=1,
             )
 
@@ -1247,8 +1253,7 @@ def build_dashboard(
         for wave in wv_order:
             fig.add_trace(
                 go.Scatter(x=wv.index, y=wv[wave], mode="lines",
-                           name=wave, legendgroup="wave_dollars",
-                           legendgrouptitle_text="Wave $"),
+                           name=wave, legend="legend3"),
                 row=6, col=1,
             )
 
@@ -1259,6 +1264,20 @@ def build_dashboard(
         # shows portfolio $ OR SPY but not both (and chart 2 shows one
         # ticker's portfolio % at a time, which is cleaner with 7+ lines).
         hovermode="closest",
+        # Per-subplot legends for charts 5 and 6, pinned to the right of
+        # each subplot in paper coordinates. The default global legend
+        # handles charts 1-4. Subplot row tops with 6 rows and
+        # vertical_spacing=0.06: row 5 top ~0.293, row 6 top ~0.117.
+        legend2=dict(
+            title_text="Asset class $",
+            xref="paper", x=1.02,
+            yref="paper", y=0.293, yanchor="top",
+        ),
+        legend3=dict(
+            title_text="Wave $",
+            xref="paper", x=1.02,
+            yref="paper", y=0.117, yanchor="top",
+        ),
     )
     fig.update_yaxes(title_text="$", row=1, col=1)
     fig.update_yaxes(title_text="portfolio %", row=2, col=1, tickformat=".0%")
@@ -1274,7 +1293,10 @@ def build_dashboard(
                      tickvals=list(range(5)),
                      ticktext=stage_ticktext)
     fig.update_yaxes(title_text="$", row=5, col=1)
-    fig.update_yaxes(title_text="$", row=6, col=1)
+    # Log scale on chart 6 so small wave allocations (e.g., zero-weighted
+    # robotics/biology lines hovering near a few hundred dollars) don't
+    # collapse to the floor next to the dominant general_markets line.
+    fig.update_yaxes(title_text="$ (log)", row=6, col=1, type="log")
 
     o_path = Path(out_path)
     o_path.parent.mkdir(parents=True, exist_ok=True)
