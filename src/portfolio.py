@@ -478,9 +478,12 @@ def backtest(
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
 
-    # Date window (default: 6 months back to yesterday).
+    # Date window (default: 12 months back to yesterday). Tickers younger
+    # than the 3y optimizer lookback (e.g., NUKZ, listed Nov 2024) get a
+    # thin μ estimate in early weeks; the lookback is the real constraint
+    # on young-ticker statistics, not the backtest window length.
     end = pd.Timestamp(end_date) if end_date else pd.Timestamp.today().normalize() - pd.Timedelta(days=1)
-    start = pd.Timestamp(start_date) if start_date else end - pd.Timedelta(days=180)
+    start = pd.Timestamp(start_date) if start_date else end - pd.Timedelta(days=365)
     if start >= end:
         raise ValueError(f"start_date ({start.date()}) must be before end_date ({end.date()})")
 

@@ -100,7 +100,7 @@ def main(argv: list[str] | None = None) -> int:
     p_bt.add_argument("--holdings", default="holdings.csv",
                       help="watchlist source; only the ticker column is used")
     p_bt.add_argument("--start-date", default=None,
-                      help="YYYY-MM-DD; defaults to 6 months before --end-date")
+                      help="YYYY-MM-DD; defaults to 12 months before --end-date")
     p_bt.add_argument("--end-date", default=None,
                       help="YYYY-MM-DD; defaults to yesterday")
     p_bt.add_argument("--initial-usd", type=float, default=50000.0,
