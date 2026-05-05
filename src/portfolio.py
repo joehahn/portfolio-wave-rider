@@ -393,6 +393,7 @@ def recommend_portfolio(
     max_weight: float = 0.25,
     risk_free_rate: float = 0.04,
     objective: str = "max_sharpe",
+    risk_aversion: float = 1.0,
     date: str | None = None,
     force: bool = False,
 ) -> dict[str, Any]:
@@ -425,7 +426,8 @@ def recommend_portfolio(
         existing = existing[existing["date"] != str(rec_date)]
 
     result = analyze(tickers, period=period, objective=objective,
-                     max_weight=max_weight, risk_free_rate=risk_free_rate)
+                     max_weight=max_weight, risk_free_rate=risk_free_rate,
+                     risk_aversion=risk_aversion)
     opt = result["optimization"]
     if not opt.get("success"):
         raise RuntimeError(f"optimization failed: {opt.get('message')}")

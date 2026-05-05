@@ -102,7 +102,9 @@ def main(argv: list[str] | None = None) -> int:
     p_rec.add_argument("--max-weight", type=float, default=0.25)
     p_rec.add_argument("--risk-free-rate", type=float, default=0.04)
     p_rec.add_argument("--objective", default="max_sharpe",
-                       choices=["max_sharpe", "min_variance"])
+                       choices=["max_sharpe", "min_variance", "mean_variance"])
+    p_rec.add_argument("--risk-aversion", type=float, default=1.0,
+                       help="lambda in mean_variance objective; see analyze --risk-aversion")
     p_rec.add_argument("--date", default=None)
     p_rec.add_argument("--force", action="store_true")
 
@@ -192,6 +194,7 @@ def main(argv: list[str] | None = None) -> int:
                 holdings_path=args.holdings, out_path=args.out,
                 period=args.period, max_weight=args.max_weight,
                 risk_free_rate=args.risk_free_rate, objective=args.objective,
+                risk_aversion=args.risk_aversion,
                 date=args.date, force=args.force,
             )
         else:  # dashboard
