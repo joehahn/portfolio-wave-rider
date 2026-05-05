@@ -925,6 +925,21 @@ TICKER_WAVE: dict[str, str] = {
     "XLU": "general_markets", "XLP": "general_markets",
 }
 
+# Short display labels for chart 3 (Latest recommended portfolio %). Each
+# equity ticker gets a wave annotation under its asset class so a reader
+# can tell at a glance which wave thesis each stock or ETF belongs to.
+# `general_markets` renders as "defensive" because that bucket on equities
+# is a defensive / quality-tilted holding (e.g., VIG), not a thesis bet.
+WAVE_DISPLAY_LABEL: dict[str, str] = {
+    "AI": "AI",
+    "robotics": "robotics",
+    "rockets_spacecraft": "rockets",
+    "engineered_biology": "biology",
+    "quantum": "quantum",
+    "nuclear_fusion": "fusion",
+    "general_markets": "defensive",
+}
+
 
 def _render_news_section(payload: dict, title: str, intro: str) -> str:
     """Render one news section (title + intro + per-ticker click-to-expand bullets).
@@ -1188,12 +1203,19 @@ def build_dashboard(
     # 3. Latest recommended weights (bar chart). The x-axis tick text
     # shows ticker plus a small asset-class label so a reader can scan
     # "what kind of thing is this" without consulting the holdings file.
+    # Equities also get a wave annotation (AI, robotics, etc.) so the
+    # reader can tell which wave thesis each stock or ETF belongs to;
+    # non-equity tickers (bonds, cash, gold) don't need it because their
+    # asset class already says everything.
     if latest_weights is not None and not latest_weights.empty:
         tickers_in_chart = latest_weights["ticker"].tolist()
-        ticktext_3 = [
-            f"{t}<br><sub>{TICKER_ASSET_CLASS.get(t, 'equity')}</sub>"
-            for t in tickers_in_chart
-        ]
+        def _label_chart3(t: str) -> str:
+            cls = TICKER_ASSET_CLASS.get(t, "equity")
+            if cls.startswith("equity"):
+                wave = TICKER_WAVE.get(t, "general_markets")
+                return f"{t}<br><sub>{cls}, {WAVE_DISPLAY_LABEL.get(wave, wave)}</sub>"
+            return f"{t}<br><sub>{cls}</sub>"
+        ticktext_3 = [_label_chart3(t) for t in tickers_in_chart]
         fig.add_trace(
             go.Bar(x=tickers_in_chart, y=latest_weights["weight"],
                    name=f"As of {latest_weights['date'].iloc[0].date()}",
