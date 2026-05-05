@@ -42,7 +42,7 @@ The user decides. Never silently clamp a recommendation to fit the profile.
   - `/review-portfolio`: orchestrates the news-researcher, runs the `analyze` CLI with wave tilts, invokes the report-writer, and refreshes the dashboard. On a first run (when `holdings.csv` has all-zero shares), the skill first does a thesis-driven dollar allocation: it reads `initial_investment_usd` from the profile, proposes a dollar split across the watchlist using the wave thesis, asset-class targets, and exclusions, calls `init-holdings` to convert dollars to shares, runs `snapshot --force` to record day 0, and passes a `day_0_baseline` payload to the report-writer so the report shows beliefs and math side-by-side. On subsequent runs the first-run branch is skipped.
 - All Python in two files:
   - `src/portfolio.py`: every math function (fetch_prices, compute_returns, optimize_portfolio, risk_metrics, analyze, initialize_holdings, snapshot_holdings, recommend_portfolio, append_wave_history, fetch_news_feed, backtest, build_dashboard).
-  - `src/cli.py`: one entry point with eight subcommands (`init-holdings`, `wave-history`, `news-feed`, `analyze`, `snapshot`, `recommend`, `backtest`, `dashboard`) that the skill and cron jobs invoke via Bash. `backtest` is a one-off spot-check tool, not part of any cron flow.
+  - `src/cli.py`: one entry point with nine subcommands (`init-holdings`, `wave-history`, `seed-wave-history`, `news-feed`, `analyze`, `snapshot`, `recommend`, `backtest`, `dashboard`) that the skill and cron jobs invoke via Bash. `backtest` is a one-off spot-check tool, not part of any cron flow. `seed-wave-history` is a one-time backfill for chart 4 trajectories.
 - Reports are written to `data/reports/YYYY-MM-DD-<skill>.md`.
 - Dashboard is a single static `data/dashboard.html`, regenerated after each snapshot or recommend run and at the end of `/review-portfolio`.
 
@@ -56,6 +56,7 @@ The user decides. Never silently clamp a recommendation to fit the profile.
 
 - `data/snapshots.csv`: daily per-ticker $ values. Schema: `date, ticker, shares, price, value, total_value`. Idempotent on date; pass `--force` to overwrite.
 - `data/recommendations.csv`: weekly lightweight optimizer output. Schema: `date, ticker, weight, expected_return, annual_volatility, sharpe_ratio, objective`. Idempotent on date; pass `--force` to overwrite.
+- `data/wave_history.csv`: per-wave stage classifications, one row per (date, wave). Schema: `date, wave, stage, evidence_tickers, rationale, seeded`. `seeded=True` rows are post-hoc judgments from `seed-wave-history`; `seeded=False` rows are organic from `/review-portfolio` runs or from running the news-researcher with strict as-of-date instructions. Drives the dashboard's wave-stage trajectory chart.
 
 These are the user's history. Don't break their schemas. If you must extend them, add columns at the end and keep existing ones.
 

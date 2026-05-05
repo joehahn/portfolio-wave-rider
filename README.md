@@ -188,7 +188,7 @@ Install with `crontab -e` and paste. Adjust `PROJ` to your clone path. Verify wi
 |---|---|---|
 | `data/dashboard.html` | Six Plotly charts (1: portfolio value over time **with SPY overlay**; 2: per-ticker recommended portfolio % drift; 3: latest recommended portfolio % bar chart; 4: per-wave stage trajectories accumulating across `/review-portfolio` runs; 5: $ allocated by asset class over time; 6: $ allocated by wave over time, log y-axis) plus two news sections: "Today's headlines" (refreshed daily by cron from yfinance) and "In-depth news from last `/review-portfolio`" (LLM portfolio-relevance summaries with wave-stage classification, refreshed monthly) | Open in a browser any time |
 | `data/news_feed.json` | Daily Yahoo Finance headlines per ticker (refreshed by cron). Headline + first-paragraph summary + source + URL + date. ~5 bullets per ticker. Drives the dashboard's "Today's headlines" section. | If you want raw daily headline coverage |
-| `data/wave_history.csv` | Long-format per-wave stage history: `date, wave, stage, evidence_tickers, rationale`. One row per wave per `/review-portfolio` run. Drives the wave-stage trajectory chart on the dashboard. | If you want raw history of how the LLM has classified each wave over time |
+| `data/wave_history.csv` | Long-format per-wave stage history: `date, wave, stage, evidence_tickers, rationale, seeded`. One row per wave per classification event. `seeded=True` rows are post-hoc judgments from `seed-wave-history`; `seeded=False` rows come from organic `/review-portfolio` runs (or from running the news-researcher with strict as-of-date instructions, which can be folded into the same file). Drives the wave-stage trajectory chart on the dashboard. | If you want raw history of how each wave has been classified over time |
 | `data/news/YYYY-MM-DD-news.json` | Full archived news payload from each `/review-portfolio` run (per-ticker bullets with headline + summary). About 25 KB per run; accumulates with no pruning. | When the dashboard chart shows a wave-stage shift and you want to re-read what news was driving the LLM's call on that date |
 | `data/snapshots.csv` | Long-format daily snapshots: `date, ticker, shares, price, value, total_value` | Raw history; load with pandas |
 | `data/recommendations.csv` | Long-format weekly optimizer output: `date, ticker, weight, expected_return, annual_volatility, sharpe_ratio, objective` | Raw history; load with pandas |
@@ -203,7 +203,7 @@ The "Profile conflicts" section of any report is the most important thing to rea
 - **Sample bias.** The realized Sharpe on any 2-3 year window is usually optimistic vs the forward-looking distribution. Returns are non-stationary; vol clusters; means are noisy.
 - **Estimation error in `μ`.** Mean-variance amplifies small errors in the expected-return estimate. A weight pinned at the concentration cap is often a symptom of estimation noise, not a real signal. This is the well-known Markowitz blow-up. Run `python -m src.cli backtest` to walk the optimizer forward on real historical data; if the weight-stability L1 metric is small (~0.02 means weights barely move week to week) the estimation noise isn't driving the solution.
 - **Wave-stage tilts.** Multipliers are deliberately small and symmetric: 1.20 / 1.10 / 1.00 / 0.90 / 0.80. The tilt nudges the optimizer; it does not dictate. Track the realized vs tilted Sharpe gap (the "views premium") to see whether the news-researcher's classifications add information.
-- **Wave-stage trajectories.** The dashboard's fourth chart plots each wave's stage rank over time as `wave_history.csv` accumulates. Organic accumulation is slow (one row per wave per `/review-portfolio` run, monthly cadence), so a fresh repo runs `python -m src.cli seed-wave-history` once to backfill 12 months of post-hoc monthly classifications grounded in the news flow over 2025-2026 (AI revenue compounding mid-2025, humanoid surge late 2025, nuclear-energy run-up Q4 2025 then digestion in Q1 2026). Seeded rows carry `seeded=True` so they're distinguishable from organic output. Watch for sustained climbs (buildup → surge → peak) as a rebalance trigger and sustained drops (peak → digestion) as a trim signal.
+- **Wave-stage trajectories.** The dashboard's fourth chart plots each wave's stage rank over time as `wave_history.csv` accumulates. Organic accumulation is slow (one row per wave per `/review-portfolio` run, monthly cadence), so a fresh repo can backfill 12 months of trajectories two ways: `python -m src.cli seed-wave-history` writes post-hoc judgments tagged `seeded=True` (fast, free, but written today with hindsight); or invoking the news-researcher in parallel with strict as-of-date instructions (12 agents, ~$5 of Sonnet usage, the more honest path — each agent only sees news dated ≤ its target date) and merging the resulting wave_stages into the same CSV with `seeded=False`. The agent-based path is what the public demo uses for the headline backtest. Watch for sustained climbs (buildup → surge → peak) as a rebalance trigger and sustained drops (peak → digestion) as a trim signal.
 - **Numbers come from Python.** If a figure in a report did not come from `src.cli`, that's a bug. The LLM is allowed to write prose; it is not allowed to do arithmetic.
 
 ## CLI reference
@@ -243,10 +243,20 @@ Nine subcommands. `/review-portfolio` calls `init-holdings` (first-run branch on
 .venv/bin/python -m src.cli recommend  [--max-weight 0.25] [--force]
 
 # Walk-forward backtest of the cron 'recommend' path over a historical window
-# (math-only; no news, no LLM cost). Writes data/backtest/{snapshots,recommendations}.csv
-# plus data/backtest/report.md with realized return, max drawdown, weight stability,
-# and per-benchmark active-return comparison (default SPY).
+# (math-only; no LLM cost at the math layer). Writes data/backtest/{snapshots,
+# recommendations}.csv plus data/backtest/report.md with realized return, max
+# drawdown, weight stability, and per-benchmark active-return comparison
+# (default SPY). Default window is 12 months ending yesterday.
 .venv/bin/python -m src.cli backtest [--start-date YYYY-MM-DD] [--end-date YYYY-MM-DD] [--initial-usd 50000] [--benchmarks SPY DIA QQQ]
+
+# Same backtest with the mean_variance objective at lambda=1 — wave-thesis-heavy
+# (more equity weight) at the cost of variance reduction.
+.venv/bin/python -m src.cli backtest --objective mean_variance --risk-aversion 1.0
+
+# Same backtest with time-varying wave-stage tilts: at each weekly rebalance,
+# the optimizer looks up the most recent classification at-or-before that
+# Friday from wave_history.csv and applies the stage multiplier to mu.
+.venv/bin/python -m src.cli backtest --wave-history data/wave_history.csv
 
 # Static dashboard (reads the CSVs above plus both news files; writes data/dashboard.html;
 # overlays each --benchmarks ticker on the portfolio-value chart, default SPY)
