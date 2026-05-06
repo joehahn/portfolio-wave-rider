@@ -203,12 +203,12 @@ The "Profile conflicts" section of any report is the most important thing to rea
 - **Sample bias.** The realized Sharpe on any 2-3 year window is usually optimistic vs the forward-looking distribution. Returns are non-stationary; vol clusters; means are noisy.
 - **Estimation error in `μ`.** Mean-variance amplifies small errors in the expected-return estimate. A weight pinned at the concentration cap is often a symptom of estimation noise, not a real signal. This is the well-known Markowitz blow-up. Run `python -m src.cli backtest` to walk the optimizer forward on real historical data; if the weight-stability L1 metric is small (~0.02 means weights barely move week to week) the estimation noise isn't driving the solution.
 - **Wave-stage tilts.** Multipliers are deliberately small and symmetric: 1.20 / 1.10 / 1.00 / 0.90 / 0.80. The tilt nudges the optimizer; it does not dictate. Track the realized vs tilted Sharpe gap (the "views premium") to see whether the news-researcher's classifications add information.
-- **Wave-stage trajectories.** The dashboard's fourth chart plots each wave's stage rank over time as `wave_history.csv` accumulates. Organic accumulation is slow (one row per wave per `/review-portfolio` run, monthly cadence), so a fresh repo can backfill 12 months of trajectories two ways: `python -m src.cli seed-wave-history` writes post-hoc judgments tagged `seeded=True` (fast, free, but written today with hindsight); or invoking the news-researcher in parallel with strict as-of-date instructions (12 agents, ~$5 of Sonnet usage, the more honest path — each agent only sees news dated ≤ its target date) and merging the resulting wave_stages into the same CSV with `seeded=False`. The agent-based path is what the public demo uses for the headline backtest. Watch for sustained climbs (buildup → surge → peak) as a rebalance trigger and sustained drops (peak → digestion) as a trim signal.
+- **Wave-stage trajectories.** The dashboard's fifth chart plots each wave's stage rank over time as `wave_history.csv` accumulates. Organic accumulation is slow (one row per wave per `/review-portfolio` run, monthly cadence), so a fresh repo can backfill 12 months of trajectories two ways: `python -m src.cli seed-wave-history` writes post-hoc judgments tagged `seeded=True` (fast, free, but written today with hindsight); or invoking the news-researcher in parallel with strict as-of-date instructions (12 agents, ~$5 of Sonnet usage, the more honest path — each agent only sees news dated ≤ its target date) and merging the resulting wave_stages into the same CSV with `seeded=False`. The agent-based path is what the public demo uses for the headline backtest. Watch for sustained climbs (buildup → surge → peak) as a rebalance trigger and sustained drops (peak → digestion) as a trim signal.
 - **Numbers come from Python.** If a figure in a report did not come from `src.cli`, that's a bug. The LLM is allowed to write prose; it is not allowed to do arithmetic.
 
 ## CLI reference
 
-Nine subcommands. `/review-portfolio` calls `init-holdings` (first-run branch only), `wave-history` (after each news pass), and `analyze`. The cron jobs call `snapshot`, `news-feed`, `recommend`, and `dashboard`. `backtest` is a one-off spot-check tool, not part of any cron flow. `seed-wave-history` is a one-time backfill for chart 4 trajectories. Every subcommand prints a single JSON blob to stdout.
+Nine subcommands. `/review-portfolio` calls `init-holdings` (first-run branch only), `wave-history` (after each news pass), and `analyze`. The cron jobs call `snapshot`, `news-feed`, `recommend`, and `dashboard`. `backtest` is a one-off spot-check tool, not part of any cron flow. `seed-wave-history` is a one-time backfill for the wave-stage trajectory chart (chart 5). Every subcommand prints a single JSON blob to stdout.
 
 ```bash
 # Convert a thesis-driven dollar allocation into shares (used internally by the
@@ -221,7 +221,7 @@ Nine subcommands. `/review-portfolio` calls `init-holdings` (first-run branch on
 .venv/bin/python -m src.cli wave-history [--news data/news_latest.json] [--force]
 
 # Backfill 12 months of post-hoc monthly wave-stage classifications, tagged
-# seeded=True. Run once on a fresh repo so chart 4 is informative before
+# seeded=True. Run once on a fresh repo so chart 5 (wave-stage trajectories) is informative before
 # /review-portfolio has had time to accumulate organic history.
 .venv/bin/python -m src.cli seed-wave-history [--force]
 
