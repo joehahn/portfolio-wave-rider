@@ -15,15 +15,25 @@ Finance and stats terms used in the README, reports, and dashboard.
 
 ## Wave-stage cycle
 
-The four wave stages map onto a typical investment cycle. Each stage has a multiplier on `μ` (the expected-return vector) that the optimizer applies before solving:
+The four wave stages map onto a typical investment cycle. Each stage gets a multiplier on `μ` (the expected-return vector) that the optimizer applies before solving:
 
 ```
-buildup (×1.20)  →  surge (×1.10)  →  peak (×0.80)  →  digestion (×0.90)
-early, cheap        adoption           enthusiasm        post-crest
-under-owned         compounding        priced in         hangover
-
-neutral (×1.00)  —  no wave attachment (general_markets), no tilt
+                peak (×0.80)
+                  ╱╲
+       surge   ╱     ╲   digestion
+      (×1.10) ╱       ╲  (×0.90)
+            ╱           ╲
+  buildup ╱               ╲___ neutral
+  (×1.20)                     (×1.00)
 ```
+
+The multiplier reflects how much we think the **recent historical μ** (estimated from the lookback window) **understates or overstates the forward μ** at that point in the cycle. The optimizer's μ is naïvely the past; the tilt nudges it toward the future:
+
+- **buildup ×1.20** — wave is quiet, under-owned, cheap. The thesis hasn't been priced in yet, so historical μ likely **understates** forward μ. Biggest upward nudge.
+- **surge ×1.10** — adoption compounding, real revenue, but some of the move is in the price now. Still room to run; smaller upward nudge than buildup.
+- **peak ×0.80** — enthusiasm priced in, valuations stretched, sell-side unanimous. Historical μ likely **overstates** forward μ; mean reversion dominates from here. Biggest downward nudge.
+- **digestion ×0.90** — post-crest hangover. Most overvaluation has burned off but there's still drag; smaller downward nudge than peak.
+- **neutral ×1.00** — no wave thesis applies at all (broad-market ETFs, bonds, cash, gold). We have no view either way, so trust the historical μ as-is.
 
 The multipliers above are the defaults; they can be overridden per-investor in `investor_profile.md`'s `financial_model.wave_stage_tilts`. See the **Wave-stage tilt** entry below for the math.
 
