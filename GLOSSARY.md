@@ -13,6 +13,20 @@ Finance and stats terms used in the README, reports, and dashboard.
 - `cummax(V)_t` = the running max of `V` through time `t`. Same semantics as pandas' `Series.cummax()`.
 - `α` = quantile level (e.g., `α = 0.05` picks out the 5% tail of the return distribution).
 
+## Wave-stage cycle
+
+The four wave stages map onto a typical investment cycle. Each stage has a multiplier on `μ` (the expected-return vector) that the optimizer applies before solving:
+
+```
+buildup (×1.20)  →  surge (×1.10)  →  peak (×0.80)  →  digestion (×0.90)
+early, cheap        adoption           enthusiasm        post-crest
+under-owned         compounding        priced in         hangover
+
+neutral (×1.00)  —  no wave attachment (general_markets), no tilt
+```
+
+The multipliers above are the defaults; they can be overridden per-investor in `investor_profile.md`'s `financial_model.wave_stage_tilts`. See the **Wave-stage tilt** entry below for the math.
+
 ## Terms
 
 | Term | Plain definition |
