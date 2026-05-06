@@ -1370,6 +1370,10 @@ def build_dashboard(
             "$ by wave over time",
         ),
         vertical_spacing=0.045,
+        # Chart 5 (wave-stage trajectories) gets a right y-axis showing
+        # each rank's tilt multiplier, so a reader can see at a glance
+        # what nudge the optimizer applies for each stage.
+        specs=[[{}], [{}], [{}], [{}], [{"secondary_y": True}], [{}], [{}], [{}]],
     )
 
     # 1. Portfolio total value over time (from snapshots.csv).
@@ -1625,11 +1629,28 @@ def build_dashboard(
     # 0=neutral, 1=buildup, 2=surge, etc.
     rank_to_stage = {v: k for k, v in WAVE_STAGE_RANK.items()}
     stage_ticktext = [f"{r} {rank_to_stage.get(r, '')}" for r in range(5)]
-    fig.update_yaxes(title_text="stage", row=5, col=1,
+    fig.update_yaxes(title_text="stage", row=5, col=1, secondary_y=False,
                      range=[-0.3, 4.3],
                      tickmode="array",
                      tickvals=list(range(5)),
                      ticktext=stage_ticktext)
+    # Right-side y-axis: the wave_stage_tilts multiplier for each rank,
+    # loaded from the profile's financial_model section (falls back to
+    # the WAVE_STAGE_TILT defaults). Same range and tickvals as the
+    # primary y-axis so the rows line up.
+    try:
+        _tilts = load_financial_model()["wave_stage_tilts"]
+    except Exception:  # noqa: BLE001 — profile is optional; fall back to defaults
+        _tilts = WAVE_STAGE_TILT
+    multiplier_ticktext = [
+        f"×{_tilts.get(rank_to_stage.get(r, ''), 1.0):.2f}" for r in range(5)
+    ]
+    fig.update_yaxes(title_text="tilt", row=5, col=1, secondary_y=True,
+                     range=[-0.3, 4.3],
+                     tickmode="array",
+                     tickvals=list(range(5)),
+                     ticktext=multiplier_ticktext,
+                     showgrid=False)
     fig.update_yaxes(title_text="articles", row=6, col=1, rangemode="tozero")
     fig.update_yaxes(title_text="$", row=7, col=1)
     # Log scale on chart 8 so small wave allocations (e.g., zero-weighted
