@@ -1547,8 +1547,7 @@ def build_dashboard(
                 sub = adf[adf["wave"] == wave].sort_values("date")
                 fig.add_trace(
                     go.Scatter(x=sub["date"], y=sub["count"], mode="lines+markers",
-                               name=wave, legendgroup="article_counts",
-                               legendgrouptitle_text="Articles per wave"),
+                               name=wave, legend="legend4"),
                     row=6, col=1,
                 )
 
@@ -1595,10 +1594,16 @@ def build_dashboard(
         # shows portfolio $ OR SPY but not both (and chart 2 shows one
         # ticker's portfolio % at a time, which is cleaner with 7+ lines).
         hovermode="closest",
-        # Per-subplot legends for charts 7 and 8, pinned to the right of
-        # each subplot in paper coordinates. The default global legend
-        # handles charts 1-6. Subplot row tops with 8 rows and
-        # vertical_spacing=0.045: row 7 top ~0.215, row 8 top ~0.084.
+        # Per-subplot legends for charts 6, 7, and 8, pinned to the right
+        # of each subplot in paper coordinates. The default global legend
+        # handles charts 1-5. Subplot row tops with 8 rows and
+        # vertical_spacing=0.045: row 6 top ~0.345, row 7 top ~0.215,
+        # row 8 top ~0.084.
+        legend4=dict(
+            title_text="Articles per wave",
+            xref="paper", x=1.02,
+            yref="paper", y=0.345, yanchor="top",
+        ),
         legend2=dict(
             title_text="Asset class $",
             xref="paper", x=1.02,
