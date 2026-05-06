@@ -1358,17 +1358,18 @@ def build_dashboard(
         )
 
     fig = make_subplots(
-        rows=7, cols=1,
+        rows=8, cols=1,
         subplot_titles=(
             "Portfolio value over time",
             "Recommended portfolio % drift over time",
             "Latest recommended portfolio %",
             "Cumulative $ gain per holding over the snapshot window",
             "Wave-stage trajectories (0=neutral, 1=buildup, 2=surge, 3=peak, 4=digestion)",
+            "Articles harvested per wave over time (data/news/ archive)",
             "$ by asset class over time",
             "$ by wave over time",
         ),
-        vertical_spacing=0.05,
+        vertical_spacing=0.045,
     )
 
     # 1. Portfolio total value over time (from snapshots.csv).
@@ -1515,7 +1516,43 @@ def build_dashboard(
                 row=5, col=1,
             )
 
-    # 6. $ by asset class over time and 7. $ by wave over time. Both
+    # 6. Articles harvested per wave over time. Reads each archived
+    # data/news/<date>-news.json file and counts bullets per wave_bucket.
+    # This answers "is the wave-stage classification (chart 5 above)
+    # backed by lots of evidence on each date, or thin coverage?"
+    news_dir = Path("data/news")
+    if news_dir.is_dir():
+        article_rows: list[dict[str, Any]] = []
+        for f in sorted(news_dir.glob("*-news.json")):
+            try:
+                payload = json.loads(f.read_text())
+            except (OSError, json.JSONDecodeError):
+                continue
+            d = payload.get("date")
+            if not d:
+                continue
+            counts: dict[str, int] = {}
+            for ticker_info in (payload.get("per_ticker") or {}).values():
+                wave = ticker_info.get("wave_bucket", "general_markets")
+                # Normalize legacy synthetic_biology label so the chart
+                # legend doesn't split into two near-identical lines.
+                if wave == "synthetic_biology":
+                    wave = "engineered_biology"
+                counts[wave] = counts.get(wave, 0) + len(ticker_info.get("bullets") or [])
+            for wave, n in counts.items():
+                article_rows.append({"date": pd.Timestamp(d), "wave": wave, "count": n})
+        if article_rows:
+            adf = pd.DataFrame(article_rows)
+            for wave in [w for w in _WAVE_DISPLAY_ORDER if w in adf["wave"].unique()]:
+                sub = adf[adf["wave"] == wave].sort_values("date")
+                fig.add_trace(
+                    go.Scatter(x=sub["date"], y=sub["count"], mode="lines+markers",
+                               name=wave, legendgroup="article_counts",
+                               legendgrouptitle_text="Articles per wave"),
+                    row=6, col=1,
+                )
+
+    # 7. $ by asset class over time and 8. $ by wave over time. Both
     # roll up the per-ticker per-day $ values from snapshots.csv. Each
     # ticker contributes to exactly one bucket in each chart, so the sum
     # of all lines in either chart equals the portfolio total.
@@ -1528,7 +1565,7 @@ def build_dashboard(
             lambda t: TICKER_WAVE.get(t, "general_markets")
         )
 
-        # Asset-class chart (row 6). Sum $ per (date, bucket).
+        # Asset-class chart (row 7). Sum $ per (date, bucket).
         ac = snaps_full.groupby(["date", "asset_bucket"])["value"].sum().unstack(fill_value=0)
         # Stable, intuitive ordering.
         ac_order = [c for c in ["equities", "bonds", "cash", "precious metals", "crypto"]
@@ -1537,10 +1574,10 @@ def build_dashboard(
             fig.add_trace(
                 go.Scatter(x=ac.index, y=ac[bucket], mode="lines",
                            name=bucket, legend="legend2"),
-                row=6, col=1,
+                row=7, col=1,
             )
 
-        # Wave chart (row 7). Same shape, different grouping.
+        # Wave chart (row 8). Same shape, different grouping.
         wv = snaps_full.groupby(["date", "wave_bucket"])["value"].sum().unstack(fill_value=0)
         # Use the same display order as elsewhere in the dashboard.
         wv_order = [w for w in _WAVE_DISPLAY_ORDER if w in wv.columns]
@@ -1548,29 +1585,29 @@ def build_dashboard(
             fig.add_trace(
                 go.Scatter(x=wv.index, y=wv[wave], mode="lines",
                            name=wave, legend="legend3"),
-                row=7, col=1,
+                row=8, col=1,
             )
 
     fig.update_layout(
-        height=2000,
+        height=2300,
         title_text="Portfolio Wave Rider — dashboard",
         # `closest` shows one trace's popup at a time, so hovering chart 1
         # shows portfolio $ OR SPY but not both (and chart 2 shows one
         # ticker's portfolio % at a time, which is cleaner with 7+ lines).
         hovermode="closest",
-        # Per-subplot legends for charts 6 and 7, pinned to the right of
+        # Per-subplot legends for charts 7 and 8, pinned to the right of
         # each subplot in paper coordinates. The default global legend
-        # handles charts 1-5. Subplot row tops with 7 rows and
-        # vertical_spacing=0.05: row 6 top ~0.25, row 7 top ~0.10.
+        # handles charts 1-6. Subplot row tops with 8 rows and
+        # vertical_spacing=0.045: row 7 top ~0.215, row 8 top ~0.084.
         legend2=dict(
             title_text="Asset class $",
             xref="paper", x=1.02,
-            yref="paper", y=0.25, yanchor="top",
+            yref="paper", y=0.215, yanchor="top",
         ),
         legend3=dict(
             title_text="Wave $",
             xref="paper", x=1.02,
-            yref="paper", y=0.10, yanchor="top",
+            yref="paper", y=0.084, yanchor="top",
         ),
     )
     fig.update_yaxes(title_text="$", row=1, col=1)
@@ -1588,11 +1625,12 @@ def build_dashboard(
                      tickmode="array",
                      tickvals=list(range(5)),
                      ticktext=stage_ticktext)
-    fig.update_yaxes(title_text="$", row=6, col=1)
-    # Log scale on chart 7 so small wave allocations (e.g., zero-weighted
+    fig.update_yaxes(title_text="articles", row=6, col=1, rangemode="tozero")
+    fig.update_yaxes(title_text="$", row=7, col=1)
+    # Log scale on chart 8 so small wave allocations (e.g., zero-weighted
     # robotics/biology lines hovering near a few hundred dollars) don't
     # collapse to the floor next to the dominant general_markets line.
-    fig.update_yaxes(title_text="$ (log)", row=7, col=1, type="log")
+    fig.update_yaxes(title_text="$ (log)", row=8, col=1, type="log")
 
     o_path = Path(out_path)
     o_path.parent.mkdir(parents=True, exist_ok=True)
