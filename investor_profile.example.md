@@ -10,6 +10,17 @@ asset_class_targets:              # rough guide, not a hard constraint
   precious metals: 0.10
   bonds: 0.10
   cash: 0.05
+financial_model:                  # optimizer math; CLI flags override at runtime
+  objective: max_sharpe           # max_sharpe | min_variance | mean_variance
+  risk_aversion: 1.0              # λ in mean_variance utility (μᵀw − λ·wᵀΣw); ignored otherwise
+  risk_free_rate: 0.04            # ≈ 1y Treasury yield; used in Sharpe and as numeraire
+  lookback_period: 3y             # history window for estimating μ and Σ
+  wave_stage_tilts:               # multipliers on μ before optimization
+    buildup:   1.20
+    surge:     1.10
+    neutral:   1.00
+    digestion: 0.90
+    peak:      0.80
 ---
 
 # Goals

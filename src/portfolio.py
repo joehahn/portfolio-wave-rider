@@ -45,13 +45,69 @@ WAVE_STAGE_TILT = {
 }
 
 
-def apply_wave_tilt(mu: pd.Series, wave_views: dict[str, str]) -> pd.Series:
-    """Multiply annualized mean returns by each ticker's stage tilt."""
+def apply_wave_tilt(
+    mu: pd.Series,
+    wave_views: dict[str, str],
+    tilt_schedule: dict[str, float] | None = None,
+) -> pd.Series:
+    """Multiply annualized mean returns by each ticker's stage tilt.
+
+    ``tilt_schedule`` maps each stage to its multiplier. Defaults to
+    ``WAVE_STAGE_TILT``; pass a different dict (e.g., from the profile's
+    `financial_model.wave_stage_tilts` field) to override.
+    """
+    schedule = tilt_schedule or WAVE_STAGE_TILT
     tilted = mu.copy()
     for ticker, stage in wave_views.items():
         if ticker in tilted.index:
-            tilted[ticker] = tilted[ticker] * WAVE_STAGE_TILT.get(stage, 1.0)
+            tilted[ticker] = tilted[ticker] * schedule.get(stage, 1.0)
     return tilted
+
+
+# ---------------------------------------------------------------------------
+# Profile loader. Reads the YAML front matter of investor_profile.md and
+# returns the financial_model section. Missing fields fall through to
+# hard-coded defaults so old profiles (without the section) still work.
+# ---------------------------------------------------------------------------
+
+_FINANCIAL_MODEL_DEFAULTS: dict[str, Any] = {
+    "objective": "max_sharpe",
+    "risk_aversion": 1.0,
+    "risk_free_rate": 0.04,
+    "lookback_period": "3y",
+    "wave_stage_tilts": dict(WAVE_STAGE_TILT),
+}
+
+
+def load_financial_model(profile_path: str = "investor_profile.md") -> dict[str, Any]:
+    """Read `financial_model` from investor_profile.md's YAML front matter.
+
+    Returns a dict with the five fields (`objective`, `risk_aversion`,
+    `risk_free_rate`, `lookback_period`, `wave_stage_tilts`); any missing
+    field falls back to the hard-coded default. If the profile file
+    doesn't exist or has no front matter, all defaults are returned.
+    """
+    import re
+    import yaml
+
+    p = Path(profile_path)
+    if not p.exists():
+        return dict(_FINANCIAL_MODEL_DEFAULTS)
+    text = p.read_text()
+    m = re.match(r"^---\s*\n(.*?)\n---\s*\n", text, re.DOTALL)
+    if not m:
+        return dict(_FINANCIAL_MODEL_DEFAULTS)
+    data = yaml.safe_load(m.group(1)) or {}
+    fm = data.get("financial_model") or {}
+    out = dict(_FINANCIAL_MODEL_DEFAULTS)
+    out.update(fm)
+    # Merge wave_stage_tilts so a partial override only changes the named
+    # stages and the rest fall back to defaults.
+    if isinstance(fm.get("wave_stage_tilts"), dict):
+        merged = dict(WAVE_STAGE_TILT)
+        merged.update(fm["wave_stage_tilts"])
+        out["wave_stage_tilts"] = merged
+    return out
 
 
 # ---------------------------------------------------------------------------
@@ -100,6 +156,7 @@ def optimize_portfolio(
     min_weight: float = 0.0,
     wave_views: dict[str, str] | None = None,
     risk_aversion: float = 1.0,
+    tilt_schedule: dict[str, float] | None = None,
 ) -> dict[str, Any]:
     """Solve the mean-variance problem and return weights + summary stats.
 
@@ -120,7 +177,7 @@ def optimize_portfolio(
         raise ValueError("risk_aversion (lambda) must be >= 0 for mean_variance objective")
 
     tickers = list(returns["mean"].index)
-    mean_series = apply_wave_tilt(returns["mean"], wave_views) if wave_views else returns["mean"]
+    mean_series = apply_wave_tilt(returns["mean"], wave_views, tilt_schedule) if wave_views else returns["mean"]
     mu = mean_series.to_numpy(dtype=float)
     sigma = returns["cov"].to_numpy(dtype=float)
     n = len(tickers)
@@ -230,6 +287,7 @@ def analyze(
     risk_free_rate: float = 0.04,
     wave_views: dict[str, str] | None = None,
     risk_aversion: float = 1.0,
+    tilt_schedule: dict[str, float] | None = None,
 ) -> dict[str, Any]:
     """Run the full pipeline and return a single JSON-serializable dict."""
     prices = fetch_prices(tickers, period=period)
@@ -237,7 +295,7 @@ def analyze(
     opt = optimize_portfolio(
         returns, objective=objective, risk_free_rate=risk_free_rate,
         max_weight=max_weight, wave_views=wave_views,
-        risk_aversion=risk_aversion,
+        risk_aversion=risk_aversion, tilt_schedule=tilt_schedule,
     )
     risk = risk_metrics(returns, opt["weights"], risk_free_rate=risk_free_rate) \
         if opt.get("success") else None
@@ -394,6 +452,7 @@ def recommend_portfolio(
     risk_free_rate: float = 0.04,
     objective: str = "max_sharpe",
     risk_aversion: float = 1.0,
+    tilt_schedule: dict[str, float] | None = None,
     date: str | None = None,
     force: bool = False,
 ) -> dict[str, Any]:
@@ -427,7 +486,7 @@ def recommend_portfolio(
 
     result = analyze(tickers, period=period, objective=objective,
                      max_weight=max_weight, risk_free_rate=risk_free_rate,
-                     risk_aversion=risk_aversion)
+                     risk_aversion=risk_aversion, tilt_schedule=tilt_schedule)
     opt = result["optimization"]
     if not opt.get("success"):
         raise RuntimeError(f"optimization failed: {opt.get('message')}")
@@ -480,6 +539,7 @@ def backtest(
     max_weight: float = 0.25,
     objective: str = "max_sharpe",
     risk_aversion: float = 1.0,
+    tilt_schedule: dict[str, float] | None = None,
     risk_free_rate: float = 0.04,
     benchmarks: list[str] | None = None,
     wave_history_path: str | None = None,
@@ -585,7 +645,7 @@ def backtest(
             opt = optimize_portfolio(
                 returns, objective=objective, risk_free_rate=risk_free_rate,
                 max_weight=max_weight, risk_aversion=risk_aversion,
-                wave_views=_wave_views_at(date),
+                wave_views=_wave_views_at(date), tilt_schedule=tilt_schedule,
             )
             if not opt.get("success"):
                 continue

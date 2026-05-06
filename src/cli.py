@@ -43,6 +43,11 @@ def _load_allocations(arg: str) -> dict[str, float]:
 
 
 def main(argv: list[str] | None = None) -> int:
+    # Load profile-driven defaults for the optimizer-related flags. Missing
+    # profile / missing financial_model section -> hard-coded defaults so
+    # nothing breaks. CLI flags still override the profile values explicitly.
+    fm = portfolio.load_financial_model()
+
     parser = argparse.ArgumentParser(prog="src.cli", description="Portfolio CLI.")
     sub = parser.add_subparsers(dest="cmd", required=True)
 
@@ -76,12 +81,12 @@ def main(argv: list[str] | None = None) -> int:
 
     p_an = sub.add_parser("analyze", help="fetch + optimize + risk in one call")
     p_an.add_argument("--tickers", nargs="+", required=True)
-    p_an.add_argument("--period", default="3y")
-    p_an.add_argument("--objective", default="max_sharpe",
+    p_an.add_argument("--period", default=fm["lookback_period"])
+    p_an.add_argument("--objective", default=fm["objective"],
                       choices=["max_sharpe", "min_variance", "mean_variance"])
     p_an.add_argument("--max-weight", type=float, default=0.25)
-    p_an.add_argument("--risk-free-rate", type=float, default=0.04)
-    p_an.add_argument("--risk-aversion", type=float, default=1.0,
+    p_an.add_argument("--risk-free-rate", type=float, default=fm["risk_free_rate"])
+    p_an.add_argument("--risk-aversion", type=float, default=fm["risk_aversion"],
                       help="lambda in mean_variance objective (μᵀw - λ·wᵀΣw); "
                            "small λ favors return, large λ favors variance reduction")
     p_an.add_argument("--wave-views", default=None,
@@ -98,12 +103,12 @@ def main(argv: list[str] | None = None) -> int:
     p_rec = sub.add_parser("recommend", help="optimize and append weights to data/recommendations.csv")
     p_rec.add_argument("--holdings", default="holdings.csv")
     p_rec.add_argument("--out", default="data/recommendations.csv")
-    p_rec.add_argument("--period", default="3y")
+    p_rec.add_argument("--period", default=fm["lookback_period"])
     p_rec.add_argument("--max-weight", type=float, default=0.25)
-    p_rec.add_argument("--risk-free-rate", type=float, default=0.04)
-    p_rec.add_argument("--objective", default="max_sharpe",
+    p_rec.add_argument("--risk-free-rate", type=float, default=fm["risk_free_rate"])
+    p_rec.add_argument("--objective", default=fm["objective"],
                        choices=["max_sharpe", "min_variance", "mean_variance"])
-    p_rec.add_argument("--risk-aversion", type=float, default=1.0,
+    p_rec.add_argument("--risk-aversion", type=float, default=fm["risk_aversion"],
                        help="lambda in mean_variance objective; see analyze --risk-aversion")
     p_rec.add_argument("--date", default=None)
     p_rec.add_argument("--force", action="store_true")
@@ -119,18 +124,22 @@ def main(argv: list[str] | None = None) -> int:
     p_bt.add_argument("--initial-usd", type=float, default=50000.0,
                       help="starting portfolio value in dollars")
     p_bt.add_argument("--out-dir", default="data/backtest/")
-    p_bt.add_argument("--lookback-years", type=int, default=3,
+    # Parse "3y" -> 3 from the profile's lookback_period.
+    import re as _re
+    _m = _re.match(r"(\d+)", str(fm["lookback_period"]))
+    _default_lookback_years = int(_m.group(1)) if _m else 3
+    p_bt.add_argument("--lookback-years", type=int, default=_default_lookback_years,
                       help="optimizer lookback window in years; default 3 matches the live system")
     p_bt.add_argument("--max-weight", type=float, default=0.25)
-    p_bt.add_argument("--objective", default="max_sharpe",
+    p_bt.add_argument("--objective", default=fm["objective"],
                       choices=["max_sharpe", "min_variance", "mean_variance"])
-    p_bt.add_argument("--risk-aversion", type=float, default=1.0,
+    p_bt.add_argument("--risk-aversion", type=float, default=fm["risk_aversion"],
                       help="lambda in mean_variance objective; see analyze --risk-aversion")
     p_bt.add_argument("--wave-history", default=None,
                       help="path to wave_history.csv; if given, the optimizer applies "
                            "time-varying wave-stage tilts at each rebalance based on the "
                            "most recent classification at or before that date")
-    p_bt.add_argument("--risk-free-rate", type=float, default=0.04)
+    p_bt.add_argument("--risk-free-rate", type=float, default=fm["risk_free_rate"])
     p_bt.add_argument("--benchmarks", nargs="*", default=["SPY"],
                       help="benchmark tickers compared against the backtest's realized return "
                            "(default: SPY). Pass an empty list to skip the benchmark section.")
@@ -181,6 +190,7 @@ def main(argv: list[str] | None = None) -> int:
                 lookback_years=args.lookback_years,
                 max_weight=args.max_weight, objective=args.objective,
                 risk_aversion=args.risk_aversion,
+                tilt_schedule=fm["wave_stage_tilts"],
                 risk_free_rate=args.risk_free_rate,
                 benchmarks=args.benchmarks,
                 wave_history_path=args.wave_history,
@@ -190,6 +200,7 @@ def main(argv: list[str] | None = None) -> int:
                 args.tickers, period=args.period, objective=args.objective,
                 max_weight=args.max_weight, risk_free_rate=args.risk_free_rate,
                 risk_aversion=args.risk_aversion,
+                tilt_schedule=fm["wave_stage_tilts"],
                 wave_views=_load_wave_views(args.wave_views) if args.wave_views else None,
             )
         elif args.cmd == "snapshot":
@@ -203,6 +214,7 @@ def main(argv: list[str] | None = None) -> int:
                 period=args.period, max_weight=args.max_weight,
                 risk_free_rate=args.risk_free_rate, objective=args.objective,
                 risk_aversion=args.risk_aversion,
+                tilt_schedule=fm["wave_stage_tilts"],
                 date=args.date, force=args.force,
             )
         else:  # dashboard

@@ -67,7 +67,7 @@ cp holdings.example.csv holdings.csv
 
 The two files you maintain:
 
-- `investor_profile.md`: `initial_investment_usd`, `concentration_cap`, `exclusions`, `asset_class_targets`, and the wave-thesis prose. Every recommendation cites lines from this file.
+- `investor_profile.md`: `initial_investment_usd`, `concentration_cap`, `exclusions`, `asset_class_targets`, the wave-thesis prose, plus a `financial_model` section that controls the optimizer math (`objective`, `risk_aversion` (λ), `risk_free_rate`, `lookback_period`, `wave_stage_tilts`). Every recommendation cites lines from this file. CLI flags (`--objective`, `--risk-aversion`, etc.) override the profile values at runtime.
 - `holdings.csv`: a two-column CSV (`ticker,shares`) acting as your watchlist. Pre-day-0 you can leave every `shares` at 0; that's the universe `/review-portfolio` will allocate dollars across on its first run.
 
 Optional: `news_sources.md`, a curated list of sources per technology wave. Improves the news-researcher's signal. Missing is fine; the agent falls back to open web search.
@@ -92,7 +92,7 @@ The news-researcher's only job that touches the optimizer is to assign each tick
 μ_tilted[i] = stage_multiplier[stage(i)] × μ[i]
 ```
 
-with the multipliers fixed in `src/portfolio.py:WAVE_STAGE_TILT`:
+with the multipliers loaded from the profile's `financial_model.wave_stage_tilts` (defaults to `src/portfolio.py:WAVE_STAGE_TILT`):
 
 | Stage | Multiplier | Plain reading |
 |---|---|---|
