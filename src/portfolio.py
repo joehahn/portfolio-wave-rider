@@ -1650,7 +1650,12 @@ def build_dashboard(
                      tickmode="array",
                      tickvals=list(range(5)),
                      ticktext=multiplier_ticktext,
-                     showgrid=False)
+                     showgrid=False,
+                     # Plotly otherwise renders the right-axis ticks at a
+                     # default position that can land underneath the per-
+                     # subplot legends pinned at x=1.02; automargin asks
+                     # the figure to make room for the labels.
+                     automargin=True)
     fig.update_yaxes(title_text="articles", row=6, col=1, rangemode="tozero")
     fig.update_yaxes(title_text="$", row=7, col=1)
     # Log scale on chart 8 so small wave allocations (e.g., zero-weighted
