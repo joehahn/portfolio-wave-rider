@@ -100,7 +100,7 @@ The headline pieces are spelled out below: how `holdings.csv` shapes a run, and 
 - **To add a ticker:** append a row `<TICKER>,0` and run `/review-portfolio` (or wait for the next cron). The next run picks it up automatically — no other config changes needed.
 - **To remove a ticker:** delete the row. Subsequent runs skip it. The historical rows in `data/snapshots.csv` and `data/recommendations.csv` are not pruned (so old charts still render correctly), but no new rows accumulate.
 
-The optimizer respects two profile-level constraints when allocating across this universe: `concentration_cap` (no single ticker exceeds that fraction) and `exclusions` (a ticker tagged with an excluded sector is flagged in "Profile conflicts" if it gets non-zero weight). Constraints come from the profile; the universe comes from `holdings.csv`.
+The optimizer respects two profile-level constraints when allocating across this universe: `concentration_cap` (no single ticker exceeds that fraction) and `exclusions` (a ticker tagged with an excluded sector is flagged in "Profile conflicts" if it gets non-zero weight). Constraints come from the profile; the list of tickers the optimizer is allowed to weight comes from `holdings.csv`.
 
 ### How wave-stage tilts enter the math
 
