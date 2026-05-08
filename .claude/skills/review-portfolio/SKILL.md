@@ -1,6 +1,6 @@
 ---
 name: review-portfolio
-description: Full portfolio review. Reads the investor profile and holdings, gathers wave-aligned news, runs the analyze CLI with wave-stage tilts, and writes a profile-aware report plus a refreshed dashboard. On a first run (when holdings.csv has all-zero shares), this skill also does the day 0 thesis-driven dollar allocation before optimizing, so the report can show beliefs and math side-by-side. The single demo flow.
+description: Full portfolio review. Reads the investor profile and holdings, gathers wave-aligned news, runs the analyze CLI with wave-stage tilts, and writes a profile-aware report plus a refreshed dashboard. On a first run (when holdings.csv has all-zero shares), this skill also does the thesis-driven dollar allocation before optimizing, so the report can show beliefs and math side-by-side. The single demo flow.
 ---
 
 # /review-portfolio
@@ -15,7 +15,7 @@ Holdings in, profile-aware report out. Run this monthly to get a fresh wave-stag
 
 ## Step 0 — first-run check (conditional)
 
-Inspect `holdings.csv`. If **every** row has `shares == 0`, this is a first run. Do the day 0 thesis allocation before optimizing. Otherwise skip Step 0 entirely.
+Inspect `holdings.csv`. If **every** row has `shares == 0`, this is a first run. Do the thesis allocation before optimizing. Otherwise skip Step 0 entirely.
 
 ### When Step 0 fires:
 
@@ -37,9 +37,9 @@ Inspect `holdings.csv`. If **every** row has `shares == 0`, this is a first run.
    ```
    python -m src.cli snapshot --force
    ```
-   Records day 0.
-6. Save `day_0_baseline = { allocations_usd: <step 2 JSON>, reasoning: <step 3 prose>, holdings: <step 4 return> }` for the report-writer.
-7. Set `news_lookback_days = 60` for Step 1. The default is 30 days; on a first run we widen the window to 60 days so the day-1 wave-stage call has roughly two months of context, since `wave_history.csv` is empty and provides no longer-horizon trajectory yet.
+   Records the thesis snapshot.
+6. Save `thesis_baseline = { date: <today YYYY-MM-DD>, allocations_usd: <step 2 JSON>, reasoning: <step 3 prose>, holdings: <step 4 return> }` for the report-writer. Also persist it to `data/thesis_baseline.json` so subsequent /review-portfolio runs can render the thesis-vs-recommended comparison.
+7. Set `news_lookback_days = 60` for Step 1. The default is 30 days; on a first run we widen the window to 60 days so the wave-stage call has roughly two months of context, since `wave_history.csv` is empty and provides no longer-horizon trajectory yet.
 
 ## Orchestration
 
@@ -90,11 +90,11 @@ Pass:
   "analysis": <step 2 JSON>,
   "news": <step 1 payload>,
   "profile_conflicts": <merged from step 1 + step 2>,
-  "day_0_baseline": <step 0 payload, OR null if not a first run>
+  "thesis_baseline": <step 0 payload, OR contents of data/thesis_baseline.json if it exists, OR null>
 }
 ```
 
-The report is written to `data/reports/YYYY-MM-DD-review-portfolio.md`. When `day_0_baseline` is non-null, the report-writer must include a "Day 0 baseline" section showing the thesis-driven allocation alongside the optimizer's recommendation, and a one-paragraph interpretation of the gap.
+The report is written to `data/reports/YYYY-MM-DD-review-portfolio.md`. When `thesis_baseline` is non-null, the report-writer must include a "Thesis allocation" section showing the thesis-driven allocation alongside the optimizer's recommendation, and a one-paragraph interpretation of the gap.
 
 ### Step 4 — refresh dashboard (Bash)
 
@@ -111,7 +111,7 @@ One short message:
 - Path to the report.
 - Path to the dashboard (`data/dashboard.html`).
 - One-line summary: objective + Sharpe + profile_conflicts count.
-- If Step 0 fired, also: total dollars allocated on day 0 and "this was a first run; the report includes a Day 0 baseline section."
+- If Step 0 fired, also: total dollars allocated and "this was a first run; the report includes a Thesis allocation section."
 - "Read the report, especially the 'Profile conflicts' section."
 
 ## Rules
@@ -121,4 +121,4 @@ One short message:
 - Never silently clamp weights to satisfy the profile; surface conflicts instead.
 - Numbers come from `src.cli` (`init-holdings`, `analyze`, `snapshot`, `dashboard`). The thesis-driven dollar weights in Step 0 come from the LLM, but every share count, price, and risk metric passes through Python.
 - Step 0 must run before Step 1, and Step 1 must run before Step 2. Do not parallelize.
-- If Step 0 fires, Step 1's news-researcher sees the *populated* holdings.csv (post-init-holdings), so the news context applies to the day 0 positions.
+- If Step 0 fires, Step 1's news-researcher sees the *populated* holdings.csv (post-init-holdings), so the news context applies to the thesis positions.

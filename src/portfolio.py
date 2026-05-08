@@ -318,9 +318,9 @@ def analyze(
 
 
 # ---------------------------------------------------------------------------
-# Day 0 setup. Convert a thesis-driven dollar allocation to shares and write
-# the initial holdings.csv. Pure function: prices are passed in so the unit
-# test stays offline.
+# Thesis setup. Convert a thesis-driven dollar allocation to shares and
+# write the initial holdings.csv. Pure function: prices are passed in so
+# the unit test stays offline.
 # ---------------------------------------------------------------------------
 
 def initialize_holdings(

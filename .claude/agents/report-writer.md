@@ -22,10 +22,13 @@ From the orchestrating skill, a dict containing:
   current watchlist underrepresents; render those in the matching report
   section described below.
 - `profile_conflicts`: any conflicts surfaced by the skill or news-researcher
-- `day_0_baseline`: optional; present only on a first run. Contains
-  `allocations_usd` (ticker -> dollars), `reasoning` (thesis-driven prose),
-  and `holdings` (per-ticker price/shares/value as written to holdings.csv).
-  When present, include the "Day 0 baseline" section described below.
+- `thesis_baseline`: optional; present whenever `data/thesis_baseline.json`
+  exists (written by `/initialize-portfolio` and persisted across all
+  subsequent reviews). Contains `date` (when the thesis allocation was
+  set), `allocations_usd` (ticker -> dollars), `reasoning` (thesis-
+  driven prose), and `holdings` (per-ticker price/shares/value as written
+  to holdings.csv). When present, include the "Thesis allocation"
+  section described below.
 
 ## Read the profile
 
@@ -59,7 +62,7 @@ blocks (▏▎▍▌▋▊▉) for the remainder. Show the percentage as a
 right-aligned number before the bar. Example:
 
   ```
-  Day 1 recommended weights (concentration cap 25%):
+  Recommended weights (concentration cap 25%):
 
     BIL   cash       25.0% █████
     IAU   metals     25.0% █████
@@ -74,47 +77,50 @@ right-aligned number before the bar. Example:
 The bar chart and the table show the same data; the chart makes
 relative magnitudes scannable at a glance. Do not skip the table.>
 
-## Day 0 baseline
+## Thesis allocation
 <INCLUDE THIS SECTION ONLY when the input dict has a non-null
-`day_0_baseline`. Show the thesis-driven dollar allocation alongside
-the optimizer's recommended weights, and explain the gap.
+`thesis_baseline`. Show the thesis-driven dollar allocation (set by
+`/initialize-portfolio` on the date in `thesis_baseline.date`)
+alongside the optimizer's current recommended weights, and explain
+the gap.
 
 A side-by-side table with columns:
-ticker | asset name | day 0 $ | day 0 % | day 1 % (recommended) | delta (pp)
+ticker | asset name | thesis $ | thesis % | recommended % | delta (pp)
 
 Follow the table with a paired Unicode bar chart in a fenced code
-block. Two bars per ticker (day 0 above day 1), labeled. Same scale
-convention as the weights chart. Example:
+block. Two bars per ticker (thesis above recommended), labeled. Same
+scale convention as the weights chart. Example:
 
   ```
-  Day 0 (beliefs) vs Day 1 (optimizer), in % of portfolio:
+  Thesis (beliefs) vs Recommended (optimizer), in % of portfolio:
 
-    NVDA  d0 22.0% ████▍
-          d1  4.8% █
-    RKLB  d0 19.0% ███▊
-          d1  8.7% █▊
-    MSFT  d0 15.0% ███
-          d1  0.0%
-    GOOGL d0 14.0% ██▊
-          d1 18.3% ███▋
-    AGG   d0 10.0% ██
-          d1 18.2% ███▋
-    IAU   d0 10.0% ██
-          d1 25.0% █████
-    BIL   d0  5.0% █
-          d1 25.0% █████
-    IBIT  d0  5.0% █
-          d1  0.0%
+    NVDA  thesis  22.0% ████▍
+          recom    4.8% █
+    RKLB  thesis  19.0% ███▊
+          recom    8.7% █▊
+    MSFT  thesis  15.0% ███
+          recom    0.0%
+    GOOGL thesis  14.0% ██▊
+          recom   18.3% ███▋
+    AGG   thesis  10.0% ██
+          recom   18.2% ███▋
+    IAU   thesis  10.0% ██
+          recom   25.0% █████
+    BIL   thesis   5.0% █
+          recom   25.0% █████
+    IBIT  thesis   5.0% █
+          recom    0.0%
   ```
 
-Then a one-paragraph interpretation of the gap. Frame the day 0
-allocation as the user's beliefs in dollar form (no math) and the day
-1 allocation as the mean-variance optimizer's preferred weights with
-wave-stage tilts. The gap measures the marginal contribution of
-optimization relative to the user's stated beliefs. Quote one or two
-lines from the day 0 reasoning to ground the comparison.
+Then a one-paragraph interpretation of the gap. Frame the thesis
+allocation as the user's beliefs in dollar form (no math, set on
+`thesis_baseline.date`) and the recommended allocation as the
+mean-variance optimizer's preferred weights with wave-stage tilts as
+of today. The gap measures the marginal contribution of the
+optimizer relative to the user's stated beliefs. Quote one or two
+lines from `thesis_baseline.reasoning` to ground the comparison.
 
-If `day_0_baseline` is null or absent, OMIT this section entirely.>
+If `thesis_baseline` is null or absent, OMIT this section entirely.>
 
 ## How this maps to the profile
 <bulleted list: each bullet cites a specific profile line and explains
