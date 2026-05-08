@@ -1083,6 +1083,21 @@ _WAVE_DISPLAY_ORDER = [
     "quantum", "nuclear_fusion", "general_markets",
 ]
 
+# Stable wave -> color mapping so the same wave shows in the same color
+# across all dashboard charts that group by wave (chart 2 = % by wave,
+# chart 5 = wave-stage trajectories, chart 6 = articles per wave,
+# chart 8 = $ by wave). Reader can scan vertically and track a wave's
+# behavior across all four charts by color alone.
+WAVE_COLORS: dict[str, str] = {
+    "AI":                 "#1f77b4",  # blue
+    "rockets_spacecraft": "#ff7f0e",  # orange
+    "robotics":           "#2ca02c",  # green
+    "engineered_biology": "#d62728",  # red
+    "quantum":            "#9467bd",  # purple
+    "nuclear_fusion":     "#8c564b",  # brown
+    "general_markets":    "#7f7f7f",  # gray
+}
+
 # Asset-class labels for the dashboard's "Latest recommended weights" bar chart.
 # Each ticker gets a small secondary label under its name so a reader can
 # scan "what kind of thing am I looking at" at a glance. Unknown tickers
@@ -1477,7 +1492,7 @@ def build_dashboard(
         totals = snaps.groupby("date")["total_value"].first().sort_index()
         fig.add_trace(
             go.Scatter(x=totals.index, y=totals.values, mode="lines+markers",
-                       name="Portfolio $", line={"width": 2}),
+                       name="Portfolio $", line={"width": 2}, legend="legend"),
             row=1, col=1,
         )
         # Benchmark overlays normalized to the portfolio's starting value.
@@ -1488,7 +1503,8 @@ def build_dashboard(
             for b, curve in benchmark_curves.items():
                 fig.add_trace(
                     go.Scatter(x=curve.index, y=curve.values, mode="lines",
-                               name=f"{b} (rebased)", line={"width": 1, "dash": "dash"}),
+                               name=f"{b} (rebased)", line={"width": 1, "dash": "dash"},
+                               legend="legend"),
                     row=1, col=1,
                 )
 
@@ -1508,8 +1524,8 @@ def build_dashboard(
         for wave in wv_order:
             fig.add_trace(
                 go.Scatter(x=wv_weight.index, y=wv_weight[wave], mode="lines+markers",
-                           name=wave, legendgroup="drift",
-                           legendgrouptitle_text="Portfolio % by wave"),
+                           name=wave, legend="legend5",
+                           line={"color": WAVE_COLORS.get(wave)}),
                 row=2, col=1,
             )
         latest_date = recs["date"].max()
@@ -1613,8 +1629,8 @@ def build_dashboard(
                      for s, t in zip(sub["stage"], sub["evidence_tickers"].fillna(""))]
             fig.add_trace(
                 go.Scatter(x=sub["date"], y=sub["stage_rank"], mode="lines+markers",
-                           name=wave, legendgroup="waves",
-                           legendgrouptitle_text="Wave stages",
+                           name=wave, legend="legend6",
+                           line={"color": WAVE_COLORS.get(wave)},
                            hovertext=hover, hoverinfo="text+x"),
                 row=5, col=1,
             )
@@ -1650,7 +1666,8 @@ def build_dashboard(
                 sub = adf[adf["wave"] == wave].sort_values("date")
                 fig.add_trace(
                     go.Scatter(x=sub["date"], y=sub["count"], mode="lines+markers",
-                               name=wave, legend="legend4"),
+                               name=wave, legend="legend4",
+                               line={"color": WAVE_COLORS.get(wave)}),
                     row=6, col=1,
                 )
 
@@ -1686,7 +1703,8 @@ def build_dashboard(
         for wave in wv_order:
             fig.add_trace(
                 go.Scatter(x=wv.index, y=wv[wave], mode="lines",
-                           name=wave, legend="legend3"),
+                           name=wave, legend="legend3",
+                           line={"color": WAVE_COLORS.get(wave)}),
                 row=8, col=1,
             )
 
@@ -1697,11 +1715,29 @@ def build_dashboard(
         # shows portfolio $ OR SPY but not both (and chart 2 shows one
         # ticker's portfolio % at a time, which is cleaner with 7+ lines).
         hovermode="closest",
-        # Per-subplot legends for charts 6, 7, and 8, pinned to the right
-        # of each subplot in paper coordinates. The default global legend
-        # handles charts 1-5. Subplot row tops with 8 rows and
-        # vertical_spacing=0.06: row 6 top ~0.338, row 7 top ~0.205,
-        # row 8 top ~0.073.
+        # Per-subplot legends, one per chart, pinned to the right of each
+        # subplot in paper coordinates. Subplot row tops with 8 rows and
+        # vertical_spacing=0.06: row 1 top ~1.000, row 2 top ~0.868,
+        # row 5 top ~0.470, row 6 top ~0.338, row 7 top ~0.205,
+        # row 8 top ~0.073. Charts 3 and 4 have showlegend=False on their
+        # traces so they need no legend entry.
+        legend=dict(
+            title_text="Portfolio value",
+            xref="paper", x=1.02,
+            yref="paper", y=1.000, yanchor="top",
+        ),
+        legend5=dict(
+            title_text="Portfolio % by wave",
+            xref="paper", x=1.02,
+            yref="paper", y=0.868, yanchor="top",
+        ),
+        # Chart 5 has a secondary y-axis (tilt multiplier) on the right,
+        # so push this legend further out (x=1.06) to clear that axis.
+        legend6=dict(
+            title_text="Wave stages",
+            xref="paper", x=1.06,
+            yref="paper", y=0.470, yanchor="top",
+        ),
         legend4=dict(
             title_text="Articles per wave",
             xref="paper", x=1.02,
