@@ -1,51 +1,27 @@
 ---
 name: review-portfolio
-description: Full portfolio review. Reads the investor profile and holdings, gathers wave-aligned news, runs the analyze CLI with wave-stage tilts, and writes a profile-aware report plus a refreshed dashboard. On a first run (when holdings.csv has all-zero shares), this skill also does the thesis-driven dollar allocation before optimizing, so the report can show beliefs and math side-by-side. The single demo flow.
+description: Recurring portfolio review. Reads the investor profile, holdings, and (if present) the persisted thesis baseline; gathers wave-aligned news via the news-researcher subagent; runs the analyze CLI with wave-stage tilts; and writes a profile-aware report plus a refreshed dashboard. The thesis baseline (if any) is rendered as a side-by-side thesis-vs-recommended comparison on every run, not just the first.
 ---
 
 # /review-portfolio
 
 Holdings in, profile-aware report out. Run this monthly to get a fresh wave-stage news read plus a written narrative. The weekly cron is the lightweight Python-only sibling.
 
+This skill assumes a portfolio already exists. If you're starting fresh, run `/initialize-portfolio` first to set up the thesis allocation; come back here once `data/thesis_baseline.json` exists.
+
 ## Before you start
 
 1. Read `investor_profile.md`. If missing or empty, stop and tell the user to copy `investor_profile.example.md` to `investor_profile.md` and edit. Never fall back to a default.
 2. Read `holdings.csv` for the ticker universe. Every ticker in this file is passed to the news-researcher (Step 1) and to `analyze` (Step 2). The optimizer can only assign weight to tickers in this file. Rows with `shares=0` are part of the universe just like populated rows — they get news and they get a weight slot.
-3. Parse the user's request. Optional overrides: objective (default `max_sharpe`), period (default `3y`), max_weight (default = profile's `concentration_cap`).
-
-## Step 0 — first-run check (conditional)
-
-Inspect `holdings.csv`. If **every** row has `shares == 0`, this is a first run. Do the thesis allocation before optimizing. Otherwise skip Step 0 entirely.
-
-### When Step 0 fires:
-
-1. Confirm `initial_investment_usd` in the profile is present and positive. If missing, stop and tell the user to add it.
-2. Produce a JSON object mapping each watchlist ticker to a dollar amount. Constraints:
-   - The dollar amounts must sum to `initial_investment_usd` exactly.
-   - Honor the profile's `exclusions`: any ticker in an excluded sector gets $0.
-   - Honor `asset_class_targets` as a guideline. Sum the dollar amounts within each asset class and try to roughly match the target percentages. Use the asset-class mapping in `.claude/agents/report-writer.md`.
-   - Within each asset class, weight tickers using the wave thesis. For equities specifically: lean into the current AI wave, then the named "next waves" listed in the profile (rockets/spacecraft, robotics, engineered biology, quantum computing, nuclear fusion). Tickers tied to past or unrelated waves get smaller weights.
-   - Respect `concentration_cap`: no single ticker gets more than that fraction of `initial_investment_usd`.
-   - Do not optimize for Sharpe, volatility, or any other math metric. This is the user's beliefs in dollar form.
-3. State the reasoning per asset class and per ticker in plain prose before producing the JSON. Cite the wave thesis when assigning equity weights. Save this reasoning to pass to the report-writer.
-4. Bash:
-   ```
-   python -m src.cli init-holdings --allocations '<json>' --out holdings.csv
-   ```
-   Capture the per-ticker price, shares, and value from the CLI's JSON return.
-5. Bash:
-   ```
-   python -m src.cli snapshot --force
-   ```
-   Records the thesis snapshot.
-6. Save `thesis_baseline = { date: <today YYYY-MM-DD>, allocations_usd: <step 2 JSON>, reasoning: <step 3 prose>, holdings: <step 4 return> }` for the report-writer. Also persist it to `data/thesis_baseline.json` so subsequent /review-portfolio runs can render the thesis-vs-recommended comparison.
-7. Set `news_lookback_days = 60` for Step 1. The default is 30 days; on a first run we widen the window to 60 days so the wave-stage call has roughly two months of context, since `wave_history.csv` is empty and provides no longer-horizon trajectory yet.
+3. **Empty-holdings guard.** If **every** row in `holdings.csv` has `shares == 0`, stop and tell the user: this is a fresh repo; they should run `/initialize-portfolio` first to set up the thesis allocation. Do not proceed.
+4. Read `data/thesis_baseline.json` if it exists. Its contents (`date`, `allocations_usd`, `reasoning`, `holdings`) are passed to the report-writer so every review report can render the thesis-vs-recommended comparison. If the file doesn't exist, that's fine — the comparison section is just omitted.
+5. Parse the user's request. Optional overrides: objective (default from profile's `financial_model.objective`), period (default from `financial_model.lookback_period`), max_weight (default from `concentration_cap`).
 
 ## Orchestration
 
 ### Step 1 — gather news (Task → news-researcher)
 
-Pass the ticker list and `lookback_days`. Use `news_lookback_days` (60) if Step 0 fired this run; otherwise use the default 30 days. State the lookback explicitly in the Task prompt so the agent uses it.
+Pass the ticker list and `lookback_days = 30`. State the lookback explicitly in the Task prompt so the agent uses it.
 
 Get back: `wave_views` (ticker → stage), bullets, `wave_stages` (per-wave call with rationale + evidence), and `exclusion_conflicts`.
 
@@ -90,7 +66,7 @@ Pass:
   "analysis": <step 2 JSON>,
   "news": <step 1 payload>,
   "profile_conflicts": <merged from step 1 + step 2>,
-  "thesis_baseline": <step 0 payload, OR contents of data/thesis_baseline.json if it exists, OR null>
+  "thesis_baseline": <contents of data/thesis_baseline.json if it exists, OR null>
 }
 ```
 
@@ -99,26 +75,27 @@ The report is written to `data/reports/YYYY-MM-DD-review-portfolio.md`. When `th
 ### Step 4 — refresh dashboard (Bash)
 
 ```
-python -m src.cli dashboard
+python -m src.cli dashboard --nav-current live --out docs/index.html
 ```
 
-Regenerates `data/dashboard.html` with the latest snapshots and recommendations data.
+Regenerates the public live dashboard. Time-series charts are scoped to dates >= `thesis_baseline.date` if the file exists.
+
+(Also regenerate the local copy if you want to inspect it without pushing: `python -m src.cli dashboard` writes `data/dashboard.html`.)
 
 ## Final output to the user
 
 One short message:
 
 - Path to the report.
-- Path to the dashboard (`data/dashboard.html`).
+- Path to the dashboard (`docs/index.html` and/or `data/dashboard.html`).
 - One-line summary: objective + Sharpe + profile_conflicts count.
-- If Step 0 fired, also: total dollars allocated and "this was a first run; the report includes a Thesis allocation section."
 - "Read the report, especially the 'Profile conflicts' section."
 
 ## Rules
 
-- Never skip Step 0's check (the holdings-all-zero detection). The first-run branch is the demo's setup arc.
+- **Never skip the empty-holdings guard.** If `holdings.csv` is all-zero, the right next step is `/initialize-portfolio`, not this skill.
 - Never modify the profile mid-run.
 - Never silently clamp weights to satisfy the profile; surface conflicts instead.
-- Numbers come from `src.cli` (`init-holdings`, `analyze`, `snapshot`, `dashboard`). The thesis-driven dollar weights in Step 0 come from the LLM, but every share count, price, and risk metric passes through Python.
-- Step 0 must run before Step 1, and Step 1 must run before Step 2. Do not parallelize.
-- If Step 0 fires, Step 1's news-researcher sees the *populated* holdings.csv (post-init-holdings), so the news context applies to the thesis positions.
+- Numbers come from `src.cli` (`analyze`, `snapshot`, `recommend`, `dashboard`). Risk metrics, weights, and prices all pass through Python.
+- Step 1 must run before Step 2. Do not parallelize.
+- The thesis baseline is read-only here. /initialize-portfolio writes it; /review-portfolio only renders it.
