@@ -13,12 +13,12 @@ htmlcov/
 *.log
 data_cache/
 data/reports/
-data/dashboard.html
 data/news_latest.json
 data/news_feed.json
 data/wave_history.csv
 data/news/
 data/backtest/
+# data/dashboard.html removed — docs/index.html is the single dashboard now (commit 53d4929)
 
 # personal data — never push
 .claude/settings.local.json
