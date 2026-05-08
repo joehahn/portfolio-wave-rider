@@ -1424,16 +1424,24 @@ def build_dashboard(
     fig = make_subplots(
         rows=8, cols=1,
         subplot_titles=(
-            "Portfolio value over time",
-            "Recommended portfolio % segregated by wave, versus time",
-            "Latest recommended portfolio %",
-            "Cumulative $ gain per holding over the snapshot window",
-            "Wave-stage trajectories (0=neutral, 1=buildup, 2=surge, 3=peak, 4=digestion)",
-            "Articles harvested per wave over time (data/news/ archive)",
-            "$ by asset class over time",
-            "$ by wave over time",
+            "Portfolio value over time"
+            "<br><sub><i>Σ(actual shares × close price) per day. SPY rebased to share starting value for comparison.</i></sub>",
+            "Recommended portfolio % segregated by wave, versus time"
+            "<br><sub><i>Each weekly optimizer run produces target weights per ticker; this chart sums them by wave bucket so each line is the wave's total target allocation.</i></sub>",
+            "Latest recommended portfolio %"
+            "<br><sub><i>The most recent optimizer's target weight per ticker. Bars at the cap signal the optimizer wanted more than the concentration constraint allowed.</i></sub>",
+            "Cumulative $ gain per holding over the snapshot window"
+            "<br><sub><i>Per-ticker P&L attribution: Σ(prior-day shares × price change). Bars sum to total realized portfolio gain. Green = winners, red = losers.</i></sub>",
+            "Wave-stage trajectories (0=neutral, 1=buildup, 2=surge, 3=peak, 4=digestion)"
+            "<br><sub><i>How the news-researcher classified each wave's cycle stage at each /review-portfolio run. Right axis shows the tilt multiplier applied to that wave's tickers' expected returns.</i></sub>",
+            "Articles harvested per wave over time (data/news/ archive)"
+            "<br><sub><i>Bullet count per wave per /review-portfolio run, from the archived news payloads. Indicates how much evidence backs each stage classification.</i></sub>",
+            "$ by asset class over time"
+            "<br><sub><i>Daily portfolio value rolled up by asset class. Sums to total portfolio value (chart 1).</i></sub>",
+            "$ by wave over time"
+            "<br><sub><i>Daily portfolio value rolled up by wave bucket. Same data as chart 7 grouped differently. Log y-axis keeps small allocations visible next to the dominant general_markets line.</i></sub>",
         ),
-        vertical_spacing=0.045,
+        vertical_spacing=0.06,
         # Chart 5 (wave-stage trajectories) gets a right y-axis showing
         # each rank's tilt multiplier, so a reader can see at a glance
         # what nudge the optimizer applies for each stage.
@@ -1683,7 +1691,7 @@ def build_dashboard(
             )
 
     fig.update_layout(
-        height=2300,
+        height=2700,
         title_text="Portfolio Wave Rider — dashboard",
         # `closest` shows one trace's popup at a time, so hovering chart 1
         # shows portfolio $ OR SPY but not both (and chart 2 shows one
@@ -1692,22 +1700,22 @@ def build_dashboard(
         # Per-subplot legends for charts 6, 7, and 8, pinned to the right
         # of each subplot in paper coordinates. The default global legend
         # handles charts 1-5. Subplot row tops with 8 rows and
-        # vertical_spacing=0.045: row 6 top ~0.345, row 7 top ~0.215,
-        # row 8 top ~0.084.
+        # vertical_spacing=0.06: row 6 top ~0.338, row 7 top ~0.205,
+        # row 8 top ~0.073.
         legend4=dict(
             title_text="Articles per wave",
             xref="paper", x=1.02,
-            yref="paper", y=0.345, yanchor="top",
+            yref="paper", y=0.338, yanchor="top",
         ),
         legend2=dict(
             title_text="Asset class $",
             xref="paper", x=1.02,
-            yref="paper", y=0.215, yanchor="top",
+            yref="paper", y=0.205, yanchor="top",
         ),
         legend3=dict(
             title_text="Wave $",
             xref="paper", x=1.02,
-            yref="paper", y=0.084, yanchor="top",
+            yref="paper", y=0.073, yanchor="top",
         ),
     )
     fig.update_yaxes(title_text="$", row=1, col=1)
