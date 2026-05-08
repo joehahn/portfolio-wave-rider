@@ -25,7 +25,7 @@ cp holdings.example.csv holdings.csv
 
 The two files you maintain:
 
-- `investor_profile.md`: `initial_investment_usd`, `concentration_cap`, `exclusions`, `asset_class_targets`, the wave-thesis prose, plus a `financial_model` section that controls the optimizer math (`objective`, `risk_aversion` (λ), `risk_free_rate`, `lookback_period`, `wave_stage_tilts`). Every recommendation cites lines from this file. CLI flags (`--objective`, `--risk-aversion`, etc.) override the profile values at runtime.
+- `investor_profile.md`: declares your goals, constraints, exclusions, asset-class targets, the wave-thesis prose, and the optimizer's mathematical model (objective, risk aversion, risk-free rate, lookback window, wave-stage tilt multipliers). Each field is documented with inline comments in `investor_profile.example.md` — copy that file and edit. Every recommendation cites lines from this file; CLI flags override the profile values at runtime.
 - `holdings.csv`: a two-column CSV (`ticker,shares`) acting as your watchlist. Pre-thesis you can leave every `shares` at 0; that's the universe `/initialize-portfolio` will allocate dollars across on its first run.
 
 Optional: `news_sources.md`, a curated list of sources per technology wave. Improves the news-researcher's signal. Missing is fine; the agent falls back to open web search.
