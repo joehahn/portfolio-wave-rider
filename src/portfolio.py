@@ -1425,7 +1425,7 @@ def build_dashboard(
         rows=8, cols=1,
         subplot_titles=(
             "Portfolio value over time",
-            "Recommended portfolio % drift over time",
+            "Recommended portfolio % segregated by wave, versus time",
             "Latest recommended portfolio %",
             "Cumulative $ gain per holding over the snapshot window",
             "Wave-stage trajectories (0=neutral, 1=buildup, 2=surge, 3=peak, 4=digestion)",
@@ -1484,19 +1484,24 @@ def build_dashboard(
                     row=1, col=1,
                 )
 
-    # 2. Weight drift over time (one line per ticker, from recommendations.csv).
-    # Legend labels include the asset class so a reader can scan which
-    # bucket each line belongs to without consulting the holdings file.
+    # 2. Recommended portfolio % segregated by wave, versus time.
+    # Sum each wave's tickers' weights into one line per wave so the
+    # chart reads as ~6 lines (one per wave bucket) instead of ~12-line
+    # ticker spaghetti. Per-ticker latest weights still get extracted
+    # below for chart 3.
     latest_weights: pd.DataFrame | None = None
     if rec_path.exists():
         recs = pd.read_csv(rec_path, parse_dates=["date"])
-        for ticker, sub in recs.groupby("ticker"):
-            sub = sub.sort_values("date")
-            cls = TICKER_ASSET_CLASS.get(ticker, "equity")
+        recs["wave_bucket"] = recs["ticker"].map(
+            lambda t: TICKER_WAVE.get(t, "general_markets")
+        )
+        wv_weight = recs.groupby(["date", "wave_bucket"])["weight"].sum().unstack(fill_value=0)
+        wv_order = [w for w in _WAVE_DISPLAY_ORDER if w in wv_weight.columns]
+        for wave in wv_order:
             fig.add_trace(
-                go.Scatter(x=sub["date"], y=sub["weight"], mode="lines+markers",
-                           name=f"{ticker} ({cls})", legendgroup="drift",
-                           legendgrouptitle_text="Portfolio % drift"),
+                go.Scatter(x=wv_weight.index, y=wv_weight[wave], mode="lines+markers",
+                           name=wave, legendgroup="drift",
+                           legendgrouptitle_text="Portfolio % by wave"),
                 row=2, col=1,
             )
         latest_date = recs["date"].max()
