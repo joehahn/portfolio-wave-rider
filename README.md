@@ -13,19 +13,26 @@ See [GLOSSARY.md](GLOSSARY.md) for the finance and stats terms used below (`σ`,
 
 ## What it does
 
-Three cadences:
+Three slash commands plus two cron jobs. Two dashboards published to GitHub Pages.
 
 | Cadence | Mechanism | What runs | Output |
 |---|---|---|---|
-| Daily, Mon-Fri 16:30 local | cron | `snapshot && news-feed && dashboard`. Fetches the latest close price for every ticker in `holdings.csv`, multiplies by `shares`, appends one row per ticker to `data/snapshots.csv`. Then pulls fresh Yahoo Finance headlines per ticker into `data/news_feed.json`. Then refreshes the dashboard. | `data/snapshots.csv`, `data/news_feed.json`, `data/dashboard.html` |
+| Once, on a fresh repo | You run `/initialize-portfolio` in Claude Code | Reads the profile, proposes a thesis-driven dollar allocation across the watchlist (no math, just the wave thesis + asset-class targets + exclusions), calls `init-holdings` to convert dollars to shares, runs `snapshot --force`, persists the allocation to `data/thesis_baseline.json`, and writes a thesis-only report. No optimizer, no news. | `holdings.csv` (populated), `data/thesis_baseline.json`, `data/snapshots.csv` (first row), `data/reports/YYYY-MM-DD-initialize-portfolio.md`, `docs/index.html` |
+| Daily, Mon-Fri 16:30 local | cron | `snapshot && news-feed && dashboard`. Fetches the latest close price for every ticker in `holdings.csv`, multiplies by `shares`, appends one row per ticker to `data/snapshots.csv`. Then pulls fresh Yahoo Finance headlines per ticker into `data/news_feed.json`. Then refreshes the live dashboard. | `data/snapshots.csv`, `data/news_feed.json`, `data/dashboard.html` |
 | Weekly, Fri 17:00 local | cron | `recommend && dashboard`. Re-runs the mean-variance optimizer over the holdings universe, appends new target weights to `data/recommendations.csv`, refreshes the dashboard. No news, no wave tilts. | `data/recommendations.csv`, `data/dashboard.html` |
-| Monthly, you decide | You run `/review-portfolio` in Claude Code | LLM subagents gather wave-aligned news (60-day lookback on the first run, 30-day default thereafter), classify each wave's stage, pass `wave_views` to the optimizer (which scales `μ` accordingly), then write a profile-aware report and refresh the dashboard. The run also appends today's wave-stage classifications to `data/wave_history.csv` (drives the trajectory chart) and archives the full news payload to `data/news/<date>-news.json`. The first run additionally does a thesis-driven dollar allocation (persisted to `data/thesis_baseline.json`) before optimizing, and every subsequent run re-renders the thesis-vs-recommended comparison from that file. | `data/reports/YYYY-MM-DD-review-portfolio.md`, `data/dashboard.html`, `data/wave_history.csv` (appended), `data/news/<date>-news.json` |
+| Monthly, you decide | You run `/review-portfolio` in Claude Code | LLM subagents gather wave-aligned news (30-day lookback), classify each wave's stage, pass `wave_views` to the optimizer (which scales `μ` accordingly), then write a profile-aware report and refresh the live dashboard. The run also appends today's wave-stage classifications to `data/wave_history.csv` (drives the trajectory chart) and archives the full news payload to `data/news/<date>-news.json`. If `data/thesis_baseline.json` exists (it should, after `/initialize-portfolio`), every report re-renders the thesis-vs-recommended comparison. | `data/reports/YYYY-MM-DD-review-portfolio.md`, `docs/index.html` (refreshed), `data/wave_history.csv` (appended), `data/news/<date>-news.json` |
+| On demand, you decide | You run `/run-backtest` in Claude Code | Walk-forward weekly-rebalance backtest of the optimizer over a 12-month window, applying the wave-stage tilts that were known at each historical Friday (from `data/wave_history.csv`). Pure Python, no LLM. Auto-renders both the local backtest dashboard and the public `docs/backtest.html`. | `data/backtest/{snapshots,recommendations}.csv`, `data/backtest/dashboard.html`, `docs/backtest.html` |
 
 The weekly cron is the lightweight Python-only sibling of `/review-portfolio`: pure Python, no LLM, no wave tilts. Run the skill when you want a fresh wave-stage read and a written narrative.
 
+Two pages on GitHub Pages: [`docs/index.html`](https://joehahn.github.io/portfolio-wave-rider/) is the **live dashboard** (data scoped to dates ≥ thesis allocation); [`docs/backtest.html`](https://joehahn.github.io/portfolio-wave-rider/backtest.html) is the **12-month walk-forward backtest** (yearlong synthetic time series). Each page has a nav strip linking to the other plus the parameter-sweep comparison pages.
+
 ## How it's built
 
-- One skill at `.claude/skills/review-portfolio/`. Reads the profile and holdings, gathers news, runs the optimizer with wave-stage tilts, writes a report, refreshes the dashboard. On a first run (when `holdings.csv` has all-zero shares) it first does a thesis-driven dollar allocation so the user's beliefs become the thesis baseline (persisted to `data/thesis_baseline.json`); the same report (and every subsequent /review-portfolio report) shows beliefs and math side-by-side.
+- Three skills at `.claude/skills/`:
+  - `initialize-portfolio` (one-shot): reads the profile and an empty holdings.csv, produces a thesis-driven dollar allocation, persists it to `data/thesis_baseline.json`, and writes a thesis-only report.
+  - `review-portfolio` (recurring): reads the profile, holdings, and (if present) the thesis baseline; gathers news, runs the optimizer with wave-stage tilts, writes a profile-aware report, refreshes the live dashboard. Renders the thesis-vs-recommended comparison on every run when the baseline exists.
+  - `run-backtest` (on demand): walk-forward 12-month backtest, auto-rendering both the local and public backtest dashboards.
 - Two subagents at `.claude/agents/`:
   - `news-researcher`: picks wave-aligned news per ticker (web search scoped to `news_sources.md` first, open search as fallback), classifies each wave's stage, returns a `wave_views` mapping `{ticker: stage}`.
   - `report-writer`: synthesizes the analysis and news into the final markdown report.
