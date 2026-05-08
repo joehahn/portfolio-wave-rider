@@ -1374,6 +1374,7 @@ def build_dashboard(
     wave_history_path: str = "data/wave_history.csv",
     benchmarks: list[str] | None = None,
     nav_current: str | None = None,
+    thesis_baseline_path: str | None = "data/thesis_baseline.json",
 ) -> dict[str, Any]:
     """Render four Plotly charts plus the news area (daily yfinance feed
     + the most recent /review-portfolio payload) into one HTML file.
@@ -1413,12 +1414,32 @@ def build_dashboard(
         specs=[[{}], [{}], [{}], [{}], [{"secondary_y": True}], [{}], [{}], [{}]],
     )
 
+    # If a thesis_baseline.json exists, the live dashboard scopes its
+    # time-series charts to dates >= the thesis date. The backtest
+    # dashboard passes thesis_baseline_path=None to skip this filter
+    # (its data deliberately predates any thesis allocation).
+    thesis_date: pd.Timestamp | None = None
+    if thesis_baseline_path:
+        tb_path = Path(thesis_baseline_path)
+        if tb_path.exists():
+            try:
+                tb = json.loads(tb_path.read_text())
+                if tb.get("date"):
+                    thesis_date = pd.Timestamp(tb["date"])
+            except (OSError, json.JSONDecodeError, ValueError):
+                thesis_date = None
+
+    def _filter_post_thesis(df: pd.DataFrame) -> pd.DataFrame:
+        if thesis_date is None or df.empty:
+            return df
+        return df[df["date"] >= thesis_date]
+
     # 1. Portfolio total value over time (from snapshots.csv).
     benchmark_curves: dict[str, pd.Series] = {}
     if benchmarks is None:
         benchmarks = ["SPY"]
     if snap_path.exists():
-        snaps = pd.read_csv(snap_path, parse_dates=["date"])
+        snaps = _filter_post_thesis(pd.read_csv(snap_path, parse_dates=["date"]))
         totals = snaps.groupby("date")["total_value"].first().sort_index()
         fig.add_trace(
             go.Scatter(x=totals.index, y=totals.values, mode="lines+markers",
@@ -1500,7 +1521,9 @@ def build_dashboard(
     # change is multiplied by that day's share count. Sums to the
     # portfolio's total realized gain (modulo numerical noise).
     if snap_path.exists():
-        snaps_full = pd.read_csv(snap_path, parse_dates=["date"]).sort_values(["ticker", "date"])
+        snaps_full = _filter_post_thesis(
+            pd.read_csv(snap_path, parse_dates=["date"])
+        ).sort_values(["ticker", "date"])
         gain_by_ticker: dict[str, float] = {}
         for ticker, sub in snaps_full.groupby("ticker"):
             sub = sub.sort_values("date").reset_index(drop=True)
@@ -1597,7 +1620,7 @@ def build_dashboard(
     # ticker contributes to exactly one bucket in each chart, so the sum
     # of all lines in either chart equals the portfolio total.
     if snap_path.exists():
-        snaps_full = pd.read_csv(snap_path, parse_dates=["date"])
+        snaps_full = _filter_post_thesis(pd.read_csv(snap_path, parse_dates=["date"]))
         snaps_full["asset_bucket"] = snaps_full["ticker"].map(
             lambda t: ASSET_CLASS_BUCKET.get(TICKER_ASSET_CLASS.get(t, "equity"), "equities")
         )

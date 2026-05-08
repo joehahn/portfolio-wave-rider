@@ -158,6 +158,10 @@ def main(argv: list[str] | None = None) -> int:
                         choices=["live", "backtest", "lambda", "max_weight"],
                         help="if set, prepend a cross-page nav strip to the rendered HTML "
                              "with the named page highlighted as current (used in docs/)")
+    p_dash.add_argument("--thesis-baseline", default="data/thesis_baseline.json",
+                        help="if the file exists, time-series charts are scoped to dates "
+                             ">= the thesis date. Pass an empty string to disable (the "
+                             "backtest dashboard does this since its data predates any thesis).")
 
     args = parser.parse_args(argv)
 
@@ -231,6 +235,7 @@ def main(argv: list[str] | None = None) -> int:
                 wave_history_path=args.wave_history,
                 benchmarks=args.benchmarks,
                 nav_current=args.nav_current,
+                thesis_baseline_path=args.thesis_baseline or None,
             )
     except Exception as e:  # noqa: BLE001 — surface any failure as a JSON error line
         print(json.dumps({"error": f"{type(e).__name__}: {e}"}), file=sys.stderr)
