@@ -88,7 +88,7 @@ The "Profile conflicts" section of any report is the most important thing to rea
 
 ## What it does
 
-The headline pieces are spelled out below: how the universe of tickers gets fed in, and how the news-researcher's wave classifications affect the optimizer's expected returns.
+The headline pieces are spelled out below: how `holdings.csv` shapes a run, and how the news-researcher's wave classifications affect the optimizer's expected returns.
 
 ### How `holdings.csv` shapes a run
 
