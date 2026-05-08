@@ -154,6 +154,10 @@ def main(argv: list[str] | None = None) -> int:
                         help="benchmark tickers to overlay on the portfolio-value chart "
                              "(default: SPY). Pass an empty list to suppress overlays.")
     p_dash.add_argument("--out", default="data/dashboard.html")
+    p_dash.add_argument("--nav-current", default=None,
+                        choices=["live", "backtest", "lambda", "max_weight"],
+                        help="if set, prepend a cross-page nav strip to the rendered HTML "
+                             "with the named page highlighted as current (used in docs/)")
 
     args = parser.parse_args(argv)
 
@@ -226,6 +230,7 @@ def main(argv: list[str] | None = None) -> int:
                 news_feed_path=args.news_feed,
                 wave_history_path=args.wave_history,
                 benchmarks=args.benchmarks,
+                nav_current=args.nav_current,
             )
     except Exception as e:  # noqa: BLE001 — surface any failure as a JSON error line
         print(json.dumps({"error": f"{type(e).__name__}: {e}"}), file=sys.stderr)

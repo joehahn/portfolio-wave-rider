@@ -1329,6 +1329,42 @@ def _fetch_benchmark_curves(
     return curves
 
 
+_NAV_LINKS = [
+    ("live",       "Live dashboard",       "index.html"),
+    ("backtest",   "12-month backtest",    "backtest.html"),
+    ("lambda",     "Lambda sweep",         "lambda_comparison.html"),
+    ("max_weight", "Concentration sweep",  "max_weight_comparison.html"),
+]
+
+
+def _render_nav_strip(current: str | None) -> str:
+    """Small navigation block prepended to each dashboard HTML so a
+    visitor can jump between the live dashboard, backtest dashboard,
+    and the parameter-sweep comparison pages. ``current`` highlights
+    one of `_NAV_LINKS`; pass None to omit the strip entirely.
+    """
+    if not current:
+        return ""
+    items = []
+    for key, label, href in _NAV_LINKS:
+        if key == current:
+            items.append(
+                f'<span style="padding:0.4em 0.9em;background:#1f77b4;color:#fff;'
+                f'border-radius:4px;font-weight:600;">{label}</span>'
+            )
+        else:
+            items.append(
+                f'<a href="{href}" style="padding:0.4em 0.9em;color:#1f77b4;'
+                f'text-decoration:none;border:1px solid #1f77b4;border-radius:4px;">'
+                f'{label}</a>'
+            )
+    return (
+        '<div style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;'
+        'max-width:980px;margin:1em auto 0.5em;padding:0 1.5em;display:flex;'
+        f'gap:0.6em;flex-wrap:wrap;align-items:center;">{"".join(items)}</div>\n'
+    )
+
+
 def build_dashboard(
     snapshots_path: str = "data/snapshots.csv",
     recommendations_path: str = "data/recommendations.csv",
@@ -1337,6 +1373,7 @@ def build_dashboard(
     news_feed_path: str = "data/news_feed.json",
     wave_history_path: str = "data/wave_history.csv",
     benchmarks: list[str] | None = None,
+    nav_current: str | None = None,
 ) -> dict[str, Any]:
     """Render four Plotly charts plus the news area (daily yfinance feed
     + the most recent /review-portfolio payload) into one HTML file.
@@ -1664,6 +1701,15 @@ def build_dashboard(
     o_path = Path(out_path)
     o_path.parent.mkdir(parents=True, exist_ok=True)
     fig.write_html(str(o_path), include_plotlyjs="cdn")
+
+    # Inject the cross-page nav strip (between dashboards in docs/) just
+    # inside <body>, if requested. Plotly's write_html doesn't expose a
+    # body-injection hook, so we read the file back and rewrite it.
+    nav_html = _render_nav_strip(nav_current)
+    if nav_html:
+        html = o_path.read_text(encoding="utf-8")
+        html = html.replace("<body>", "<body>\n" + nav_html, 1)
+        o_path.write_text(html, encoding="utf-8")
 
     # Append the news area (daily feed + latest /review-portfolio payload)
     # after Plotly's HTML, if either file is present.
