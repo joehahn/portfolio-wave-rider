@@ -39,8 +39,8 @@ Three slash commands plus two cron jobs. Two dashboards published to GitHub Page
 | Cadence | Mechanism | What runs | Output |
 |---|---|---|---|
 | Once, on a fresh repo | You run `/initialize-portfolio` in Claude Code | Reads the profile `investor_profile.md` and proposes a thesis-driven dollar allocation across the watchlist (no math, just the wave thesis plus asset-class targets and exclusions). Converts those dollars to shares at current prices, records the initial portfolio snapshot, persists the allocation to a thesis-baseline file, and writes a thesis-only report. No optimizer, no news. | `holdings.csv` (populated)<br>`data/thesis_baseline.json`<br>`data/snapshots.csv` (first row)<br>`data/reports/YYYY-MM-DD-initialize-portfolio.md`<br>`docs/index.html` |
-| Daily, Mon-Fri 16:30 local | cron | Records today's per-ticker shares × close price to `data/snapshots.csv`, pulls fresh Yahoo Finance headlines per ticker into `data/news_feed.json`, then refreshes both the local `data/dashboard.html` and the public `docs/index.html`. Each step only runs if the previous succeeded — if yfinance is down or a step errors, the chain short-circuits and nothing downstream gets stale data. | `data/snapshots.csv`<br>`data/news_feed.json`<br>`data/dashboard.html`<br>`docs/index.html` |
-| Weekly, Fri 17:00 local | cron | Re-runs the mean-variance optimizer over the holdings universe, appends new target weights to `data/recommendations.csv`, then refreshes both dashboards. | `data/recommendations.csv`<br>`data/dashboard.html`<br>`docs/index.html` |
+| Daily, Mon-Fri 16:30 local | cron | Records today's per-ticker shares × close price to `data/snapshots.csv`, pulls fresh Yahoo Finance headlines per ticker into `data/news_feed.json`, then refreshes the live dashboard. Each step only runs if the previous succeeded — if yfinance is down or a step errors, the chain short-circuits and nothing downstream gets stale data. | `data/snapshots.csv`<br>`data/news_feed.json`<br>`docs/index.html` |
+| Weekly, Fri 17:00 local | cron | Re-runs the mean-variance optimizer over the holdings universe, appends new target weights to `data/recommendations.csv`, then refreshes the live dashboard. | `data/recommendations.csv`<br>`docs/index.html` |
 | Monthly, you decide | You run `/review-portfolio` in Claude Code | LLM subagents gather wave-aligned news for each ticker (30-day lookback), classify each wave's stage, and pass those classifications to the optimizer as a tilt on expected returns. Then write a profile-aware report and refresh the live dashboard. The run also appends today's wave-stage classifications to the wave-history file (which drives the trajectory chart) and archives the full news payload for forensic re-reading. If a thesis baseline exists (it should, after `/initialize-portfolio`), every report re-renders the thesis-vs-recommended comparison. | `data/reports/YYYY-MM-DD-review-portfolio.md`<br>`docs/index.html` (refreshed)<br>`data/wave_history.csv` (appended)<br>`data/news/<date>-news.json` |
 | On demand, you decide | You run `/run-backtest` in Claude Code | Walk-forward weekly-rebalance backtest of the optimizer over a 12-month window, applying the wave-stage tilts that were known at each historical Friday. Pure Python, no LLM. Auto-renders both the local backtest dashboard and the public-demo backtest page. | `data/backtest/snapshots.csv`<br>`data/backtest/recommendations.csv`<br>`data/backtest/dashboard.html`<br>`docs/backtest.html` |
 
@@ -48,12 +48,12 @@ The weekly cron is the lightweight Python-only sibling of `/review-portfolio`: p
 
 ## Operations
 
-- Daily: nothing. The cron job appends a row per ticker to `data/snapshots.csv` and refreshes both `data/dashboard.html` and `docs/index.html`.
-- Weekly: nothing. Friday 17:00 local appends one optimization run to `data/recommendations.csv` and refreshes both dashboards.
-- Whenever you want to publish the cron-refreshed public dashboard: `git add docs/index.html && git commit -m "Refresh live dashboard" && git push`. cron does not auto-push.
+- Daily: nothing. The cron job appends a row per ticker to `data/snapshots.csv` and refreshes `docs/index.html`.
+- Weekly: nothing. Friday 17:00 local appends one optimization run to `data/recommendations.csv` and refreshes `docs/index.html`.
+- Whenever you want to publish the cron-refreshed dashboard: `git add docs/index.html && git commit -m "Refresh live dashboard" && git push`. cron does not auto-push.
 - Monthly: run `/review-portfolio` in Claude Code. Read the report (especially the **Profile conflicts** section), decide on rebalances, execute trades in your brokerage, then update `holdings.csv`.
 - After trading: edit `holdings.csv` to reflect new share counts. The next snapshot picks up the new positions.
-- Anytime: open `data/dashboard.html` in a browser for the local view, or visit the public-demo URL.
+- Anytime: open `docs/index.html` in a browser for the local view, or visit the public-demo URL.
 
 ### Optional: cron automation
 
@@ -62,12 +62,12 @@ If you want the daily snapshot and weekly portfolio recommendation to update aut
 ```cron
 PROJ=/path/to/portfolio-wave-rider
 # Daily snapshot + news-feed + dashboard refresh, Mon-Fri 16:30 local
-30 16 * * 1-5  cd $PROJ && .venv/bin/python -m src.cli snapshot && .venv/bin/python -m src.cli news-feed && .venv/bin/python -m src.cli dashboard && .venv/bin/python -m src.cli dashboard --out docs/index.html --nav-current live >> data/snapshot.log 2>&1
+30 16 * * 1-5  cd $PROJ && .venv/bin/python -m src.cli snapshot && .venv/bin/python -m src.cli news-feed && .venv/bin/python -m src.cli dashboard --nav-current live >> data/snapshot.log 2>&1
 # Weekly recommend + dashboard refresh, Fri 17:00 local
-0  17 * * 5    cd $PROJ && .venv/bin/python -m src.cli recommend && .venv/bin/python -m src.cli dashboard && .venv/bin/python -m src.cli dashboard --out docs/index.html --nav-current live >> data/recommend.log 2>&1
+0  17 * * 5    cd $PROJ && .venv/bin/python -m src.cli recommend && .venv/bin/python -m src.cli dashboard --nav-current live >> data/recommend.log 2>&1
 ```
 
-Each cron call renders two dashboards: the local `data/dashboard.html` (gitignored, no nav strip) and the public-demo `docs/index.html` (git-tracked, with nav strip). cron does not push to git — `git status` will show `docs/index.html` modified after each run, and a manual `git add docs/index.html && git commit && git push` publishes the refresh.
+Each cron call refreshes `docs/index.html` (the dashboard CLI's default `--out`). The file is git-tracked but cron does not push — `git status` will show it modified after each run, and a manual `git add docs/index.html && git commit && git push` publishes the refresh.
 
 Install with `crontab -e` and paste. Adjust `PROJ` to your clone path. Verify with `crontab -l`. cron only fires while the machine is awake; missed runs do not auto-replay. Use `--date YYYY-MM-DD` on either subcommand to backfill.
 
@@ -75,7 +75,7 @@ Install with `crontab -e` and paste. Adjust `PROJ` to your clone path. Verify wi
 
 | File | What's in it | When to look |
 |---|---|---|
-| `data/dashboard.html` | Eight Plotly charts (1: portfolio value over time **with SPY overlay**; 2: per-ticker recommended portfolio % drift; 3: latest recommended portfolio % bar chart; 4: cumulative $ gain per holding over the snapshot window — green/red bars showing each ticker's realized P&L contribution; 5: per-wave stage trajectories accumulating across `/review-portfolio` runs; 6: articles harvested per wave over time, computed from each archived `data/news/<date>-news.json` file — answers "is the wave-stage call backed by lots of evidence on each date?"; 7: $ allocated by asset class over time; 8: $ allocated by wave over time, log y-axis) plus two news sections: "Today's headlines" (refreshed daily by cron from yfinance) and "In-depth news from last `/review-portfolio`" (LLM portfolio-relevance summaries with wave-stage classification, refreshed monthly) | Open in a browser any time |
+| `docs/index.html` | Eight Plotly charts (1: portfolio value over time **with SPY overlay**; 2: per-ticker recommended portfolio % drift; 3: latest recommended portfolio % bar chart; 4: cumulative $ gain per holding over the snapshot window — green/red bars showing each ticker's realized P&L contribution; 5: per-wave stage trajectories accumulating across `/review-portfolio` runs; 6: articles harvested per wave over time, computed from each archived `data/news/<date>-news.json` file — answers "is the wave-stage call backed by lots of evidence on each date?"; 7: $ allocated by asset class over time; 8: $ allocated by wave over time, log y-axis) plus two news sections: "Today's headlines" (refreshed daily by cron from yfinance) and "In-depth news from last `/review-portfolio`" (LLM portfolio-relevance summaries with wave-stage classification, refreshed monthly). Same file is what GitHub Pages serves at the public-demo URL. | Open in a browser any time |
 | `data/news_feed.json` | Daily Yahoo Finance headlines per ticker (refreshed by cron). Headline + first-paragraph summary + source + URL + date. ~5 bullets per ticker. Drives the dashboard's "Today's headlines" section. | If you want raw daily headline coverage |
 | `data/wave_history.csv` | Long-format per-wave stage history: `date, wave, stage, evidence_tickers, rationale, seeded`. One row per wave per classification event. `seeded=True` rows are post-hoc judgments from `seed-wave-history`; `seeded=False` rows come from organic `/review-portfolio` runs (or from running the news-researcher with strict as-of-date instructions, which can be folded into the same file). Drives the wave-stage trajectory chart on the dashboard. | If you want raw history of how each wave has been classified over time |
 | `data/news/YYYY-MM-DD-news.json` | Full archived news payload from each `/review-portfolio` run (per-ticker bullets with headline + summary). About 25 KB per run; accumulates with no pruning. | When the dashboard chart shows a wave-stage shift and you want to re-read what news was driving the LLM's call on that date |

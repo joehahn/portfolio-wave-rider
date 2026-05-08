@@ -56,10 +56,10 @@ Nine subcommands. `/review-portfolio` calls `init-holdings` (first-run branch on
 .venv/bin/python -m src.cli backtest --wave-history data/wave_history.csv
 
 # Static dashboard (reads the CSVs above plus both news files; writes
-# data/dashboard.html by default; overlays each --benchmarks ticker on the
+# docs/index.html by default; overlays each --benchmarks ticker on the
 # portfolio-value chart, default SPY). Pass --nav-current to prepend the
 # cross-page nav strip used by docs/index.html and docs/backtest.html.
-.venv/bin/python -m src.cli dashboard [--benchmarks SPY] [--out data/dashboard.html] [--nav-current live|backtest|lambda|max_weight]
+.venv/bin/python -m src.cli dashboard [--benchmarks SPY] [--out docs/index.html] [--nav-current live|backtest|lambda|max_weight]
 ```
 
 To inspect the backtest visually without auto-render, point the dashboard at the backtest CSVs:
@@ -97,7 +97,6 @@ portfolio-wave-rider/
 │   ├── recommendations.csv     # weekly, appended (your history; gitignored)
 │   ├── wave_history.csv        # per-/review-portfolio run, appended (gitignored)
 │   ├── thesis_baseline.json    # one-time artifact from /initialize-portfolio (gitignored)
-│   ├── dashboard.html          # static Plotly + news dashboard (gitignored, regenerated)
 │   ├── news_feed.json          # daily yfinance headlines (gitignored)
 │   ├── news_latest.json        # latest news payload from /review-portfolio (gitignored)
 │   ├── news/                   # archived news payloads, one per run (gitignored)

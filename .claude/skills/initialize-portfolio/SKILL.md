@@ -87,7 +87,7 @@ One short message:
 
 - Path to the report: `data/reports/<date>-initialize-portfolio.md`.
 - Total dollars allocated, ticker count.
-- Two next steps: "(1) Run `/review-portfolio` to get the optimizer's recommended allocation and the thesis-vs-recommended comparison. (2) Open `data/dashboard.html` to see the dashboard."
+- Two next steps: "(1) Run `/review-portfolio` to get the optimizer's recommended allocation and the thesis-vs-recommended comparison. (2) Open `docs/index.html` to see the dashboard."
 
 ## Rules
 

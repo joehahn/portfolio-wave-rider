@@ -144,7 +144,7 @@ def main(argv: list[str] | None = None) -> int:
                       help="benchmark tickers compared against the backtest's realized return "
                            "(default: SPY). Pass an empty list to skip the benchmark section.")
 
-    p_dash = sub.add_parser("dashboard", help="generate data/dashboard.html from snapshots + recommendations + news + wave history")
+    p_dash = sub.add_parser("dashboard", help="generate docs/index.html from snapshots + recommendations + news + wave history")
     p_dash.add_argument("--snapshots", default="data/snapshots.csv")
     p_dash.add_argument("--recommendations", default="data/recommendations.csv")
     p_dash.add_argument("--news", default="data/news_latest.json")
@@ -153,7 +153,7 @@ def main(argv: list[str] | None = None) -> int:
     p_dash.add_argument("--benchmarks", nargs="*", default=["SPY"],
                         help="benchmark tickers to overlay on the portfolio-value chart "
                              "(default: SPY). Pass an empty list to suppress overlays.")
-    p_dash.add_argument("--out", default="data/dashboard.html")
+    p_dash.add_argument("--out", default="docs/index.html")
     p_dash.add_argument("--nav-current", default=None,
                         choices=["live", "backtest", "lambda", "max_weight"],
                         help="if set, prepend a cross-page nav strip to the rendered HTML "

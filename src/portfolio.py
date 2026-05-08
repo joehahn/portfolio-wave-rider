@@ -1394,7 +1394,7 @@ def _render_nav_strip(current: str | None) -> str:
 def build_dashboard(
     snapshots_path: str = "data/snapshots.csv",
     recommendations_path: str = "data/recommendations.csv",
-    out_path: str = "data/dashboard.html",
+    out_path: str = "docs/index.html",
     news_path: str = "data/news_latest.json",
     news_feed_path: str = "data/news_feed.json",
     wave_history_path: str = "data/wave_history.csv",

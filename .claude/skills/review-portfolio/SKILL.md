@@ -75,19 +75,17 @@ The report is written to `data/reports/YYYY-MM-DD-review-portfolio.md`. When `th
 ### Step 4 — refresh dashboard (Bash)
 
 ```
-python -m src.cli dashboard --nav-current live --out docs/index.html
+python -m src.cli dashboard --nav-current live
 ```
 
-Regenerates the public live dashboard. Time-series charts are scoped to dates >= `thesis_baseline.date` if the file exists.
-
-(Also regenerate the local copy if you want to inspect it without pushing: `python -m src.cli dashboard` writes `data/dashboard.html`.)
+Regenerates the live dashboard at `docs/index.html` (the CLI's default `--out`). Time-series charts are scoped to dates >= `thesis_baseline.date` if the file exists.
 
 ## Final output to the user
 
 One short message:
 
 - Path to the report.
-- Path to the dashboard (`docs/index.html` and/or `data/dashboard.html`).
+- Path to the dashboard (`docs/index.html`).
 - One-line summary: objective + Sharpe + profile_conflicts count.
 - "Read the report, especially the 'Profile conflicts' section."
 

@@ -46,7 +46,7 @@ The user decides. Never silently clamp a recommendation to fit the profile.
   - `src/portfolio.py`: every math function (fetch_prices, compute_returns, optimize_portfolio, risk_metrics, analyze, initialize_holdings, snapshot_holdings, recommend_portfolio, append_wave_history, fetch_news_feed, backtest, build_dashboard).
   - `src/cli.py`: one entry point with nine subcommands (`init-holdings`, `wave-history`, `seed-wave-history`, `news-feed`, `analyze`, `snapshot`, `recommend`, `backtest`, `dashboard`) that the skill and cron jobs invoke via Bash. `backtest` is a one-off spot-check tool, not part of any cron flow. `seed-wave-history` is a one-time backfill for the wave-stage trajectory chart (chart 5).
 - Reports are written to `data/reports/YYYY-MM-DD-<skill>.md`.
-- Dashboard is a single static `data/dashboard.html`, regenerated after each snapshot or recommend run and at the end of `/review-portfolio`.
+- Dashboard is a single static `docs/index.html`, regenerated after each snapshot or recommend run and at the end of `/review-portfolio`. The same file is what GitHub Pages serves at the public-demo URL; cron does not auto-push, so `git add docs/index.html && git commit && git push` is the manual publish step whenever you want the live demo refreshed.
 
 ## User-maintained inputs
 
@@ -70,12 +70,12 @@ Two cron entries handle the daily and weekly automation. The exact crontab insta
 ```cron
 PROJ=/Users/joehahn/Library/CloudStorage/Dropbox/prog/claude/portfolio-wave-rider
 # Daily snapshot + dashboard refresh, Mon-Fri 16:30 local
-30 16 * * 1-5  cd $PROJ && .venv/bin/python -m src.cli snapshot && .venv/bin/python -m src.cli news-feed && .venv/bin/python -m src.cli dashboard && .venv/bin/python -m src.cli dashboard --out docs/index.html --nav-current live >> data/snapshot.log 2>&1
+30 16 * * 1-5  cd $PROJ && .venv/bin/python -m src.cli snapshot && .venv/bin/python -m src.cli news-feed && .venv/bin/python -m src.cli dashboard --nav-current live >> data/snapshot.log 2>&1
 # Weekly recommend + dashboard refresh, Fri 17:00 local
-0  17 * * 5    cd $PROJ && .venv/bin/python -m src.cli recommend && .venv/bin/python -m src.cli dashboard && .venv/bin/python -m src.cli dashboard --out docs/index.html --nav-current live >> data/recommend.log 2>&1
+0  17 * * 5    cd $PROJ && .venv/bin/python -m src.cli recommend && .venv/bin/python -m src.cli dashboard --nav-current live >> data/recommend.log 2>&1
 ```
 
-Each cron call renders two dashboards: the local `data/dashboard.html` (no nav strip) and the public-demo `docs/index.html` (with nav strip linking to backtest/sweep pages). The local file is gitignored; `docs/index.html` is git-tracked but not auto-pushed — `git status` will show it modified after each cron run, and a manual `git add docs/index.html && git commit && git push` publishes the refresh.
+Each cron call refreshes `docs/index.html` (the dashboard CLI's default `--out`). The file is git-tracked but cron does not push — `git status` will show it modified after each run, and a manual `git add docs/index.html && git commit && git push` publishes the refresh.
 
 Set `PROJ` to wherever you cloned the repo, then `crontab -e` and paste. Works the same on macOS and Linux. cron only fires when the machine is awake at the trigger time; missed runs do not auto-replay. Use `--date YYYY-MM-DD` to backfill.
 

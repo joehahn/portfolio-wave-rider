@@ -45,7 +45,7 @@ Write to `data/reports/YYYY-MM-DD-<skill-name>.md` with this outline:
 ## The ask
 <one paragraph: what the user asked for. End with one line:
 "For interactive charts of portfolio value, weight drift, and the
-latest weights, open `data/dashboard.html` in a browser.">
+latest weights, open `docs/index.html` in a browser.">
 
 ## Recommended allocation
 <a weights table, plus expected return, annual vol, Sharpe.
