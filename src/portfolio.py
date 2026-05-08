@@ -784,6 +784,31 @@ def backtest(
     )
     (out / "report.md").write_text(report)
 
+    # Auto-render the backtest dashboard at the standard path under
+    # ``out_dir`` plus a public copy at ``docs/backtest.html`` so the
+    # GitHub Pages two-page architecture stays in sync without a
+    # manual second invocation. Pass thesis_baseline_path=None so the
+    # full yearlong window is preserved (the backtest predates any
+    # thesis allocation by design).
+    rendered: list[str] = []
+    for path, nav in [(str(out / "dashboard.html"), None),
+                      ("docs/backtest.html", "backtest")]:
+        try:
+            build_dashboard(
+                snapshots_path=str(out / "snapshots.csv"),
+                recommendations_path=str(out / "recommendations.csv"),
+                out_path=path,
+                news_path="data/news_latest.json",
+                news_feed_path="data/news_feed.json",
+                wave_history_path="data/wave_history.csv",
+                benchmarks=benchmarks,
+                nav_current=nav,
+                thesis_baseline_path=None,
+            )
+            rendered.append(path)
+        except Exception:  # noqa: BLE001 — rendering shouldn't fail the backtest
+            continue
+
     return {
         "out_dir": str(out),
         "window": {"start": str(totals.index[0]), "end": str(totals.index[-1]), "days": int(days)},
@@ -796,6 +821,7 @@ def backtest(
         "max_drawdown": round(max_drawdown, 4),
         "weight_stability_l1": round(weight_stability, 4),
         "benchmark_returns": {b: round(r, 4) for b, r in benchmark_returns.items()},
+        "dashboards_rendered": rendered,
     }
 
 
