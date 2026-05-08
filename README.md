@@ -57,7 +57,7 @@ The weekly cron is the lightweight Python-only sibling of `/review-portfolio`: p
 
 ### Optional: cron automation
 
-If you want the daily snapshot and weekly recommend to run automatically, install these two cron entries. Skip if you'd rather invoke the commands by hand. The two entries work the same on macOS and Linux:
+If you want the daily snapshot and weekly portfolio recommendation to update automatically, install these two cron entries. Skip if you'd rather invoke the commands by hand. The two entries work the same on macOS and Linux:
 
 ```cron
 PROJ=/path/to/portfolio-wave-rider
