@@ -75,14 +75,14 @@ Install with `crontab -e` and paste. Adjust `PROJ` to your clone path. Verify wi
 
 | File | What's in it | When to look |
 |---|---|---|
-| `docs/index.html` | Eight Plotly charts (1: portfolio value over time **with SPY overlay**; 2: per-ticker recommended portfolio % drift; 3: latest recommended portfolio % bar chart; 4: cumulative $ gain per holding over the snapshot window — green/red bars showing each ticker's realized P&L contribution; 5: per-wave stage trajectories accumulating across `/review-portfolio` runs; 6: articles harvested per wave over time, computed from each archived `data/news/<date>-news.json` file — answers "is the wave-stage call backed by lots of evidence on each date?"; 7: $ allocated by asset class over time; 8: $ allocated by wave over time, log y-axis) plus two news sections: "Today's headlines" (refreshed daily by cron from yfinance) and "In-depth news from last `/review-portfolio`" (LLM portfolio-relevance summaries with wave-stage classification, refreshed monthly). Same file is what GitHub Pages serves at the public-demo URL. | Open in a browser any time |
-| `data/news_feed.json` | Daily Yahoo Finance headlines per ticker (refreshed by cron). Headline + first-paragraph summary + source + URL + date. ~5 bullets per ticker. Drives the dashboard's "Today's headlines" section. | If you want raw daily headline coverage |
-| `data/wave_history.csv` | Long-format per-wave stage history: `date, wave, stage, evidence_tickers, rationale, seeded`. One row per wave per classification event. `seeded=True` rows are post-hoc judgments from `seed-wave-history`; `seeded=False` rows come from organic `/review-portfolio` runs (or from running the news-researcher with strict as-of-date instructions, which can be folded into the same file). Drives the wave-stage trajectory chart on the dashboard. | If you want raw history of how each wave has been classified over time |
-| `data/news/YYYY-MM-DD-news.json` | Full archived news payload from each `/review-portfolio` run (per-ticker bullets with headline + summary). About 25 KB per run; accumulates with no pruning. | When the dashboard chart shows a wave-stage shift and you want to re-read what news was driving the LLM's call on that date |
-| `data/snapshots.csv` | Long-format daily snapshots: `date, ticker, shares, price, value, total_value` | Raw history; load with pandas |
-| `data/recommendations.csv` | Long-format weekly optimizer output: `date, ticker, weight, expected_return, annual_volatility, sharpe_ratio, objective` | Raw history; load with pandas |
-| `data/reports/*.md` | LLM-written narrative reports, one per `/review-portfolio` run | After each `/review-portfolio` |
-| `data/snapshot.log`, `data/recommend.log` | cron stdout/stderr | If a scheduled run looks missing |
+| `docs/index.html` | Eight Plotly charts plus a "Today's headlines" and "In-depth news" section. Same file GitHub Pages serves. | Open in a browser any time |
+| `data/news_feed.json` | Daily yfinance headlines per ticker. ~5 bullets each. Drives the "Today's headlines" section. | Raw daily headline coverage |
+| `data/wave_history.csv` | Per-wave stage classifications over time. Drives chart 5 (wave-stage trajectory). | Raw wave-classification history |
+| `data/news/YYYY-MM-DD-news.json` | Full archived news payload per `/review-portfolio` run (~25 KB each). | Forensic re-read after a stage shift |
+| `data/snapshots.csv` | Long-format daily snapshots (date, ticker, shares, price, value, total_value). | Raw price/share history |
+| `data/recommendations.csv` | Long-format weekly optimizer output (date, ticker, weight, return, vol, Sharpe, objective). | Raw weight history |
+| `data/reports/*.md` | LLM-written narrative reports, one per `/review-portfolio` run. | After each `/review-portfolio` |
+| `data/snapshot.log`, `data/recommend.log` | cron stdout/stderr. | If a scheduled run looks missing |
 
 The "Profile conflicts" section of any report is the most important thing to read. It tells you when the optimizer wanted something the profile forbids.
 
