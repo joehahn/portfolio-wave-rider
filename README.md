@@ -2,10 +2,10 @@
 
 **Author:** Joe Hahn  
 **Email:** jmh.datasciences@gmail.com  
-**Date:** 2026-May-04 <br>
+**Date:** 2026-May-08 <br>
 **branch:** main
 
-A Claude Code demo: optimize a long-horizon portfolio of stocks and ETFs against a user-authored investor profile. One slash command, two LLM subagents, eight Python CLI subcommands, and a static dashboard. Stack: yfinance for prices (free Python wrapper around Yahoo Finance's historical close-price API), scipy.optimize for picking portfolio weights (maximizes risk-adjusted return subject to no-shorting and a per-asset weight cap), pandas for everything in between, Plotly for the dashboard.
+A Claude Code demo for long-horizon portfolio construction. You declare your goals, constraints, and a wave thesis (which technology waves you believe will drive future returns) in `investor_profile.md`, plus a watchlist of tickers in `holdings.csv`. The system pulls the last few years of price history via yfinance, runs a mean-variance optimizer (scipy.optimize) over those tickers, and recommends weights that maximize risk-adjusted return subject to your concentration cap and asset-class targets. A monthly `/review-portfolio` slash command sends two Claude subagents out for fresh news per ticker, classifies each wave's stage (buildup → surge → peak → digestion), tilts the optimizer's expected-return vector accordingly, and writes a profile-aware report. The result accumulates into a static Plotly dashboard so you can watch the recommended weights, the wave classifications, and the realized portfolio value evolve over time.
 
 **Live demo:** [joehahn.github.io/portfolio-wave-rider](https://joehahn.github.io/portfolio-wave-rider/). A snapshot of the dashboard generated against the example profile and watchlist. Refreshed manually; the timestamp inside the "Latest news" section tells you the date.
 
