@@ -70,10 +70,12 @@ Two cron entries handle the daily and weekly automation. The exact crontab insta
 ```cron
 PROJ=/Users/joehahn/Library/CloudStorage/Dropbox/prog/claude/portfolio-wave-rider
 # Daily snapshot + dashboard refresh, Mon-Fri 16:30 local
-30 16 * * 1-5  cd $PROJ && .venv/bin/python -m src.cli snapshot && .venv/bin/python -m src.cli news-feed && .venv/bin/python -m src.cli dashboard >> data/snapshot.log 2>&1
+30 16 * * 1-5  cd $PROJ && .venv/bin/python -m src.cli snapshot && .venv/bin/python -m src.cli news-feed && .venv/bin/python -m src.cli dashboard && .venv/bin/python -m src.cli dashboard --out docs/index.html --nav-current live >> data/snapshot.log 2>&1
 # Weekly recommend + dashboard refresh, Fri 17:00 local
-0  17 * * 5    cd $PROJ && .venv/bin/python -m src.cli recommend && .venv/bin/python -m src.cli dashboard >> data/recommend.log 2>&1
+0  17 * * 5    cd $PROJ && .venv/bin/python -m src.cli recommend && .venv/bin/python -m src.cli dashboard && .venv/bin/python -m src.cli dashboard --out docs/index.html --nav-current live >> data/recommend.log 2>&1
 ```
+
+Each cron call renders two dashboards: the local `data/dashboard.html` (no nav strip) and the public-demo `docs/index.html` (with nav strip linking to backtest/sweep pages). The local file is gitignored; `docs/index.html` is git-tracked but not auto-pushed — `git status` will show it modified after each cron run, and a manual `git add docs/index.html && git commit && git push` publishes the refresh.
 
 Set `PROJ` to wherever you cloned the repo, then `crontab -e` and paste. Works the same on macOS and Linux. cron only fires when the machine is awake at the trigger time; missed runs do not auto-replay. Use `--date YYYY-MM-DD` to backfill.
 

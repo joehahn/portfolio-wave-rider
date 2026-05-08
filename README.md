@@ -18,8 +18,8 @@ Three slash commands plus two cron jobs. Two dashboards published to GitHub Page
 | Cadence | Mechanism | What runs | Output |
 |---|---|---|---|
 | Once, on a fresh repo | You run `/initialize-portfolio` in Claude Code | Reads the profile, proposes a thesis-driven dollar allocation across the watchlist (no math, just the wave thesis + asset-class targets + exclusions), calls `init-holdings` to convert dollars to shares, runs `snapshot --force`, persists the allocation to `data/thesis_baseline.json`, and writes a thesis-only report. No optimizer, no news. | `holdings.csv` (populated), `data/thesis_baseline.json`, `data/snapshots.csv` (first row), `data/reports/YYYY-MM-DD-initialize-portfolio.md`, `docs/index.html` |
-| Daily, Mon-Fri 16:30 local | cron | `snapshot && news-feed && dashboard`. Fetches the latest close price for every ticker in `holdings.csv`, multiplies by `shares`, appends one row per ticker to `data/snapshots.csv`. Then pulls fresh Yahoo Finance headlines per ticker into `data/news_feed.json`. Then refreshes the live dashboard. | `data/snapshots.csv`, `data/news_feed.json`, `data/dashboard.html` |
-| Weekly, Fri 17:00 local | cron | `recommend && dashboard`. Re-runs the mean-variance optimizer over the holdings universe, appends new target weights to `data/recommendations.csv`, refreshes the dashboard. No news, no wave tilts. | `data/recommendations.csv`, `data/dashboard.html` |
+| Daily, Mon-Fri 16:30 local | cron | `snapshot && news-feed && dashboard && dashboard --out docs/index.html --nav-current live`. Fetches the latest close price for every ticker in `holdings.csv`, multiplies by `shares`, appends one row per ticker to `data/snapshots.csv`. Then pulls fresh Yahoo Finance headlines per ticker into `data/news_feed.json`. Then refreshes both the local `data/dashboard.html` and the public `docs/index.html`. | `data/snapshots.csv`, `data/news_feed.json`, `data/dashboard.html`, `docs/index.html` |
+| Weekly, Fri 17:00 local | cron | `recommend && dashboard && dashboard --out docs/index.html --nav-current live`. Re-runs the mean-variance optimizer over the holdings universe, appends new target weights to `data/recommendations.csv`, refreshes both dashboards. No news, no wave tilts. | `data/recommendations.csv`, `data/dashboard.html`, `docs/index.html` |
 | Monthly, you decide | You run `/review-portfolio` in Claude Code | LLM subagents gather wave-aligned news (30-day lookback), classify each wave's stage, pass `wave_views` to the optimizer (which scales `μ` accordingly), then write a profile-aware report and refresh the live dashboard. The run also appends today's wave-stage classifications to `data/wave_history.csv` (drives the trajectory chart) and archives the full news payload to `data/news/<date>-news.json`. If `data/thesis_baseline.json` exists (it should, after `/initialize-portfolio`), every report re-renders the thesis-vs-recommended comparison. | `data/reports/YYYY-MM-DD-review-portfolio.md`, `docs/index.html` (refreshed), `data/wave_history.csv` (appended), `data/news/<date>-news.json` |
 | On demand, you decide | You run `/run-backtest` in Claude Code | Walk-forward weekly-rebalance backtest of the optimizer over a 12-month window, applying the wave-stage tilts that were known at each historical Friday (from `data/wave_history.csv`). Pure Python, no LLM. Auto-renders both the local backtest dashboard and the public `docs/backtest.html`. | `data/backtest/{snapshots,recommendations}.csv`, `data/backtest/dashboard.html`, `docs/backtest.html` |
 
@@ -140,17 +140,20 @@ If you want the daily snapshot and weekly recommend to run automatically, instal
 ```cron
 PROJ=/path/to/portfolio-wave-rider
 # Daily snapshot + news-feed + dashboard refresh, Mon-Fri 16:30 local
-30 16 * * 1-5  cd $PROJ && .venv/bin/python -m src.cli snapshot && .venv/bin/python -m src.cli news-feed && .venv/bin/python -m src.cli dashboard >> data/snapshot.log 2>&1
+30 16 * * 1-5  cd $PROJ && .venv/bin/python -m src.cli snapshot && .venv/bin/python -m src.cli news-feed && .venv/bin/python -m src.cli dashboard && .venv/bin/python -m src.cli dashboard --out docs/index.html --nav-current live >> data/snapshot.log 2>&1
 # Weekly recommend + dashboard refresh, Fri 17:00 local
-0  17 * * 5    cd $PROJ && .venv/bin/python -m src.cli recommend && .venv/bin/python -m src.cli dashboard >> data/recommend.log 2>&1
+0  17 * * 5    cd $PROJ && .venv/bin/python -m src.cli recommend && .venv/bin/python -m src.cli dashboard && .venv/bin/python -m src.cli dashboard --out docs/index.html --nav-current live >> data/recommend.log 2>&1
 ```
+
+Each cron call renders two dashboards: the local `data/dashboard.html` (gitignored, no nav strip) and the public-demo `docs/index.html` (git-tracked, with nav strip). cron does not push to git — `git status` will show `docs/index.html` modified after each run, and a manual `git add docs/index.html && git commit && git push` publishes the refresh.
 
 Install with `crontab -e` and paste. Adjust `PROJ` to your clone path. Verify with `crontab -l`. cron only fires while the machine is awake; missed runs do not auto-replay. Use `--date YYYY-MM-DD` on either subcommand to backfill.
 
 ## Operations
 
-- Daily: nothing. The cron job appends a row per ticker to `data/snapshots.csv` and refreshes `data/dashboard.html`.
-- Weekly: nothing. Friday 17:00 local appends one optimization run to `data/recommendations.csv` and refreshes the dashboard.
+- Daily: nothing. The cron job appends a row per ticker to `data/snapshots.csv` and refreshes both `data/dashboard.html` and `docs/index.html`.
+- Weekly: nothing. Friday 17:00 local appends one optimization run to `data/recommendations.csv` and refreshes both dashboards.
+- Whenever you want to publish the cron-refreshed public dashboard: `git add docs/index.html && git commit -m "Refresh live dashboard" && git push`. cron does not auto-push.
 - Monthly: run `/review-portfolio` in Claude Code. Read the report, decide on rebalances, execute trades in your brokerage, then update `holdings.csv`.
 - Anytime: open `data/dashboard.html` in a browser.
 - After trading: edit `holdings.csv` to reflect new share counts. The next snapshot picks up the new positions.
