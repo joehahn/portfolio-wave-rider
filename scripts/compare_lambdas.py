@@ -1,7 +1,9 @@
 """Walk-forward backtest swept across mean_variance risk-aversion (lambda) values.
 
 For each lambda in LAMBDAS, runs a 12-month weekly-rebalance walk-forward
-on the 12-ticker watchlist with the mean_variance objective. Aggregates
+on the 12-ticker watchlist with the mean_variance objective. Each rebalance
+applies time-varying wave-stage tilts looked up as-of-date from
+data/wave_history.csv (same source as the headline backtest). Aggregates
 all curves into one Plotly chart plus a summary table.
 
 Output: data/backtest/lambda_comparison.html and docs/lambda_comparison.html.
@@ -13,7 +15,10 @@ import pandas as pd
 import yfinance as yf
 import plotly.graph_objects as go
 
-from src.portfolio import compute_returns, optimize_portfolio, _fetch_benchmark_curves, _render_nav_strip
+from src.portfolio import (
+    compute_returns, optimize_portfolio, _fetch_benchmark_curves,
+    _render_nav_strip, TICKER_WAVE,
+)
 
 TICKERS = ["AGG", "BIL", "IAU", "GOOGL", "RKLB", "NVDA", "MSFT", "BOTZ", "ARKG", "QTUM", "NUKZ", "VIG"]
 LAMBDAS = [0.0, 0.33, 1.0, 3.3, 10.0, 33.3]
@@ -23,11 +28,30 @@ INITIAL_USD = 50_000.0
 LOOKBACK_YEARS = 3
 MAX_WEIGHT = 0.25
 RISK_FREE = 0.04
+WAVE_HISTORY_PATH = "data/wave_history.csv"
 
 
-def run_walk_forward(prices: pd.DataFrame, daily_dates, lam: float) -> pd.Series:
+def wave_views_at(wh_df: pd.DataFrame, date: pd.Timestamp) -> dict[str, str] | None:
+    """Build {ticker: stage} from the most recent wave_history row at-or-before date.
+    Mirrors the as-of-date lookup in src.portfolio.backtest so the lambda sweep
+    sees the same time-varying tilts the headline backtest does."""
+    relevant = wh_df[wh_df["date"] <= date]
+    if relevant.empty:
+        return None
+    latest_date = relevant["date"].max()
+    latest = relevant[relevant["date"] == latest_date]
+    wave_to_stage = dict(zip(latest["wave"], latest["stage"]))
+    return {
+        t: wave_to_stage.get(TICKER_WAVE.get(t, "general_markets"), "neutral")
+        for t in TICKERS
+    }
+
+
+def run_walk_forward(prices: pd.DataFrame, daily_dates, lam: float,
+                     wh_df: pd.DataFrame) -> pd.Series:
     """Walk-forward backtest under mean_variance with this lambda. Returns
-    a Series of portfolio total value indexed by trading day."""
+    a Series of portfolio total value indexed by trading day. wave_views are
+    looked up as-of-date from wh_df at each Friday rebalance."""
     shares = None
     values = []
     for date in daily_dates:
@@ -42,6 +66,7 @@ def run_walk_forward(prices: pd.DataFrame, daily_dates, lam: float) -> pd.Series
             opt = optimize_portfolio(
                 returns, objective="mean_variance", risk_free_rate=RISK_FREE,
                 max_weight=MAX_WEIGHT, risk_aversion=lam,
+                wave_views=wave_views_at(wh_df, date),
             )
             if not opt.get("success"):
                 continue
@@ -65,11 +90,15 @@ prices = raw["Close"].dropna(how="all").ffill().dropna()
 daily_dates = prices.loc[START:END].index
 print(f"{len(daily_dates)} trading days in [{START.date()}, {END.date()}]")
 
+# Load the as-of-date wave history once; reused at every rebalance.
+print(f"loading wave history from {WAVE_HISTORY_PATH} ...")
+wh_df = pd.read_csv(WAVE_HISTORY_PATH, parse_dates=["date"])
+
 # Run a walk-forward per lambda.
 curves: dict[float, pd.Series] = {}
 for lam in LAMBDAS:
     print(f"running mean_variance walk-forward, λ={lam} ...")
-    curves[lam] = run_walk_forward(prices, daily_dates, lam)
+    curves[lam] = run_walk_forward(prices, daily_dates, lam, wh_df)
 
 # SPY benchmark, rebased to the same starting value.
 spy = _fetch_benchmark_curves(["SPY"], daily_dates[0], daily_dates[-1], INITIAL_USD)["SPY"]
@@ -128,7 +157,7 @@ rows = "".join(
     for lam in LAMBDAS
 )
 table_html = (
-    f"<h2>Summary, {START.date()} to {END.date()}, 12-ticker watchlist (no wave tilts)</h2>"
+    f"<h2>Summary, {START.date()} to {END.date()}, 12-ticker watchlist with wave tilts</h2>"
     f"<table style='border-collapse:collapse;font-size:0.95em'>"
     f"<thead><tr style='border-bottom:1px solid #888'>"
     f"<th style='padding:4px 12px;text-align:right'>λ</th>"
@@ -146,7 +175,7 @@ table_html = (
     f"SPY benchmark return over the same window: {spy_return*100:+.2f}%. "
     f"This is one path through history; the AI / data-center electricity narrative "
     f"drove tech and nuclear-energy ETFs hard over this specific 12-month window. "
-    f"Backtest is the lightweight Python-only path: no news, no wave-stage tilts. "
+    f"Backtest applies the as-of-date wave-stage tilts from data/wave_history.csv at each weekly rebalance — same as the headline backtest path. "
     f"</p>"
 )
 
@@ -160,8 +189,9 @@ chart_caption = (
     f"<p style='color:#666;font-size:0.9em;max-width:65em;margin:0 auto;padding:0 1.5em;'>"
     f"<i>Walk-forward 12-month backtest run six times, once per λ (risk-aversion parameter "
     f"in the mean_variance utility μᵀw - λ·wᵀΣw). Each line is the same simulation with a "
-    f"different λ, holding wave classifications constant across the window. SPY rebased "
-    f"to share the starting value.</i>"
+    f"different λ, with time-varying wave-stage tilts looked up as-of-date from "
+    f"data/wave_history.csv at each weekly rebalance — same source as the headline backtest. "
+    f"SPY rebased to share the starting value.</i>"
     f"</p>"
 )
 
