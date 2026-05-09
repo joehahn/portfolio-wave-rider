@@ -42,7 +42,7 @@ Nine subcommands. `/review-portfolio` calls `init-holdings` (first-run branch on
 # (math-only; no LLM cost at the math layer). Writes data/backtest/{snapshots,
 # recommendations}.csv plus data/backtest/report.md with realized return, max
 # drawdown, weight stability, and per-benchmark active-return comparison
-# (default SPY). Default window is 12 months ending yesterday. Auto-renders
+# (default SPY). Default window is a rolling 12 months ending today (yfinance silently clips to whatever trading day has data, so a mid-session run just stops at yesterday's close). Auto-renders
 # both data/backtest/dashboard.html and docs/backtest.html.
 .venv/bin/python -m src.cli backtest [--start-date YYYY-MM-DD] [--end-date YYYY-MM-DD] [--initial-usd 50000] [--benchmarks SPY DIA QQQ]
 

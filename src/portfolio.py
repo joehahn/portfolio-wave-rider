@@ -565,8 +565,11 @@ def backtest(
     # than the 3y optimizer lookback (e.g., NUKZ, listed Nov 2024) get a
     # thin μ estimate in early weeks; the lookback is the real constraint
     # on young-ticker statistics, not the backtest window length.
-    end = pd.Timestamp(end_date) if end_date else pd.Timestamp.today().normalize() - pd.Timedelta(days=1)
-    start = pd.Timestamp(start_date) if start_date else end - pd.Timedelta(days=365)
+    # Default to a rolling 12-month window ending today. yfinance silently
+    # clips to whatever trading day actually has data (so running before
+    # today's market close just stops at yesterday's price).
+    end = pd.Timestamp(end_date) if end_date else pd.Timestamp.today().normalize()
+    start = pd.Timestamp(start_date) if start_date else end - pd.DateOffset(years=1)
     if start >= end:
         raise ValueError(f"start_date ({start.date()}) must be before end_date ({end.date()})")
 
