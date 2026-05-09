@@ -1516,6 +1516,26 @@ def build_dashboard(
     latest_weights: pd.DataFrame | None = None
     if rec_path.exists():
         recs = pd.read_csv(rec_path, parse_dates=["date"])
+        # Prepend the thesis allocation as the t=thesis_date starting
+        # point so chart 2 begins on the same date as the other charts
+        # (recommendations.csv only carries weekly Friday rows, so
+        # without this it starts on the first post-thesis Friday and
+        # leaves a visible gap from the snapshot/asset/wave-$ charts).
+        if thesis_date is not None and thesis_baseline_path:
+            tb_path = Path(thesis_baseline_path)
+            if tb_path.exists():
+                try:
+                    tb = json.loads(tb_path.read_text())
+                    alloc = tb.get("allocations_usd", {})
+                    total = sum(alloc.values())
+                    if total > 0 and not (recs["date"] == thesis_date).any():
+                        thesis_rows = pd.DataFrame([
+                            {"date": thesis_date, "ticker": t, "weight": v / total}
+                            for t, v in alloc.items()
+                        ])
+                        recs = pd.concat([thesis_rows, recs], ignore_index=True)
+                except (OSError, json.JSONDecodeError, ValueError):
+                    pass
         recs["wave_bucket"] = recs["ticker"].map(
             lambda t: TICKER_WAVE.get(t, "general_markets")
         )
@@ -1615,7 +1635,7 @@ def build_dashboard(
 
     # 5. Wave-stage trajectories (one line per wave, from wave_history.csv).
     if wh_path.exists():
-        wh = pd.read_csv(wh_path, parse_dates=["date"])
+        wh = _filter_post_thesis(pd.read_csv(wh_path, parse_dates=["date"]))
         wh["stage_rank"] = wh["stage"].map(WAVE_STAGE_RANK).fillna(0).astype(int)
         # Order legend by display priority so AI is at the top, general_markets last.
         ordered = sorted(
@@ -1661,7 +1681,7 @@ def build_dashboard(
             for wave, n in counts.items():
                 article_rows.append({"date": pd.Timestamp(d), "wave": wave, "count": n})
         if article_rows:
-            adf = pd.DataFrame(article_rows)
+            adf = _filter_post_thesis(pd.DataFrame(article_rows))
             for wave in [w for w in _WAVE_DISPLAY_ORDER if w in adf["wave"].unique()]:
                 sub = adf[adf["wave"] == wave].sort_values("date")
                 fig.add_trace(
