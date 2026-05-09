@@ -1,0 +1,187 @@
+"""Walk-forward backtest swept across mean_variance risk-aversion (lambda) values.
+
+For each lambda in LAMBDAS, runs a 12-month weekly-rebalance walk-forward
+on the 12-ticker watchlist with the mean_variance objective. Aggregates
+all curves into one Plotly chart plus a summary table.
+
+Output: data/backtest/lambda_comparison.html and docs/lambda_comparison.html.
+"""
+from __future__ import annotations
+
+import numpy as np
+import pandas as pd
+import yfinance as yf
+import plotly.graph_objects as go
+
+from src.portfolio import compute_returns, optimize_portfolio, _fetch_benchmark_curves, _render_nav_strip
+
+TICKERS = ["AGG", "BIL", "IAU", "GOOGL", "RKLB", "NVDA", "MSFT", "BOTZ", "ARKG", "QTUM", "NUKZ", "VIG"]
+LAMBDAS = [0.0, 0.33, 1.0, 3.3, 10.0, 33.3]
+START = pd.Timestamp("2025-05-04")
+END = pd.Timestamp("2026-05-04")
+INITIAL_USD = 50_000.0
+LOOKBACK_YEARS = 3
+MAX_WEIGHT = 0.25
+RISK_FREE = 0.04
+
+
+def run_walk_forward(prices: pd.DataFrame, daily_dates, lam: float) -> pd.Series:
+    """Walk-forward backtest under mean_variance with this lambda. Returns
+    a Series of portfolio total value indexed by trading day."""
+    shares = None
+    values = []
+    for date in daily_dates:
+        is_friday = date.weekday() == 4
+        is_first = date == daily_dates[0]
+        if is_friday or (is_first and shares is None):
+            lookback_start = date - pd.Timedelta(days=365 * LOOKBACK_YEARS)
+            slice_prices = prices.loc[lookback_start:date]
+            if len(slice_prices) < 30:
+                continue
+            returns = compute_returns(slice_prices)
+            opt = optimize_portfolio(
+                returns, objective="mean_variance", risk_free_rate=RISK_FREE,
+                max_weight=MAX_WEIGHT, risk_aversion=lam,
+            )
+            if not opt.get("success"):
+                continue
+            weights = opt["weights"]
+            pv = INITIAL_USD if shares is None else sum(
+                shares[t] * float(prices.loc[date, t]) for t in TICKERS
+            )
+            shares = {t: weights[t] * pv / float(prices.loc[date, t]) for t in TICKERS}
+        if shares is not None:
+            total = sum(shares[t] * float(prices.loc[date, t]) for t in TICKERS)
+            values.append((date, total))
+    return pd.Series({d: v for d, v in values}, name=f"λ={lam}")
+
+
+# Fetch prices once.
+print(f"fetching prices for {len(TICKERS)} tickers, {LOOKBACK_YEARS}y + window...")
+fetch_start = START - pd.Timedelta(days=365 * LOOKBACK_YEARS + 30)
+raw = yf.download(TICKERS, start=fetch_start, end=END + pd.Timedelta(days=1),
+                  auto_adjust=True, progress=False, group_by="column")
+prices = raw["Close"].dropna(how="all").ffill().dropna()
+daily_dates = prices.loc[START:END].index
+print(f"{len(daily_dates)} trading days in [{START.date()}, {END.date()}]")
+
+# Run a walk-forward per lambda.
+curves: dict[float, pd.Series] = {}
+for lam in LAMBDAS:
+    print(f"running mean_variance walk-forward, λ={lam} ...")
+    curves[lam] = run_walk_forward(prices, daily_dates, lam)
+
+# SPY benchmark, rebased to the same starting value.
+spy = _fetch_benchmark_curves(["SPY"], daily_dates[0], daily_dates[-1], INITIAL_USD)["SPY"]
+
+# Summary table.
+def summarize(s: pd.Series) -> dict[str, float]:
+    log_rets = np.log(s / s.shift(1)).dropna()
+    realized = float(s.iloc[-1] / s.iloc[0] - 1.0)
+    annualized_vol = float(log_rets.std() * np.sqrt(252))
+    excess = log_rets - RISK_FREE / 252
+    sharpe = float(excess.mean() / excess.std() * np.sqrt(252))
+    peak = np.maximum.accumulate(s.values)
+    max_dd = float(((s.values - peak) / peak).min())
+    return {"final": float(s.iloc[-1]), "return": realized,
+            "vol": annualized_vol, "sharpe": sharpe, "max_dd": max_dd}
+
+stats = {lam: summarize(curve) for lam, curve in curves.items()}
+spy_return = float(spy.iloc[-1] / spy.iloc[0] - 1.0)
+
+# Figure: portfolio value over time, one line per λ + SPY.
+fig = go.Figure()
+# Use a color gradient from low-λ (return-greedy, red) to high-λ (variance-averse, blue).
+n = len(LAMBDAS)
+for i, lam in enumerate(LAMBDAS):
+    # red -> purple -> blue gradient.
+    t = i / max(n - 1, 1)
+    r = int(220 * (1 - t)); g = int(80 + 30 * t); b = int(60 + 195 * t)
+    color = f"rgb({r},{g},{b})"
+    s = curves[lam]
+    fig.add_trace(go.Scatter(x=s.index, y=s.values, mode="lines",
+                             name=f"λ={lam}", line={"width": 2, "color": color},
+                             hovertemplate=f"λ={lam}<br>%{{x|%Y-%m-%d}}<br>$%{{y:,.0f}}<extra></extra>"))
+fig.add_trace(go.Scatter(x=spy.index, y=spy.values, mode="lines",
+                         name="SPY (rebased)", line={"width": 1.5, "color": "#444", "dash": "dash"},
+                         hovertemplate="SPY<br>%{x|%Y-%m-%d}<br>$%{y:,.0f}<extra></extra>"))
+
+fig.update_layout(
+    title="Portfolio value over time, mean_variance objective swept across λ",
+    xaxis_title="date",
+    yaxis_title="$",
+    height=600,
+    hovermode="closest",
+    legend={"title_text": "Risk-aversion λ"},
+)
+
+# Build the summary table HTML.
+rows = "".join(
+    f"<tr><td style='text-align:right;font-family:monospace'>λ = {lam}</td>"
+    f"<td style='text-align:right;font-family:monospace'>${stats[lam]['final']:,.0f}</td>"
+    f"<td style='text-align:right;font-family:monospace'>{stats[lam]['return']*100:+.2f}%</td>"
+    f"<td style='text-align:right;font-family:monospace'>{stats[lam]['vol']*100:.2f}%</td>"
+    f"<td style='text-align:right;font-family:monospace'>{stats[lam]['sharpe']:.2f}</td>"
+    f"<td style='text-align:right;font-family:monospace'>{stats[lam]['max_dd']*100:.2f}%</td>"
+    f"<td style='text-align:right;font-family:monospace'>{(stats[lam]['return']-spy_return)*100:+.2f}pp</td>"
+    f"</tr>"
+    for lam in LAMBDAS
+)
+table_html = (
+    f"<h2>Summary, {START.date()} to {END.date()}, 12-ticker watchlist (no wave tilts)</h2>"
+    f"<table style='border-collapse:collapse;font-size:0.95em'>"
+    f"<thead><tr style='border-bottom:1px solid #888'>"
+    f"<th style='padding:4px 12px;text-align:right'>λ</th>"
+    f"<th style='padding:4px 12px;text-align:right'>Final value</th>"
+    f"<th style='padding:4px 12px;text-align:right'>Realized return</th>"
+    f"<th style='padding:4px 12px;text-align:right'>Annualized vol</th>"
+    f"<th style='padding:4px 12px;text-align:right'>Realized Sharpe</th>"
+    f"<th style='padding:4px 12px;text-align:right'>Max drawdown</th>"
+    f"<th style='padding:4px 12px;text-align:right'>vs SPY</th>"
+    f"</tr></thead><tbody>{rows}</tbody></table>"
+    f"<p style='color:#666;font-size:0.9em;max-width:65em'>"
+    f"Each λ corresponds to a different point on the Markowitz efficient frontier. "
+    f"λ → 0 ignores variance (return-greedy: equity-heavy, big swings); "
+    f"λ → ∞ ignores return (variance-averse: defensive ballast). "
+    f"SPY benchmark return over the same window: {spy_return*100:+.2f}%. "
+    f"This is one path through history; the AI / data-center electricity narrative "
+    f"drove tech and nuclear-energy ETFs hard over this specific 12-month window. "
+    f"Backtest is the lightweight Python-only path: no news, no wave-stage tilts. "
+    f"</p>"
+)
+
+# Write the standalone HTML.
+import pathlib
+out_paths = [
+    pathlib.Path("data/backtest/lambda_comparison.html"),
+    pathlib.Path("docs/lambda_comparison.html"),
+]
+chart_caption = (
+    f"<p style='color:#666;font-size:0.9em;max-width:65em;margin:0 auto;padding:0 1.5em;'>"
+    f"<i>Walk-forward 12-month backtest run six times, once per λ (risk-aversion parameter "
+    f"in the mean_variance utility μᵀw - λ·wᵀΣw). Each line is the same simulation with a "
+    f"different λ, holding wave classifications constant across the window. SPY rebased "
+    f"to share the starting value.</i>"
+    f"</p>"
+)
+
+nav_html = _render_nav_strip("lambda")
+
+for p in out_paths:
+    p.parent.mkdir(parents=True, exist_ok=True)
+    fig.write_html(str(p), include_plotlyjs="cdn")
+    # Inject the cross-page nav strip just after <body> so this page links
+    # back to the live dashboard, backtest, and concentration sweep.
+    html = p.read_text(encoding="utf-8")
+    p.write_text(html.replace("<body>", "<body>\n" + nav_html, 1), encoding="utf-8")
+    with p.open("a", encoding="utf-8") as f:
+        f.write("\n" + chart_caption + "\n" + table_html + "\n")
+    print(f"wrote {p}")
+
+print()
+print(f"{'λ':>8} {'Final':>11} {'Return':>9} {'Vol':>7} {'Sharpe':>7} {'MaxDD':>8} {'vs SPY':>9}")
+for lam in LAMBDAS:
+    s = stats[lam]
+    print(f"{lam:>8.2f} {s['final']:>11,.0f} {s['return']*100:>+8.2f}% {s['vol']*100:>6.2f}% "
+          f"{s['sharpe']:>7.2f} {s['max_dd']*100:>+7.2f}% {(s['return']-spy_return)*100:>+8.2f}pp")
+print(f"     SPY {spy.iloc[-1]:>11,.0f} {spy_return*100:>+8.2f}%")
