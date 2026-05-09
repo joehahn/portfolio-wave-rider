@@ -124,6 +124,8 @@ with the multipliers loaded from the profile's `financial_model.wave_stage_tilts
 
 This is why the optimizer often zeros tickers with bullish wave views (BOTZ, ARKG, MSFT in recent runs). The tilt isn't strong enough to override the volatility / covariance penalty for those tickers given the 3y lookback. The "Profile conflicts" section of the report flags exactly that gap — the wave-thesis prior pulled one direction; the data pulled another. A ±20% bump in μ is meaningful but deliberately modest: a single news pass plus an LLM judgment is fairly weak evidence, so the tilts nudge weights rather than dictate them.
 
+For a single-page consolidation of the entire wave-stage pipeline (LLM judgment process, math, history-storage, as-of-date lookup, look-ahead-bias caveat) see [docs/wave-stage-classification.md](docs/wave-stage-classification.md).
+
 ## How it's built
 
 - Three skills at `.claude/skills/`:

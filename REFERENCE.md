@@ -107,7 +107,8 @@ portfolio-wave-rider/
     ├── index.html              # public live dashboard
     ├── backtest.html           # public 12-month backtest dashboard
     ├── lambda_comparison.html  # mean_variance λ sweep
-    └── max_weight_comparison.html  # concentration_cap sweep
+    ├── max_weight_comparison.html  # concentration_cap sweep
+    └── wave-stage-classification.md  # consolidated doc on wave-stage pipeline
 ```
 
 ## Testing
