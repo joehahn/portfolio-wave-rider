@@ -1,0 +1,15 @@
+{
+  "date": "2025-10-31",
+  "as_of_mode": "strict_historical_replay",
+  "lookback_days": 30,
+  "wave_stages": {
+    "AI": {"stage": "surge", "rationale": "GOOGL first $100B quarter Q3 (Cloud +34%, gen AI revenue +200% YoY, capex raised to $91-93B); MSFT Q1 FY26 Azure +40%, $77.7B revenue; NVDA $5.03T market cap Oct 29 pre-Q3; Blackwell 'sold out' across cloud providers ($95B supply commitments). Real revenue compounding.", "evidence_tickers": ["GOOGL", "MSFT", "NVDA"]},
+    "rockets_spacecraft": {"stage": "buildup", "rationale": "RKLB iQPS multi-launch contract Oct 7; backlog $2.2B+; Neutron still 'green light' for 2025 first flight as of late August (no delay announced as of Oct 31). Q3 earnings not yet released. Pre-Neutron commercial inflection.", "evidence_tickers": ["RKLB"]},
+    "robotics": {"stage": "buildup", "rationale": "Figure 03 launched Oct 9 (Helix VLA AI, $20K target, 12K units 2026 ramp, late-2026 consumer availability); Tesla Optimus Gen 3 demo Oct 7, V3 teased for Q1 2026, 1,000+ internal Tesla units, zero external sales; Boston Dynamics+TRI LBM Atlas demo Aug 26. Real research and product launches but no commercial-scale humanoid revenue yet. NOTE: as-of-Oct-31 evidence does NOT support 'surge' — Q2 2026 Optimus production figures are post-window.", "evidence_tickers": ["BOTZ"]},
+    "engineered_biology": {"stage": "digestion", "rationale": "Intellia MAGNITUDE-2 clinical hold Oct 27-29 — Grade 4 liver toxicity, NTLA -23% on news. Major Phase 3 setback for ARK's largest gene-editing position; sentiment hit broadly. Long-term thesis intact but near-term NAV hostage to trial outcomes.", "evidence_tickers": ["ARKG"]},
+    "quantum": {"stage": "buildup", "rationale": "QTUM topped $3B AUM Oct 27 (5-star Morningstar, 36.7% YTD); Google Willow chip first verifiable quantum advantage Oct 22-23 (13,000x faster on Quantum Echoes algorithm, Nature publication). BCG market projection $90-170B by 2040 — pre-commercial.", "evidence_tickers": ["QTUM", "GOOGL"]},
+    "nuclear_fusion": {"stage": "buildup", "rationale": "No publicly traded pure-play fusion companies. NUKZ AUM only $56.8M, primarily fission/utilities (Cameco 9.7%, GE Vernova 3.65%, Talen 3.13%). AI-data-center PPAs (MSFT TMI restart, GOOGL Kairos, AMZN X-energy) drive fission demand. Fusion pre-commercial.", "evidence_tickers": ["NUKZ"]},
+    "general_markets": {"stage": "neutral", "rationale": "Fed cut 25bp Oct 29 to 3.75-4.0%, Powell signaled December cut not guaranteed. Gold broke $4,000/oz, briefly above $4,200 (central bank Q3 2025 demand 50% above prior 4Q average). AGG faces mixed duration signal.", "evidence_tickers": ["AGG", "BIL", "IAU", "VIG"]}
+  },
+  "wave_views": {"NVDA": "surge", "GOOGL": "surge", "MSFT": "surge", "RKLB": "buildup", "BOTZ": "buildup", "ARKG": "digestion", "QTUM": "buildup", "NUKZ": "buildup", "AGG": "neutral", "BIL": "neutral", "IAU": "neutral", "VIG": "neutral"}
+}

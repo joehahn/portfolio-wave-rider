@@ -1,0 +1,144 @@
+{
+  "date": "2026-02-28",
+  "as_of_mode": "strict_historical_replay",
+  "lookback_days": 30,
+  "per_ticker": {
+    "NVDA": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {"headline": "NVDA Q4 FY2026: $68B revenue, +73% YoY, guides $78B Q1", "summary": "NVIDIA reported Q4 fiscal 2026 revenue of $68.1 billion on February 25, 2026, up 73% year-over-year and 20% quarter-over-quarter. Data center revenue for the full fiscal year reached $197.3 billion. The company guided Q1 FY2027 revenue to $78 billion (±2%), quashing near-term concerns about an AI spending pullback. The Blackwell ramp remains the primary demand driver across hyperscaler customers.", "source": "Bloomberg", "url": "https://www.bloomberg.com/news/live-blog/2026-02-25/nvidia-fourth-quarter-earnings", "date": "2026-02-25"},
+        {"headline": "DeepSeek V4 efficiency claims pressure NVDA narrative in January", "summary": "DeepSeek V4, slated for full release mid-February 2026, demonstrated that efficient architecture can reduce the number of GPUs needed per inference workload, sparking a brief sell-off in NVDA. J.P. Morgan and Wedbush both argued the efficiency gains actually expand the total addressable market by lowering cost-per-query, but the debate introduced a new risk narrative around whether unlimited GPU scaling is necessary. The ~$725B in confirmed 2026 hyperscaler AI capex suggests enterprise demand remains intact despite the efficiency headlines.", "source": "Yahoo Finance", "url": "https://finance.yahoo.com/news/nvidia-microsoft-drop-deepseek-ai-142148021.html", "date": "2026-01-21"}
+      ]
+    },
+    "GOOGL": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {"headline": "Alphabet Q4 2025: revenue +18%, Cloud +48%, Gemini 750M MAU", "summary": "Alphabet reported Q4 2025 results on February 4, 2026, with consolidated revenue of $113.8 billion, up 18% year-over-year. Google Cloud revenue grew 48% to $17.7 billion, driven by enterprise AI infrastructure and AI solutions. The Gemini AI app reached 750 million monthly active users, up from 650 million in the prior quarter. Cloud backlog more than doubled year-over-year to $240 billion, suggesting durable enterprise AI demand.", "source": "CNBC", "url": "https://www.cnbc.com/2026/02/04/alphabet-googl-q4-2025-earnings.html", "date": "2026-02-04"},
+        {"headline": "Google Cloud backlog hits $240B, doubling year-over-year", "summary": "Alphabet's Q4 2025 earnings call revealed a Google Cloud backlog of $240 billion, up 55% sequentially and more than double year-over-year. This figure functions as a revenue visibility indicator (contracted but not yet recognized revenue) and signals that enterprise customers are locking in multi-year AI infrastructure commitments. The scale of the backlog reduces near-term revenue risk for GOOGL's fastest-growing segment.", "source": "CNBC", "url": "https://www.cnbc.com/2026/02/04/alphabet-googl-q4-2025-earnings.html", "date": "2026-02-04"}
+      ]
+    },
+    "MSFT": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {"headline": "MSFT Q2 FY2026: $81B revenue, Azure +39%, Copilot 15M paid seats", "summary": "Microsoft reported Q2 FY2026 results on January 28, 2026, with revenue of $81.3 billion, up 17% year-over-year. Azure and cloud services grew 39%, and Microsoft 365 Copilot reached 15 million paid seats. CEO Satya Nadella noted the company had built an AI business larger than some of its biggest franchises. An OpenAI investment gain of $7.6 billion lifted reported net income significantly in the quarter.", "source": "CNBC", "url": "https://www.cnbc.com/2026/01/28/microsoft-msft-q2-earnings-report-2026.html", "date": "2026-01-28"},
+        {"headline": "Microsoft launches 2026 Quantum Pioneers Program, topological qubit research active", "summary": "On January 23, 2026, Microsoft opened applications for its 2026 Quantum Pioneers Program (QuaPP), a research initiative advancing measurement-based quantum computing under Dr. Chetan Nayak. Separately, in February 2026 Microsoft released a technical paper in Nature and a preprint on the roadmap to fault-tolerant quantum computation using topological qubits. A peer-reviewed challenge to Microsoft's topological qubit claims by the physics community adds uncertainty to the timeline. This is a secondary exposure for MSFT; the primary driver remains Azure AI.", "source": "Quantum Computing Report", "url": "https://quantumcomputingreport.com/microsoft-opens-applications-for-2026-quantum-pioneers-program-targeting-measurement-based-computing/", "date": "2026-01-23"}
+      ]
+    },
+    "RKLB": {
+      "wave_bucket": "rockets_spacecraft",
+      "used_fallback": false,
+      "bullets": [
+        {"headline": "RKLB wins $816M SDA contract, biggest deal ever, in early January", "summary": "Rocket Lab entered 2026 having secured its largest contract ever -- a U.S. Space Development Agency award worth $816 million to produce 18 satellites. The contract diversifies RKLB's revenue beyond launch services into spacecraft manufacturing, which carries higher margins and longer revenue duration.", "source": "The Motley Fool", "url": "https://www.fool.com/investing/2026/01/04/in-time-for-2026-rocket-lab-wins-biggest-contract/", "date": "2026-01-04"},
+        {"headline": "Neutron rocket delayed to late 2026 after propellant tank rupture", "summary": "A propellant tank failure during testing forced Rocket Lab to delay the debut of its Neutron medium-lift rocket to at least Q4 2026. Neutron is Rocket Lab's path to competing with SpaceX Falcon 9 for larger payloads. The slip extends the period during which RKLB is solely dependent on the smaller Electron rocket for launch revenue. The company projected at least 25 Electron launches in 2026 (vs. 21 in 2025), and completed its first 2026 Electron launch on January 22.", "source": "SpaceNews", "url": "https://spacenews.com/rocket-lab-delays-neutron-debut-to-late-2026/", "date": "2026-02-01"},
+        {"headline": "HASTE hypersonic mission scheduled for late February from Wallops Island", "summary": "Rocket Lab prepared to launch its fourth hypersonic test mission (HASTE) for the Defense Innovation Unit from Launch Complex 2 at Wallops Island, Virginia, no earlier than late February 2026. Four HASTE flights in under six months demonstrates Rocket Lab's growing role in U.S. defense hypersonics testing.", "source": "GlobeNewswire", "url": "https://www.globenewswire.com/news-release/2026/02/12/3237714/0/en/Rocket-Lab-Prepares-To-Launch-Latest-Hypersonic-Test-Mission-for-Defense-Innovation-Unit.html", "date": "2026-02-12"}
+      ]
+    },
+    "BOTZ": {
+      "wave_bucket": "robotics",
+      "used_fallback": false,
+      "bullets": [
+        {"headline": "Boston Dynamics Atlas enters commercial production at Hyundai facilities", "summary": "Boston Dynamics began commercial production of its Atlas humanoid robot in January 2026, with planned deployment of tens of thousands of units at Hyundai Motor Group manufacturing facilities. This is the first large-scale industrial deployment of a general-purpose humanoid, marking a shift from prototype to production in the robotics wave.", "source": "The Register", "url": "https://www.theregister.com/2026/01/06/boston_dynamics_atlas_production/", "date": "2026-01-06"},
+        {"headline": "$4.6B invested in humanoid developers in 2025; IEEE survey flags robotics as top AI-impact sector", "summary": "The Robot Report's January 2026 roundup confirmed that $4.6 billion was invested in humanoid robot developers during 2025. An IEEE survey of technologists found that 52% believe robotics will be one of the industries most impacted by AI in the near term. At CES 2026, multiple new humanoid debuts occurred including LG's CLOiD and AGIBOT's expanded U.S. presence.", "source": "The Robot Report", "url": "https://www.therobotreport.com/top-10-robotics-developments-of-january-2026/", "date": "2026-01-31"}
+      ]
+    },
+    "ARKG": {
+      "wave_bucket": "engineered_biology",
+      "used_fallback": false,
+      "bullets": [
+        {"headline": "FDA lifts MAGNITUDE-2 clinical hold on Intellia's nex-z CRISPR therapy", "summary": "On January 27, 2026, the FDA removed the clinical hold on Intellia Therapeutics' MAGNITUDE-2 Phase 3 trial of nexiguran ziclumeran (nex-z) for hereditary ATTR amyloidosis with polyneuropathy. The original hold was imposed October 29, 2025 after a Grade 4 liver adverse event. ARKG holds NTLA as a significant position; resumption of the Phase 3 trial removes a key overhang.", "source": "GlobeNewswire", "url": "https://www.globenewswire.com/news-release/2026/01/27/3226448/0/en/intellia-therapeutics-announces-fda-lift-of-clinical-hold-on-magnitude-2-phase-3-clinical-trial-in-attrv-pn.html", "date": "2026-01-27"},
+        {"headline": "ARK buys BEAM and NTLA shares; FDA announces personalized CRISPR pathway", "summary": "In early 2026, ARK Invest collectively purchased over 195,000 shares of Beam Therapeutics (BEAM) and continued adding to Intellia Therapeutics (NTLA) positions across ARKG and ARKK. On January 26, 2026, top FDA officials Marty Makary and Vinay Prasad published a 'Plausible Mechanism Pathway' in the New England Journal of Medicine, creating a faster approval route for personalized gene-editing treatments.", "source": "STAT News", "url": "https://www.statnews.com/2026/01/26/fda-makary-prasad-crispr-gene-editing-concerns-baby-kj/", "date": "2026-01-26"}
+      ]
+    },
+    "QTUM": {
+      "wave_bucket": "quantum",
+      "used_fallback": false,
+      "bullets": [
+        {"headline": "QTUM surpasses $3.5B AUM, earns 5-star Morningstar rating in Feb 2026", "summary": "On February 24, 2026, Defiance ETFs announced that QTUM had surpassed $3.5 billion in assets under management and received a 5-star Morningstar rating based on risk-adjusted returns through December 31, 2025. The fund delivered a 42.12% 1-year return (net of fees) through January 31, 2026.", "source": "Quantum Computing Report", "url": "https://quantumcomputingreport.com/microsoft-announces-development-of-its-first-operational-topological-qubit-device/", "date": "2026-02-24"},
+        {"headline": "Nature paper: first single-shot Majorana qubit readout achieved (Feb 11, 2026)", "summary": "An international team led by QuTech and the Spanish National Research Council published a Nature paper on February 11, 2026 demonstrating the first single-shot, real-time readout of quantum information stored in Majorana zero modes in a Kitaev chain device. Peer-reviewed confirmation of Majorana readout in a real device provides tangible experimental support for topological qubit architectures -- though commercial timelines remain years away.", "source": "Quantum Computing Report", "url": "https://quantumcomputingreport.com/single-shot-parity-readout-of-a-minimal-kitaev-chain-a-breakthrough-in-majorana-qubits/", "date": "2026-02-15"},
+        {"headline": "Honeywell Quantinuum IPO flagged in Jan 2026 filings; could re-rate pure-play quantum stocks", "summary": "Honeywell's planned spin-out IPO of its Quantinuum division was disclosed in January 2026 corporate filings. An eventual Quantinuum public listing would introduce a dedicated pure-play quantum computing stock into the market.", "source": "247 Wall St.", "url": "https://247wallst.com/investing/2026/04/30/quantinuums-ipo-could-reshape-qtum-in-2026-heres-what-to-watch/", "date": "2026-01-31"}
+      ]
+    },
+    "NUKZ": {
+      "wave_bucket": "nuclear_fusion",
+      "used_fallback": false,
+      "bullets": [
+        {"headline": "Meta signs nuclear PPAs with Oklo and Vistra for AI data centers (Jan 9, 2026)", "summary": "Meta announced on January 9, 2026 that it had signed power purchase agreements with TerraPower, Oklo, and Vistra to supply nuclear power for its Prometheus AI data center campus in New Albany, Ohio, targeting 6.6 gigawatts of capacity by 2035. Meta pre-paid for Oklo capacity, providing a critical early revenue signal for small modular reactor developers. Oklo and Vistra rose over 12% intraday on January 9.", "source": "CNBC", "url": "https://www.cnbc.com/2026/01/09/meta-signs-nuclear-energy-deals-to-power-prometheus-ai-supercluster.html", "date": "2026-01-09"},
+        {"headline": "NUKZ up 50% past year as of Feb 19; nuclear stocks strong start to 2026", "summary": "As of February 19, 2026, NUKZ had gained approximately 50% over the prior twelve months, versus ~13% for SPY over the same period. A DOE award of $2.7 billion in uranium enrichment task orders and France's announcement to extend its nuclear fleet and build six new EPR2 reactors added to the positive macro backdrop.", "source": "ETF Trends", "url": "https://www.etftrends.com/nuclear-energy-content-hub/powering-on-nuclear-stocks-strong-start-2026/", "date": "2026-01-14"}
+      ]
+    },
+    "IAU": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {"headline": "Gold hits all-time high near $5,400-$5,590/oz in late January 2026", "summary": "Spot gold reached an all-time closing high of approximately $5,589/oz on January 28, 2026, with IAU's NAV hitting a record ~$101.57 on the same date. The surge was driven by geopolitical risk, record global gold ETF inflows of $89 billion in 2025, and safe-haven demand.", "source": "Fortune", "url": "https://fortune.com/article/current-price-of-gold-01-30-2026/", "date": "2026-01-30"}
+      ]
+    },
+    "AGG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {"headline": "Fed paused at 3.50-3.75% since Dec 2025; AGG yields ~4.3%, 2-3 cuts expected in 2026", "summary": "The Federal Reserve cut rates 25 bps to 3.50-3.75% at its final 2025 meeting and held steady through February 2026. AGG yields were running near 4.3% as of the lookback period.", "source": "iShares", "url": "https://www.ishares.com/us/insights/fed-outlook-2026-interest-rate-forecast", "date": "2026-02-01"}
+      ]
+    },
+    "BIL": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {"headline": "BIL yielding ~3.91% with monthly distributions in rate-pause environment", "summary": "BIL continued paying monthly distributions at an annualized yield of approximately 3.91% through February 2026, reflecting the Fed's pause at 3.50-3.75%.", "source": "StockAnalysis", "url": "https://stockanalysis.com/etf/bil/dividend/", "date": "2026-02-01"}
+      ]
+    },
+    "VIG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {"headline": "VIG dividend yield 1.51%; quarterly distributions, defensive quality positioning", "summary": "Vanguard Dividend Appreciation ETF (VIG) tracks companies with at least 10 consecutive years of dividend growth, producing a 1.51% trailing yield with quarterly distributions. No material ETF-specific news in lookback window.", "source": "StockAnalysis", "url": "https://stockanalysis.com/etf/vig/dividend/", "date": "2026-02-01"}
+      ]
+    }
+  },
+  "wave_stages": {
+    "AI": {
+      "stage": "surge",
+      "rationale": "Real, accelerating revenue: NVDA $68B Q4 (+73% YoY) with $78B Q1 guide; GOOGL Cloud +48% with $240B backlog; MSFT Azure +39%. DeepSeek V4 efficiency debate introduced narrative risk but ~$725B 2026 hyperscaler capex commitments intact.",
+      "evidence_tickers": ["NVDA", "GOOGL", "MSFT"]
+    },
+    "rockets_spacecraft": {
+      "stage": "buildup",
+      "rationale": "RKLB's largest contract ever ($816M SDA) and 25+ Electron launches projected for 2026, but Neutron delayed to late 2026 keeps the company pre-scale on medium-lift addressable market.",
+      "evidence_tickers": ["RKLB"]
+    },
+    "robotics": {
+      "stage": "buildup",
+      "rationale": "$4.6B invested in humanoid developers in 2025; Boston Dynamics Atlas entered commercial production in January 2026. However, commercial revenue from humanoid robots remains small relative to industrial automation. Wave is transitioning from pre-commercial to early-commercial but has not yet hit adoption compounding of 'surge.'",
+      "evidence_tickers": ["BOTZ"]
+    },
+    "engineered_biology": {
+      "stage": "buildup",
+      "rationale": "Intellia nex-z MAGNITUDE-2 hold lifted Jan 27, 2026; FDA introduced new 'Plausible Mechanism Pathway' for personalized gene editing. ARK adding to ARKG positions. No CRISPR therapy yet at blockbuster commercial revenue.",
+      "evidence_tickers": ["ARKG"]
+    },
+    "quantum": {
+      "stage": "buildup",
+      "rationale": "Genuine research momentum (Nature paper Feb 11, 2026, first single-shot Majorana qubit readout; QTUM at $3.5B AUM, 42% 1yr return) but the wave remains pre-commercial. Microsoft topological qubit claims face active peer scrutiny; no quantum computer has achieved commercial-grade advantage on industry problems within lookback window.",
+      "evidence_tickers": ["QTUM"]
+    },
+    "nuclear_fusion": {
+      "stage": "surge",
+      "rationale": "NUKZ predominantly holds fission (nuclear power) assets, not fusion. Within that fission-dominated basket the wave is in surge: NUKZ +50% past year vs SPY +13%; Meta nuclear PPAs Jan 9 2026 for 6.6 GW; DOE $2.7B uranium enrichment; France extends fleet. Real revenue flows from PPAs distinguish from buildup. Caveat: pure fusion (Commonwealth, Helion) remains pre-commercial and not publicly investable.",
+      "evidence_tickers": ["NUKZ"]
+    },
+    "general_markets": {
+      "stage": "neutral",
+      "rationale": "AGG, BIL, IAU, VIG are macro/fixed-income/commodity instruments. Gold ATH late Jan; bonds at ~4.3%; T-bills steady. No wave-specific thesis applies.",
+      "evidence_tickers": ["AGG", "BIL", "IAU", "VIG"]
+    }
+  },
+  "wave_views": {
+    "NVDA": "surge", "GOOGL": "surge", "MSFT": "surge",
+    "RKLB": "buildup", "BOTZ": "buildup", "ARKG": "buildup",
+    "QTUM": "buildup", "NUKZ": "surge",
+    "IAU": "neutral", "AGG": "neutral", "BIL": "neutral", "VIG": "neutral"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "date": "2025-09-30",
+  "as_of_mode": "strict_historical_replay",
+  "lookback_days": 30,
+  "wave_stages": {
+    "AI": {"stage": "surge", "rationale": "NVDA Q2 FY26 $46.7B (+56% YoY), Q3 guide $54B, Blackwell Ultra ramping, $4T market cap July 9; MSFT FY25 Q4 Azure +39%, AI contributing 12pp; MSFT Fairwater AI datacenter Sept 18 ($3.3B Wisconsin); GOOGL Q2 Cloud +32%, capex $85B; DOJ remedies ruling Sept 2 avoided break-up.", "evidence_tickers": ["NVDA", "MSFT", "GOOGL", "BOTZ"]},
+    "rockets_spacecraft": {"stage": "buildup", "rationale": "RKLB Q2 record $144M (+36%), gross margin +650bps; Geost acquisition $275M; Neutron LC-3 ribbon-cutting late Aug/early Sept; SDA Tranche 2 $515M build. Neutron 2025 first-launch target reaffirmed but pre-flight.", "evidence_tickers": ["RKLB"]},
+    "engineered_biology": {"stage": "digestion", "rationale": "ARKG below 2021 peak as of Sept 2025 despite broader healthcare recovery. Sector M&A heating up (Takeda partner $250M) but no re-rating of public names. Waiting for clinical proof points.", "evidence_tickers": ["ARKG"]},
+    "quantum": {"stage": "buildup", "rationale": "QTUM crossed $2B AUM Sept 4; HSBC used IBM Heron for bond trading (first commercial quantum edge); DOE $625M renewal for 5 national quantum research centers. Pre-commercial revenue.", "evidence_tickers": ["QTUM"]},
+    "nuclear_fusion": {"stage": "buildup", "rationale": "Palisades transitioned from decommissioning to operational status Aug 25 (first ever); DOE $155M Sept release; Big Tech (AMZN/GOOGL/META) pledged tripling nuclear capacity by 2050; MSFT joined WNA Sept 8; NRC reform EO with 18-month decision deadlines.", "evidence_tickers": ["NUKZ"]},
+    "general_markets": {"stage": "neutral", "rationale": "Fed cut 25bp to 4.00-4.25% Sept 17 (first 2025 cut, 2 more signaled); gold record $3,869 Sept 30 (~+27% YTD); AGG Morningstar Gold; VIG steady.", "evidence_tickers": ["AGG", "BIL", "IAU", "VIG"]}
+  },
+  "wave_views": {"NVDA": "surge", "GOOGL": "surge", "MSFT": "surge", "BOTZ": "surge", "RKLB": "buildup", "ARKG": "digestion", "QTUM": "buildup", "NUKZ": "buildup", "AGG": "neutral", "BIL": "neutral", "IAU": "neutral", "VIG": "neutral"}
+}

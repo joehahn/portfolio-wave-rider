@@ -1,0 +1,15 @@
+{
+  "date": "2026-01-31",
+  "as_of_mode": "strict_historical_replay",
+  "lookback_days": 30,
+  "wave_stages": {
+    "AI": {"stage": "peak", "rationale": "DeepSeek shock Jan 27: NVDA -17% intraday (~$600B single-day mcap loss, largest in US history), closed January -11%. Triggered repricing of GPU-demand thesis. MSFT Q2 FY26 $81.3B, Azure +39% CC, $625B RPO with $250B OpenAI cloud commit (real adoption) but Q4 GOOGL not yet reported. Combination of stretched entering-Jan valuations + DeepSeek shock + sell-side unanimity tips toward peak.", "evidence_tickers": ["NVDA", "MSFT", "GOOGL"]},
+    "rockets_spacecraft": {"stage": "surge", "rationale": "RKLB completed two Electron launches January (80th cumulative on Jan 22); 100% 2025 success rate carrying into 2026. Neutron Q1 2026 LC-3 ship + mid-2026 debut targeted, with two booked Neutron missions. Real launch revenue compounding alongside imminent re-rating catalyst.", "evidence_tickers": ["RKLB"]},
+    "robotics": {"stage": "surge", "rationale": "Boston Dynamics Atlas commercial production at Hyundai Metaplant CES 2026 (Jan 6) — all 2026 units committed, 30,000/year capacity targeted; $4.6B 2025 humanoid investment, 16,000 global units installed. Transition from R&D to paid production deployment.", "evidence_tickers": ["BOTZ"]},
+    "engineered_biology": {"stage": "buildup", "rationale": "FDA lifted MAGNITUDE-2 hold Jan 27 (with enhanced liver monitoring); ARK heavily added BEAM (~5.08% of ARKG) and Intellia in early Jan. Pre-revenue: BEAM-101 still Phase 1/2, no in vivo CRISPR FDA approval yet.", "evidence_tickers": ["ARKG"]},
+    "quantum": {"stage": "buildup", "rationale": "MSFT 2026 Quantum Pioneers Program open through Jan 31 ($200K research grants, topological qubits); Google Willow chip UK research expansion. QTUM ~37% 2025 return reflects re-rating, but pure-play quantum hardware still pre-revenue. Buildup over surge: physics risk retired, commercial risk intact.", "evidence_tickers": ["QTUM", "MSFT"]},
+    "nuclear_fusion": {"stage": "buildup", "rationale": "Meta nuclear PPAs Jan 9 (6.6 GW landmark): 20-yr 2,609 MW Vistra, up to 2.79 GW TerraPower Natrium 2032-2035, up to 1.2 GW Oklo. OKLO/VST +12%+ intraday. Some NUKZ names +35% in first week of 2026. Funded buildup — Oklo 2030 earliest online, TerraPower 2032-2035.", "evidence_tickers": ["NUKZ"]},
+    "general_markets": {"stage": "neutral", "rationale": "Fed held 3.50-3.75% in January; markets pricing limited 2026 cuts. Gold intraday high ~$4,689 Jan 19 on China central bank ($6B) + India ($2.5B) ETF inflows; gold ETFs $19B January (record monthly inflow). 30Y yield highest since September.", "evidence_tickers": ["AGG", "BIL", "IAU", "VIG"]}
+  },
+  "wave_views": {"NVDA": "peak", "GOOGL": "peak", "MSFT": "peak", "RKLB": "surge", "BOTZ": "surge", "ARKG": "buildup", "QTUM": "buildup", "NUKZ": "buildup", "AGG": "neutral", "BIL": "neutral", "IAU": "neutral", "VIG": "neutral"}
+}

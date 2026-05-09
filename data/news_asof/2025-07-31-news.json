@@ -1,0 +1,15 @@
+{
+  "date": "2025-07-31",
+  "as_of_mode": "strict_historical_replay",
+  "lookback_days": 30,
+  "wave_stages": {
+    "AI": {"stage": "surge", "rationale": "NVDA $4T market cap milestone (July 9), H20 export ban reversal (July 15) with 15% China revenue share; GOOGL Q2 $96.4B (+14%), Cloud +32%, capex $85B; MSFT FY25 Q4 $76.4B (+18%), Azure +39%, Q1 FY26 Azure guide 37% CC. Real revenue, growing capex.", "evidence_tickers": ["NVDA", "GOOGL", "MSFT"]},
+    "rockets_spacecraft": {"stage": "buildup", "rationale": "RKLB Q1 $123M (+32%), Q2 guide $130-140M; Space Systems now majority of revenue; Neutron 'green-light schedule' for 2025 launch per SpaceNews, U.S. Air Force point-to-point task order. Pre-Neutron commercial inflection.", "evidence_tickers": ["RKLB"]},
+    "robotics": {"stage": "neutral", "rationale": "No material BOTZ-specific news in July 2025 lookback from curated robotics sources. Industrial robotics holdings (Keyence, Fanuc, ABB) not events-driven this month; ETF performance bleeds through from NVDA exposure but no robotics-specific signal.", "evidence_tickers": ["BOTZ"]},
+    "engineered_biology": {"stage": "buildup", "rationale": "ARKG ~23% YTD recovering from drawdowns; Arbor Biotechnology dosed first patient in PH1 CRISPR trial July 2025; Intellia Phase III running. Genome editing market only ~$5B 2026 projected.", "evidence_tickers": ["ARKG"]},
+    "quantum": {"stage": "buildup", "rationale": "$2.5B DOE Quantum Leadership Act introduced (Feb, in Senate committee through July); National Quantum Algorithm Center launched July 2025; QTUM only +0.7% in July, lagging tech category by 140bp. Pre-commercial, under-owned.", "evidence_tickers": ["QTUM"]},
+    "nuclear_fusion": {"stage": "buildup", "rationale": "Google-CFS 200 MW PPA (June 30 / July 2) — largest corporate fusion offtake ever; $2.6B in fusion sector funding 12 months to mid-2025; Palisades NRC restart decision pending. CFS ARC online early 2030s. Capital formation phase.", "evidence_tickers": ["NUKZ"]},
+    "general_markets": {"stage": "neutral", "rationale": "Fed pause; AGG ~6.4% YTD; gold ~$3,288 end-June, IAU AUM at largest size since Nov 2024; BIL near 4.9-5.0% pre-cut.", "evidence_tickers": ["AGG", "BIL", "IAU", "VIG"]}
+  },
+  "wave_views": {"NVDA": "surge", "GOOGL": "surge", "MSFT": "surge", "BOTZ": "neutral", "RKLB": "buildup", "ARKG": "buildup", "QTUM": "buildup", "NUKZ": "buildup", "AGG": "neutral", "BIL": "neutral", "IAU": "neutral", "VIG": "neutral"}
+}

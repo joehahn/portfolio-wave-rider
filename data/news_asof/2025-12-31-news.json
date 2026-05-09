@@ -1,0 +1,15 @@
+{
+  "date": "2025-12-31",
+  "as_of_mode": "strict_historical_replay",
+  "lookback_days": 30,
+  "wave_stages": {
+    "AI": {"stage": "surge", "rationale": "NVDA Q3 FY26 $57B (+62% YoY), Q4 guide $65B, Blackwell sold out; GOOGL Gemini 3 Flash Dec 17 (81.2% MMMU-Pro top benchmark), Sam Altman 'code red'; MSFT Azure ~39%, $392B Azure AI backlog, 150M Copilot MAUs, $23B India+Canada infra Dec.", "evidence_tickers": ["NVDA", "GOOGL", "MSFT"]},
+    "rockets_spacecraft": {"stage": "buildup", "rationale": "RKLB Q3 record $155M (+48% YoY) at 37% gross margin; $816M Space Force prime contract Dec 19 (largest ever); Neutron slipped to 2026, Q1 2026 LC-3 arrival; 21 Electron launches in 2025 with 100% mission success.", "evidence_tickers": ["RKLB"]},
+    "robotics": {"stage": "buildup", "rationale": "Robotics market $94.5B end-2025 (forecast $372B by 2034); Figure 03 successful BMW Spartanburg autonomy pilot. Tesla Optimus 5-10K FY25 production target NOT achieved. BOTZ +19.4% 3-yr annualized; commercial humanoid revenue still small relative to industrial automation. Pre-mass-deployment.", "evidence_tickers": ["BOTZ"]},
+    "engineered_biology": {"stage": "buildup", "rationale": "CRSP CTX310 Phase 1 NEJM Nov 8 (-73% ANGPTL3, -49% LDL, no SAEs); ARKG ~23% 2025 NAV return after multi-year drawdown; ARK accumulating BEAM aggressively. ASGCT 2025: in vivo editing 'transitioning from experimental to clinical reality.' Pre-commercial revenue.", "evidence_tickers": ["ARKG"]},
+    "quantum": {"stage": "buildup", "rationale": "QTUM 36.7% 2025 return outpacing Nasdaq 100; IBM Nighthawk 120-qubit + Loon (Nov 12); Google Quantum Echoes verifiable advantage Oct 22; IBM targets quantum advantage 2026, FTQC 2029. Speculative-capital-led, no commercial revenue yet.", "evidence_tickers": ["QTUM"]},
+    "nuclear_fusion": {"stage": "buildup", "rationale": "Bipartisan fusion bill Senate (Nov), DOE Fusion Office bill introduced Dec 17. NUKZ ~73% 2025 gain driven by fission/AI-energy demand (hyperscaler PPAs). All commercial fusion (TAE, Helion, CFS) remains private. Regulatory groundwork, not commercial deployment.", "evidence_tickers": ["NUKZ"]},
+    "general_markets": {"stage": "neutral", "rationale": "Fed cut 25bp Dec 10 to 3.50-3.75% (3rd consecutive); dot plot signals only one 2026 cut. 10Y at 4.3%, AGG +6.3% TTM. Gold 53rd ATH Dec 23 at ~$4,449 with year-end ~$4,368 (~+65% 2025); silver simultaneous record.", "evidence_tickers": ["AGG", "BIL", "IAU", "VIG"]}
+  },
+  "wave_views": {"NVDA": "surge", "GOOGL": "surge", "MSFT": "surge", "BOTZ": "buildup", "RKLB": "buildup", "ARKG": "buildup", "QTUM": "buildup", "NUKZ": "buildup", "AGG": "neutral", "BIL": "neutral", "IAU": "neutral", "VIG": "neutral"}
+}
