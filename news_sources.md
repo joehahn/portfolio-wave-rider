@@ -30,6 +30,7 @@ For LLM / ML platform / semiconductor coverage.
 - **Ars Technica — AI** — https://arstechnica.com/ai/ — technical but accessible.
 - **Anthropic blog** — https://www.anthropic.com/news — primary source for Claude models and research.
 - **OpenAI blog** — https://openai.com/news/ — primary source for GPT models and research.
+- **Gary Marcus** — https://garymarcus.substack.com — *skeptic.* Neuroscientist and prominent LLM-hype critic; deflationary takes on AGI timelines and AI-capex returns. Useful contrarian foil to the cheerleader outlets above.
 
 ## Rockets & spacecraft
 
@@ -57,6 +58,7 @@ Gene editing, engineered cells, mRNA platforms, cellular agriculture, longevity 
 - **BioPharma Dive** — https://www.biopharmadive.com — pharma and biotech industry news.
 - **Nature Biotechnology** — https://www.nature.com/nbt/ — peer-reviewed research and reviews.
 - **SynBioBeta** — https://www.synbiobeta.com — synthetic biology industry community and conference coverage.
+- **In the Pipeline (Derek Lowe)** — https://www.science.org/blogs/pipeline — *skeptic.* Pharma medicinal chemist with two decades of rigorous, skeptical biotech analysis. The best skeptic outlet on this wave; flags clinical-trial design issues and over-hyped mechanisms.
 
 ## Quantum computing
 
@@ -66,6 +68,7 @@ Pre-commercial but with rapid research-cadence.
 - **Nature — Quantum Information** — https://www.nature.com/npjqi/ — peer-reviewed results.
 - **IBM Quantum blog** — https://www.ibm.com/quantum/blog — primary source for IBM's roadmap.
 - **Google Quantum AI** — https://quantumai.google — primary source for Google's quantum research.
+- **Shtetl-Optimized (Scott Aaronson)** — https://scottaaronson.blog — *skeptic.* UT Austin computer scientist; the most prominent and rigorous public quantum-hype skeptic. Calls out vendor claims point-by-point and distinguishes peer-reviewed milestones from press-release theater.
 
 ## Nuclear fusion
 
@@ -85,4 +88,5 @@ For tickers that don't map cleanly to a single wave, or for macro context.
 - **Wall Street Journal** — https://www.wsj.com — paywalled; US-centric markets and corporate news.
 - **SEC EDGAR** — https://www.sec.gov/edgar — primary source for 10-Ks, 10-Qs, 8-Ks, proxy filings.
 - **Yahoo Finance — ticker news** — https://finance.yahoo.com — ticker-scoped recent headlines aggregator.
+- **FT Alphaville** — https://www.ft.com/alphaville — *skeptic.* Rigorous, skeptical markets commentary; Bryce Elder's columns are especially good for accounting-irregularity and valuation-skepticism framing. The credibility-weighted contrarian foil to the wire-service primary sources above.
 - **Zero Hedge** — https://www.zerohedge.com — contrarian macro/markets blog; often early on stories wires are slow on, but framing is editorial and signal-to-noise is mixed — treat as a cross-check, not a primary source.
