@@ -1466,32 +1466,30 @@ def build_dashboard(
         specs=[[{}], [{}], [{}], [{}], [{"secondary_y": True}], [{}], [{}], [{}]],
     )
 
-    # If a thesis_baseline.json exists, the live dashboard scopes its
-    # time-series charts to dates >= the thesis date. The backtest
-    # dashboard passes thesis_baseline_path=None to skip this filter
-    # (its data deliberately predates any thesis allocation).
-    thesis_date: pd.Timestamp | None = None
-    if thesis_baseline_path:
-        tb_path = Path(thesis_baseline_path)
-        if tb_path.exists():
-            try:
-                tb = json.loads(tb_path.read_text())
-                if tb.get("date"):
-                    thesis_date = pd.Timestamp(tb["date"])
-            except (OSError, json.JSONDecodeError, ValueError):
-                thesis_date = None
-
-    def _filter_post_thesis(df: pd.DataFrame) -> pd.DataFrame:
-        if thesis_date is None or df.empty:
-            return df
-        return df[df["date"] >= thesis_date]
+    # The live dashboard's x-axis range is derived from the daily-cadence
+    # data (snapshots.csv min/max), so every time-series plot visually
+    # spans the same window even when its underlying data is sparser
+    # (e.g., wave_history.csv only updates on /review-portfolio runs;
+    # data/news/ accumulates one file per /review-portfolio). No
+    # hardcoded dates: the range rolls forward each business day as
+    # the cron appends new snapshots. The backtest dashboard skips
+    # this clip and lets each chart auto-range, since its data is
+    # 12 months wide regardless.
+    live_xrange: tuple[pd.Timestamp, pd.Timestamp] | None = None
+    if thesis_baseline_path is not None and snap_path.exists():
+        try:
+            _snaps_dates = pd.read_csv(snap_path, parse_dates=["date"])["date"]
+            if not _snaps_dates.empty:
+                live_xrange = (_snaps_dates.min(), _snaps_dates.max())
+        except (OSError, pd.errors.EmptyDataError):
+            live_xrange = None
 
     # 1. Portfolio total value over time (from snapshots.csv).
     benchmark_curves: dict[str, pd.Series] = {}
     if benchmarks is None:
         benchmarks = ["SPY"]
     if snap_path.exists():
-        snaps = _filter_post_thesis(pd.read_csv(snap_path, parse_dates=["date"]))
+        snaps = pd.read_csv(snap_path, parse_dates=["date"])
         totals = snaps.groupby("date")["total_value"].first().sort_index()
         fig.add_trace(
             go.Scatter(x=totals.index, y=totals.values, mode="lines+markers",
@@ -1519,26 +1517,6 @@ def build_dashboard(
     latest_weights: pd.DataFrame | None = None
     if rec_path.exists():
         recs = pd.read_csv(rec_path, parse_dates=["date"])
-        # Prepend the thesis allocation as the t=thesis_date starting
-        # point so chart 2 begins on the same date as the other charts
-        # (recommendations.csv only carries weekly Friday rows, so
-        # without this it starts on the first post-thesis Friday and
-        # leaves a visible gap from the snapshot/asset/wave-$ charts).
-        if thesis_date is not None and thesis_baseline_path:
-            tb_path = Path(thesis_baseline_path)
-            if tb_path.exists():
-                try:
-                    tb = json.loads(tb_path.read_text())
-                    alloc = tb.get("allocations_usd", {})
-                    total = sum(alloc.values())
-                    if total > 0 and not (recs["date"] == thesis_date).any():
-                        thesis_rows = pd.DataFrame([
-                            {"date": thesis_date, "ticker": t, "weight": v / total}
-                            for t, v in alloc.items()
-                        ])
-                        recs = pd.concat([thesis_rows, recs], ignore_index=True)
-                except (OSError, json.JSONDecodeError, ValueError):
-                    pass
         recs["wave_bucket"] = recs["ticker"].map(
             lambda t: TICKER_WAVE.get(t, "general_markets")
         )
@@ -1599,9 +1577,7 @@ def build_dashboard(
     # change is multiplied by that day's share count. Sums to the
     # portfolio's total realized gain (modulo numerical noise).
     if snap_path.exists():
-        snaps_full = _filter_post_thesis(
-            pd.read_csv(snap_path, parse_dates=["date"])
-        ).sort_values(["ticker", "date"])
+        snaps_full = pd.read_csv(snap_path, parse_dates=["date"]).sort_values(["ticker", "date"])
         gain_by_ticker: dict[str, float] = {}
         for ticker, sub in snaps_full.groupby("ticker"):
             sub = sub.sort_values("date").reset_index(drop=True)
@@ -1638,7 +1614,7 @@ def build_dashboard(
 
     # 5. Wave-stage trajectories (one line per wave, from wave_history.csv).
     if wh_path.exists():
-        wh = _filter_post_thesis(pd.read_csv(wh_path, parse_dates=["date"]))
+        wh = pd.read_csv(wh_path, parse_dates=["date"])
         wh["stage_rank"] = wh["stage"].map(WAVE_STAGE_RANK).fillna(0).astype(int)
         # Order legend by display priority so AI is at the top, general_markets last.
         ordered = sorted(
@@ -1684,7 +1660,7 @@ def build_dashboard(
             for wave, n in counts.items():
                 article_rows.append({"date": pd.Timestamp(d), "wave": wave, "count": n})
         if article_rows:
-            adf = _filter_post_thesis(pd.DataFrame(article_rows))
+            adf = pd.DataFrame(article_rows)
             for wave in [w for w in _WAVE_DISPLAY_ORDER if w in adf["wave"].unique()]:
                 sub = adf[adf["wave"] == wave].sort_values("date")
                 fig.add_trace(
@@ -1699,7 +1675,7 @@ def build_dashboard(
     # ticker contributes to exactly one bucket in each chart, so the sum
     # of all lines in either chart equals the portfolio total.
     if snap_path.exists():
-        snaps_full = _filter_post_thesis(pd.read_csv(snap_path, parse_dates=["date"]))
+        snaps_full = pd.read_csv(snap_path, parse_dates=["date"])
         snaps_full["asset_bucket"] = snaps_full["ticker"].map(
             lambda t: ASSET_CLASS_BUCKET.get(TICKER_ASSET_CLASS.get(t, "equity"), "equities")
         )
@@ -1818,6 +1794,17 @@ def build_dashboard(
     # robotics/biology lines hovering near a few hundred dollars) don't
     # collapse to the floor next to the dominant general_markets line.
     fig.update_yaxes(title_text="$ (log)", row=8, col=1, type="log")
+
+    # Apply the snapshots-derived x-axis range to every time-series
+    # subplot on the live dashboard so all 8 charts visually span the
+    # same window (the daily-cron-collected snapshot range), even
+    # though wave_history (chart 5) and articles (chart 6) update on
+    # /review-portfolio cadence rather than daily. Charts 3 (latest
+    # weights) and 4 (gain bars) are bar charts with categorical
+    # x-axes so the range setter is a no-op there.
+    if live_xrange is not None:
+        for r in (1, 2, 5, 6, 7, 8):
+            fig.update_xaxes(range=list(live_xrange), row=r, col=1)
 
     o_path = Path(out_path)
     o_path.parent.mkdir(parents=True, exist_ok=True)
