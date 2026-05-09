@@ -27,8 +27,10 @@ from src.portfolio import (
 TICKERS = ["AGG", "BIL", "IAU", "GOOGL", "RKLB", "NVDA", "MSFT", "BOTZ", "ARKG", "QTUM", "NUKZ", "VIG"]
 MAX_WEIGHTS = [0.25, 0.33, 0.50, 1.00]
 LAMBDA = 1.0
-START = pd.Timestamp("2025-05-04")
-END = pd.Timestamp("2026-05-04")
+# Rolling 12-month window ending today, so reruns automatically pick up
+# the most recent prices and the most recent wave_history.csv classifications.
+END = pd.Timestamp.today().normalize()
+START = (END - pd.DateOffset(years=1)).normalize()
 INITIAL_USD = 50_000.0
 LOOKBACK_YEARS = 3
 RISK_FREE = 0.04
