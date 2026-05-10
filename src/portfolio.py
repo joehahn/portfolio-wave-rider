@@ -447,6 +447,7 @@ def snapshot_holdings(
 def recommend_portfolio(
     holdings_path: str = "holdings.csv",
     out_path: str = "data/recommendations.csv",
+    wave_history_path: str = "data/wave_history.csv",
     period: str = "3y",
     max_weight: float = 0.25,
     risk_free_rate: float = 0.04,
@@ -456,16 +457,22 @@ def recommend_portfolio(
     date: str | None = None,
     force: bool = False,
 ) -> dict[str, Any]:
-    """Run a lightweight optimization and append per-ticker weights to a CSV.
+    """Run an optimization with the most recent wave-stage tilts and
+    append per-ticker weights to a CSV.
 
-    The "automation" sibling of /review-portfolio: pure Python, no news,
-    no wave-stage tilts. Universe = the tickers listed in `holdings_path`.
-    Schema appended to `out_path`:
+    The cron-friendly sibling of /review-portfolio: pure Python, no news
+    pulls, no LLM. Tilts are applied from the most recent
+    ``wave_history.csv`` row dated on or before today (same as-of-date
+    lookup used by ``backtest`` and the sweep scripts), so the weekly
+    cron's recommendation stays consistent with the wave thesis between
+    monthly /review-portfolio runs without needing to re-classify the
+    waves itself. Universe = the tickers listed in ``holdings_path``.
+
+    Schema appended to ``out_path``:
         date, ticker, weight, expected_return, annual_volatility,
         sharpe_ratio, objective
 
-    Idempotent on date (skip unless force=True). Run /review-portfolio
-    when you want fresh wave-stage tilts and a written report.
+    Idempotent on date (skip unless force=True).
     """
     h_path = Path(holdings_path)
     if not h_path.exists():
@@ -484,8 +491,26 @@ def recommend_portfolio(
                     "reason": "recommendation already exists; pass force=True to overwrite"}
         existing = existing[existing["date"] != str(rec_date)]
 
+    # Build wave_views from the most recent wave_history row at or before
+    # rec_date. Mirrors the as-of-date lookup helpers in backtest() and
+    # the sweep scripts.
+    wave_views: dict[str, str] | None = None
+    wh_path = Path(wave_history_path)
+    if wh_path.exists():
+        wh_df = pd.read_csv(wh_path, parse_dates=["date"])
+        relevant = wh_df[wh_df["date"] <= pd.Timestamp(rec_date)]
+        if not relevant.empty:
+            latest_date = relevant["date"].max()
+            latest = relevant[relevant["date"] == latest_date]
+            wave_to_stage = dict(zip(latest["wave"], latest["stage"]))
+            wave_views = {
+                t: wave_to_stage.get(TICKER_WAVE.get(t, "general_markets"), "neutral")
+                for t in tickers
+            }
+
     result = analyze(tickers, period=period, objective=objective,
                      max_weight=max_weight, risk_free_rate=risk_free_rate,
+                     wave_views=wave_views,
                      risk_aversion=risk_aversion, tilt_schedule=tilt_schedule)
     opt = result["optimization"]
     if not opt.get("success"):
@@ -515,6 +540,7 @@ def recommend_portfolio(
         "expected_annual_return": opt["expected_annual_return"],
         "annual_volatility": opt["annual_volatility"],
         "sharpe_ratio": opt["sharpe_ratio"],
+        "wave_views_applied": wave_views,
         "n_rows_appended": len(new_rows),
         "out_path": str(o_path),
     }

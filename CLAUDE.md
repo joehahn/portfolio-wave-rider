@@ -79,7 +79,7 @@ Each cron call refreshes `docs/index.html` (the dashboard CLI's default `--out`)
 
 Set `PROJ` to wherever you cloned the repo, then `crontab -e` and paste. Works the same on macOS and Linux. cron only fires when the machine is awake at the trigger time; missed runs do not auto-replay. Use `--date YYYY-MM-DD` to backfill.
 
-The weekly `recommend` is the lightweight sibling of `/review-portfolio`: pure Python, no news-researcher, no wave-stage tilts. Use the full skill when the user wants fresh wave classification and a written report.
+The weekly `recommend` is the lightweight sibling of `/review-portfolio`: pure Python, no news-researcher, no fresh news pulls. It re-applies the most recent wave-stage tilts (looked up as-of-today from `data/wave_history.csv`) to fresh prices each Friday. Use the full skill when the user wants fresh wave classification and a written report.
 
 ## Repo rules
 

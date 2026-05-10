@@ -94,6 +94,8 @@ def main(argv: list[str] | None = None) -> int:
     p_rec = sub.add_parser("recommend", help="optimize and append weights to data/recommendations.csv")
     p_rec.add_argument("--holdings", default="holdings.csv")
     p_rec.add_argument("--out", default="data/recommendations.csv")
+    p_rec.add_argument("--wave-history", default="data/wave_history.csv",
+                       help="apply tilts from this file's most recent row at/before today; pass '' to skip")
     p_rec.add_argument("--period", default=fm["lookback_period"])
     p_rec.add_argument("--max-weight", type=float, default=0.25)
     p_rec.add_argument("--risk-free-rate", type=float, default=fm["risk_free_rate"])
@@ -204,6 +206,7 @@ def main(argv: list[str] | None = None) -> int:
         elif args.cmd == "recommend":
             result = portfolio.recommend_portfolio(
                 holdings_path=args.holdings, out_path=args.out,
+                wave_history_path=args.wave_history or "",
                 period=args.period, max_weight=args.max_weight,
                 risk_free_rate=args.risk_free_rate, objective=args.objective,
                 risk_aversion=args.risk_aversion,
