@@ -1466,23 +1466,26 @@ def build_dashboard(
         specs=[[{}], [{}], [{}], [{}], [{"secondary_y": True}], [{}], [{}], [{}]],
     )
 
-    # The live dashboard's x-axis range is derived from the daily-cadence
-    # data (snapshots.csv min/max), so every time-series plot visually
-    # spans the same window even when its underlying data is sparser
-    # (e.g., wave_history.csv only updates on /review-portfolio runs;
-    # data/news/ accumulates one file per /review-portfolio). No
-    # hardcoded dates: the range rolls forward each business day as
-    # the cron appends new snapshots. The backtest dashboard skips
-    # this clip and lets each chart auto-range, since its data is
-    # 12 months wide regardless.
-    live_xrange: tuple[pd.Timestamp, pd.Timestamp] | None = None
-    if thesis_baseline_path is not None and snap_path.exists():
+    # Compute a shared x-axis range from the daily-cadence data
+    # (snapshots.csv min/max) and pad each end by a fixed fraction so
+    # data points don't sit flush against the axis edges. Applied to
+    # every time-series subplot on both the live and backtest dashboards
+    # so the charts align visually even when sparser data sources
+    # (wave_history.csv updates on /review-portfolio cadence;
+    # data/news/ accumulates one file per /review-portfolio) extend
+    # beyond the snapshots range. No hardcoded dates: the range rolls
+    # forward each business day as the cron appends new snapshots.
+    xrange: tuple[pd.Timestamp, pd.Timestamp] | None = None
+    if snap_path.exists():
         try:
             _snaps_dates = pd.read_csv(snap_path, parse_dates=["date"])["date"]
             if not _snaps_dates.empty:
-                live_xrange = (_snaps_dates.min(), _snaps_dates.max())
+                d_min, d_max = _snaps_dates.min(), _snaps_dates.max()
+                span = d_max - d_min
+                pad = max(pd.Timedelta(days=1), span * 0.03)
+                xrange = (d_min - pad, d_max + pad)
         except (OSError, pd.errors.EmptyDataError):
-            live_xrange = None
+            xrange = None
 
     # 1. Portfolio total value over time (from snapshots.csv).
     benchmark_curves: dict[str, pd.Series] = {}
@@ -1795,16 +1798,16 @@ def build_dashboard(
     # collapse to the floor next to the dominant general_markets line.
     fig.update_yaxes(title_text="$ (log)", row=8, col=1, type="log")
 
-    # Apply the snapshots-derived x-axis range to every time-series
-    # subplot on the live dashboard so all 8 charts visually span the
-    # same window (the daily-cron-collected snapshot range), even
-    # though wave_history (chart 5) and articles (chart 6) update on
+    # Apply the padded snapshots-derived range to every time-series
+    # subplot so data points don't sit flush against the axis edges
+    # and all 6 time-series charts share the same visual window even
+    # when wave_history (chart 5) and articles (chart 6) update on
     # /review-portfolio cadence rather than daily. Charts 3 (latest
     # weights) and 4 (gain bars) are bar charts with categorical
     # x-axes so the range setter is a no-op there.
-    if live_xrange is not None:
+    if xrange is not None:
         for r in (1, 2, 5, 6, 7, 8):
-            fig.update_xaxes(range=list(live_xrange), row=r, col=1)
+            fig.update_xaxes(range=list(xrange), row=r, col=1)
 
     o_path = Path(out_path)
     o_path.parent.mkdir(parents=True, exist_ok=True)
