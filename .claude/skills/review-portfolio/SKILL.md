@@ -5,7 +5,7 @@ description: Recurring portfolio review. Reads the investor profile, holdings, a
 
 # /review-portfolio
 
-Holdings in, profile-aware report out. Run this monthly to get a fresh wave-stage news read plus a written narrative. The weekly cron is the lightweight Python-only sibling.
+Holdings in, profile-aware report out. Run this monthly to get a fresh wave-stage news read plus a written narrative.
 
 This skill assumes a portfolio already exists. If you're starting fresh, run `/initialize-portfolio` first to set up the thesis allocation; come back here once `data/thesis_baseline.json` exists.
 
@@ -55,6 +55,14 @@ python -m src.cli analyze \
 ```
 
 The CLI returns a single JSON blob with `optimization` (weights, Sharpe, applied_wave_views, profile boundary flags) and `risk` (Sharpe, vol, max drawdown, VaR, CVaR).
+
+### Step 2b — persist recommendation (Bash)
+
+```
+python -m src.cli recommend --force
+```
+
+`analyze` returns the optimization result for the report-writer but doesn't write to `data/recommendations.csv`. `recommend` runs the same optimization (with the just-appended wave-history classifications) and persists per-ticker rows to that CSV so the dashboard's chart 2 (recommended % by wave) accumulates a time-series. `--force` overwrites today's row if the cron already wrote one earlier.
 
 ### Step 3 — write report (Task → report-writer)
 

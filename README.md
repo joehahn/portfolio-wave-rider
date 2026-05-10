@@ -34,20 +34,16 @@ To bootstrap a fresh portfolio, run `/initialize-portfolio` in Claude Code. Then
 
 ## Runs
 
-Five triggers cover the portfolio's lifecycle: setup, daily/weekly refresh, monthly review, and on-demand backtest.
+Four triggers cover the portfolio's lifecycle: setup, daily price refresh, monthly review, and on-demand backtest.
 
 - **Once, on a fresh repo** — you run `/initialize-portfolio` in Claude Code. This distributes your starting dollars across the watchlist noted in `holdings.csv` using only the qualitative inputs described in `investor_profile.md`. The result is a "beliefs in dollar form" initial baseline portfolio.
 - **Daily, Mon-Fri 16:30 local** — cron captures today's per-ticker shares and close price, and then updates the live dashboard.
-- **Weekly, Fri 17:00 local** — cron re-runs the mean-variance optimizer over the watchlist with the most recent wave-stage tilts (looked up from `data/wave_history.csv` as-of-today), records the recommended portfolio, then updates the live dashboard.
-- **Monthly, you decide** — you run `/review-portfolio` in Claude Code. LLM subagents gather wave-aligned news for each ticker (30-day lookback), classify each wave's stage, and pass those classifications to the optimizer as a tilt on expected returns. Then write a profile-aware report and refresh the live dashboard. The run also appends today's wave-stage classifications to the wave-history file (which drives the trajectory chart) and archives the full news payload for forensic re-reading. If a thesis baseline exists (it should, after `/initialize-portfolio`), every report re-renders the thesis-vs-recommended comparison.
+- **Monthly, you decide** — you run `/review-portfolio` in Claude Code. LLM subagents gather wave-aligned news for each ticker (30-day lookback), classify each wave's stage, and pass those classifications to the optimizer as a tilt on expected returns. The optimizer's recommended weights are persisted to `data/recommendations.csv` (driving the dashboard's chart 2 trajectory). Then write a profile-aware report and refresh the live dashboard. The run also appends today's wave-stage classifications to the wave-history file (which drives the trajectory chart) and archives the full news payload for forensic re-reading. If a thesis baseline exists (it should, after `/initialize-portfolio`), every report re-renders the thesis-vs-recommended comparison.
 - **On demand, you decide** — you run `/run-backtest` in Claude Code. Walk-forward weekly-rebalance backtest of the optimizer over a 12-month window, applying the wave-stage tilts that were known at each historical Friday. Pure Python, no LLM. Auto-renders both the local backtest dashboard and the public-demo backtest page.
-
-The weekly cron is the lightweight Python-only sibling of `/review-portfolio`: pure Python, no LLM, no fresh news pulls. It re-applies the most recent wave-stage tilts (whatever was last classified by `/review-portfolio`) to fresh prices each Friday. Run the skill when you want a fresh wave-stage read and a written narrative.
 
 ## Operations
 
 - Daily: nothing. The cron job appends a row per ticker to `data/snapshots.csv` and refreshes `docs/index.html`.
-- Weekly: nothing. Friday 17:00 local appends one optimization run to `data/recommendations.csv` and refreshes `docs/index.html`.
 - Whenever you want to publish the cron-refreshed dashboard: `git add docs/index.html && git commit -m "Refresh live dashboard" && git push`. cron does not auto-push.
 - Monthly: run `/review-portfolio` in Claude Code. Read the report (especially the **Profile conflicts** section), decide on rebalances, execute trades in your brokerage, then update `holdings.csv`.
 - After trading: edit `holdings.csv` to reflect new share counts. The next snapshot picks up the new positions.
@@ -55,14 +51,12 @@ The weekly cron is the lightweight Python-only sibling of `/review-portfolio`: p
 
 ### Optional: cron automation
 
-If you want the daily snapshot and weekly portfolio recommendation to update automatically, install these two cron entries. Skip if you'd rather invoke the commands by hand. The two entries work the same on macOS and Linux:
+If you want the daily snapshot to update automatically, install this cron entry. Skip if you'd rather invoke the commands by hand. Works the same on macOS and Linux:
 
 ```cron
 PROJ=/path/to/portfolio-wave-rider
 # Daily snapshot + dashboard refresh, Mon-Fri 16:30 local
 30 16 * * 1-5  cd $PROJ && .venv/bin/python -m src.cli snapshot && .venv/bin/python -m src.cli dashboard --nav-current live >> data/snapshot.log 2>&1
-# Weekly recommend + dashboard refresh, Fri 17:00 local
-0  17 * * 5    cd $PROJ && .venv/bin/python -m src.cli recommend && .venv/bin/python -m src.cli dashboard --nav-current live >> data/recommend.log 2>&1
 ```
 
 Each cron call refreshes `docs/index.html` (the dashboard CLI's default `--out`). The file is git-tracked but cron does not push — `git status` will show it modified after each run, and a manual `git add docs/index.html && git commit && git push` publishes the refresh.
@@ -78,9 +72,9 @@ Install with `crontab -e` and paste. Adjust `PROJ` to your clone path. Verify wi
 | `data/wave_history.csv` | Per-wave stage classifications over time. Drives chart 5 (wave-stage trajectory). | Raw wave-classification history |
 | `data/news/YYYY-MM-DD-news.json` | Full archived news payload per `/review-portfolio` run (~25 KB each). | Forensic re-read after a stage shift |
 | `data/snapshots.csv` | Long-format daily snapshots (date, ticker, shares, price, value, total_value). | Raw price/share history |
-| `data/recommendations.csv` | Long-format weekly optimizer output (date, ticker, weight, return, vol, Sharpe, objective). | Raw weight history |
+| `data/recommendations.csv` | Long-format optimizer output (date, ticker, weight, return, vol, Sharpe, objective). One row block per `/review-portfolio` run. | Raw weight history |
 | `data/reports/*.md` | LLM-written narrative reports, one per `/review-portfolio` run. | After each `/review-portfolio` |
-| `data/snapshot.log`, `data/recommend.log` | cron stdout/stderr. | If a scheduled run looks missing |
+| `data/snapshot.log` | cron stdout/stderr. | If a scheduled run looks missing |
 
 The "Profile conflicts" section of any report is the most important thing to read. It tells you when the optimizer wanted something the profile forbids.
 
@@ -93,7 +87,7 @@ The headline pieces are spelled out below: how `holdings.csv` shapes a run, and 
 `holdings.csv` is the watchlist universe. Both LLM subagents and the optimizer operate on exactly the set of tickers in this file:
 
 - **News scope.** The `news-researcher` is invoked with the ticker list from `holdings.csv` and only fetches headlines for those tickers.
-- **Optimizer eligibility.** `analyze` and the weekly `recommend` cron pass the same ticker list to `optimize_portfolio`, which builds a covariance matrix and an expected-return vector over only that set. The optimizer cannot assign weight to a ticker that isn't in the file.
+- **Optimizer eligibility.** `analyze` (called by `/review-portfolio`) passes the ticker list to `optimize_portfolio`, which builds a covariance matrix and an expected-return vector over only that set. The optimizer cannot assign weight to a ticker that isn't in the file.
 - **`shares = 0` is meaningful.** A row with zero shares puts the ticker on the watchlist (news is fetched, the optimizer can assign weight, the dashboard tracks its price) without representing an actual position. Use this when researching a candidate before buying, or when you want price-only history for context.
 - **To add a ticker:** append a row `<TICKER>,0` and run `/review-portfolio` (or wait for the next cron). The next run picks it up automatically — no other config changes needed.
 - **To remove a ticker:** delete the row. Subsequent runs skip it. The historical rows in `data/snapshots.csv` and `data/recommendations.csv` are not pruned (so old charts still render correctly), but no new rows accumulate.

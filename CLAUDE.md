@@ -57,7 +57,7 @@ The user decides. Never silently clamp a recommendation to fit the profile.
 ## Time-series outputs (appended, not overwritten)
 
 - `data/snapshots.csv`: daily per-ticker $ values. Schema: `date, ticker, shares, price, value, total_value`. Idempotent on date; pass `--force` to overwrite.
-- `data/recommendations.csv`: weekly lightweight optimizer output. Schema: `date, ticker, weight, expected_return, annual_volatility, sharpe_ratio, objective`. Idempotent on date; pass `--force` to overwrite.
+- `data/recommendations.csv`: optimizer output, one row block per `/review-portfolio` run. Schema: `date, ticker, weight, expected_return, annual_volatility, sharpe_ratio, objective`. Idempotent on date; the skill passes `--force` to overwrite if the user re-runs the review on the same day.
 - `data/wave_history.csv`: per-wave stage classifications, one row per (date, wave). Schema: `date, wave, stage, evidence_tickers, rationale, seeded`. `seeded=True` rows are post-hoc judgments from `seed-wave-history`; `seeded=False` rows are organic from `/review-portfolio` runs or from running the news-researcher with strict as-of-date instructions. Drives the dashboard's wave-stage trajectory chart.
 - `data/thesis_baseline.json`: one-time artifact written by `/initialize-portfolio`. Schema: `{date, allocations_usd, reasoning, holdings}`. Read-only after creation: `/review-portfolio` reads it on every run to render the thesis-vs-recommended comparison; `build_dashboard` reads its `date` to scope the live dashboard's time-series charts. Delete the file manually only if you want to redo the thesis from scratch (then re-run `/initialize-portfolio`).
 
@@ -65,21 +65,19 @@ These are the user's history. Don't break their schemas. If you must extend them
 
 ## Automation (cron, cross-platform)
 
-Two cron entries handle the daily and weekly automation. The exact crontab installed on the author's machine:
+One cron entry handles daily price snapshots. The exact crontab installed on the author's machine:
 
 ```cron
 PROJ=/Users/joehahn/Library/CloudStorage/Dropbox/prog/claude/portfolio-wave-rider
 # Daily snapshot + dashboard refresh, Mon-Fri 16:30 local
 30 16 * * 1-5  cd $PROJ && .venv/bin/python -m src.cli snapshot && .venv/bin/python -m src.cli dashboard --nav-current live >> data/snapshot.log 2>&1
-# Weekly recommend + dashboard refresh, Fri 17:00 local
-0  17 * * 5    cd $PROJ && .venv/bin/python -m src.cli recommend && .venv/bin/python -m src.cli dashboard --nav-current live >> data/recommend.log 2>&1
 ```
 
-Each cron call refreshes `docs/index.html` (the dashboard CLI's default `--out`). The file is git-tracked but cron does not push — `git status` will show it modified after each run, and a manual `git add docs/index.html && git commit && git push` publishes the refresh.
+The cron call refreshes `docs/index.html` (the dashboard CLI's default `--out`). The file is git-tracked but cron does not push — `git status` will show it modified after each run, and a manual `git add docs/index.html && git commit && git push` publishes the refresh.
 
 Set `PROJ` to wherever you cloned the repo, then `crontab -e` and paste. Works the same on macOS and Linux. cron only fires when the machine is awake at the trigger time; missed runs do not auto-replay. Use `--date YYYY-MM-DD` to backfill.
 
-The weekly `recommend` is the lightweight sibling of `/review-portfolio`: pure Python, no news-researcher, no fresh news pulls. It re-applies the most recent wave-stage tilts (looked up as-of-today from `data/wave_history.csv`) to fresh prices each Friday. Use the full skill when the user wants fresh wave classification and a written report.
+`recommend` lives only inside `/review-portfolio` now. The skill calls `python -m src.cli recommend --force` after `analyze` so `data/recommendations.csv` accumulates one row block per monthly review. There used to be a weekly Friday `recommend` cron too, but it produced near-duplicate rows between monthly reviews (wave classifications don't change between /review-portfolio runs and 7 days of new prices barely move μ over a 3-year lookback), so it was retired.
 
 ## Repo rules
 

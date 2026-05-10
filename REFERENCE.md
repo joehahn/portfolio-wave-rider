@@ -4,7 +4,7 @@ CLI flags, repo layout, and testing instructions for Portfolio Wave Rider. Narra
 
 ## CLI reference
 
-Eight subcommands. `/review-portfolio` calls `init-holdings` (first-run branch only), `wave-history` (after each news pass), and `analyze`. The cron jobs call `snapshot`, `recommend`, and `dashboard`. `backtest` is a one-off spot-check tool, not part of any cron flow. `seed-wave-history` is a one-time backfill for the wave-stage trajectory chart (chart 5). Every subcommand prints a single JSON blob to stdout.
+Eight subcommands. `/review-portfolio` calls `init-holdings` (first-run branch only), `wave-history` (after each news pass), `analyze`, `recommend`, and `dashboard`. The daily cron calls `snapshot` and `dashboard`. `backtest` is a one-off spot-check tool, not part of any cron flow. `seed-wave-history` is a one-time backfill for the wave-stage trajectory chart (chart 5). Every subcommand prints a single JSON blob to stdout.
 
 ```bash
 # Convert a thesis-driven dollar allocation into shares (used internally by the
@@ -35,7 +35,7 @@ Eight subcommands. `/review-portfolio` calls `init-holdings` (first-run branch o
 .venv/bin/python -m src.cli snapshot   [--date YYYY-MM-DD] [--force]
 .venv/bin/python -m src.cli recommend  [--max-weight 0.25] [--force]
 
-# Walk-forward backtest of the cron 'recommend' path over a historical window
+# Walk-forward backtest of the 'recommend' path over a historical window
 # (math-only; no LLM cost at the math layer). Writes data/backtest/{snapshots,
 # recommendations}.csv plus data/backtest/report.md with realized return, max
 # drawdown, weight stability, and per-benchmark active-return comparison
@@ -91,7 +91,7 @@ portfolio-wave-rider/
 ├── tests/
 ├── data/
 │   ├── snapshots.csv           # daily, appended (your history; gitignored)
-│   ├── recommendations.csv     # weekly, appended (your history; gitignored)
+│   ├── recommendations.csv     # appended on each /review-portfolio (your history; gitignored)
 │   ├── wave_history.csv        # per-/review-portfolio run, appended (gitignored)
 │   ├── thesis_baseline.json    # one-time artifact from /initialize-portfolio (gitignored)
 │   ├── news_feed.json          # daily yfinance headlines (gitignored)
