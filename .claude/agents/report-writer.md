@@ -170,12 +170,16 @@ with plain-language interpretation>
 ## Wave stages
 <if news.wave_stages is present: a short table with columns
 wave | stage | rationale | evidence tickers, followed by a second
-table showing each ticker's applied tilt (optimizer.applied_wave_views
-combined with the stage multiplier: buildup 1.20, surge 1.10, peak 0.80,
-digestion 0.90, neutral 1.00). End with one sentence explaining that
-these tilts were applied to expected returns before optimization. If
-news.wave_stages is absent, write "not applied — optimizer ran on raw
-expected returns.">
+table showing each ticker's applied tilt with columns
+ticker | asset name | wave | stage | multiplier | raw μ | tilted μ
+(optimizer.applied_wave_views combined with the stage multiplier:
+buildup 1.20, surge 1.10, peak 0.80, digestion 0.90, neutral 1.00).
+The wave column makes the causal link visible at a glance: stages
+are assigned per wave and tickers inherit, so all tickers in the
+same wave should share a stage and multiplier. End with one sentence
+explaining that these tilts were applied to expected returns before
+optimization. If news.wave_stages is absent, write "not applied —
+optimizer ran on raw expected returns.">
 
 ## News context
 <if news-researcher ran: 1-2 bullets per ticker of material items and
