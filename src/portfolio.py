@@ -1399,10 +1399,27 @@ def build_dashboard(
         snaps = pd.read_csv(snap_path, parse_dates=["date"])
         totals = snaps.groupby("date")["total_value"].first().sort_index()
         fig.add_trace(
-            go.Scatter(x=totals.index, y=totals.values, mode="lines+markers",
-                       name="Portfolio $", line={"width": 2}, legend="legend"),
+            go.Scatter(x=totals.index, y=totals.values, mode="lines",
+                       name="Portfolio $", line={"width": 2, "color": "#1f77b4"},
+                       legend="legend"),
             row=1, col=1,
         )
+        # Mark each rebalance date (where the optimizer fired) with a
+        # large open-square symbol so the cadence is visually obvious.
+        # Rebalance dates come from recommendations.csv; the markers sit
+        # on top of the portfolio-value line at each fire date.
+        if rec_path.exists():
+            rec_dates = pd.read_csv(rec_path, parse_dates=["date"])["date"].unique()
+            rebalance_totals = totals[totals.index.isin(rec_dates)]
+            if not rebalance_totals.empty:
+                fig.add_trace(
+                    go.Scatter(x=rebalance_totals.index, y=rebalance_totals.values,
+                               mode="markers", name="Rebalance",
+                               marker={"size": 11, "symbol": "square-open",
+                                       "color": "#1f77b4", "line": {"width": 2}},
+                               legend="legend"),
+                    row=1, col=1,
+                )
         # Benchmark overlays normalized to the portfolio's starting value.
         if benchmarks and len(totals) > 1:
             benchmark_curves = _fetch_benchmark_curves(
@@ -1429,11 +1446,21 @@ def build_dashboard(
         )
         wv_weight = recs.groupby(["date", "wave_bucket"])["weight"].sum().unstack(fill_value=0)
         wv_order = [w for w in _WAVE_DISPLAY_ORDER if w in wv_weight.columns]
-        for wave in wv_order:
+        # Add a tiny vertical offset per wave so traces with the same
+        # value (often 0%) don't pile on top of each other and become
+        # invisible. The offset is cosmetic; hover text reports the
+        # true weight.
+        wv_offset_step = 0.002  # 0.2 percentage points per trace
+        for i, wave in enumerate(wv_order):
+            offset = i * wv_offset_step
+            true_pct = [v * 100 for v in wv_weight[wave]]
             fig.add_trace(
-                go.Scatter(x=wv_weight.index, y=wv_weight[wave], mode="lines+markers",
-                           name=wave, legend="legend5",
-                           line={"color": WAVE_COLORS.get(wave)}),
+                go.Scatter(x=wv_weight.index, y=wv_weight[wave] + offset,
+                           mode="lines+markers", name=wave, legend="legend5",
+                           line={"color": WAVE_COLORS.get(wave)},
+                           customdata=true_pct,
+                           hovertemplate=f"{wave}<br>%{{x|%Y-%m-%d}}"
+                                         "<br>%{customdata:.2f}%<extra></extra>"),
                 row=2, col=1,
             )
         latest_date = recs["date"].max()
@@ -1533,13 +1560,19 @@ def build_dashboard(
             wh["wave"].unique(),
             key=lambda w: _WAVE_DISPLAY_ORDER.index(w) if w in _WAVE_DISPLAY_ORDER else 99,
         )
-        for wave in ordered:
+        # Per-wave vertical offset so multiple waves at the same stage
+        # rank don't render on top of each other. Cosmetic only; hover
+        # shows the actual stage label.
+        wh_offset_step = 0.05  # in stage-rank units (0..4)
+        for i, wave in enumerate(ordered):
             sub = wh[wh["wave"] == wave].sort_values("date")
+            offset = i * wh_offset_step
             # Hover shows the actual stage label, not just the rank.
             hover = [f"{wave}<br>stage: {s}<br>tickers: {t}"
                      for s, t in zip(sub["stage"], sub["evidence_tickers"].fillna(""))]
             fig.add_trace(
-                go.Scatter(x=sub["date"], y=sub["stage_rank"], mode="lines+markers",
+                go.Scatter(x=sub["date"], y=sub["stage_rank"] + offset,
+                           mode="lines+markers",
                            name=wave, legend="legend6",
                            line={"color": WAVE_COLORS.get(wave)},
                            hovertext=hover, hoverinfo="text+x"),
