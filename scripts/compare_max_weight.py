@@ -172,18 +172,12 @@ fig.add_trace(go.Scatter(x=spy.index, y=spy.values, mode="lines",
                          name="SPY (rebased)", line={"width": 1.5, "color": "#444", "dash": "dash"},
                          hovertemplate="SPY<br>%{x|%Y-%m-%d}<br>$%{y:,.0f}<extra></extra>"))
 
-# Rebalance markers: orange open squares at each rebalance date on each
-# cap's curve. Same style as the live and backtest dashboards.
-for mw in MAX_WEIGHTS:
-    s = curves[mw]
-    rb = s[s.index.isin(rebalance_dates)]
-    fig.add_trace(go.Scatter(
-        x=rb.index, y=rb.values, mode="markers",
-        name=f"Rebalance cap={mw}", showlegend=False,
-        marker={"size": 9, "symbol": "square-open",
-                "color": "#ff7f0e", "line": {"width": 1.5}},
-        hoverinfo="skip",
-    ))
+# Rebalance indicators: thin light-gray dotted vertical lines at each
+# rebalance date, behind all the line traces. Less visually busy than
+# per-curve markers when the figure has 4 simultaneously-plotted lines.
+for d in rebalance_dates:
+    fig.add_vline(x=d, line_dash="dot", line_width=1, line_color="#bbb",
+                  layer="below")
 fig.update_layout(
     title="Portfolio value over time, mean_variance λ=1 swept across concentration_cap",
     xaxis_title="date",
