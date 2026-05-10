@@ -1344,7 +1344,7 @@ def build_dashboard(
         )
 
     fig = make_subplots(
-        rows=8, cols=1,
+        rows=9, cols=1,
         subplot_titles=(
             "Portfolio value over time"
             "<br><sub><i>Σ(actual shares × close price) per day. SPY rebased to share starting value for comparison.</i></sub>",
@@ -1362,12 +1362,14 @@ def build_dashboard(
             "<br><sub><i>Daily portfolio value rolled up by asset class. Sums to total portfolio value (chart 1).</i></sub>",
             "$ by wave over time"
             "<br><sub><i>Daily portfolio value rolled up by wave bucket. Same data as chart 7 grouped differently. Log y-axis keeps small allocations visible next to the dominant general_markets line.</i></sub>",
+            "Rebalance turnover (% of portfolio dollars that changed holdings)"
+            "<br><sub><i>At each rebalance, ½·||Δw||₁ — half the L1 distance between consecutive weight vectors. Equals the fraction of portfolio value that moved between tickers. Step-function: each value holds until the next rebalance.</i></sub>",
         ),
         vertical_spacing=0.06,
         # Chart 5 (wave-stage trajectories) gets a right y-axis showing
         # each rank's tilt multiplier, so a reader can see at a glance
         # what nudge the optimizer applies for each stage.
-        specs=[[{}], [{}], [{}], [{}], [{"secondary_y": True}], [{}], [{}], [{}]],
+        specs=[[{}], [{}], [{}], [{}], [{"secondary_y": True}], [{}], [{}], [{}], [{}]],
     )
 
     # Compute a shared x-axis range from the daily-cadence data
@@ -1654,19 +1656,45 @@ def build_dashboard(
                 row=8, col=1,
             )
 
+    # 9. Rebalance turnover. Computed from recommendations.csv: at each
+    # rebalance the dollar-fraction-of-portfolio that moved between
+    # tickers equals (½ × ||w_new - w_prev||₁) where the weight vectors
+    # are normalized to sum to 1. Step-function via line_shape="hv": the
+    # value at each rebalance holds horizontally until the next one.
+    if rec_path.exists():
+        recs_for_turnover = pd.read_csv(rec_path, parse_dates=["date"])
+        wide = (recs_for_turnover.pivot_table(index="date", columns="ticker",
+                                              values="weight", fill_value=0)
+                .sort_index())
+        if len(wide) >= 2:
+            diffs = wide.diff().abs().sum(axis=1) / 2.0
+            diffs = diffs.dropna()
+            if not diffs.empty:
+                fig.add_trace(
+                    go.Scatter(x=diffs.index, y=diffs.values * 100,
+                               mode="lines+markers",
+                               name="Turnover",
+                               line={"color": "#ff7f0e", "width": 2, "shape": "hv"},
+                               marker={"size": 9, "symbol": "square-open",
+                                       "color": "#ff7f0e", "line": {"width": 2}},
+                               hovertemplate="%{x|%Y-%m-%d}<br>%{y:.1f}%<extra></extra>",
+                               showlegend=False),
+                    row=9, col=1,
+                )
+
     fig.update_layout(
-        height=2700,
+        height=3050,
         title_text="Portfolio Wave Rider — dashboard",
         # `closest` shows one trace's popup at a time, so hovering chart 1
         # shows portfolio $ OR SPY but not both (and chart 2 shows one
         # ticker's portfolio % at a time, which is cleaner with 7+ lines).
         hovermode="closest",
         # Per-subplot legends, one per chart, pinned to the right of each
-        # subplot in paper coordinates. Subplot row tops with 8 rows and
-        # vertical_spacing=0.06: row 1 top ~1.000, row 2 top ~0.868,
-        # row 5 top ~0.470, row 6 top ~0.338, row 7 top ~0.205,
-        # row 8 top ~0.073. Charts 3 and 4 have showlegend=False on their
-        # traces so they need no legend entry.
+        # subplot in paper coordinates. Subplot row tops with 9 rows and
+        # vertical_spacing=0.06: row 1 top ~1.000, row 2 top ~0.882,
+        # row 5 top ~0.529, row 6 top ~0.411, row 7 top ~0.293,
+        # row 8 top ~0.176, row 9 top ~0.058. Charts 3, 4, and 9 have
+        # showlegend=False on their traces so they need no legend entry.
         legend=dict(
             title_text="Portfolio value",
             xref="paper", x=1.02,
@@ -1675,29 +1703,29 @@ def build_dashboard(
         legend5=dict(
             title_text="Portfolio % by wave",
             xref="paper", x=1.02,
-            yref="paper", y=0.868, yanchor="top",
+            yref="paper", y=0.882, yanchor="top",
         ),
         # Chart 5 has a secondary y-axis (tilt multiplier) on the right,
         # so push this legend further out (x=1.06) to clear that axis.
         legend6=dict(
             title_text="Wave stages",
             xref="paper", x=1.06,
-            yref="paper", y=0.470, yanchor="top",
+            yref="paper", y=0.529, yanchor="top",
         ),
         legend4=dict(
             title_text="Articles per wave",
             xref="paper", x=1.02,
-            yref="paper", y=0.338, yanchor="top",
+            yref="paper", y=0.411, yanchor="top",
         ),
         legend2=dict(
             title_text="Asset class $",
             xref="paper", x=1.02,
-            yref="paper", y=0.205, yanchor="top",
+            yref="paper", y=0.293, yanchor="top",
         ),
         legend3=dict(
             title_text="Wave $",
             xref="paper", x=1.02,
-            yref="paper", y=0.073, yanchor="top",
+            yref="paper", y=0.176, yanchor="top",
         ),
     )
     fig.update_yaxes(title_text="$", row=1, col=1)
@@ -1741,6 +1769,7 @@ def build_dashboard(
     # robotics/biology lines hovering near a few hundred dollars) don't
     # collapse to the floor next to the dominant general_markets line.
     fig.update_yaxes(title_text="$ (log)", row=8, col=1, type="log")
+    fig.update_yaxes(title_text="turnover (%)", row=9, col=1, rangemode="tozero")
 
     # Apply the padded snapshots-derived range to every time-series
     # subplot so data points don't sit flush against the axis edges
@@ -1750,7 +1779,7 @@ def build_dashboard(
     # weights) and 4 (gain bars) are bar charts with categorical
     # x-axes so the range setter is a no-op there.
     if xrange is not None:
-        for r in (1, 2, 5, 6, 7, 8):
+        for r in (1, 2, 5, 6, 7, 8, 9):
             fig.update_xaxes(range=list(xrange), row=r, col=1)
 
     o_path = Path(out_path)
