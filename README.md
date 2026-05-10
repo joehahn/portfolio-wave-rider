@@ -73,7 +73,8 @@ Install with `crontab -e` and paste. Adjust `PROJ` to your clone path. Verify wi
 
 | File | What's in it | When to look |
 |---|---|---|
-| `docs/index.html` | Eight Plotly charts plus a "Today's headlines" and "In-depth news" section. Same file GitHub Pages serves. | Open in a browser any time |
+| `docs/index.html` | Eight Plotly charts of the live portfolio. Same file GitHub Pages serves. | Open in a browser any time |
+| `docs/news.html` | Wave-stage news bullets from the latest `/review-portfolio` run, grouped by wave bucket — the evidence the news-researcher used to classify each wave's stage. | After each `/review-portfolio` |
 | `data/wave_history.csv` | Per-wave stage classifications over time. Drives chart 5 (wave-stage trajectory). | Raw wave-classification history |
 | `data/news/YYYY-MM-DD-news.json` | Full archived news payload per `/review-portfolio` run (~25 KB each). | Forensic re-read after a stage shift |
 | `data/snapshots.csv` | Long-format daily snapshots (date, ticker, shares, price, value, total_value). | Raw price/share history |
