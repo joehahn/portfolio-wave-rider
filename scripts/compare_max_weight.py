@@ -172,11 +172,11 @@ fig.add_trace(go.Scatter(x=spy.index, y=spy.values, mode="lines",
                          name="SPY (rebased)", line={"width": 1.5, "color": "#444", "dash": "dash"},
                          hovertemplate="SPY<br>%{x|%Y-%m-%d}<br>$%{y:,.0f}<extra></extra>"))
 
-# Rebalance indicators: thin light-gray dotted vertical lines at each
-# rebalance date, behind all the line traces. Less visually busy than
-# per-curve markers when the figure has 4 simultaneously-plotted lines.
+# Rebalance indicators: thin orange dotted vertical lines at each
+# rebalance date, behind all the line traces. Same orange as the
+# square markers on the live and backtest dashboards.
 for d in rebalance_dates:
-    fig.add_vline(x=d, line_dash="dot", line_width=1, line_color="#bbb",
+    fig.add_vline(x=d, line_dash="dot", line_width=1, line_color="#ff7f0e",
                   layer="below")
 fig.update_layout(
     title="Portfolio value over time, mean_variance λ=1 swept across concentration_cap",
@@ -337,7 +337,8 @@ chart_caption = (
     f"<p style='color:#666;font-size:0.9em;max-width:65em;margin:0 auto;padding:0 1.5em;'>"
     f"<i>Walk-forward 12-month backtest run four times, once per concentration cap. "
     f"Each line is the same simulation (mean_variance λ=1, organic wave-history tilts) "
-    f"with a different per-position max weight. SPY rebased to share the starting value.</i>"
+    f"with a different per-position max weight. SPY rebased to share the starting value. "
+    f"Orange dotted vertical lines mark rebalance dates.</i>"
     f"</p>"
 )
 
