@@ -801,8 +801,6 @@ def backtest(
                 snapshots_path=str(out / "snapshots.csv"),
                 recommendations_path=str(out / "recommendations.csv"),
                 out_path=path,
-                news_path="data/news_latest.json",
-                news_feed_path="data/news_feed.json",
                 wave_history_path="data/wave_history.csv",
                 benchmarks=benchmarks,
                 nav_current=nav,
@@ -825,80 +823,6 @@ def backtest(
         "weight_stability_l1": round(weight_stability, 4),
         "benchmark_returns": {b: round(r, 4) for b, r in benchmark_returns.items()},
         "dashboards_rendered": rendered,
-    }
-
-
-# ---------------------------------------------------------------------------
-# Daily news feed. Cron-friendly, no LLM. Uses yfinance's per-ticker news
-# (Yahoo Finance) to keep the dashboard's "Today's headlines" section fresh
-# between manual /review-portfolio runs.
-# ---------------------------------------------------------------------------
-
-def fetch_news_feed(
-    holdings_path: str = "holdings.csv",
-    out_path: str = "data/news_feed.json",
-    per_ticker_limit: int = 5,
-    date: str | None = None,
-) -> dict[str, Any]:
-    """Pull recent Yahoo Finance headlines for each ticker in holdings.csv,
-    write a JSON payload shaped like ``data/news_latest.json`` (so the
-    dashboard's existing news-rendering code can consume it without
-    branching).
-
-    yfinance returns up to ~10 items per ticker; we keep the most recent
-    ``per_ticker_limit`` of them. No wave-stage classification; this is
-    raw "what happened today" surfacing, not the LLM's interpretation.
-    """
-    h_path = Path(holdings_path)
-    if not h_path.exists():
-        raise FileNotFoundError(f"holdings file not found: {h_path}")
-    holdings = pd.read_csv(h_path)
-    if "ticker" not in holdings.columns:
-        raise ValueError(f"{h_path} must have a 'ticker' column")
-    tickers = holdings["ticker"].str.upper().str.strip().tolist()
-
-    feed_date = pd.Timestamp(date).date() if date else pd.Timestamp.today().date()
-
-    per_ticker: dict[str, dict[str, Any]] = {}
-    for ticker in tickers:
-        items = yf.Ticker(ticker).news or []
-        bullets = []
-        for item in items[:per_ticker_limit]:
-            content = item.get("content") or {}
-            title = (content.get("title") or "").strip()
-            summary = (content.get("summary") or "").strip()
-            url_obj = content.get("canonicalUrl") or content.get("clickThroughUrl") or {}
-            url = (url_obj.get("url") if isinstance(url_obj, dict) else "") or ""
-            provider = content.get("provider") or {}
-            source = (provider.get("displayName") if isinstance(provider, dict) else "") or ""
-            pub_iso = content.get("pubDate") or ""
-            pub_date = pub_iso[:10] if pub_iso else ""
-            if not title or not url:
-                continue
-            bullets.append({
-                "headline": title,
-                "summary": summary,
-                "source": source,
-                "url": url,
-                "date": pub_date,
-            })
-        per_ticker[ticker] = {"bullets": bullets}
-
-    payload = {
-        "date": str(feed_date),
-        "per_ticker": per_ticker,
-    }
-
-    o_path = Path(out_path)
-    o_path.parent.mkdir(parents=True, exist_ok=True)
-    o_path.write_text(json.dumps(payload, indent=2))
-
-    n_bullets = sum(len(v.get("bullets") or []) for v in per_ticker.values())
-    return {
-        "date": str(feed_date),
-        "tickers": tickers,
-        "n_bullets": n_bullets,
-        "out_path": str(o_path),
     }
 
 
@@ -1201,10 +1125,9 @@ def _render_news_section(payload: dict, title: str, intro: str) -> str:
     """Render one news section (title + intro + per-ticker click-to-expand bullets).
 
     Returns an empty string if payload has no per_ticker bullets. Used by
-    `_render_news_html` for both the daily yfinance feed and the monthly
-    /review-portfolio rich payload; the two sections share the same
-    schema (per_ticker -> {bullets: [{headline, summary, source, url, date,
-    optional wave_bucket}]}) so the same renderer fits both.
+    ``render_news_page`` for the dashboard's wave-stage news section.
+    Schema: per_ticker -> {bullets: [{headline, summary, source, url,
+    date, optional wave_bucket}]}.
     """
     per_ticker = payload.get("per_ticker") or {}
     if not per_ticker:
@@ -1273,60 +1196,6 @@ def _render_news_section(payload: dict, title: str, intro: str) -> str:
     return "\n".join(parts)
 
 
-def _render_news_html(news_path: Path, news_feed_path: Path | None = None) -> str:
-    """Render the dashboard's news area as up to two sections.
-
-    Top section ("Today's headlines") comes from ``news_feed_path``
-    (the daily yfinance scrape) when present. Bottom section
-    ("In-depth news from last /review-portfolio") comes from
-    ``news_path`` (the monthly LLM-driven payload) when present.
-
-    Returns "" if neither file exists / has content.
-    """
-    sections: list[str] = []
-
-    if news_feed_path is not None and news_feed_path.exists():
-        try:
-            feed = json.loads(news_feed_path.read_text())
-            section = _render_news_section(
-                feed,
-                title="Today's headlines",
-                intro="Refreshed daily by cron via Yahoo Finance "
-                      "(<code>yfinance.Ticker(t).news</code>). Each entry's "
-                      "summary is the article's lead paragraph from the source. "
-                      "Surface-level coverage; for portfolio-relevant analysis "
-                      "see the section below.",
-            )
-            if section:
-                sections.append(section)
-        except (json.JSONDecodeError, OSError):
-            pass
-
-    if news_path.exists():
-        try:
-            latest = json.loads(news_path.read_text())
-            section = _render_news_section(
-                latest,
-                title="In-depth news from last /review-portfolio",
-                intro="Click any headline to expand the LLM-written, "
-                      "portfolio-relevance summary plus a link to the source. "
-                      "Refreshed when you run <code>/review-portfolio</code> "
-                      "(typically monthly). Tickers are grouped by wave bucket.",
-            )
-            if section:
-                sections.append(section)
-        except (json.JSONDecodeError, OSError):
-            pass
-
-    if not sections:
-        return ""
-
-    return "\n".join([
-        '<div style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;'
-        'max-width:980px;margin:1.5em auto 3em;padding:0 1.5em;color:#222;">',
-        *sections,
-        '</div>',
-    ])
 
 
 def _fetch_benchmark_curves(
@@ -1414,15 +1283,16 @@ def build_dashboard(
     snapshots_path: str = "data/snapshots.csv",
     recommendations_path: str = "data/recommendations.csv",
     out_path: str = "docs/index.html",
-    news_path: str = "data/news_latest.json",
-    news_feed_path: str = "data/news_feed.json",
     wave_history_path: str = "data/wave_history.csv",
     benchmarks: list[str] | None = None,
     nav_current: str | None = None,
     thesis_baseline_path: str | None = "data/thesis_baseline.json",
 ) -> dict[str, Any]:
-    """Render four Plotly charts plus the news area (daily yfinance feed
-    + the most recent /review-portfolio payload) into one HTML file.
+    """Render the time-series + bar charts into one HTML file.
+
+    News content is rendered separately by ``render_news_page`` into
+    docs/news.html; the dashboard CLI calls both together so cron and
+    /review-portfolio refresh both files in one go.
 
     If ``benchmarks`` is provided (or defaulted to ``["SPY"]``), each
     benchmark ticker's price curve is fetched via yfinance for the

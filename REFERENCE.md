@@ -4,7 +4,7 @@ CLI flags, repo layout, and testing instructions for Portfolio Wave Rider. Narra
 
 ## CLI reference
 
-Nine subcommands. `/review-portfolio` calls `init-holdings` (first-run branch only), `wave-history` (after each news pass), and `analyze`. The cron jobs call `snapshot`, `news-feed`, `recommend`, and `dashboard`. `backtest` is a one-off spot-check tool, not part of any cron flow. `seed-wave-history` is a one-time backfill for the wave-stage trajectory chart (chart 5). Every subcommand prints a single JSON blob to stdout.
+Eight subcommands. `/review-portfolio` calls `init-holdings` (first-run branch only), `wave-history` (after each news pass), and `analyze`. The cron jobs call `snapshot`, `recommend`, and `dashboard`. `backtest` is a one-off spot-check tool, not part of any cron flow. `seed-wave-history` is a one-time backfill for the wave-stage trajectory chart (chart 5). Every subcommand prints a single JSON blob to stdout.
 
 ```bash
 # Convert a thesis-driven dollar allocation into shares (used internally by the
@@ -20,9 +20,6 @@ Nine subcommands. `/review-portfolio` calls `init-holdings` (first-run branch on
 # seeded=True. Run once on a fresh repo so chart 5 (wave-stage trajectories) is
 # informative before /review-portfolio has had time to accumulate organic history.
 .venv/bin/python -m src.cli seed-wave-history [--force]
-
-# Pull recent Yahoo Finance headlines per ticker into data/news_feed.json (cron, no LLM)
-.venv/bin/python -m src.cli news-feed [--per-ticker-limit 5]
 
 # One-shot analysis (fetch prices + compute log-returns + optimize + risk metrics).
 # Three objectives:

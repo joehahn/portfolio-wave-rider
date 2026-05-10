@@ -1,18 +1,17 @@
 """Single CLI for every portfolio operation.
 
-Nine subcommands. Each calls one function in ``src/portfolio.py`` and
+Eight subcommands. Each calls one function in ``src/portfolio.py`` and
 prints the result as JSON to stdout. The /review-portfolio skill
 invokes ``init-holdings`` (first-run branch only), ``wave-history``
 (after each news pass), and ``analyze``; the cron jobs invoke
-``snapshot``, ``news-feed``, ``recommend``, and ``dashboard``.
-``backtest`` is a one-off spot-check tool, not part of any cron flow.
-``seed-wave-history`` is a one-time backfill for chart 4 trajectories.
+``snapshot``, ``recommend``, and ``dashboard``. ``backtest`` is a
+one-off spot-check tool, not part of any cron flow. ``seed-wave-history``
+is a one-time backfill for chart 4 trajectories.
 
 Usage:
     python -m src.cli init-holdings      --allocations '{"AAPL": 5000, ...}' --out holdings.csv
     python -m src.cli wave-history       [--news data/news_latest.json] [--force]
     python -m src.cli seed-wave-history  [--force]
-    python -m src.cli news-feed          [--holdings holdings.csv] [--per-ticker-limit 5]
     python -m src.cli analyze            --tickers AAPL MSFT NVDA --period 3y --max-weight 0.25
     python -m src.cli snapshot           [--date YYYY-MM-DD] [--force]
     python -m src.cli recommend          [--max-weight 0.25] [--force]
@@ -70,14 +69,6 @@ def main(argv: list[str] | None = None) -> int:
     p_seed.add_argument("--out", default="data/wave_history.csv")
     p_seed.add_argument("--force", action="store_true",
                         help="overwrite any existing rows for the seeded dates")
-
-    p_nf = sub.add_parser("news-feed",
-                          help="pull recent Yahoo Finance headlines per holdings ticker into data/news_feed.json")
-    p_nf.add_argument("--holdings", default="holdings.csv")
-    p_nf.add_argument("--out", default="data/news_feed.json")
-    p_nf.add_argument("--per-ticker-limit", type=int, default=5,
-                      help="max headlines per ticker (default 5; yfinance typically returns ~10)")
-    p_nf.add_argument("--date", default=None, help="YYYY-MM-DD; defaults to today")
 
     p_an = sub.add_parser("analyze", help="fetch + optimize + risk in one call")
     p_an.add_argument("--tickers", nargs="+", required=True)
@@ -148,7 +139,6 @@ def main(argv: list[str] | None = None) -> int:
     p_dash.add_argument("--snapshots", default="data/snapshots.csv")
     p_dash.add_argument("--recommendations", default="data/recommendations.csv")
     p_dash.add_argument("--news", default="data/news_latest.json")
-    p_dash.add_argument("--news-feed", default="data/news_feed.json")
     p_dash.add_argument("--wave-history", default="data/wave_history.csv")
     p_dash.add_argument("--benchmarks", nargs="*", default=["SPY"],
                         help="benchmark tickers to overlay on the portfolio-value chart "
@@ -185,11 +175,6 @@ def main(argv: list[str] | None = None) -> int:
             )
         elif args.cmd == "seed-wave-history":
             result = portfolio.seed_wave_history(out_path=args.out, force=args.force)
-        elif args.cmd == "news-feed":
-            result = portfolio.fetch_news_feed(
-                holdings_path=args.holdings, out_path=args.out,
-                per_ticker_limit=args.per_ticker_limit, date=args.date,
-            )
         elif args.cmd == "backtest":
             result = portfolio.backtest(
                 holdings_path=args.holdings,
@@ -230,8 +215,6 @@ def main(argv: list[str] | None = None) -> int:
                 snapshots_path=args.snapshots,
                 recommendations_path=args.recommendations,
                 out_path=args.out,
-                news_path=args.news,
-                news_feed_path=args.news_feed,
                 wave_history_path=args.wave_history,
                 benchmarks=args.benchmarks,
                 nav_current=args.nav_current,

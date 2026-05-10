@@ -37,7 +37,7 @@ To bootstrap a fresh portfolio, run `/initialize-portfolio` in Claude Code. Then
 Five triggers cover the portfolio's lifecycle: setup, daily/weekly refresh, monthly review, and on-demand backtest.
 
 - **Once, on a fresh repo** — you run `/initialize-portfolio` in Claude Code. This distributes your starting dollars across the watchlist (`holdings.csv`) using only the qualitative inputs described in `investor_profile.md`. The result is a "beliefs in dollar form" initial baseline portfolio.
-- **Daily, Mon-Fri 16:30 local** — cron records today's per-ticker shares and close price, pulls fresh Yahoo Finance headlines, then updates the live dashboard.
+- **Daily, Mon-Fri 16:30 local** — cron records today's per-ticker shares and close price, then updates the live dashboard.
 - **Weekly, Fri 17:00 local** — cron re-runs the mean-variance optimizer over the watchlist, records the recommended portfolio, then updates the live dashboard.
 - **Monthly, you decide** — you run `/review-portfolio` in Claude Code. LLM subagents gather wave-aligned news for each ticker (30-day lookback), classify each wave's stage, and pass those classifications to the optimizer as a tilt on expected returns. Then write a profile-aware report and refresh the live dashboard. The run also appends today's wave-stage classifications to the wave-history file (which drives the trajectory chart) and archives the full news payload for forensic re-reading. If a thesis baseline exists (it should, after `/initialize-portfolio`), every report re-renders the thesis-vs-recommended comparison.
 - **On demand, you decide** — you run `/run-backtest` in Claude Code. Walk-forward weekly-rebalance backtest of the optimizer over a 12-month window, applying the wave-stage tilts that were known at each historical Friday. Pure Python, no LLM. Auto-renders both the local backtest dashboard and the public-demo backtest page.
@@ -59,8 +59,8 @@ If you want the daily snapshot and weekly portfolio recommendation to update aut
 
 ```cron
 PROJ=/path/to/portfolio-wave-rider
-# Daily snapshot + news-feed + dashboard refresh, Mon-Fri 16:30 local
-30 16 * * 1-5  cd $PROJ && .venv/bin/python -m src.cli snapshot && .venv/bin/python -m src.cli news-feed && .venv/bin/python -m src.cli dashboard --nav-current live >> data/snapshot.log 2>&1
+# Daily snapshot + dashboard refresh, Mon-Fri 16:30 local
+30 16 * * 1-5  cd $PROJ && .venv/bin/python -m src.cli snapshot && .venv/bin/python -m src.cli dashboard --nav-current live >> data/snapshot.log 2>&1
 # Weekly recommend + dashboard refresh, Fri 17:00 local
 0  17 * * 5    cd $PROJ && .venv/bin/python -m src.cli recommend && .venv/bin/python -m src.cli dashboard --nav-current live >> data/recommend.log 2>&1
 ```
@@ -74,7 +74,6 @@ Install with `crontab -e` and paste. Adjust `PROJ` to your clone path. Verify wi
 | File | What's in it | When to look |
 |---|---|---|
 | `docs/index.html` | Eight Plotly charts plus a "Today's headlines" and "In-depth news" section. Same file GitHub Pages serves. | Open in a browser any time |
-| `data/news_feed.json` | Daily yfinance headlines per ticker. ~5 bullets each. Drives the "Today's headlines" section. | Raw daily headline coverage |
 | `data/wave_history.csv` | Per-wave stage classifications over time. Drives chart 5 (wave-stage trajectory). | Raw wave-classification history |
 | `data/news/YYYY-MM-DD-news.json` | Full archived news payload per `/review-portfolio` run (~25 KB each). | Forensic re-read after a stage shift |
 | `data/snapshots.csv` | Long-format daily snapshots (date, ticker, shares, price, value, total_value). | Raw price/share history |
@@ -92,7 +91,7 @@ The headline pieces are spelled out below: how `holdings.csv` shapes a run, and 
 
 `holdings.csv` is the watchlist universe. Both LLM subagents and the optimizer operate on exactly the set of tickers in this file:
 
-- **News scope.** The `news-researcher` is invoked with the ticker list from `holdings.csv` and only fetches headlines for those tickers. The daily yfinance `news-feed` cron does the same.
+- **News scope.** The `news-researcher` is invoked with the ticker list from `holdings.csv` and only fetches headlines for those tickers.
 - **Optimizer eligibility.** `analyze` and the weekly `recommend` cron pass the same ticker list to `optimize_portfolio`, which builds a covariance matrix and an expected-return vector over only that set. The optimizer cannot assign weight to a ticker that isn't in the file.
 - **`shares = 0` is meaningful.** A row with zero shares puts the ticker on the watchlist (news is fetched, the optimizer can assign weight, the dashboard tracks its price) without representing an actual position. Use this when researching a candidate before buying, or when you want price-only history for context.
 - **To add a ticker:** append a row `<TICKER>,0` and run `/review-portfolio` (or wait for the next cron). The next run picks it up automatically — no other config changes needed.

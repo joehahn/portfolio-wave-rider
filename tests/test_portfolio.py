@@ -121,12 +121,17 @@ def test_initialize_holdings_rejects_negative_allocation() -> None:
         portfolio.initialize_holdings({"AAA": -100.0}, {"AAA": 50.0})
 
 
-def test_render_news_html_returns_empty_when_file_missing(tmp_path) -> None:
-    assert portfolio._render_news_html(tmp_path / "missing.json") == ""
+def test_render_news_page_writes_placeholder_when_file_missing(tmp_path) -> None:
+    """If no /review-portfolio has run yet, render_news_page still writes a page
+    so the nav-strip link doesn't 404."""
+    out_path = tmp_path / "news.html"
+    portfolio.render_news_page(news_path=str(tmp_path / "missing.json"),
+                               out_path=str(out_path), nav_current=None)
+    assert out_path.exists()
+    assert "No wave-stage news yet" in out_path.read_text()
 
 
-def test_render_news_html_emits_expandable_headlines(tmp_path) -> None:
-    import json
+def test_render_news_section_emits_expandable_headlines() -> None:
     news = {
         "date": "2026-05-02",
         "per_ticker": {
@@ -150,9 +155,7 @@ def test_render_news_html_emits_expandable_headlines(tmp_path) -> None:
             },
         },
     }
-    p = tmp_path / "news.json"
-    p.write_text(json.dumps(news))
-    out = portfolio._render_news_html(p)
+    out = portfolio._render_news_section(news, title="Test", intro="Intro.")
     # Date appears in header.
     assert "2026-05-02" in out
     # Both tickers and their wave buckets appear as headers.
@@ -311,19 +314,10 @@ def test_fetch_benchmark_curves_returns_empty_on_yfinance_failure(monkeypatch) -
     assert curves == {}
 
 
-def test_render_news_html_renders_both_sections_when_both_paths_provided(tmp_path) -> None:
-    """The two news files render as two sections in the same HTML block."""
+def test_render_news_page_writes_html_with_wave_bucket_label(tmp_path) -> None:
+    """render_news_page produces a standalone HTML file with per-ticker bullets,
+    grouped under their wave bucket."""
     import json
-    feed = {
-        "date": "2026-05-04",
-        "per_ticker": {
-            "NVDA": {"bullets": [
-                {"headline": "Yahoo headline for NVDA", "summary": "Yahoo lead.",
-                 "source": "Yahoo Finance", "url": "https://example.com/yf-nvda",
-                 "date": "2026-05-04"},
-            ]},
-        },
-    }
     latest = {
         "date": "2026-05-02",
         "per_ticker": {
@@ -334,34 +328,25 @@ def test_render_news_html_renders_both_sections_when_both_paths_provided(tmp_pat
             ]},
         },
     }
-    feed_path = tmp_path / "news_feed.json"
-    latest_path = tmp_path / "news_latest.json"
-    feed_path.write_text(json.dumps(feed))
-    latest_path.write_text(json.dumps(latest))
+    news_path = tmp_path / "news_latest.json"
+    out_path = tmp_path / "news.html"
+    news_path.write_text(json.dumps(latest))
 
-    out = portfolio._render_news_html(latest_path, news_feed_path=feed_path)
+    portfolio.render_news_page(news_path=str(news_path), out_path=str(out_path),
+                               nav_current=None)
+    out = out_path.read_text()
 
-    # Both section titles appear, daily-feed first.
-    assert "Today's headlines" in out
-    assert "In-depth news from last /review-portfolio" in out
-    assert out.index("Today's headlines") < out.index("In-depth news from last /review-portfolio")
-
-    # Both source URLs render.
-    assert 'href="https://example.com/yf-nvda"' in out
+    # Section title appears.
+    assert "Wave-stage news from last /review-portfolio" in out
+    # Source URL renders.
     assert 'href="https://example.com/llm-nvda"' in out
-
-    # Daily section omits wave_bucket label since yfinance doesn't classify;
-    # in-depth section keeps the (AI) label from wave_bucket.
-    feed_section_end = out.index("In-depth news from last /review-portfolio")
-    feed_section = out[:feed_section_end]
-    indepth_section = out[feed_section_end:]
-    assert "(AI)" not in feed_section
-    assert "(AI)" in indepth_section
+    # wave_bucket label appears next to the ticker.
+    assert "(AI)" in out
 
 
-def test_render_news_html_falls_back_when_headline_missing(tmp_path) -> None:
-    """Older news_latest.json without a headline field still renders cleanly."""
-    import json
+def test_render_news_section_falls_back_when_headline_missing() -> None:
+    """Older news_latest.json without a headline field still renders cleanly:
+    the click target falls back to the first sentence of the summary body."""
     news = {
         "date": "2026-05-02",
         "per_ticker": {
@@ -375,9 +360,7 @@ def test_render_news_html_falls_back_when_headline_missing(tmp_path) -> None:
             },
         },
     }
-    p = tmp_path / "news.json"
-    p.write_text(json.dumps(news))
-    out = portfolio._render_news_html(p)
+    out = portfolio._render_news_section(news, title="Test", intro="Intro.")
     # Click target (the <summary>) falls back to the first sentence of the body.
     assert "Revenue jumped 69 percent year over year" in out
     # Full body still appears in the expanded section.

@@ -43,8 +43,8 @@ The user decides. Never silently clamp a recommendation to fit the profile.
   - `/review-portfolio` (recurring): reads the profile, holdings, and `data/thesis_baseline.json` (if present); gathers news via news-researcher; runs the `analyze` CLI with wave tilts; invokes the report-writer (which renders the thesis-vs-recommended comparison whenever the baseline exists); refreshes the live dashboard at `docs/index.html`. Empty-holdings guard sends the user to `/initialize-portfolio` if holdings.csv is all-zero.
   - `/run-backtest` (on demand): wraps `python -m src.cli backtest` with the demo-headline configuration (mean_variance λ=1, time-varying wave tilts from data/wave_history.csv, SPY benchmark). Auto-renders both `data/backtest/dashboard.html` and `docs/backtest.html`.
 - All Python in two files:
-  - `src/portfolio.py`: every math function (fetch_prices, compute_returns, optimize_portfolio, risk_metrics, analyze, initialize_holdings, snapshot_holdings, recommend_portfolio, append_wave_history, fetch_news_feed, backtest, build_dashboard).
-  - `src/cli.py`: one entry point with nine subcommands (`init-holdings`, `wave-history`, `seed-wave-history`, `news-feed`, `analyze`, `snapshot`, `recommend`, `backtest`, `dashboard`) that the skill and cron jobs invoke via Bash. `backtest` is a one-off spot-check tool, not part of any cron flow. `seed-wave-history` is a one-time backfill for the wave-stage trajectory chart (chart 5).
+  - `src/portfolio.py`: every math function (fetch_prices, compute_returns, optimize_portfolio, risk_metrics, analyze, initialize_holdings, snapshot_holdings, recommend_portfolio, append_wave_history, backtest, build_dashboard, render_news_page).
+  - `src/cli.py`: one entry point with eight subcommands (`init-holdings`, `wave-history`, `seed-wave-history`, `analyze`, `snapshot`, `recommend`, `backtest`, `dashboard`) that the skill and cron jobs invoke via Bash. `backtest` is a one-off spot-check tool, not part of any cron flow. `seed-wave-history` is a one-time backfill for the wave-stage trajectory chart (chart 5).
 - Reports are written to `data/reports/YYYY-MM-DD-<skill>.md`.
 - Dashboard is a single static `docs/index.html`, regenerated after each snapshot or recommend run and at the end of `/review-portfolio`. The same file is what GitHub Pages serves at the public-demo URL; cron does not auto-push, so `git add docs/index.html && git commit && git push` is the manual publish step whenever you want the live demo refreshed.
 
@@ -70,7 +70,7 @@ Two cron entries handle the daily and weekly automation. The exact crontab insta
 ```cron
 PROJ=/Users/joehahn/Library/CloudStorage/Dropbox/prog/claude/portfolio-wave-rider
 # Daily snapshot + dashboard refresh, Mon-Fri 16:30 local
-30 16 * * 1-5  cd $PROJ && .venv/bin/python -m src.cli snapshot && .venv/bin/python -m src.cli news-feed && .venv/bin/python -m src.cli dashboard --nav-current live >> data/snapshot.log 2>&1
+30 16 * * 1-5  cd $PROJ && .venv/bin/python -m src.cli snapshot && .venv/bin/python -m src.cli dashboard --nav-current live >> data/snapshot.log 2>&1
 # Weekly recommend + dashboard refresh, Fri 17:00 local
 0  17 * * 5    cd $PROJ && .venv/bin/python -m src.cli recommend && .venv/bin/python -m src.cli dashboard --nav-current live >> data/recommend.log 2>&1
 ```
