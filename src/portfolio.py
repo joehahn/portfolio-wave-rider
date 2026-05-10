@@ -1618,6 +1618,11 @@ def build_dashboard(
     # 5. Wave-stage trajectories (one line per wave, from wave_history.csv).
     if wh_path.exists():
         wh = pd.read_csv(wh_path, parse_dates=["date"])
+        # Clip to the same x-axis window the other charts use, so
+        # off-screen earlier classifications don't draw a line into
+        # the left edge of the visible chart.
+        if xrange is not None:
+            wh = wh[(wh["date"] >= xrange[0]) & (wh["date"] <= xrange[1])]
         wh["stage_rank"] = wh["stage"].map(WAVE_STAGE_RANK).fillna(0).astype(int)
         # Order legend by display priority so AI is at the top, general_markets last.
         ordered = sorted(
@@ -1664,6 +1669,8 @@ def build_dashboard(
                 article_rows.append({"date": pd.Timestamp(d), "wave": wave, "count": n})
         if article_rows:
             adf = pd.DataFrame(article_rows)
+            if xrange is not None:
+                adf = adf[(adf["date"] >= xrange[0]) & (adf["date"] <= xrange[1])]
             for wave in [w for w in _WAVE_DISPLAY_ORDER if w in adf["wave"].unique()]:
                 sub = adf[adf["wave"] == wave].sort_values("date")
                 fig.add_trace(
