@@ -25,12 +25,12 @@ cp holdings.example.csv holdings.csv
 
 The two files you maintain:
 
-- `investor_profile.md`: here you declare your goals, constraints, exclusions, asset-class targets, the wave-thesis prose, and the optimizer's mathematical model (objective, risk aversion, risk-free rate, lookback window, wave-stage tilt multipliers). Each field is documented with inline comments in `investor_profile.example.md` — copy that file and edit. Every recommendation cites lines from this file.
+- `investor_profile.md`: here you declare your goals, constraints, exclusions, asset-class targets, the wave-thesis prose, and the optimizer's mathematical model (objective, risk aversion, risk-free rate, lookback window, wave-stage tilt multipliers). Each field is documented with explanatory comments in `investor_profile.example.md`. Every recommendation cites lines from this file.
 - `holdings.csv`: a two-column CSV (`ticker,shares`) acting as your watchlist. Initialize that with 0; the `/initialize-portfolio` skill will then allocate dollars across that portfolio during its first run.
 
 Optional: `news_sources.md`, a curated list of sources per technology wave. Improves the news-researcher's signal. Missing is fine; the agent falls back to open web search.
 
-To bootstrap a fresh portfolio, run `/initialize-portfolio` in Claude Code (one-shot). Then `/review-portfolio` is the recurring monthly call. See **Runs** below for the full cadence.
+To bootstrap a fresh portfolio, run `/initialize-portfolio` in Claude Code. Then execute `/review-portfolio` to update the portfolio recommendations. See **Runs** below for the full cadence.
 
 ## Runs
 
