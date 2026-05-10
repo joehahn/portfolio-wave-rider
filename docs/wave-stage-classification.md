@@ -81,7 +81,7 @@ return {t: wave_to_stage.get(TICKER_WAVE.get(t, "general_markets"), "neutral")
         for t in tickers}
 ```
 
-At each weekly Friday rebalance, the helper filters to rows dated on or before that Friday and picks the most recent classification. A November 2025 rebalance only sees rows from October 2025 or earlier. This is the as-of-date discipline that makes the backtest free of price-side look-ahead bias.
+At each monthly rebalance (first trading day of each new month), the helper filters to rows dated on or before that day and picks the most recent classification. A November 2025 rebalance only sees rows from October 2025 or earlier. This is the as-of-date discipline that makes the backtest free of price-side look-ahead bias.
 
 The wave-history-side protection depends on the rows themselves having honest content, which is what the pilot rebuild establishes. The seed path produced rows whose dates were honest but whose rationales had foresight, so the as-of-date filter alone was not sufficient under the seed.
 

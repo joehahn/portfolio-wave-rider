@@ -570,7 +570,7 @@ def backtest(
     benchmarks: list[str] | None = None,
     wave_history_path: str | None = None,
 ) -> dict[str, Any]:
-    """Walk-forward weekly-rebalance backtest of the lightweight Python-only path.
+    """Walk-forward monthly-rebalance backtest of the lightweight Python-only path.
 
     For each Friday in [start_date, end_date], runs the optimizer with a
     `lookback_years`-long window ending that Friday and rebalances the
@@ -659,12 +659,18 @@ def backtest(
     current_shares: dict[str, float] | None = None
     last_weights: dict[str, float] | None = None
     weight_l1_distances: list[float] = []
+    last_rebalance_month: int | None = None
 
     for date in daily_dates:
-        is_friday = date.weekday() == 4
+        # Monthly rebalance cadence: fire on the first trading day of each
+        # month. Matches the live system's /review-portfolio cadence and the
+        # /review-portfolio-driven update of wave_history.csv (which has at
+        # most one row per month, so weekly rebalances between month-ends
+        # added no new wave information anyway).
+        is_new_month = date.month != last_rebalance_month
         is_first_day = date == daily_dates[0]
 
-        if is_friday or (is_first_day and current_shares is None):
+        if is_new_month or (is_first_day and current_shares is None):
             # Run optimizer with a `lookback_years`-long window ending today.
             lookback_start = date - pd.Timedelta(days=365 * lookback_years)
             slice_prices = full_prices.loc[lookback_start:date]
@@ -680,7 +686,7 @@ def backtest(
                 continue
             weights = opt["weights"]
 
-            # Track week-over-week weight stability (L1 distance between weight vectors).
+            # Track month-over-month weight stability (L1 distance between weight vectors).
             if last_weights is not None:
                 l1 = sum(abs(weights[t] - last_weights.get(t, 0)) for t in weights)
                 weight_l1_distances.append(l1)
@@ -708,6 +714,7 @@ def backtest(
                     "sharpe_ratio": opt["sharpe_ratio"],
                     "objective": objective,
                 })
+            last_rebalance_month = date.month
 
         # Daily snapshot (always, once we have shares).
         if current_shares is not None:
@@ -783,7 +790,7 @@ def backtest(
         f"**Tickers:** {', '.join(tickers)}\n"
         f"**Benchmarks:** {', '.join(benchmarks) if benchmarks else 'none'}\n"
         f"**Optimizer:** `{objective}`, lookback {lookback_years}y, max_weight {max_weight:.2f}\n"
-        f"**Rebalance cadence:** weekly (Friday close)\n"
+        f"**Rebalance cadence:** monthly (first trading day of each month)\n"
         f"**Transaction costs:** none modeled\n\n"
         f"## Realized performance\n\n"
         f"| Metric | Value |\n|---|---|\n"

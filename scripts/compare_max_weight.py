@@ -1,6 +1,6 @@
 """Walk-forward backtest swept across concentration_cap (max_weight) values.
 
-For each max_weight in MAX_WEIGHTS, runs a 12-month weekly-rebalance
+For each max_weight in MAX_WEIGHTS, runs a 12-month monthly-rebalance
 walk-forward on the 12-ticker watchlist with mean_variance λ=1 and
 time-varying wave tilts from data/wave_history.csv. Outputs:
 
@@ -56,10 +56,11 @@ def run_walk_forward(prices: pd.DataFrame, daily_dates, wh_df, max_weight: float
     shares = None
     totals_rows = []
     snap_rows = []
+    last_rebalance_month: int | None = None
     for date in daily_dates:
-        is_friday = date.weekday() == 4
+        is_new_month = date.month != last_rebalance_month
         is_first = date == daily_dates[0]
-        if is_friday or (is_first and shares is None):
+        if is_new_month or (is_first and shares is None):
             lookback_start = date - pd.Timedelta(days=365 * LOOKBACK_YEARS)
             slice_prices = prices.loc[lookback_start:date]
             if len(slice_prices) < 30:
@@ -77,6 +78,7 @@ def run_walk_forward(prices: pd.DataFrame, daily_dates, wh_df, max_weight: float
                 shares[t] * float(prices.loc[date, t]) for t in TICKERS
             )
             shares = {t: weights[t] * pv / float(prices.loc[date, t]) for t in TICKERS}
+            last_rebalance_month = date.month
         if shares is not None:
             total = sum(shares[t] * float(prices.loc[date, t]) for t in TICKERS)
             totals_rows.append((date, total))
@@ -302,7 +304,7 @@ breakdown_intro = (
     f"For each cap, the bars show each ticker's cumulative dollar gain "
     f"over the 12-month window. Per-ticker P&amp;L = sum_t (prior shares) "
     f"× (price change), so the values reflect changing position sizes "
-    f"across weekly rebalances. Sum across bars in each panel matches "
+    f"across monthly rebalances. Sum across bars in each panel matches "
     f"that cap's realized portfolio gain in the summary table above. "
     f"All four panels share the same ticker order (by gain at cap=0.25) "
     f"and the same y-axis range, so loosening the cap is visible as "

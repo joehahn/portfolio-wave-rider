@@ -47,7 +47,7 @@ Eight subcommands. `/review-portfolio` calls `init-holdings` (first-run branch o
 # (more equity weight) at the cost of variance reduction.
 .venv/bin/python -m src.cli backtest --objective mean_variance --risk-aversion 1.0
 
-# Same backtest with time-varying wave-stage tilts: at each weekly rebalance,
+# Same backtest with time-varying wave-stage tilts: at each monthly rebalance,
 # the optimizer looks up the most recent classification at-or-before that
 # Friday from wave_history.csv and applies the stage multiplier to mu.
 .venv/bin/python -m src.cli backtest --wave-history data/wave_history.csv

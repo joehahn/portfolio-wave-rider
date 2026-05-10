@@ -1,6 +1,6 @@
 """Walk-forward backtest swept across mean_variance risk-aversion (lambda) values.
 
-For each lambda in LAMBDAS, runs a 12-month weekly-rebalance walk-forward
+For each lambda in LAMBDAS, runs a 12-month monthly-rebalance walk-forward
 on the 12-ticker watchlist with the mean_variance objective. Each rebalance
 applies time-varying wave-stage tilts looked up as-of-date from
 data/wave_history.csv (same source as the headline backtest). Aggregates
@@ -53,13 +53,15 @@ def run_walk_forward(prices: pd.DataFrame, daily_dates, lam: float,
                      wh_df: pd.DataFrame) -> pd.Series:
     """Walk-forward backtest under mean_variance with this lambda. Returns
     a Series of portfolio total value indexed by trading day. wave_views are
-    looked up as-of-date from wh_df at each Friday rebalance."""
+    looked up as-of-date from wh_df at each monthly rebalance (first
+    trading day of each new month)."""
     shares = None
     values = []
+    last_rebalance_month: int | None = None
     for date in daily_dates:
-        is_friday = date.weekday() == 4
+        is_new_month = date.month != last_rebalance_month
         is_first = date == daily_dates[0]
-        if is_friday or (is_first and shares is None):
+        if is_new_month or (is_first and shares is None):
             lookback_start = date - pd.Timedelta(days=365 * LOOKBACK_YEARS)
             slice_prices = prices.loc[lookback_start:date]
             if len(slice_prices) < 30:
@@ -77,6 +79,7 @@ def run_walk_forward(prices: pd.DataFrame, daily_dates, lam: float,
                 shares[t] * float(prices.loc[date, t]) for t in TICKERS
             )
             shares = {t: weights[t] * pv / float(prices.loc[date, t]) for t in TICKERS}
+            last_rebalance_month = date.month
         if shares is not None:
             total = sum(shares[t] * float(prices.loc[date, t]) for t in TICKERS)
             values.append((date, total))
@@ -177,7 +180,7 @@ table_html = (
     f"SPY benchmark return over the same window: {spy_return*100:+.2f}%. "
     f"This is one path through history; the AI / data-center electricity narrative "
     f"drove tech and nuclear-energy ETFs hard over this specific 12-month window. "
-    f"Backtest applies the as-of-date wave-stage tilts from data/wave_history.csv at each weekly rebalance — same as the headline backtest path. "
+    f"Backtest applies the as-of-date wave-stage tilts from data/wave_history.csv at each monthly rebalance — same as the headline backtest path. "
     f"</p>"
 )
 
@@ -192,7 +195,7 @@ chart_caption = (
     f"<i>Walk-forward 12-month backtest run six times, once per λ (risk-aversion parameter "
     f"in the mean_variance utility μᵀw - λ·wᵀΣw). Each line is the same simulation with a "
     f"different λ, with time-varying wave-stage tilts looked up as-of-date from "
-    f"data/wave_history.csv at each weekly rebalance — same source as the headline backtest. "
+    f"data/wave_history.csv at each monthly rebalance — same source as the headline backtest. "
     f"SPY rebased to share the starting value.</i>"
     f"</p>"
 )
