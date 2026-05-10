@@ -123,6 +123,16 @@ def summarize(s: pd.Series) -> dict[str, float]:
 stats = {lam: summarize(curve) for lam, curve in curves.items()}
 spy_return = float(spy.iloc[-1] / spy.iloc[0] - 1.0)
 
+# Compute rebalance dates: the first trading day of each month within
+# the simulation window. Same dates for every λ since the walk-forward
+# uses a fixed monthly cadence.
+rebalance_dates = []
+_last_month: int | None = None
+for d in daily_dates:
+    if d.month != _last_month:
+        rebalance_dates.append(d)
+        _last_month = d.month
+
 # Figure: portfolio value over time, one line per λ + SPY.
 fig = go.Figure()
 # Use a color gradient from low-λ (return-greedy, red) to high-λ (variance-averse, blue).
@@ -139,6 +149,19 @@ for i, lam in enumerate(LAMBDAS):
 fig.add_trace(go.Scatter(x=spy.index, y=spy.values, mode="lines",
                          name="SPY (rebased)", line={"width": 1.5, "color": "#444", "dash": "dash"},
                          hovertemplate="SPY<br>%{x|%Y-%m-%d}<br>$%{y:,.0f}<extra></extra>"))
+
+# Rebalance markers: orange open squares at each rebalance date for each
+# λ curve. Aligns with the live and backtest dashboards' marker style.
+for i, lam in enumerate(LAMBDAS):
+    s = curves[lam]
+    rb = s[s.index.isin(rebalance_dates)]
+    fig.add_trace(go.Scatter(
+        x=rb.index, y=rb.values, mode="markers",
+        name=f"Rebalance λ={lam}", showlegend=False,
+        marker={"size": 9, "symbol": "square-open",
+                "color": "#ff7f0e", "line": {"width": 1.5}},
+        hoverinfo="skip",
+    ))
 
 fig.update_layout(
     title="Portfolio value over time, mean_variance objective swept across λ",

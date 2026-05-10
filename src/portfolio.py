@@ -1416,7 +1416,7 @@ def build_dashboard(
                     go.Scatter(x=rebalance_totals.index, y=rebalance_totals.values,
                                mode="markers", name="Rebalance",
                                marker={"size": 11, "symbol": "square-open",
-                                       "color": "#1f77b4", "line": {"width": 2}},
+                                       "color": "#ff7f0e", "line": {"width": 2}},
                                legend="legend"),
                     row=1, col=1,
                 )

@@ -147,6 +147,15 @@ spy = _fetch_benchmark_curves(["SPY"], daily_dates[0], daily_dates[-1], INITIAL_
 spy_return = float(spy.iloc[-1] / spy.iloc[0] - 1.0)
 stats = {mw: summarize(curve) for mw, curve in curves.items()}
 
+# Compute rebalance dates: first trading day of each month within
+# the simulation window. Same for every cap.
+rebalance_dates = []
+_last_month: int | None = None
+for d in daily_dates:
+    if d.month != _last_month:
+        rebalance_dates.append(d)
+        _last_month = d.month
+
 # Figure: 4 portfolio-value lines + SPY.
 fig = go.Figure()
 n = len(MAX_WEIGHTS)
@@ -162,6 +171,19 @@ for i, mw in enumerate(MAX_WEIGHTS):
 fig.add_trace(go.Scatter(x=spy.index, y=spy.values, mode="lines",
                          name="SPY (rebased)", line={"width": 1.5, "color": "#444", "dash": "dash"},
                          hovertemplate="SPY<br>%{x|%Y-%m-%d}<br>$%{y:,.0f}<extra></extra>"))
+
+# Rebalance markers: orange open squares at each rebalance date on each
+# cap's curve. Same style as the live and backtest dashboards.
+for mw in MAX_WEIGHTS:
+    s = curves[mw]
+    rb = s[s.index.isin(rebalance_dates)]
+    fig.add_trace(go.Scatter(
+        x=rb.index, y=rb.values, mode="markers",
+        name=f"Rebalance cap={mw}", showlegend=False,
+        marker={"size": 9, "symbol": "square-open",
+                "color": "#ff7f0e", "line": {"width": 1.5}},
+        hoverinfo="skip",
+    ))
 fig.update_layout(
     title="Portfolio value over time, mean_variance λ=1 swept across concentration_cap",
     xaxis_title="date",
