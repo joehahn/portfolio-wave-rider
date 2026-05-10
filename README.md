@@ -36,7 +36,7 @@ To bootstrap a fresh portfolio, run `/initialize-portfolio` in Claude Code. Then
 
 Five triggers cover the portfolio's lifecycle: setup, daily/weekly refresh, monthly review, and on-demand backtest.
 
-- **Once, on a fresh repo** — you run `/initialize-portfolio` in Claude Code. This distributes your starting dollars across the watchlist (`holdings.csv`) using only the qualitative inputs described in `investor_profile.md`. The result is a "beliefs in dollar form" initial baseline portfolio.
+- **Once, on a fresh repo** — you run `/initialize-portfolio` in Claude Code. This distributes your starting dollars across the watchlist noted in `holdings.csv` using only the qualitative inputs described in `investor_profile.md`. This results is a "beliefs in dollar form" initial baseline portfolio.
 - **Daily, Mon-Fri 16:30 local** — cron records today's per-ticker shares and close price, then updates the live dashboard.
 - **Weekly, Fri 17:00 local** — cron re-runs the mean-variance optimizer over the watchlist, records the recommended portfolio, then updates the live dashboard.
 - **Monthly, you decide** — you run `/review-portfolio` in Claude Code. LLM subagents gather wave-aligned news for each ticker (30-day lookback), classify each wave's stage, and pass those classifications to the optimizer as a tilt on expected returns. Then write a profile-aware report and refresh the live dashboard. The run also appends today's wave-stage classifications to the wave-history file (which drives the trajectory chart) and archives the full news payload for forensic re-reading. If a thesis baseline exists (it should, after `/initialize-portfolio`), every report re-renders the thesis-vs-recommended comparison.
