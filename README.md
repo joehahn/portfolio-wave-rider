@@ -34,7 +34,7 @@ To bootstrap a fresh portfolio, run `/initialize-portfolio` in Claude Code. Then
 
 ## Runs
 
-Three slash commands plus two cron jobs. Two dashboards published to GitHub Pages.
+Five triggers cover the portfolio's lifecycle: setup, daily/weekly refresh, monthly review, and on-demand backtest.
 
 - **Once, on a fresh repo** — you run `/initialize-portfolio` in Claude Code. This distributes your starting dollars across the watchlist (`holdings.csv`) using only the qualitative inputs described in `investor_profile.md`. The result is a "beliefs in dollar form" initial baseline portfolio.
 - **Daily, Mon-Fri 16:30 local** — cron records today's per-ticker shares and close price, pulls fresh Yahoo Finance headlines, then updates the live dashboard.
