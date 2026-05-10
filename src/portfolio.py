@@ -1348,6 +1348,8 @@ def build_dashboard(
         subplot_titles=(
             "Portfolio value over time"
             "<br><sub><i>Σ(actual shares × close price) per day. SPY rebased to share starting value for comparison.</i></sub>",
+            "Rebalance turnover (% of portfolio dollars that changed holdings)"
+            "<br><sub><i>At each rebalance, ½·||Δw||₁ — half the L1 distance between consecutive weight vectors. Equals the fraction of portfolio value that moved between tickers. Step-function: each value holds until the next rebalance.</i></sub>",
             "Recommended portfolio % segregated by wave, versus time"
             "<br><sub><i>Each weekly optimizer run produces target weights per ticker; this chart sums them by wave bucket so each line is the wave's total target allocation.</i></sub>",
             "Latest recommended portfolio %"
@@ -1361,15 +1363,13 @@ def build_dashboard(
             "$ by asset class over time"
             "<br><sub><i>Daily portfolio value rolled up by asset class. Sums to total portfolio value (chart 1).</i></sub>",
             "$ by wave over time"
-            "<br><sub><i>Daily portfolio value rolled up by wave bucket. Same data as chart 7 grouped differently. Log y-axis keeps small allocations visible next to the dominant general_markets line.</i></sub>",
-            "Rebalance turnover (% of portfolio dollars that changed holdings)"
-            "<br><sub><i>At each rebalance, ½·||Δw||₁ — half the L1 distance between consecutive weight vectors. Equals the fraction of portfolio value that moved between tickers. Step-function: each value holds until the next rebalance.</i></sub>",
+            "<br><sub><i>Daily portfolio value rolled up by wave bucket. Same data as the asset-class chart above grouped differently. Log y-axis keeps small allocations visible next to the dominant general_markets line.</i></sub>",
         ),
         vertical_spacing=0.06,
-        # Chart 5 (wave-stage trajectories) gets a right y-axis showing
+        # Chart 6 (wave-stage trajectories) gets a right y-axis showing
         # each rank's tilt multiplier, so a reader can see at a glance
         # what nudge the optimizer applies for each stage.
-        specs=[[{}], [{}], [{}], [{}], [{"secondary_y": True}], [{}], [{}], [{}], [{}]],
+        specs=[[{}], [{}], [{}], [{}], [{}], [{"secondary_y": True}], [{}], [{}], [{}]],
     )
 
     # Compute a shared x-axis range from the daily-cadence data
@@ -1463,7 +1463,7 @@ def build_dashboard(
                            customdata=true_pct,
                            hovertemplate=f"{wave}<br>%{{x|%Y-%m-%d}}"
                                          "<br>%{customdata:.2f}%<extra></extra>"),
-                row=2, col=1,
+                row=3, col=1,
             )
         latest_date = recs["date"].max()
         latest_weights = recs[recs["date"] == latest_date].sort_values("weight", ascending=False)
@@ -1496,14 +1496,14 @@ def build_dashboard(
             go.Bar(x=tickers_in_chart, y=latest_weights["weight"],
                    name=f"As of {latest_weights['date'].iloc[0].date()}",
                    showlegend=False),
-            row=3, col=1,
+            row=4, col=1,
         )
         fig.update_xaxes(
             tickmode="array",
             tickvals=tickers_in_chart,
             ticktext=ticktext_3,
             tickangle=0,
-            row=3, col=1,
+            row=4, col=1,
         )
 
     # 4. Cumulative $ gain per holding over the snapshot window. For each
@@ -1538,14 +1538,14 @@ def build_dashboard(
             go.Bar(x=gain_tickers, y=gain_values,
                    marker_color=bar_colors,
                    name="Cumulative $ gain", showlegend=False),
-            row=4, col=1,
+            row=5, col=1,
         )
         fig.update_xaxes(
             tickmode="array",
             tickvals=gain_tickers,
             ticktext=ticktext_4,
             tickangle=0,
-            row=4, col=1,
+            row=5, col=1,
         )
 
     # 5. Wave-stage trajectories (one line per wave, from wave_history.csv).
@@ -1578,7 +1578,7 @@ def build_dashboard(
                            name=wave, legend="legend6",
                            line={"color": WAVE_COLORS.get(wave)},
                            hovertext=hover, hoverinfo="text+x"),
-                row=5, col=1,
+                row=6, col=1,
             )
 
     # 6. Articles harvested per wave over time. Reads each archived
@@ -1616,7 +1616,7 @@ def build_dashboard(
                     go.Scatter(x=sub["date"], y=sub["count"], mode="lines+markers",
                                name=wave, legend="legend4",
                                line={"color": WAVE_COLORS.get(wave)}),
-                    row=6, col=1,
+                    row=7, col=1,
                 )
 
     # 7. $ by asset class over time and 8. $ by wave over time. Both
@@ -1641,7 +1641,7 @@ def build_dashboard(
             fig.add_trace(
                 go.Scatter(x=ac.index, y=ac[bucket], mode="lines",
                            name=bucket, legend="legend2"),
-                row=7, col=1,
+                row=8, col=1,
             )
 
         # Wave chart (row 8). Same shape, different grouping.
@@ -1653,7 +1653,7 @@ def build_dashboard(
                 go.Scatter(x=wv.index, y=wv[wave], mode="lines",
                            name=wave, legend="legend3",
                            line={"color": WAVE_COLORS.get(wave)}),
-                row=8, col=1,
+                row=9, col=1,
             )
 
     # 9. Rebalance turnover. Computed from recommendations.csv: at each
@@ -1674,12 +1674,12 @@ def build_dashboard(
                     go.Scatter(x=diffs.index, y=diffs.values * 100,
                                mode="lines+markers",
                                name="Turnover",
-                               line={"color": "#ff7f0e", "width": 2, "shape": "hv"},
+                               line={"color": "#1f77b4", "width": 2, "shape": "hv"},
                                marker={"size": 9, "symbol": "square-open",
                                        "color": "#ff7f0e", "line": {"width": 2}},
                                hovertemplate="%{x|%Y-%m-%d}<br>%{y:.1f}%<extra></extra>",
                                showlegend=False),
-                    row=9, col=1,
+                    row=2, col=1,
                 )
 
     fig.update_layout(
@@ -1691,10 +1691,10 @@ def build_dashboard(
         hovermode="closest",
         # Per-subplot legends, one per chart, pinned to the right of each
         # subplot in paper coordinates. Subplot row tops with 9 rows and
-        # vertical_spacing=0.06: row 1 top ~1.000, row 2 top ~0.882,
-        # row 5 top ~0.529, row 6 top ~0.411, row 7 top ~0.293,
-        # row 8 top ~0.176, row 9 top ~0.058. Charts 3, 4, and 9 have
-        # showlegend=False on their traces so they need no legend entry.
+        # vertical_spacing=0.06: row 1 ~1.000, row 3 ~0.764, row 6 ~0.411,
+        # row 7 ~0.293, row 8 ~0.176, row 9 ~0.058. Chart 2 (turnover,
+        # single trace) and charts 4 and 5 (bar charts) have showlegend
+        # =False on their traces so they need no legend entry.
         legend=dict(
             title_text="Portfolio value",
             xref="paper", x=1.02,
@@ -1703,42 +1703,42 @@ def build_dashboard(
         legend5=dict(
             title_text="Portfolio % by wave",
             xref="paper", x=1.02,
-            yref="paper", y=0.882, yanchor="top",
+            yref="paper", y=0.764, yanchor="top",
         ),
-        # Chart 5 has a secondary y-axis (tilt multiplier) on the right,
+        # Chart 6 has a secondary y-axis (tilt multiplier) on the right,
         # so push this legend further out (x=1.06) to clear that axis.
         legend6=dict(
             title_text="Wave stages",
             xref="paper", x=1.06,
-            yref="paper", y=0.529, yanchor="top",
+            yref="paper", y=0.411, yanchor="top",
         ),
         legend4=dict(
             title_text="Articles per wave",
             xref="paper", x=1.02,
-            yref="paper", y=0.411, yanchor="top",
+            yref="paper", y=0.293, yanchor="top",
         ),
         legend2=dict(
             title_text="Asset class $",
             xref="paper", x=1.02,
-            yref="paper", y=0.293, yanchor="top",
+            yref="paper", y=0.176, yanchor="top",
         ),
         legend3=dict(
             title_text="Wave $",
             xref="paper", x=1.02,
-            yref="paper", y=0.176, yanchor="top",
+            yref="paper", y=0.058, yanchor="top",
         ),
     )
     fig.update_yaxes(title_text="$", row=1, col=1)
-    fig.update_yaxes(title_text="portfolio %", row=2, col=1, tickformat=".0%")
     fig.update_yaxes(title_text="portfolio %", row=3, col=1, tickformat=".0%")
-    fig.update_yaxes(title_text="$ gain", row=4, col=1, zeroline=True,
+    fig.update_yaxes(title_text="portfolio %", row=4, col=1, tickformat=".0%")
+    fig.update_yaxes(title_text="$ gain", row=5, col=1, zeroline=True,
                      zerolinewidth=1, zerolinecolor="#888")
     # Chart 5: y-axis ticks show stage names alongside the numeric rank
     # so a reader can read the trajectory directly without remembering
     # 0=neutral, 1=buildup, 2=surge, etc.
     rank_to_stage = {v: k for k, v in WAVE_STAGE_RANK.items()}
     stage_ticktext = [f"{r} {rank_to_stage.get(r, '')}" for r in range(5)]
-    fig.update_yaxes(title_text="stage", row=5, col=1, secondary_y=False,
+    fig.update_yaxes(title_text="stage", row=6, col=1, secondary_y=False,
                      range=[-0.3, 4.3],
                      tickmode="array",
                      tickvals=list(range(5)),
@@ -1756,20 +1756,20 @@ def build_dashboard(
     multiplier_ticktext = [
         f"×{_tilts.get(rank_to_stage.get(r, ''), 1.0):.2f}" for r in range(5)
     ]
-    fig.update_yaxes(title_text="tilt", row=5, col=1, secondary_y=True,
+    fig.update_yaxes(title_text="tilt", row=6, col=1, secondary_y=True,
                      range=[-0.3, 4.3],
                      tickmode="array",
                      tickvals=list(range(5)),
                      ticktext=multiplier_ticktext,
                      showgrid=False,
                      automargin=True)
-    fig.update_yaxes(title_text="articles", row=6, col=1, rangemode="tozero")
-    fig.update_yaxes(title_text="$", row=7, col=1)
+    fig.update_yaxes(title_text="articles", row=7, col=1, rangemode="tozero")
+    fig.update_yaxes(title_text="$", row=8, col=1)
     # Log scale on chart 8 so small wave allocations (e.g., zero-weighted
     # robotics/biology lines hovering near a few hundred dollars) don't
     # collapse to the floor next to the dominant general_markets line.
-    fig.update_yaxes(title_text="$ (log)", row=8, col=1, type="log")
-    fig.update_yaxes(title_text="turnover (%)", row=9, col=1, rangemode="tozero")
+    fig.update_yaxes(title_text="$ (log)", row=9, col=1, type="log")
+    fig.update_yaxes(title_text="turnover (%)", row=2, col=1, rangemode="tozero")
 
     # Apply the padded snapshots-derived range to every time-series
     # subplot so data points don't sit flush against the axis edges
@@ -1779,7 +1779,7 @@ def build_dashboard(
     # weights) and 4 (gain bars) are bar charts with categorical
     # x-axes so the range setter is a no-op there.
     if xrange is not None:
-        for r in (1, 2, 5, 6, 7, 8, 9):
+        for r in (1, 2, 3, 6, 7, 8, 9):
             fig.update_xaxes(range=list(xrange), row=r, col=1)
 
     o_path = Path(out_path)
