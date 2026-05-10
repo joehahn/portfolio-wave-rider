@@ -5,9 +5,9 @@
 **Date:** 2026-May-08 <br>
 **branch:** main
 
-A Claude Code demo for long-horizon portfolio construction. You declare your goals, constraints, and a wave thesis (which technology waves you believe will drive future returns) in `investor_profile.md`, plus a watchlist of tickers in `holdings.csv`. The system pulls the last few years of price history via yfinance, runs a mean-variance optimizer (scipy.optimize) over those tickers, and recommends weights that maximize risk-adjusted return subject to your concentration cap and asset-class targets. A monthly `/review-portfolio` slash command sends two Claude subagents out for fresh news per ticker, classifies each wave's stage (buildup → surge → peak → digestion), tilts the optimizer's expected-return vector accordingly, and writes a profile-aware report. The result accumulates into a static Plotly dashboard so you can watch the recommended weights, the wave classifications, and the realized portfolio value evolve over time.
+A Claude Code demo for long-horizon portfolio construction. You declare your goals, constraints, and a wave thesis (which technology waves you believe will drive future returns) in `investor_profile.md`, as well as a watchlist of tickers in `holdings.csv`. The system then pulls the last few years of price history via yfinance, runs a mean-variance optimizer (scipy.optimize) over those tickers, and recommends weights that maximize risk-adjusted return subject to your concentration cap and asset-class targets. A monthly `/review-portfolio` slash command sends two Claude subagents out for fresh news per ticker, classifies each wave's stage (buildup → surge → peak → digestion), tilts the optimizer's expected-return vector accordingly, and writes a profile-aware report. The result accumulates into a static Plotly dashboard so you can watch the recommended weights, the wave classifications, and the realized portfolio value evolve over time.
 
-**Live demo:** [joehahn.github.io/portfolio-wave-rider](https://joehahn.github.io/portfolio-wave-rider/) (live dashboard) and [/backtest.html](https://joehahn.github.io/portfolio-wave-rider/backtest.html) (12-month walk-forward backtest). Each page has a nav strip linking to the other plus the parameter-sweep comparison pages.
+**Live demo:** [joehahn.github.io/portfolio-wave-rider](https://joehahn.github.io/portfolio-wave-rider/) (live dashboard) and [/backtest.html](https://joehahn.github.io/portfolio-wave-rider/backtest.html) (12-month walk-forward backtest).
 
 See [GLOSSARY.md](GLOSSARY.md) for finance and stats terms (`σ`, `μ`, `Σ`, Sharpe ratio, risk aversion `λ`, mean-variance optimization, max drawdown, VaR/CVaR, etc.) and [REFERENCE.md](REFERENCE.md) for the CLI flags, repo layout, and testing instructions.
 
@@ -25,7 +25,7 @@ cp holdings.example.csv holdings.csv
 
 The two files you maintain:
 
-- `investor_profile.md`: declares your goals, constraints, exclusions, asset-class targets, the wave-thesis prose, and the optimizer's mathematical model (objective, risk aversion, risk-free rate, lookback window, wave-stage tilt multipliers). Each field is documented with inline comments in `investor_profile.example.md` — copy that file and edit. Every recommendation cites lines from this file.
+- `investor_profile.md`: here you declare your goals, constraints, exclusions, asset-class targets, the wave-thesis prose, and the optimizer's mathematical model (objective, risk aversion, risk-free rate, lookback window, wave-stage tilt multipliers). Each field is documented with inline comments in `investor_profile.example.md` — copy that file and edit. Every recommendation cites lines from this file.
 - `holdings.csv`: a two-column CSV (`ticker,shares`) acting as your watchlist. Initialize that with 0; the `/initialize-portfolio` skill will then allocate dollars across that portfolio during its first run.
 
 Optional: `news_sources.md`, a curated list of sources per technology wave. Improves the news-researcher's signal. Missing is fine; the agent falls back to open web search.
