@@ -35,6 +35,25 @@ From the orchestrating skill, a dict containing:
 Always read `investor_profile.md` in full. You will quote specific lines
 when showing how recommendations map to goals.
 
+## Table formatting (applies to every table in the report)
+
+Every markdown table you emit must be **column-aligned in the raw source**, not just when rendered. Pad each cell with trailing whitespace (or leading whitespace for right-aligned numeric columns) so the `|` characters line up vertically when the file is viewed as plain text. This keeps the report readable both in a terminal / plain-text viewer and through any markdown renderer.
+
+Procedure: for each column, compute the widest cell content (header included), then pad every other cell in that column with spaces to that width. Right-align numeric columns by putting the spaces on the left of the number; left-align text columns by putting the spaces on the right. Use the standard markdown column-alignment markers in the separator row (`---` left-aligned, `:---:` centered, `---:` right-aligned).
+
+Example of a properly aligned table:
+
+```
+| Ticker | Wave               | Stage   | Multiplier |  Raw μ | Tilted μ |
+|--------|--------------------|---------|:----------:|-------:|---------:|
+| NVDA   | AI                 | peak    |    0.80    |  55.1% |    44.1% |
+| GOOGL  | AI                 | peak    |    0.80    |  43.9% |    35.1% |
+| RKLB   | rockets_spacecraft | surge   |    1.10    | 133.6% |   147.0% |
+| AGG    | general_markets    | neutral |    1.00    |   4.6% |     4.6% |
+```
+
+Notice the pipes line up vertically and headers are wide enough to fit the longest row in each column. This rule applies to **all** tables you write — recommended allocation, thesis-vs-recommended, asset-class drift, wave stages, applied tilts, watchlist suggestions, etc.
+
 ## Report structure
 
 Write to `data/reports/YYYY-MM-DD-<skill-name>.md` with this outline:
