@@ -37,7 +37,7 @@ To bootstrap a fresh portfolio, run `/initialize-portfolio` in Claude Code. Then
 Three slash commands plus two cron jobs. Two dashboards published to GitHub Pages.
 
 - **Once, on a fresh repo** — you run `/initialize-portfolio` in Claude Code.
-  - **What happens:** reads the profile `investor_profile.md` and proposes a thesis-driven dollar allocation across the watchlist (no math, just the wave thesis plus asset-class targets and exclusions). Converts those dollars to shares at current prices, records the initial portfolio snapshot, persists the allocation to a thesis-baseline file, and writes a thesis-only report. No optimizer, no news.
+  - **What happens:** distributes your starting dollars across the watchlist using only the qualitative inputs in `investor_profile.md` — the wave thesis (which technologies you believe in), asset-class targets, and exclusions — without running any mean-variance optimization, statistical estimation, or numerical solver. The result is a "beliefs in dollar form" baseline; the optimizer that runs later in `/review-portfolio` is what does the math, and the gap between the two is what every review report flags as Profile conflicts.
   - **Outputs:** `holdings.csv` (populated), `data/thesis_baseline.json`, `data/snapshots.csv` (first row), `data/reports/YYYY-MM-DD-initialize-portfolio.md`, `docs/index.html`.
 - **Daily, Mon-Fri 16:30 local** — cron.
   - **What happens:** records today's per-ticker `shares × close price` to `data/snapshots.csv`, pulls fresh Yahoo Finance headlines per ticker into `data/news_feed.json`, then refreshes the live dashboard. Each step only runs if the previous succeeded — if yfinance is down or a step errors, the chain short-circuits and nothing downstream gets stale data.
