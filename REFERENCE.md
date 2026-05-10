@@ -108,6 +108,7 @@ portfolio-wave-rider/
     ├── backtest.html           # public 12-month backtest dashboard
     ├── lambda_comparison.html  # mean_variance λ sweep
     ├── max_weight_comparison.html  # concentration_cap sweep
+    ├── news.html               # news bullets that drove the latest wave-stage classifications
     └── wave-stage-classification.md  # consolidated doc on wave-stage pipeline
 ```
 

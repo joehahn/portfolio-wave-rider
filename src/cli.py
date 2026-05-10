@@ -237,6 +237,16 @@ def main(argv: list[str] | None = None) -> int:
                 nav_current=args.nav_current,
                 thesis_baseline_path=args.thesis_baseline or None,
             )
+            # Side-effect: refresh docs/news.html from the latest
+            # /review-portfolio news payload so cron and the slash command
+            # keep the news page in sync with the dashboard. Path is
+            # derived from --out so e.g. data/dashboard.html keeps its
+            # news next to it at data/news.html.
+            news_out = str(Path(args.out).with_name("news.html"))
+            news_result = portfolio.render_news_page(
+                news_path=args.news, out_path=news_out,
+            )
+            result["news_page"] = news_result
     except Exception as e:  # noqa: BLE001 — surface any failure as a JSON error line
         print(json.dumps({"error": f"{type(e).__name__}: {e}"}), file=sys.stderr)
         return 1

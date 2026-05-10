@@ -1378,6 +1378,7 @@ _NAV_LINKS = [
     ("backtest",   "12-month backtest",    "backtest.html"),
     ("lambda",     "Lambda sweep",         "lambda_comparison.html"),
     ("max_weight", "Concentration sweep",  "max_weight_comparison.html"),
+    ("news",       "News",                 "news.html"),
 ]
 
 
@@ -1829,14 +1830,10 @@ def build_dashboard(
         html = html.replace("<body>", "<body>\n" + nav_html, 1)
         o_path.write_text(html, encoding="utf-8")
 
-    # Append the news area (daily feed + latest /review-portfolio payload)
-    # after Plotly's HTML, if either file is present.
-    nf_path = Path(news_feed_path)
-    news_html = _render_news_html(Path(news_path), news_feed_path=nf_path)
-    news_included = bool(news_html)
-    if news_included:
-        with o_path.open("a", encoding="utf-8") as f:
-            f.write("\n" + news_html + "\n")
+    # News content is no longer rendered into the dashboard HTML. The
+    # latest /review-portfolio news payload (the one that drives the
+    # wave-stage classifications) lives on its own page at
+    # docs/news.html — see render_news_page().
 
     return {
         "out_path": str(o_path),
@@ -1844,6 +1841,73 @@ def build_dashboard(
         "recommendations_rows": int(len(pd.read_csv(rec_path))) if rec_path.exists() else 0,
         "wave_history_rows": int(len(pd.read_csv(wh_path))) if wh_path.exists() else 0,
         "benchmarks_overlaid": list(benchmark_curves.keys()),
-        "news_feed_included": nf_path.exists(),
-        "news_included": news_included,
     }
+
+
+def render_news_page(
+    news_path: str = "data/news_latest.json",
+    out_path: str = "docs/news.html",
+    nav_current: str | None = "news",
+) -> dict[str, Any]:
+    """Render docs/news.html: a standalone page showing the latest
+    /review-portfolio news payload (the bullets the news-researcher
+    surfaced and used to classify each wave's stage).
+
+    Companion to build_dashboard; the dashboard CLI calls this after
+    writing index.html so cron + /review-portfolio refresh both files
+    together. The news payload at ``news_path`` is overwritten on each
+    /review-portfolio run, so this page always reflects the most recent
+    classification rationale.
+    """
+    n_path = Path(news_path)
+    if not n_path.exists():
+        # No /review-portfolio has run yet. Write a minimal placeholder
+        # so the nav-strip link doesn't break.
+        body = (
+            '<h2 style="margin-top:1.5em;">No wave-stage news yet</h2>'
+            '<p style="color:#666;">Run <code>/review-portfolio</code> '
+            'to surface the news that drives the optimizer\'s wave-stage '
+            'tilts. The latest run\'s bullets will appear here.</p>'
+        )
+    else:
+        try:
+            payload = json.loads(n_path.read_text())
+            body = _render_news_section(
+                payload,
+                title="Wave-stage news from last /review-portfolio",
+                intro="The bullets below are the evidence the news-researcher "
+                      "surfaced for each ticker on the most recent "
+                      "<code>/review-portfolio</code> run. They drive each wave's "
+                      "stage classification (chart 5 of the live dashboard) and "
+                      "the per-ticker tilt the optimizer applies. Click any "
+                      "headline to expand the LLM-written, portfolio-relevance "
+                      "summary plus a link to the source. Tickers grouped by wave bucket.",
+            )
+            if not body:
+                body = (
+                    '<h2 style="margin-top:1.5em;">News payload is empty</h2>'
+                    '<p style="color:#666;">The latest <code>news_latest.json</code> '
+                    'has no per-ticker bullets.</p>'
+                )
+        except (json.JSONDecodeError, OSError) as e:
+            body = (
+                '<h2 style="margin-top:1.5em;">Could not read news payload</h2>'
+                f'<p style="color:#666;">{_html.escape(type(e).__name__)}: '
+                f'{_html.escape(str(e))}</p>'
+            )
+
+    nav_html = _render_nav_strip(nav_current)
+    page = (
+        '<!doctype html><html><head><meta charset="utf-8">'
+        '<title>Portfolio Wave Rider — news</title>'
+        '<style>body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;'
+        'max-width:980px;margin:0 auto;padding:0 1.5em;color:#222;line-height:1.5;}</style>'
+        '</head><body>\n'
+        + nav_html
+        + body
+        + '\n</body></html>'
+    )
+    o_path = Path(out_path)
+    o_path.parent.mkdir(parents=True, exist_ok=True)
+    o_path.write_text(page, encoding="utf-8")
+    return {"out_path": str(o_path), "news_payload_present": n_path.exists()}
