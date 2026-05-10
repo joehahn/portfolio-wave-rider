@@ -36,13 +36,21 @@ To bootstrap a fresh portfolio, run `/initialize-portfolio` in Claude Code. Then
 
 Three slash commands plus two cron jobs. Two dashboards published to GitHub Pages.
 
-| Cadence | Mechanism | What runs | Output |
-|---|---|---|---|
-| Once, on a fresh repo | You run `/initialize-portfolio` in Claude Code | Reads the profile `investor_profile.md` and proposes a thesis-driven dollar allocation across the watchlist (no math, just the wave thesis plus asset-class targets and exclusions). Converts those dollars to shares at current prices, records the initial portfolio snapshot, persists the allocation to a thesis-baseline file, and writes a thesis-only report. No optimizer, no news. | `holdings.csv` (populated)<br>`data/thesis_baseline.json`<br>`data/snapshots.csv` (first row)<br>`data/reports/YYYY-MM-DD-initialize-portfolio.md`<br>`docs/index.html` |
-| Daily, Mon-Fri 16:30 local | cron | Records today's per-ticker shares × close price to `data/snapshots.csv`, pulls fresh Yahoo Finance headlines per ticker into `data/news_feed.json`, then refreshes the live dashboard. Each step only runs if the previous succeeded — if yfinance is down or a step errors, the chain short-circuits and nothing downstream gets stale data. | `data/snapshots.csv`<br>`data/news_feed.json`<br>`docs/index.html` |
-| Weekly, Fri 17:00 local | cron | Re-runs the mean-variance optimizer over the holdings universe, appends new target weights to `data/recommendations.csv`, then refreshes the live dashboard. | `data/recommendations.csv`<br>`docs/index.html` |
-| Monthly, you decide | You run `/review-portfolio` in Claude Code | LLM subagents gather wave-aligned news for each ticker (30-day lookback), classify each wave's stage, and pass those classifications to the optimizer as a tilt on expected returns. Then write a profile-aware report and refresh the live dashboard. The run also appends today's wave-stage classifications to the wave-history file (which drives the trajectory chart) and archives the full news payload for forensic re-reading. If a thesis baseline exists (it should, after `/initialize-portfolio`), every report re-renders the thesis-vs-recommended comparison. | `data/reports/YYYY-MM-DD-review-portfolio.md`<br>`docs/index.html` (refreshed)<br>`data/wave_history.csv` (appended)<br>`data/news/<date>-news.json` |
-| On demand, you decide | You run `/run-backtest` in Claude Code | Walk-forward weekly-rebalance backtest of the optimizer over a 12-month window, applying the wave-stage tilts that were known at each historical Friday. Pure Python, no LLM. Auto-renders both the local backtest dashboard and the public-demo backtest page. | `data/backtest/snapshots.csv`<br>`data/backtest/recommendations.csv`<br>`data/backtest/dashboard.html`<br>`docs/backtest.html` |
+- **Once, on a fresh repo** — you run `/initialize-portfolio` in Claude Code.
+  - **What runs:** reads the profile `investor_profile.md` and proposes a thesis-driven dollar allocation across the watchlist (no math, just the wave thesis plus asset-class targets and exclusions). Converts those dollars to shares at current prices, records the initial portfolio snapshot, persists the allocation to a thesis-baseline file, and writes a thesis-only report. No optimizer, no news.
+  - **Outputs:** `holdings.csv` (populated), `data/thesis_baseline.json`, `data/snapshots.csv` (first row), `data/reports/YYYY-MM-DD-initialize-portfolio.md`, `docs/index.html`.
+- **Daily, Mon-Fri 16:30 local** — cron.
+  - **What runs:** records today's per-ticker `shares × close price` to `data/snapshots.csv`, pulls fresh Yahoo Finance headlines per ticker into `data/news_feed.json`, then refreshes the live dashboard. Each step only runs if the previous succeeded — if yfinance is down or a step errors, the chain short-circuits and nothing downstream gets stale data.
+  - **Outputs:** `data/snapshots.csv`, `data/news_feed.json`, `docs/index.html`.
+- **Weekly, Fri 17:00 local** — cron.
+  - **What runs:** re-runs the mean-variance optimizer over the holdings universe, appends new target weights to `data/recommendations.csv`, then refreshes the live dashboard.
+  - **Outputs:** `data/recommendations.csv`, `docs/index.html`.
+- **Monthly, you decide** — you run `/review-portfolio` in Claude Code.
+  - **What runs:** LLM subagents gather wave-aligned news for each ticker (30-day lookback), classify each wave's stage, and pass those classifications to the optimizer as a tilt on expected returns. Then write a profile-aware report and refresh the live dashboard. The run also appends today's wave-stage classifications to the wave-history file (which drives the trajectory chart) and archives the full news payload for forensic re-reading. If a thesis baseline exists (it should, after `/initialize-portfolio`), every report re-renders the thesis-vs-recommended comparison.
+  - **Outputs:** `data/reports/YYYY-MM-DD-review-portfolio.md`, `docs/index.html` (refreshed), `data/wave_history.csv` (appended), `data/news/<date>-news.json`.
+- **On demand, you decide** — you run `/run-backtest` in Claude Code.
+  - **What runs:** walk-forward weekly-rebalance backtest of the optimizer over a 12-month window, applying the wave-stage tilts that were known at each historical Friday. Pure Python, no LLM. Auto-renders both the local backtest dashboard and the public-demo backtest page.
+  - **Outputs:** `data/backtest/snapshots.csv`, `data/backtest/recommendations.csv`, `data/backtest/dashboard.html`, `docs/backtest.html`.
 
 The weekly cron is the lightweight Python-only sibling of `/review-portfolio`: pure Python, no LLM, no wave tilts. Run the skill when you want a fresh wave-stage read and a written narrative.
 
