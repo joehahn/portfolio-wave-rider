@@ -46,7 +46,7 @@ Four triggers cover the portfolio's lifecycle: setup, daily price refresh, month
 ## Operations
 
 - Daily: nothing. The cron job appends a row per ticker to `data/snapshots.csv` and refreshes the local copy of `docs/index.html`.
-- Whenever you want to publish the cron-refreshed dashboard: `git add docs/index.html && git commit -m "Refresh live dashboard" && git push`. cron does not auto-push.
+- Whenever you want to publish the cron-refreshed dashboard: `git add docs/index.html && git commit -m "Refresh live dashboard" && git push` since cron does not auto-push.
 - Monthly: run `/review-portfolio` in Claude Code. Read the report (especially the **Profile conflicts** section), decide on rebalances, execute trades in your brokerage, then update `holdings.csv`.
 - After trading: edit `holdings.csv` to reflect new share counts. The next snapshot picks up the new positions.
 - Anytime: open `docs/index.html` in a browser for the local view, or visit the public-demo URL.
