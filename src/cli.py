@@ -117,12 +117,12 @@ def main(argv: list[str] | None = None) -> int:
     p_bt.add_argument("--initial-usd", type=float, default=50000.0,
                       help="starting portfolio value in dollars")
     p_bt.add_argument("--out-dir", default="data/backtest/")
-    # Parse "3y" -> 3 from the profile's lookback_period.
+    # Parse "1.3y" -> 1.3 from the profile's lookback_period.
     import re as _re
-    _m = _re.match(r"(\d+)", str(fm["lookback_period"]))
-    _default_lookback_years = int(_m.group(1)) if _m else 3
-    p_bt.add_argument("--lookback-years", type=int, default=_default_lookback_years,
-                      help="optimizer lookback window in years; default 3 matches the live system")
+    _m = _re.match(r"(\d+(?:\.\d+)?)", str(fm["lookback_period"]))
+    _default_lookback_years = float(_m.group(1)) if _m else 1.3
+    p_bt.add_argument("--lookback-years", type=float, default=_default_lookback_years,
+                      help="optimizer lookback window in years (default from investor_profile)")
     p_bt.add_argument("--max-weight", type=float, default=0.25)
     p_bt.add_argument("--objective", default=fm["objective"],
                       choices=["max_sharpe", "min_variance", "mean_variance"])

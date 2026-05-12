@@ -32,7 +32,7 @@ LAMBDA = 1.0
 END = pd.Timestamp.today().normalize()
 START = (END - pd.DateOffset(years=1)).normalize()
 INITIAL_USD = 50_000.0
-LOOKBACK_YEARS = 3
+LOOKBACK_YEARS = 1.3
 RISK_FREE = 0.04
 
 

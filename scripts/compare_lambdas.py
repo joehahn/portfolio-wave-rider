@@ -27,7 +27,7 @@ LAMBDAS = [0.0, 0.33, 1.0, 3.3, 10.0, 33.3]
 END = pd.Timestamp.today().normalize()
 START = (END - pd.DateOffset(years=1)).normalize()
 INITIAL_USD = 50_000.0
-LOOKBACK_YEARS = 3
+LOOKBACK_YEARS = 1.3
 MAX_WEIGHT = 0.25
 RISK_FREE = 0.04
 WAVE_HISTORY_PATH = "data/wave_history.csv"

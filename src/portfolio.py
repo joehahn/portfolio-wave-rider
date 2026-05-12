@@ -585,7 +585,7 @@ def backtest(
     end_date: str | None = None,
     initial_usd: float = 50000.0,
     out_dir: str = "data/backtest/",
-    lookback_years: int = 3,
+    lookback_years: float = 1.3,
     max_weight: float = 0.25,
     objective: str = "max_sharpe",
     risk_aversion: float = 1.0,
