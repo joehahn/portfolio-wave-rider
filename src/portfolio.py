@@ -1346,25 +1346,25 @@ def build_dashboard(
     fig = make_subplots(
         rows=10, cols=1,
         subplot_titles=(
-            "Portfolio value over time"
+            "1. Portfolio value over time"
             "<br><sub><i>Σ(actual shares × close price) per day. SPY rebased to share starting value for comparison.</i></sub>",
-            "Rebalance turnover (% of portfolio dollars that changed holdings)"
+            "2. Rebalance turnover (% of portfolio dollars that changed holdings)"
             "<br><sub><i>At each rebalance, ½·||Δw||₁ — half the L1 distance between consecutive weight vectors. Equals the fraction of portfolio value that moved between tickers. Step-function: each value holds until the next rebalance.</i></sub>",
-            "Recommended portfolio % segregated by wave, versus time"
-            "<br><sub><i>Each weekly optimizer run produces target weights per ticker; this chart sums them by wave bucket so each line is the wave's total target allocation.</i></sub>",
-            "Latest recommended portfolio %"
+            "3. Recommended portfolio % segregated by wave, versus time"
+            "<br><sub><i>Each optimizer run produces target weights per ticker; this chart sums them by wave bucket so each line is the wave's total target allocation.</i></sub>",
+            "4. Latest recommended portfolio %"
             "<br><sub><i>The most recent optimizer's target weight per ticker. Bars at the cap signal the optimizer wanted more than the concentration constraint allowed.</i></sub>",
-            "Cumulative $ gain per holding since /initialize-portfolio executed"
+            "5. Cumulative $ gain per holding since /initialize-portfolio executed"
             "<br><sub><i>Per-ticker P&L attribution from the day-zero snapshot through today: Σ(prior-day shares × price change). Bars sum to total realized portfolio gain since the thesis was set. Green = winners, red = losers.</i></sub>",
-            "Cumulative $ gain per holding since the most recent /review-portfolio rebalance"
+            "6. Cumulative $ gain per holding since the most recent /review-portfolio rebalance"
             "<br><sub><i>Per-ticker P&L attribution from the most recent /review-portfolio rebalance date through today. Shows how the current allocation has performed since the latest optimizer fire.</i></sub>",
-            "Wave-stage trajectories (0=neutral, 1=buildup, 2=surge, 3=peak, 4=digestion)"
-            "<br><sub><i>How the news-researcher classified each wave's cycle stage at each /review-portfolio run. Right axis shows the tilt multiplier applied to that wave's tickers' expected returns.</i></sub>",
-            "Articles harvested per wave over time (data/news/ archive)"
+            "7. Wave-stage trajectories (0=neutral, 1=buildup, 2=surge, 3=peak, 4=digestion)"
+            "<br><sub><i>How the news-researcher classified each wave's cycle stage. Forward-filled across the snapshot window so each business day shows the most-recent-at-or-before classification. Right axis shows the tilt multiplier applied to that wave's tickers' expected returns.</i></sub>",
+            "8. Articles harvested per wave over time (data/news/ archive)"
             "<br><sub><i>Bullet count per wave per /review-portfolio run, from the archived news payloads. Indicates how much evidence backs each stage classification.</i></sub>",
-            "$ by asset class over time"
+            "9. $ by asset class over time"
             "<br><sub><i>Daily portfolio value rolled up by asset class. Sums to total portfolio value (chart 1).</i></sub>",
-            "$ by wave over time"
+            "10. $ by wave over time"
             "<br><sub><i>Daily portfolio value rolled up by wave bucket. Same data as the asset-class chart above grouped differently. Log y-axis keeps small allocations visible next to the dominant general_markets line.</i></sub>",
         ),
         vertical_spacing=0.06,
@@ -1586,17 +1586,24 @@ def build_dashboard(
             )
 
     # 7. Wave-stage trajectories (one line per wave, from wave_history.csv).
-    if wh_path.exists():
-        wh = pd.read_csv(wh_path, parse_dates=["date"])
-        # Clip to the same x-axis window the other charts use, so
-        # off-screen earlier classifications don't draw a line into
-        # the left edge of the visible chart.
-        if xrange is not None:
-            wh = wh[(wh["date"] >= xrange[0]) & (wh["date"] <= xrange[1])]
-        wh["stage_rank"] = wh["stage"].map(WAVE_STAGE_RANK).fillna(0).astype(int)
+    # Forward-filled across the snapshot window so each business day
+    # carries the most-recent-at-or-before classification, even though
+    # wave_history.csv itself only updates on /review-portfolio cadence.
+    # Produces a step-function trace per wave that's visible across the
+    # whole window instead of degenerating to single dots on the few
+    # actual classification dates.
+    if wh_path.exists() and xrange is not None:
+        wh_full = pd.read_csv(wh_path, parse_dates=["date"])
+        # Snapshot dates anchor the x-axis. Use unique trading days
+        # in the snapshot window.
+        if snap_path.exists():
+            snap_dates = pd.read_csv(snap_path, parse_dates=["date"])["date"].drop_duplicates().sort_values()
+            window_dates = snap_dates[(snap_dates >= xrange[0]) & (snap_dates <= xrange[1])]
+        else:
+            window_dates = pd.Series(dtype="datetime64[ns]")
         # Order legend by display priority so AI is at the top, general_markets last.
         ordered = sorted(
-            wh["wave"].unique(),
+            wh_full["wave"].unique(),
             key=lambda w: _WAVE_DISPLAY_ORDER.index(w) if w in _WAVE_DISPLAY_ORDER else 99,
         )
         # Per-wave vertical offset so multiple waves at the same stage
@@ -1604,7 +1611,19 @@ def build_dashboard(
         # shows the actual stage label.
         wh_offset_step = 0.05  # in stage-rank units (0..4)
         for i, wave in enumerate(ordered):
-            sub = wh[wh["wave"] == wave].sort_values("date")
+            wave_history = (wh_full[wh_full["wave"] == wave]
+                            .sort_values("date")
+                            .set_index("date"))
+            if window_dates.empty or wave_history.empty:
+                continue
+            # For each business day in the window, look up the most
+            # recent classification at or before that day.
+            ff = wave_history.reindex(pd.DatetimeIndex(window_dates), method="ffill").dropna(subset=["stage"])
+            if ff.empty:
+                continue
+            ff = ff.reset_index().rename(columns={"index": "date"})
+            ff["stage_rank"] = ff["stage"].map(WAVE_STAGE_RANK).fillna(0).astype(int)
+            sub = ff
             offset = i * wh_offset_step
             # Hover shows the actual stage label, not just the rank.
             hover = [f"{wave}<br>stage: {s}<br>tickers: {t}"
