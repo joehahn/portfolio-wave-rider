@@ -1653,34 +1653,24 @@ def build_dashboard(
             lambda t: TICKER_WAVE.get(t, "general_markets")
         )
         wv_weight = recs.groupby(["date", "wave_bucket"])["weight"].sum().unstack(fill_value=0)
-        # Extend the most recent rebalance horizontally to the right
-        # edge of the x-axis window, so the chart shows that the latest
-        # weights remain in effect until the next /review-portfolio.
-        # Implemented as a step trace ("hv" line shape) with the last
-        # row's values repeated at xrange[1].
-        if latest_snap_date is not None and not wv_weight.empty and wv_weight.index.max() < latest_snap_date:
-            wv_weight = pd.concat([wv_weight,
-                                   wv_weight.iloc[[-1]].rename(index={wv_weight.index[-1]: latest_snap_date})])
         wv_order = [w for w in _WAVE_DISPLAY_ORDER if w in wv_weight.columns]
-        # Add a tiny vertical offset per wave so traces with the same
-        # value (often 0%) don't pile on top of each other and become
-        # invisible. The offset is cosmetic; hover text reports the
-        # true weight.
-        wv_offset_step = 0.002  # 0.2 percentage points per trace
-        for i, wave in enumerate(wv_order):
-            offset = i * wv_offset_step
-            true_pct = [v * 100 for v in wv_weight[wave]]
+        # Stacked bar chart: one vertical bar per rebalance date, each
+        # bar's height = 100%, partitioned into wave-colored segments.
+        # Reads as a portfolio-composition timeline: how the optimizer
+        # allocated across the wave buckets at each monthly rebalance.
+        for wave in wv_order:
             fig.add_trace(
-                go.Scatter(x=wv_weight.index, y=wv_weight[wave] + offset,
-                           mode="lines+markers",
-                           name=WAVE_DISPLAY_LABEL.get(wave, wave),
-                           legend="legend5",
-                           line={"color": WAVE_COLORS.get(wave), "shape": "hv"},
-                           customdata=true_pct,
-                           hovertemplate=f"{wave}<br>%{{x|%Y-%m-%d}}"
-                                         "<br>%{customdata:.2f}%<extra></extra>"),
+                go.Bar(x=wv_weight.index, y=wv_weight[wave] * 100,
+                       name=WAVE_DISPLAY_LABEL.get(wave, wave),
+                       legend="legend5",
+                       marker_color=WAVE_COLORS.get(wave),
+                       hovertemplate=f"{wave}<br>%{{x|%Y-%m-%d}}"
+                                     "<br>%{y:.2f}%<extra></extra>"),
                 row=R_REC_WAVE, col=1,
             )
+        # Force stacking on the chart-4 y-axis. barmode is figure-wide
+        # but we only have one set of bar traces in a stack here.
+        fig.update_layout(barmode="stack")
         latest_date = recs["date"].max()
         latest_weights = recs[recs["date"] == latest_date].sort_values("weight", ascending=False)
 
