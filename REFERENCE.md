@@ -158,6 +158,35 @@ flowchart TD
 
 Two LLM specialists (blue) bracket one Python call (yellow). The profile and `news_sources.md` are read-only inputs.
 
+## 5-year backtest experiment (research artifact)
+
+A separate branch `5y-backtest` contains a longer-horizon, multi-regime
+test of whether the news-researcher's wave-stage tilts add value to the
+optimizer. Headline numbers and methodology:
+
+- **Window:** 2021-09-30 → 2026-04-30 (~4.6 years, 20 quarterly rebalances)
+- **Universe:** 11 tickers — AAPL, MSFT, GOOGL, NVDA, BOTZ, QTUM, SPY, VIG, AGG, BIL, IAU. ARKG / NUKZ / RKLB excluded (insufficient pre-window history)
+- **Starting portfolio (fixed, not optimizer-picked):** AAPL 25%, MSFT 20%, GOOGL 15%, SPY 15%, AGG 10%, IAU 10%, BIL 5% — a realistic "tech-savvy 2021-Q3 investor with vague AI thesis but no thematic positions"
+- **Optimizer:** mean_variance λ=1, lookback 1.3y, max_weight 0.25, cadence quarterly
+- **Wave-stage tilts:** 20 strict as-of-date news-researcher Sonnet calls (one per quarter-end), aggregated into `data/wave_history_5y.csv` with seven-lever discipline (date-stamped persona, named-event suppression, WebSearch `before:` filters, grounding rule, forbidden-phrase blocklist, self-critique pass, quarterly calibration probe)
+
+| Path | Final | Return | Annualized | vs SPY |
+|---|---|---|---|---|
+| Buy-and-hold initial portfolio | $95,611 | +91.22% | +15.19%/yr | +13pp |
+| Quarterly rebalance, **no AI tilt** | $121,141 | **+142.28%** | +21.30%/yr | +64pp |
+| Quarterly rebalance, **with AI tilt** | $115,516 | +131.03% | +20.04%/yr | +53pp |
+| SPY (rebased) | $89,073 | +78.15% | +13.43%/yr | — |
+
+**Findings:**
+
+1. Quarterly rebalancing alone (no AI signal) added +51pp over do-nothing, migrating the megacap-tech start toward wave-thematic targets as price-history μ picked them up.
+2. The news-researcher's wave-stage classifications **subtracted ~5%** in final value vs the same rebalance loop without them. Consistent with the 1y backtest's −1.3% AI lift and the prior corner-pick 5y backtest's −2.5%.
+3. Starting-allocation choice mattered less than expected — AAPL/MSFT/GOOGL/SPY-heavy buy-and-hold beat SPY by only +13pp.
+
+The branch's `docs/backtest_5y.html` renders the full ten-chart dashboard (portfolio value with all three paths overlaid, AI-lift ratio chart, recommended-weights stacked bars over 20 quarters, wave-stage trajectories from the 20 quarterly news-researcher calls, etc.).
+
+To reproduce: `git checkout 5y-backtest`, then the scaffolding under `scripts/` (`post_date_events.py`, `asof_news_prompt.md`, `aggregate_wave_history_5y.py`) plus the `.claude/skills/rebuild-wave-history-5y/` skill. Cost: ~$5 in Sonnet usage for the 20 strict as-of-date news classifications.
+
 ## Testing
 
 ```bash
