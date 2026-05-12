@@ -1349,7 +1349,8 @@ def build_dashboard(
             "1. Portfolio value over time"
             "<br><sub><i>Σ(actual shares × close price) per day. SPY rebased to share starting value for comparison.</i></sub>",
             "2. Rebalance turnover (% of portfolio dollars that changed holdings)"
-            "<br><sub><i>At each rebalance, ½·||Δw||₁ — half the L1 distance between consecutive weight vectors. Equals the fraction of portfolio value that moved between tickers. Step-function: each value holds until the next rebalance.</i></sub>",
+            "<br><sub><i>At each rebalance, ½·||Δw||₁ — half the L1 distance between consecutive weight vectors. Equals the fraction of portfolio value that moved between tickers."
+            "<br>Step-function: each value holds until the next rebalance.</i></sub>",
             "3. Recommended portfolio % segregated by wave, versus time"
             "<br><sub><i>Each optimizer run produces target weights per ticker; this chart sums them by wave bucket so each line is the wave's total target allocation.</i></sub>",
             "4. Latest recommended portfolio %"
@@ -1387,6 +1388,7 @@ def build_dashboard(
     # beyond the snapshots range. No hardcoded dates: the range rolls
     # forward each business day as the cron appends new snapshots.
     xrange: tuple[pd.Timestamp, pd.Timestamp] | None = None
+    latest_snap_date: pd.Timestamp | None = None
     if snap_path.exists():
         try:
             _snaps_dates = pd.read_csv(snap_path, parse_dates=["date"])["date"]
@@ -1395,6 +1397,7 @@ def build_dashboard(
                 span = d_max - d_min
                 pad = max(pd.Timedelta(days=1), span * 0.03)
                 xrange = (d_min - pad, d_max + pad)
+                latest_snap_date = d_max
         except (OSError, pd.errors.EmptyDataError):
             xrange = None
 
@@ -1457,9 +1460,9 @@ def build_dashboard(
         # weights remain in effect until the next /review-portfolio.
         # Implemented as a step trace ("hv" line shape) with the last
         # row's values repeated at xrange[1].
-        if xrange is not None and not wv_weight.empty and wv_weight.index.max() < xrange[1]:
+        if latest_snap_date is not None and not wv_weight.empty and wv_weight.index.max() < latest_snap_date:
             wv_weight = pd.concat([wv_weight,
-                                   wv_weight.iloc[[-1]].rename(index={wv_weight.index[-1]: xrange[1]})])
+                                   wv_weight.iloc[[-1]].rename(index={wv_weight.index[-1]: latest_snap_date})])
         wv_order = [w for w in _WAVE_DISPLAY_ORDER if w in wv_weight.columns]
         # Add a tiny vertical offset per wave so traces with the same
         # value (often 0%) don't pile on top of each other and become
@@ -1509,6 +1512,25 @@ def build_dashboard(
             go.Bar(x=tickers_in_chart, y=latest_weights["weight"],
                    name=f"As of {latest_weights['date'].iloc[0].date()}",
                    showlegend=False),
+            row=4, col=1,
+        )
+        # Horizontal dashed line at the concentration cap (read from
+        # investor_profile.md top-level YAML). Plotted as a Scatter trace
+        # so it shows up in the legend with a descriptive label.
+        try:
+            import yaml as _yaml
+            import re as _re
+            _profile_text = Path("investor_profile.md").read_text()
+            _m = _re.match(r"^---\s*\n(.*?)\n---\s*\n", _profile_text, _re.DOTALL)
+            _cap = float((_yaml.safe_load(_m.group(1)) or {}).get(
+                "concentration_cap", 0.25)) if _m else 0.25
+        except (OSError, ValueError, AttributeError):
+            _cap = 0.25
+        fig.add_trace(
+            go.Scatter(x=tickers_in_chart, y=[_cap] * len(tickers_in_chart),
+                       mode="lines", name=f"Concentration cap ({_cap*100:.0f}%)",
+                       line={"color": "#888", "width": 1.5, "dash": "dash"},
+                       hoverinfo="skip", showlegend=True, legend="legend7"),
             row=4, col=1,
         )
         fig.update_xaxes(
@@ -1703,8 +1725,8 @@ def build_dashboard(
                 # /review-portfolio dates.
                 xs = list(sub["date"])
                 ys = list(sub["count"])
-                if xrange is not None and xs and xs[-1] < xrange[1]:
-                    xs.append(xrange[1])
+                if latest_snap_date is not None and xs and xs[-1] < latest_snap_date:
+                    xs.append(latest_snap_date)
                     ys.append(ys[-1])
                 fig.add_trace(
                     go.Scatter(x=xs, y=ys, mode="lines",
@@ -1733,7 +1755,16 @@ def build_dashboard(
             lambda t: TICKER_WAVE.get(t, "general_markets")
         )
 
-        # Asset-class chart (row 7). Sum $ per (date, bucket).
+        # Asset-class chart (row 9). Sum $ per (date, bucket). Explicit
+        # colors so bonds (purple) and precious metals (gold) don't
+        # collide on the log y-axis when their dollar values are close.
+        ac_colors = {
+            "equities":        "#1f77b4",  # blue
+            "bonds":           "#9467bd",  # purple
+            "cash":            "#7f7f7f",  # gray
+            "precious metals": "#bcbd22",  # gold/olive
+            "crypto":          "#17becf",  # cyan
+        }
         ac = snaps_full.groupby(["date", "asset_bucket"])["value"].sum().unstack(fill_value=0)
         # Stable, intuitive ordering.
         ac_order = [c for c in ["equities", "bonds", "cash", "precious metals", "crypto"]
@@ -1741,20 +1772,38 @@ def build_dashboard(
         for bucket in ac_order:
             fig.add_trace(
                 go.Scatter(x=ac.index, y=ac[bucket], mode="lines",
-                           name=bucket, legend="legend2"),
+                           name=bucket, legend="legend2",
+                           line={"color": ac_colors.get(bucket, "#444")}),
                 row=9, col=1,
             )
 
-        # Wave chart (row 8). Same shape, different grouping.
+        # Wave chart (row 10). Same shape, different grouping. Waves
+        # with zero $ in the watchlist (e.g., the user has shares=0
+        # for every ticker in that wave) don't render on a log axis,
+        # so we list them in an annotation at the chart's top-right
+        # rather than silently dropping them.
         wv = snaps_full.groupby(["date", "wave_bucket"])["value"].sum().unstack(fill_value=0)
         # Use the same display order as elsewhere in the dashboard.
         wv_order = [w for w in _WAVE_DISPLAY_ORDER if w in wv.columns]
+        zero_waves = [w for w in wv_order if (wv[w] <= 0).all()]
         for wave in wv_order:
+            if wave in zero_waves:
+                continue
             fig.add_trace(
                 go.Scatter(x=wv.index, y=wv[wave], mode="lines",
                            name=wave, legend="legend3",
                            line={"color": WAVE_COLORS.get(wave)}),
                 row=10, col=1,
+            )
+        if zero_waves:
+            fig.add_annotation(
+                xref="x10 domain", yref="y10 domain",
+                x=0.99, y=0.97, xanchor="right", yanchor="top",
+                text="At $0 today: " + ", ".join(zero_waves),
+                showarrow=False,
+                font={"size": 11, "color": "#666"},
+                bgcolor="rgba(255,255,255,0.7)",
+                bordercolor="#bbb", borderwidth=1, borderpad=4,
             )
 
     # 9. Rebalance turnover. Computed from recommendations.csv: at each
@@ -1780,8 +1829,8 @@ def build_dashboard(
                 y_vals = list(diffs.values * 100)
                 marker_x = list(diffs.index)
                 marker_y = list(diffs.values * 100)
-                if xrange is not None and diffs.index[-1] < xrange[1]:
-                    x_vals.append(xrange[1])
+                if latest_snap_date is not None and diffs.index[-1] < latest_snap_date:
+                    x_vals.append(latest_snap_date)
                     y_vals.append(diffs.values[-1] * 100)
                 fig.add_trace(
                     go.Scatter(x=x_vals, y=y_vals,
@@ -1825,6 +1874,12 @@ def build_dashboard(
             title_text="Portfolio % by wave",
             xref="paper", x=1.02,
             yref="paper", y=0.788, yanchor="top",
+        ),
+        # Chart 4 (latest weights) gets a small legend just for the
+        # concentration-cap reference line. Anchored at row 4's top.
+        legend7=dict(
+            xref="paper", x=1.02,
+            yref="paper", y=0.682, yanchor="top",
         ),
         # Chart 7 has a secondary y-axis (tilt multiplier) on the right,
         # so push this legend further out (x=1.06) to clear that axis.
