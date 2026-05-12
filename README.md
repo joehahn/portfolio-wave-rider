@@ -9,7 +9,7 @@ A Claude Code demo for long-horizon portfolio optimization. You declare your goa
 
 **Live demo:** [joehahn.github.io/portfolio-wave-rider](https://joehahn.github.io/portfolio-wave-rider/) (live dashboard), [/backtest.html](https://joehahn.github.io/portfolio-wave-rider/backtest.html) (12-month walk-forward backtest), and [/news.html](https://joehahn.github.io/portfolio-wave-rider/news.html) (the news bullets that drove the latest wave-stage classifications).
 
-See [GLOSSARY.md](GLOSSARY.md) for finance and stats terms (`σ`, `μ`, `Σ`, Sharpe ratio, risk aversion `λ`, mean-variance optimization, max drawdown, VaR/CVaR, etc.) and [REFERENCE.md](REFERENCE.md) for the CLI flags, repo layout, output files, and testing instructions.
+See [GLOSSARY.md](GLOSSARY.md) for finance and stats terms (`σ`, `μ`, `Σ`, Sharpe ratio, risk aversion `λ`, mean-variance optimization, max drawdown, VaR/CVaR, etc.) and [REFERENCE.md](REFERENCE.md) for the CLI flags, repo layout, output files, architecture overview, and testing instructions.
 
 ## Setup
 
@@ -105,39 +105,6 @@ This is why the optimizer often zeros tickers with bullish wave views (BOTZ, ARK
 
 For a single-page consolidation of the entire wave-stage pipeline (LLM judgment process, math, history-storage, as-of-date lookup, look-ahead-bias caveat) see [docs/wave-stage-classification.md](docs/wave-stage-classification.md).
 
-## How it's built
-
-- Three skills at `.claude/skills/`:
-  - `initialize-portfolio` (one-shot): reads the profile and an empty holdings.csv, produces a thesis-driven dollar allocation, persists it to `data/thesis_baseline.json`, and writes a thesis-only report.
-  - `review-portfolio` (recurring): reads the profile, holdings, and (if present) the thesis baseline; gathers news, runs the optimizer with wave-stage tilts, writes a profile-aware report, refreshes the live dashboard. Renders the thesis-vs-recommended comparison on every run when the baseline exists.
-  - `run-backtest` (on demand): walk-forward 12-month backtest, auto-rendering both the local and public backtest dashboards.
-- Two subagents at `.claude/agents/`:
-  - `news-researcher`: picks wave-aligned news per ticker (web search scoped to `news_sources.md` first, open search as fallback), classifies each wave's stage, returns a `wave_views` mapping `{ticker: stage}`.
-  - `report-writer`: synthesizes the analysis and news into the final markdown report.
-- All Python in two files: `src/portfolio.py` (math) and `src/cli.py` (one entry point with eight subcommands).
-- The user-authored `investor_profile.md` is the source of truth. Every recommendation cites lines from it. When the optimal numerical answer violates a profile constraint, the report flags the conflict; it does not silently clamp.
-
-```mermaid
-flowchart TD
-    user([User]) -->|/review-portfolio| skill[Skill: review-portfolio]
-    profile[(investor_profile.md)] -.read.-> skill
-    skill --> news[news-researcher]
-    sources[(news_sources.md)] -.read.-> news
-    skill -->|src.cli analyze --wave-views| analyze[Python: fetch + optimize + risk]
-    news --> writer[report-writer]
-    analyze --> writer
-    writer --> out[/report.md + dashboard.html/]
-
-    classDef agent fill:#e1f0ff,stroke:#3b82f6
-    classDef cli fill:#fef3c7,stroke:#d97706
-    classDef file fill:#f3f4f6,stroke:#6b7280
-    class news,writer agent
-    class analyze cli
-    class out file
-```
-
-Two LLM specialists (blue) bracket one Python call (yellow). The profile and `news_sources.md` are read-only inputs.
-
 ## Things to watch
 
 - **Prior vs likelihood.** The wave thesis is a prior; mean-variance over a 2-3 year price window is a likelihood. The optimizer often disagrees with the prior because the recent past favored low-volatility assets (bonds, cash, gold). The "Profile conflicts" section shows where they disagree. The user decides which to trust.
@@ -149,7 +116,7 @@ Two LLM specialists (blue) bracket one Python call (yellow). The profile and `ne
 
 ## Notes
 
-This project was developed with [Claude Code](https://claude.com/claude-code). See `CLAUDE.md` for the rules Claude follows when operating in this repo. CLI flags, repo layout, output files, and testing instructions live in [REFERENCE.md](REFERENCE.md). Finance and stats terms are defined in [GLOSSARY.md](GLOSSARY.md).
+This project was developed with [Claude Code](https://claude.com/claude-code). See `CLAUDE.md` for the rules Claude follows when operating in this repo. CLI flags, repo layout, output files, architecture overview, and testing instructions live in [REFERENCE.md](REFERENCE.md). Finance and stats terms are defined in [GLOSSARY.md](GLOSSARY.md).
 
 ## Disclaimer
 
