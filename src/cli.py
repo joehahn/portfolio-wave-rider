@@ -147,7 +147,7 @@ def main(argv: list[str] | None = None) -> int:
                              "(default: SPY). Pass an empty list to suppress overlays.")
     p_dash.add_argument("--out", default="docs/index.html")
     p_dash.add_argument("--nav-current", default=None,
-                        choices=["live", "backtest", "lambda", "max_weight"],
+                        choices=["live", "backtest", "lambda", "max_weight", "lookback"],
                         help="if set, prepend a cross-page nav strip to the rendered HTML "
                              "with the named page highlighted as current (used in docs/)")
     p_dash.add_argument("--thesis-baseline", default="data/thesis_baseline.json",

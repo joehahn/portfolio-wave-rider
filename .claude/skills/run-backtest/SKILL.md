@@ -1,6 +1,6 @@
 ---
 name: run-backtest
-description: Run a 12-month walk-forward backtest of the optimizer using mean_variance λ=1, time-varying wave tilts from data/wave_history.csv, and the current 12-ticker watchlist. Auto-renders both data/backtest/dashboard.html and docs/backtest.html, then re-runs the lambda sweep so docs/lambda_comparison.html refreshes in the same invocation.
+description: Run a 12-month walk-forward backtest of the optimizer using mean_variance λ=1, time-varying wave tilts from data/wave_history.csv, and the current 12-ticker watchlist. Auto-renders both data/backtest/dashboard.html and docs/backtest.html, then re-runs the lambda and lookback sweeps so docs/lambda_comparison.html and docs/lookback_comparison.html refresh in the same invocation.
 ---
 
 # /run-backtest
@@ -33,15 +33,23 @@ The CLI writes to `data/backtest/` (snapshots.csv, recommendations.csv, report.m
 python scripts/compare_lambdas.py
 ```
 
-Runs the same 12-month walk-forward six times (one per λ in `[0.0, 0.33, 1.0, 3.3, 10.0, 33.3]`) and writes `data/backtest/lambda_comparison.html` and `docs/lambda_comparison.html`. Both backtest pages live in the nav strip so the user can flip between them.
+Runs the same 12-month walk-forward six times (one per λ in `[0.0, 0.33, 1.0, 3.3, 10.0, 33.3]`) and writes `data/backtest/lambda_comparison.html` and `docs/lambda_comparison.html`.
 
-## Step 3 — final output to the user
+## Step 3 — refresh the lookback sweep (Bash)
+
+```
+python scripts/compare_lookbacks.py
+```
+
+Runs the same 12-month walk-forward five times (one per lookback in `[0.25, 0.5, 0.75, 1.0, 1.3]` years) and writes `data/backtest/lookback_comparison.html` and `docs/lookback_comparison.html`. Sweep is capped at 1.3y because NUKZ launched 2024-01-24; longer lookbacks would all collapse to the same effective window.
+
+## Step 4 — final output to the user
 
 One short message:
 
 - Backtest summary: realized return, max drawdown, vs SPY (one line each).
-- Rendered paths: `data/backtest/dashboard.html` (local), `docs/backtest.html` (public), and `docs/lambda_comparison.html` (public lambda sweep).
-- Suggest committing both public pages to publish the refresh: `git add docs/backtest.html docs/lambda_comparison.html && git commit -m "Refresh backtest + lambda sweep" && git push`.
+- Rendered paths: `data/backtest/dashboard.html` (local), plus the three public pages (`docs/backtest.html`, `docs/lambda_comparison.html`, `docs/lookback_comparison.html`).
+- Suggest committing all three to publish the refresh: `git add docs/backtest.html docs/lambda_comparison.html docs/lookback_comparison.html && git commit -m "Refresh backtest + sweeps" && git push`.
 
 ## Rules
 

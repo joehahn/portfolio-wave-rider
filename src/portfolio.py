@@ -1286,6 +1286,7 @@ _NAV_LINKS = [
     ("backtest",   "12-month backtest",    "backtest.html"),
     ("lambda",     "Lambda sweep",         "lambda_comparison.html"),
     ("max_weight", "Concentration sweep",  "max_weight_comparison.html"),
+    ("lookback",   "Lookback sweep",       "lookback_comparison.html"),
     ("news",       "News",                 "news.html"),
 ]
 
