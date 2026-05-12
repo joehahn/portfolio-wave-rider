@@ -77,13 +77,22 @@ Install with `crontab -e` and paste. Adjust `PROJ` to your clone path. Verify wi
 
 ## How wave-stage tilts enter the math
 
-The news-researcher's only job that touches the optimizer is to assign each ticker a wave stage (`buildup`, `surge`, `neutral`, `digestion`, `peak`). The skill then passes these classifications to `analyze`, which scales each ticker's expected return by the stage's multiplier *before* running the optimizer. The math is one line:
+The default optimizer objective is the Sharpe ratio:
+
+```
+maximize  (μᵀw − r_free) / √(wᵀΣw)
+subject to  Σw = 1,  0 ≤ w_i ≤ concentration_cap
+```
+
+The two inputs estimated from price history are `μ` (the per-ticker expected-return vector — annualized mean of daily log returns over the lookback window) and `Σ` (the ticker × ticker covariance matrix — variances on the diagonal, pairwise covariances off-diagonal). `w` is the weight vector the optimizer is solving for. The mean-variance variant swaps the objective for `μᵀw − λ·wᵀΣw`, with `λ` sliding along the same efficient frontier. See [GLOSSARY.md](GLOSSARY.md) for the full definitions.
+
+Wave-stage tilts modify `μ`, not `Σ`. The news-researcher assigns each ticker a wave stage (`buildup`, `surge`, `neutral`, `digestion`, `peak`); `analyze` scales each ticker's expected return by the stage's multiplier *before* solving:
 
 ```
 μ_tilted[i] = stage_multiplier[stage(i)] × μ[i]
 ```
 
-with the multipliers loaded from the profile's `financial_model.wave_stage_tilts` (defaults to `src/portfolio.py:WAVE_STAGE_TILT`):
+Multipliers are loaded from the profile's `financial_model.wave_stage_tilts` (defaults to `src/portfolio.py:WAVE_STAGE_TILT`):
 
 | Stage | Multiplier | Plain reading |
 |---|---|---|
@@ -93,7 +102,7 @@ with the multipliers loaded from the profile's `financial_model.wave_stage_tilts
 | `digestion` | **0.90** | post-crest hangover: nudge μ down 10% |
 | `peak` | **0.80** | enthusiasm is the story, valuations stretched: nudge μ down 20% |
 
-`μ` (mu) is the expected-return vector — historical mean of daily log returns over the lookback window, annualized. The optimizer maximizes Sharpe `(μ_tiltedᵀw − r_free) / √(wᵀΣw)` using the tilted version. Note that `Σ` (the covariance matrix) is **not** tilted — only the expected returns. So a ticker with a bullish wave view doesn't get blindly upweighted: the optimizer still discounts it for volatility and correlation with the rest of the portfolio.
+Because `Σ` stays untouched, a ticker with a bullish wave view doesn't get blindly upweighted — the optimizer still discounts it for volatility and correlation with the rest of the portfolio.
 
 This is why the optimizer often zeros tickers with bullish wave views (BOTZ, ARKG, MSFT in recent runs). The tilt isn't strong enough to override the volatility / covariance penalty for those tickers given the 3y lookback. The "Profile conflicts" section of the report flags exactly that gap — the wave-thesis prior pulled one direction; the data pulled another. A ±20% bump in μ is meaningful but deliberately modest: a single news pass plus an LLM judgment is fairly weak evidence, so the tilts nudge weights rather than dictate them.
 
