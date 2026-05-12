@@ -1355,17 +1355,20 @@ def build_dashboard(
             "4. Latest recommended portfolio %"
             "<br><sub><i>The most recent optimizer's target weight per ticker. Bars at the cap signal the optimizer wanted more than the concentration constraint allowed.</i></sub>",
             "5. Cumulative $ gain per holding since /initialize-portfolio executed"
-            "<br><sub><i>Per-ticker P&L attribution from the day-zero snapshot through today: Σ(prior-day shares × price change). Bars sum to total realized portfolio gain since the thesis was set. Green = winners, red = losers.</i></sub>",
+            "<br><sub><i>Per-ticker P&L attribution from the day-zero snapshot through today: Σ(prior-day shares × price change)."
+            "<br>Bars sum to total realized portfolio gain since the thesis was set. Green = winners, red = losers.</i></sub>",
             "6. Cumulative $ gain per holding since the most recent /review-portfolio rebalance"
-            "<br><sub><i>Per-ticker P&L attribution from the most recent /review-portfolio rebalance date through today. Shows how the current allocation has performed since the latest optimizer fire.</i></sub>",
+            "<br><sub><i>Per-ticker P&L attribution from the most recent /review-portfolio rebalance date through today."
+            "<br>Shows how the current allocation has performed since the latest optimizer fire.</i></sub>",
             "7. Wave-stage trajectories (0=neutral, 1=buildup, 2=surge, 3=peak, 4=digestion)"
-            "<br><sub><i>How the news-researcher classified each wave's cycle stage. Forward-filled across the snapshot window so each business day shows the most-recent-at-or-before classification. Right axis shows the tilt multiplier applied to that wave's tickers' expected returns.</i></sub>",
+            "<br><sub><i>How the news-researcher classified each wave's cycle stage. Forward-filled across the snapshot window so each business day shows the most-recent-at-or-before classification."
+            "<br>Right axis shows the tilt multiplier applied to that wave's tickers' expected returns.</i></sub>",
             "8. Articles harvested per wave over time (data/news/ archive)"
-            "<br><sub><i>Bullet count per wave per /review-portfolio run, from the archived news payloads. Indicates how much evidence backs each stage classification.</i></sub>",
+            "<br><sub><i>Bullet count per wave per /review-portfolio run, from the archived news payloads. Forward-filled across the window so the latest count holds until the next /review-portfolio refreshes the payload.</i></sub>",
             "9. $ by asset class over time"
-            "<br><sub><i>Daily portfolio value rolled up by asset class. Sums to total portfolio value (chart 1).</i></sub>",
+            "<br><sub><i>Daily portfolio value rolled up by asset class. Sums to total portfolio value (chart 1). Log y-axis keeps small allocations visible.</i></sub>",
             "10. $ by wave over time"
-            "<br><sub><i>Daily portfolio value rolled up by wave bucket. Same data as the asset-class chart above grouped differently. Log y-axis keeps small allocations visible next to the dominant general_markets line.</i></sub>",
+            "<br><sub><i>Daily portfolio value rolled up by wave bucket. Same data as the asset-class chart above grouped differently. Log y-axis.</i></sub>",
         ),
         vertical_spacing=0.06,
         # Chart 7 (wave-stage trajectories) gets a right y-axis showing
@@ -1449,6 +1452,14 @@ def build_dashboard(
             lambda t: TICKER_WAVE.get(t, "general_markets")
         )
         wv_weight = recs.groupby(["date", "wave_bucket"])["weight"].sum().unstack(fill_value=0)
+        # Extend the most recent rebalance horizontally to the right
+        # edge of the x-axis window, so the chart shows that the latest
+        # weights remain in effect until the next /review-portfolio.
+        # Implemented as a step trace ("hv" line shape) with the last
+        # row's values repeated at xrange[1].
+        if xrange is not None and not wv_weight.empty and wv_weight.index.max() < xrange[1]:
+            wv_weight = pd.concat([wv_weight,
+                                   wv_weight.iloc[[-1]].rename(index={wv_weight.index[-1]: xrange[1]})])
         wv_order = [w for w in _WAVE_DISPLAY_ORDER if w in wv_weight.columns]
         # Add a tiny vertical offset per wave so traces with the same
         # value (often 0%) don't pile on top of each other and become
@@ -1461,7 +1472,7 @@ def build_dashboard(
             fig.add_trace(
                 go.Scatter(x=wv_weight.index, y=wv_weight[wave] + offset,
                            mode="lines+markers", name=wave, legend="legend5",
-                           line={"color": WAVE_COLORS.get(wave)},
+                           line={"color": WAVE_COLORS.get(wave), "shape": "hv"},
                            customdata=true_pct,
                            hovertemplate=f"{wave}<br>%{{x|%Y-%m-%d}}"
                                          "<br>%{customdata:.2f}%<extra></extra>"),
@@ -1549,6 +1560,16 @@ def build_dashboard(
             tickangle=0,
             row=5, col=1,
         )
+        # Inject total gain into the chart-5 title via annotation 4
+        # (subplot titles map 1:1 to the figure's annotations in row
+        # order).
+        _total_init = sum(gain_values)
+        fig.layout.annotations[4].update(
+            text=fig.layout.annotations[4].text.replace(
+                "5. Cumulative $ gain per holding since /initialize-portfolio executed",
+                f"5. Cumulative $ gain per holding since /initialize-portfolio executed (total: ${_total_init:+,.0f})",
+            )
+        )
 
     # 6. Cumulative $ gain per holding since the most recent /review-portfolio
     # rebalance. Same daily-PnL math as chart 5, but the snapshot window is
@@ -1583,6 +1604,14 @@ def build_dashboard(
                 ticktext=ticktext_4,
                 tickangle=0,
                 row=6, col=1,
+            )
+            # Inject total gain into the chart-6 title.
+            _total_recent = sum(recent_values)
+            fig.layout.annotations[5].update(
+                text=fig.layout.annotations[5].text.replace(
+                    "6. Cumulative $ gain per holding since the most recent /review-portfolio rebalance",
+                    f"6. Cumulative $ gain per holding since the most recent /review-portfolio rebalance (total: ${_total_recent:+,.0f})",
+                )
             )
 
     # 7. Wave-stage trajectories (one line per wave, from wave_history.csv).
@@ -1668,10 +1697,26 @@ def build_dashboard(
                 adf = adf[(adf["date"] >= xrange[0]) & (adf["date"] <= xrange[1])]
             for wave in [w for w in _WAVE_DISPLAY_ORDER if w in adf["wave"].unique()]:
                 sub = adf[adf["wave"] == wave].sort_values("date")
+                # Extend the most recent bullet count horizontally to
+                # the right edge of the window so the chart spans the
+                # full snapshot range. Markers stay only at real
+                # /review-portfolio dates.
+                xs = list(sub["date"])
+                ys = list(sub["count"])
+                if xrange is not None and xs and xs[-1] < xrange[1]:
+                    xs.append(xrange[1])
+                    ys.append(ys[-1])
                 fig.add_trace(
-                    go.Scatter(x=sub["date"], y=sub["count"], mode="lines+markers",
+                    go.Scatter(x=xs, y=ys, mode="lines",
                                name=wave, legend="legend4",
-                               line={"color": WAVE_COLORS.get(wave)}),
+                               line={"color": WAVE_COLORS.get(wave), "shape": "hv"}),
+                    row=8, col=1,
+                )
+                fig.add_trace(
+                    go.Scatter(x=sub["date"], y=sub["count"], mode="markers",
+                               name=f"{wave} mark", legend="legend4",
+                               marker={"color": WAVE_COLORS.get(wave), "size": 7},
+                               hoverinfo="skip", showlegend=False),
                     row=8, col=1,
                 )
 
@@ -1726,14 +1771,34 @@ def build_dashboard(
             diffs = wide.diff().abs().sum(axis=1) / 2.0
             diffs = diffs.dropna()
             if not diffs.empty:
+                # Extend the last turnover value horizontally to the
+                # right edge of the chart window so the step function
+                # makes clear "this is the most recent turnover and it
+                # remains in effect until the next rebalance". Markers
+                # only appear at real rebalance dates.
+                x_vals = list(diffs.index)
+                y_vals = list(diffs.values * 100)
+                marker_x = list(diffs.index)
+                marker_y = list(diffs.values * 100)
+                if xrange is not None and diffs.index[-1] < xrange[1]:
+                    x_vals.append(xrange[1])
+                    y_vals.append(diffs.values[-1] * 100)
                 fig.add_trace(
-                    go.Scatter(x=diffs.index, y=diffs.values * 100,
-                               mode="lines+markers",
+                    go.Scatter(x=x_vals, y=y_vals,
+                               mode="lines",
                                name="Turnover",
                                line={"color": "#1f77b4", "width": 2, "shape": "hv"},
+                               hovertemplate="%{x|%Y-%m-%d}<br>%{y:.1f}%<extra></extra>",
+                               showlegend=False),
+                    row=2, col=1,
+                )
+                fig.add_trace(
+                    go.Scatter(x=marker_x, y=marker_y,
+                               mode="markers",
+                               name="Turnover marker",
                                marker={"size": 9, "symbol": "square-open",
                                        "color": "#ff7f0e", "line": {"width": 2}},
-                               hovertemplate="%{x|%Y-%m-%d}<br>%{y:.1f}%<extra></extra>",
+                               hoverinfo="skip",
                                showlegend=False),
                     row=2, col=1,
                 )
@@ -1822,7 +1887,7 @@ def build_dashboard(
                      showgrid=False,
                      automargin=True)
     fig.update_yaxes(title_text="articles", row=8, col=1, rangemode="tozero")
-    fig.update_yaxes(title_text="$", row=9, col=1)
+    fig.update_yaxes(title_text="$ (log)", row=9, col=1, type="log")
     # Log scale on chart 8 so small wave allocations (e.g., zero-weighted
     # robotics/biology lines hovering near a few hundred dollars) don't
     # collapse to the floor next to the dominant general_markets line.
