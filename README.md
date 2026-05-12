@@ -77,14 +77,14 @@ Install with `crontab -e` and paste. Adjust `PROJ` to your clone path. Verify wi
 
 ## How the optimizer works
 
-The default optimizer objective is the Sharpe ratio:
+The headline objective is the mean-variance utility:
 
 ```
-maximize  (μᵀw − r_free) / √(wᵀΣw)
-subject to  Σw = 1,  0 ≤ w_i ≤ concentration_cap
+maximize  μᵀw − λ·wᵀΣw
+subject to  ∑ᵢ wᵢ = 1,  0 ≤ wᵢ ≤ concentration_cap
 ```
 
-The two inputs estimated from price history are `μ` (the per-ticker expected-return vector — annualized mean of daily log returns over the lookback window) and `Σ` (the ticker × ticker covariance matrix — variances on the diagonal, pairwise covariances off-diagonal). `w` is the weight vector the optimizer is solving for. The mean-variance variant swaps the objective for `μᵀw − λ·wᵀΣw`, with `λ` sliding along the same efficient frontier. See [GLOSSARY.md](GLOSSARY.md) for the full definitions.
+The two inputs estimated from price history are `μ` (the per-ticker expected-return vector — annualized mean of daily log returns over the lookback window) and `Σ` (the ticker × ticker covariance matrix — variances on the diagonal, pairwise covariances off-diagonal). `w` is the weight vector the optimizer is solving for, and `λ` (risk aversion) trades expected return against variance — small `λ` favors return (more equity-heavy), large `λ` favors variance reduction (more bond/cash-heavy). The public-demo backtest and lambda sweep both use `λ = 1`. An alternative objective is max-Sharpe — `(μᵀw − r_free) / √(wᵀΣw)`, which the `/review-portfolio` skill uses by default — but it picks just one point on the same efficient frontier the mean-variance sweep traces out. See [GLOSSARY.md](GLOSSARY.md) for the full definitions.
 
 Wave-stage tilts modify `μ`, not `Σ`. The news-researcher assigns each ticker a wave stage (`buildup`, `surge`, `neutral`, `digestion`, `peak`); `analyze` scales each ticker's expected return by the stage's multiplier *before* solving:
 
