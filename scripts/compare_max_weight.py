@@ -172,12 +172,18 @@ fig.add_trace(go.Scatter(x=spy.index, y=spy.values, mode="lines",
                          name="SPY (rebased)", line={"width": 1.5, "color": "#444", "dash": "dash"},
                          hovertemplate="SPY<br>%{x|%Y-%m-%d}<br>$%{y:,.0f}<extra></extra>"))
 
-# Rebalance indicators: thin orange dotted vertical lines at each
-# rebalance date, behind all the line traces. Same orange as the
-# square markers on the live and backtest dashboards.
+# Rebalance indicators: orange dotted vertical lines at each rebalance
+# date, behind all the line traces. A dummy zero-data scatter trace
+# carries the "Rebalance" legend entry since add_vline shapes don't
+# show up in the legend.
 for d in rebalance_dates:
-    fig.add_vline(x=d, line_dash="dot", line_width=1, line_color="#ff7f0e",
+    fig.add_vline(x=d, line_dash="dot", line_width=2, line_color="#ff7f0e",
                   layer="below")
+fig.add_trace(go.Scatter(
+    x=[None], y=[None], mode="lines",
+    line={"dash": "dot", "width": 2, "color": "#ff7f0e"},
+    name="Rebalance",
+))
 # Pad the x-axis a couple percent on each side so the leftmost and
 # rightmost data points sit inside the plotting frame.
 _x_span = daily_dates[-1] - daily_dates[0]
