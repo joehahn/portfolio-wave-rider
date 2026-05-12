@@ -45,7 +45,7 @@ Four triggers cover the portfolio's lifecycle: setup, daily price refresh, month
 
 ## Operations
 
-- Daily: nothing. The cron job appends a row per ticker to `data/snapshots.csv` and refreshes `docs/index.html`.
+- Daily: nothing. The cron job appends a row per ticker to `data/snapshots.csv` and refreshes the local copy of `docs/index.html`.
 - Whenever you want to publish the cron-refreshed dashboard: `git add docs/index.html && git commit -m "Refresh live dashboard" && git push`. cron does not auto-push.
 - Monthly: run `/review-portfolio` in Claude Code. Read the report (especially the **Profile conflicts** section), decide on rebalances, execute trades in your brokerage, then update `holdings.csv`.
 - After trading: edit `holdings.csv` to reflect new share counts. The next snapshot picks up the new positions.
@@ -61,7 +61,7 @@ PROJ=/path/to/portfolio-wave-rider
 30 16 * * 1-5  cd $PROJ && .venv/bin/python -m src.cli snapshot && .venv/bin/python -m src.cli dashboard --nav-current live >> data/snapshot.log 2>&1
 ```
 
-Each cron call refreshes `docs/index.html` (the dashboard CLI's default `--out`). The file is git-tracked but cron does not push — `git status` will show it modified after each run, and a manual `git add docs/index.html && git commit && git push` publishes the refresh.
+Each cron call refreshes the local copy of `docs/index.html` (the dashboard CLI's default `--out`). The file is git-tracked but cron does not push — `git status` will show it modified after each run, and a manual `git add docs/index.html && git commit && git push` publishes the refresh.
 
 Install with `crontab -e` and paste. Adjust `PROJ` to your clone path. Verify with `crontab -l`. cron only fires while the machine is awake; missed runs do not auto-replay. Use `--date YYYY-MM-DD` on either subcommand to backfill.
 
