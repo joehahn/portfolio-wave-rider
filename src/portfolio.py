@@ -596,6 +596,7 @@ def backtest(
     publish_docs: bool = True,
     cadence: str = "monthly",
     docs_out_path: str = "docs/backtest.html",
+    initial_weights: dict[str, float] | None = None,
 ) -> dict[str, Any]:
     """Walk-forward monthly-rebalance backtest of the lightweight Python-only path.
 
@@ -704,50 +705,80 @@ def backtest(
         is_first_day = date == daily_dates[0]
 
         if is_new_period or (is_first_day and current_shares is None):
-            # Run optimizer with a `lookback_years`-long window ending today.
-            lookback_start = date - pd.Timedelta(days=365 * lookback_years)
-            slice_prices = full_prices.loc[lookback_start:date]
-            if len(slice_prices) < 30:
-                continue
-            returns = compute_returns(slice_prices)
-            opt = optimize_portfolio(
-                returns, objective=objective, risk_free_rate=risk_free_rate,
-                max_weight=max_weight, risk_aversion=risk_aversion,
-                wave_views=_wave_views_at(date), tilt_schedule=tilt_schedule,
-            )
-            if not opt.get("success"):
-                continue
-            weights = opt["weights"]
-
-            # Track month-over-month weight stability (L1 distance between weight vectors).
-            if last_weights is not None:
-                l1 = sum(abs(weights[t] - last_weights.get(t, 0)) for t in weights)
-                weight_l1_distances.append(l1)
-            last_weights = weights
-
-            # Compute current portfolio value, then rebalance to the new weights.
-            if current_shares is None:
+            # Initial-allocation override: when initial_weights is provided
+            # AND this is the first day, skip the optimizer and use those
+            # weights directly. The first true optimizer call fires at the
+            # start of the next period (e.g., Q4-2021 for a Q3-2021 start).
+            # Lets a backtest simulate a real investor whose starting
+            # holdings predate any optimizer recommendation.
+            using_initial = is_first_day and initial_weights is not None and current_shares is None
+            if using_initial:
+                weights = {t: float(initial_weights.get(t, 0.0)) for t in tickers}
+                _w_sum = sum(weights.values())
+                if abs(_w_sum - 1.0) > 1e-6:
+                    raise ValueError(f"initial_weights must sum to 1, got {_w_sum:.6f}")
+                last_weights = weights
                 portfolio_value = initial_usd
+                current_shares = {
+                    t: (weights[t] * portfolio_value) / float(full_prices.loc[date, t])
+                    for t in tickers
+                }
+                for t in tickers:
+                    rec_rows.append({
+                        "date": str(date.date()),
+                        "ticker": t,
+                        "weight": weights[t],
+                        "expected_return": float("nan"),
+                        "annual_volatility": float("nan"),
+                        "sharpe_ratio": float("nan"),
+                        "objective": "initial_weights",
+                    })
+                last_period = _period_id(date)
             else:
-                portfolio_value = sum(
-                    current_shares[t] * float(full_prices.loc[date, t]) for t in tickers
+                # Run optimizer with a `lookback_years`-long window ending today.
+                lookback_start = date - pd.Timedelta(days=365 * lookback_years)
+                slice_prices = full_prices.loc[lookback_start:date]
+                if len(slice_prices) < 30:
+                    continue
+                returns = compute_returns(slice_prices)
+                opt = optimize_portfolio(
+                    returns, objective=objective, risk_free_rate=risk_free_rate,
+                    max_weight=max_weight, risk_aversion=risk_aversion,
+                    wave_views=_wave_views_at(date), tilt_schedule=tilt_schedule,
                 )
-            current_shares = {
-                t: (weights[t] * portfolio_value) / float(full_prices.loc[date, t])
-                for t in tickers
-            }
+                if not opt.get("success"):
+                    continue
+                weights = opt["weights"]
 
-            for t in tickers:
-                rec_rows.append({
-                    "date": str(date.date()),
-                    "ticker": t,
-                    "weight": weights[t],
-                    "expected_return": opt["expected_annual_return"],
-                    "annual_volatility": opt["annual_volatility"],
-                    "sharpe_ratio": opt["sharpe_ratio"],
-                    "objective": objective,
-                })
-            last_period = _period_id(date)
+                # Track month-over-month weight stability (L1 distance between weight vectors).
+                if last_weights is not None:
+                    l1 = sum(abs(weights[t] - last_weights.get(t, 0)) for t in weights)
+                    weight_l1_distances.append(l1)
+                last_weights = weights
+
+                # Compute current portfolio value, then rebalance to the new weights.
+                if current_shares is None:
+                    portfolio_value = initial_usd
+                else:
+                    portfolio_value = sum(
+                        current_shares[t] * float(full_prices.loc[date, t]) for t in tickers
+                    )
+                current_shares = {
+                    t: (weights[t] * portfolio_value) / float(full_prices.loc[date, t])
+                    for t in tickers
+                }
+
+                for t in tickers:
+                    rec_rows.append({
+                        "date": str(date.date()),
+                        "ticker": t,
+                        "weight": weights[t],
+                        "expected_return": opt["expected_annual_return"],
+                        "annual_volatility": opt["annual_volatility"],
+                        "sharpe_ratio": opt["sharpe_ratio"],
+                        "objective": objective,
+                    })
+                last_period = _period_id(date)
 
         # Daily snapshot (always, once we have shares).
         if current_shares is not None:
@@ -786,23 +817,31 @@ def backtest(
         is_new_period = _period_id(date) != nt_last_period
         is_first_day = date == daily_dates[0]
         if is_new_period or (is_first_day and nt_shares is None):
-            lookback_start = date - pd.Timedelta(days=365 * lookback_years)
-            slice_prices = full_prices.loc[lookback_start:date]
-            if len(slice_prices) < 30:
-                continue
-            returns = compute_returns(slice_prices)
-            nt_opt = optimize_portfolio(
-                returns, objective=objective, risk_free_rate=risk_free_rate,
-                max_weight=max_weight, risk_aversion=risk_aversion,
-                wave_views=None, tilt_schedule=tilt_schedule,
-            )
-            if not nt_opt.get("success"):
-                continue
-            nt_w = nt_opt["weights"]
-            nt_pv = (initial_usd if nt_shares is None
-                     else sum(nt_shares[t] * float(full_prices.loc[date, t]) for t in tickers))
-            nt_shares = {t: nt_w[t] * nt_pv / float(full_prices.loc[date, t]) for t in tickers}
-            nt_last_period = _period_id(date)
+            # Same initial-allocation override as the main loop, so both
+            # paths share the same starting holdings.
+            if is_first_day and initial_weights is not None and nt_shares is None:
+                nt_w = {t: float(initial_weights.get(t, 0.0)) for t in tickers}
+                nt_pv = initial_usd
+                nt_shares = {t: nt_w[t] * nt_pv / float(full_prices.loc[date, t]) for t in tickers}
+                nt_last_period = _period_id(date)
+            else:
+                lookback_start = date - pd.Timedelta(days=365 * lookback_years)
+                slice_prices = full_prices.loc[lookback_start:date]
+                if len(slice_prices) < 30:
+                    continue
+                returns = compute_returns(slice_prices)
+                nt_opt = optimize_portfolio(
+                    returns, objective=objective, risk_free_rate=risk_free_rate,
+                    max_weight=max_weight, risk_aversion=risk_aversion,
+                    wave_views=None, tilt_schedule=tilt_schedule,
+                )
+                if not nt_opt.get("success"):
+                    continue
+                nt_w = nt_opt["weights"]
+                nt_pv = (initial_usd if nt_shares is None
+                         else sum(nt_shares[t] * float(full_prices.loc[date, t]) for t in tickers))
+                nt_shares = {t: nt_w[t] * nt_pv / float(full_prices.loc[date, t]) for t in tickers}
+                nt_last_period = _period_id(date)
         if nt_shares is not None:
             nt_totals.append({
                 "date": str(date.date()),
@@ -1217,6 +1256,10 @@ TICKER_WAVE: dict[str, str] = {
     # not a wave bet, so general_markets bucket).
     "VIG": "general_markets", "DVY": "general_markets",
     "XLU": "general_markets", "XLP": "general_markets",
+    # AAPL: megacap quality default. Classified general_markets (NOT AI) for the
+    # 5y backtest experiment so it stays untilted and the news-researcher's AI
+    # signal has migration room from AAPL into NVDA/MSFT/GOOGL.
+    "AAPL": "general_markets",
 }
 
 # Short display labels for chart 3 (Latest recommended portfolio %). Each
