@@ -1433,9 +1433,8 @@ def build_dashboard(
     )
     titles_pre6 = (
         "1. Portfolio value over time"
-        "<br><sub><i>Σ(actual shares × close price) per day. SPY rescaled to share starting value for comparison."
-        "<br>buy-and-hold holds the first-rebalance share counts for the full window, no further trades."
-        "<br>monthly rebalance, no AI tilt re-runs the optimizer on every first trading day of each month with all wave-stage multipliers set to 1.0, so the LLM's news-driven tilts never enter μ. Gap to the main portfolio line is the AI tilt contribution; gap to buy-and-hold is the pure-math re-optimization contribution.</i></sub>",
+        "<br><sub><i>Σ(actual shares × close price) per day."
+        "<br>monthly rebalance, no AI tilt re-runs the optimizer each month with all wave-stage multipliers set to 1.0, so the LLM's news-driven tilts never enter μ.</i></sub>",
         "2. Rebalance turnover (% of portfolio dollars that changed holdings)"
         "<br><sub><i>At each rebalance, ½·||Δw||₁ — half the L1 distance between consecutive weight vectors. Equals the fraction of portfolio value that moved between tickers."
         "<br>Step-function: each value holds until the next rebalance.</i></sub>",
