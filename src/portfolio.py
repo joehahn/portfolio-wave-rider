@@ -1366,10 +1366,10 @@ def build_dashboard(
             "<br>Right axis shows the tilt multiplier applied to that wave's tickers' expected returns.</i></sub>",
             "8. Articles harvested per wave over time (data/news/ archive)"
             "<br><sub><i>Bullet count per wave per /review-portfolio run, from the archived news payloads. Forward-filled across the window so the latest count holds until the next /review-portfolio refreshes the payload.</i></sub>",
-            "9. $ by asset class over time"
-            "<br><sub><i>Daily portfolio value rolled up by asset class. Sums to total portfolio value (chart 1). Log y-axis keeps small allocations visible.</i></sub>",
-            "10. $ by wave over time"
-            "<br><sub><i>Daily portfolio value rolled up by wave bucket. Same data as the asset-class chart above grouped differently. Log y-axis.</i></sub>",
+            "9. Actual portfolio $ by asset class over time"
+            "<br><sub><i>Your real holdings (from holdings.csv × close prices), grouped by asset class. Sums to total portfolio value (chart 1). Log y-axis keeps small allocations visible.</i></sub>",
+            "10. Actual portfolio $ by wave over time"
+            "<br><sub><i>Your real holdings (from holdings.csv × close prices), grouped by wave. This is what you own today — not the optimizer's recommendation. Compare to chart 4 (latest recommended %) to see how far the actual portfolio sits from the latest recommendation. Log y-axis.</i></sub>",
         ),
         vertical_spacing=0.06,
         # Chart 7 (wave-stage trajectories) gets a right y-axis showing
