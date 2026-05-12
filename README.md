@@ -7,7 +7,15 @@
 
 A Claude Code demo for long-horizon portfolio optimization. You declare your goals, constraints, and a wave thesis (which technology waves you believe will drive future returns) in `investor_profile.md`, as well as a watchlist of tickers in `holdings.csv`. The system then pulls the last few years of price history via yfinance, runs a mean-variance optimizer (scipy.optimize) over those tickers, and recommends weights that maximize risk-adjusted return subject to your concentration cap (drift from your asset-class targets is reported in each run's Profile conflicts section, not enforced). A monthly `/review-portfolio` slash command sends two Claude subagents out for fresh news per ticker, classifies each wave's stage (buildup → surge → peak → digestion), tilts the optimizer's expected-return vector accordingly, and writes a profile-aware report. The result accumulates into a static Plotly dashboard so you can watch the recommended weights, the wave classifications, and the realized portfolio value evolve over time.
 
-**Live demo:** [joehahn.github.io/portfolio-wave-rider](https://joehahn.github.io/portfolio-wave-rider/) (live dashboard), [/backtest.html](https://joehahn.github.io/portfolio-wave-rider/backtest.html) (12-month walk-forward backtest), and [/news.html](https://joehahn.github.io/portfolio-wave-rider/news.html) (the news bullets that drove the latest wave-stage classifications).
+**Live demo:** four entry points, all served from GitHub Pages and reachable directly from here. There's no cross-page navigation between them — each is a standalone leaf except the three sweep pages, which cross-link to each other.
+
+- [Live dashboard](https://joehahn.github.io/portfolio-wave-rider/) — what your portfolio looks like today: realized value, recommended weights, asset-class and wave-bucket breakdowns.
+- [12-month backtest](https://joehahn.github.io/portfolio-wave-rider/backtest.html) — walk-forward replay of the optimizer over the trailing year, plus the AI-tilt attribution (portfolio value vs no-tilt vs buy-and-hold).
+- Sweeps — same backtest with one optimizer setting varied at a time. The three pages cross-link from a small nav strip at the top of each:
+  - [Lambda sweep](https://joehahn.github.io/portfolio-wave-rider/lambda_comparison.html) (risk-aversion λ)
+  - [Concentration-cap sweep](https://joehahn.github.io/portfolio-wave-rider/max_weight_comparison.html) (per-ticker weight ceiling)
+  - [Lookback sweep](https://joehahn.github.io/portfolio-wave-rider/lookback_comparison.html) (price-history window for μ and Σ)
+- [News](https://joehahn.github.io/portfolio-wave-rider/news.html) — the bullets the news-researcher used to classify each wave's stage at the most recent `/review-portfolio` run.
 
 See [GLOSSARY.md](GLOSSARY.md) for finance and stats terms (`σ`, `μ`, `Σ`, Sharpe ratio, risk aversion `λ`, mean-variance optimization, max drawdown, VaR/CVaR, etc.) and [REFERENCE.md](REFERENCE.md) for the CLI flags, repo layout, output files, architecture overview, and testing instructions.
 
@@ -58,7 +66,7 @@ If you want the daily snapshot to update automatically, install this cron entry.
 ```cron
 PROJ=/path/to/portfolio-wave-rider
 # Daily snapshot + dashboard refresh, Mon-Fri 16:30 local
-30 16 * * 1-5  cd $PROJ && .venv/bin/python -m src.cli snapshot && .venv/bin/python -m src.cli dashboard --nav-current live >> data/snapshot.log 2>&1
+30 16 * * 1-5  cd $PROJ && .venv/bin/python -m src.cli snapshot && .venv/bin/python -m src.cli dashboard >> data/snapshot.log 2>&1
 ```
 
 Each cron call refreshes the local copy of `docs/index.html` (the dashboard CLI's default `--out`). The file is git-tracked but cron does not push — `git status` will show it modified after each run, and a manual `git add docs/index.html && git commit && git push` publishes the refresh.

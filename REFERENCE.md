@@ -54,9 +54,10 @@ Eight subcommands. `/review-portfolio` calls `init-holdings` (first-run branch o
 
 # Static dashboard (reads the CSVs above plus both news files; writes
 # docs/index.html by default; overlays each --benchmarks ticker on the
-# portfolio-value chart, default SPY). Pass --nav-current to prepend the
-# cross-page nav strip used by docs/index.html and docs/backtest.html.
-.venv/bin/python -m src.cli dashboard [--benchmarks SPY] [--out docs/index.html] [--nav-current live|backtest|lambda|max_weight]
+# portfolio-value chart, default SPY). --nav-current is only meaningful
+# for the three sweep pages (lambda, max_weight, lookback), which cross-link
+# to each other; the live/backtest/news pages are leaves reached from README.
+.venv/bin/python -m src.cli dashboard [--benchmarks SPY] [--out docs/index.html] [--nav-current lambda|max_weight|lookback]
 ```
 
 To inspect the backtest visually without auto-render, point the dashboard at the backtest CSVs:

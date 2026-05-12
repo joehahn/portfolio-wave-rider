@@ -70,7 +70,7 @@ One cron entry handles daily price snapshots. The exact crontab installed on the
 ```cron
 PROJ=/Users/joehahn/Library/CloudStorage/Dropbox/prog/claude/portfolio-wave-rider
 # Daily snapshot + dashboard refresh, Mon-Fri 16:30 local
-30 16 * * 1-5  cd $PROJ && .venv/bin/python -m src.cli snapshot && .venv/bin/python -m src.cli dashboard --nav-current live >> data/snapshot.log 2>&1
+30 16 * * 1-5  cd $PROJ && .venv/bin/python -m src.cli snapshot && .venv/bin/python -m src.cli dashboard >> data/snapshot.log 2>&1
 ```
 
 The cron call refreshes `docs/index.html` (the dashboard CLI's default `--out`). The file is git-tracked but cron does not push — `git status` will show it modified after each run, and a manual `git add docs/index.html && git commit && git push` publishes the refresh.

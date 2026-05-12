@@ -893,9 +893,11 @@ def backtest(
     # The docs/ copy is the GitHub Pages-served version; tests and ad-hoc
     # callers that don't want to clobber the public dashboard can pass
     # publish_docs=False.
+    # No nav strip on either backtest copy — backtest is a leaf page
+    # reachable only from the README.
     targets = [(str(out / "dashboard.html"), None)]
     if publish_docs:
-        targets.append(("docs/backtest.html", "backtest"))
+        targets.append(("docs/backtest.html", None))
     rendered: list[str] = []
     for path, nav in targets:
         try:
@@ -1345,22 +1347,21 @@ def _fetch_benchmark_curves(
 
 
 _NAV_LINKS = [
-    ("live",       "Live dashboard",       "index.html"),
-    ("backtest",   "12-month backtest",    "backtest.html"),
     ("lambda",     "Lambda sweep",         "lambda_comparison.html"),
     ("max_weight", "Concentration sweep",  "max_weight_comparison.html"),
     ("lookback",   "Lookback sweep",       "lookback_comparison.html"),
-    ("news",       "News",                 "news.html"),
 ]
 
 
 def _render_nav_strip(current: str | None) -> str:
-    """Small navigation block prepended to each dashboard HTML so a
-    visitor can jump between the live dashboard, backtest dashboard,
-    and the parameter-sweep comparison pages. ``current`` highlights
-    one of `_NAV_LINKS`; pass None to omit the strip entirely.
+    """Small navigation block prepended to each sweep HTML so a visitor
+    can flip between the three parameter-sweep comparison pages.
+    ``current`` highlights one of `_NAV_LINKS`; pass None or a value
+    not in `_NAV_LINKS` to omit the strip entirely. The live dashboard,
+    backtest, and news pages are standalone leaves — readers reach
+    them from the README, not from each other.
     """
-    if not current:
+    if not current or current not in {k for k, _, _ in _NAV_LINKS}:
         return ""
     items = []
     for key, label, href in _NAV_LINKS:
@@ -2239,7 +2240,7 @@ def build_dashboard(
 def render_news_page(
     news_path: str = "data/news_latest.json",
     out_path: str = "docs/news.html",
-    nav_current: str | None = "news",
+    nav_current: str | None = None,
 ) -> dict[str, Any]:
     """Render docs/news.html: a standalone page showing the latest
     /review-portfolio news payload (the bullets the news-researcher

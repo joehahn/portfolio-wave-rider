@@ -83,7 +83,7 @@ The report is written to `data/reports/YYYY-MM-DD-review-portfolio.md`. When `th
 ### Step 4 — refresh dashboard (Bash)
 
 ```
-python -m src.cli dashboard --nav-current live
+python -m src.cli dashboard
 ```
 
 Regenerates the live dashboard at `docs/index.html` (the CLI's default `--out`). Time-series charts are scoped to dates >= `thesis_baseline.date` if the file exists.
