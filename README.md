@@ -75,7 +75,7 @@ Install with `crontab -e` and paste. Adjust `PROJ` to your clone path. Verify wi
 - **To add a ticker:** append a row `<TICKER>,0` to `holdings.csv` and run `/review-portfolio` (or wait for the next cron). The next run picks it up automatically — no other config changes needed.
 - **To remove a ticker:** delete the row. Subsequent runs skip it. The historical rows in `data/snapshots.csv` and `data/recommendations.csv` are not pruned (so old charts still render correctly), but no new rows accumulate.
 
-## How wave-stage tilts enter the math
+## How the optimizer works
 
 The default optimizer objective is the Sharpe ratio:
 
