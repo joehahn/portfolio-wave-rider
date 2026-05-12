@@ -1731,7 +1731,7 @@ def build_dashboard(
                 fig.add_trace(
                     go.Scatter(x=xs, y=ys, mode="lines",
                                name=wave, legend="legend4",
-                               line={"color": WAVE_COLORS.get(wave), "shape": "hv"}),
+                               line={"color": WAVE_COLORS.get(wave)}),
                     row=8, col=1,
                 )
                 fig.add_trace(
