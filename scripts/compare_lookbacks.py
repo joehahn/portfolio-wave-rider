@@ -181,7 +181,7 @@ for i, lb in enumerate(LOOKBACKS_YEARS):
                              line={"width": 2, "color": color},
                              hovertemplate=f"LB={lb}y<br>%{{x|%Y-%m-%d}}<br>$%{{y:,.0f}}<extra></extra>"))
 fig.add_trace(go.Scatter(x=spy.index, y=spy.values, mode="lines",
-                         name="SPY (rebased)", line={"width": 1.5, "color": "#66c266", "dash": "dash"},
+                         name="SPY (rescaled)", line={"width": 1.5, "color": "#66c266", "dash": "dash"},
                          hovertemplate="SPY<br>%{x|%Y-%m-%d}<br>$%{y:,.0f}<extra></extra>"))
 
 # No-rebalance counterfactual: take lookback=1.3y (headline) first-month
@@ -290,7 +290,7 @@ chart_caption = (
     f"wave tilts from data/wave_history.csv) with a different lookback for "
     f"estimating μ and Σ at each monthly rebalance. The ticker universe "
     f"shrinks for longer lookbacks: LB ≥ 2y drops NUKZ (launched 2024-01-24), "
-    f"LB = 5y also drops RKLB. SPY rebased to share the starting value. "
+    f"LB = 5y also drops RKLB. SPY rescaled to share the starting value. "
     f"Orange dotted vertical lines mark rebalance dates.</i>"
     f"</p>"
 )

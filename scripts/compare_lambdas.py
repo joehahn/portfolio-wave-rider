@@ -105,7 +105,7 @@ for lam in LAMBDAS:
     print(f"running mean_variance walk-forward, λ={lam} ...")
     curves[lam] = run_walk_forward(prices, daily_dates, lam, wh_df)
 
-# SPY benchmark, rebased to the same starting value.
+# SPY benchmark, rescaled to the same starting value.
 spy = _fetch_benchmark_curves(["SPY"], daily_dates[0], daily_dates[-1], INITIAL_USD)["SPY"]
 
 # Summary table.
@@ -148,7 +148,7 @@ for i, lam in enumerate(LAMBDAS):
                              hovertemplate=f"λ={lam}<br>%{{x|%Y-%m-%d}}<br>$%{{y:,.0f}}<extra></extra>"))
 # SPY in light green, consistent across all backtest + sweep dashboards.
 fig.add_trace(go.Scatter(x=spy.index, y=spy.values, mode="lines",
-                         name="SPY (rebased)", line={"width": 1.5, "color": "#66c266", "dash": "dash"},
+                         name="SPY (rescaled)", line={"width": 1.5, "color": "#66c266", "dash": "dash"},
                          hovertemplate="SPY<br>%{x|%Y-%m-%d}<br>$%{y:,.0f}<extra></extra>"))
 
 # No-rebalance counterfactual: take lambda=1's first-month allocation
@@ -251,7 +251,7 @@ chart_caption = (
     f"in the mean_variance utility μᵀw - λ·wᵀΣw). Each line is the same simulation with a "
     f"different λ, with time-varying wave-stage tilts looked up as-of-date from "
     f"data/wave_history.csv at each monthly rebalance — same source as the headline backtest. "
-    f"SPY rebased to share the starting value. Orange dotted vertical lines mark rebalance dates.</i>"
+    f"SPY rescaled to share the starting value. Orange dotted vertical lines mark rebalance dates.</i>"
     f"</p>"
 )
 

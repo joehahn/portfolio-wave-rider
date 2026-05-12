@@ -1394,7 +1394,7 @@ def build_dashboard(
     )
     titles_pre6 = (
         "1. Portfolio value over time"
-        "<br><sub><i>Σ(actual shares × close price) per day. SPY rebased to share starting value for comparison.</i></sub>",
+        "<br><sub><i>Σ(actual shares × close price) per day. SPY rescaled to share starting value for comparison.</i></sub>",
         "2. Rebalance turnover (% of portfolio dollars that changed holdings)"
         "<br><sub><i>At each rebalance, ½·||Δw||₁ — half the L1 distance between consecutive weight vectors. Equals the fraction of portfolio value that moved between tickers."
         "<br>Step-function: each value holds until the next rebalance.</i></sub>",
@@ -1505,7 +1505,7 @@ def build_dashboard(
             for b, curve in benchmark_curves.items():
                 fig.add_trace(
                     go.Scatter(x=curve.index, y=curve.values, mode=_ts_mode,
-                               name=f"{b} (rebased)",
+                               name=f"{b} (rescaled)",
                                line={"width": 1.5, "color": "#66c266", "dash": "dash"},
                                legend="legend"),
                     row=1, col=1,

@@ -169,7 +169,7 @@ for i, mw in enumerate(MAX_WEIGHTS):
                              line={"width": 2, "color": color},
                              hovertemplate=f"max={mw}<br>%{{x|%Y-%m-%d}}<br>$%{{y:,.0f}}<extra></extra>"))
 fig.add_trace(go.Scatter(x=spy.index, y=spy.values, mode="lines",
-                         name="SPY (rebased)", line={"width": 1.5, "color": "#66c266", "dash": "dash"},
+                         name="SPY (rescaled)", line={"width": 1.5, "color": "#66c266", "dash": "dash"},
                          hovertemplate="SPY<br>%{x|%Y-%m-%d}<br>$%{y:,.0f}<extra></extra>"))
 
 # No-rebalance counterfactual: take max_weight=0.25's first-month
@@ -374,7 +374,7 @@ chart_caption = (
     f"<p style='color:#666;font-size:0.9em;max-width:65em;margin:0 auto;padding:0 1.5em;'>"
     f"<i>Walk-forward 12-month backtest run four times, once per concentration cap. "
     f"Each line is the same simulation (mean_variance λ=1, organic wave-history tilts) "
-    f"with a different per-position max weight. SPY rebased to share the starting value. "
+    f"with a different per-position max weight. SPY rescaled to share the starting value. "
     f"Orange dotted vertical lines mark rebalance dates.</i>"
     f"</p>"
 )
