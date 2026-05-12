@@ -1461,7 +1461,7 @@ def build_dashboard(
     if R_AI_LIFT is not None:
         titles_list.append(
             f"{R_AI_LIFT}. AI lift = portfolio $ / monthly rebalance (no AI tilt)"
-            "<br><sub><i>Ratio of the with-tilt portfolio value to the no-AI-tilt counterpart at each business day. Above 1.0 means the LLM's wave-stage tilts added value; below 1.0 means they cost value; 1.0 means no contribution.</i></sub>"
+            "<br><sub><i>Ratio of the with-tilt portfolio value to the no-AI-tilt counterpart at each business day.</i></sub>"
         )
     titles_list.append(
         f"{R_TURNOVER}. Rebalance turnover (% of portfolio dollars that changed holdings)"
