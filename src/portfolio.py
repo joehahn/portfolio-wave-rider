@@ -1440,11 +1440,15 @@ def build_dashboard(
     benchmark_curves: dict[str, pd.Series] = {}
     if benchmarks is None:
         benchmarks = ["SPY"]
+    # Live dashboard has only a few snapshots (since /initialize-portfolio),
+    # so "lines+markers" shows each day as a visible dot. Backtest has
+    # ~250 snapshots; markers would be cluttered, so it stays lines-only.
+    _ts_mode = "lines+markers" if is_live else "lines"
     if snap_path.exists():
         snaps = pd.read_csv(snap_path, parse_dates=["date"])
         totals = snaps.groupby("date")["total_value"].first().sort_index()
         fig.add_trace(
-            go.Scatter(x=totals.index, y=totals.values, mode="lines",
+            go.Scatter(x=totals.index, y=totals.values, mode=_ts_mode,
                        name="Portfolio $", line={"width": 2, "color": "#1f77b4"},
                        legend="legend"),
             row=1, col=1,
@@ -1472,7 +1476,7 @@ def build_dashboard(
             )
             for b, curve in benchmark_curves.items():
                 fig.add_trace(
-                    go.Scatter(x=curve.index, y=curve.values, mode="lines",
+                    go.Scatter(x=curve.index, y=curve.values, mode=_ts_mode,
                                name=f"{b} (rebased)", line={"width": 1, "dash": "dash"},
                                legend="legend"),
                     row=1, col=1,
@@ -1722,7 +1726,7 @@ def build_dashboard(
                      for s, t in zip(sub["stage"], sub["evidence_tickers"].fillna(""))]
             fig.add_trace(
                 go.Scatter(x=sub["date"], y=sub["stage_rank"] + offset,
-                           mode="lines",
+                           mode=_ts_mode,
                            name=wave_label, legend="legend6",
                            line={"color": WAVE_COLORS.get(wave)},
                            hovertext=hover, hoverinfo="text+x"),
@@ -1816,7 +1820,7 @@ def build_dashboard(
                     if c in ac.columns]
         for bucket in ac_order:
             fig.add_trace(
-                go.Scatter(x=ac.index, y=ac[bucket], mode="lines",
+                go.Scatter(x=ac.index, y=ac[bucket], mode=_ts_mode,
                            name=bucket, legend="legend2",
                            line={"color": ac_colors.get(bucket, "#444")}),
                 row=R_ASSET_USD, col=1,
@@ -1835,7 +1839,7 @@ def build_dashboard(
             if wave in zero_waves:
                 continue
             fig.add_trace(
-                go.Scatter(x=wv.index, y=wv[wave], mode="lines",
+                go.Scatter(x=wv.index, y=wv[wave], mode=_ts_mode,
                            name=WAVE_DISPLAY_LABEL.get(wave, wave),
                            legend="legend3",
                            line={"color": WAVE_COLORS.get(wave)}),
