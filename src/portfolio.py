@@ -569,6 +569,7 @@ def backtest(
     risk_free_rate: float = 0.04,
     benchmarks: list[str] | None = None,
     wave_history_path: str | None = None,
+    publish_docs: bool = True,
 ) -> dict[str, Any]:
     """Walk-forward monthly-rebalance backtest of the lightweight Python-only path.
 
@@ -826,9 +827,14 @@ def backtest(
     # manual second invocation. Pass thesis_baseline_path=None so the
     # full yearlong window is preserved (the backtest predates any
     # thesis allocation by design).
+    # The docs/ copy is the GitHub Pages-served version; tests and ad-hoc
+    # callers that don't want to clobber the public dashboard can pass
+    # publish_docs=False.
+    targets = [(str(out / "dashboard.html"), None)]
+    if publish_docs:
+        targets.append(("docs/backtest.html", "backtest"))
     rendered: list[str] = []
-    for path, nav in [(str(out / "dashboard.html"), None),
-                      ("docs/backtest.html", "backtest")]:
+    for path, nav in targets:
         try:
             build_dashboard(
                 snapshots_path=str(out / "snapshots.csv"),

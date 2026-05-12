@@ -255,6 +255,9 @@ def test_backtest_runs_against_seeded_prices(tmp_path, monkeypatch) -> None:
         initial_usd=10000.0, out_dir=str(out_dir),
         # max_weight >= 1/n_tickers required for feasibility; with 3 tickers, 0.25 would be infeasible.
         max_weight=0.5,
+        # Don't overwrite the GitHub-Pages-served docs/backtest.html with
+        # the synthetic AAA/BBB/CCC dashboard.
+        publish_docs=False,
     )
 
     # Output files exist.
