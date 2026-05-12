@@ -1,0 +1,314 @@
+{
+  "as_of_date": "2023-03-31",
+  "per_ticker": {
+    "AGG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "The Federal Reserve raised the fed funds rate 25bp on 2023-03-22 to a target range of 4.75%-5.00%, its ninth consecutive hike, signaling rates could go higher despite nascent banking-sector stress.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2023-03-22/fed-hikes-quarter-point-signals-it-still-expects-higher-rates",
+          "date": "2023-03-22"
+        },
+        {
+          "summary": "Silicon Valley Bank collapsed on 2023-03-10; benchmark 2-year Treasury yields fell as much as 28bp in the days following as markets priced in a slower Fed tightening path, providing a temporary bid to investment-grade bond prices including AGG holdings.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2023-03-13/treasuries-gain-from-asian-open-as-svb-damps-hawkish-fed-bets",
+          "date": "2023-03-13"
+        },
+        {
+          "summary": "Bond traders priced in an end to Fed hikes as UBS-Credit Suisse deal failed to fully calm banking fears, with global bonds rallying and yield curves flattening through the final week of March 2023.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2023-03-24/global-bonds-rally-as-ubs-slumps-on-renewed-concern-over-banks",
+          "date": "2023-03-24"
+        }
+      ]
+    },
+    "BIL": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "The Fed's March 2023 25bp hike brought the fed funds target to 4.75%-5.00%, pushing 1-3 month T-bill yields to their highest levels since 2007; BIL, which tracks this maturity, was yielding approximately 4.5%-4.7% \u2014 competitive with equities on a risk-adjusted basis.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2023-03-22/fed-hikes-quarter-point-signals-it-still-expects-higher-rates",
+          "date": "2023-03-22"
+        },
+        {
+          "summary": "Goldman Sachs briefly dropped its March rate-hike call following SVB's collapse, highlighting the uncertainty around short-rate duration even for the most liquid T-bill instruments; the Fed ultimately hiked as expected.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2023-03-13/fed-half-point-hike-looks-less-likely-as-financial-risks-flare",
+          "date": "2023-03-13"
+        }
+      ]
+    },
+    "IAU": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Gold surged 5% over three days following SVB's collapse on 2023-03-10 as investors rotated into haven assets; the metal stabilized above $1,900/oz before briefly crossing $2,000 for the first time in a year.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2023-03-14/gold-stable-after-banking-crisis-stokes-5-rally-over-three-days",
+          "date": "2023-03-14"
+        },
+        {
+          "summary": "Gold rose above $2,000/oz for the first time since early 2022 in late March 2023 as the UBS-Credit Suisse forced merger failed to fully ease banking-sector stress, reinforcing bullion's safe-haven bid.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2023-03-20/gold-xauusd-rises-above-2-000-for-first-time-in-a-year",
+          "date": "2023-03-20"
+        },
+        {
+          "summary": "Multiple commentators noted SVB's collapse as a catalyst for renewed interest in gold and silver as inflation hedges and safe-haven stores of value, with IAU tracking spot gold minus a 0.25% expense ratio.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/news/heres-why-investors-turning-gold-184521751.html",
+          "date": "2023-03-13"
+        }
+      ]
+    },
+    "GOOGL": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Alphabet's Bard AI chatbot made a factual error in a promotional video on 2023-02-06 (wrongly claimed JWST took the first exoplanet images); the stock fell 9% on 2023-02-08, erasing approximately $100B in market cap.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2023-02-08/alphabet-falls-most-in-three-months-on-bard-accuracy-concerns",
+          "date": "2023-02-08"
+        },
+        {
+          "summary": "Google employees who tested Bard ahead of launch reportedly called it 'cringeworthy' and a 'pathological liar'; Alphabet Chairman John Hennessy acknowledged the company did not think Bard was 'really ready for a product yet' \u2014 indicating the ChatGPT competitive pressure forced a premature release.",
+          "source": "Yahoo Finance",
+          "url": "https://ca.finance.yahoo.com/news/google-didnt-think-bard-ai-054333795.html",
+          "date": "2023-02-09"
+        },
+        {
+          "summary": "GPT-4 launched on 2023-03-14, outperforming ChatGPT on bar exam and biology olympiad benchmarks; MIT Technology Review noted OpenAI is now fully commercial and withheld all technical disclosures, intensifying competitive pressure on Google's AI research culture.",
+          "source": "MIT Technology Review",
+          "url": "https://www.technologyreview.com/2023/03/14/1069823/gpt-4-is-bigger-and-better-chatgpt-openai/",
+          "date": "2023-03-14"
+        },
+        {
+          "summary": "Alphabet's Q4 2022 earnings missed on ad revenue; the core search advertising business faced a cyclical slowdown at the same time that AI-powered search from Microsoft threatened structural disruption to Google's search moat.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/news/alphabet-stock-tumbles-after-company-misses-expectations-on-google-ad-revenue-143420493.html",
+          "date": "2023-02-02"
+        }
+      ]
+    },
+    "RKLB": {
+      "wave_bucket": "rockets_spacecraft",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Rocket Lab completed its first Electron launch from US soil (Wallops Island, Virginia) on 2023-01-24, deploying HawkEye 360 Cluster 6 satellites \u2014 a milestone that diversified launch operations beyond New Zealand and de-risked single-pad dependency.",
+          "source": "NASASpaceFlight",
+          "url": "https://www.nasaspaceflight.com/2023/01/virginia-is-for-launch-lovers/",
+          "date": "2023-01-24"
+        },
+        {
+          "summary": "Rocket Lab launched the 'Beat Goes On' mission in March 2023 carrying two BlackSky Gen-2 imaging satellites and tested first-stage marine recovery, expanding its reusability program toward the Electron booster reuse objective.",
+          "source": "NASASpaceFlight",
+          "url": "https://www.nasaspaceflight.com/2023/03/the-beat-goes-on/",
+          "date": "2023-03-24"
+        },
+        {
+          "summary": "Rocket Lab lowered Q4 2022 revenue guidance to $46-47M from $51-54M after a launch customer pushed its mission into 2023; full-year 2022 revenue came in at approximately $211M, entirely from Electron launches and space systems hardware.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/news/rocket-lab-usa-reschedules-first-103712651.html",
+          "date": "2023-01-06"
+        },
+        {
+          "summary": "Neutron medium-lift rocket remained in early development with no firm launch date; Rocket Lab opened construction at Launch Complex 3 at Wallops but no test hardware had flown, keeping Neutron a longer-horizon revenue item.",
+          "source": "SpaceNews",
+          "url": "https://spacenews.com/rocket-lab-delays-neutron-debut-to-late-2026/",
+          "date": "2023-02-28"
+        }
+      ]
+    },
+    "NVDA": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Nvidia Q4 FY2023 earnings call (2023-02-22): total revenue $6.05B (-21% YoY); data center $3.62B (+11% YoY, -6% sequentially); gaming $1.83B (-46% YoY). CEO Jensen Huang stated 'AI adoption is at an inflection point' and positioned the H100 GPU as critical infrastructure for large language models.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/news/nvidia-corporation-nasdaq-nvda-q4-101731582.html",
+          "date": "2023-02-22"
+        },
+        {
+          "summary": "ChatGPT's November 2022 launch was trained on 30,000 Nvidia A100 GPUs, triggering a surge in enterprise interest in H100 procurement; wait times for H100-powered servers stretched to 6-12 months as demand outpaced production.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/news/nvidia-h100-chip-behind-ai-023727066.html",
+          "date": "2023-03-15"
+        },
+        {
+          "summary": "SemiAnalysis reported that GPU rental capacity was severely constrained heading into Q1 2023 as hyperscalers and AI startups competed for H100 allocation, with Nvidia's data-center product mix shifting toward inference and training workloads.",
+          "source": "SemiAnalysis",
+          "url": "https://newsletter.semianalysis.com/p/the-great-gpu-shortage-rental-capacity",
+          "date": "2023-03-20"
+        }
+      ]
+    },
+    "MSFT": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Microsoft announced a multi-billion-dollar (reported $10B) investment in OpenAI on 2023-01-23, building on prior rounds in 2019 and 2021; the capital was earmarked to keep ChatGPT online and accelerate Azure AI services.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2023-01-23/microsoft-makes-multibillion-dollar-investment-in-openai",
+          "date": "2023-01-23"
+        },
+        {
+          "summary": "Microsoft launched an AI-powered Bing search engine and updated Edge browser on 2023-02-07, powered by a model later confirmed to be GPT-4, directly challenging Google's search dominance for the first time in a decade.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2023-02-07/microsoft-unveils-bing-search-edge-browser-using-chatgpt-technology",
+          "date": "2023-02-07"
+        },
+        {
+          "summary": "MIT Technology Review (2023-02-16) framed the Bing-ChatGPT battle as bigger than either company \u2014 the first credible structural challenge to Google Search in 20 years \u2014 with implications for Microsoft's Azure cloud revenue and enterprise productivity suite.",
+          "source": "MIT Technology Review",
+          "url": "https://www.technologyreview.com/2023/02/16/1068695/chatgpt-chatbot-battle-search-microsoft-bing-google/",
+          "date": "2023-02-16"
+        },
+        {
+          "summary": "GPT-4 launched March 14, 2023; Microsoft confirmed Bing had been running GPT-4 since early February, giving MSFT a five-week head start integrating the most capable public LLM into a consumer product with 100M+ users.",
+          "source": "MIT Technology Review",
+          "url": "https://www.technologyreview.com/2023/03/14/1069823/gpt-4-is-bigger-and-better-chatgpt-openai/",
+          "date": "2023-03-14"
+        }
+      ]
+    },
+    "BOTZ": {
+      "wave_bucket": "robotics",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "North American industrial robot orders fell 6% in Q1 2023 versus Q1 2022; non-automotive sector orders collapsed 42% as macro uncertainty caused manufacturers to pause capital spending after record 2021-2022 deployments.",
+          "source": "The Robot Report",
+          "url": "https://www.therobotreport.com/robot-sales-in-north-america-dip-6-in-q1/",
+          "date": "2023-03-31"
+        },
+        {
+          "summary": "BOTZ holds diversified exposure to Fanuc, Keyence, and ABB (each ~8-9% of the fund) \u2014 all industrial-automation companies whose revenue is tied to capital expenditure cycles, leaving the ETF vulnerable to the near-term macro slowdown in manufacturing investment.",
+          "source": "The Robot Report",
+          "url": "https://www.therobotreport.com/botz-robotics-etf-picks-diverse-tech-winners-for-investors/",
+          "date": "2023-02-01"
+        },
+        {
+          "summary": "BOTZ returned approximately -28% in 2022 (in line with high-multiple growth ETFs hit by Fed rate hikes) after strong gains in 2021; no humanoid-robot or generative-AI robotics funding news of scale was confirmed in the public record before 2023-03-31.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/quote/BOTZ/performance/",
+          "date": "2023-01-01"
+        }
+      ]
+    },
+    "QTUM": {
+      "wave_bucket": "quantum",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "QTUM fell approximately -28.8% in 2022, consistent with the broader tech-growth selloff driven by Fed rate hikes, leaving the fund trading well below its 2021 highs heading into Q1 2023.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/quote/QTUM/performance/",
+          "date": "2023-01-01"
+        },
+        {
+          "summary": "IBM announced its 433-qubit Osprey processor at the IBM Quantum Summit in November 2022 \u2014 the largest qubit-count chip IBM had disclosed \u2014 accompanied by a roadmap toward multi-processor, fault-tolerant systems; this was the headline quantum hardware milestone entering 2023.",
+          "source": "Quantum Computing Report",
+          "url": "https://quantumcomputingreport.com/ibm-announces-433-qubit-osprey-processor-several-additional-advancements-and-a-100x100-challenge/",
+          "date": "2022-11-09"
+        },
+        {
+          "summary": "Quantum computing remained pre-commercial as of Q1 2023: no vendor had demonstrated quantum advantage on a commercially relevant workload; the sector attracted specialized investors but had minimal institutional ownership and near-zero product revenue.",
+          "source": "Quantum Computing Report",
+          "url": "https://quantumcomputingreport.com/news/",
+          "date": "2023-03-01"
+        }
+      ]
+    },
+    "VIG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "VIG declined -9.81% in 2022 alongside broad equity markets as Fed rate hikes compressed valuations; the fund tracks the S&P US Dividend Growers Index, requiring 10+ consecutive years of annual dividend growth, providing a quality screen but not insulation from rising discount rates.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/quote/VIG/performance/",
+          "date": "2023-01-01"
+        },
+        {
+          "summary": "Equity markets in Q1 2023 were shaped by the SVB banking crisis (March 10-24), which temporarily compressed risk appetite; VIG's large-cap quality bias and 23% tech weighting positioned it between defensive bond proxies and high-beta growth names.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2023-03-19/5-ways-us-bank-failures-may-impact-march-2023-fed-rate-decision",
+          "date": "2023-03-19"
+        }
+      ]
+    }
+  },
+  "wave_stages": {
+    "AI": {
+      "stage": "buildup",
+      "rationale": "Real models are deployed and generating consumer adoption (ChatGPT, Bing AI, GPT-4 as of March 2023), and Microsoft committed $10B to OpenAI, but Nvidia's data-center GPU revenue was still $3.62B/quarter \u2014 essentially flat sequentially \u2014 and down -6% QoQ. The revenue compounding has not yet appeared in reported financials; the $100B Alphabet wipeout after a single Bard demo error signals that markets are still price-discovering AI's commercial value, not pricing in proven earnings growth. The wave is clearly in motion but not yet self-funding at scale.",
+      "evidence_tickers": [
+        "NVDA",
+        "MSFT",
+        "GOOGL"
+      ]
+    },
+    "rockets_spacecraft": {
+      "stage": "buildup",
+      "rationale": "Rocket Lab executed its first US-soil launch in January 2023 and a booster-recovery test in March 2023 \u2014 real operational milestones. But Q4 2022 revenue was cut to $46-47M and the company's full-year run rate (~$211M) is modest for its market cap. Neutron remains in early development with no hardware flown. The sector is under-owned with real but incremental commercial progress.",
+      "evidence_tickers": [
+        "RKLB"
+      ]
+    },
+    "robotics": {
+      "stage": "digestion",
+      "rationale": "North American industrial robot orders fell 6% in Q1 2023 versus the year-prior period, and non-automotive orders collapsed 42% \u2014 a clear post-2021-2022 record-high hangover as manufacturers paused capital spending. BOTZ declined approximately -28% in 2022. The fundamental thesis (labor displacement via automation) is intact, but shipment volumes and equity prices are consolidating after the 2021 surge.",
+      "evidence_tickers": [
+        "BOTZ"
+      ]
+    },
+    "quantum": {
+      "stage": "buildup",
+      "rationale": "IBM's 433-qubit Osprey processor (November 2022) represents genuine hardware progress, but the sector remains pre-commercial with no vendor having demonstrated quantum advantage on a revenue-generating workload. QTUM fell -28.8% in 2022 and is under-owned relative to AI. Quiet, cheap, and early.",
+      "evidence_tickers": [
+        "QTUM"
+      ]
+    },
+    "general_markets": {
+      "stage": "neutral",
+      "rationale": "AGG, BIL, IAU, and VIG are diversified instruments without a single-wave thesis. The macro backdrop \u2014 SVB crisis, Fed at 4.75-5%, gold at $2,000 \u2014 is notable but not indicative of a wave cycle stage.",
+      "evidence_tickers": [
+        "AGG",
+        "BIL",
+        "IAU",
+        "VIG"
+      ]
+    }
+  },
+  "wave_views": {
+    "AGG": "neutral",
+    "BIL": "neutral",
+    "IAU": "neutral",
+    "GOOGL": "buildup",
+    "RKLB": "buildup",
+    "NVDA": "buildup",
+    "MSFT": "buildup",
+    "BOTZ": "digestion",
+    "QTUM": "buildup",
+    "VIG": "neutral"
+  },
+  "exclusion_conflicts": [],
+  "thematic_concerns": [
+    {
+      "ticker": "GOOGL",
+      "concern": "Competitive AI threat to core search revenue: Alphabet's $100B market-cap loss after the Bard demo error, combined with MSFT's Bing-ChatGPT launch, signals that GOOGL's ~57% gross-margin search moat faces its first credible structural challenger. The profile's thesis is to ride the AI wave, but GOOGL is more exposed to AI disruption than to AI benefit at this juncture.",
+      "evidence": "Bard factual error erased $100B market cap on 2023-02-08 (Bloomberg). MSFT launched AI Bing on 2023-02-07 (Bloomberg). GOOGL ad revenue missed Q4 2022 estimates (Yahoo Finance, 2023-02-02)."
+    }
+  ],
+  "self_critique_downgrades": []
+}

@@ -1,0 +1,344 @@
+{
+  "as_of_date": "2025-06-30",
+  "per_ticker": {
+    "NVDA": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Nvidia Q1 FY2026 (quarter ended April 27, 2025): total revenue $44.1B (+69% YoY, +12% QoQ); data-center revenue $39.1B (+73% YoY), with Blackwell architecture contributing roughly 70% of data-center compute revenue. Company described the Blackwell ramp as the fastest product ramp in Nvidia history.",
+          "source": "NVIDIA Newsroom",
+          "url": "https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-first-quarter-fiscal-2026",
+          "date": "2025-05-28"
+        },
+        {
+          "summary": "US government imposed a license requirement for exports of Nvidia H20 chips to China effective April 9, 2025. Nvidia recorded a $4.5B inventory and purchase-obligation charge in Q1 FY2026; an additional $2.5B in H20 revenue could not ship in the quarter.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2025-04-15/nvidia-says-us-has-imposed-new-china-restrictions-on-h20-chips",
+          "date": "2025-04-15"
+        },
+        {
+          "summary": "SemiAnalysis GTC 2025 analysis (March 2025): Nvidia Blackwell platform transitions to GB200A NVL36 amid supply-chain rework; AI datacenter energy demand estimated to cross 10 GW globally by early 2025, sustaining Blackwell order momentum despite platform mix shifts.",
+          "source": "SemiAnalysis",
+          "url": "https://newsletter.semianalysis.com/p/nvidia-gtc-2025-built-for-reasoning-vera-rubin-kyber-cpo-dynamo-inference-jensen-math-feynman",
+          "date": "2025-03-01"
+        },
+        {
+          "summary": "Stratechery post-earnings analysis: Nvidia data-center sequential growth QoQ was +10% (Q1 FY26), a deceleration from +18% in the prior year, though year-on-year growth of 73% remains exceptional; sell-side coverage is near-unanimously bullish on AI hardware demand through 2025.",
+          "source": "Stratechery",
+          "url": "https://stratechery.com/2025/nvidia-earnings-power-scarcity-and-marginal-costs-openai-hand-wringing/",
+          "date": "2025-05-28"
+        }
+      ]
+    },
+    "GOOGL": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Alphabet Q1 2025 (reported April 29, 2025): consolidated revenue $90.2B (+12% YoY). Google Cloud revenue $12.3B (+28% YoY), led by GCP core products, AI infrastructure, and Generative AI Solutions. Cloud growth came in slightly below some analyst expectations despite the acceleration.",
+          "source": "SEC EDGAR (Alphabet Q1 2025 earnings release)",
+          "url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204425000040/googexhibit991q12025.htm",
+          "date": "2025-04-29"
+        },
+        {
+          "summary": "Google signed a 25-year power purchase agreement with NextEra Energy for power from a restarted Duane Arnold nuclear plant, reinforcing its AI data-center energy strategy with long-duration carbon-free contracts. Secondary nuclear-wave exposure for GOOGL.",
+          "source": "World Nuclear News",
+          "url": "https://world-nuclear-news.org/articles/duane-arnold-restart-underpins-nextera-energy-and-google-collaboration",
+          "date": "2024-12-01"
+        },
+        {
+          "summary": "Google Quantum AI opened early-access applications for the 105-qubit Willow processor to external researchers in early 2025, marking a step toward ecosystem development. Secondary quantum-wave exposure for GOOGL.",
+          "source": "Quantum Computing Report",
+          "url": "https://quantumcomputingreport.com/google-quantum-ai-is-now-accepting-proposals-for-early-access-to-their-willow-quantum-processor/",
+          "date": "2025-02-01"
+        }
+      ]
+    },
+    "MSFT": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Microsoft Q3 FY2025 (quarter ended March 31, 2025, reported April 30, 2025): Intelligent Cloud segment $26.8B (+21% YoY). Azure and other cloud services grew 33% YoY, with AI services contributing 16 percentage points of that growth \u2014 the highest AI-contribution reading yet reported.",
+          "source": "Microsoft Investor Relations",
+          "url": "https://www.microsoft.com/en-us/investor/earnings/fy-2025-q3/press-release-webcast",
+          "date": "2025-04-30"
+        },
+        {
+          "summary": "Azure growth accelerated in Q3 FY2025 as Microsoft brought new data center capacity online ahead of schedule, fulfilling pent-up demand including large-scale OpenAI commitments. Gross margin declined modestly due to AI infrastructure scaling costs.",
+          "source": "Futurum Group",
+          "url": "https://futurumgroup.com/insights/microsoft-q3-fy-2025-earnings-beat-on-strong-cloud-and-ai-services-growth/",
+          "date": "2025-04-30"
+        },
+        {
+          "summary": "Microsoft is the third-largest holding in VIG (Vanguard Dividend Appreciation ETF) at approximately 3.81%, creating AI-wave cross-exposure in the general-markets ETF. MSFT's quantum research program (Azure Quantum) also gives it secondary quantum-wave exposure.",
+          "source": "Yahoo Finance (VIG holdings)",
+          "url": "https://finance.yahoo.com/quote/VIG/holdings/",
+          "date": "2025-06-01"
+        }
+      ]
+    },
+    "RKLB": {
+      "wave_bucket": "rockets_spacecraft",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Rocket Lab Q1 2025 financial results: revenue $123M (+32% YoY), five Electron missions launched with 100% mission success, and backlog hit a record $2.2B (+20% QoQ). Q2 2025 guidance: $130M-$140M.",
+          "source": "Yahoo Finance (Rocket Lab Q1 2025 press release)",
+          "url": "https://finance.yahoo.com/news/rocket-lab-announces-first-quarter-201500056.html",
+          "date": "2025-05-12"
+        },
+        {
+          "summary": "Rocket Lab signed five new dedicated Neutron launch contracts in Q1 2025 with commercial and government customers (including AFRL for a point-to-point cargo demo), and reaffirmed a second-half 2025 target for Neutron's maiden flight.",
+          "source": "Payload Space",
+          "url": "https://payloadspace.com/rocket-lab-signs-first-neutron-customer/",
+          "date": "2025-05-12"
+        },
+        {
+          "summary": "NASASpaceFlight Neutron development update (May 16, 2025): multiple structural and propulsion milestones achieved on Neutron. Rocket Lab was selected for NSSL Phase 3 Lane 1, allowing it to compete for up to $5.6B in National Security Space Launch contracts over five years.",
+          "source": "NASASpaceFlight",
+          "url": "https://www.nasaspaceflight.com/2025/05/neutron-update-051625/",
+          "date": "2025-05-16"
+        },
+        {
+          "summary": "SpaceNews reported Rocket Lab reaffirmed 2025 as the target year for Neutron's first launch; the article confirmed the company's confidence in the development schedule despite the rocket not yet having flown.",
+          "source": "SpaceNews",
+          "url": "https://spacenews.com/rocket-lab-reaffirms-2025-first-launch-of-neutron/",
+          "date": "2025-05-01"
+        }
+      ]
+    },
+    "BOTZ": {
+      "wave_bucket": "robotics",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Global industrial robot market contracted 5.8% YoY in 2024 (Interact Analysis), with global shipment volume falling to just over 505,000 units \u2014 a 2.4% volume decrease from 2023. The decline continued a slump from 2023 driven by high interest rates and subdued manufacturing demand in Europe and Asia.",
+          "source": "The Robot Report",
+          "url": "https://www.therobotreport.com/global-industrial-robot-market-contracted-5-8-last-year-says-interact-analysis/",
+          "date": "2025-02-01"
+        },
+        {
+          "summary": "FANUC (a major BOTZ holding) reported robot-division sales down 16.4% to \u00a5242B for the nine months ended December 31, 2024, citing weaker demand across automobile-related industries in China, Europe, and the Americas.",
+          "source": "The Robot Report",
+          "url": "https://www.therobotreport.com/fanuc-industrial-robot-sales-drop-16/",
+          "date": "2025-02-01"
+        },
+        {
+          "summary": "The Robot Report's 2024 annual review ('From surge to sobriety') described a transition from 2022-2023 venture-funding euphoria to selective investment; Q4 2024 North American robot orders showed +8% QoQ recovery (A3 data), suggesting stabilization but not yet a confirmed upturn.",
+          "source": "The Robot Report",
+          "url": "https://www.therobotreport.com/from-surge-to-sobriety-the-state-of-robotics-investment-in-2024/",
+          "date": "2025-01-15"
+        }
+      ]
+    },
+    "QTUM": {
+      "wave_bucket": "quantum",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Google unveiled the 105-qubit Willow chip in December 2024, demonstrating below-threshold quantum error correction \u2014 logical qubit lifetime improves as array size scales from 3x3 to 5x5 to 7x7, resolving a key obstacle to fault-tolerant quantum computing.",
+          "source": "Quantum Computing Report",
+          "url": "https://quantumcomputingreport.com/google-unveils-the-105-qubit-willow-chip-and-demonstrates-new-levels-of-rcs-benchmark-performance-and-quantum-error-correction-below-the-threshold/",
+          "date": "2024-12-09"
+        },
+        {
+          "summary": "Google Quantum AI opened an early-access program for Willow to external researchers in early 2025, a first significant opening to non-Google users, signaling a move from internal research toward ecosystem development.",
+          "source": "Quantum Computing Report",
+          "url": "https://quantumcomputingreport.com/google-quantum-ai-is-now-accepting-proposals-for-early-access-to-their-willow-quantum-processor/",
+          "date": "2025-02-01"
+        },
+        {
+          "summary": "IBM's Quantum Readiness Index 2025 found enterprise organizations largely in early planning phases for quantum adoption; Gartner named IBM the company to beat in its 2025 quantum computing report. No commercial quantum advantage has been demonstrated as of mid-2025; QTUM's performance is partly driven by AI-adjacent holdings in the index.",
+          "source": "IBM Quantum Computing Blog",
+          "url": "https://www.ibm.com/quantum/blog/large-scale-ftqc",
+          "date": "2025-05-01"
+        }
+      ]
+    },
+    "NUKZ": {
+      "wave_bucket": "nuclear_fusion",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Amazon, Energy Northwest, and X-energy announced plans to build up to 12 SMRs near Columbia Generating Station in Washington State \u2014 part of a broader hyperscaler nuclear-PPA wave (Google-NextEra, Microsoft-Constellation) aimed at carbon-free power for AI data centers.",
+          "source": "World Nuclear News",
+          "url": "https://www.world-nuclear-news.org/articles/amazon-updates-smr-progress-with-new-images-of-proposed-plant",
+          "date": "2024-11-01"
+        },
+        {
+          "summary": "The US DOE re-issued its SMR deployment funding solicitation in March 2025 with up to $900M available; TVA and Holtec were among applicants targeting first-mover awards. The re-issuance explicitly aligned the program to the Trump administration's energy and AI-dominance agenda.",
+          "source": "World Nuclear News",
+          "url": "https://www.world-nuclear-news.org/articles/us-doe-re-issues-smr-funding-solicitation",
+          "date": "2025-03-01"
+        },
+        {
+          "summary": "The DOE identified 16 federal land sites for rapid data-center and co-located nuclear energy development through H1 2025, and the Deep Atomic MK60 SMR was unveiled as a design specifically for data-center power and cooling co-location \u2014 demonstrating accelerating commercial specificity in the nuclear-AI narrative.",
+          "source": "World Nuclear News",
+          "url": "https://www.world-nuclear-news.org/articles/us-national-labs-identified-as-potential-ai-sites",
+          "date": "2025-04-01"
+        },
+        {
+          "summary": "NUKZ (Range Nuclear Renaissance ETF, launched January 2024) holds 44 nuclear-related companies across advanced reactors, utilities, construction, and fuel. The fund's sector mix (45% Industrials, 36% Utilities, 13% Energy) positions it primarily as a fission-renaissance play; fusion exposure within the fund is indirect.",
+          "source": "ETFdb.com",
+          "url": "https://etfdb.com/etf/NUKZ/",
+          "date": "2025-06-01"
+        }
+      ]
+    },
+    "AGG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "The Federal Reserve held its benchmark rate at 4.25-4.50% through all of H1 2025 with no cuts. AGG (iShares Core US Aggregate Bond ETF), which packages Treasuries, agency MBS, and investment-grade corporates, saw price appreciation constrained by the higher-for-longer rate environment.",
+          "source": "Yahoo Finance (AGG quote)",
+          "url": "https://finance.yahoo.com/quote/AGG/",
+          "date": "2025-06-30"
+        },
+        {
+          "summary": "Bond traders entered 2025 positioned for deeper Fed rate cuts than market consensus implied (Bloomberg, December 17, 2024); sticky inflation through Q1-Q2 2025 prevented any easing, keeping AGG's total return subdued versus expectations set at year-end 2024.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2024-12-17/bond-traders-target-deeper-2025-fed-rate-cuts-than-market-sees",
+          "date": "2024-12-17"
+        }
+      ]
+    },
+    "BIL": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "SPDR Bloomberg 1-3 Month T-Bill ETF (BIL) yielded approximately 4.1-4.2% annualized through H1 2025, closely tracking the federal funds target rate of 4.25-4.50%. BIL functions as a near-zero-duration cash proxy.",
+          "source": "Yahoo Finance (BIL performance)",
+          "url": "https://finance.yahoo.com/quote/BIL/performance/",
+          "date": "2025-06-30"
+        },
+        {
+          "summary": "With no Fed rate cuts in H1 2025, BIL continued to earn competitive risk-free yield relative to longer-duration bonds, serving as the portfolio's opportunity-cost benchmark for wave-themed risk assets.",
+          "source": "Yahoo Finance (BIL quote)",
+          "url": "https://finance.yahoo.com/quote/BIL/",
+          "date": "2025-06-30"
+        }
+      ]
+    },
+    "IAU": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Gold closed June 30, 2025 at approximately $3,284/oz (Fortune date-specific article), up roughly 25% from January 2025, driven by central bank accumulation, US dollar weakness, and safe-haven demand amid tariff-related geopolitical and trade tensions.",
+          "source": "Fortune",
+          "url": "https://fortune.com/article/current-price-of-gold-06-30-2025/",
+          "date": "2025-06-30"
+        },
+        {
+          "summary": "Central banks have purchased over 1,000 tonnes of gold annually since 2022 \u2014 roughly twice the prior decade's average. H1 2025 net purchases totaled 415 tonnes (World Gold Council data), sustaining the structural demand floor beneath gold prices.",
+          "source": "World Gold Council",
+          "url": "https://www.gold.org/goldhub/research/gold-demand-trends/gold-demand-trends-full-year-2025",
+          "date": "2025-06-01"
+        }
+      ]
+    },
+    "VIG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "VIG (Vanguard Dividend Appreciation ETF) tracks the S&P US Dividend Growers Index, requiring 10+ consecutive years of annual dividend growth. Top holdings as of mid-2025: Broadcom (4.07%), Apple (4.03%), Microsoft (3.81%), JPMorgan Chase (3.53%), Eli Lilly (3.48%). A roughly 23% technology allocation makes it unusually tech-heavy for a dividend-growth fund.",
+          "source": "Yahoo Finance (VIG holdings)",
+          "url": "https://finance.yahoo.com/quote/VIG/holdings/",
+          "date": "2025-06-01"
+        },
+        {
+          "summary": "VIG's dividend-growth screen biases toward companies with durable free cash flow and 10+ years of dividend increases. Microsoft and Broadcom, both AI beneficiaries, together represent roughly 8% of the fund \u2014 incidental AI-wave exposure embedded in this general-markets holding.",
+          "source": "Yahoo Finance (VIG news)",
+          "url": "https://finance.yahoo.com/news/vanguard-dividend-appreciation-etf-vig-143000030.html",
+          "date": "2025-03-01"
+        }
+      ]
+    }
+  },
+  "wave_stages": {
+    "AI": {
+      "stage": "surge",
+      "rationale": "Real revenue is compounding at scale with no sign of slowdown as of June 30, 2025. Nvidia data-center revenue was $39.1B in Q1 FY2026 (+73% YoY, 2025-05-28). MSFT Azure grew 33% with AI contributing 16 percentage points of that growth (2025-04-30). Google Cloud grew 28% (2025-04-29). The Blackwell ramp is described as Nvidia's fastest product generation ever. The H20 China export control (2025-04-15) introduces geopolitical risk but does not interrupt the core adoption trajectory. Sell-side consensus is bullish and valuations are elevated \u2014 peak-adjacent signals \u2014 but revenue growth is still accelerating, the defining characteristic of surge.",
+      "evidence_tickers": [
+        "NVDA",
+        "MSFT",
+        "GOOGL"
+      ]
+    },
+    "rockets_spacecraft": {
+      "stage": "surge",
+      "rationale": "Rocket Lab Q1 2025 results ($123M revenue, +32% YoY, backlog $2.2B; 2025-05-12) confirm real and growing revenue in the small-launch segment. Five Neutron pre-launch contracts signed in Q1 2025 demonstrate customer commitment to a rocket that has not yet flown. NSSL Phase 3 Lane 1 selection opens $5.6B in potential government business. Revenue and backlog are compounding; the wave has moved past quiet buildup.",
+      "evidence_tickers": [
+        "RKLB"
+      ]
+    },
+    "robotics": {
+      "stage": "digestion",
+      "rationale": "Industrial robotics is in contraction: global market -5.8% in 2024 (Interact Analysis, reported February 2025), FANUC robot-division revenue -16.4% for nine months ended December 2024. The Robot Report explicitly described 2024 as 'from surge to sobriety.' BOTZ's largest holdings are industrial-automation companies facing this headwind. Q4 2024 North American orders showed a tentative +8% QoQ recovery, but no confirmed trend reversal is visible as of June 30, 2025.",
+      "evidence_tickers": [
+        "BOTZ"
+      ]
+    },
+    "quantum": {
+      "stage": "buildup",
+      "rationale": "Real scientific progress is visible: Google Willow demonstrated below-threshold error correction in December 2024, a key theoretical milestone. IBM's roadmap is executing on schedule and Gartner named IBM the leader in its 2025 report. However, no commercial quantum advantage has been demonstrated as of June 30, 2025, and the IBM Quantum Readiness Index 2025 found enterprises in early planning stages. The wave is technically advancing but has not translated into commercial revenue from quantum computation itself.",
+      "evidence_tickers": [
+        "QTUM"
+      ]
+    },
+    "nuclear_fusion": {
+      "stage": "surge",
+      "rationale": "The nuclear fission renaissance is generating real commercial activity: major hyperscalers (Amazon, Google, Microsoft) have signed nuclear PPAs for AI data-center power (2024 announcements); the DOE re-issued $900M SMR deployment funding in March 2025; and data-center-specific SMR designs (Deep Atomic MK60) and co-location proposals at federal lands (16 DOE sites, April 2025) show the AI-nuclear pairing is moving from narrative to contracts. NUKZ's uranium, utility, and SMR-developer holdings are positioned to capture this cash-flow expansion. Fusion remains pre-commercial but is not the primary revenue driver for this ETF.",
+      "evidence_tickers": [
+        "NUKZ"
+      ]
+    },
+    "general_markets": {
+      "stage": "neutral",
+      "rationale": "AGG, BIL, IAU, and VIG serve portfolio construction roles rather than technology-wave exposure. Gold's +25% H1 2025 rally is driven by macro factors (central bank buying, dollar weakness, safe-haven demand), not a technology wave. Neutral by design for all four tickers.",
+      "evidence_tickers": [
+        "AGG",
+        "BIL",
+        "IAU",
+        "VIG"
+      ]
+    }
+  },
+  "wave_views": {
+    "NVDA": "surge",
+    "GOOGL": "surge",
+    "MSFT": "surge",
+    "RKLB": "surge",
+    "BOTZ": "digestion",
+    "QTUM": "buildup",
+    "NUKZ": "surge",
+    "AGG": "neutral",
+    "BIL": "neutral",
+    "IAU": "neutral",
+    "VIG": "neutral"
+  },
+  "exclusion_conflicts": [],
+  "thematic_concerns": [
+    {
+      "ticker": "IAU",
+      "concern": "Gold has rallied roughly 25% in H1 2025, reaching ~$3,284/oz on June 30. While this fits the profile's 10% precious-metals target for capital preservation, the magnitude of the move means IAU is not in the quiet/cheap phase the investor profile associates with early-wave entry \u2014 it may be approaching a macro-sentiment peak rather than a building-block allocation.",
+      "evidence": "Fortune (2025-06-30): gold at $3,284/oz. World Gold Council: central bank buying 415 tonnes in H1 2025."
+    },
+    {
+      "ticker": "GOOGL",
+      "concern": "GOOGL spans two waves: AI (primary, surge) and quantum (secondary, buildup). The optimizer will receive the AI/surge tilt. The quantum secondary exposure is noted but does not change the primary wave assignment.",
+      "evidence": "Quantum Computing Report (2025-02-01): Willow early-access program. SEC EDGAR (2025-04-29): primary revenue from Cloud and Search, not quantum."
+    },
+    {
+      "ticker": "MSFT",
+      "concern": "MSFT spans AI (primary, surge) and quantum (secondary, buildup) via Azure Quantum. Same note as GOOGL: optimizer receives AI/surge tilt; quantum is a minor secondary exposure.",
+      "evidence": "Microsoft Investor Relations (2025-04-30): Azure AI driving 16pp of 33% Azure growth. Quantum is a research investment, not a revenue line."
+    }
+  ],
+  "self_critique_downgrades": []
+}

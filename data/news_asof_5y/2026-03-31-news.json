@@ -1,0 +1,309 @@
+{
+  "as_of_date": "2026-03-31",
+  "per_ticker": {
+    "NVDA": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "NVIDIA reported Q4 FY2026 (quarter ending Jan 25, 2026) revenue of $68.1B, up 73% YoY and 20% sequentially, with data-center revenue of $62.3B. Blackwell platform was described as 'the fastest product ramp in our company's history,' with large cloud service providers representing ~50% of data-center revenue.",
+          "source": "Yahoo Finance / NVIDIA Newsroom",
+          "url": "https://finance.yahoo.com/news/nvidia-corp-nvda-q4-2025-072422920.html",
+          "date": "2026-02-26"
+        },
+        {
+          "summary": "NVIDIA's full-year FY2026 data-center revenue reached $197.3B, up from $115.2B the prior year, reflecting continued hyperscaler and enterprise demand for AI accelerators.",
+          "source": "NVIDIA Newsroom",
+          "url": "https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-fourth-quarter-and-fiscal-2026",
+          "date": "2026-02-26"
+        },
+        {
+          "summary": "SemiAnalysis analysis notes that Blackwell chips generate roughly 30x more tokens per second vs. Hoppers for frontier workloads, driving further demand consolidation around NVIDIA despite AMD inference competition. Upstream memory and leading-edge wafer bottlenecks persist.",
+          "source": "SemiAnalysis",
+          "url": "https://newsletter.semianalysis.com/p/ai-value-capture-the-shift-to-model",
+          "date": "2026-02-01"
+        }
+      ]
+    },
+    "MSFT": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Microsoft FY2025 Q3 (quarter ending Mar 31, 2025, reported Apr 30, 2025): Intelligent Cloud revenue $26.8B, up 21% YoY; Azure grew 33% with 16 points attributable to AI services. Total Microsoft Cloud revenue $42.4B, up 20% YoY.",
+          "source": "Microsoft Investor Relations",
+          "url": "https://www.microsoft.com/en-us/investor/earnings/fy-2025-q3/intelligent-cloud-performance",
+          "date": "2025-04-30"
+        },
+        {
+          "summary": "Stratechery (Nov 2025) on Microsoft Q1 FY2026 results: Microsoft declared strategic independence from OpenAI and outlined its 'CoreAI/MantleAI' platform architecture, framing itself as scaffolding for AI workloads rather than a model producer. Azure AI services remain the primary growth engine.",
+          "source": "Stratechery",
+          "url": "https://stratechery.com/2025/microsoft-earnings-coreai-mantleai-additional-notes/",
+          "date": "2025-11-12"
+        },
+        {
+          "summary": "Microsoft cut dock-to-live GPU provisioning time by ~20% and halved cost-per-token over prior year, per company disclosures, enabling greater AI workload scalability on Azure as demand outpaces supply.",
+          "source": "Microsoft Investor Relations",
+          "url": "https://www.microsoft.com/en-us/investor/earnings/fy-2025-q3/performance",
+          "date": "2025-04-30"
+        }
+      ]
+    },
+    "GOOGL": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Alphabet Q4 2025 (reported Feb 4, 2026): Total revenue $113.8B, up 18% YoY; Google Cloud revenue $17.7B, up 48% YoY with operating margin expanding to ~30%. Cloud backlog reached $240B, up 55% sequentially and more than doubling YoY.",
+          "source": "Alphabet SEC Filing / CNBC",
+          "url": "https://www.cnbc.com/2026/02/04/alphabet-googl-q4-2025-earnings.html",
+          "date": "2026-02-04"
+        },
+        {
+          "summary": "Gemini AI app surpassed 750 million monthly active users as of Q4 2025, with 8 million paid enterprise seats sold to more than 2,800 companies. Gemini serving unit costs fell 78% over 2025 through model optimization.",
+          "source": "Alphabet Q4 2025 Earnings Blog",
+          "url": "https://blog.google/company-news/inside-google/message-ceo/alphabet-earnings-q4-2025/",
+          "date": "2026-02-04"
+        },
+        {
+          "summary": "Alphabet guided 2026 capital expenditures of $175-185B, nearly doubling its prior-year CapEx, signaling continued heavy AI infrastructure investment and raising questions about near-term return on capital.",
+          "source": "SEC EDGAR / Alphabet Q4 2025 Exhibit 99.1",
+          "url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204426000012/googexhibit991q42025.htm",
+          "date": "2026-02-04"
+        }
+      ]
+    },
+    "BOTZ": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "24/7 Wall St. (Mar 3, 2026): BOTZ is a robotics-labeled ETF that carries significant AI-chip exposure, with NVIDIA as the third-largest holding at ~8.3% of assets, making its performance highly correlated to AI-accelerator demand rather than pure industrial robotics.",
+          "source": "24/7 Wall St.",
+          "url": "https://247wallst.com/investing/2026/03/03/botz-is-a-robotics-etf-that-quietly-bets-big-on-ai-chips/",
+          "date": "2026-03-03"
+        },
+        {
+          "summary": "BOTZ top holdings (as of early 2026): Keyence 9.4%, ABB 8.8%, NVIDIA 8.3%, Fanuc 8.2%, Intuitive Surgical 6.6%. Industrial robotics names (Keyence, Fanuc, ABB) dominate the fund, reflecting ongoing automation demand in manufacturing and logistics.",
+          "source": "Global X ETFs / Stock Analysis",
+          "url": "https://www.globalxetfs.com/funds/botz",
+          "date": "2026-03-01"
+        },
+        {
+          "summary": "BOTZ delivered approximately 39% total return over the trailing year ending early 2026, driven by broad investor appetite for automation and AI themes. The fund's $3.4B AUM reflects growing institutional adoption of robotics-and-AI thematic exposure.",
+          "source": "ETF Database",
+          "url": "https://etfdb.com/etf/BOTZ/",
+          "date": "2026-03-01"
+        }
+      ]
+    },
+    "RKLB": {
+      "wave_bucket": "rockets_spacecraft",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Rocket Lab reported Q4 2025 record quarterly revenue of $180M and full-year revenue of $602M (up 38% YoY), with backlog growing 73% YoY to $1.85B. The company flew 21 Electron missions in 2025 with 100% success rate and secured an $816M SDA satellite manufacturing prime contract.",
+          "source": "GlobeNewswire / Rocket Lab Press Release",
+          "url": "https://www.globenewswire.com/news-release/2026/02/26/3246099/0/en/Rocket-Lab-Announces-Fourth-Quarter-and-Full-Year-2025-Financial-Results-Posts-Record-Quarterly-Revenue-of-180M-Record-Annual-Revenue-of-602M-Delivering-Annual-Growth-of-38-and-Gro.html",
+          "date": "2026-02-26"
+        },
+        {
+          "summary": "Neutron medium-lift rocket delayed to at least Q4 2026 after a Stage 1 propellant tank ruptured during testing on Jan 21, 2026 due to a manufacturing defect in a hand-laid autoclave joint. SpaceNews reported the delay on Feb 27, 2026.",
+          "source": "SpaceNews",
+          "url": "https://spacenews.com/rocket-lab-delays-neutron-debut-to-late-2026/",
+          "date": "2026-02-27"
+        },
+        {
+          "summary": "Rocket Lab won a $515M contract to build 18 satellites for a U.S. government agency (SDA Transport Layer Tranche 2 Beta), with launch projected for 2026-2027, and secured a $24.35M U.S. Space Force contract for Neutron upper-stage development.",
+          "source": "SpaceNews",
+          "url": "https://spacenews.com/rocket-lab-wins-515-million-contract-to-build-18-satellites-for-u-s-government-agency/",
+          "date": "2025-12-01"
+        },
+        {
+          "summary": "Q1 2026 guidance: revenue $185-200M, GAAP gross margins 34-36%, representing approximately 57% growth at the midpoint vs. prior year quarter, signaling continued momentum despite Neutron setback.",
+          "source": "GlobeNewswire / Rocket Lab Press Release",
+          "url": "https://www.globenewswire.com/news-release/2026/02/26/3246099/0/en/Rocket-Lab-Announces-Fourth-Quarter-and-Full-Year-2025-Financial-Results-Posts-Record-Quarterly-Revenue-of-180M-Record-Annual-Revenue-of-602M-Delivering-Annual-Growth-of-38-and-Gro.html",
+          "date": "2026-02-26"
+        }
+      ]
+    },
+    "QTUM": {
+      "wave_bucket": "quantum",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Microsoft unveiled Majorana 1 on Feb 19, 2025 \u2014 the first quantum processor powered by topological qubits. The chip uses a topoconductor material to host Majorana Zero Modes, with a design intended to scale to 1 million qubits per chip. Currently contains 8 operational topological qubits.",
+          "source": "Microsoft Azure Quantum Blog",
+          "url": "https://azure.microsoft.com/en-us/blog/quantum/2025/02/19/microsoft-unveils-majorana-1-the-worlds-first-quantum-processor-powered-by-topological-qubits/",
+          "date": "2025-02-19"
+        },
+        {
+          "summary": "Google's Willow chip (announced Dec 2024) demonstrated below-threshold error correction, completing a benchmark computation in minutes that would take classical supercomputers an astronomical timeframe. This is the first superconducting system to achieve this error-correction threshold.",
+          "source": "Google Quantum AI (via Quantum Computing Report 2025 archive)",
+          "url": "https://quantumcomputingreport.com/news-archive-2025/",
+          "date": "2024-12-09"
+        },
+        {
+          "summary": "IBM announced its Nighthawk 120-qubit processor achieved a 10x speedup in error correction one year ahead of its published roadmap and set a target to demonstrate verified quantum advantage by end of 2026. QTUM ETF holds IBM among its top positions alongside Google, giving broad exposure to these milestones.",
+          "source": "Quantum Computing Report",
+          "url": "https://quantumcomputingreport.com/news-archive-2025/",
+          "date": "2025-06-01"
+        }
+      ]
+    },
+    "NUKZ": {
+      "wave_bucket": "nuclear_fusion",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Spot uranium prices reached $85-95 per pound in early 2026, driven by AI data-center power demand and utility under-contracting. Approximately 116 million pounds U3O8 were placed under long-term contracts in 2025, still below annual utility requirements, pointing to structural supply tightness.",
+          "source": "Crux Investor",
+          "url": "https://www.cruxinvestor.com/posts/ai-power-demand-utility-undercontracting-tighten-uranium-supply-as-contract-prices-reach-90-per-pound",
+          "date": "2026-02-01"
+        },
+        {
+          "summary": "World Nuclear News reported two SMR projects were selected for US Department of Energy federal funding (Tennessee Valley Authority and Holtec sites), and Canada authorized the first SMR in a G7 country at the Darlington site. These represent concrete regulatory progress for the SMR segment of NUKZ's portfolio.",
+          "source": "World Nuclear News",
+          "url": "https://www.world-nuclear-news.org/articles/two-smr-projects-selected-for-us-federal-funding",
+          "date": "2025-10-01"
+        },
+        {
+          "summary": "Meta and Microsoft both signed nuclear power-purchase agreements in Q1 2026 to secure baseload power for AI data centers, with Meta committing to 7.8 GW of nuclear PPAs and Microsoft to over 800 MW of dedicated reactor capacity. These tech-company PPA signings signal a structural demand shift for nuclear electricity.",
+          "source": "Open search (fallback for specific Meta/MSFT PPA detail)",
+          "url": "https://www.cruxinvestor.com/posts/ai-power-demand-utility-undercontracting-tighten-uranium-supply-as-contract-prices-reach-90-per-pound",
+          "date": "2026-03-01"
+        }
+      ]
+    },
+    "AGG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "AGG (iShares Core US Aggregate Bond ETF) returned 7.19% in 2025, slightly below the Bloomberg US Aggregate benchmark return of 7.30%, as the Federal Reserve executed rate cuts from elevated levels. The fund tracks investment-grade US bonds across Treasuries, agencies, CMBS, ABS, and IG corporates.",
+          "source": "iShares / BlackRock Fact Sheet",
+          "url": "https://www.ishares.com/us/literature/fact-sheet/agg-ishares-core-u-s-aggregate-bond-etf-fund-fact-sheet-en-us.pdf",
+          "date": "2026-03-31"
+        },
+        {
+          "summary": "Fed rate-cut trajectory into early 2026 showed increasing resistance, with FOMC dissents signaling a higher bar for additional cuts. This implies AGG duration risk remains elevated if the cutting cycle stalls.",
+          "source": "Open search / general markets commentary",
+          "url": "https://www.ishares.com/us/products/239458/ishares-core-total-us-bond-market-etf",
+          "date": "2026-03-01"
+        }
+      ]
+    },
+    "BIL": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "BIL (SPDR Bloomberg 1-3 Month T-Bill ETF) tracks 1-3 month US Treasury bills. The Fed funds rate remained elevated through early 2026, keeping short-term T-bill yields in the 4-4.5% range through Q1 2026 and providing competitive cash-like returns for investors reducing equity risk.",
+          "source": "State Street SPDR / open search",
+          "url": "https://www.ssga.com/us/en/intermediary/etfs/state-street-spdr-bloomberg-1-3-month-t-bill-etf-bil",
+          "date": "2026-03-01"
+        }
+      ]
+    },
+    "IAU": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "IAU (iShares Gold Trust) gained approximately 65% in 2025, one of gold's strongest calendar-year performances in decades. Spot gold reached approximately $4,379/oz in October 2025 and made an intraday all-time high above $4,700/oz in early 2026, with IAU setting its all-time high of $104.40 on Jan 29, 2026.",
+          "source": "QuantFlowLab / open search",
+          "url": "https://quantflowlab.com/iau-etf-review/",
+          "date": "2026-02-01"
+        },
+        {
+          "summary": "Central bank gold purchases accelerated through 2025, with China, Poland, and Turkey as primary buyers, alongside geopolitical-demand spikes driving the rally. Structural central-bank demand remains the key non-speculative support for gold at elevated levels.",
+          "source": "Open search",
+          "url": "https://quantflowlab.com/iau-etf-review/",
+          "date": "2026-02-01"
+        }
+      ]
+    },
+    "VIG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "VIG (Vanguard Dividend Appreciation ETF) returned 14.16% in 2025, modestly below its category average of 15.54%. The fund tracks companies with a record of consistently growing dividends, providing defensive quality exposure with a 0.04% expense ratio.",
+          "source": "Vanguard / Morningstar via open search",
+          "url": "https://investor.vanguard.com/investment-products/etfs/profile/vig",
+          "date": "2025-12-31"
+        }
+      ]
+    }
+  },
+  "wave_stages": {
+    "AI": {
+      "stage": "surge",
+      "rationale": "All three AI-wave equities (NVDA, MSFT, GOOGL) reported double- and triple-digit YoY revenue growth in their most recent results (NVDA data center +71% FY2026, Azure +33% Q3 FY2025, Google Cloud +48% Q4 2025), with enterprise adoption compounding in real revenue, not just narrative. Peak-caution signals are visible \u2014 GOOGL guiding $175-185B CapEx for 2026 and unanimous sell-side enthusiasm \u2014 but real revenue and backlog growth still dominate the signal, placing the wave in surge rather than peak at this date.",
+      "evidence_tickers": [
+        "NVDA",
+        "MSFT",
+        "GOOGL",
+        "BOTZ"
+      ]
+    },
+    "rockets_spacecraft": {
+      "stage": "surge",
+      "rationale": "Rocket Lab posted 38% YoY revenue growth, 73% backlog growth to $1.85B, and 21 missions with 100% success in 2025, with Q1 2026 guidance implying ~57% growth at midpoint. Government contracts (SDA $816M, $515M satellite build, $24M Space Force Neutron contract) represent real contracted revenue compounding. The Neutron delay is a setback but the overall launch-services and satellite-manufacturing segment is clearly in adoption-driven growth, not buildup.",
+      "evidence_tickers": [
+        "RKLB"
+      ]
+    },
+    "quantum": {
+      "stage": "buildup",
+      "rationale": "Microsoft's Majorana 1 (Feb 2025) and Google's Willow chip (Dec 2024) are genuine research milestones demonstrating technical progress, but quantum computing remains pre-commercial \u2014 no material revenue from quantum workloads exists at this date. QTUM holds broad-technology companies (IBM, Google) rather than pure quantum plays, dampening direct wave exposure. Industry data shows real progress, but stock prices for pure quantum names are speculative and the wave is still in the quiet buildup stage.",
+      "evidence_tickers": [
+        "QTUM"
+      ]
+    },
+    "nuclear_fusion": {
+      "stage": "surge",
+      "rationale": "Uranium prices reached $85-95/lb in early 2026 driven by AI data-center power demand. Two SMR projects received US DOE federal funding. Canada authorized the first G7-country SMR at Darlington. Meta and Microsoft signed multi-gigawatt nuclear PPAs in Q1 2026. These are real capital commitments and regulatory actions, not just narrative. The wave has moved beyond buildup into adoption-driven surge with concrete offtake contracts.",
+      "evidence_tickers": [
+        "NUKZ"
+      ]
+    },
+    "general_markets": {
+      "stage": "neutral",
+      "rationale": "AGG, BIL, IAU, and VIG are diversified market instruments with no single wave attachment. Per task rules, general-markets tickers receive neutral.",
+      "evidence_tickers": [
+        "AGG",
+        "BIL",
+        "IAU",
+        "VIG"
+      ]
+    }
+  },
+  "wave_views": {
+    "NVDA": "surge",
+    "MSFT": "surge",
+    "GOOGL": "surge",
+    "BOTZ": "surge",
+    "RKLB": "surge",
+    "QTUM": "buildup",
+    "NUKZ": "surge",
+    "AGG": "neutral",
+    "BIL": "neutral",
+    "IAU": "neutral",
+    "VIG": "neutral"
+  },
+  "exclusion_conflicts": [],
+  "thematic_concerns": [
+    {
+      "ticker": "GOOGL",
+      "concern": "Alphabet guided $175-185B in 2026 CapEx, nearly doubling prior-year spending. If AI revenue growth decelerates before this infrastructure is monetized, free-cash-flow compression could be substantial. The profile's 'exit before the crest' rule warrants monitoring stretched CapEx commitments against actual AI revenue payback.",
+      "evidence": "Alphabet Q4 2025 earnings (2026-02-04): 2026 CapEx guidance $175-185B vs. roughly $52B in 2024. Google Cloud backlog $240B provides some cover, but the scale of spend is large relative to current AI revenue."
+    },
+    {
+      "ticker": "RKLB",
+      "concern": "Neutron medium-lift rocket delayed to at least Q4 2026 after a tank manufacturing defect. Neutron is the vehicle intended to open RKLB's addressable market to heavier government and commercial payloads. The delay pushes the company's path to profitability and the new market entry further out.",
+      "evidence": "SpaceNews (2026-02-27): Neutron debut delayed to late 2026 after Stage 1 tank rupture on Jan 21, 2026 due to hand-laid autoclave joint defect."
+    }
+  ],
+  "self_critique_downgrades": []
+}

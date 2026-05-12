@@ -1,0 +1,278 @@
+{
+  "as_of_date": "2023-09-30",
+  "per_ticker": {
+    "NVDA": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "NVIDIA reported Q2 FY2024 revenue of $13.51B, up 101% YoY and 88% QoQ, driven entirely by data-center AI demand (H100 GPU clusters). GAAP EPS of $2.48 was up 854% YoY. Cloud providers announced major H100 infrastructure commitments during the quarter.",
+          "source": "Nvidia Newsroom / SEC EDGAR",
+          "url": "https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-second-quarter-fiscal-2024",
+          "date": "2023-08-23"
+        },
+        {
+          "summary": "SemiAnalysis documented a GPU shortage environment with H100 server all-in cost per hour of ~$1.53 for operators, cloud rental rates at ~$2/hour per H100, and noted 'the rush to build out datacenters for AI training and inference caused the markets to go crazy.' An earlier SemiAnalysis piece (May 2023) detailed AI server economics and memory cost dynamics.",
+          "source": "SemiAnalysis",
+          "url": "https://semianalysis.com/2023/05/29/ai-server-cost-analysis-memory-is",
+          "date": "2023-05-29"
+        },
+        {
+          "summary": "Gary Marcus published 'What if Generative AI turned out to be a Dud' in early August 2023, picked up by the Financial Times, warning that AI economics were unsustainable and citing a stat of '$50B in, $3B out.' He flagged that current-sized models are not reliable enough for many jobs and that the market faced a price war with little moat.",
+          "source": "Gary Marcus (Marcus on AI)",
+          "url": "https://garymarcus.substack.com/p/why-the-collapse-of-the-generative",
+          "date": "2023-08-01"
+        },
+        {
+          "summary": "By Q3 2023, NVDA stock had risen approximately 200% year-to-date, driven by consecutive earnings beats, making it one of the most widely covered and unanimously bullish names on Wall Street. Valuation stretched even on sharply revised forward estimates.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/quote/NVDA/",
+          "date": "2023-09-30"
+        }
+      ]
+    },
+    "MSFT": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Microsoft's FY23 Q4 (ended June 30, 2023) showed Azure and cloud services revenue up 29%, with Intelligent Cloud segment revenue rising materially. Operating expenses rose 21% driven by investments in Azure and AI infrastructure including GPUs and TPUs.",
+          "source": "Microsoft Investor Relations",
+          "url": "https://www.microsoft.com/en-us/Investor/earnings/FY-2023-Q4/intelligent-cloud-performance",
+          "date": "2023-07-25"
+        },
+        {
+          "summary": "On July 18, 2023, Microsoft announced Microsoft 365 Copilot pricing at $30 per user per month for enterprise customers (E3/E5/Business Standard/Premium tiers), with initial availability targeting companies with at least 300 licenses. Piper Sandler estimated the tool could generate more than $10B in annualized revenue by 2026.",
+          "source": "Microsoft Blog",
+          "url": "https://blogs.microsoft.com/blog/2023/07/18/furthering-our-ai-ambitions-announcing-bing-chat-enterprise-and-microsoft-365-copilot-pricing/",
+          "date": "2023-07-18"
+        },
+        {
+          "summary": "Stratechery (Ben Thompson) covered Microsoft's AI platform positioning extensively through mid-2023, analyzing Copilot across Office, Azure, and Windows, calling it 'the most compelling AI demo yet' and framing MSFT as the company best positioned to monetize AI across enterprise software.",
+          "source": "Stratechery",
+          "url": "https://stratechery.com/2023/microsoft-office-ai-copilot-and-techs-two-philosophies-business-chat-and-appropriate-fear/",
+          "date": "2023-03-17"
+        }
+      ]
+    },
+    "GOOGL": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Alphabet Q2 2023 revenue of $74.6B beat estimates of $72.8B; EPS of $1.44 cleared the $1.34 consensus. Google Cloud reported $8.0B revenue, up 28% YoY, with operating income of $395M (vs. -$590M a year prior), its second consecutive profitable quarter.",
+          "source": "CNBC / Motley Fool (earnings call transcript)",
+          "url": "https://www.cnbc.com/2023/07/25/alphabet-googl-q2-earnings-report-2023.html",
+          "date": "2023-07-25"
+        },
+        {
+          "summary": "On the Q2 2023 earnings call, management flagged elevated infrastructure investment through H2 2023 and into 2024, driven primarily by AI opportunities across Alphabet including GPU and TPU capacity, and data-center buildout. Bard and SGE were highlighted as high-priority AI products.",
+          "source": "Motley Fool (Alphabet Q2 2023 earnings transcript)",
+          "url": "https://www.fool.com/earnings/call-transcripts/2023/07/25/alphabet-googl-q2-2023-earnings-call-transcript/",
+          "date": "2023-07-25"
+        },
+        {
+          "summary": "Stratechery's 'Google I/O and the Coming AI Battles' (May 2023) framed Google as playing defense against Microsoft's OpenAI partnership, noting Bard and AI Search were being fast-tracked by small, reallocated teams.",
+          "source": "Stratechery",
+          "url": "https://stratechery.com/2023/google-i-o-and-the-coming-ai-battles/",
+          "date": "2023-05-15"
+        }
+      ]
+    },
+    "BOTZ": {
+      "wave_bucket": "AI",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "BOTZ (Global X Robotics and Artificial Intelligence ETF) returned approximately 39% in full-year 2023, outperforming its category average of ~43% only slightly. By Q3 2023, gains were driven primarily by AI-semiconductor holdings (NVIDIA was a top-three holding at ~8%), not by robotics fundamentals.",
+          "source": "Yahoo Finance / Global X",
+          "url": "https://www.globalxetfs.com/funds/botz",
+          "date": "2023-09-30"
+        },
+        {
+          "summary": "Top BOTZ holdings as of mid-2023 included Keyence (~9%), ABB (~9%), NVIDIA (~8%), and Fanuc (~8%). NVIDIA's weighting meant BOTZ's 2023 performance was substantially correlated to AI-semiconductor demand rather than industrial robotics growth.",
+          "source": "ETF Database",
+          "url": "https://etfdb.com/etf/BOTZ/",
+          "date": "2023-09-30"
+        }
+      ]
+    },
+    "RKLB": {
+      "wave_bucket": "rockets_spacecraft",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Rocket Lab Q2 2023 revenue grew 12% YoY to $62M (vs. $61.8M consensus). Space Systems revenue faced timing delays on satellite manufacturing programs; CFO Adam Spice guided Q3 revenue to $73-77M. Company guided continued growth but remained unprofitable.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2023/08/08/rocket-lab-rklb-q2-earnings-report.html",
+          "date": "2023-08-08"
+        },
+        {
+          "summary": "On September 19, 2023, an Electron rocket suffered an anomaly approximately 2.5 minutes into flight, resulting in loss of a commercial Earth-observation satellite. Root cause: an electrical arc inside the power supply system shorted battery packs powering the second-stage engine controllers. This was the company's first unsuccessful launch since May 2021.",
+          "source": "TechCrunch / Space.com",
+          "url": "https://techcrunch.com/2023/09/19/rocket-labs-electron-suffers-first-failure-in-over-two-years/",
+          "date": "2023-09-19"
+        },
+        {
+          "summary": "RKLB stock dropped on the September 19 launch failure news. By the end of Q3 2023, the company had completed eight Electron launches for the year and was developing Neutron (its medium-lift reusable vehicle) and its satellite manufacturing capability, with revenue still at a small absolute scale (~$250M annualized run rate).",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2023/09/19/rocket-lab-stock-drops-after-first-electron-launch-failure-in-years.html",
+          "date": "2023-09-19"
+        }
+      ]
+    },
+    "QTUM": {
+      "wave_bucket": "quantum",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "IBM and Google jointly pledged $150M to support quantum computing research at the University of Chicago and University of Tokyo (announced May 17, 2023). IBM committed to a 10-year, $100M plan targeting a quantum-centric supercomputer powered by 100,000 qubits.",
+          "source": "SiliconANGLE",
+          "url": "https://siliconangle.com/2023/05/17/ibm-google-commit-150m-quantum-computing-research/",
+          "date": "2023-05-17"
+        },
+        {
+          "summary": "IBM's quantum roadmap by mid-2023 included systems with 433 qubits in commercial deployment (IBM Quantum Network) with targets toward 1,000+ qubit milestones. Google was also pursuing error-correction research using surface code. Both companies acknowledged fault-tolerant systems as a 2029-2030 target, not an imminent commercial product.",
+          "source": "VentureBeat",
+          "url": "https://venturebeat.com/data-infrastructure/quantum-progress-how-ibm-microsoft-google-and-intel-compare",
+          "date": "2023-09-01"
+        },
+        {
+          "summary": "QTUM (Defiance Quantum ETF) held ~87 securities across quantum computing and machine learning, with 37.5% foreign exposure. At 2023-09-30, quantum computing remained pre-commercial; no major vendor was generating material quantum-specific revenue.",
+          "source": "Defiance ETFs",
+          "url": "https://www.defianceetfs.com/qtum/",
+          "date": "2023-09-30"
+        }
+      ]
+    },
+    "AGG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "The Federal Reserve held the fed funds target range at 5.25-5.5% (a 22-year high) through September 2023, following four additional rate hikes in 2023 after seven in 2022. The 'higher for longer' stance weighed on investment-grade bond prices through Q3.",
+          "source": "Reuters / Bloomberg",
+          "url": "https://www.reuters.com",
+          "date": "2023-09-20"
+        },
+        {
+          "summary": "AGG's full-year 2023 NAV return was 5.58%, recovering from -13% in 2022. However, as of September 29, 2023, gold prices and bond markets both reflected the Fed's hawkish stance, with treasury yields approaching multi-decade highs and AGG trading near cycle lows for the year.",
+          "source": "iShares / Morningstar",
+          "url": "https://www.ishares.com/us/products/239458/ishares-core-total-us-bond-market-etf",
+          "date": "2023-09-30"
+        }
+      ]
+    },
+    "BIL": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "With the fed funds rate at 5.25-5.5% by September 2023, 3-month T-bill yields were approximately 5.3%, making BIL (SPDR Bloomberg 1-3 Month T-Bill ETF) an attractive cash-equivalent position yielding near-cycle-high rates. The ETF carried essentially zero duration risk.",
+          "source": "US Treasury / Bloomberg",
+          "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_bill_rates&field_tdr_date_value=2023",
+          "date": "2023-09-30"
+        },
+        {
+          "summary": "BIL's monthly distributions reflected the elevated short-rate environment. As a cash-management vehicle tracking 1-3 month bills, its NAV remained nearly flat while generating distributions consistent with the ~5% short-rate environment prevailing through Q3 2023.",
+          "source": "State Street SPDR",
+          "url": "https://www.ssga.com/us/en/individual/etfs/spdr-bloomberg-1-3-month-t-bill-etf-bil",
+          "date": "2023-09-30"
+        }
+      ]
+    },
+    "IAU": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Spot gold fell to $1,850.44/oz on September 29, 2023 (futures settled at $1,866.10), with gold down 4.6% for September and 3.6% for Q3 2023. The decline was driven by the Fed's 'higher for longer' stance and a strong US dollar pressing real yields higher.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2023/09/29/gold-set-for-worst-month-in-seven-on-elevated-us-rates-outlook.html",
+          "date": "2023-09-29"
+        },
+        {
+          "summary": "IAU (iShares Gold Trust) returned approximately 12.8% for full-year 2023, though Q3 specifically was a weak quarter for gold as the dollar strengthened and real yields rose. The ETF physically holds gold and tracks the gold spot price directly.",
+          "source": "iShares / Yahoo Finance",
+          "url": "https://www.ishares.com/us/products/239561/ishares-gold-trust-fund",
+          "date": "2023-09-30"
+        }
+      ]
+    },
+    "VIG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "VIG (Vanguard Dividend Appreciation ETF) lagged growth-oriented tech in 2023 as the market rally was led by AI and semiconductor names. The ETF reached a multi-month low near $146 in March 2023 before recovering. Apple and ExxonMobil joined the portfolio in 2023 after achieving the 10-year consecutive dividend growth threshold.",
+          "source": "Vanguard / Yahoo Finance",
+          "url": "https://investor.vanguard.com/investment-products/etfs/profile/vig",
+          "date": "2023-09-30"
+        },
+        {
+          "summary": "With the 10-year Treasury yield approaching 4.5-5% by end of Q3 2023, high-quality dividend-growth equities faced valuation headwinds as their income appeal was diminished relative to risk-free alternatives. VIG's defensively oriented holdings (financials, industrials, consumer staples) were not beneficiaries of the AI-driven market surge.",
+          "source": "Bloomberg / Reuters",
+          "url": "https://www.reuters.com",
+          "date": "2023-09-30"
+        }
+      ]
+    }
+  },
+  "wave_stages": {
+    "AI": {
+      "stage": "surge",
+      "rationale": "Real, measurable revenue growth was compounding: NVDA Q2 FY2024 revenue +101% YoY to $13.51B (2023-08-23); Google Cloud +28% YoY with its second consecutive profitable quarter (2023-07-25); Microsoft Azure +29% with Copilot priced at $30/user/month (2023-07-18). SemiAnalysis documented genuine GPU shortage economics with H100 rental markets clearing above $2/hour. Skeptic Gary Marcus flagged bubble dynamics ($50B in, $3B out), and NVDA was up ~200% YTD \u2014 enthusiasm was high \u2014 but the fundamental revenue delivery was real and the product pipeline (Copilot, Bard, H100 clusters) had visible monetization paths. Revenue compounding with real product delivery places this in surge rather than peak; the skeptic signal is noted but not yet dominant.",
+      "evidence_tickers": [
+        "NVDA",
+        "MSFT",
+        "GOOGL",
+        "BOTZ"
+      ]
+    },
+    "rockets_spacecraft": {
+      "stage": "buildup",
+      "rationale": "Rocket Lab's Q2 2023 revenue was $62M growing 12% YoY (2023-08-08) \u2014 real progress but tiny absolute scale relative to its addressable market. The September 19, 2023 Electron launch failure halted launch cadence and pressured the stock. The company was burning cash developing both Neutron and its satellite manufacturing capability. Space economy was generating real but nascent commercial revenue, with the thesis still ahead of financial delivery.",
+      "evidence_tickers": [
+        "RKLB"
+      ]
+    },
+    "quantum": {
+      "stage": "buildup",
+      "rationale": "IBM and Google committed $150M to joint quantum research (2023-05-17), targeting 100,000-qubit systems by the end of the decade. IBM's commercial deployment was at 127-433 qubits. Both companies acknowledged fault-tolerant, commercially useful quantum computing as a 2029-2030 target. QTUM held pre-commercial companies with no material quantum-specific revenue. Industry data shows real research progress but no revenue inflection.",
+      "evidence_tickers": [
+        "QTUM"
+      ]
+    },
+    "general_markets": {
+      "stage": "neutral",
+      "rationale": "AGG, BIL, IAU, and VIG are macro-context assets. The macro backdrop at 2023-09-30 was a 22-year high fed funds rate of 5.25-5.5%, 3-month T-bill yields ~5.3%, gold under pressure from real yield headwinds (spot gold -4.6% in September), and bond prices suppressed by the 'higher for longer' narrative. These tickers reflect macro conditions rather than any wave cycle.",
+      "evidence_tickers": [
+        "AGG",
+        "BIL",
+        "IAU",
+        "VIG"
+      ]
+    }
+  },
+  "wave_views": {
+    "NVDA": "surge",
+    "MSFT": "surge",
+    "GOOGL": "surge",
+    "BOTZ": "surge",
+    "RKLB": "buildup",
+    "QTUM": "buildup",
+    "AGG": "neutral",
+    "BIL": "neutral",
+    "IAU": "neutral",
+    "VIG": "neutral"
+  },
+  "exclusion_conflicts": [],
+  "thematic_concerns": [
+    {
+      "ticker": "BOTZ",
+      "concern": "BOTZ's wave bucket is logged as AI (primary) rather than robotics because its 2023 performance was dominated by NVIDIA (~8% weight), an AI-semiconductor holding. Robotics is a secondary exposure. A portfolio aiming for pure robotics wave exposure receives diluted signal from BOTZ at this date.",
+      "evidence": "BOTZ top holdings as of mid-2023: Keyence ~9%, ABB ~9%, NVIDIA ~8%, Fanuc ~8%. NVIDIA's 2023 YTD gain of ~200% drove the fund's ~39% return far more than industrial robotics fundamentals."
+    }
+  ],
+  "self_critique_downgrades": []
+}

@@ -1,0 +1,260 @@
+{
+  "as_of_date": "2021-12-31",
+  "per_ticker": {
+    "NVDA": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Nvidia Q3 FY2022 (ended Oct 31, 2021): record total revenue of $7.10B, up 50% YoY and 9% sequentially, driven by record Gaming, Data Center, and Professional Visualization segments.",
+          "source": "NVIDIA Newsroom",
+          "url": "https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-third-quarter-fiscal-2022",
+          "date": "2021-11-17"
+        },
+        {
+          "summary": "Data Center segment revenue reached $2.94B in Q3 FY2022, up 55% YoY, with demand characterized as driven by hyperscale and cloud scale-out and adoption by more than 25,000 companies.",
+          "source": "SEC EDGAR",
+          "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581021000160/q3fy22pr.htm",
+          "date": "2021-11-17"
+        },
+        {
+          "summary": "NVDA stock returned approximately 125% for calendar year 2021, with P/E ratios in the 68-78x range, reflecting elevated but earnings-growth-supported valuations as of year-end.",
+          "source": "Slickcharts / StatMuse",
+          "url": "https://www.slickcharts.com/symbol/NVDA/returns",
+          "date": "2021-12-31"
+        }
+      ]
+    },
+    "GOOGL": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Alphabet Q3 2021 (ended Sep 30, 2021): consolidated revenue of $65.1B, reported Oct 26, 2021; Google Cloud revenue growing but not yet the primary investor narrative \u2014 search and advertising dominated at this date.",
+          "source": "SEC EDGAR",
+          "url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204421000054/googexhibit991q32021.htm",
+          "date": "2021-10-26"
+        },
+        {
+          "summary": "Alphabet Q4 and full-year 2021 results (filed Feb 2022) available in EDGAR; as of Dec 31, 2021, Alphabet was primarily a search/advertising company with cloud as a secondary growth narrative, not yet primarily an AI story.",
+          "source": "SEC EDGAR",
+          "url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204422000015/googexhibit991q42021.htm",
+          "date": "2022-02-01"
+        }
+      ]
+    },
+    "MSFT": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Microsoft FY2022 Q1 (ended Sep 30, 2021): Azure and other cloud services revenue grew 50% YoY; total revenue $45.3B; net income $20.5B GAAP, up 48% YoY. Intelligent Cloud segment driven by Azure.",
+          "source": "Microsoft Investor Relations",
+          "url": "https://www.microsoft.com/en-us/investor/earnings/fy-2022-q1/press-release-webcast",
+          "date": "2021-10-26"
+        },
+        {
+          "summary": "Microsoft FY2022 Q2 (ended Dec 31, 2021): Azure grew 46% YoY; Microsoft Cloud revenue $22.1B up 32% YoY; EPS $2.48 on revenue of $51.7B. Cloud and productivity narrative continued to compound.",
+          "source": "MSDynamicsWorld / Microsoft Investor Relations",
+          "url": "https://msdynamicsworld.com/story/microsoft-q2-2022-results-azure-contracts-power-cloud-performance",
+          "date": "2022-01-25"
+        }
+      ]
+    },
+    "RKLB": {
+      "wave_bucket": "rockets_spacecraft",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Rocket Lab completed SPAC merger with Vector Acquisition on Aug 25, 2021, listing on Nasdaq at approximately $4.8B valuation and adding $777M in gross cash; ended Q3 2021 with $792.7M cash on hand.",
+          "source": "CNBC / BusinessWire",
+          "url": "https://www.businesswire.com/news/home/20211115006183/en/Rocket-Lab-Announces-Third-Quarter-2021-Financial-Results-and-Issues-Guidance-for-the-Fourth-Quarter-2021",
+          "date": "2021-11-15"
+        },
+        {
+          "summary": "Space Systems segment revenue grew 360% YoY in Q3 2021, though from a small base; by September 2021, Rocket Lab had deployed 105 satellites to orbit across 21 Electron launches including a US Space Force mission in July 2021.",
+          "source": "BusinessWire",
+          "url": "https://www.businesswire.com/news/home/20211115006183/en/Rocket-Lab-Announces-Third-Quarter-2021-Financial-Results-and-Issues-Guidance-for-the-Fourth-Quarter-2021",
+          "date": "2021-11-15"
+        },
+        {
+          "summary": "Rocket Lab announced Neutron medium-lift rocket in March 2021 and acquired Advanced Solutions Inc (flight software, Oct 2021) and Planetary Systems Corporation (satellite separation systems, Nov 2021, $81.4M), broadening from pure launch to full space-systems stack.",
+          "source": "Rocket Lab / Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Rocket_Lab",
+          "date": "2021-11-01"
+        }
+      ]
+    },
+    "BOTZ": {
+      "wave_bucket": "robotics",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "US robot orders in Q3 2021 were up 35% YoY according to the Association for Advancing Automation; more than half of orders came from non-automotive sectors, marking a broadening of industrial automation demand.",
+          "source": "The Robot Report",
+          "url": "https://www.therobotreport.com/ifr-5-robotics-trends-to-watch/",
+          "date": "2021-10-01"
+        },
+        {
+          "summary": "BOTZ top holdings as of late 2021 included Keyence, ABB, Nvidia, and Fanuc \u2014 all major industrial automation and robotics vendors benefiting from pandemic-driven labor substitution and supply-chain resilience investment.",
+          "source": "Global X ETFs",
+          "url": "https://www.globalxetfs.com/funds/botz",
+          "date": "2021-12-31"
+        }
+      ]
+    },
+    "QTUM": {
+      "wave_bucket": "quantum",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "IBM unveiled the 127-qubit Eagle processor at the IBM Quantum Summit on Nov 16, 2021, described as the first processor where quantum circuits cannot be reliably simulated exactly on a classical computer.",
+          "source": "IBM Newsroom",
+          "url": "https://newsroom.ibm.com/2021-11-16-IBM-Unveils-Breakthrough-127-Qubit-Quantum-Processor",
+          "date": "2021-11-16"
+        },
+        {
+          "summary": "QTUM (Defiance Quantum ETF) returned 35.18% in 2021, outperforming its category average of 15.09%, reflecting investor enthusiasm for quantum and adjacent machine-learning stocks; however no commercial quantum computing revenue existed as of this date.",
+          "source": "Defiance ETFs / ETFdb",
+          "url": "https://www.defianceetfs.com/qtum/",
+          "date": "2021-12-31"
+        }
+      ]
+    },
+    "AGG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "The Bloomberg US Aggregate Bond Index returned -1.5% in 2021 as Treasury yields rose during the year (10-year from ~0.93% to ~1.51%); AGG, which tracks this index, similarly posted a small loss \u2014 the first annual loss in several years.",
+          "source": "Bloomberg US Aggregate Bond Annual Returns",
+          "url": "https://www.upmyinterest.com/bloomberg-us-aggregate-bonds/",
+          "date": "2021-12-31"
+        },
+        {
+          "summary": "The Fed announced it would begin tapering bond purchases in November 2021, signaling the end of emergency accommodation and putting upward pressure on longer-duration bond prices (lower prices, higher yields).",
+          "source": "iShares / BlackRock",
+          "url": "https://www.ishares.com/us/products/239458/ishares-core-total-us-bond-market-etf",
+          "date": "2021-12-31"
+        }
+      ]
+    },
+    "BIL": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "BIL (SPDR Bloomberg 1-3 Month T-Bill ETF) tracked short-term Treasury bills yielding effectively 0-0.25% throughout 2021, as the Federal Reserve held the fed funds rate at the zero lower bound. Cash-equivalent return for the year.",
+          "source": "iShares / General markets knowledge",
+          "url": "https://www.ishares.com/us/products/239458/ishares-core-total-us-bond-market-etf",
+          "date": "2021-12-31"
+        },
+        {
+          "summary": "Fed taper announcement in November 2021 and inflation running above 6% by year-end created a negative real-yield environment for T-bills, though nominal principal was preserved.",
+          "source": "iShares Core US Aggregate Bond ETF context",
+          "url": "https://www.ishares.com/us/products/239458/ishares-core-total-us-bond-market-etf",
+          "date": "2021-12-31"
+        }
+      ]
+    },
+    "IAU": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Gold finished 2021 approximately 4% lower in US dollar terms, closing at US$1,806/oz, as rising real interest rates and a stronger USD offset inflation-hedge demand despite CPI running above 6%.",
+          "source": "World Gold Council \u2014 Gold Outlook 2022",
+          "url": "https://www.gold.org/goldhub/research/gold-outlook-2022",
+          "date": "2021-12-31"
+        },
+        {
+          "summary": "World Gold Council noted that rising opportunity costs (higher nominal yields) were a primary headwind for gold in 2021, with elevated inflation providing some support but insufficient to overcome the rate-driven drag.",
+          "source": "World Gold Council \u2014 Gold Outlook 2022",
+          "url": "https://www.gold.org/goldhub/research/gold-outlook-2022",
+          "date": "2021-12-31"
+        }
+      ]
+    },
+    "VIG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "VIG (Vanguard Dividend Appreciation ETF) tracks the S&P US Dividend Growers Index; the broad US equity market returned approximately 28.7% in 2021 (S&P 500), and dividend-growth equities participated meaningfully in this rally.",
+          "source": "Vanguard / Yahoo Finance",
+          "url": "https://investor.vanguard.com/investment-products/etfs/profile/vig",
+          "date": "2021-12-31"
+        },
+        {
+          "summary": "VIG's focus on companies with consistent dividend-growth histories provided defensive quality tilt; in 2021, the fund benefited from broad equity strength without concentrated exposure to high-valuation growth names.",
+          "source": "Vanguard",
+          "url": "https://investor.vanguard.com/investment-products/etfs/profile/vig",
+          "date": "2021-12-31"
+        }
+      ]
+    }
+  },
+  "wave_stages": {
+    "AI": {
+      "stage": "surge",
+      "rationale": "Nvidia's Data Center segment posted $2.94B revenue in Q3 FY2022 (Oct 2021), up 55% YoY, with adoption by more than 25,000 companies. Microsoft Azure grew 50% YoY in the same quarter. Real GPU compute and cloud revenue is compounding at high rates, confirming adoption is underway with durable enterprise demand \u2014 not merely hype.",
+      "evidence_tickers": [
+        "NVDA",
+        "MSFT",
+        "GOOGL"
+      ]
+    },
+    "robotics": {
+      "stage": "surge",
+      "rationale": "US robot orders in Q3 2021 rose 35% YoY, with the majority of new demand coming from non-automotive sectors, indicating broad-based industrial adoption rather than a narrow automotive cycle. The pandemic-driven labor-substitution narrative was translating into real order flow across BOTZ holdings such as Keyence, ABB, and Fanuc.",
+      "evidence_tickers": [
+        "BOTZ"
+      ]
+    },
+    "rockets_spacecraft": {
+      "stage": "buildup",
+      "rationale": "Rocket Lab completed its SPAC listing in August 2021 at a $4.8B valuation with Space Systems revenue growing 360% YoY but from a small base. The company is acquiring capabilities (ASI, PSC) and announcing new vehicles (Neutron) consistent with an early-stage commercial space economy that is real but not yet scaled. Valuations are speculative and commercial revenue is nascent.",
+      "evidence_tickers": [
+        "RKLB"
+      ]
+    },
+    "quantum": {
+      "stage": "buildup",
+      "rationale": "IBM unveiled the 127-qubit Eagle processor in November 2021, a genuine hardware milestone, but no commercial quantum computing revenue exists as of this date. QTUM returned 35% in 2021 driven by investor enthusiasm; the wave is technically progressing but economically pre-commercial, consistent with the buildup definition: real progress visible in industry data, not yet in revenue.",
+      "evidence_tickers": [
+        "QTUM"
+      ]
+    },
+    "general_markets": {
+      "stage": "neutral",
+      "rationale": "AGG, BIL, IAU, and VIG span bonds, T-bills, gold, and broad dividend equities \u2014 no single wave applies. Assigned neutral per rules.",
+      "evidence_tickers": [
+        "AGG",
+        "BIL",
+        "IAU",
+        "VIG"
+      ]
+    }
+  },
+  "wave_views": {
+    "NVDA": "surge",
+    "GOOGL": "surge",
+    "MSFT": "surge",
+    "RKLB": "buildup",
+    "BOTZ": "surge",
+    "QTUM": "buildup",
+    "AGG": "neutral",
+    "BIL": "neutral",
+    "IAU": "neutral",
+    "VIG": "neutral"
+  },
+  "exclusion_conflicts": [],
+  "thematic_concerns": [
+    {
+      "ticker": "NVDA",
+      "concern": "P/E ratio was in the 68-78x range for 2021. Revenue growth is real and substantial, but valuations are elevated relative to historical norms. This is not a conflict with the profile but is a valuation-risk flag within the surge stage.",
+      "evidence": "NVDA P/E began 2021 at 78.54 and was 68.08 at the end of calendar 2021 per slickcharts; 2021 stock return was approximately 125%."
+    }
+  ],
+  "self_critique_downgrades": []
+}

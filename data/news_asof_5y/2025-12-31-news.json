@@ -1,0 +1,317 @@
+{
+  "as_of_date": "2025-12-31",
+  "per_ticker": {
+    "AGG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "The Federal Reserve cut rates by 25bp at its final 2025 meeting to a range of 3.50-3.75%, completing 175bp of cumulative cuts since September 2024; the Bloomberg US Aggregate Bond Index returned approximately 7.1% for full-year 2025.",
+          "source": "Bloomberg / iShares IR",
+          "url": "https://www.ishares.com/us/products/239458/ishares-core-total-us-bond-market-etf",
+          "date": "2025-12-31"
+        },
+        {
+          "summary": "AGG carries duration risk into 2026 as the Fed signaled a slower pace of additional cuts; yields on investment-grade bonds remained relatively elevated compared to the prior decade, supporting income returns but limiting price appreciation.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/news/balancing-income-growth-3-bond-125400127.html",
+          "date": "2025-12-31"
+        }
+      ]
+    },
+    "BIL": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "BIL tracks the Bloomberg 1-3 Month T-Bill Index; with the Fed funds rate at 3.50-3.75% at end-2025, BIL yielded approximately 4.5-5% annualized for most of the year before declining as the Fed cut, offering cash-equivalent carry with minimal duration risk.",
+          "source": "State Street SPDR / ETF DB",
+          "url": "https://etfdb.com/etf/BIL/",
+          "date": "2025-12-31"
+        },
+        {
+          "summary": "No material security-specific news surfaced for BIL from curated or open search with confirmed dates on or before 2025-12-31; fund behavior is mechanically tied to short-term Treasury rates, not individual corporate events.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/quote/BIL/",
+          "date": "2025-12-31"
+        }
+      ]
+    },
+    "IAU": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Gold set 53 new all-time highs during 2025, with prices topping $4,500/oz by late December for an approximately 70% full-year gain; IAU tracked this rally, trading at roughly $85.18 by late 2025 after opening the year near $50.",
+          "source": "World Gold Council / Goldco",
+          "url": "https://goldco.com/central-bank-gold-buying-october-2025/",
+          "date": "2025-10-01"
+        },
+        {
+          "summary": "Central bank gold demand totaled 863 tonnes in 2025, below the >1,000t records of 2022-2023 but still nearly double the 2010-2021 average; a record 43% of central banks surveyed indicated plans to increase gold holdings.",
+          "source": "World Gold Council",
+          "url": "https://www.gold.org/goldhub/research/gold-demand-trends/gold-demand-trends-full-year-2025",
+          "date": "2025-12-31"
+        },
+        {
+          "summary": "J.P. Morgan Global Research set a gold price target of $5,055/oz by Q4 2026 as of December 22, 2025, citing structural demand from central banks, China, and new crypto-linked buyers.",
+          "source": "Kitco News / J.P. Morgan",
+          "url": "https://www.kitco.com/news/article/2025-12-22/jp-morgan-sees-gold-5055-q4-2026-china-and-cryptosphere-add-new-demand",
+          "date": "2025-12-22"
+        }
+      ]
+    },
+    "GOOGL": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Alphabet Q3 2025 (calendar): consolidated revenue $102.3B (+16% YoY), Alphabet's first-ever $100B quarter; Google Cloud grew 34% YoY to $15.2B with AI-related cloud revenue up more than 200% YoY and Cloud backlog reaching $155B.",
+          "source": "SEC EDGAR / Alphabet IR",
+          "url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204425000087/googexhibit991q32025.htm",
+          "date": "2025-10-29"
+        },
+        {
+          "summary": "Gemini models processed 7 billion tokens per minute via direct API by Q3 2025; Gemini App reached 650 million monthly active users; Gemini Enterprise crossed 2 million subscribers across 700 companies.",
+          "source": "Google Blog / Alphabet IR",
+          "url": "https://blog.google/company-news/inside-google/message-ceo/alphabet-earnings-q3-2025/",
+          "date": "2025-10-29"
+        },
+        {
+          "summary": "Google published Willow quantum chip results in Nature on December 9, 2024: the 105-qubit chip achieved below-threshold quantum error correction \u2014 a 30-year research goal \u2014 and completed a benchmark computation in under 5 minutes that would take classical supercomputers 10 septillion years.",
+          "source": "Google Quantum AI / HPCwire",
+          "url": "https://blog.google/innovation-and-ai/technology/research/google-willow-quantum-chip/",
+          "date": "2024-12-09"
+        }
+      ]
+    },
+    "RKLB": {
+      "wave_bucket": "rockets_spacecraft",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Rocket Lab reported Q3 2025 revenue of $155M (+48% YoY) with a record GAAP gross margin of 37%; secured 17 new dedicated Electron launch contracts in the quarter, a company record; Q4 2025 guidance set at $170-180M.",
+          "source": "GlobeNewswire / Rocket Lab IR",
+          "url": "https://www.globenewswire.com/news-release/2025/11/10/3185076/0/en/Rocket-Lab-Announces-Third-Quarter-2025-Financial-Results-Posts-Record-Quarterly-Revenue-of-155m-Representing-48-Year-on-Year-Growth-at-Record-Gross-Margin.html",
+          "date": "2025-11-10"
+        },
+        {
+          "summary": "Rocket Lab completed its 21st Electron launch on December 21, 2025, finishing the year with 100% mission success and establishing Electron as the world's most frequently-launched small-lift orbital rocket.",
+          "source": "GlobeNewswire / Rocket Lab",
+          "url": "https://www.globenewswire.com/news-release/2025/12/21/3208889/0/en/Rocket-Lab-Successfully-Launches-for-iQPS-Ends-2025-with-21-Launches-and-100-Mission-Success.html",
+          "date": "2025-12-21"
+        },
+        {
+          "summary": "Rocket Lab won an $816M Space Development Agency (SDA) Tranche III prime contract to build 18 missile-warning spacecraft, its largest single contract ever; total SDA contract value exceeded $1.3B by year-end; company backlog reached approximately $1.85B, up ~73% YoY.",
+          "source": "Rocket Lab / CNBC",
+          "url": "https://www.cnbc.com/2025/11/11/rocket-lab-rklb-earnings-q3-2025.html",
+          "date": "2025-11-11"
+        },
+        {
+          "summary": "Neutron medium-lift rocket debut delayed to 2026; Launch Complex 3 was formally opened during Q3 2025 with the vehicle expected to arrive at the site in Q1 2026; a tank rupture during qualification testing was attributed to a manufacturing defect.",
+          "source": "Space.com / NASASpaceFlight",
+          "url": "https://www.space.com/space-exploration/rocket-lab-delays-debut-of-powerful-partially-reusable-neutron-rocket-to-2026",
+          "date": "2025-12-01"
+        }
+      ]
+    },
+    "NVDA": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Nvidia reported Q3 FY2026 (ended October 26, 2025) revenue of $57.0B (+62% YoY, +22% QoQ) with Data Center revenue of $51.2B (+66% YoY); Q4 FY2026 guidance set at $65.0B midpoint, 4.2% above consensus.",
+          "source": "NVIDIA Newsroom",
+          "url": "https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-third-quarter-fiscal-2026",
+          "date": "2025-11-19"
+        },
+        {
+          "summary": "CEO Jensen Huang stated 'Blackwell sales are off the charts, and cloud GPUs are sold out'; the Blackwell GB300 accounted for roughly two-thirds of Blackwell revenue in Q3; supply commitments nearly doubled to $95.2B.",
+          "source": "NVIDIA Newsroom / Inferential Investor",
+          "url": "https://www.inferentialinvestor.com/p/nvidia-nvda-q3-fy26-detailed-earnings",
+          "date": "2025-11-19"
+        },
+        {
+          "summary": "CFO disclosed revenue visibility of approximately $500B in Blackwell and Rubin systems from January 2025 through end of calendar 2026; Blackwell-based systems deployed across all major cloud providers.",
+          "source": "NVIDIA CFO Commentary / Futurum",
+          "url": "https://futurumgroup.com/insights/nvidia-q3-fy-2026-record-data-center-revenue-higher-q4-guide/",
+          "date": "2025-11-19"
+        }
+      ]
+    },
+    "MSFT": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Microsoft Q3 FY2025 (ended March 2025): revenue $70.1B (+13% YoY); Intelligent Cloud segment $26.8B (+21% YoY); Azure grew 33% YoY; AI services reached an annual revenue run rate exceeding $13B.",
+          "source": "Futurum Group / Microsoft IR",
+          "url": "https://futurumgroup.com/insights/microsoft-q3-fy-2025-earnings-beat-on-strong-cloud-and-ai-services-growth/",
+          "date": "2025-04-30"
+        },
+        {
+          "summary": "Microsoft Copilot surpassed 1 million paid seats by early 2025; Q4 FY2025 guidance for Intelligent Cloud set at $28.75-29.05B implying 20-22% constant-currency growth, with Azure guided +34-35% YoY.",
+          "source": "Microsoft IR",
+          "url": "https://www.microsoft.com/en-us/investor/earnings/fy-2025-q3/intelligent-cloud-performance",
+          "date": "2025-04-30"
+        }
+      ]
+    },
+    "BOTZ": {
+      "wave_bucket": "robotics",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Global X Robotics & AI ETF (BOTZ) reached $3.16B AUM by September 2025 (9-year anniversary); top holdings as of late 2025: Keyence (9.37%), ABB (8.81%), NVDA (8.28%), Fanuc (8.21%), Intuitive Surgical (6.55%); no single humanoid-pure-play dominates.",
+          "source": "Global X ETFs / ETF DB",
+          "url": "https://etfdb.com/etf/BOTZ/",
+          "date": "2025-09-30"
+        },
+        {
+          "summary": "The global robotics market was estimated at $108B in 2025 with forecasts to reach $416B by 2035; BOTZ's one-year return through late 2025 was approximately 38.87%, outpacing the broader market.",
+          "source": "Global X ETFs / Stock Analysis",
+          "url": "https://stockanalysis.com/etf/botz/",
+          "date": "2025-12-30"
+        },
+        {
+          "summary": "A Motley Fool article dated December 30, 2025 examined whether BOTZ could triple in three years, citing humanoid robot commercialization timelines at Tesla, FANUC, and ABB as the primary growth catalyst.",
+          "source": "The Motley Fool",
+          "url": "https://www.fool.com/investing/2025/12/30/is-the-global-x-robotics-artificial-intelligence-e/",
+          "date": "2025-12-30"
+        }
+      ]
+    },
+    "QTUM": {
+      "wave_bucket": "quantum",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Defiance QTUM ETF crossed $2B in assets under management as of September 4, 2025, earning a 5-star Overall Morningstar Rating (as of June 30, 2025); the fund tracks 83-85 global quantum and machine-learning companies via a modified equal-weight methodology.",
+          "source": "The Quantum Insider",
+          "url": "https://thequantuminsider.com/2025/09/04/defiances-quantum-computing-etf-surpasses-2-billion-aum/",
+          "date": "2025-09-04"
+        },
+        {
+          "summary": "Google published the Willow 105-qubit quantum chip on December 9, 2024 (a major QTUM-held company milestone): the chip achieved below-threshold quantum error correction for the first time, a 30-year research target, and completed a quantum benchmark in under 5 minutes vs. 10 septillion years for classical supercomputers.",
+          "source": "Google Quantum AI / HPCwire",
+          "url": "https://blog.google/innovation-and-ai/technology/research/google-willow-quantum-chip/",
+          "date": "2024-12-09"
+        },
+        {
+          "summary": "IBM targets utility-scale quantum computing by 2025 and fault-tolerant systems by 2029 on its published roadmap; no commercial quantum revenue reported from any vendor by end-2025; all quantum plays remain pre-commercial.",
+          "source": "Quantum Computing Report / TipRanks",
+          "url": "https://www.tipranks.com/news/qtum-etf-and-the-quantum-computing-breakout-what-the-2025-2026-milestone-wave-means-for-tech-investors",
+          "date": "2025-10-01"
+        }
+      ]
+    },
+    "VIG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Vanguard Dividend Appreciation ETF (VIG) tracks the S&P US Dividend Growers Index (companies with 10+ consecutive years of dividend increases); the fund's 1-year total return through end-2025 was approximately 20.3%.",
+          "source": "Vanguard / Stock Analysis",
+          "url": "https://stockanalysis.com/etf/vig/",
+          "date": "2025-12-31"
+        },
+        {
+          "summary": "No material catalyst-level news (earnings, regulatory, M&A, leadership) surfaced for VIG from curated or open search with confirmed dates \u2264 2025-12-31; fund performance tracks the broad large-cap dividend-growth universe.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/quote/VIG/",
+          "date": "2025-12-31"
+        }
+      ]
+    },
+    "NUKZ": {
+      "wave_bucket": "nuclear",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Google signed the first corporate SMR power purchase agreement with Kairos Power in August 2025; Microsoft has a 20-year PPA with Constellation Energy for restart of Three Mile Island Unit 1 (expected 2028); AWS/Talen Energy finalized a 17-year, 1.92GW PPA in June 2025.",
+          "source": "Various / Introl Blog",
+          "url": "https://introl.com/blog/nuclear-power-ai-data-centers-microsoft-google-amazon-2025",
+          "date": "2025-08-01"
+        },
+        {
+          "summary": "Big tech companies signed more than 10GW of new US nuclear capacity agreements in the 12 months through end-2025, with over $10B committed across hyperscaler nuclear partnerships; NUKZ ETF gained approximately 73% in 2025.",
+          "source": "ETF Trends / Range ETFs",
+          "url": "https://www.etftrends.com/disruptive-technology-content-hub/data-centers-embracing-nuclear-smrs-ai-needs/",
+          "date": "2025-11-01"
+        },
+        {
+          "summary": "NUKZ is described as the only ETF specifically designed around the SMR commercialization theme, bundling reactor operators, SMR developers, and utilities negotiating long-dated PPAs; key holdings include Constellation Energy (CEG) and Oklo; expense ratio is 0.85%.",
+          "source": "Range ETFs",
+          "url": "https://www.rangeetfs.com/nukz",
+          "date": "2025-12-31"
+        }
+      ]
+    }
+  },
+  "wave_stages": {
+    "AI": {
+      "stage": "peak",
+      "rationale": "Real, compounding revenue growth is undeniable (NVDA $57B quarter, Azure +33%, Google Cloud +34%), but the dominant story by end-2025 is unbounded enthusiasm: Jensen Huang's 'Blackwell off the charts' language, $65B Q4 guidance above consensus, $500B forward revenue visibility claim, and unanimous sell-side excitement. Revenue exists but enthusiasm is now the lead headline \u2014 a hallmark of the peak stage.",
+      "evidence_tickers": [
+        "NVDA",
+        "MSFT",
+        "GOOGL"
+      ]
+    },
+    "rockets_spacecraft": {
+      "stage": "surge",
+      "rationale": "RKLB posted 48% YoY revenue growth in Q3 2025 to $155M, launched 21 missions with 100% success in 2025, and won an $816M SDA prime contract bringing backlog to $1.85B (+73% YoY). Revenue and launch cadence are compounding with room to grow; Neutron's commercial potential has not yet been priced in given its debut delay to 2026.",
+      "evidence_tickers": [
+        "RKLB"
+      ]
+    },
+    "robotics": {
+      "stage": "surge",
+      "rationale": "The global robotics market reached $108B in 2025; BOTZ returned approximately 38.87% over the prior year with real industrial-automation revenue flowing through holdings like Keyence, ABB, and Fanuc. Humanoid robot enthusiasm (Tesla Optimus, XPeng IRON) is adding speculative premium, but the bulk of the ETF's weight is in established revenue-generating automation companies.",
+      "evidence_tickers": [
+        "BOTZ"
+      ]
+    },
+    "quantum": {
+      "stage": "buildup",
+      "rationale": "Google's Willow chip (December 2024) achieved a 30-year research target for below-threshold error correction \u2014 genuine scientific progress visible in peer-reviewed results. QTUM crossed $2B AUM by September 2025. However, IBM, Google, and all other vendors report zero commercial quantum revenue as of end-2025; the wave is real-progress-visible but not-yet-in-revenue, which is the canonical definition of buildup.",
+      "evidence_tickers": [
+        "QTUM",
+        "GOOGL"
+      ]
+    },
+    "nuclear": {
+      "stage": "surge",
+      "rationale": "By end-2025 more than 10GW of US nuclear capacity was under hyperscaler PPA agreements (Google/Kairos, AWS/Talen, Microsoft/Constellation), with over $10B committed. These are binding commercial contracts, not plans \u2014 real capital is flowing. NUKZ gained 73% in 2025 as the market priced in the AI-datacenter-to-nuclear-power chain. Revenue from existing nuclear utilities is current; SMR commissioning is 2027-2030. Adoption compounding with real (if future-dated) contract volume.",
+      "evidence_tickers": [
+        "NUKZ"
+      ]
+    },
+    "general_markets": {
+      "stage": "neutral",
+      "rationale": "AGG, BIL, IAU, and VIG are macro and broad-market instruments. Gold's 70% rally reflects currency/uncertainty dynamics not a technology wave; bonds reflect the Fed rate cycle; VIG reflects broad equity performance. No single technology-wave thesis applies.",
+      "evidence_tickers": [
+        "AGG",
+        "BIL",
+        "IAU",
+        "VIG"
+      ]
+    }
+  },
+  "wave_views": {
+    "AGG": "neutral",
+    "BIL": "neutral",
+    "IAU": "neutral",
+    "GOOGL": "peak",
+    "RKLB": "surge",
+    "NVDA": "peak",
+    "MSFT": "peak",
+    "BOTZ": "surge",
+    "QTUM": "buildup",
+    "VIG": "neutral",
+    "NUKZ": "surge"
+  },
+  "exclusion_conflicts": [],
+  "thematic_concerns": [],
+  "self_critique_downgrades": []
+}

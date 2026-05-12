@@ -1,0 +1,293 @@
+{
+  "as_of_date": "2024-09-30",
+  "per_ticker": {
+    "NVDA": {
+      "wave_bucket": "AI",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Q2 FY2025 (ending July 28, 2024): revenue $30.0B (+122% YoY), data center revenue $26.3B (+154% YoY), non-GAAP EPS $0.68 (+152% YoY). Hopper demand described as strong going into H2 2024.",
+          "source": "NVIDIA Newsroom / SEC EDGAR",
+          "url": "https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-second-quarter-fiscal-2025",
+          "date": "2024-08-28"
+        },
+        {
+          "summary": "10-for-1 stock split completed June 10, 2024, lowering nominal share price from ~$1,200 to ~$120 to broaden retail access; stock had appreciated ~200% YTD at split date driven by AI chip demand.",
+          "source": "The Motley Fool",
+          "url": "https://www.fool.com/investing/2024/07/10/nvidia-completed-10-for-1-stock-split-2-mag-seven/",
+          "date": "2024-07-10"
+        },
+        {
+          "summary": "Blackwell GPU architecture entered production in Q3 2024; CEO Jensen Huang stated demand is 'insane' and orders are 'booked out 12 months or so,' with Blackwell chips priced $30,000-$40,000 each and sold out well into 2025 per Wall Street analysts.",
+          "source": "Nasdaq.com",
+          "url": "https://www.nasdaq.com/articles/should-investors-load-nvidia-its-blackwell-chip-launches",
+          "date": "2024-09-01"
+        }
+      ]
+    },
+    "GOOGL": {
+      "wave_bucket": "AI",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Q2 2024 (reported July 29, 2024): total revenue $85B (+14% YoY). Google Cloud crossed $10B quarterly revenue for the first time and exceeded $1B in operating profit. CEO Sundar Pichai attributed Cloud growth directly to AI adoption.",
+          "source": "SEC EDGAR (Alphabet Q2 2024 earnings exhibit)",
+          "url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204424000076/googexhibit991q22024.htm",
+          "date": "2024-07-29"
+        },
+        {
+          "summary": "Google announced a quantum computing error-correction breakthrough in September 2024: a logical qubit composed of 105 physical qubits achieved 2.4x longer lifespan than its best constituent physical qubit, validating surface-code error correction as a practical path to fault tolerance.",
+          "source": "MIT Technology Review",
+          "url": "https://www.technologyreview.com/2024/09/11/1103828/google-says-its-made-a-quantum-computing-breakthrough-that-reduces-errors/",
+          "date": "2024-09-11"
+        }
+      ]
+    },
+    "MSFT": {
+      "wave_bucket": "AI",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Q4 FY2024 (ending June 30, 2024, reported July 30, 2024): revenue $64.73B (+15% YoY), EPS $2.95 vs $2.93 consensus. Azure grew 29% but missed the 31% estimate; stock fell ~7% after-hours on cloud growth shortfall, reflecting market's high sensitivity to AI-driven cloud expectations.",
+          "source": "Microsoft Investor Relations / Kavout",
+          "url": "https://www.microsoft.com/en-us/investor/earnings/fy-2024-q4/intelligent-cloud-performance",
+          "date": "2024-07-30"
+        },
+        {
+          "summary": "Azure AI customer base exceeded 60,000 organizations (+60% YoY) and GitHub Copilot was deployed in 77,000+ organizations. Microsoft's AI business described internally as fastest-growing in company history, on track to cross $10B annual revenue run rate.",
+          "source": "Moor Insights & Strategy",
+          "url": "https://moorinsightsstrategy.com/research-notes/microsoft-q4-fy2024-earnings-show-strong-copilot-adoption-and-teams-growth/",
+          "date": "2024-07-30"
+        }
+      ]
+    },
+    "RKLB": {
+      "wave_bucket": "rockets_spacecraft",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Q2 2024 (reported August 8, 2024): record revenue $106M (+71% YoY). Space Systems revenue ~$79-84M; launch backlog topped 70 missions; total contract backlog reached $1.07B ($772M Space Systems, $294M launch). EPS -$0.08.",
+          "source": "Business Wire / GuruFocus",
+          "url": "https://www.businesswire.com/news/home/20240808283474/en/Rocket-Lab-Announces-Second-Quarter-2024-Financial-Results-Posts-Record-Revenue-on-71-Year-on-Year-Growth",
+          "date": "2024-08-08"
+        },
+        {
+          "summary": "Neutron medium-lift rocket development: CFO acknowledged 2024 first-launch target was a 'green-light schedule' with zero margin for problems; Archimedes engine hot-fire testing had not yet begun. NSSLP Phase 3 Lane 1 eligibility a key motivator for the aggressive timeline.",
+          "source": "SpaceNews",
+          "url": "https://spacenews.com/rocket-lab-pushing-for-first-neutron-launch-in-2024/",
+          "date": "2024-08-01"
+        },
+        {
+          "summary": "Electron booked 31 missions in Q2 2024 across orbital and suborbital (HASTE) customers; successful launches for NASA, Synspective, Kineis, and KAIST. Year-to-date signed launches reached 17, with a multi-launch deal announced as the largest contract in company history at time of reporting.",
+          "source": "Yahoo Finance / AlphaSpread",
+          "url": "https://finance.yahoo.com/news/rocket-lab-usa-inc-rklb-220422222.html",
+          "date": "2024-08-08"
+        }
+      ]
+    },
+    "BOTZ": {
+      "wave_bucket": "robotics",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "BOTZ (Global X Robotics & AI ETF) as of mid-2024 held Keyence (9.37%), ABB (8.81%), Nvidia (8.28%), Fanuc (8.21%), and Intuitive Surgical (6.55%) as top five positions; IT sector 43.9%, industrials 37.9%. The ETF blends traditional industrial automation (Keyence, Fanuc, ABB) with AI-chip exposure (Nvidia) and surgical robotics (ISRG).",
+          "source": "Global X ETFs / ETF.com",
+          "url": "https://www.globalxetfs.com/funds/botz",
+          "date": "2024-09-01"
+        },
+        {
+          "summary": "Industrial robotics sub-themes tracked by BOTZ include automation, unmanned vehicles/drones, non-industrial robots, and AI. Declining AI compute cost and rapid innovation in general-purpose robotics \u2014 particularly humanoids \u2014 cited as emerging catalysts alongside demographic and reshoring tailwinds.",
+          "source": "ETF Database",
+          "url": "https://etfdb.com/etf/BOTZ/",
+          "date": "2024-09-01"
+        }
+      ]
+    },
+    "QTUM": {
+      "wave_bucket": "quantum",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Google published a quantum error-correction breakthrough (September 11, 2024): surface-code logical qubit built from 105 physical qubits achieved 2.4x longer lifespan than the best single physical qubit, validating error correction as a viable path to fault-tolerant quantum computing.",
+          "source": "MIT Technology Review",
+          "url": "https://www.technologyreview.com/2024/09/11/1103828/google-says-its-made-a-quantum-computing-breakthrough-that-reduces-errors/",
+          "date": "2024-09-11"
+        },
+        {
+          "summary": "IBM completed its '100x100 Challenge' in 2024: running a 100-qubit circuit at depth 100 on the Heron processor, demonstrating utility-scale computation. Gate fidelities on Heron improved to 2Q error rates of ~8x10^-4, with circuits up to 5,000 two-qubit gates achievable.",
+          "source": "IBM Quantum Blog / BlockchainReporter",
+          "url": "https://blockchainreporter.net/latest-breakthroughs-in-quantum-computing-2024",
+          "date": "2024-09-01"
+        },
+        {
+          "summary": "QTUM ETF (Defiance Quantum) tracks 71 quantum computing and ML stocks in a modified equal-weight index; key holdings include IonQ (IONQ), D-Wave Quantum (QBTS), and Rigetti Computing (RGTI). No commercial revenue from pure-play quantum vendors as of Q3 2024; wave is in research-and-development phase.",
+          "source": "Defiance ETFs / AAII",
+          "url": "https://www.defianceetfs.com/qtum/",
+          "date": "2024-09-01"
+        }
+      ]
+    },
+    "NUKZ": {
+      "wave_bucket": "nuclear_fusion",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Constellation Energy announced a 20-year power purchase agreement with Microsoft to restart the Three Mile Island Unit 1 nuclear plant (835 MW, rebranded Crane Clean Energy Center), providing 24/7 carbon-free power to Microsoft AI data centers. CEG stock jumped ~22% on the day of announcement.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2024/09/20/constellation-energy-to-restart-three-mile-island-and-sell-the-power-to-microsoft.html",
+          "date": "2024-09-20"
+        },
+        {
+          "summary": "NUKZ ETF launched January 23, 2024; gained approximately 70% from launch through late September 2024. Holdings span the full nuclear ecosystem: uranium producers (Cameco), operating utilities (Constellation Energy), reactor manufacturers (NuScale), and advanced reactor developers.",
+          "source": "TipRanks / Nasdaq.com",
+          "url": "https://www.tipranks.com/news/article/nukz-brand-new-nuclear-energy-etf-is-one-of-2024s-hottest-etfs",
+          "date": "2024-09-01"
+        },
+        {
+          "summary": "Goldman Sachs forecast that AI data centers will consume 8% of total US electricity demand by 2030, up from 3% in 2024. Federal Energy Regulatory Commission projected US data center electricity demand to climb from 19 GW (2023) to 35 GW (2030), underpinning the nuclear-as-baseload narrative.",
+          "source": "US Department of Energy / Common Fund",
+          "url": "https://www.energy.gov/ne/articles/advantages-and-challenges-nuclear-powered-data-centers",
+          "date": "2024-09-01"
+        }
+      ]
+    },
+    "AGG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Federal Reserve cut rates 50 basis points on September 18, 2024 \u2014 the first cut in over four years \u2014 moving the fed funds target to 4.75%-5.00%. An 11-1 vote; median FOMC participant penciled in 50 more bps of cuts in 2024 and 100 bps in 2025.",
+          "source": "CNBC / J.P. Morgan",
+          "url": "https://www.cnbc.com/2024/09/18/fed-cuts-rates-september-2024-.html",
+          "date": "2024-09-18"
+        },
+        {
+          "summary": "AGG yield-to-maturity stood at 4.20% as of September 9, 2024, above the Fed's long-run neutral rate estimate of 2.75%, suggesting the fund offered a positive real yield premium while the easing cycle was just beginning.",
+          "source": "Advisor Perspectives / iShares",
+          "url": "https://www.ishares.com/us/products/239458/ishares-core-total-us-bond-market-etf",
+          "date": "2024-09-09"
+        }
+      ]
+    },
+    "BIL": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "BIL (SPDR Bloomberg 1-3 Month T-Bill ETF) tracked 1-3 month Treasury bills; with the fed funds rate at 5.25%-5.50% through September 17, 2024, BIL was delivering near-5% annualized yield with minimal duration and credit risk \u2014 the highest cash-equivalent yield in over 15 years.",
+          "source": "State Street SSGA / ETF Database",
+          "url": "https://www.ssga.com/us/en/intermediary/etfs/state-street-spdr-bloomberg-1-3-month-t-bill-etf-bil",
+          "date": "2024-09-01"
+        },
+        {
+          "summary": "Federal Reserve's 50-basis-point cut on September 18, 2024 initiated the easing cycle; BIL's yield is mechanically linked to short-term rates, meaning the fund's income yield will decline as the cutting cycle proceeds through 2024-2025.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2024/09/18/fed-cuts-rates-september-2024-.html",
+          "date": "2024-09-18"
+        }
+      ]
+    },
+    "IAU": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Gold prices were rising in 2024 driven by central bank demand (1,000+ tonnes purchased annually for three consecutive years through 2024) and anticipation of Federal Reserve rate cuts; IAU tracks spot gold and had been trending toward new all-time highs through Q3 2024.",
+          "source": "BullionVault / USAGOLD",
+          "url": "https://www.bullionvault.com/gold-news/gold-price-news/gold-silver-federal-reserve-rate-cut-082220243",
+          "date": "2024-08-22"
+        },
+        {
+          "summary": "The Fed's 50-basis-point cut on September 18, 2024 was viewed as broadly supportive of gold prices; historical Julius Baer analysis showed gold climbs 15%+ in the year following an initial rate cut coinciding with an economic slowdown.",
+          "source": "CNBC / Money.com",
+          "url": "https://money.com/interest-rate-cuts-and-the-price-of-gold/",
+          "date": "2024-09-18"
+        }
+      ]
+    },
+    "VIG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "VIG (Vanguard Dividend Appreciation ETF) excludes many high-growth tech companies (AMZN, TSLA, GOOGL, NVDA absent from the index) due to its dividend-growth criteria, leading to structural underweight in AI/tech relative to broad large-cap benchmarks in a period of tech-driven market leadership.",
+          "source": "Vanguard Investor Relations / StockAnalysis",
+          "url": "https://investor.vanguard.com/investment-products/etfs/profile/vig",
+          "date": "2024-09-01"
+        },
+        {
+          "summary": "With the Federal Reserve beginning its easing cycle in September 2024, dividend-growth equities in VIG (typically cash-flow-positive, quality-oriented companies) were expected to benefit from declining discount rates, which mechanically raises the present value of future dividend streams.",
+          "source": "CNBC / Russell Investments",
+          "url": "https://russellinvestments.com/content/ri/us/en/insights/russell-research/2024/09/the-first-cut-is-the-deepest-fed-kicks-off-easing-cycle-with-50-.html",
+          "date": "2024-09-18"
+        }
+      ]
+    }
+  },
+  "wave_stages": {
+    "AI": {
+      "stage": "surge",
+      "rationale": "Revenue is compounding at triple-digit rates across the major AI infrastructure plays. NVDA Q2 FY2025 data center revenue hit $26.3B (+154% YoY, 2024-08-28). GOOGL Cloud crossed $10B quarterly for the first time with $1B operating profit (2024-07-29). MSFT Azure AI customer base grew 60% YoY with 60,000+ customers (2024-07-30). Blackwell GPUs entered production with Jensen Huang describing demand as 'insane' and orders booked 12 months out. Adoption is real and compounding. However, the MSFT stock drop of ~7% on a 2-point Azure miss indicates stretched expectations, which is a cautionary sign. On balance, real revenue growth dominates and the wave reads surge, not yet peak.",
+      "evidence_tickers": [
+        "NVDA",
+        "GOOGL",
+        "MSFT"
+      ]
+    },
+    "rockets_spacecraft": {
+      "stage": "surge",
+      "rationale": "Rocket Lab (RKLB) reported Q2 2024 record revenue of $106M (+71% YoY, 2024-08-08) with a $1.07B total backlog and 70+ launches in the queue. Space Systems segment revenue is growing faster than launch. Electron is the global leader in small-launch. Commercial and government demand is compounding into a real backlog. Neutron remains in development \u2014 its delayed timeline is a risk but not a wave-cycle signal. The wave is in early-surge: real revenue, real customers, real backlog, but still pre-breakeven.",
+      "evidence_tickers": [
+        "RKLB"
+      ]
+    },
+    "nuclear_fusion": {
+      "stage": "surge",
+      "rationale": "The Constellation Energy / Microsoft Three Mile Island restart PPA (September 20, 2024) crystallized the AI-data-center-to-nuclear-power thesis with a real 20-year contract for 835 MW. CEG shares rose ~22% on the announcement. NUKZ ETF gained approximately 70% from its January 2024 launch through late September 2024. The fundamental driver \u2014 AI data center electricity demand growing from 19 GW to 35 GW by 2030 \u2014 is backed by FERC and Goldman Sachs projections available before 2024-10-01. Real contracts, real operating capacity, real demand driver = surge. Not yet peak because institutional nuclear capex commitments and regulatory restarts are still at the starting gun.",
+      "evidence_tickers": [
+        "NUKZ"
+      ]
+    },
+    "quantum": {
+      "stage": "buildup",
+      "rationale": "Research milestones are advancing \u2014 Google's error-correction paper (September 11, 2024) validated that logical qubits made of 105 physical qubits outperform physical qubits by 2.4x in lifespan, and IBM demonstrated utility-scale 100-qubit computations. However, no pure-play quantum vendor had commercial revenue as of Q3 2024. QTUM's holdings (IonQ, D-Wave, Rigetti) were pre-revenue or minimal-revenue. Progress visible in research data, not yet in stock-price revenue cycles. Classic buildup.",
+      "evidence_tickers": [
+        "QTUM",
+        "GOOGL"
+      ]
+    },
+    "robotics": {
+      "stage": "neutral",
+      "rationale": "No date-confirmed (\u2264 2024-09-30) bullet from this harvest provides a clear directional signal on the robotics wave specifically. BOTZ's holdings data lacked a confirmed pre-date performance figure. Per the grounding rule, insufficient evidence forces neutral.",
+      "evidence_tickers": [
+        "BOTZ"
+      ]
+    },
+    "general_markets": {
+      "stage": "neutral",
+      "rationale": "AGG, BIL, IAU, and VIG are not wave-aligned tickers. The Fed's 50-basis-point cut on September 18, 2024 is macro context, not a wave classification signal. Neutral by definition for general-markets tickers.",
+      "evidence_tickers": [
+        "AGG",
+        "BIL",
+        "IAU",
+        "VIG"
+      ]
+    }
+  },
+  "wave_views": {
+    "NVDA": "surge",
+    "GOOGL": "surge",
+    "MSFT": "surge",
+    "RKLB": "surge",
+    "NUKZ": "surge",
+    "QTUM": "buildup",
+    "BOTZ": "neutral",
+    "AGG": "neutral",
+    "BIL": "neutral",
+    "IAU": "neutral",
+    "VIG": "neutral"
+  },
+  "exclusion_conflicts": [],
+  "thematic_concerns": [],
+  "self_critique_downgrades": []
+}

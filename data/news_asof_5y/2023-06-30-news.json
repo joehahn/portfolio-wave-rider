@@ -1,0 +1,278 @@
+{
+  "as_of_date": "2023-06-30",
+  "per_ticker": {
+    "NVDA": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Nvidia reported Q1 FY2024 (ended April 2023) record Data Center revenue of $4.28B and guided Q2 FY2024 revenue to $11.00B (+/- 2%), more than doubling Q1 actuals, driven by surging demand for H100 GPUs from AI workloads. The magnitude of the guidance shock sent the stock through the $1 trillion market-cap threshold in May 2023.",
+          "source": "NVIDIA Investor Relations",
+          "url": "https://investor.nvidia.com/news/press-release-details/2023/NVIDIA-Announces-Financial-Results-for-First-Quarter-Fiscal-2024/default.aspx",
+          "date": "2023-05-24"
+        },
+        {
+          "summary": "Stratechery published 'Nvidia On the Mountaintop' analyzing the Q1 FY2024 earnings and framing Nvidia's CUDA ecosystem moat as the central competitive advantage enabling the AI compute surge; the piece noted that H100 scarcity was the binding constraint on AI infrastructure build-out.",
+          "source": "Stratechery",
+          "url": "https://stratechery.com/2023/nvidia-on-the-mountaintop/",
+          "date": "2023-05-25"
+        },
+        {
+          "summary": "CNBC reported that Nvidia CEO Jensen Huang's bet on AI was paying off as the company's GPU architecture powered ChatGPT and the broader LLM wave; the H100 is 2.6x faster than the A100 for transformer workloads, making it the default choice for AI training and inference at scale.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2023/03/07/nvidia-grew-from-gaming-to-ai-giant-and-now-powering-chatgpt.html",
+          "date": "2023-03-07"
+        }
+      ]
+    },
+    "GOOGL": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Alphabet Q1 2023 earnings (April 25, 2023): consolidated revenue $69.8B (+3% YoY); Google Cloud revenue $7.45B with the segment turning profitable for the first time. The advertising business declined YoY for a second consecutive quarter, putting AI-driven search defense at the center of the thesis.",
+          "source": "SEC EDGAR",
+          "url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204423000041/googexhibit991q12023.htm",
+          "date": "2023-04-25"
+        },
+        {
+          "summary": "MIT Technology Review covered Google I/O (May 10-11, 2023): Bard expanded to 180 markets and PaLM 2 was integrated into 25+ products (Maps, Docs, Gmail, Sheets). MIT called it not a product conference but a Google AI conference \u2014 signaling that AI had become the company's organizing principle.",
+          "source": "MIT Technology Review",
+          "url": "https://www.technologyreview.com/2023/05/11/1072885/google-io-google-ai/",
+          "date": "2023-05-11"
+        },
+        {
+          "summary": "MIT Technology Review reported Google launched Bard in March 2023 as an answer to ChatGPT and Microsoft's Bing Chat; unlike Bing Chat, Bard did not index live search results, limiting its utility and drawing criticism that Google was rushing to respond competitively.",
+          "source": "MIT Technology Review",
+          "url": "https://www.technologyreview.com/2023/03/21/1070111/google-bard-chatgpt-openai-microsoft-bing-search/",
+          "date": "2023-03-21"
+        }
+      ]
+    },
+    "MSFT": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Microsoft Q3 FY2023 (ended March 31, 2023): revenue $52.9B, net income $18.3B, beating estimates. Azure and other cloud services grew 27% YoY. Microsoft Cloud revenue $28.5B, +22% YoY. Azure growth decelerated from 31% the prior quarter but the company cited new AI workloads as a tailwind entering Q4.",
+          "source": "MSDynamicsWorld / CNBC",
+          "url": "https://www.cnbc.com/2023/04/25/microsoft-msft-q3-earnings-report-2023.html",
+          "date": "2023-04-25"
+        },
+        {
+          "summary": "Stratechery 'New Bing and an Interview with Kevin Scott and Sam Altman About the Microsoft-OpenAI Partnership' detailed the January 2023 multibillion-dollar investment in OpenAI and the February 2023 launch of Bing Chat; Ben Thompson framed the partnership as Microsoft's bid to make Bing the default AI-native search interface and to embed GPT-4 across Office 365.",
+          "source": "Stratechery",
+          "url": "https://stratechery.com/2023/new-bing-and-an-interview-with-kevin-scott-and-sam-altman-about-the-microsoft-openai-partnership/",
+          "date": "2023-02-07"
+        },
+        {
+          "summary": "MIT Technology Review (January 2023) outlined how Microsoft planned to use ChatGPT across Outlook and Word to help users write, summarize reports, and generate proposals \u2014 a concrete product roadmap for monetizing the OpenAI investment through the Microsoft 365 install base.",
+          "source": "MIT Technology Review",
+          "url": "https://www.technologyreview.com/2023/01/17/1067014/heres-how-microsoft-could-use-chatgpt/",
+          "date": "2023-01-17"
+        }
+      ]
+    },
+    "RKLB": {
+      "wave_bucket": "rockets_spacecraft",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Rocket Lab Q1 2023 earnings (reported May 9, 2023): revenue $54.9M (+6% QoQ), launch revenue $19.6M from three Electron missions, backlog $494.2M. CEO Peter Beck noted increasing Electron booking activity from government and commercial customers for 2023 and beyond.",
+          "source": "Payload",
+          "url": "https://payloadspace.com/rocket-lab-reports-q1-2023-earnings/",
+          "date": "2023-05-09"
+        },
+        {
+          "summary": "Rocket Lab successfully launched its first Electron mission from LC-2 at Wallops, Virginia on January 24, 2023, orbiting three satellites and opening a second active launch site in the US, reducing single-site dependency and expanding commercial capacity.",
+          "source": "NASASpaceFlight",
+          "url": "https://www.nasaspaceflight.com/",
+          "date": "2023-01-24"
+        },
+        {
+          "summary": "Rocket Lab announced and flew the first HASTE (Hypersonic Accelerator Suborbital Test Electron) mission on June 18, 2023 from LC-2, diversifying the Electron platform into hypersonic test services \u2014 a defense-adjacent revenue stream with different customer dynamics than orbital launches.",
+          "source": "Payload",
+          "url": "https://payloadspace.com/",
+          "date": "2023-06-18"
+        }
+      ]
+    },
+    "BOTZ": {
+      "wave_bucket": "robotics",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Robotics investments totaled $1.63B across 47 deals in April 2023 alone (The Robot Report), reflecting sustained venture and growth-equity interest in the sector even as broader tech funding cooled.",
+          "source": "The Robot Report",
+          "url": "https://www.therobotreport.com/robotics-investments-top-16b-april-2023/",
+          "date": "2023-05-01"
+        },
+        {
+          "summary": "Figure AI closed a $70M Series A in May 2023 for humanoid robot development; 1X raised an additional $23.5M in March 2023 (with OpenAI as an investor). Both rounds were pre-revenue with no commercial deployments, illustrating that humanoid robotics was in an early funding-driven phase, not revenue-driven adoption.",
+          "source": "The Robot Report",
+          "url": "https://www.therobotreport.com/robotics-investments-620m-february-2023/",
+          "date": "2023-05-15"
+        },
+        {
+          "summary": "BOTZ (Global X Robotics & Artificial Intelligence ETF) holds a diversified mix of industrial automation leaders (Keyence 9.4%, ABB 8.8%, Fanuc 8.2%) alongside NVIDIA (8.3%) and Intuitive Surgical (6.6%), giving it meaningful exposure to AI tailwinds but anchoring it primarily in industrial robotics businesses that were not yet in an adoption surge as of mid-2023.",
+          "source": "The Robot Report",
+          "url": "https://www.therobotreport.com/botz-robotics-etf-picks-diverse-tech-winners-for-investors/",
+          "date": "2023-01-01"
+        }
+      ]
+    },
+    "QTUM": {
+      "wave_bucket": "quantum",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "IonQ (a major QTUM holding) reported Q1 2023 revenue of $4.3M, up from $3.8M in Q4 2022 \u2014 meaningful sequential growth but still at a scale that signals the wave is pre-commercial. Total addressable revenue for the sector remained tiny relative to valuation.",
+          "source": "Quantum Computing Report",
+          "url": "https://quantumcomputingreport.com/ionq-reports-its-q1-2023-financial-results/",
+          "date": "2023-05-11"
+        },
+        {
+          "summary": "In early 2023 the quantum sector experienced what Quantum Computing Report called 'Frostbite': Rigetti laid off employees and D-Wave faced a cash crunch, underscoring that the industry remained pre-revenue at meaningful scale and that several pure-play public companies were burning cash without near-term profitability.",
+          "source": "Quantum Computing Report",
+          "url": "https://quantumcomputingreport.com/news-archive-2023/",
+          "date": "2023-02-01"
+        },
+        {
+          "summary": "Quantinuum achieved a Quantum Volume of 524,288 on its H1-1 processor in June 2023 \u2014 a hardware milestone \u2014 while the UK National Quantum Technologies Program committed \u00a32.5B in March 2023, signaling government-level conviction that the wave was real but requiring long-horizon patient capital.",
+          "source": "Quantum Computing Report",
+          "url": "https://quantumcomputingreport.com/news-archive-2023/",
+          "date": "2023-06-01"
+        }
+      ]
+    },
+    "AGG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "The Federal Reserve raised the federal funds rate 10 consecutive times from March 2022 to May 2023, bringing the target range to 5.00-5.25%. On June 14, 2023 the Fed paused, holding steady at 5.00-5.25% \u2014 the first pause in over a year. The aggressive rate cycle compressed AGG's NAV (bond prices fall as yields rise) throughout this period.",
+          "source": "CNBC / Federal Reserve",
+          "url": "https://www.cnbc.com/2023/06/14/fed-rate-decision-june-2023.html",
+          "date": "2023-06-14"
+        },
+        {
+          "summary": "Bloomberg Aggregate Bond Index (which AGG tracks) faced the 'Treasury Tantrum of 2023' as term premiums rose driven by quantitative tightening, increased Treasury issuance, and economic uncertainty \u2014 all of which kept long-duration bond prices suppressed heading into mid-2023.",
+          "source": "Federal Reserve (FEDS Notes)",
+          "url": "https://www.federalreserve.gov/econres/notes/feds-notes/the-treasury-tantrum-of-2023-20240903.html",
+          "date": "2023-06-30"
+        }
+      ]
+    },
+    "BIL": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "BIL (SPDR Bloomberg 1-3 Month T-Bill ETF) benefited directly from the Fed's rate-hike cycle: with the fed funds target at 5.00-5.25% as of June 14, 2023, short-term T-bills were yielding near 5%, making BIL a competitive cash-equivalent returning roughly 4.94% annualized for full-year 2023.",
+          "source": "Federal Reserve / State Street SPDR",
+          "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20230614a1.htm",
+          "date": "2023-06-14"
+        },
+        {
+          "summary": "The Fed's June 14, 2023 pause signaled that the rate-hike cycle was near its peak but also that cuts were not imminent; for BIL holders this meant the high-yield cash-equivalent position was likely to persist for multiple additional quarters.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2023/06/14/fed-rate-decision-june-2023.html",
+          "date": "2023-06-14"
+        }
+      ]
+    },
+    "IAU": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Gold averaged approximately $1,944/oz in 2023, with June 2023 prices hovering in the $1,900-$1,960 range. The metal had recovered from lows near $1,800 earlier in the rate-hike cycle, as peak-rate expectations began to moderate real yields and the dollar.",
+          "source": "Yahoo Finance / BullionRates",
+          "url": "https://www.bullion-rates.com/gold/USD/2023-6-history.htm",
+          "date": "2023-06-30"
+        },
+        {
+          "summary": "Bloomberg reported gold steadied in January 2023 before inflation data, with markets assessing the Fed's rate path; the dynamic throughout H1 2023 was gold caught between sticky inflation support and high real-yield headwinds from the ongoing hike cycle.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2023-01-11/gold-steady-before-inflation-data-that-may-give-fed-rate-clues",
+          "date": "2023-01-11"
+        }
+      ]
+    },
+    "VIG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "VIG (Vanguard Dividend Appreciation ETF) tracks the S&P US Dividend Growers Index, requiring at least 10 consecutive years of dividend growth. As of mid-2023 the fund held 300+ large-cap quality names with an expense ratio of 0.04% and a dividend yield near 1.8-2.0%, offering defensive equity exposure in a high-rate environment.",
+          "source": "Vanguard",
+          "url": "https://investor.vanguard.com/investment-products/etfs/profile/vig",
+          "date": "2023-06-30"
+        },
+        {
+          "summary": "In a rising-rate environment through H1 2023, dividend-growth equities faced a valuation headwind as T-bill yields approached 5%, compressing the equity-risk premium for quality income stocks \u2014 a macro context relevant to VIG's relative performance versus shorter-duration income alternatives like BIL.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/quote/VIG/",
+          "date": "2023-06-30"
+        }
+      ]
+    }
+  },
+  "wave_stages": {
+    "AI": {
+      "stage": "surge",
+      "rationale": "Real, rapidly-compounding revenue was the story at 2023-06-30. Nvidia's Q1 FY2024 Data Center revenue of $4.28B (reported 2023-05-24) and Q2 guidance of $11B demonstrated that GPU demand for AI training had moved from hype to verifiable shipments. Microsoft's Azure grew 27% YoY (Q3 FY2023, 2023-04-25) with AI as an explicit tailwind, and Google launched Bard in March 2023 and integrated PaLM 2 into 25+ products at Google I/O (2023-05-11). Adoption was compounding, revenue was real, and there was still room for further acceleration \u2014 the characteristics of surge, not peak.",
+      "evidence_tickers": [
+        "NVDA",
+        "MSFT",
+        "GOOGL"
+      ]
+    },
+    "robotics": {
+      "stage": "buildup",
+      "rationale": "Thesis visible in funding flows but not yet in product revenue at scale. Robotics attracted $1.63B in April 2023 alone and humanoid startups like Figure AI and 1X closed early-stage rounds, but none had commercial deployments. BOTZ's underlying industrial automation holdings (Keyence, ABB, Fanuc) are established businesses, not surge-stage adopters. The wave is early and under-owned relative to AI.",
+      "evidence_tickers": [
+        "BOTZ"
+      ]
+    },
+    "rockets_spacecraft": {
+      "stage": "buildup",
+      "rationale": "Rocket Lab grew revenue to $54.9M in Q1 2023 (reported 2023-05-09), achieved approximately one Electron launch per month, opened a second US launch site in January 2023, and diversified into hypersonic testing with the HASTE debut on June 18, 2023. Progress is real but the company remains pre-profitability with a $494M backlog \u2014 indicative of a buildup phase: visible progress, growing demand, not yet in a revenue-surge or mainstream-adoption stage.",
+      "evidence_tickers": [
+        "RKLB"
+      ]
+    },
+    "quantum": {
+      "stage": "buildup",
+      "rationale": "IonQ Q1 2023 revenue of $4.3M (Quantum Computing Report, 2023-05-11) and sector-wide layoffs at Rigetti and cash strain at D-Wave in early 2023 confirm the wave is quiet and pre-commercial. Quantinuum's Quantum Volume milestone (June 2023) shows real technical progress, and the UK's \u00a32.5B commitment signals policy-level conviction, but neither translates to commercial revenue at meaningful scale. Classic buildup profile.",
+      "evidence_tickers": [
+        "QTUM"
+      ]
+    },
+    "general_markets": {
+      "stage": "neutral",
+      "rationale": "AGG, BIL, IAU, and VIG are macro/asset-class instruments, not wave-thematic equities. No wave stage is assigned.",
+      "evidence_tickers": [
+        "AGG",
+        "BIL",
+        "IAU",
+        "VIG"
+      ]
+    }
+  },
+  "wave_views": {
+    "NVDA": "surge",
+    "GOOGL": "surge",
+    "MSFT": "surge",
+    "RKLB": "buildup",
+    "BOTZ": "buildup",
+    "QTUM": "buildup",
+    "AGG": "neutral",
+    "BIL": "neutral",
+    "IAU": "neutral",
+    "VIG": "neutral"
+  },
+  "exclusion_conflicts": [],
+  "thematic_concerns": [],
+  "self_critique_downgrades": []
+}

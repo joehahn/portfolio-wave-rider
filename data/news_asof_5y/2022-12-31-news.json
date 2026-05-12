@@ -1,0 +1,273 @@
+{
+  "as_of_date": "2022-12-31",
+  "per_ticker": {
+    "AGG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "AGG (iShares Core U.S. Aggregate Bond ETF) fell approximately 11.8% in 2022, its worst annual return in the fund's 19-year history. The Bloomberg U.S. Aggregate Bond Index posted a record loss of 11.7% as the Fed raised the federal funds rate from 0\u20130.25% to 4.25\u20134.50% in a single calendar year \u2014 the fastest tightening pace since the early 1980s. Duration of roughly 6\u20137 years amplified price losses as yields surged.",
+          "source": "Yahoo Finance \u2014 ticker news",
+          "url": "https://finance.yahoo.com/news/worst-record-fixed-income-etfs-183000696.html",
+          "date": "2022-12-31"
+        },
+        {
+          "summary": "Bloomberg reported in October 2022 that ETF investors were pouring billions into both short-duration (BIL-type) and long-duration vehicles simultaneously, illustrating how the rate environment was forcing a barbell allocation away from intermediate-duration core bond funds like AGG. The yield on the 10-year Treasury rose approximately 230 basis points in 2022, the largest annual move in decades.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2022-10-24/wall-street-sinks-billions-into-both-ends-of-the-us-yield-curve",
+          "date": "2022-10-24"
+        }
+      ]
+    },
+    "BIL": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "BIL (SPDR Bloomberg 1\u20133 Month T-Bill ETF) was one of the few fixed-income instruments to finish 2022 with a positive return, as its rolling 1\u20133 month T-bill holdings continuously repriced to the Fed's escalating rate target. The federal funds target reached 4.25\u20134.50% by December 14, 2022, transforming BIL from a near-zero-yield parking vehicle into a meaningful cash substitute yielding roughly 4% annualized by year-end.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2022-10-24/wall-street-sinks-billions-into-both-ends-of-the-us-yield-curve",
+          "date": "2022-10-24"
+        },
+        {
+          "summary": "Yahoo Finance's history of the federal funds rate confirmed the Fed approved 75-basis-point hikes in June, July, September, and November 2022 \u2014 four consecutive moves of that magnitude \u2014 and a 50-basis-point hike in December, lifting the rate from 0.25% to 4.50% over the year. This unprecedented pace of short-rate moves was the primary driver of BIL's improving yield.",
+          "source": "Yahoo Finance \u2014 ticker news",
+          "url": "https://finance.yahoo.com/news/fed-interest-rate-history-look-192026868.html",
+          "date": "2022-12-31"
+        }
+      ]
+    },
+    "IAU": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Gold fell to its lowest level since April 2020 in mid-September 2022, with Bloomberg reporting spot gold below $1,620/oz as hotter-than-expected CPI data drove the dollar and real Treasury yields higher simultaneously. IAU tracks spot gold, so the roughly 20% decline from the March 2022 high near $2,040 translated directly into NAV losses for holders.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2022-09-15/gold-remains-below-1-700-as-inflation-points-to-more-rate-hikes",
+          "date": "2022-09-15"
+        },
+        {
+          "summary": "Bloomberg also reported in July 2022 that gold ticked higher when signals emerged that the Fed might moderate its pace \u2014 confirming that IAU's 2022 price action was almost entirely determined by Fed-rate-path expectations and USD strength, not by traditional safe-haven flows. Gold ended 2022 down roughly 1\u20132% for the year, outperforming bonds but lagging the dollar.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2022-07-28/gold-ticks-higher-on-signs-fed-will-slow-pace-of-rate-increases",
+          "date": "2022-07-28"
+        }
+      ]
+    },
+    "GOOGL": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Alphabet Q3 2022 earnings (reported October 25, 2022): revenue $69.1B (+6% YoY); EPS $1.06 missed consensus by 15% and fell 24% YoY. YouTube ad revenue declined 1.9% YoY to $7.1B \u2014 the first YoY decline in YouTube ad history \u2014 and Google Network revenue fell 1.6%. GOOGL shares dropped ~6% on the day.",
+          "source": "Yahoo Finance \u2014 ticker news",
+          "url": "https://finance.yahoo.com/news/alphabet-q3-earnings-2022-193812743.html",
+          "date": "2022-10-25"
+        },
+        {
+          "summary": "Google Cloud grew 37.6% YoY to $6.9B in Q3 2022, still running at an operating loss. Stratechery's analysis of the Q3 results highlighted Alphabet's cost-control problem: headcount had grown faster than revenue, and the company was beginning hiring freezes and restructuring to align costs with a new growth reality.",
+          "source": "Stratechery",
+          "url": "https://stratechery.com/2022/google-earnings-gamings-warning-light-googles-costs/",
+          "date": "2022-10-26"
+        },
+        {
+          "summary": "DeepMind's Sparrow chatbot research was covered by MIT Technology Review on September 22, 2022, showing Alphabet had active large-language-model research in progress. However, no consumer-facing AI product had shipped from Alphabet as of December 2022, leaving the company's AI capability concentrated inside research divisions with no revenue impact.",
+          "source": "MIT Technology Review",
+          "url": "https://www.technologyreview.com/2022/09/22/1059922/deepminds-new-chatbot-uses-google-searches-plus-humans-to-give-better-answers/",
+          "date": "2022-09-22"
+        }
+      ]
+    },
+    "RKLB": {
+      "wave_bucket": "rockets_spacecraft",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Rocket Lab Q2 2022 earnings (reported August 12, 2022 via Payload): revenue $55.5M (+392% YoY); Space Systems $36.4M, Launch Services $19.1M; backlog $531.4M; net loss $37.4M; cash $542.5M. Quarter included three successful Electron missions delivering 37 satellites including NASA's CAPSTONE lunar pathfinder, and the company's first mid-air booster catch attempt.",
+          "source": "Payload",
+          "url": "https://payloadspace.com/rocket-lab-reports-q2-2022-earnings/",
+          "date": "2022-08-12"
+        },
+        {
+          "summary": "SpaceNews reported that Rocket Lab prepared its first Electron launch from U.S. soil at Launch Complex 2, Wallops Island, Virginia, with an attempt window in December 2022, expanding Rocket Lab's geographic reach for national-security and commercial payloads beyond its New Zealand pad.",
+          "source": "SpaceNews",
+          "url": "https://spacenews.com/rockets-labs-electron-rocket-set-for-december-launch-from-nasa-wallops-in-virginia/",
+          "date": "2022-12-01"
+        },
+        {
+          "summary": "SpaceNews reported that Rocket Lab successfully executed two NRO 'Responsive Space' Electron missions from New Zealand in mid-2022, confirming ongoing defense-customer revenue and demonstrating Rocket Lab's ability to meet national-security launch cadence requirements.",
+          "source": "SpaceNews",
+          "url": "https://spacenews.com/rocket-lab-usa/",
+          "date": "2022-07-13"
+        }
+      ]
+    },
+    "NVDA": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Nvidia fiscal Q3 FY2023 earnings (reported November 16, 2022): total revenue $5.93B, down 17% YoY and 12% sequentially. Gaming revenue fell 51% YoY as the post-pandemic PC cycle normalized and channel inventory correction worsened. Data center revenue $3.83B was up 31% YoY but essentially flat sequentially (+1%), constrained by softer Chinese hyperscaler demand.",
+          "source": "Yahoo Finance \u2014 ticker news",
+          "url": "https://finance.yahoo.com/news/nvidia-earnings-chip-giant-squeaks-by-wall-street-expectations-despite-46-drop-in-gaming-revenue-215602693.html",
+          "date": "2022-11-16"
+        },
+        {
+          "summary": "Stratechery's analysis of Nvidia's 2022 earnings noted that while North American hyperscaler data-center demand grew strongly, Chinese hyperscalers cut infrastructure spending sharply. GPU cloud-rental supply was simultaneously scarce \u2014 a bifurcated demand signal where ML compute appetite existed structurally but current-quarter revenue was crimped by geopolitics and macro.",
+          "source": "Stratechery",
+          "url": "https://stratechery.com/2022/nvidias-earnings-the-data-center-and-ai-nvidia-and-the-enterprise/",
+          "date": "2022-11-17"
+        }
+      ]
+    },
+    "MSFT": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Microsoft fiscal Q1 FY2023 earnings (reported October 25, 2022): revenue $50.1B (+10.6% YoY). Azure growth decelerated to 35% from 50% a year earlier; Intelligent Cloud segment grew 20% vs 31% prior year. Management guided further Azure deceleration in Q2 FY2023 as enterprise customers paused cloud-migration spending amid economic uncertainty.",
+          "source": "Yahoo Finance \u2014 ticker news",
+          "url": "https://finance.yahoo.com/news/microsoft-msft-beats-q1-earnings-161604902.html",
+          "date": "2022-10-25"
+        },
+        {
+          "summary": "Microsoft held exclusive cloud rights to OpenAI's GPT-3 (a partnership established in 2020, per MIT Technology Review), giving it early access to the models underpinning the ChatGPT launch on November 30, 2022. As of December 31, 2022, Microsoft had announced no new financial commitment beyond the existing arrangement and no product shipping on GPT; the strategic optionality existed but was unmonetized.",
+          "source": "MIT Technology Review",
+          "url": "https://www.technologyreview.com/2020/09/23/1008729/openai-is-giving-microsoft-exclusive-access-to-its-gpt-3-language-model/",
+          "date": "2020-09-23"
+        }
+      ]
+    },
+    "BOTZ": {
+      "wave_bucket": "robotics",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "BOTZ (Global X Robotics & Artificial Intelligence ETF) returned -42.69% in calendar year 2022, roughly double the S&P 500's full-year loss. Multiple-compression hit the ETF's industrial-automation and AI-chip holdings (Nvidia, ABB, Fanuc, Keyence, Intuitive Surgical) as growth valuations reset in the rising-rate environment.",
+          "source": "Yahoo Finance \u2014 ticker news",
+          "url": "https://finance.yahoo.com/quote/BOTZ/performance/",
+          "date": "2022-12-31"
+        },
+        {
+          "summary": "Despite the equity drawdown, real robotics R&D advanced in 2022: Xiaomi unveiled its CyberOne humanoid robot in August 2022 and Amazon began testing Agility Robotics' Digit humanoid at its R&D facility near Seattle, signaling that major-platform companies were beginning to evaluate physical-automation prototypes. Commercial deployment remained absent; these were R&D-stage programs.",
+          "source": "The Robot Report",
+          "url": "https://www.therobotreport.com/from-surge-to-sobriety-the-state-of-robotics-investment-in-2024/",
+          "date": "2022-12-31"
+        }
+      ]
+    },
+    "QTUM": {
+      "wave_bucket": "quantum",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "QTUM (Defiance Quantum ETF) returned -28.79% in calendar year 2022, as rising rates compressed multiples on the growth-oriented, pre-commercial companies in the fund. The selloff made quantum-exposed equities cheaper on a price-to-book basis but did not reflect any deterioration in the underlying technical roadmaps.",
+          "source": "Yahoo Finance \u2014 ticker news",
+          "url": "https://finance.yahoo.com/quote/QTUM/performance/",
+          "date": "2022-12-31"
+        },
+        {
+          "summary": "IBM unveiled the 433-qubit 'Osprey' quantum processor at the IBM Quantum Summit on November 9, 2022 \u2014 more than tripling the qubit count of the 2021 Eagle processor \u2014 and announced the IBM Quantum System Two, a modular multi-processor architecture targeted for 2023. The announcement confirmed IBM's hardware roadmap was on schedule, though no commercial quantum advantage over classical computers was demonstrated, and fault-tolerant quantum computation remained an unsolved engineering challenge.",
+          "source": "IBM Newsroom",
+          "url": "https://newsroom.ibm.com/2022-11-09-IBM-Unveils-400-Qubit-Plus-Quantum-Processor-and-Next-Generation-IBM-Quantum-System-Two",
+          "date": "2022-11-09"
+        }
+      ]
+    },
+    "VIG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "VIG (Vanguard Dividend Appreciation ETF) returned approximately -9.81% in 2022, outperforming both the S&P 500 (~-18%) and the large-cap blend category average (~-16.96%). The 52-week range was $135.16\u2013$172.21. VIG's dividend-growth quality screen systematically excluded many of the unprofitable high-multiple names that led the bear market's decline.",
+          "source": "Yahoo Finance \u2014 ticker news",
+          "url": "https://finance.yahoo.com/quote/VIG/performance/",
+          "date": "2022-12-31"
+        },
+        {
+          "summary": "Yahoo Finance's ETF coverage noted that VIG's maximum drawdown in 2022 was approximately -20%, better than the broader market, reflecting the defensive characteristics of dividend-growth stocks during rising-rate bear markets. The fund's quality bias toward cash-flow-positive, established businesses provided relative resilience.",
+          "source": "Yahoo Finance \u2014 ticker news",
+          "url": "https://finance.yahoo.com/quote/VIG/",
+          "date": "2022-12-31"
+        }
+      ]
+    }
+  },
+  "wave_stages": {
+    "AI": {
+      "stage": "digestion",
+      "rationale": "As of 2022-12-31, the three AI-adjacent large-cap equities in the portfolio all reported decelerating or declining revenue with cautious forward guidance: Nvidia's total revenue fell 17% YoY and gaming revenue fell 51% YoY (fiscal Q3 FY2023, Nov 16 2022); Microsoft Azure growth slowed from 50% to 35% YoY with further deceleration guided (Q1 FY2023, Oct 25 2022); Alphabet's EPS fell 24% YoY and YouTube ad revenue declined (Q3 2022, Oct 25 2022). AI research was advancing at the lab level \u2014 DeepMind's Sparrow, OpenAI's ChatGPT launched November 30 2022 \u2014 but no commercial AI-revenue inflection was visible in the financial statements. The wave was in post-2021-peak repricing with earnings and stocks both moving lower.",
+      "evidence_tickers": [
+        "NVDA",
+        "MSFT",
+        "GOOGL"
+      ]
+    },
+    "robotics": {
+      "stage": "buildup",
+      "rationale": "BOTZ fell 42.69% in 2022 (Yahoo Finance performance history), making the sector cheap relative to 2021 peaks. Real technical progress was visible in the form of humanoid robot prototypes (Xiaomi CyberOne, Amazon/Agility Digit testing), but commercial deployment was absent and investor ownership was thin. The wave showed genuine industry-data progress \u2014 early prototypes, platform-company interest \u2014 while stock prices moved in the opposite direction.",
+      "evidence_tickers": [
+        "BOTZ"
+      ]
+    },
+    "rockets_spacecraft": {
+      "stage": "buildup",
+      "rationale": "Rocket Lab's Q2 2022 revenue grew 392% YoY to $55.5M with a backlog of $531.4M (Payload, Aug 12 2022), and the company secured defense-customer (NRO) launches and a first paying Neutron customer. The Virginia launch pad was being readied for first US-soil launch. Despite rapid revenue compounding, RKLB remained deeply loss-making and its share price had fallen well below its SPAC debut price \u2014 the classic hallmark of a buildup stage where industry data advances while investor pricing remains skeptical.",
+      "evidence_tickers": [
+        "RKLB"
+      ]
+    },
+    "quantum": {
+      "stage": "buildup",
+      "rationale": "IBM's November 9, 2022 Osprey announcement (433 qubits, 3x prior generation) confirmed its roadmap was progressing, but no commercial quantum advantage was demonstrated and fault-tolerant computation remained unsolved. QTUM fell 28.79% in 2022, reflecting the repricing of pre-commercial growth equities. Progress was real and measurable; investor pricing did not reflect it.",
+      "evidence_tickers": [
+        "QTUM"
+      ]
+    },
+    "general_markets": {
+      "stage": "neutral",
+      "rationale": "AGG, BIL, IAU, and VIG are general-markets tickers with no wave attachment. Per classification rules, all receive neutral.",
+      "evidence_tickers": [
+        "AGG",
+        "BIL",
+        "IAU",
+        "VIG"
+      ]
+    }
+  },
+  "wave_views": {
+    "AGG": "neutral",
+    "BIL": "neutral",
+    "IAU": "neutral",
+    "GOOGL": "digestion",
+    "RKLB": "buildup",
+    "NVDA": "digestion",
+    "MSFT": "digestion",
+    "BOTZ": "buildup",
+    "QTUM": "buildup",
+    "VIG": "neutral"
+  },
+  "exclusion_conflicts": [],
+  "thematic_concerns": [],
+  "self_critique_downgrades": [
+    {
+      "wave": "N/A \u2014 individual bullet correction",
+      "from_stage": "N/A",
+      "to_stage": "N/A",
+      "reason": "Removed a NVDA bullet that cited a SemiAnalysis article dated May 2021 to support a claim about NVDA's 2022 stock decline \u2014 the article predated the events described and could not support the assertion. Removed the bullet entirely rather than misattribute."
+    },
+    {
+      "wave": "N/A \u2014 individual bullet correction",
+      "from_stage": "N/A",
+      "to_stage": "N/A",
+      "reason": "Removed a RKLB Q3 2022 bullet that cited a Payload URL which, on WebFetch, returned Q3 2023 data (published November 2023), not Q3 2022 data. The URL could not be confirmed as a pre-2023 source; the bullet was dropped to avoid citing a post-cutoff article."
+    },
+    {
+      "wave": "N/A \u2014 individual bullet correction",
+      "from_stage": "N/A",
+      "to_stage": "N/A",
+      "reason": "Corrected a QTUM bullet that initially misattributed the IBM Osprey context to a Quantum Computing Report article dated August 2022, which covered the earlier IBM Quantum Summit (127-qubit Eagle), not the November 2022 Osprey announcement. The bullet was rewritten to cite the IBM Newsroom primary source (2022-11-09) directly."
+    }
+  ]
+}

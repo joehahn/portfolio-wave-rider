@@ -1,0 +1,302 @@
+{
+  "as_of_date": "2021-09-30",
+  "per_ticker": {
+    "AGG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Fed Chair Powell at the September 22, 2021 FOMC meeting signaled the central bank could begin tapering bond purchases in November 2021 and complete the process by mid-2022, with markets having already priced in a late-2021 taper start; AGG faces duration headwinds as rates normalize.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2021-09-22/fed-signals-bond-buying-taper-may-start-soon-split-on-2022-hike",
+          "date": "2021-09-22"
+        },
+        {
+          "summary": "Fed Governor Waller (August 2, 2021) said strong job reports may warrant a September taper call, and noted a late-2021 taper was already priced in by most market participants, suggesting limited additional bond repricing risk but confirming the directional headwind for AGG.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2021-08-02/waller-says-strong-job-reports-may-warrant-september-taper-call",
+          "date": "2021-08-02"
+        },
+        {
+          "summary": "A Bloomberg survey published September 17, 2021 showed economists expecting a November taper announcement with rate liftoff in 2023, reinforcing the near-term ceiling on bond prices and ongoing headwind to AGG's total return.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2021-09-17/fed-seen-announcing-bond-taper-in-november-rate-liftoff-in-2023",
+          "date": "2021-09-17"
+        }
+      ]
+    },
+    "BIL": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "As of September 30, 2021, the Federal Reserve's policy rate remained at 0-0.25%, leaving 1-3 month T-bill yields essentially flat near zero; BIL functioned as a cash-equivalent holding with negligible income return in Q3 2021.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2021-09-22/fed-signals-bond-buying-taper-may-start-soon-split-on-2022-hike",
+          "date": "2021-09-22"
+        },
+        {
+          "summary": "Fed's tapering trajectory (asset-purchase taper expected November 2021, rate hikes not until 2023 per September 17 Bloomberg survey) meant BIL would remain near-zero yielding for the foreseeable near term, serving primarily as a liquidity sleeve rather than an income source.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2021-09-17/fed-seen-announcing-bond-taper-in-november-rate-liftoff-in-2023",
+          "date": "2021-09-17"
+        }
+      ]
+    },
+    "IAU": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Gold gained after Fed Chair Powell at Jackson Hole (August 27, 2021) stopped short of providing a specific taper timeline, providing a brief relief rally for the metal; IAU tracks gold spot price directly.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2021-08-27/gold-edges-higher-as-fed-s-powell-stops-short-of-taper-timeline",
+          "date": "2021-08-27"
+        },
+        {
+          "summary": "Gold advanced on September 14, 2021 after softer-than-expected U.S. CPI (+0.3% MoM, smallest advance in seven months), easing near-term taper urgency; dollar and Treasury yields dipped, supporting non-interest-bearing bullion and IAU.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2021-09-14/gold-holds-gain-ahead-of-u-s-cpi-with-taper-timeline-in-focus",
+          "date": "2021-09-14"
+        },
+        {
+          "summary": "Gold had its worst month since 2016 in June 2021 on dollar strength and Fed hawkishness; the taper-signal-driven gold weakness dominated Q2-Q3 2021, leaving IAU down from its August 2020 all-time high and range-bound as of Q3-end.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2021-06-30/gold-heads-for-worst-month-since-2016-on-dollar-strength-fed",
+          "date": "2021-06-30"
+        }
+      ]
+    },
+    "GOOGL": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Alphabet Q2 2021 results (July 27, 2021): total revenue $61.9B reflecting broad-based advertiser strength; Google Cloud revenue $4.63B vs $4.40B estimate, with operating loss improving from -$1.43B to -$591M year-over-year, showing the cloud unit moving toward profitability.",
+          "source": "SEC EDGAR",
+          "url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204421000041/googexhibit991q22021.htm",
+          "date": "2021-07-27"
+        },
+        {
+          "summary": "At Google I/O in May 2021, CEO Sundar Pichai announced LaMDA (Language Model for Dialogue Applications), a large language model designed for open-ended conversation, with plans to integrate it into Search, Google Assistant, and Workspace \u2014 the first concrete signal of Google deploying transformer-scale AI in core products.",
+          "source": "MIT Technology Review",
+          "url": "https://www.technologyreview.com/2021/05/20/1025135/ai-large-language-models-bigscience-project/",
+          "date": "2021-05-20"
+        },
+        {
+          "summary": "Google filed a formal complaint to U.S. antitrust regulators in February 2021 opposing Nvidia's $40B acquisition of Arm, alongside Microsoft and Qualcomm, citing harm to competition in the semiconductor supply chain that underpins Alphabet's own TPU AI infrastructure strategy.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2021-02-12/google-microsoft-qualcomm-protest-nvidia-s-arm-acquisition",
+          "date": "2021-02-12"
+        }
+      ]
+    },
+    "RKLB": {
+      "wave_bucket": "rockets_spacecraft",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Rocket Lab completed its SPAC merger with Vector Acquisition Corporation and began trading on Nasdaq as RKLB on August 25, 2021, closing down 9.85% at $10.45 on its first day; the deal raised approximately $777M ($320M trust plus $470M PIPE led by BlackRock and Neuberger Berman) at a $4.1B valuation.",
+          "source": "SpaceNews",
+          "url": "https://spacenews.com/rocket-lab-closes-lower-in-first-day-on-nasdaq/",
+          "date": "2021-08-25"
+        },
+        {
+          "summary": "Rocket Lab reported H1 2021 revenue of $29.5M and a net loss of $32.5M, with full-year 2021 guidance of $50-54M; a pre-profitability small-launch company with a clear near-term revenue ceiling before the Neutron medium-lift vehicle enters service.",
+          "source": "SpaceNews",
+          "url": "https://spacenews.com/rocket-lab-provides-first-half-2021-financial-results-update/",
+          "date": "2021-08-25"
+        },
+        {
+          "summary": "Post-merger, Rocket Lab announced development of the Neutron reusable medium-lift rocket (up to 8,000 kg to LEO, propulsive ocean-platform landing), targeting satellite constellations, deep-space, and human spaceflight \u2014 the company's strategic step beyond the small-launch Electron market.",
+          "source": "SpaceNews",
+          "url": "https://spacenews.com/rocket-lab-says-spac-deal-will-accelerate-development-of-neutron-rocket/",
+          "date": "2021-03-01"
+        },
+        {
+          "summary": "Post-SPAC space companies were noted to be redoubling efforts to attract institutional investors, underscoring the early-stage, capital-seeking nature of the commercial space sector at the as-of date; RKLB is among the firms navigating this investor-base transition.",
+          "source": "SpaceNews",
+          "url": "https://spacenews.com/post-spac-space-firms-redoubling-efforts-to-attract-institutional-investors/",
+          "date": "2021-08-25"
+        }
+      ]
+    },
+    "NVDA": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Nvidia Q2 FY22 results (quarter ended August 1, 2021, announced August 18, 2021): record revenue $6.51B +68% YoY; Data Center revenue $2.37B +35% YoY; Gaming revenue $3.06B +85% YoY; GAAP EPS $0.94 +276% YoY \u2014 driven by GPU demand across gaming, AI training, and scientific computing.",
+          "source": "SEC EDGAR",
+          "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581021000128/q2fy22pr.htm",
+          "date": "2021-08-18"
+        },
+        {
+          "summary": "UK regulators in August 2021 called for a longer Phase 2 antitrust investigation into Nvidia's $40B bid to acquire Arm Ltd., raising national security concerns alongside competition worries; this regulatory overhang represents a tail risk to Nvidia's chip-supply-chain ambitions.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2021-08-03/u-k-considers-blocking-nvidia-s-takeover-of-arm-over-security",
+          "date": "2021-08-03"
+        },
+        {
+          "summary": "Nvidia formally filed its Arm acquisition with EU regulators in September 2021, triggering a tough antitrust scrutiny process in Brussels that adds a second regulatory hurdle alongside the UK probe; the deal's outcome remained uncertain as of September 30, 2021.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2021-09-08/nvidia-s-eu-filing-for-arm-deal-kicks-off-tough-scrutiny",
+          "date": "2021-09-08"
+        }
+      ]
+    },
+    "MSFT": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Microsoft Q4 FY21 results (July 27, 2021): revenue +21% YoY with over 20% top-and-bottom-line growth; commercial bookings +30% YoY; operating income +46% in the quarter; Azure and Intelligent Cloud identified as the primary growth engine; gaming, security, and LinkedIn each surpassed $10B in annual revenue.",
+          "source": "SEC EDGAR",
+          "url": "https://www.sec.gov/Archives/edgar/data/789019/000119312521225746/d200100dex991.htm",
+          "date": "2021-07-27"
+        },
+        {
+          "summary": "Google, Microsoft, and Qualcomm formally protested Nvidia's $40B Arm acquisition to U.S. antitrust regulators in February 2021, citing harm to competition in the semiconductor supply chain on which all three depend for AI infrastructure build-out.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2021-02-12/google-microsoft-qualcomm-protest-nvidia-s-arm-acquisition",
+          "date": "2021-02-12"
+        },
+        {
+          "summary": "Microsoft launched Azure Quantum in partnership with IonQ, Honeywell, Quantum Circuits Inc., and 1QBit, establishing Microsoft's cloud as a multi-vendor quantum hardware distribution platform \u2014 a secondary quantum wave exposure complementing its primary AI/cloud thesis.",
+          "source": "Quantum Computing Report",
+          "url": "https://quantumcomputingreport.com/microsoft-announces-azure-quantum-with-partners-ionq-honeywell-qci-and-1qbit/",
+          "date": "2021-02-01"
+        }
+      ]
+    },
+    "BOTZ": {
+      "wave_bucket": "robotics",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "The robotics sector attracted $1.14B across 37 funding rounds and $1.58B in 9 M&A deals in July 2021 alone; notable deals included Zebra Technologies acquiring Fetch Robotics for $290M, ABB acquiring Spanish AMR developer ASTI Mobile Robotics, and Aurora merging via SPAC at a $13B valuation \u2014 direct dollar-flow evidence of institutional capital entering the sector at scale.",
+          "source": "The Robot Report",
+          "url": "https://www.therobotreport.com/july-2021-robotics-investments-and-acquisitions/",
+          "date": "2021-08-01"
+        },
+        {
+          "summary": "BOTZ top holdings \u2014 Nvidia, Keyence, Mitsubishi Electric, Fanuc, ABB, Intuitive Surgical, iRobot \u2014 span industrial automation, surgical robotics, and machine vision; ABB's acquisition of ASTI Mobile Robotics in July 2021 directly benefited a core constituent and signals industrial-automation consolidation within the BOTZ portfolio.",
+          "source": "The Robot Report",
+          "url": "https://www.therobotreport.com/botz-robotics-etf-picks-tech-winners-investors/",
+          "date": "2021-01-01"
+        },
+        {
+          "summary": "April 2021 robotics investments tracked 38 deals worth more than $4.8B (including AutoStore raising $2.8B from SoftBank); May 2021 tracked 36 deals worth $581M; the sector showed consistent multi-billion-dollar quarterly funding throughput heading into Q3 2021, indicating sustained institutional commitment.",
+          "source": "The Robot Report",
+          "url": "https://www.therobotreport.com/robotics-investments-recap-april-2021/",
+          "date": "2021-05-01"
+        }
+      ]
+    },
+    "QTUM": {
+      "wave_bucket": "quantum",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "IBM unveiled a quantum computing roadmap on July 2, 2021 targeting one million qubits and beyond, with innovations planned at the chip, electrical, mechanical, and software technology levels \u2014 the most ambitious public qubit-scale commitment from any hardware vendor to date as of September 30, 2021.",
+          "source": "Quantum Computing Report",
+          "url": "https://quantumcomputingreport.com/ibm-unveils-a-quantum-computing-roadmap-that-will-take-them-to-one-million-qubits-and-beyond/",
+          "date": "2021-07-02"
+        },
+        {
+          "summary": "Microsoft's Azure Quantum platform, in partnership with IonQ, Honeywell, QCI, and 1QBit, began surfacing quantum hardware to cloud customers; QTUM's portfolio includes names that feed into this ecosystem, positioning it as a thematic beneficiary of cloud-accessible quantum access.",
+          "source": "Quantum Computing Report",
+          "url": "https://quantumcomputingreport.com/microsoft-announces-azure-quantum-with-partners-ionq-honeywell-qci-and-1qbit/",
+          "date": "2021-02-01"
+        },
+        {
+          "summary": "No material QTUM ETF-specific news (NAV, inflows, holdings changes) was found in curated sources for the Q3 2021 lookback window; the ETF is a thin-volume thematic basket whose constituent news is better tracked through individual names (IBM, Honeywell, IonQ) than ETF-level coverage. Quantum wave remains pre-commercial.",
+          "source": "Quantum Computing Report",
+          "url": "https://quantumcomputingreport.com/news-archive-2021/",
+          "date": "2021-09-30"
+        }
+      ]
+    },
+    "VIG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "VIG posted a NAV return of -0.31% for Q3 2021 (quarter ended September 30, 2021) and a year-to-date return of +10.08%, per the official Vanguard fact sheet dated September 30, 2021; the fund tracks the S&P U.S. Dividend Growers Index.",
+          "source": "Vanguard (fund fact sheet)",
+          "url": "https://www.bivio.com/tpc/file/Public/Web%20Contents/Fund%20Fact%20Sheets/VIG.pdf",
+          "date": "2021-09-30"
+        },
+        {
+          "summary": "VIG's slight Q3 drawdown reflects broader equity-market softness in September 2021 driven by Fed taper expectations and rising rate signals; the fund's quality-dividend orientation provided partial buffer versus growth-heavy indices during this period.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2021-09-22/fed-signals-bond-buying-taper-may-start-soon-split-on-2022-hike",
+          "date": "2021-09-22"
+        }
+      ]
+    }
+  },
+  "wave_stages": {
+    "AI": {
+      "stage": "surge",
+      "rationale": "Real revenue growth is compounding across the AI wave's primary enablers: Nvidia data-center revenue +35% YoY to $2.37B in Q2 FY22 (2021-08-18, SEC EDGAR); Alphabet Google Cloud growing to $4.63B with operating-loss improvement from -$1.43B to -$591M (Q2 2021, July 27); Microsoft commercial bookings +30% YoY in Q4 FY21 (July 27). Google's LaMDA deployment at I/O (May 2021) shows platform-level AI moving into core products. Revenue is real and growing; the wave has moved from research/buildup to commercial adoption.",
+      "evidence_tickers": [
+        "NVDA",
+        "GOOGL",
+        "MSFT"
+      ]
+    },
+    "robotics": {
+      "stage": "surge",
+      "rationale": "Monthly robotics funding ran at multi-billion-dollar levels through Q2-Q3 2021: April 2021 tracked $4.8B (including $2.8B AutoStore/SoftBank), July 2021 tracked $1.14B in 37 rounds plus $1.58B in 9 M&A deals including ABB acquiring ASTI and Zebra acquiring Fetch Robotics for $290M (The Robot Report, 2021-08-01). Institutional capital is deploying consistently into industrial automation and AMR at a pace consistent with compounding adoption.",
+      "evidence_tickers": [
+        "BOTZ"
+      ]
+    },
+    "rockets_spacecraft": {
+      "stage": "buildup",
+      "rationale": "Rocket Lab, the only pure-play in this ticker universe, just completed its SPAC and debuted on Nasdaq on August 25, 2021 with H1 2021 revenue of only $29.5M and full-year guidance of $50-54M. The stock closed down 9.85% on its first trading day. The commercial space economy is real but nascent \u2014 RKLB is pre-scale on revenue, Neutron is in early development, and the sector is actively recruiting institutional investors post-SPAC, which is consistent with a quiet buildup rather than a surge.",
+      "evidence_tickers": [
+        "RKLB"
+      ]
+    },
+    "quantum": {
+      "stage": "buildup",
+      "rationale": "IBM's July 2021 roadmap targets one million qubits and beyond (Quantum Computing Report, 2021-07-02), the most ambitious public commitment from any hardware vendor, but this is a research roadmap, not commercial revenue. QTUM is a thin-volume thematic basket; no material revenue or adoption evidence was found for any constituent. The sector is under-owned, pre-commercial, and the biggest news is an aspirational roadmap \u2014 consistent with quiet buildup.",
+      "evidence_tickers": [
+        "QTUM"
+      ]
+    },
+    "general_markets": {
+      "stage": "neutral",
+      "rationale": "AGG, BIL, IAU, and VIG are macro or asset-class instruments without technology-wave exposure. No wave-stage classification is meaningful for these tickers.",
+      "evidence_tickers": [
+        "AGG",
+        "BIL",
+        "IAU",
+        "VIG"
+      ]
+    }
+  },
+  "wave_views": {
+    "AGG": "neutral",
+    "BIL": "neutral",
+    "IAU": "neutral",
+    "GOOGL": "surge",
+    "RKLB": "buildup",
+    "NVDA": "surge",
+    "MSFT": "surge",
+    "BOTZ": "surge",
+    "QTUM": "buildup",
+    "VIG": "neutral"
+  },
+  "exclusion_conflicts": [],
+  "thematic_concerns": [
+    {
+      "ticker": "AGG",
+      "concern": "Fed taper signaling creates a near-term duration headwind for the core bond fund; AGG holds Treasuries and MBS that reprice downward as rates normalize, which creates a tension with a return-maximizing profile even if AGG is held as a defensive sleeve.",
+      "evidence": "Bloomberg (2021-09-22): Powell signaled taper could start November 2021 and complete by mid-2022; the September 17 Bloomberg economist survey expected rate liftoff in 2023, confirming the directional headwind."
+    }
+  ],
+  "self_critique_downgrades": []
+}

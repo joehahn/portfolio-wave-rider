@@ -1,0 +1,339 @@
+{
+  "as_of_date": "2026-04-30",
+  "per_ticker": {
+    "NVDA": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "NVIDIA Q1 FY2026 (quarter ended April 27, 2025): revenue $44.1B, +69% YoY; Data Center segment $39.1B; EPS $0.81 vs $0.75 consensus. U.S. government required an export license for H20 chips to China as of April 9, 2025, generating a $4.5B inventory charge. Q2 FY2026 guidance set at $45B, absorbing an estimated $8B H20 revenue loss.",
+          "source": "NVIDIA Newsroom",
+          "url": "https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-first-quarter-fiscal-2026",
+          "date": "2025-05-28"
+        },
+        {
+          "summary": "SemiAnalysis GTC 2026 recap (March 24, 2026): NVIDIA announced three new systems \u2014 Groq LPX, Vera ETL256, and STX \u2014 and updated the Kyber rack architecture with co-packaged optics (CPO) for scale-up networking, expanding its inference infrastructure portfolio.",
+          "source": "SemiAnalysis",
+          "url": "https://newsletter.semianalysis.com/p/nvidia-the-inference-kingdom-expands",
+          "date": "2026-03-24"
+        },
+        {
+          "summary": "SemiAnalysis InferenceX v2 (February 16, 2026): head-to-head benchmark of NVIDIA Blackwell vs AMD Hopper/MI series for inference workloads; Blackwell retained performance and cost-per-token leadership across most configurations, though AMD closed the gap on specific token-throughput benchmarks.",
+          "source": "SemiAnalysis",
+          "url": "https://newsletter.semianalysis.com/p/inferencex-v2-nvidia-blackwell-vs",
+          "date": "2026-02-16"
+        },
+        {
+          "summary": "SemiAnalysis AMD 2.0 analysis (April 23, 2025): NVIDIA's moat identified as system-level integration and software stack, not chip microarchitecture alone; AMD's MI450X rack-scale solution not expected in production until H2 2026, leaving NVIDIA dominant through the as-of date.",
+          "source": "SemiAnalysis",
+          "url": "https://semianalysis.com/2025/04/23/amd-2-0-new-sense-of-urgency-mi450x-chance-to-beat-nvidia-nvidias-new-moat/",
+          "date": "2025-04-23"
+        }
+      ]
+    },
+    "GOOGL": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Alphabet Q1 2026 earnings (April 29, 2026): consolidated revenue $109.9B, +22% YoY; Google Cloud revenue $20.0B, +63% YoY, with enterprise AI solutions described as the primary cloud growth driver for the first time. Net income $62.58B (+81%), EPS $5.11 vs $2.63 consensus. Full-year 2026 capex guidance raised to $180-190B.",
+          "source": "Alphabet Investor Relations / SEC",
+          "url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204426000043/googexhibit991q12026.htm",
+          "date": "2026-04-29"
+        },
+        {
+          "summary": "CEO Sundar Pichai Q1 2026 earnings call (April 29, 2026): Gemini Enterprise paid monthly active users grew 40% QoQ; enterprise AI solutions named the primary growth driver for Google Cloud for the first time in Q1 2026.",
+          "source": "Google / Alphabet Earnings",
+          "url": "https://blog.google/company-news/inside-google/message-ceo/alphabet-earnings-q1-2026/",
+          "date": "2026-04-29"
+        },
+        {
+          "summary": "SemiAnalysis Google TPUv7 analysis: SemiAnalysis noted massive upward revisions for Google TPU orders for 2026, with Google beginning to sell TPU systems externally, including to Anthropic (confirmed 1 million+ TPUs). Gemini 3 trained entirely on TPUs, indicating competitive AI infrastructure independence from third-party GPUs.",
+          "source": "SemiAnalysis",
+          "url": "https://newsletter.semianalysis.com/p/tpuv7-google-takes-a-swing-at-the",
+          "date": "2025-09-01"
+        }
+      ]
+    },
+    "MSFT": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Microsoft Q3 FY2026 earnings (April 29, 2026): revenue and cloud strength fueled results; Azure and other cloud services grew 40% YoY; Intelligent Cloud revenue increased substantially. Commercial bookings rose 112% YoY signaling strong enterprise Copilot and Azure commitments. Q1 FY2026 capex was $34.9B with FY2026 capex growth expected to exceed FY2025.",
+          "source": "Microsoft Investor Relations",
+          "url": "https://news.microsoft.com/source/2026/04/29/microsoft-cloud-and-ai-strength-fuels-third-quarter-results/",
+          "date": "2026-04-29"
+        },
+        {
+          "summary": "SemiAnalysis Microsoft AI strategy analysis (November 12, 2025): Microsoft's AI return-on-invested-capital (ROIC) is not materially higher than peers once OpenAI revenue-share (expiring 2030-2032) is stripped out. Microsoft has the least custom AI silicon among hyperscalers; majority of >$50B annual AI datacenter spend directed at internal workloads, not OpenAI.",
+          "source": "SemiAnalysis",
+          "url": "https://newsletter.semianalysis.com/p/microsofts-ai-strategy-deconstructed",
+          "date": "2025-11-12"
+        },
+        {
+          "summary": "Microsoft Majorana 1 topological qubit processor (announced early 2026): Microsoft unveiled the world's first quantum processor based on topological qubits, claiming it could enable practical quantum computers within years. This positions MSFT as a quantum dark-horse inside the AI wave.",
+          "source": "Quantum Computing Report",
+          "url": "https://quantumcomputingreport.com/news/",
+          "date": "2026-02-01"
+        }
+      ]
+    },
+    "RKLB": {
+      "wave_bucket": "rockets_spacecraft",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Rocket Lab Q4 2025 / Full Year 2025 earnings (February 26, 2026): record quarterly revenue $180M and record annual revenue $602M, +38% YoY; backlog reached $1.85B, +73% YoY. Space Systems segment $402.8M for 2025, up from $310.8M in 2024. Company flew 21 missions in 2025 with 100% success rate.",
+          "source": "GlobeNewswire / Rocket Lab Investor Relations",
+          "url": "https://www.globenewswire.com/news-release/2026/02/26/3246099/0/en/Rocket-Lab-Announces-Fourth-Quarter-and-Full-Year-2025-Financial-Results-Posts-Record-Quarterly-Revenue-of-180M-Record-Annual-Revenue-of-602M-Delivering-Annual-Growth-of-38-and-Gro.html",
+          "date": "2026-02-26"
+        },
+        {
+          "summary": "SpaceNews (February 27, 2026): Neutron's first launch delayed to Q4 2026 after a propellant tank failure during testing. Development cost grew from initial estimate of $250-300M to $360M spent through end of 2025. Company had previously reaffirmed 2025 target for first Neutron launch.",
+          "source": "SpaceNews",
+          "url": "https://spacenews.com/rocket-lab-delays-neutron-debut-to-late-2026/",
+          "date": "2026-02-27"
+        },
+        {
+          "summary": "SpaceNews (November 2024): Rocket Lab signed its first Neutron launch customer \u2014 an undisclosed commercial satellite constellation operator \u2014 for two Neutron launches, one mid-2026 and one 2027, demonstrating commercial demand for the still-in-development vehicle.",
+          "source": "SpaceNews",
+          "url": "https://spacenews.com/rocket-lab-signs-first-neutron-launch-customer/",
+          "date": "2024-11-01"
+        },
+        {
+          "summary": "Rocket Lab was awarded an $816M prime contract by the Space Development Agency to design and build 18 advanced missile warning and tracking spacecraft; the contract anchor reflects RKLB's strategic shift toward defense-oriented Space Systems revenue alongside commercial launch.",
+          "source": "GlobeNewswire / Rocket Lab Investor Relations",
+          "url": "https://investors.rocketlabcorp.com/news-releases/news-release-details/rocket-lab-announces-fourth-quarter-and-full-year-2025-financial",
+          "date": "2026-02-26"
+        }
+      ]
+    },
+    "BOTZ": {
+      "wave_bucket": "robotics",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "24/7 Wall St. (March 3, 2026): BOTZ is described as 'quietly betting big on AI chips,' with NVIDIA as its largest single holding at ~10.6%. The analysis notes the ETF's robotics-and-AI mandate blurs its exposure \u2014 a significant share of return is driven by NVDA and Japanese industrial automation names (Keyence, Mitsubishi Electric), not pure-play humanoid names.",
+          "source": "24/7 Wall St.",
+          "url": "https://247wallst.com/investing/2026/03/03/botz-is-a-robotics-etf-that-quietly-bets-big-on-ai-chips/",
+          "date": "2026-03-03"
+        },
+        {
+          "summary": "24/7 Wall St. (April 24, 2026): 'The Humanoid Robot Boom Is Here' \u2014 multiple ETFs now capture the humanoid supply chain. CES 2026 featured robots from XPENG (IRON), Boston Dynamics/Google DeepMind (Atlas+Gemini integration), and 1X (NEO consumer pre-orders). Declining AI compute cost and labor shortages named as adoption catalysts.",
+          "source": "24/7 Wall St.",
+          "url": "https://247wallst.com/investing/2026/04/24/the-humanoid-robot-boom-is-here-these-3-etfs-capture-the-entire-supply-chain/",
+          "date": "2026-04-24"
+        },
+        {
+          "summary": "Global X ETFs research (early 2026): 'Robotics: AI Moves into the Physical Economy' \u2014 declining cost of AI compute combined with rapid innovation in general-purpose robotics acts as a catalyst, alongside labor shortages, aging demographics, and reshoring. BOTZ YTD return approximately -2.2% through April 2026, trailing the broader market.",
+          "source": "Global X ETFs",
+          "url": "https://www.globalxetfs.com/articles/robotics-ai-moves-into-the-physical-economy",
+          "date": "2026-04-01"
+        }
+      ]
+    },
+    "QTUM": {
+      "wave_bucket": "quantum",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "GlobeNewswire (April 21, 2026): Defiance Quantum ETF (QTUM) surpassed $4 billion in AUM and earned a 5-star Morningstar rating. The ETF is up approximately 75% in the trailing year, outpacing the S&P 500 by roughly 57 percentage points. This follows 36.69% return in 2025 and 50.54% in 2024.",
+          "source": "GlobeNewswire",
+          "url": "https://www.globenewswire.com/news-release/2026/04/21/3278267/0/en/Defiance-s-Quantum-Computing-ETF-QTUM-Surpasses-4-Billion-in-Assets-and-Earns-5-Star-Morningstar-Rating.html",
+          "date": "2026-04-21"
+        },
+        {
+          "summary": "24/7 Wall St. (April 30, 2026): 'Quantinuum's IPO Could Reshape QTUM in 2026' \u2014 a potential IPO from Honeywell's quantum spinout Quantinuum would add a high-profile public market entrant to the wave, potentially increasing index concentration and retail flow into quantum names.",
+          "source": "24/7 Wall St.",
+          "url": "https://247wallst.com/investing/2026/04/30/quantinuums-ipo-could-reshape-qtum-in-2026-heres-what-to-watch/",
+          "date": "2026-04-30"
+        },
+        {
+          "summary": "Motley Fool (April 17, 2026): An institutional fund trimmed its quantum ETF position amid a 75% gain in the holding \u2014 cited stretched valuations and the ETF's repositioning in March 2026 toward pure-play quantum hardware (Quantum eMotion to top holding, BTQ Technologies added). The March 2026 rebalance shifted QTUM away from software toward hardware providers.",
+          "source": "The Motley Fool",
+          "url": "https://www.fool.com/coverage/filings/2026/04/17/this-fund-trimmed-a-quantum-etf-amid-75-gain-here-s-what-investors-should-know/",
+          "date": "2026-04-17"
+        },
+        {
+          "summary": "Quantum Computing Report: IBM targeting verified quantum advantage by end of 2026 with 120-qubit Nighthawk processor; Google Willow chip achieved 'below threshold' error correction; Microsoft unveiled Majorana 1 topological qubit processor in early 2026. Research milestones are real but all three companies remain pre-commercial for general-purpose quantum workloads.",
+          "source": "Quantum Computing Report",
+          "url": "https://quantumcomputingreport.com/news/",
+          "date": "2026-04-01"
+        }
+      ]
+    },
+    "NUKZ": {
+      "wave_bucket": "nuclear_fusion",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "ETF Express (April 2, 2026): HANetf and Infrastructure Capital Advisors launched the Nuclear Renaissance ETF in Europe under the NUKZ ticker, expanding the fund's European distribution. The U.S.-listed NUKZ (Range Nuclear Renaissance Index ETF) covers advanced reactors, utilities, construction and services, and fuel, including SMR developers Oklo, NuScale, and Nano Nuclear.",
+          "source": "ETF Express",
+          "url": "https://etfexpress.com/2026/04/02/hanetf-and-infrastructure-capital-advisors-launch-nuclear-renaissance-etf-in-europe-nukz/",
+          "date": "2026-04-02"
+        },
+        {
+          "summary": "TechCrunch (January 9, 2026): Meta signed deals with three nuclear companies for 6+ GW of power \u2014 Oklo (1.2 GW campus in Ohio with 16 Aurora Powerhouse reactors), TerraPower (SMR development agreement), and Vistra (existing nuclear plant capacity). The deal volume signals hyperscaler baseload demand converting into real commercial contracts for nuclear operators and SMR developers.",
+          "source": "TechCrunch",
+          "url": "https://techcrunch.com/2026/01/09/meta-signs-deals-with-three-nuclear-companies-for-6-plus-gw-of-power/",
+          "date": "2026-01-09"
+        },
+        {
+          "summary": "ETF Trends / 24/7 Wall St. (March 18, 2026): NUKZ and peer nuclear ETFs are posting triple-digit returns driven by the AI data center electricity narrative. NUKZ reported approximately 73% annual return with $875M in AUM; holdings span the full nuclear value chain including uranium miners (Cameco, NexGen), utilities (Constellation, Duke), and SMR developers.",
+          "source": "24/7 Wall St.",
+          "url": "https://247wallst.com/investing/2026/03/18/the-nuclear-etfs-powering-ai-data-centers-and-posting-triple-digit-returns/",
+          "date": "2026-03-18"
+        }
+      ]
+    },
+    "AGG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "iShares AGG fact sheet (March 31, 2026): AGG tracks the Bloomberg U.S. Aggregate Bond Index, holding ~46% U.S. Treasuries, ~24% MBS, ~24% corporates. Effective duration approximately 6 years, meaning a 1% rate rise translates to roughly a 6% price decline. Fund received Morningstar Gold medal as of April 30, 2026.",
+          "source": "iShares / BlackRock",
+          "url": "https://www.ishares.com/us/literature/fact-sheet/agg-ishares-core-u-s-aggregate-bond-etf-fund-fact-sheet-en-us.pdf",
+          "date": "2026-03-31"
+        },
+        {
+          "summary": "ETF DB / Treasury data (April 2, 2026): 10-year Treasury yield at 4.31%, 2-year yield at 3.79%. Fed funds rate at 3.50%-3.75% after 25bp cut in December 2025; markets pricing limited further cuts amid sticky inflation near 2.5%-3% and resilient GDP near 2%-2.5%. Long-term yields range-bound 3.75%-4.25%, supporting AGG income profile while capping price appreciation.",
+          "source": "ETF DB",
+          "url": "https://etfdb.com/fixed-income-content-hub/april-2-2026-treasury-yields-snapshot/",
+          "date": "2026-04-02"
+        }
+      ]
+    },
+    "BIL": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "U.S. Treasury / Federal Reserve data (April 2026): Fed funds rate at 3.50%-3.75% following 175bp of cumulative cuts since September 2024. The 3-month T-bill yield (BIL's benchmark) tracks the fed funds rate closely. BIL holds zero-coupon T-bills with less than 3 months to maturity \u2014 near-zero duration, no credit risk.",
+          "source": "U.S. Treasury / Federal Reserve",
+          "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_bill_rates&field_tdr_date_value=2026",
+          "date": "2026-04-30"
+        },
+        {
+          "summary": "iShares Fed Outlook 2026: markets pricing fed funds settling in 3.0%-3.25% range as 2026 progresses, with limited rate-cut path given sticky inflation. BIL yield expected to drift modestly lower but remain above 3% through most of 2026, preserving its role as a cash-equivalent with competitive yield versus longer-duration bonds.",
+          "source": "iShares / BlackRock",
+          "url": "https://www.ishares.com/us/insights/fed-outlook-2026-interest-rate-forecast",
+          "date": "2026-03-01"
+        }
+      ]
+    },
+    "IAU": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "24/7 Wall St. (April 4, 2026): IAU (iShares Gold Trust) has $83.8B in assets with a 0.25% expense ratio. The fund surged +65% in 2025, making it one of the strongest-performing ETFs of that year.",
+          "source": "24/7 Wall St.",
+          "url": "https://247wallst.com/investing/2026/04/04/the-gold-etf-with-83-8-billion-in-assets-and-a-0-25-fee-investors-keep-choosing-over-gld/",
+          "date": "2026-04-04"
+        },
+        {
+          "summary": "Open search (April 2026): Spot gold traded near $4,743/oz on April 9, 2026, up roughly $1,600 from a year prior, driven by falling real yields, a weakening dollar, and macro uncertainty including U.S. tariffs (a 39% tariff on Swiss gold bar imports was specified). IAU set its all-time high NAV of $101.57 on January 29, 2026, before retracing. Tariff-driven safe-haven demand and geopolitical risk cited as primary drivers.",
+          "source": "FXStreet / quantflowlab",
+          "url": "https://quantflowlab.com/iau-etf-review/",
+          "date": "2026-04-09"
+        }
+      ]
+    },
+    "VIG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Vanguard VIG fund fact sheet (March 31, 2026): VIG tracks the S&P US Dividend Growers Index (10+ consecutive years of dividend increases). YTD return through March 31, 2026: -1.75%; 1-year return 12.72%; 3-year annualized 13.81%. Top holdings: Broadcom (4.1%), Apple (4.0%), Microsoft (3.8%), JPMorgan Chase (3.5%), Eli Lilly (3.5%). Expense ratio 0.04%.",
+          "source": "Vanguard",
+          "url": "https://fund-docs.vanguard.com/F0920.pdf",
+          "date": "2026-03-31"
+        },
+        {
+          "summary": "Morningstar / Vanguard data (April 2026): VIG 52-week high $230.53, 52-week low $193.01; as of late April 2026 trading near $228.77, close to 52-week high, with P/E of 23.90 and dividend yield 1.7%. The fund holds 334 stocks with median market cap $260.5B, providing broad large-cap quality exposure with dividend discipline.",
+          "source": "Morningstar",
+          "url": "https://www.morningstar.com/etfs/arcx/vig/quote",
+          "date": "2026-04-30"
+        }
+      ]
+    }
+  },
+  "wave_stages": {
+    "AI": {
+      "stage": "surge",
+      "rationale": "Real revenue compounding across all three AI tickers: NVDA data center revenue $39.1B in Q1 FY2026 (+69% YoY), GOOGL Cloud $20B (+63%), MSFT Azure +40%. Hyperscaler capex still expanding ($180-190B Alphabet 2026 guidance). Export controls on H20 chips represent headwinds but underlying demand is evident in guidance. Revenue growth, not just enthusiasm, is the dominant signal.",
+      "evidence_tickers": [
+        "NVDA",
+        "GOOGL",
+        "MSFT"
+      ]
+    },
+    "robotics": {
+      "stage": "buildup",
+      "rationale": "Real technology progress is visible \u2014 CES 2026 humanoid showcases, Google DeepMind/Boston Dynamics integration, consumer pre-orders beginning \u2014 but it has not yet shown up in BOTZ's share price (YTD -2.2% through April 2026). The ETF's largest single holding is NVIDIA, not a pure-play humanoid name, suggesting the market has not yet priced commercial humanoid adoption separately.",
+      "evidence_tickers": [
+        "BOTZ"
+      ]
+    },
+    "rockets_spacecraft": {
+      "stage": "surge",
+      "rationale": "RKLB demonstrated real revenue compounding: $602M full-year 2025 revenue (+38% YoY), backlog $1.85B (+73% YoY), 100% launch success rate in 2025, and an $816M Space Development Agency prime contract. Neutron delay to Q4 2026 is a risk but Space Systems revenue is growing rapidly on existing SDA contracts.",
+      "evidence_tickers": [
+        "RKLB"
+      ]
+    },
+    "nuclear_fusion": {
+      "stage": "surge",
+      "rationale": "Hyperscaler power purchase agreements converted from announcements to signed contracts: Meta's January 2026 6+GW nuclear deal with Oklo, TerraPower, and Vistra is a real commercial commitment. NUKZ ETF posted approximately 73% annual return on the back of genuine utility and SMR contract flow, not pure speculation.",
+      "evidence_tickers": [
+        "NUKZ"
+      ]
+    },
+    "quantum": {
+      "stage": "peak",
+      "rationale": "QTUM surpassed $4B AUM and earned a 5-star Morningstar rating (April 21, 2026) after a 75% trailing-year gain outpacing the S&P 500 by 57 percentage points. An institutional fund trimmed the position citing stretched valuations (April 17, 2026). A potential Quantinuum IPO (April 30, 2026) signals new entrants chasing. Underlying IBM/Google/Microsoft milestones are real but pre-commercial \u2014 enthusiasm is now carrying a disproportionate share of the valuation.",
+      "evidence_tickers": [
+        "QTUM"
+      ]
+    },
+    "general_markets": {
+      "stage": "neutral",
+      "rationale": "AGG, BIL, IAU, and VIG are macro/asset-class instruments not attached to a technology wave. No wave-stage classification is applicable.",
+      "evidence_tickers": [
+        "AGG",
+        "BIL",
+        "IAU",
+        "VIG"
+      ]
+    }
+  },
+  "wave_views": {
+    "NVDA": "surge",
+    "GOOGL": "surge",
+    "MSFT": "surge",
+    "RKLB": "surge",
+    "BOTZ": "buildup",
+    "QTUM": "peak",
+    "NUKZ": "surge",
+    "AGG": "neutral",
+    "BIL": "neutral",
+    "IAU": "neutral",
+    "VIG": "neutral"
+  },
+  "exclusion_conflicts": [],
+  "thematic_concerns": [
+    {
+      "ticker": "NVDA",
+      "concern": "U.S. export controls on H20 chips to China (effective April 9, 2025) generated a $4.5B inventory charge and approximately $8B of estimated Q2 FY2026 revenue loss. Blackwell chips remain barred from China export. If restrictions tighten further or the H200 re-approval unravels, NVDA's total addressable market is materially constrained.",
+      "evidence": "NVDA Q1 FY2026 earnings release (May 2025); SemiAnalysis GTC 2026 recap (March 24, 2026)"
+    },
+    {
+      "ticker": "QTUM",
+      "concern": "QTUM's wave_view is 'peak' \u2014 a -10% tilt on expected return in the optimizer. The ETF's 75% trailing-year gain and $4B AUM inflows with unanimous sell-side enthusiasm and an imminent IPO (Quantinuum) all point to stretched valuations relative to still-pre-commercial underlying technology. This conflicts with the profile's 'invest early in next waves while cheap' mandate \u2014 QTUM is no longer cheap.",
+      "evidence": "GlobeNewswire April 21, 2026 (QTUM $4B AUM, 5-star Morningstar); Motley Fool April 17, 2026 (institutional trim amid 75% gain); 24/7 Wall St. April 30, 2026 (Quantinuum IPO)"
+    }
+  ],
+  "self_critique_downgrades": []
+}

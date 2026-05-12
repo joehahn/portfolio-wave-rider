@@ -1,0 +1,279 @@
+{
+  "as_of_date": "2024-03-31",
+  "per_ticker": {
+    "NVDA": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "NVDA reported Q4 FY2024 (quarter ended January 28, 2024) total revenue of $22.1 billion, up 265% year-over-year, with Data Center revenue of $18.4 billion, up 409% YoY. CEO Jensen Huang stated that 'accelerated computing and generative AI have hit the tipping point.' Q1 FY2025 guidance was set at $24.0 billion, plus or minus 2%.",
+          "source": "NVIDIA Newsroom",
+          "url": "https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-fourth-quarter-and-fiscal-2024",
+          "date": "2024-02-21"
+        },
+        {
+          "summary": "SemiAnalysis estimated Nvidia would have shipped accelerators equivalent to 5 million-plus H100s from 2021 through end of 2024. Global AI datacenter critical IT power demand is projected to roughly double from 49 GW in 2023 to 96 GW by 2026, with AI accounting for approximately 40 GW of that, creating a structural demand tailwind for Nvidia's GPU franchise.",
+          "source": "SemiAnalysis",
+          "url": "https://newsletter.semianalysis.com/p/ai-datacenter-energy-dilemma-race",
+          "date": "2024-03-13"
+        },
+        {
+          "summary": "MIT Technology Review identified 2024 as the year generative AI must prove commercial utility, with tech companies under pressure to monetize their AI investments. The publication named 'AI for everything' as a breakthrough technology, reflecting broad mainstream recognition of the wave rather than early-stage discovery.",
+          "source": "MIT Technology Review",
+          "url": "https://www.technologyreview.com/2024/01/08/1085096/artificial-intelligence-generative-ai-chatgpt-open-ai-breakthrough-technologies",
+          "date": "2024-01-08"
+        }
+      ]
+    },
+    "MSFT": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Microsoft FY2024 Q2 (ended December 31, 2023) showed Azure and other cloud services revenue grew 30% (28% in constant currency), with 6 percentage points of that growth attributed to AI services. Intelligent Cloud segment revenue was $25.9 billion, up 20%. The company launched Copilot as a $30/month add-on for Microsoft 365 commercial customers but declined to disclose adoption numbers, citing early days.",
+          "source": "Microsoft Investor Relations",
+          "url": "https://www.microsoft.com/en-us/investor/earnings/fy-2024-q2/performance",
+          "date": "2024-01-30"
+        },
+        {
+          "summary": "SemiAnalysis (March 2024) documented that the race for AI datacenter space is intensifying, with US datacenter critical IT capacity needing to triple from 2023 to 2027 to meet AI demand. Microsoft, as a primary Azure provider and OpenAI exclusive cloud partner, stands at the center of this buildout. The article noted hyperscaler capex is accelerating at a scale requiring new power sources.",
+          "source": "SemiAnalysis",
+          "url": "https://newsletter.semianalysis.com/p/ai-datacenter-energy-dilemma-race",
+          "date": "2024-03-13"
+        }
+      ]
+    },
+    "GOOGL": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Alphabet Q4 2023 (reported January 30, 2024) posted total revenue of $86.3 billion, up 13% YoY. Google Cloud revenue came in at $9.19 billion, beating the $8.94 billion estimate. Advertising revenue of $65.52 billion missed analyst estimates of $65.94 billion, triggering a greater than 6% after-hours stock decline. Net income jumped 52% to $20.7 billion.",
+          "source": "SEC EDGAR (Alphabet Q4 2023 press release)",
+          "url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204424000014/googexhibit991q42023.htm",
+          "date": "2024-01-30"
+        },
+        {
+          "summary": "Google announced Gemini 1.5 Pro in February 2024, featuring a one-million-token context window and a Mixture-of-Experts architecture. The model entered limited private preview on Vertex AI for enterprise customers. Google positioned Gemini as competitive with GPT-4 class models, a direct response to Microsoft's OpenAI advantage, with the goal of licensing Gemini via Google Cloud.",
+          "source": "Google Blog",
+          "url": "https://blog.google/innovation-and-ai/products/google-gemini-next-generation-model-february-2024/",
+          "date": "2024-02-08"
+        }
+      ]
+    },
+    "BOTZ": {
+      "wave_bucket": "robotics",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Global X Robotics and AI ETF (BOTZ) holds top positions in Keyence (9.4%), ABB (8.8%), Nvidia (8.3%), Fanuc (8.2%), and Intuitive Surgical (6.6%) as of early 2024. The fund spans industrial automation, medical robotics, and AI-adjacent semiconductor exposure. With Nvidia as a top holding, BOTZ straddles both the robotics and AI waves.",
+          "source": "Global X ETFs (fund page)",
+          "url": "https://www.globalxetfs.com/funds/botz",
+          "date": "2024-03-31"
+        },
+        {
+          "summary": "Figure AI raised $675 million in a Series B round in February 2024 at a $2.6 billion valuation. Investors included Microsoft, Nvidia, OpenAI Startup Fund, Amazon, and Jeff Bezos. BMW began testing Figure's humanoid robot at its Spartanburg, South Carolina facility in January 2024. The raise signals institutional conviction in near-term commercial humanoid deployment, a theme relevant to BOTZ's robotics holdings.",
+          "source": "The Robot Report",
+          "url": "https://www.therobotreport.com/figure-ai-raises-675m-to-commercialize-humanoids/",
+          "date": "2024-02-29"
+        },
+        {
+          "summary": "IEEE Spectrum (dated December 30, 2023, for January 2024 print) reported that 2024 was positioned as the first year multiple well-funded humanoid companies\u2014Agility Robotics, 1X, Apptronik, Figure, Sanctuary, Tesla, and Unitree\u2014would move from prototype to commercial pilot. Agility's Digit robot was targeting warehouse logistics with an operational cost near $12.50 per hour, competitive with human labor at approximately $30 per hour. Key obstacles cited: software reliability, battery limits, and manufacturing scalability.",
+          "source": "IEEE Spectrum \u2014 Robotics",
+          "url": "https://spectrum.ieee.org/amp/humanoid-robots-2666662286",
+          "date": "2023-12-30"
+        }
+      ]
+    },
+    "RKLB": {
+      "wave_bucket": "rockets_spacecraft",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Rocket Lab reported Q4 2023 and full-year 2023 results on February 27, 2024. Full-year 2023 revenue grew 16% year-on-year. The company flew a record 10 Electron missions in 2023 and signed 25 new orbital and suborbital contracts during the year. Q1 2024 guidance was issued at $92\u2013$98 million, representing sequential revenue growth of more than 50%, driven by a $515 million Space Development Agency prime contract to build 18 Transport Layer-Beta satellites.",
+          "source": "Business Wire (Rocket Lab Q4 2023 press release)",
+          "url": "https://www.businesswire.com/news/home/20240227634541/en/Rocket-Lab-Announces-Fourth-Quarter-and-Full-Year-2023-Financial-Results-Issues-Guidance-for-the-First-Quarter-2024-Including-Sequential-Revenue-Growth-Greater-than-50-Percent",
+          "date": "2024-02-27"
+        },
+        {
+          "summary": "SpaceNews reported in February 2024 that Rocket Lab was pushing for its first Neutron medium-lift rocket launch in 2024, an ambitious target for a vehicle still in development. Neutron is designed to compete with SpaceX Falcon 9 on cost and reusability and is central to Rocket Lab's long-term revenue scalability.",
+          "source": "SpaceNews",
+          "url": "https://spacenews.com/rocket-lab-pushing-for-first-neutron-launch-in-2024/",
+          "date": "2024-02-28"
+        },
+        {
+          "summary": "The $515 million SDA Tranche 2 Transport Layer-Beta prime contract, disclosed in the Q4 2023 earnings release, marks Rocket Lab's debut as a defense satellite prime contractor, not merely a launch provider. Contract backlog grew significantly. CNBC reported the deal as a sign of the company's expanding systems-integration capability beyond its Electron small-launch identity.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2024/02/27/rocket-lab-rklb-q4-2023-results.html",
+          "date": "2024-02-27"
+        }
+      ]
+    },
+    "QTUM": {
+      "wave_bucket": "quantum",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Defiance Quantum ETF (QTUM) is a modified equal-weighted ETF covering companies deriving at least 50% of revenue from quantum computing and machine learning. As of early 2024 the fund held approximately 71\u201387 securities with an expense ratio of 0.40%. Top holdings include companies across quantum hardware, cloud-based quantum access, and AI-adjacent machine learning infrastructure.",
+          "source": "Defiance ETFs (fund page)",
+          "url": "https://www.defianceetfs.com/qtum/",
+          "date": "2024-03-31"
+        },
+        {
+          "summary": "IBM unveiled the Heron quantum processor at the IBM Quantum Summit in December 2023, calling it the highest-performance quantum processor the company had built. The 156-qubit processor uses a heavy-hexagonal lattice and a tunable-coupler design that significantly reduces gate error rates. IBM positioned Heron as the processor underpinning its path toward quantum utility, though commercial advantage over classical computers had not yet been demonstrated.",
+          "source": "Network World (IBM Heron announcement)",
+          "url": "https://www.networkworld.com/article/1251100/ibm-unveils-heron-quantum-processor-and-new-modular-quantum-computer.html",
+          "date": "2023-12-04"
+        }
+      ]
+    },
+    "NUKZ": {
+      "wave_bucket": "nuclear_fusion",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Range Nuclear Renaissance ETF (NUKZ) launched on January 23, 2024, providing investors with exposure to uranium producers (Cameco), utilities (Constellation Energy), and reactor manufacturers (NuScale). The fund debuted with modest AUM (approximately $40 million) but was positioned to capture the nascent nuclear energy renaissance narrative.",
+          "source": "Range ETFs (fund page)",
+          "url": "https://www.rangeetfs.com/nukz",
+          "date": "2024-01-23"
+        },
+        {
+          "summary": "Uranium spot prices reached $100.25 per pound in January 2024, the highest level in 17 years, driven by Kazatomprom cutting its 2024 production guidance by approximately 14% and by growing utility interest in long-term supply contracts amid the clean-energy narrative. By March 31, 2024, prices had pulled back modestly but remained well above the $50\u2013$60 range seen through 2022.",
+          "source": "Crux Investor (uranium price coverage)",
+          "url": "https://www.cruxinvestor.com/posts/uranium-price-spikes-above-100-lb-and-equities-will-quickly-catch-up",
+          "date": "2024-01-31"
+        },
+        {
+          "summary": "World Nuclear News and SemiAnalysis (March 2024) together documented the emerging AI-data-center electricity narrative: hyperscalers require carbon-free baseload power, and nuclear is increasingly discussed as the answer. As of Q1 2024, this was primarily a narrative rather than a closed-contract story, but discussions of SMR power purchase agreements were circulating among utilities and technology companies.",
+          "source": "World Nuclear News",
+          "url": "https://world-nuclear-news.org/articles/us-computing-infrastructure-provider-announces-smr",
+          "date": "2024-03-01"
+        }
+      ]
+    },
+    "AGG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "The Federal Reserve held rates steady through Q1 2024. Expectations that had priced in four to six cuts for 2024 at the start of the year were progressively walked back as inflation proved stickier than anticipated. The AGG (iShares Core US Aggregate Bond ETF) carries an effective duration near 6 years, making it sensitive to this rate recalibration \u2014 the fund posted a modest negative total return in Q1 2024 as longer yields drifted higher.",
+          "source": "iShares (fund characteristics page)",
+          "url": "https://www.ishares.com/us/products/239561/ishares-gold-trust-fund",
+          "date": "2024-03-31"
+        }
+      ]
+    },
+    "BIL": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "SPDR Bloomberg 1-3 Month T-Bill ETF (BIL) was yielding approximately 5.2\u20135.3% annualized in Q1 2024, reflecting the Federal Reserve's 5.25\u20135.50% federal funds rate target. With rate cuts not yet materialized, BIL continued to function as a near-cash instrument delivering competitive risk-free income, attractive relative to a bond market repricing rate-cut expectations lower.",
+          "source": "State Street SPDR (BIL fund page)",
+          "url": "https://www.ssga.com/us/en/intermediary/etfs/state-street-spdr-bloomberg-1-3-month-t-bill-etf-bil",
+          "date": "2024-03-31"
+        }
+      ]
+    },
+    "IAU": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Gold surged to a new all-time high of approximately $2,390 per ounce by late March 2024, representing close to a 20% gain from the start of the year. Global official gold reserves rose by a net 290 tonnes in Q1 2024, the highest Q1 total in the World Gold Council's data series back to 2000, with Turkey, China, and India leading buying. The rally was driven by central bank demand, geopolitical uncertainty, and anticipation of eventual Federal Reserve rate cuts.",
+          "source": "World Gold Council \u2014 Gold Demand Trends Q1 2024",
+          "url": "https://www.gold.org/goldhub/research/gold-demand-trends/gold-demand-trends-q1-2024/central-banks",
+          "date": "2024-04-30"
+        }
+      ]
+    },
+    "VIG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Vanguard Dividend Appreciation ETF (VIG) tracks the S&P US Dividend Growers Index, holding US companies with 10-plus consecutive years of dividend growth. As of Q1 2024, VIG's large-cap quality bias (top holdings include Microsoft, Apple, JPMorgan) gave it reasonable performance in a market dominated by mega-cap AI names, though it lagged the Nasdaq-heavy indices. No material fund-level news events occurred in the lookback window.",
+          "source": "Vanguard (VIG fund page)",
+          "url": "https://investor.vanguard.com/investment-products/etfs/profile/vig",
+          "date": "2024-03-31"
+        }
+      ]
+    }
+  },
+  "wave_stages": {
+    "AI": {
+      "stage": "peak",
+      "rationale": "NVDA reported Q4 FY2024 revenue up 265% YoY with Data Center revenue up 409% (2024-02-21), and guidance for $24B in the next quarter \u2014 real, compounding revenue. However, sell-side consensus was unanimous, CEO language declared a 'tipping point' moment, and SemiAnalysis (2024-03-13) documented that datacenter power buildout is being modeled at double the 2023 capacity by 2026, implying enormous expectations already embedded. MSFT Copilot adoption was not yet disclosed but the stock was pricing in full commercial success. GOOGL stock dropped 6% on an ad revenue miss despite a cloud beat, indicating the market was repricing any sub-perfection print harshly. MIT Technology Review (2024-01-08) named AI-for-everything a breakthrough technology in a mainstream publication \u2014 a hallmark of peak-phase recognition. The combination of real revenue at NVDA, stretched forward multiples, and universal mainstream recognition places the AI wave at peak.",
+      "evidence_tickers": [
+        "NVDA",
+        "MSFT",
+        "GOOGL"
+      ]
+    },
+    "robotics": {
+      "stage": "buildup",
+      "rationale": "Figure AI raised $675M at a $2.6B valuation (2024-02-29) with backing from Microsoft, Nvidia, and OpenAI, and BMW began a pilot test in January 2024. IEEE Spectrum (2023-12-30) documented the humanoid field entering its first commercial pilot phase in 2024, with multiple companies targeting warehouse logistics. However, no company has yet demonstrated profitable commercial deployment; software reliability, battery limits, and manufacturing scalability remain unsolved. BOTZ's robotics holdings are largely in established industrial automation names (Keyence, Fanuc, ABB) whose valuations are not yet reflecting humanoid upside. The wave is real but early \u2014 venture capital and pilots only, not public-market revenue.",
+      "evidence_tickers": [
+        "BOTZ"
+      ]
+    },
+    "rockets_spacecraft": {
+      "stage": "buildup",
+      "rationale": "Rocket Lab (RKLB) posted record Electron launches in 2023, won a $515M SDA satellite prime contract (disclosed 2024-02-27), and guided to $92-98M in Q1 2024 revenue \u2014 real and growing. However, the company is pre-profitability, Neutron (the vehicle needed for revenue scalability) was still in development with an uncertain 2024 target (SpaceNews, 2024-02-28), and the space economy remains dependent on government contracts rather than broad commercial revenue. The wave shows genuine progress and new contract wins but is still in its early commercial phase.",
+      "evidence_tickers": [
+        "RKLB"
+      ]
+    },
+    "nuclear_fusion": {
+      "stage": "buildup",
+      "rationale": "NUKZ launched January 23, 2024 with modest AUM (~$40M), signaling the nuclear renaissance was still in early institutional recognition rather than mainstream allocation. Uranium spot prices reached a 17-year high of $100.25/lb in January 2024 (Crux Investor, 2024-01-31), driven by supply cuts and clean-energy narratives, but the AI-data-center power-purchase narrative was still emerging as of Q1 2024, without signed contracts publicly disclosed. World Nuclear News (circa March 2024) documented discussions of SMR power supply for computing infrastructure but these were talks, not deals. The wave has real fundamental drivers but is priced cautiously \u2014 consistent with buildup.",
+      "evidence_tickers": [
+        "NUKZ"
+      ]
+    },
+    "quantum": {
+      "stage": "buildup",
+      "rationale": "IBM unveiled its highest-performance Heron 156-qubit processor in December 2023 (Network World, 2023-12-04), and QTUM as a fund covers companies at the intersection of quantum hardware and machine learning. As of March 2024, no quantum computer had demonstrated commercial advantage over classical systems. The technology is pre-revenue in its quantum-specific applications, under-owned relative to AI, and advancing through hardware milestones that remain below the radar of mainstream investors. Classic buildup characteristics.",
+      "evidence_tickers": [
+        "QTUM"
+      ]
+    },
+    "general_markets": {
+      "stage": "neutral",
+      "rationale": "AGG, BIL, IAU, and VIG are general-markets tickers with no single wave affiliation. Gold's Q1 2024 surge to all-time highs ($2,390/oz) on central bank buying is notable but does not assign IAU to a technology wave. Bond dynamics (Fed on hold, cut expectations repriced) are macro, not wave-specific. Stage is neutral per the instructions for general_markets tickers.",
+      "evidence_tickers": [
+        "AGG",
+        "BIL",
+        "IAU",
+        "VIG"
+      ]
+    }
+  },
+  "wave_views": {
+    "NVDA": "peak",
+    "MSFT": "peak",
+    "GOOGL": "peak",
+    "BOTZ": "buildup",
+    "RKLB": "buildup",
+    "QTUM": "buildup",
+    "NUKZ": "buildup",
+    "AGG": "neutral",
+    "BIL": "neutral",
+    "IAU": "neutral",
+    "VIG": "neutral"
+  },
+  "exclusion_conflicts": [],
+  "thematic_concerns": [
+    {
+      "ticker": "NVDA",
+      "concern": "The investor profile calls for trimming AI exposure before the crest. The AI wave-stage call is 'peak' based on Q1 2024 evidence (NVDA Q4 FY2024 reported 2024-02-21: +265% revenue YoY, unanimous sell-side, CEO 'tipping point' language). The wave_stage_tilts table applies an 0.80x multiplier to peak-wave expected returns, which will mechanically reduce NVDA's optimizer weight. The profile instruction to 'ride the current AI wave, but trim before it crests' is directly triggered by this peak classification.",
+      "evidence": "NVDA Q4 FY2024 data center revenue +409% YoY; CEO declared 'accelerated computing and generative AI have hit the tipping point' (2024-02-21); SemiAnalysis (2024-03-13) documents datacenter power demand modeling that implies enormous capacity expectations already embedded in hyperscaler capex plans."
+    },
+    {
+      "ticker": "BOTZ",
+      "concern": "BOTZ holds Nvidia as its third-largest position (~8.3% of NAV). Even though BOTZ is classified in the robotics (buildup) bucket, a significant portion of its return attribution comes from Nvidia's AI-driven performance. If the AI wave is at peak and Nvidia faces a multiple compression, BOTZ is partially exposed to that risk despite its buildup classification.",
+      "evidence": "Global X ETF fund page (accessed 2024-03-31) shows NVDA at approximately 8.3% of BOTZ NAV; NVDA is classified in the AI-peak wave bucket."
+    }
+  ],
+  "self_critique_downgrades": []
+}

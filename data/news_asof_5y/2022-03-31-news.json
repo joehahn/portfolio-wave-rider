@@ -1,0 +1,241 @@
+{
+  "as_of_date": "2022-03-31",
+  "per_ticker": {
+    "AGG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "The Federal Reserve raised its benchmark rate by 25 basis points on March 16, 2022 \u2014 its first hike in more than three years \u2014 and the dot-plot signaled roughly 175bp of additional tightening in 2022, with CPI running at 7.9% year-over-year. The Bloomberg U.S. Aggregate Bond Index was tracking for its largest quarterly loss since 1980 by quarter-end, directly hammering AGG's net-asset value.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2022/03/16/federal-reserve-meeting.html",
+          "date": "2022-03-16"
+        },
+        {
+          "summary": "Bond ETFs were 'off to a bad start in 2022 and things could get worse,' per ETF Trends, as rising rate expectations pushed longer-duration holdings lower across the board. AGG, as the broad aggregate benchmark, bore the brunt of the duration hit.",
+          "source": "ETF Trends",
+          "url": "https://www.etftrends.com/fixed-income-channel/bond-etfs-are-off-to-a-bad-start-in-2022-and-things-could-get-worse/",
+          "date": "2022-01-01"
+        }
+      ]
+    },
+    "BIL": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Bloomberg reported on February 7, 2022 that billions of dollars were flowing into cash-like ETFs (including short-duration T-bill vehicles like BIL) as investors hunted yield and reduced duration risk ahead of the anticipated Fed rate-hike cycle. The narrative of T-bill ETFs as a rate-hike haven was already well-established in the market by Q1 2022.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2022-02-07/billions-are-flowing-to-cash-like-etfs-in-hunt-before-fed-hike",
+          "date": "2022-02-07"
+        },
+        {
+          "summary": "The Federal Reserve's March 16, 2022 implementation note confirmed the federal funds rate target range was raised to 0.25\u20130.50%, directly lifting the yield on 1-3 month T-bills that BIL tracks. Dot-plot projections implied the rate would continue rising, making BIL increasingly competitive versus longer-duration bond funds.",
+          "source": "Federal Reserve Board",
+          "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20220316a1.htm",
+          "date": "2022-03-16"
+        }
+      ]
+    },
+    "IAU": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "The World Gold Council's February 2022 commentary noted that the LBMA Gold Price PM jumped 6% in February, ending the month at $1,910/oz \u2014 its strongest month-on-month move since May 2021 \u2014 as Russia's invasion of Ukraine drove safe-haven demand and gold ETFs added approximately $2bn (35 tonnes) to global AUM.",
+          "source": "World Gold Council",
+          "url": "https://www.gold.org/goldhub/research/gold-market-commentary-february-2022",
+          "date": "2022-02-28"
+        },
+        {
+          "summary": "Gold rallied toward approximately $2,050/oz in early March 2022, near record levels at the time, as geopolitical uncertainty from the Russia-Ukraine conflict outweighed pressure from higher nominal yields and a stronger dollar. Safe-haven demand for gold-backed ETFs like IAU increased during this period.",
+          "source": "NAJ / BullionVault (open search)",
+          "url": "https://www.naj.co.uk/news/gold-prices-jumped-on-safe-haven-appeal-after-russian-invasion-of-ukraine",
+          "date": "2022-03-01"
+        }
+      ]
+    },
+    "GOOGL": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Alphabet reported Q4 2021 results on February 1, 2022 via SEC filing: consolidated revenue of $75.3bn (+32% YoY), Google Cloud revenue of $5.54bn (up from $3.83bn in Q4 2020), and net income of $20.64bn. Google Cloud was growing rapidly but still loss-making, signaling heavy investment in AI-infrastructure capacity.",
+          "source": "SEC EDGAR",
+          "url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204422000015/googexhibit991q42021.htm",
+          "date": "2022-02-01"
+        },
+        {
+          "summary": "9to5Google reported on February 1, 2022 that Alphabet Q4 2021 revenue reached $75.3bn with Google Cloud growing rapidly to $5.54bn, as the company continued to invest heavily in AI and cloud infrastructure. The stock nonetheless sold off with growth names in Q1 2022 as rising rates pressured high-multiple equities.",
+          "source": "9to5Google",
+          "url": "https://9to5google.com/2022/02/01/alphabet-q4-2021-earnings/",
+          "date": "2022-02-01"
+        }
+      ]
+    },
+    "RKLB": {
+      "wave_bucket": "rockets_spacecraft",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Rocket Lab announced Q3 2021 results on November 15, 2021: Space Systems revenue grew 360% YoY, contract backlog expanded from $141M at June 30, 2021 to $183M at September 30, 2021 and $237M by the announcement date. The U.S. Space Force awarded a $24.35M contract for Neutron upper-stage development, a key milestone in positioning for the medium-lift launch market.",
+          "source": "Business Wire (Rocket Lab press release)",
+          "url": "https://www.businesswire.com/news/home/20211115006183/en/Rocket-Lab-Announces-Third-Quarter-2021-Financial-Results-and-Issues-Guidance-for-the-Fourth-Quarter-2021",
+          "date": "2021-11-15"
+        },
+        {
+          "summary": "Rocket Lab successfully conducted its first Electron launch from Launch Complex 1B on February 28, 2022, deploying a Synspective StriX-beta synthetic-aperture radar satellite \u2014 the company's first launch from its second New Zealand pad. This operational expansion of launch capacity is a concrete infrastructure milestone for the rockets wave.",
+          "source": "Wikipedia / List of Electron launches (cross-referenced with orbital tracking sources)",
+          "url": "https://en.wikipedia.org/wiki/List_of_Electron_launches",
+          "date": "2022-02-28"
+        }
+      ]
+    },
+    "NVDA": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Nvidia reported Q4 fiscal 2022 results on February 16, 2022: record total revenue of $7.64bn (+53% YoY), data-center segment revenue of $3.26bn (+71% YoY, +11% QoQ), and fiscal-year data-center revenue of $10.61bn (+58%). Q1 FY23 guidance was $8.10bn. The data-center segment \u2014 driven by AI training workloads \u2014 set consecutive records, validating the AI-compute demand thesis.",
+          "source": "Nvidia Newsroom / SEC EDGAR",
+          "url": "https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-fourth-quarter-and-fiscal-2022",
+          "date": "2022-02-16"
+        },
+        {
+          "summary": "Despite the record earnings, NVDA stock slipped into a bear market in Q1 2022, down more than 18% from its November 2021 peak, as rising interest rates drove investors to exit high-multiple growth stocks. Analysts noted that high-growth names are most vulnerable when rates rise because their value is discounted at higher rates.",
+          "source": "CNBC / open search",
+          "url": "https://www.cnbc.com/2022/02/16/nvidia-nvda-earnings-q4-2022.html",
+          "date": "2022-02-16"
+        }
+      ]
+    },
+    "MSFT": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Microsoft reported FY22 Q2 results on January 25, 2022: total revenue of $51.7bn beating Wall Street estimates, Azure and other cloud services revenue grew 46% YoY (ending a four-quarter streak above 50%), and Microsoft Cloud (broader segment) reached $22.1bn (+32%). The strong Azure print confirmed sustained enterprise AI and cloud adoption.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2022/01/25/microsoft-msft-earnings-q2-2022.html",
+          "date": "2022-01-25"
+        },
+        {
+          "summary": "Windows Central reported on January 25, 2022 that Microsoft's FY22 Q2 revenue of $51.7bn beat predictions, with Intelligent Cloud segment generating $18.33bn (+25.5% YoY). The Microsoft Cloud segment \u2014 which includes Azure \u2014 grew to $22.1bn, underlining the scale of AI-and-cloud infrastructure being built before Q1 2022 close.",
+          "source": "Windows Central",
+          "url": "https://www.windowscentral.com/microsoft-fy22-q2-earnings-tk-revenue-beating-predictions",
+          "date": "2022-01-25"
+        }
+      ]
+    },
+    "BOTZ": {
+      "wave_bucket": "robotics",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Total VC funding in the robotics industry was reported to have jumped 38% from 2021 to 2022 (bringing aggregate investment to ~$6.5bn), driven by COVID-19-related labor shortages and supply-chain automation needs. The collaborative robots sub-market was growing at approximately 31% CAGR. BOTZ holds Nvidia, Keyence, and Mitsubishi Electric among its top positions, giving it exposure to this industrial automation expansion.",
+          "source": "Open search / multiple industry sources",
+          "url": "https://investingnews.com/daily/tech-investing/emerging-tech-investing/robotics-investing/how-to-invest-in-robotics/",
+          "date": "2022-01-01"
+        },
+        {
+          "summary": "The Global X Robotics & AI ETF (BOTZ) was caught in the broad Q1 2022 growth-stock sell-off, retreating alongside its high-multiple holdings as rising interest rates compressed valuations across the technology sector, despite underlying robotics demand remaining intact.",
+          "source": "Global X ETFs (fund page)",
+          "url": "https://www.globalxetfs.com/funds/botz",
+          "date": "2022-03-31"
+        }
+      ]
+    },
+    "QTUM": {
+      "wave_bucket": "quantum",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "IBM had deployed its Eagle 127-qubit processor in late 2021, the first superconducting quantum processor with more qubits than could be reliably simulated by a classical computer. This was the most recent hardware milestone available to investors at Q1 2022 close. IBM's roadmap called for the 433-qubit Osprey later in 2022, with no commercial quantum advantage demonstrated.",
+          "source": "IBM Quantum / Springer Nature / open search",
+          "url": "https://link.springer.com/article/10.1007/s11227-025-07047-7",
+          "date": "2022-01-01"
+        },
+        {
+          "summary": "The Defiance Quantum ETF (QTUM) holds a modified equal-weighted basket of companies deriving at least 50% of revenue from quantum computing and machine learning. At Q1 2022, holdings included Intel, Micron, Nokia, and STMicroelectronics \u2014 companies with early quantum research programs but no quantum-specific commercial revenue. The ETF was pulled lower with growth and semiconductor names during Q1 2022.",
+          "source": "Defiance ETFs / open search",
+          "url": "https://www.defianceetfs.com/qtum/",
+          "date": "2022-03-31"
+        }
+      ]
+    },
+    "VIG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Vanguard's Dividend Appreciation ETF (VIG), which tracks companies with at least ten consecutive years of dividend growth, returned -9.80% for full-year 2022 but outperformed its category peers by approximately 10 percentage points, reflecting its defensive quality tilt in a year of rising rates and equity-market compression.",
+          "source": "Morningstar / Finance Charts (open search)",
+          "url": "https://www.financecharts.com/etfs/VIG/performance/total-return",
+          "date": "2022-12-31"
+        },
+        {
+          "summary": "With the Federal Reserve raising 25bp on March 16, 2022 and signaling ~175bp more in hikes for 2022, dividend-growth equities like VIG were under pressure from duration math (rising rates lower present values of future dividends) but fared better than high-multiple growth names given their lower valuations and stable cash flows.",
+          "source": "Federal Reserve Board",
+          "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20220316a1.htm",
+          "date": "2022-03-16"
+        }
+      ]
+    }
+  },
+  "wave_stages": {
+    "AI": {
+      "stage": "surge",
+      "rationale": "As of 2022-03-31, AI compute revenue was compounding in real terms: Nvidia data-center segment grew 71% YoY to $3.26bn in Q4 FY22 (Feb 16, 2022), Microsoft Azure grew 46% YoY in FY22 Q2 (Jan 25, 2022), and Google Cloud reached $5.54bn in Q4 2021 (Feb 1, 2022). Revenue is real and growing, adoption by hyperscalers is unambiguous. However, the AI wave at this point was still understood primarily as a cloud/infrastructure story \u2014 the consumer-facing AI craze had not yet occurred. Valuations were contracting with rising rates, not stretched to enthusiasm-peak levels. This is a surge, not a peak.",
+      "evidence_tickers": [
+        "NVDA",
+        "MSFT",
+        "GOOGL"
+      ]
+    },
+    "robotics": {
+      "stage": "digestion",
+      "rationale": "BOTZ was selling off with the broader growth-stock complex in Q1 2022, retreating from 2021 highs. VC funding in robotics continued to grow (+38% YoY), suggesting the underlying demand thesis was intact, but investor enthusiasm had cooled and the ETF price reflected post-crest hangover. The wave is real but equity prices were correcting.",
+      "evidence_tickers": [
+        "BOTZ"
+      ]
+    },
+    "rockets_spacecraft": {
+      "stage": "buildup",
+      "rationale": "Rocket Lab's Q3 2021 results (Nov 15, 2021) showed rapid but tiny-base revenue growth (Space Systems +360% YoY) and a backlog growing to $237M. The Neutron upper-stage Space Force contract ($24.35M) signals government validation of the medium-lift thesis. The stock had pulled back sharply from its SPAC-listing highs. Commercial space is making real progress visible in operational data but is not yet in stock prices in a mania sense.",
+      "evidence_tickers": [
+        "RKLB"
+      ]
+    },
+    "quantum": {
+      "stage": "buildup",
+      "rationale": "IBM's Eagle 127-qubit processor (deployed late 2021) was the most recent public hardware milestone as of Q1 2022. Quantum computing remains entirely pre-commercial \u2014 no revenue, no quantum advantage demonstrated on useful problems. QTUM holdings are predominantly classical-semiconductor companies with quantum research programs. The wave is quiet and early.",
+      "evidence_tickers": [
+        "QTUM"
+      ]
+    },
+    "general_markets": {
+      "stage": "neutral",
+      "rationale": "AGG, BIL, IAU, and VIG are general-markets or macro-hedge instruments with no wave attachment. Stage is neutral by rule.",
+      "evidence_tickers": [
+        "AGG",
+        "BIL",
+        "IAU",
+        "VIG"
+      ]
+    }
+  },
+  "wave_views": {
+    "AGG": "neutral",
+    "BIL": "neutral",
+    "IAU": "neutral",
+    "GOOGL": "surge",
+    "RKLB": "buildup",
+    "NVDA": "surge",
+    "MSFT": "surge",
+    "BOTZ": "digestion",
+    "QTUM": "buildup",
+    "VIG": "neutral"
+  },
+  "exclusion_conflicts": [],
+  "self_critique_downgrades": []
+}

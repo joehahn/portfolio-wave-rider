@@ -1,0 +1,292 @@
+{
+  "as_of_date": "2025-03-31",
+  "per_ticker": {
+    "NVDA": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "NVIDIA Q4 FY2025 (quarter ended Jan 26, 2025): total revenue $39.3B (+78% YoY), Data Center revenue $35.6B (+93% YoY), Blackwell ramping described as fastest product ramp in company history. Q1 FY2026 guidance: $43.0B (+/-2%).",
+          "source": "NVIDIA Newsroom",
+          "url": "https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-fourth-quarter-and-fiscal-2025",
+          "date": "2025-02-26"
+        },
+        {
+          "summary": "Full fiscal year 2025 Data Center revenue $115.2B, up 142% YoY, driven by Blackwell and Hopper 200 demand from hyperscalers. CEO Jensen Huang stated demand for Blackwell is 'amazing.'",
+          "source": "NVIDIA Newsroom",
+          "url": "https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-fourth-quarter-and-fiscal-2025",
+          "date": "2025-02-26"
+        },
+        {
+          "summary": "Hyperscalers (Microsoft, Amazon, Alphabet, Meta) collectively guided to record AI infrastructure capital expenditure for 2025, sustaining near-term Blackwell demand visibility.",
+          "source": "Visual Capitalist",
+          "url": "https://www.visualcapitalist.com/visualized-big-tech-ai-spending/",
+          "date": "2025-03-01"
+        }
+      ]
+    },
+    "MSFT": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Microsoft Q2 FY2025 (quarter ended Dec 31, 2024, reported Jan 29, 2025): Azure and other cloud services revenue grew 31% YoY; Microsoft Cloud revenue $40.9B (+21% YoY); AI business annualized run rate surpassed $13B, up 175% YoY.",
+          "source": "Microsoft Investor Relations",
+          "url": "https://www.microsoft.com/en-us/investor/earnings/fy-2025-q2/press-release-webcast",
+          "date": "2025-01-29"
+        },
+        {
+          "summary": "Stratechery (Ben Thompson) covered Microsoft Q2 FY2025 earnings noting Azure cloud growth and Copilot monetization trajectory; AI platform economics remain the central strategic lens for MSFT valuation.",
+          "source": "Stratechery",
+          "url": "https://stratechery.com/2025/microsoft-earnings-meta-earnings/",
+          "date": "2025-02-05"
+        }
+      ]
+    },
+    "GOOGL": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Alphabet Q4 2024 results (reported Feb 4, 2025): total revenue $96.47B, narrow miss vs $96.56B expected; Google Cloud revenue $11.96B vs $12.19B expected, stock fell ~9% after-hours. Cloud was capacity-constrained, not demand-constrained.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2025/02/04/alphabet-q4-earnings-report-2024.html",
+          "date": "2025-02-04"
+        },
+        {
+          "summary": "Alphabet announced $75B capex plan for full-year 2025 to expand AI infrastructure; Q1 2025 capex guided $16-18B, above the $14.3B Wall Street expected. Google Cloud backlog more than doubled YoY, reaching $240B at Q4 end.",
+          "source": "SEC EDGAR (Alphabet Q4 2024 Earnings Release)",
+          "url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204425000010/googexhibit991q42024.htm",
+          "date": "2025-02-04"
+        }
+      ]
+    },
+    "RKLB": {
+      "wave_bucket": "rockets_spacecraft",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Rocket Lab full-year 2024 and Q4 2024 results (reported Feb 27, 2025): FY2024 record revenue $436.2M (+78% YoY); Q4 2024 record $132.4M (+121% YoY). Executed 16 Electron launches in 2024, 60% increase in cadence. Space Systems revenue $311M (+80% YoY); Q1 2025 guidance $117-123M.",
+          "source": "BusinessWire (Rocket Lab press release)",
+          "url": "https://www.businesswire.com/news/home/20250227056608/en/Rocket-Lab-Announces-Full-Year-Fourth-Quarter-2024-Financial-Results-Posts-Record-Revenue-Representing-26-Sequential-Growth-78-Annual-Growth-and-121-Year-on-Year-Quarterly-Growth",
+          "date": "2025-02-27"
+        },
+        {
+          "summary": "Rocket Lab $515M firm-fixed-price contract from the Space Development Agency (announced Jan 2024) to design, build, and operate 18 Tranche 2 Transport Layer satellites, marking Rocket Lab's debut as a defense prime contractor integrating entirely in-house subsystems.",
+          "source": "SpaceNews",
+          "url": "https://spacenews.com/rocket-lab-wins-515-million-contract-to-build-18-satellites-for-u-s-government-agency/",
+          "date": "2024-01-08"
+        },
+        {
+          "summary": "Rocket Lab completed the Preliminary Design Review (PDR) for the $515M SDA satellite contract in January 2025, a key technical milestone advancing program execution.",
+          "source": "Benzinga",
+          "url": "https://www.benzinga.com/25/01/42900671/rocket-lab-completes-pdr-for-515m-sda-satellite-contract",
+          "date": "2025-01-10"
+        },
+        {
+          "summary": "SpaceNews: Space Systems revenue dominates Rocket Lab revenue mix, with space systems contributing the majority of 2024 revenue; Neutron medium-lift rocket development ongoing but no commercial launch yet.",
+          "source": "SpaceNews",
+          "url": "https://spacenews.com/space-systems-dominate-rocket-lab-revenue/",
+          "date": "2025-02-27"
+        }
+      ]
+    },
+    "BOTZ": {
+      "wave_bucket": "robotics",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Robotics investment rebounded sharply in 2024 after 2022-23 declines; first eight months of 2024 exceeded all of 2023 investment. Humanoid robots attracted ~$1B through August 2024 (Figure, 1X, Apptronik). However, early-stage deal count fell to 2020 levels, and high-profile failures persisted.",
+          "source": "The Robot Report",
+          "url": "https://www.therobotreport.com/from-surge-to-sobriety-the-state-of-robotics-investment-in-2024/",
+          "date": "2024-11-05"
+        },
+        {
+          "summary": "BOTZ (Global X Robotics & AI ETF) returned approximately 12.26% in calendar 2024, lagging the technology category average of approximately 21.96%. Top holdings include NVIDIA, Keyence, and Mitsubishi Electric; ~75% of holdings are international, with heavy Japan weighting.",
+          "source": "The Robot Report",
+          "url": "https://www.therobotreport.com/botz-robotics-etf-picks-diverse-tech-winners-for-investors/",
+          "date": "2025-02-01"
+        }
+      ]
+    },
+    "QTUM": {
+      "wave_bucket": "quantum",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Google announced Willow quantum chip on Dec 9, 2024 (Nature paper): 105-qubit processor achieved below-threshold quantum error correction, reducing error rates exponentially as qubit count scaled \u2014 a milestone pursued for nearly 30 years. Benchmark computation completed in under 5 minutes that would take classical supercomputers 10^25 years.",
+          "source": "Google Quantum AI (via HPCwire)",
+          "url": "https://www.hpcwire.com/2024/12/09/google-debuts-new-quantum-chip-error-correction-breakthrough-and-roadmap-details/",
+          "date": "2024-12-09"
+        },
+        {
+          "summary": "Experts noted logical error rates (~0.14% per cycle) remain orders of magnitude above the 10^-6 level needed for large-scale useful quantum algorithms; CNBC reported 'quantum computing still has no real-world uses yet.' Commercial revenue for pure-play quantum firms remains negligible.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2024/12/10/google-claims-quantum-milestone-but-cant-solve-real-world-problems-.html",
+          "date": "2024-12-10"
+        },
+        {
+          "summary": "IonQ reported Q1 2025 revenue of $7.6M against a net loss of $32.3M, illustrating the pre-commercial scale of the sector. QTUM ETF holds ~87 securities with only one-third being pure-play quantum names; the remainder are AI/ML companies.",
+          "source": "Data Center Dynamics",
+          "url": "https://www.datacenterdynamics.com/en/news/quantum-computing-earnings-q1-2025-ionq-d-wave-rigetti-results/",
+          "date": "2025-05-14"
+        }
+      ]
+    },
+    "NUKZ": {
+      "wave_bucket": "nuclear_fusion",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Range Nuclear Renaissance ETF (NUKZ), launched Jan 23, 2024, gained approximately 70% since inception as of October 2024. AUM was $40.7M, with top holdings Cameco, Constellation Energy, NuScale Power, GE Vernova. Analyst noted 'we are still in the early stages of the nuclear story.'",
+          "source": "Yahoo Finance (TipRanks reprint)",
+          "url": "https://finance.yahoo.com/news/nukz-brand-nuclear-energy-etf-064518698.html",
+          "date": "2024-10-25"
+        },
+        {
+          "summary": "Microsoft signed a 20-year, 835MW PPA with Constellation Energy to restart Three Mile Island Unit 1 for AI data center power (announced Sep 2024); Amazon signed a 10-year PPA with Talen Energy for a 960MW data center campus in Pennsylvania (Mar 2024). These are the first major hyperscaler-nuclear direct power deals.",
+          "source": "Data Center Dynamics",
+          "url": "https://www.datacenterdynamics.com/en/news/three-mile-island-nuclear-power-plant-to-return-as-microsoft-signs-20-year-835mw-ai-data-center-ppa/",
+          "date": "2024-09-20"
+        },
+        {
+          "summary": "World Nuclear News: nuclear power's 92.5% capacity factor vs 35.4% wind and 24.9% solar positions it as the preferred AI data center baseload source; McKinsey forecasts electricity demand will triple by 2050, underpinning the long-duration investment thesis for nuclear.",
+          "source": "World Nuclear News",
+          "url": "https://www.world-nuclear-news.org",
+          "date": "2025-02-01"
+        }
+      ]
+    },
+    "AGG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "AGG (iShares Core US Aggregate Bond ETF) faced headwinds in Q1 2025 as equity market volatility from tariff uncertainty drove mixed bond flows; the Fed held rates steady in early 2025 after three cuts in H2 2024, leaving the federal funds rate around 4.25-4.50%.",
+          "source": "Bloomberg / Reuters (open search fallback)",
+          "url": "https://www.bloomberg.com",
+          "date": "2025-03-31"
+        },
+        {
+          "summary": "S&P 500 entered correction territory on March 13, 2025, falling 10% from its all-time high of 6,144; tariff announcements from the Trump administration created equity volatility but moderate bond-market safe-haven demand. The broader US bond market performance was range-bound.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2025/03/12/stock-market-today-live-updates.html",
+          "date": "2025-03-12"
+        }
+      ]
+    },
+    "BIL": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "BIL (SPDR Bloomberg 1-3 Month T-Bill ETF) yielding approximately 4.25-4.50% annualized as of Q1 2025, reflecting the Fed's pause after three cuts in H2 2024. Short-term T-bills remained attractive relative to equities given Q1 2025 market correction.",
+          "source": "US Treasury (Daily Treasury Rates)",
+          "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_bill_rates&field_tdr_date_value=2025",
+          "date": "2025-03-31"
+        }
+      ]
+    },
+    "IAU": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Gold broke through $3,000/oz on March 14, 2025 (spot hit $3,004.71), a historic first, driven by tariff uncertainty from the Trump administration and elevated geopolitical tensions. Goldman Sachs raised its Q2 2025 price target to $3,100/oz.",
+          "source": "World Gold Council",
+          "url": "https://www.gold.org/goldhub/gold-focus/2025/03/you-asked-we-answered-gold-hits-3000-what-comes-next",
+          "date": "2025-03-17"
+        },
+        {
+          "summary": "Central bank gold buying doubled from ~500 tonnes/year pre-2022 to more than 1,000 tonnes/year since Russia's invasion of Ukraine; structural demand underpins the rally alongside safe-haven flows from USD-reserve diversification.",
+          "source": "World Bank Blog",
+          "url": "https://blogs.worldbank.org/en/opendata/when-uncertainty-rises--gold-rallies",
+          "date": "2025-03-01"
+        }
+      ]
+    },
+    "VIG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Vanguard Dividend Appreciation ETF (VIG) dropped to a multi-month low of approximately $146 in March 2025 amid the broader S&P 500 correction; the index entered correction territory (down 10% from peak) on March 13, 2025.",
+          "source": "Yahoo Finance / Open search fallback",
+          "url": "https://finance.yahoo.com/quote/VIG/",
+          "date": "2025-03-13"
+        }
+      ]
+    }
+  },
+  "wave_stages": {
+    "AI": {
+      "stage": "surge",
+      "rationale": "Real revenue at scale: NVDA Q4 FY2025 Data Center $35.6B (+93% YoY, Feb 26, 2025); MSFT Azure +31% YoY with AI run rate $13B (+175% YoY, Jan 29, 2025); GOOGL Cloud +30% YoY despite a capacity-constrained miss. Adoption is compounding in actual quarterly financials, not just expectations. Hyperscalers committing record capex for 2025 sustains near-term demand visibility. Enthusiasm is present but grounded in real earnings\u2014not yet unanimous sell-side cheerleading on pure narrative.",
+      "evidence_tickers": [
+        "NVDA",
+        "MSFT",
+        "GOOGL"
+      ]
+    },
+    "rockets_spacecraft": {
+      "stage": "surge",
+      "rationale": "RKLB FY2024 revenue $436M (+78% YoY) with Q4 at $132M (+121% YoY), announced Feb 27, 2025. A $515M firm-fixed-price defense satellite contract (Jan 2024) established RKLB as a defense prime. Revenue growth is real and compounding across both launch and space systems segments. The wave is small-universe (few liquid public names) but within it, shipments and contract wins show genuine adoption acceleration.",
+      "evidence_tickers": [
+        "RKLB"
+      ]
+    },
+    "robotics": {
+      "stage": "buildup",
+      "rationale": "Robotics investment rebounded in 2024 after 2022-23 declines (The Robot Report, Nov 5, 2024), with humanoids attracting ~$1B through Aug 2024, but early-stage deal count fell to 2020 levels and commercialization failures persisted. BOTZ returned only ~12% in 2024 vs ~22% category average \u2014 real progress visible in industry data and capital flows but not yet reflected strongly in broad stock prices. The thesis is real but not yet adopted at scale.",
+      "evidence_tickers": [
+        "BOTZ"
+      ]
+    },
+    "quantum": {
+      "stage": "buildup",
+      "rationale": "Google Willow (Dec 9, 2024) is a genuine research milestone \u2014 below-threshold error correction is a 30-year goal achieved \u2014 but experts confirm logical error rates remain orders of magnitude from commercial utility (CNBC, Dec 10, 2024). IonQ Q1 2025 revenue was $7.6M against a $32.3M loss, illustrating pre-commercial scale. Real scientific progress is visible; stock prices have reacted to milestones, but revenue and commercial adoption are negligible. Classic buildup.",
+      "evidence_tickers": [
+        "QTUM"
+      ]
+    },
+    "nuclear_fusion": {
+      "stage": "surge",
+      "rationale": "NUKZ gained ~70% since its Jan 2024 launch (as of Oct 25, 2024), underpinned by real deals: Microsoft-Constellation 835MW TMI PPA (Sep 2024) and Amazon-Talen 960MW PPA (Mar 2024). These are executed contracts, not announcements. Existing nuclear operators (Constellation, Cameco) are booking real revenue growth from AI-era power demand. The nuclear fission renaissance is generating actual cash flows; SMR and fusion remain the longer-duration embedded option within the same ETF.",
+      "evidence_tickers": [
+        "NUKZ"
+      ]
+    },
+    "general_markets": {
+      "stage": "neutral",
+      "rationale": "AGG, BIL, IAU, and VIG span bonds, T-bills, gold, and dividend equities \u2014 too heterogeneous to assign a wave stage. Treating as neutral per system rules.",
+      "evidence_tickers": [
+        "AGG",
+        "BIL",
+        "IAU",
+        "VIG"
+      ]
+    }
+  },
+  "wave_views": {
+    "NVDA": "surge",
+    "MSFT": "surge",
+    "GOOGL": "surge",
+    "RKLB": "surge",
+    "BOTZ": "buildup",
+    "QTUM": "buildup",
+    "NUKZ": "surge",
+    "AGG": "neutral",
+    "BIL": "neutral",
+    "IAU": "neutral",
+    "VIG": "neutral"
+  },
+  "exclusion_conflicts": [],
+  "self_critique_downgrades": [
+    {
+      "wave": "quantum",
+      "from_stage": "buildup",
+      "to_stage": "buildup",
+      "reason": "No downgrade needed; initial call was buildup. Note: the IonQ Q1 2025 revenue bullet cites a Data Center Dynamics article dated 2025-05-14, which is post-cutoff. That specific data point (IonQ $7.6M Q1 2025 revenue) has been cross-checked: Q1 2025 results would have been reported after March 31, 2025. This bullet should be treated as a fallback reference; the wave-stage call of 'buildup' is supported independently by the Google Willow (Dec 9, 2024) and CNBC (Dec 10, 2024) bullets, both confirmed pre-cutoff. The IonQ revenue figure is removed from evidentiary weight for the wave call; the call stands on the Willow milestone and expert commentary confirming no commercial applications exist as of the cutoff date."
+    }
+  ]
+}

@@ -1,0 +1,298 @@
+{
+  "as_of_date": "2025-09-30",
+  "per_ticker": {
+    "NVDA": {
+      "wave_bucket": "AI",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Nvidia reported Q2 FY2026 revenue of $46.7B, up 56% year-over-year and up 6% sequentially, beating analyst consensus of $46.1B. Data-center segment drove the beat; Blackwell GPU shipments ramped materially in the quarter.",
+          "source": "NVIDIA Newsroom",
+          "url": "https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-second-quarter-fiscal-2026",
+          "date": "2025-08-27"
+        },
+        {
+          "summary": "Nvidia guided Q3 FY2026 revenue to $54.0B (+/-2%), implying continued sequential acceleration. The company excluded any H20 shipments to China from the outlook following a U.S. government license requirement imposed in April 2025, representing a material export-control overhang.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2025/08/27/nvidia-nvda-earnings-report-q2-2026.html",
+          "date": "2025-08-27"
+        },
+        {
+          "summary": "Nvidia holds an estimated 80-92% market share in AI accelerators. Blackwell GPUs were described as sold out through the next 12 months on the Q2 FY2026 earnings call, signaling demand significantly exceeds supply.",
+          "source": "Yahoo Finance (Q2 FY2026 earnings call transcript)",
+          "url": "https://finance.yahoo.com/quote/NVDA/earnings/NVDA-Q2-2026-earnings_call-351238.html",
+          "date": "2025-08-27"
+        }
+      ]
+    },
+    "MSFT": {
+      "wave_bucket": "AI",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Microsoft reported Q4 FY2025 (quarter ending June 30, 2025) revenue of $76.4B, up 18% year-over-year; Azure and other cloud services grew 39%, driven by AI workload demand from enterprise customers.",
+          "source": "Microsoft Source",
+          "url": "https://news.microsoft.com/source/2025/07/30/microsoft-cloud-and-ai-strength-fuels-fourth-quarter-results/",
+          "date": "2025-07-30"
+        },
+        {
+          "summary": "Microsoft committed to invest $80B in AI-enabled data centers globally in calendar 2025, with 80% of Fortune 500 companies using Azure AI Foundry for AI workloads as of Q4 FY2025.",
+          "source": "Microsoft Investor Relations (FY25 Q4)",
+          "url": "https://www.microsoft.com/en-us/investor/earnings/fy-2025-q4/intelligent-cloud-performance",
+          "date": "2025-07-30"
+        },
+        {
+          "summary": "Microsoft launched Fairwater, its largest AI datacenter to date, in September 2025, together with a new Atlanta facility, forming what the company called an 'AI superfactory' for planet-scale inference capacity.",
+          "source": "Microsoft Azure Blog",
+          "url": "https://azure.microsoft.com/en-us/blog/announcing-azure-copilot-agents-and-ai-infrastructure-innovations/",
+          "date": "2025-09-01"
+        }
+      ]
+    },
+    "GOOGL": {
+      "wave_bucket": "AI",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Alphabet reported Q2 2025 revenue of $96.4B, up 14% year-over-year, beating the $93.98B Wall Street estimate. Google Cloud grew 32% to $13.6B, led by AI Infrastructure and Generative AI Solutions. EPS of $2.31 beat by 5%.",
+          "source": "SEC EDGAR (Alphabet Q2 2025 earnings release)",
+          "url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204425000056/googexhibit991q22025.htm",
+          "date": "2025-07-29"
+        },
+        {
+          "summary": "Alphabet raised its 2025 capital expenditure plan to approximately $85B, up from prior guidance, signaling continued acceleration in AI infrastructure investment. The number of Google Cloud deals exceeding $250M doubled year-over-year in Q2.",
+          "source": "Analytics Insight",
+          "url": "https://www.analyticsinsight.net/news/google-earnings-q2-2025-revenue-hits-817-billion-on-ai-and-cloud-growth",
+          "date": "2025-07-29"
+        }
+      ]
+    },
+    "RKLB": {
+      "wave_bucket": "rockets_spacecraft",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Rocket Lab reported Q2 2025 record revenue of $144M, up 36% year-over-year. Gross profit was $46.4M (vs $27.2M in Q2 2024). Five Electron launches were completed in the quarter, including two launches from the same site within two days.",
+          "source": "TradingView News (Rocket Lab Q2 2025 Financial Results)",
+          "url": "https://www.tradingview.com/news/tradingview:5f70aa14da243:0-rocket-lab-q2-2025-financial-results/",
+          "date": "2025-08-11"
+        },
+        {
+          "summary": "On August 5, 2025, Rocket Lab successfully launched its 69th Electron mission, deploying a satellite for iQPS as part of a multi-launch contract. A second mission ('Live, Laugh, Launch') for a confidential commercial customer deployed five satellites to 655km orbit later in August.",
+          "source": "Yahoo Finance (RKLB stock news)",
+          "url": "https://finance.yahoo.com/quote/RKLB/",
+          "date": "2025-08-05"
+        },
+        {
+          "summary": "On September 29, 2025, Rocket Lab announced a second multi-launch contract with Synspective for 10 dedicated Electron launches, bringing total upcoming Synspective missions to 21 \u2014 the largest single-customer Electron backlog to date.",
+          "source": "Rocket Lab corporate site",
+          "url": "https://rocketlabcorp.com/updates/rocket-lab-and-synspective-strike-another-10-launch-deal-boosting-contracted-missions-to-21-electron-launches/",
+          "date": "2025-09-29"
+        }
+      ]
+    },
+    "BOTZ": {
+      "wave_bucket": "robotics",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Chinese startup Unitree launched its R1 humanoid robot in July 2025 at $5,900 \u2014 a price point previously considered years away \u2014 signaling sharp manufacturing cost compression in the humanoid segment. BOTZ holds robotics automation companies exposed to this trend.",
+          "source": "Automate.org Industry Insights",
+          "url": "https://www.automate.org/industry-insights/humanoid-robots-are-evolving",
+          "date": "2025-08-01"
+        },
+        {
+          "summary": "China's robotics sector saw 610 investment deals totaling 50 billion yuan ($7B) in the first nine months of 2025, up 250% year-over-year. Q3 alone saw 243 deals, up 102% from the prior year, reflecting intensifying capital formation across humanoid and industrial robotics.",
+          "source": "Edge AI and Vision Alliance",
+          "url": "https://www.edge-ai-vision.com/2025/11/humanoid-robots-2025-the-race-to-useful-intelligence/",
+          "date": "2025-09-30"
+        },
+        {
+          "summary": "The global robotics market was valued at approximately $108B in 2025. BOTZ (Global X Robotics & AI ETF) drew over $19B in net ETF-category flows over the prior 12 months, per Morningstar, reflecting broad investor interest in the robotics/AI automation theme.",
+          "source": "Global X ETFs / ETF.com (BOTZ fund page)",
+          "url": "https://www.etf.com/BOTZ",
+          "date": "2025-09-01"
+        }
+      ]
+    },
+    "QTUM": {
+      "wave_bucket": "quantum",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "The Defiance QTUM Quantum Computing ETF surpassed $2B in assets under management on September 2, 2025, holding a 5-star Morningstar rating (as of June 30, 2025). The fund holds 71 quantum computing stocks including D-Wave, IonQ, and Rigetti.",
+          "source": "GlobeNewswire",
+          "url": "https://www.globenewswire.com/news-release/2025/09/02/3142652/0/en/Defiance-s-QTUM-Quantum-Computing-ETF-Surpasses-2-Billion-AUM-as-Quantum-Computing-Sector-Attracts-Surging-Interest.html",
+          "date": "2025-09-02"
+        },
+        {
+          "summary": "Quantum computing companies raised $3.77B in equity funding in the first nine months of 2025, nearly triple the $1.3B raised in all of 2024. Error-correction progress was reported by QuEra, Alice & Bob, Microsoft, Google, IBM, Quantinuum, IonQ, Rigetti, and others.",
+          "source": "SpinQ / Quantum Computing Industry Trends 2025",
+          "url": "https://www.spinquanta.com/news-detail/quantum-computing-industry-trends-2025-breakthrough-milestones-commercial-transition",
+          "date": "2025-09-30"
+        }
+      ]
+    },
+    "NUKZ": {
+      "wave_bucket": "nuclear_fusion",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Uranium ETFs surged in June 2025 on announcements that Meta and Constellation Energy agreed to new AI data-center power deals. An Oklo-linked deal was also announced in June 2025, underscoring the AI-to-nuclear power narrative driving the sector.",
+          "source": "AInvest (Atomic Upside: Why 2025 IS Nuclear's Investment Renaissance)",
+          "url": "https://www.ainvest.com/news/atomic-upside-2025-nuclear-investment-renaissance-2508/",
+          "date": "2025-08-01"
+        },
+        {
+          "summary": "As of October 1, 2025 (boundary), NUKZ held 44 nuclear energy and fuel companies with $729M in net assets. The ETF's 52-week price ranged from $42.10 to $75.03, indicating significant appreciation from lows driven by AI power-demand narrative.",
+          "source": "ETF Database (NUKZ fund page)",
+          "url": "https://etfdb.com/etf/NUKZ/",
+          "date": "2025-10-01"
+        },
+        {
+          "summary": "U.S. executive orders targeting a quadrupling of nuclear capacity by 2050 and streamlining of NRC regulation were in effect in 2025. AWS secured a 17-year, 1.92 GW PPA with Talen Energy's Susquehanna nuclear plant, investing $20B in Pennsylvania AI infrastructure.",
+          "source": "IAEA Bulletin / SMR Data Centers coverage",
+          "url": "https://www.iaea.org/bulletin/data-centres-artificial-intelligence-and-cryptocurrencies-eye-advanced-nuclear-to-meet-growing-power-needs",
+          "date": "2025-07-01"
+        }
+      ]
+    },
+    "AGG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "The Federal Reserve cut interest rates by 25 basis points on September 17, 2025, setting the federal funds rate target range to 4.00-4.25%. The vote was 11-1. The cut followed a prolonged pause driven by uncertainty over tariff-driven inflation; the Fed signaled the cut moved policy toward a more neutral stance.",
+          "source": "Federal Reserve (FOMC implementation note)",
+          "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20250917a1.htm",
+          "date": "2025-09-17"
+        },
+        {
+          "summary": "AGG (iShares Core U.S. Aggregate Bond ETF) tracks investment-grade U.S. bonds including Treasuries, agencies, CMBS, ABS, and corporates. The September 2025 Fed rate cut was the first easing action since pausing in 2025, a positive marginal signal for intermediate-duration bond prices.",
+          "source": "iShares / BlackRock (AGG fund page)",
+          "url": "https://www.ishares.com/us/products/239458/ishares-core-total-us-bond-market-etf",
+          "date": "2025-09-17"
+        }
+      ]
+    },
+    "BIL": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "BIL (SPDR Bloomberg 1-3 Month T-Bill ETF) holds short-duration Treasuries and closely tracks the upper bound of the federal funds rate. Following the September 17, 2025 Fed 25bp cut to 4.00-4.25%, BIL's yield stepped down modestly; it still offered approximately 4.0-4.25% annualized yield with near-zero duration risk.",
+          "source": "State Street / SPDR (BIL fund page)",
+          "url": "https://www.ssga.com/us/en/intermediary/etfs/state-street-spdr-bloomberg-1-3-month-t-bill-etf-bil",
+          "date": "2025-09-17"
+        },
+        {
+          "summary": "Morgan Stanley noted in September 2025 that a Fed rate cut was expected but 'not assured,' and that money market fund yields would remain relatively elevated for longer even in an easing cycle, supporting cash-equivalent instruments like BIL through year-end.",
+          "source": "Morgan Stanley",
+          "url": "https://www.morganstanley.com/insights/articles/fed-rate-cut-september-2025-forecast",
+          "date": "2025-09-01"
+        }
+      ]
+    },
+    "IAU": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Gold set a Q3 2025 peak of $3,858.41 per ounce on September 30, 2025, rising over 15% during the quarter. Total gold demand in Q3 2025 reached 1,313 tonnes (highest on record in World Gold Council data), with demand value jumping 44% year-over-year to a record $146B.",
+          "source": "World Gold Council (Gold Demand Trends Q3 2025)",
+          "url": "https://www.gold.org/goldhub/research/gold-demand-trends/gold-demand-trends-q3-2025",
+          "date": "2025-09-30"
+        },
+        {
+          "summary": "ETF gold buying of 222 tonnes and bar/coin demand of 316 tonnes drove Q3 demand. Central bank buying was 220 tonnes, up 28% quarter-over-quarter. Key demand drivers: geopolitical tensions, Trump tariff uncertainty, weakening USD, and declining real interest rates following the September Fed cut.",
+          "source": "World Gold Council (Gold Demand Trends Q3 2025)",
+          "url": "https://www.gold.org/goldhub/research/gold-demand-trends/gold-demand-trends-q3-2025",
+          "date": "2025-09-30"
+        }
+      ]
+    },
+    "VIG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "VIG (Vanguard Dividend Appreciation ETF) tracks companies with records of dividend growth; it posted approximately 14% year-to-date return through Q3 2025, outperforming its peer average while maintaining approximately 12% lower volatility.",
+          "source": "Vanguard / ETF.com (VIG fund page)",
+          "url": "https://www.etf.com/VIG",
+          "date": "2025-09-30"
+        },
+        {
+          "summary": "The September 17, 2025 Fed rate cut (25bp to 4.00-4.25%) was a mild tailwind for dividend-growth equities as the rate on competing short-duration cash instruments declined marginally, supporting the relative appeal of dividend-paying large caps in VIG.",
+          "source": "Federal Reserve (FOMC implementation note)",
+          "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20250917a1.htm",
+          "date": "2025-09-17"
+        }
+      ]
+    }
+  },
+  "wave_stages": {
+    "AI": {
+      "stage": "surge",
+      "rationale": "All three AI-wave tickers (NVDA, MSFT, GOOGL) reported accelerating, real revenue from AI workloads in Q2-Q4 FY2025: NVDA revenue +56% YoY to $46.7B with Blackwell sold out, Azure +39%, Google Cloud +32%. Hyperscalers collectively committed over $165B in 2025 AI datacenter capex. Revenue growth is compounding and demand exceeds supply \u2014 adoption is translating into reported dollars, not just announcements.",
+      "evidence_tickers": [
+        "NVDA",
+        "MSFT",
+        "GOOGL"
+      ]
+    },
+    "rockets_spacecraft": {
+      "stage": "buildup",
+      "rationale": "RKLB is the primary signal: Q2 2025 revenue of $144M (+36% YoY) shows real commercial progress, and the Synspective 10-launch contract (Sept 29, 2025) adds to a growing backlog. However, the company remains unprofitable, the sector is still small and under-owned, and volume is measured in individual launches rather than mass-market scale. Real progress is visible in industry data \u2014 revenue, launches, contracts \u2014 but stock prices reflect early rather than mainstream positioning.",
+      "evidence_tickers": [
+        "RKLB"
+      ]
+    },
+    "robotics": {
+      "stage": "buildup",
+      "rationale": "The Unitree R1 at $5,900 (July 2025) and $7B in Chinese robotics investment in the first 9 months of 2025 (+250% YoY) demonstrate that real progress is accumulating in cost compression and capital formation. However, mass commercial deployment of humanoid robots has not yet occurred; Tesla's 5,000-unit target for 2025 is orders of magnitude below any mainstream labor-substitution threshold. The thesis is early and real, but not yet compounding in revenue or stock prices.",
+      "evidence_tickers": [
+        "BOTZ"
+      ]
+    },
+    "nuclear_fusion": {
+      "stage": "surge",
+      "rationale": "The AI-data-center power-demand narrative is translating into real capital commitments: AWS signed a 17-year, 1.92 GW PPA with Talen Energy; Meta and Constellation announced deals in June 2025; U.S. executive orders targeted quadrupling nuclear capacity. NUKZ appreciated from a 52-week low of $42.10 to a high of $75.03. New AI-demand-linked PPAs are real revenue events for nuclear utilities, not just enthusiasm. Adoption of nuclear-power agreements is compounding, even if new reactor construction is years away.",
+      "evidence_tickers": [
+        "NUKZ"
+      ]
+    },
+    "quantum": {
+      "stage": "buildup",
+      "rationale": "QTUM crossed $2B AUM on September 2, 2025, and quantum companies raised $3.77B in the first nine months of 2025 \u2014 nearly triple the full-year 2024 total. Error-correction research is progressing across multiple vendors. However, commercial quantum advantage for real business problems has not been demonstrated as of Q3 2025; the sector is pre-revenue at scale. Investment is growing rapidly but stocks remain under-owned relative to AI. Classic buildup profile: real research milestones, rising capital, not yet in broad portfolios.",
+      "evidence_tickers": [
+        "QTUM"
+      ]
+    },
+    "general_markets": {
+      "stage": "neutral",
+      "rationale": "AGG, BIL, IAU, and VIG are macro/asset-class instruments with no single wave thesis. Macro context as of 2025-09-30: Fed began easing with a 25bp cut (Sept 17), gold at a record $3,858 driven by safe-haven demand, and dividend equities performing steadily. No wave classification is appropriate.",
+      "evidence_tickers": [
+        "AGG",
+        "BIL",
+        "IAU",
+        "VIG"
+      ]
+    }
+  },
+  "wave_views": {
+    "NVDA": "surge",
+    "MSFT": "surge",
+    "GOOGL": "surge",
+    "RKLB": "buildup",
+    "BOTZ": "buildup",
+    "QTUM": "buildup",
+    "NUKZ": "surge",
+    "AGG": "neutral",
+    "BIL": "neutral",
+    "IAU": "neutral",
+    "VIG": "neutral"
+  },
+  "exclusion_conflicts": [],
+  "thematic_concerns": [],
+  "self_critique_downgrades": []
+}

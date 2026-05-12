@@ -1,0 +1,278 @@
+{
+  "as_of_date": "2023-12-31",
+  "per_ticker": {
+    "NVDA": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Nvidia Q3 FY2024 (quarter ended October 29, 2023) total revenue $18.12B, up 206% YoY and 34% QoQ; Data Center segment revenue $14.51B, up 279% YoY, beating Street consensus of $12.97B. GAAP EPS $3.71, up 1,274% YoY.",
+          "source": "NVIDIA Newsroom",
+          "url": "https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-third-quarter-fiscal-2024",
+          "date": "2023-11-21"
+        },
+        {
+          "summary": "Q4 FY2024 guidance set at $20.0B revenue (+/-2%), implying sequential acceleration; H200 GPU with HBM3e announced for Q2 FY2025 availability; AI foundry services launched on Microsoft Azure.",
+          "source": "NVIDIA Newsroom",
+          "url": "https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-third-quarter-fiscal-2024",
+          "date": "2023-11-21"
+        },
+        {
+          "summary": "SemiAnalysis (July 5, 2023) reported H100 GPU supply sold out into Q1 2024 despite Nvidia targeting 400,000 units/quarter; CoWoS packaging at TSMC and HBM3 memory (SK Hynix >95% share) are the binding constraints; even OpenAI cannot secure sufficient H100s.",
+          "source": "SemiAnalysis",
+          "url": "https://newsletter.semianalysis.com/p/ai-capacity-constraints-cowos-and",
+          "date": "2023-07-05"
+        }
+      ]
+    },
+    "MSFT": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Microsoft Q1 FY2024 (quarter ended September 30, 2023) revenue $56.5B (+13% YoY); operating income $26.9B (+25%); CEO Satya Nadella stated Microsoft is 'rapidly infusing AI across every layer of our tech stack and delivering copilots for every role and business process.'",
+          "source": "Microsoft Investor Relations",
+          "url": "https://www.microsoft.com/en-us/investor/earnings/fy-2024-q1/press-release-webcast",
+          "date": "2023-10-24"
+        },
+        {
+          "summary": "Microsoft 365 Copilot became generally available to enterprise customers (300+ license threshold) on November 1, 2023; pricing set at $30/user/month atop M365 subscription; GitHub hit $1B in annual recurring revenue by December 2023.",
+          "source": "Microsoft Blog / open search",
+          "url": "https://www.microsoft.com/en-us/microsoft-365/blog/2023/09/21/announcing-microsoft-365-copilot-general-availability-and-microsoft-365-chat/",
+          "date": "2023-09-21"
+        },
+        {
+          "summary": "Stratechery (October 25, 2023) framed Microsoft's AI-driven Azure growth as winning market share from Google Cloud; article title 'Google Earnings, Microsoft Earnings, AI Leverage' noted Microsoft results suggest AI is accelerating Azure relative to peers. (Article is paywalled; headline and abstract only accessed.)",
+          "source": "Stratechery",
+          "url": "https://stratechery.com/2023/google-earnings-microsoft-earnings-ai-leverage/",
+          "date": "2023-10-25"
+        }
+      ]
+    },
+    "GOOGL": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Alphabet Q3 2023 (quarter ended September 30, 2023) revenue $77B (+11% YoY); Google Cloud showed momentum; CEO Sundar Pichai cited AI-driven innovation across Search, YouTube, Cloud, and Pixel; Google DeepMind formed by combining Brain team and DeepMind, effective Q2 2023.",
+          "source": "SEC EDGAR (Alphabet Q3 2023 earnings release)",
+          "url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204423000088/googexhibit991q32023.htm",
+          "date": "2023-10-24"
+        },
+        {
+          "summary": "Stratechery noted Google's ad business looked healthy in Q3 2023 but cloud growth was slower than Microsoft's Azure, with the framing that Microsoft is 'winning in AI' and redirecting enterprise cloud spending. (Paywalled; abstract only.)",
+          "source": "Stratechery",
+          "url": "https://stratechery.com/2023/google-earnings-microsoft-earnings-ai-leverage/",
+          "date": "2023-10-25"
+        },
+        {
+          "summary": "MIT Technology Review (November 15, 2023) covered Microsoft CEO Satya Nadella's developer AI push at Microsoft Ignite, implicitly framing Google as the incumbent under pressure to maintain developer mindshare in the AI platform race.",
+          "source": "MIT Technology Review",
+          "url": "https://www.technologyreview.com/2023/11/15/1083426/behind-microsoft-ceo-satya-nadellas-push-to-get-ai-tools-in-developers-hands/",
+          "date": "2023-11-15"
+        }
+      ]
+    },
+    "RKLB": {
+      "wave_bucket": "rockets_spacecraft",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Rocket Lab Q3 2023 (reported November 8, 2023): total revenue $67.6M (+7% YoY); Space Systems $46.3M (+17% YoY); launch revenue $21.3M; a mid-September mission failure paused launch momentum. Net loss $40.6M (8 cents/share).",
+          "source": "Payload",
+          "url": "https://payloadspace.com/rocket-lab-reports-q1-2023-earnings/",
+          "date": "2023-11-08"
+        },
+        {
+          "summary": "Contract backlog rose 9% sequentially to $582M as of Q3 2023; Rocket Lab fully booked Electron manifest for 2024 with 22 launches contracted; company guided for 11 total Electron launches in full-year 2023.",
+          "source": "Payload / open search",
+          "url": "https://www.cnbc.com/2023/11/08/rocket-lab-rklb-q3-earnings-report.html",
+          "date": "2023-11-08"
+        },
+        {
+          "summary": "SpaceNews reported Rocket Lab was targeting first Neutron launch in 2024 as of 2023; Neutron launch pad (LC-3, Wallops Island, Virginia) under construction; development described as on schedule and budget per management.",
+          "source": "SpaceNews",
+          "url": "https://spacenews.com/rocket-lab-pushing-for-first-neutron-launch-in-2024/",
+          "date": "2023-12-01"
+        }
+      ]
+    },
+    "BOTZ": {
+      "wave_bucket": "robotics",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "North American robot sales declined sharply in 2023: Q1 down 21% YoY, Q2 down 37% YoY, overall U.S. market down 29% in H1 2023; the post-pandemic automation surge was correcting. BOTZ's core industrial holdings (Keyence, Fanuc, ABB) faced this headwind.",
+          "source": "The Robot Report",
+          "url": "https://www.therobotreport.com/the-biggest-robotics-industry-trends-in-2023/",
+          "date": "2023-12-28"
+        },
+        {
+          "summary": "Humanoid robot investment accelerating in 2023: Figure AI raised $70M Series A (May 2023); Agility Robotics commenced commercial testing of Digit at Amazon facilities (October 2023); December 2023 robotics VC investments topped $749M.",
+          "source": "The Robot Report",
+          "url": "https://www.therobotreport.com/robotics-investments-top-749m-in-december-2023/",
+          "date": "2023-12-31"
+        },
+        {
+          "summary": "Generative AI integration into robotics gained traction in 2023: Agility Robotics demonstrated controlling Digit with natural language commands using LLMs in just two weeks; GPT-4 (March 2023) and Bard seen as accelerants for human-robot interaction research.",
+          "source": "The Robot Report",
+          "url": "https://www.therobotreport.com/the-biggest-robotics-industry-trends-in-2023/",
+          "date": "2023-12-28"
+        }
+      ]
+    },
+    "QTUM": {
+      "wave_bucket": "quantum",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "IBM announced the 133-qubit Heron processor on December 4, 2023 at its annual Quantum Summit; Heron delivers up to five-times lower error rates versus predecessor Eagle; IBM Quantum System Two (three Heron processors, modular architecture) began operations at Yorktown Heights, NY.",
+          "source": "IBM Newsroom",
+          "url": "https://newsroom.ibm.com/2023-12-04-IBM-Debuts-Next-Generation-Quantum-Processor-IBM-Quantum-System-Two,-Extends-Roadmap-to-Advance-Era-of-Quantum-Utility",
+          "date": "2023-12-04"
+        },
+        {
+          "summary": "IBM demonstrated 'quantum utility' on a 127-qubit Eagle processor in 2023, showing quantum systems could tackle utility-scale problems in chemistry and materials science beyond brute-force classical simulation; IBM extended its development roadmap to 2033.",
+          "source": "IBM Newsroom",
+          "url": "https://newsroom.ibm.com/2023-12-04-IBM-Debuts-Next-Generation-Quantum-Processor-IBM-Quantum-System-Two,-Extends-Roadmap-to-Advance-Era-of-Quantum-Utility",
+          "date": "2023-12-04"
+        },
+        {
+          "summary": "Qiskit 1.0 released and IBM integrated generative AI via its watsonx platform to automate quantum code development; research partners included Argonne National Laboratory, University of Tokyo, and Harvard University confirming utility-scale demonstrations.",
+          "source": "IBM Newsroom",
+          "url": "https://newsroom.ibm.com/2023-12-04-IBM-Debuts-Next-Generation-Quantum-Processor-IBM-Quantum-System-Two,-Extends-Roadmap-to-Advance-Era-of-Quantum-Utility",
+          "date": "2023-12-04"
+        }
+      ]
+    },
+    "AGG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "AGG (iShares Core U.S. Aggregate Bond ETF) returned approximately +5.66% total return in 2023, recovering from -13.02% in 2022; the rebound reflected stabilizing rate expectations as the Fed paused after July 2023.",
+          "source": "Yahoo Finance / open search",
+          "url": "https://finance.yahoo.com/quote/AGG/performance/",
+          "date": "2023-12-31"
+        },
+        {
+          "summary": "Federal Reserve held the federal funds rate at 5.25-5.50% from July 2023 through year-end after a final hike; December 2023 FOMC meeting left rates unchanged and signaled potential cuts in 2024, supporting a bond rally into Q4 2023.",
+          "source": "CNBC / open search",
+          "url": "https://www.cnbc.com/2023/12/13/fed-interest-rate-decision-december-2023.html",
+          "date": "2023-12-13"
+        }
+      ]
+    },
+    "BIL": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "BIL (SPDR Bloomberg 1-3 Month T-Bill ETF) returned approximately +4.94% in 2023, reflecting the high-rate regime; with Fed funds at 5.25-5.50%, short T-bills offered the highest nominal yield in over two decades, creating significant competition for equity and bond allocations.",
+          "source": "Yahoo Finance / open search",
+          "url": "https://finance.yahoo.com/quote/BIL/performance/",
+          "date": "2023-12-31"
+        },
+        {
+          "summary": "The Fed's July 26, 2023 rate decision brought the target range to 5.25-5.50%; BIL's near-cash duration profile made it one of the best performing fixed-income instruments of 2023 with negligible duration risk relative to intermediate and long bonds.",
+          "source": "Federal Reserve / open search",
+          "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20230726a1.htm",
+          "date": "2023-07-26"
+        }
+      ]
+    },
+    "IAU": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Gold (and IAU, which tracks spot gold) returned approximately +15% in 2023, closing the year at ~$2,078/oz, the highest annual year-end close on record at that date; the average 2023 gold price of ~$1,940/oz was also a record, 8% above the 2022 average.",
+          "source": "Open search (World Gold Council data, published 2023-12-31 market close)",
+          "url": "https://www.gold.org/goldhub/data/gold-returns",
+          "date": "2023-12-31"
+        },
+        {
+          "summary": "Gold's outperformance in a high-rate year was driven by record central bank net purchases (~1,037 tonnes, nearly matching the 2022 record) and elevated geopolitical risk premia; interest rate headwinds were offset by non-Western demand.",
+          "source": "Open search",
+          "url": "https://www.gold.org/goldhub/research/gold-demand-trends/gold-demand-trends-full-year-2023",
+          "date": "2023-12-31"
+        }
+      ]
+    },
+    "VIG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "VIG (Vanguard Dividend Appreciation ETF) tracks companies with 10+ consecutive years of dividend growth; its 23% tech weighting (top holdings include Microsoft, Apple, Broadcom) meant it benefited from the 2023 tech rally while remaining defensive relative to growth-only ETFs.",
+          "source": "Yahoo Finance / open search",
+          "url": "https://finance.yahoo.com/quote/VIG/",
+          "date": "2023-12-31"
+        },
+        {
+          "summary": "VIG's quality-and-dividend-growth tilt positioned it as a lower-volatility equity holding in a year where the S&P 500 rebounded strongly (~24% total return); dividend-growth screens historically exclude the highest-valuation or financially leveraged names, reducing concentration risk.",
+          "source": "Yahoo Finance / open search",
+          "url": "https://finance.yahoo.com/quote/VIG/performance/",
+          "date": "2023-12-31"
+        }
+      ]
+    }
+  },
+  "wave_stages": {
+    "AI": {
+      "stage": "surge",
+      "rationale": "Real revenue is compounding at extraordinary rates: Nvidia Data Center revenue +279% YoY in Q3 FY2024 (2023-11-21); Microsoft Copilot reached GA in November 2023 with $30/user/month pricing; Azure drove 13% overall revenue growth at Microsoft. GPU supply is sold out into Q1 2024 (SemiAnalysis, 2023-07-05), confirming demand exceeds capacity. Valuations are elevated but revenue growth is genuine and accelerating.",
+      "evidence_tickers": [
+        "NVDA",
+        "MSFT",
+        "GOOGL"
+      ]
+    },
+    "robotics": {
+      "stage": "digestion",
+      "rationale": "North American industrial robot sales fell 21% in Q1 2023 and 37% in Q2 2023 YoY per The Robot Report (2023-12-28), reversing the post-pandemic automation surge. BOTZ's core industrial holdings (Fanuc, Keyence, ABB) faced direct volume headwinds. Humanoid investment is growing but not yet in BOTZ's primary portfolio companies and not yet generating industrial-scale revenue.",
+      "evidence_tickers": [
+        "BOTZ"
+      ]
+    },
+    "rockets_spacecraft": {
+      "stage": "buildup",
+      "rationale": "Rocket Lab completed 10 Electron launches in 2023 with a $582M backlog growing 9% sequentially (Q3 2023, 2023-11-08) and fully booked its 2024 manifest at 22 launches. Revenue growing but only $67.6M/quarter; company remains pre-profitability. Neutron (medium-lift reusable vehicle) is under development but not yet flying. Real commercial progress visible but not yet at scale.",
+      "evidence_tickers": [
+        "RKLB"
+      ]
+    },
+    "quantum": {
+      "stage": "buildup",
+      "rationale": "IBM debuted the 133-qubit Heron processor on 2023-12-04 with a 5x error-rate improvement over Eagle and opened IBM Quantum System Two; IBM demonstrated 'quantum utility' for scientific problems. Research milestones are real and peer-reviewed, but QTUM holds companies deriving revenue primarily from classical computing with quantum optionality. No commercial quantum revenue is flowing at end-2023.",
+      "evidence_tickers": [
+        "QTUM"
+      ]
+    },
+    "general_markets": {
+      "stage": "neutral",
+      "rationale": "AGG, BIL, IAU, and VIG are diversified instruments with no single-wave exposure. Classified neutral per the prompt instructions.",
+      "evidence_tickers": [
+        "AGG",
+        "BIL",
+        "IAU",
+        "VIG"
+      ]
+    }
+  },
+  "wave_views": {
+    "NVDA": "surge",
+    "MSFT": "surge",
+    "GOOGL": "surge",
+    "RKLB": "buildup",
+    "BOTZ": "digestion",
+    "QTUM": "buildup",
+    "AGG": "neutral",
+    "BIL": "neutral",
+    "IAU": "neutral",
+    "VIG": "neutral"
+  },
+  "exclusion_conflicts": [],
+  "thematic_concerns": [],
+  "self_critique_downgrades": []
+}

@@ -1,0 +1,274 @@
+{
+  "as_of_date": "2024-06-30",
+  "per_ticker": {
+    "NVDA": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Nvidia reported fiscal Q1 FY2025 (ended April 28, 2024) record revenue of $26.0B (+262% YoY) and record Data Center revenue of $22.6B (+427% YoY), with Q2 FY2025 guidance of $28.0B (+/- 2%). Non-GAAP EPS of $6.12 (+461% YoY). A 10-for-1 stock split was announced, effective June 10, 2024.",
+          "source": "Nvidia Newsroom",
+          "url": "https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-first-quarter-fiscal-2025",
+          "date": "2024-05-22"
+        },
+        {
+          "summary": "NVDA completed a 10-for-1 stock split on June 10, 2024, with the pre-split share price closing at approximately $1,208 on June 7, making the split effective at roughly $120.88/share. The split followed record earnings and was intended to broaden retail and employee access.",
+          "source": "Nvidia Newsroom",
+          "url": "https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-first-quarter-fiscal-2025",
+          "date": "2024-05-22"
+        }
+      ]
+    },
+    "MSFT": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Microsoft Q3 FY2024 (ended March 31, 2024): total revenue $61.9B (+17% YoY), Microsoft Cloud revenue $35.1B (+23%), Azure and other cloud services +31% YoY. Operating income $27.6B (+23%), net income $21.9B (+20%). CEO Nadella cited Copilot stack as driving 'a new era of AI transformation.'",
+          "source": "Microsoft Investor Relations",
+          "url": "https://www.microsoft.com/en-us/investor/earnings/fy-2024-q3/press-release-webcast",
+          "date": "2024-04-25"
+        },
+        {
+          "summary": "Microsoft returned $8.4B to shareholders via buybacks and dividends in Q3 FY2024. The company characterized its AI investments through the Copilot stack as a key enterprise differentiator, with Azure AI services driving cloud acceleration.",
+          "source": "Microsoft Investor Relations",
+          "url": "https://www.microsoft.com/en-us/investor/earnings/fy-2024-q3/press-release-webcast",
+          "date": "2024-04-25"
+        }
+      ]
+    },
+    "GOOGL": {
+      "wave_bucket": "AI",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Alphabet Q1 2024 revenue $80.5B (+15% YoY), beating estimates. Google Cloud revenue $9.57B (+28% YoY). Operating margin expanded to 32%. CEO Pichai stated the company is 'well underway with its Gemini era.' First-ever cash dividend of $0.20/share approved, paid June 17, 2024. $70B share buyback authorized.",
+          "source": "SEC EDGAR / Yahoo Finance",
+          "url": "https://finance.yahoo.com/news/alphabet-inc-googl-q1-2024-214204233.html",
+          "date": "2024-04-25"
+        },
+        {
+          "summary": "Alphabet consolidated Google Research and DeepMind AI model development teams and announced reporting changes starting Q2 2024, signaling organizational commitment to AI-first strategy. Cloud operating income tripled YoY to an implied strong figure with margin expanding from 9.4% to 32.9%.",
+          "source": "SEC EDGAR / Yahoo Finance",
+          "url": "https://finance.yahoo.com/news/alphabet-inc-googl-q1-2024-214204233.html",
+          "date": "2024-04-25"
+        }
+      ]
+    },
+    "RKLB": {
+      "wave_bucket": "rockets_spacecraft",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Rocket Lab Q1 2024 revenue $92.77M (+69% YoY, +55% QoQ). Backlog exceeded $1B. Cash position $365.93M, up from $162.52M at year-end 2023. Secured ~$50M contract with US Space Force Systems Command. Q2 2024 guidance: $105-110M revenue. Four Electron missions executed in Q1.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/news/rocket-lab-usa-inc-rklb-221303101.html",
+          "date": "2024-05-06"
+        },
+        {
+          "summary": "Rocket Lab delayed Neutron medium-lift rocket first launch from end-2024 to mid-2025, with Archimedes engine testing at Stennis as the primary driver. The delay removes RKLB from contention for initial national-security medium-lift contracts. CEO Beck: 'The engine is the primary driver for the move.'",
+          "source": "Payload Space",
+          "url": "https://payloadspace.com/rocket-lab-throws-in-the-towel-on-2024-neutron-launch/",
+          "date": "2024-05-07"
+        },
+        {
+          "summary": "Rocket Lab progressing on $515M Space Development Agency contract to design and build 18 spacecraft, completing preliminary designs. CEO Beck stated demand is not a concern; CFO Spice identified Neutron as the path to sustained cash flow positivity.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/news/rocket-lab-usa-inc-rklb-221303101.html",
+          "date": "2024-05-06"
+        }
+      ]
+    },
+    "BOTZ": {
+      "wave_bucket": "robotics",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Figure AI raised $675M in Series B at a $2.6B valuation in February 2024, backed by Microsoft, OpenAI Startup Fund, NVIDIA, Amazon Industrial Innovation Fund, and Jeff Bezos. Plans include expanded AI training, increased humanoid manufacturing, and delivery of production units in 2024-2025. BMW began testing Figure 01 at its South Carolina automotive factory.",
+          "source": "The Robot Report",
+          "url": "https://www.therobotreport.com/figure-ai-raises-675m-to-commercialize-humanoids/",
+          "date": "2024-02-29"
+        },
+        {
+          "summary": "Boston Dynamics retired its hydraulic Atlas and unveiled an all-electric successor on April 17, 2024, marking a transition from research platform to commercial product. CEO Playter announced Hyundai factory trials for 2025, targeting automotive parts movement and logistics. For the first time, Boston Dynamics described Atlas as a product rather than a research tool.",
+          "source": "The Robot Report",
+          "url": "https://www.therobotreport.com/boston-dynamics-debuts-electric-version-of-atlas-humanoid-robot/",
+          "date": "2024-04-17"
+        }
+      ]
+    },
+    "QTUM": {
+      "wave_bucket": "quantum",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "IBM's quantum roadmap entering 2024 focused on Heron (133-qubit, released 2023) and Flamingo (462-qubit, first inter-processor linked chip). IBM demonstrated a 100-qubit, 100-depth circuit (approximately 5,000 two-qubit gates) accurately on the Heron processor in 2024, a benchmark milestone on the path to utility-scale quantum computing.",
+          "source": "Quantum Computing Report (open search)",
+          "url": "https://quantumcomputingreport.com/ibm-reveals-more-details-about-its-quantum-error-correction-roadmap/",
+          "date": "2024-06-01"
+        },
+        {
+          "summary": "The quantum computing sector entered 2024 with an unprecedented wave of roadmap announcements -- thirteen vendors either launched or significantly updated development roadmaps, signaling heightened investment competition. Pre-commercial status persists; revenue from quantum computing hardware and services remains de minimis for nearly all players.",
+          "source": "Quantum Computing Report (open search)",
+          "url": "https://quantumcomputingreport.com/2024-the-year-of-quantum-computing-roadmaps/",
+          "date": "2024-06-15"
+        }
+      ]
+    },
+    "NUKZ": {
+      "wave_bucket": "nuclear_fusion",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "NUKZ (Range Nuclear Renaissance ETF) launched January 23, 2024, providing exposure to uranium miners (Cameco ~9.4% top holding), nuclear utilities (Constellation Energy), and reactor manufacturers (NuScale). The fund holds 53 positions with a 0.85% expense ratio.",
+          "source": "Nasdaq / Yahoo Finance (open search)",
+          "url": "https://www.nasdaq.com/articles/nukz-brand-new-nuclear-energy-etf-one-2024s-hottest-etfs",
+          "date": "2024-06-01"
+        },
+        {
+          "summary": "Uranium prices surged over the prior 10-month period, with spot U3O8 oscillating between ~$63-$83/lb in H1 2024 after a multi-year bull run. A Bloomberg report dated June 12-13, 2024 described the uranium price surge as 'revealing a world returning to nuclear power.' AI data center electricity demand was cited as a structural tailwind for nuclear generation alongside climate commitments.",
+          "source": "Bloomberg (open search)",
+          "url": "https://www.bloomberg.com/news/features/2024-06-12/uranium-price-surge-helps-deadly-metal-dominate-commodity-market",
+          "date": "2024-06-12"
+        },
+        {
+          "summary": "The IEA reported that global nuclear generating capacity was on track to grow significantly, with 61 plants under construction and 90+ in planning globally. AI data center power demand -- projected to grow from 3.5% to 8.6% of US electricity by 2035 per Bloomberg New Energy Finance -- was increasingly cited as a structural driver for nuclear baseload. No major hyperscaler nuclear PPAs had been signed as of June 30, 2024.",
+          "source": "Bloomberg / World Nuclear News (open search)",
+          "url": "https://www.bloomberg.com/news/newsletters/2024-06-13/uranium-price-surge-reveals-a-world-returning-to-nuclear-power-big-take",
+          "date": "2024-06-13"
+        }
+      ]
+    },
+    "AGG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "At its June 12, 2024 meeting, the FOMC unanimously held the federal funds rate at 5.25%-5.50% for the seventh consecutive meeting. The updated dot plot projected only one 25bp cut in 2024 (down from three projected in March), and four cuts in 2025. Core inflation forecast raised to 2.8% year-end 2024. Powell stated rate decisions would remain data-dependent.",
+          "source": "J.P. Morgan",
+          "url": "https://www.jpmorgan.com/insights/outlook/economic-outlook/fed-meeting-june-2024",
+          "date": "2024-06-13"
+        },
+        {
+          "summary": "AGG (iShares Core U.S. Aggregate Bond ETF) tracks the total US investment-grade bond market. With the Fed on hold at 5.25-5.50% through Q2 2024 and rate cuts pushed back relative to earlier expectations, intermediate-duration bond prices remained under pressure, as rising rate expectations weigh on NAV.",
+          "source": "iShares / Yahoo Finance (open search)",
+          "url": "https://www.ishares.com/us/products/239458/ishares-core-total-us-bond-market-etf",
+          "date": "2024-06-30"
+        }
+      ]
+    },
+    "BIL": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "BIL (SPDR Bloomberg 1-3 Month T-Bill ETF) tracks 1-3 month Treasury bills, which were yielding approximately 5.2-5.3% in mid-2024, closely tracking the Fed funds target of 5.25-5.50%. With the June 2024 FOMC meeting confirming only one cut expected in 2024, BIL continued to deliver elevated cash-like yields with minimal duration risk.",
+          "source": "J.P. Morgan / State Street (open search)",
+          "url": "https://www.jpmorgan.com/insights/outlook/economic-outlook/fed-meeting-june-2024",
+          "date": "2024-06-13"
+        }
+      ]
+    },
+    "IAU": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Gold (tracked by IAU, iShares Gold Trust) hit a record approximately $2,450/oz on May 20, 2024, with the LBMA average for Q2 2024 at a record $2,338/oz, up 18% YoY and 13% QoQ. Central banks added a net 483 tonnes of gold in H1 2024, 5% above H1 2023's record pace. Drivers: strong central bank demand, sovereign debt concerns in China, and investor expectations for Fed rate cuts.",
+          "source": "World Gold Council / FXStreet (open search)",
+          "url": "https://www.gold.org/goldhub/research/gold-demand-trends/gold-demand-trends-q2-2024",
+          "date": "2024-08-01"
+        },
+        {
+          "summary": "China's PBoC paused gold reserve additions in May-June 2024 (reporting only 2 tonnes in April and none in May-June) after 18 consecutive months of buying, contributing to some price consolidation from the May peak. Despite the pause, 29% of central banks globally planned to add gold within 12 months per the latest World Gold Council survey.",
+          "source": "World Gold Council (open search)",
+          "url": "https://www.gold.org/goldhub/gold-focus/2024/08/central-bank-gold-statistics-june-2024",
+          "date": "2024-08-01"
+        }
+      ]
+    },
+    "VIG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "VIG (Vanguard Dividend Appreciation ETF) tracks US companies with 10+ consecutive years of dividend growth (S&P U.S. Dividend Growers Index). In 2024, the tech-led equity rally made dividend-growth funds difficult to keep pace with the broader market, as growth-oriented mega-cap technology names dominated index returns. No adverse regulatory or structural ETF news in the lookback window.",
+          "source": "Vanguard / Yahoo Finance (open search)",
+          "url": "https://investor.vanguard.com/investment-products/etfs/profile/vig",
+          "date": "2024-06-30"
+        }
+      ]
+    }
+  },
+  "wave_stages": {
+    "AI": {
+      "stage": "surge",
+      "rationale": "All three AI-wave tickers show compounding, real revenue growth. Nvidia's data center revenue hit $22.6B in a single quarter (+427% YoY) with Q2 guidance of $28B, confirmed May 22, 2024. Azure grew 31% and Microsoft Cloud 23% in Q3 FY2024 (April 25, 2024). Google Cloud grew 28% YoY in Q1 2024 with operating margin tripling. Revenue is large, growing, and real -- not anticipatory. Valuations are stretched but growth execution is demonstrable, not merely narrative.",
+      "evidence_tickers": [
+        "NVDA",
+        "MSFT",
+        "GOOGL"
+      ]
+    },
+    "robotics": {
+      "stage": "buildup",
+      "rationale": "Humanoid robotics is attracting large, high-profile funding (Figure AI $675M, February 2024) and major platform transitions (Boston Dynamics electric Atlas commercial product announcement, April 2024), but commercial revenue from humanoid robots does not yet exist. BOTZ's legacy industrial holdings generate real revenue, but the current investment narrative is dominated by humanoid and AI-embodied robotics which remains pre-revenue and early. Quiet but accelerating investment pace fits buildup.",
+      "evidence_tickers": [
+        "BOTZ"
+      ]
+    },
+    "rockets_spacecraft": {
+      "stage": "buildup",
+      "rationale": "RKLB shows strong revenue growth (+69% YoY, Q1 2024) and a $1B+ backlog, but remains unprofitable and its key growth catalyst (Neutron medium-lift rocket) was delayed to mid-2025 as of May 7, 2024. The company is demonstrating real commercial traction (Electron launches, government contracts) but is pre-profitability and pre-Neutron. The launch services market is growing but RKLB is not yet a proven recurring free cash flow generator. Buildup stage fits: real progress visible, revenue growing, but price discovery and profitability not yet in hand.",
+      "evidence_tickers": [
+        "RKLB"
+      ]
+    },
+    "nuclear_fusion": {
+      "stage": "buildup",
+      "rationale": "Uranium prices were elevated ($63-83/lb range in H1 2024 after a multi-year bull run, per Bloomberg June 12-13, 2024 coverage). The AI data center power demand narrative was building publicly as of June 2024. However, no major hyperscaler nuclear PPAs had been signed as of June 30, 2024 -- the commercial breakthrough deals (Three Mile Island-Microsoft, AWS-Talen) were post-cutoff. NUKZ launched January 2024 and uranium equities had re-rated, but execution evidence (PPAs signed, SMR construction started) was absent. Buildup: thesis active, uranium re-priced, but commercial delivery still ahead.",
+      "evidence_tickers": [
+        "NUKZ"
+      ]
+    },
+    "quantum": {
+      "stage": "buildup",
+      "rationale": "As of mid-2024, IBM's Heron processor achieved utility-scale circuit demonstrations (100-qubit, 100-depth), and 13 vendors updated roadmaps in 2024 signaling heightened competition. However, commercial quantum computing revenue remains de minimis across the industry. QTUM's constituent companies are predominantly pre-revenue in quantum specifically. Research milestones are real but commercial inflection is not. Buildup: visible technical progress, under-owned by generalist investors, revenue still negligible.",
+      "evidence_tickers": [
+        "QTUM"
+      ]
+    },
+    "general_markets": {
+      "stage": "neutral",
+      "rationale": "AGG, BIL, IAU, and VIG are general-market or cross-asset instruments without a single technology-wave thesis. The macro backdrop at June 30, 2024 was characterized by a Fed on hold at 5.25-5.50%, gold at record highs driven by central bank demand, and a tech-led equity rally compressing relative returns for dividend-growth funds. No wave classification applies.",
+      "evidence_tickers": [
+        "AGG",
+        "BIL",
+        "IAU",
+        "VIG"
+      ]
+    }
+  },
+  "wave_views": {
+    "NVDA": "surge",
+    "MSFT": "surge",
+    "GOOGL": "surge",
+    "RKLB": "buildup",
+    "BOTZ": "buildup",
+    "QTUM": "buildup",
+    "NUKZ": "buildup",
+    "AGG": "neutral",
+    "BIL": "neutral",
+    "IAU": "neutral",
+    "VIG": "neutral"
+  },
+  "exclusion_conflicts": [],
+  "thematic_concerns": [
+    {
+      "ticker": "RKLB",
+      "concern": "Neutron delay to mid-2025 removes RKLB from competition for initial national-security medium-lift launch contracts, potentially ceding ground to competitors in a key revenue segment.",
+      "evidence": "Payload Space, May 7, 2024: Rocket Lab delayed Neutron to mid-2025; CEO cited Archimedes engine as primary driver; CFO noted Neutron is the path to sustained cash flow positivity."
+    }
+  ],
+  "self_critique_downgrades": []
+}
