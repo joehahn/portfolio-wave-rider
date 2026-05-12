@@ -25,8 +25,13 @@ the user has curated, and flag anything that clashes with the profile.
 ### Step 1 — route the ticker to a wave
 
 Use the profile's wave vocabulary (AI, robotics, rockets/spacecraft,
-nuclear fusion, quantum computing, engineered biology) and your own
-domain knowledge to pick the most relevant bucket in `news_sources.md`.
+nuclear — fission and fusion, quantum computing, engineered biology) and
+your own domain knowledge to pick the most relevant bucket in
+`news_sources.md`. The "nuclear" bucket covers both fission (uranium
+miners, utilities, small modular reactors, AI-data-center PPAs) and
+fusion (still pre-commercial; long-horizon thesis). Internal id stays
+`nuclear_fusion` for backward compatibility with the wave_history.csv
+schema.
 If the ticker's
 business doesn't map cleanly to a single wave, use `general_markets`.
 If the ticker spans two waves (e.g. a hyperscaler with both AI and
@@ -102,7 +107,7 @@ them.
 
 For each named wave in the profile (the current AI wave plus the
 named next waves: rockets/spacecraft, robotics, engineered biology,
-quantum computing, nuclear fusion):
+quantum computing, nuclear):
 
 1. Determine whether the user's current watchlist has a **pure-play**
    ticker for that wave. A pure-play means the ticker's primary
@@ -114,9 +119,9 @@ quantum computing, nuclear fusion):
 2. If the wave is uncovered or thinly covered, suggest 2-3 candidate
    tickers from your general knowledge of public US-listed markets.
    Prefer liquid stocks and ETFs. Each candidate gets a one-line
-   `fit` rationale. If no public pure-play exists for a wave (this
-   is currently true for nuclear fusion), say so explicitly rather
-   than inventing one.
+   `fit` rationale. If no public pure-play exists for a sub-wave
+   (e.g., commercial fusion within the nuclear bucket), say so
+   explicitly rather than inventing one.
 3. Skip suggestions for waves classified `neutral` or `digestion` —
    the user has no thesis-driven reason to add exposure to a wave
    that's not heating up.

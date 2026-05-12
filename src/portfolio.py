@@ -1149,7 +1149,7 @@ WAVE_DISPLAY_LABEL: dict[str, str] = {
     "rockets_spacecraft": "rockets",
     "engineered_biology": "biology",
     "quantum": "quantum",
-    "nuclear_fusion": "fusion",
+    "nuclear_fusion": "nuclear",
     "general_markets": "defensive",
 }
 
@@ -1474,7 +1474,9 @@ def build_dashboard(
             true_pct = [v * 100 for v in wv_weight[wave]]
             fig.add_trace(
                 go.Scatter(x=wv_weight.index, y=wv_weight[wave] + offset,
-                           mode="lines+markers", name=wave, legend="legend5",
+                           mode="lines+markers",
+                           name=WAVE_DISPLAY_LABEL.get(wave, wave),
+                           legend="legend5",
                            line={"color": WAVE_COLORS.get(wave), "shape": "hv"},
                            customdata=true_pct,
                            hovertemplate=f"{wave}<br>%{{x|%Y-%m-%d}}"
@@ -1677,12 +1679,13 @@ def build_dashboard(
             sub = ff
             offset = i * wh_offset_step
             # Hover shows the actual stage label, not just the rank.
-            hover = [f"{wave}<br>stage: {s}<br>tickers: {t}"
+            wave_label = WAVE_DISPLAY_LABEL.get(wave, wave)
+            hover = [f"{wave_label}<br>stage: {s}<br>tickers: {t}"
                      for s, t in zip(sub["stage"], sub["evidence_tickers"].fillna(""))]
             fig.add_trace(
                 go.Scatter(x=sub["date"], y=sub["stage_rank"] + offset,
                            mode="lines+markers",
-                           name=wave, legend="legend6",
+                           name=wave_label, legend="legend6",
                            line={"color": WAVE_COLORS.get(wave)},
                            hovertext=hover, hoverinfo="text+x"),
                 row=7, col=1,
@@ -1730,13 +1733,14 @@ def build_dashboard(
                     ys.append(ys[-1])
                 fig.add_trace(
                     go.Scatter(x=xs, y=ys, mode="lines",
-                               name=wave, legend="legend4",
+                               name=WAVE_DISPLAY_LABEL.get(wave, wave),
+                               legend="legend4",
                                line={"color": WAVE_COLORS.get(wave)}),
                     row=8, col=1,
                 )
                 fig.add_trace(
                     go.Scatter(x=sub["date"], y=sub["count"], mode="markers",
-                               name=f"{wave} mark", legend="legend4",
+                               name=f"{WAVE_DISPLAY_LABEL.get(wave, wave)} mark", legend="legend4",
                                marker={"color": WAVE_COLORS.get(wave), "size": 7},
                                hoverinfo="skip", showlegend=False),
                     row=8, col=1,
@@ -1791,7 +1795,8 @@ def build_dashboard(
                 continue
             fig.add_trace(
                 go.Scatter(x=wv.index, y=wv[wave], mode="lines",
-                           name=wave, legend="legend3",
+                           name=WAVE_DISPLAY_LABEL.get(wave, wave),
+                           legend="legend3",
                            line={"color": WAVE_COLORS.get(wave)}),
                 row=10, col=1,
             )
@@ -1805,7 +1810,7 @@ def build_dashboard(
             fig.add_annotation(
                 xref="x10 domain", yref="y10 domain",
                 x=0.99, y=0.03, xanchor="right", yanchor="bottom",
-                text="At $0 today: " + ", ".join(zero_waves),
+                text="At $0 today: " + ", ".join(WAVE_DISPLAY_LABEL.get(w, w) for w in zero_waves),
                 showarrow=False,
                 font={"size": 11, "color": "#666"},
                 bgcolor="rgba(255,255,255,0.95)",

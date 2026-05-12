@@ -70,13 +70,13 @@ Pre-commercial but with rapid research-cadence.
 - **Google Quantum AI** — https://quantumai.google — primary source for Google's quantum research.
 - **Shtetl-Optimized (Scott Aaronson)** — https://scottaaronson.blog — *skeptic.* UT Austin computer scientist; the most prominent and rigorous public quantum-hype skeptic. Calls out vendor claims point-by-point and distinguishes peer-reviewed milestones from press-release theater.
 
-## Nuclear fusion
+## Nuclear
 
-Pre-commercial; expect slow cadence and peer-reviewed results.
+Covers fission (uranium, utilities, small modular reactors, the AI-data-center electricity narrative) and fusion (still pre-commercial; expect slow cadence and peer-reviewed results).
 
+- **World Nuclear News** — https://www.world-nuclear-news.org — fission and fusion industry news, regulatory filings, PPAs.
 - **Fusion Industry Association** — https://www.fusionindustryassociation.org — trade-body briefings and state-of-industry reports.
 - **Nature — Fusion** — https://www.nature.com/subjects/nuclear-fusion-and-fission — peer-reviewed milestones.
-- **World Nuclear News** — https://www.world-nuclear-news.org — includes fusion alongside fission news.
 
 ## General markets
 

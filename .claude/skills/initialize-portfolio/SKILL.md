@@ -20,7 +20,7 @@ Produce a JSON object mapping each watchlist ticker to a dollar amount. Constrai
 - The dollar amounts must sum to `initial_investment_usd` exactly.
 - Honor the profile's `exclusions`: any ticker in an excluded sector gets $0.
 - Honor `asset_class_targets` as a guideline. Sum the dollar amounts within each asset class and try to roughly match the target percentages. Use the asset-class mapping in `.claude/agents/report-writer.md`.
-- Within each asset class, weight tickers using the wave thesis. For equities: lean into the current AI wave, then the named "next waves" listed in the profile (rockets/spacecraft, robotics, engineered biology, quantum computing, nuclear fusion). Tickers tied to past or unrelated waves get smaller weights.
+- Within each asset class, weight tickers using the wave thesis. For equities: lean into the current AI wave, then the named "next waves" listed in the profile (rockets/spacecraft, robotics, engineered biology, quantum computing, nuclear — fission and fusion). Tickers tied to past or unrelated waves get smaller weights.
 - Respect `concentration_cap`: no single ticker gets more than that fraction of `initial_investment_usd`.
 - Do not optimize for Sharpe, volatility, or any other math metric. **This is the user's beliefs in dollar form.** No optimizer is involved at this step.
 

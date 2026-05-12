@@ -1,6 +1,6 @@
 # Wave-stage classification
 
-Wave-stage classification is the process by which Portfolio Wave Rider takes recent news for each ticker, assigns one of five stages to each technology wave (AI, robotics, rockets/spacecraft, engineered biology, quantum, nuclear fusion, plus a catch-all general_markets), and translates that stage into a small multiplicative tilt on the optimizer's expected-return vector.
+Wave-stage classification is the process by which Portfolio Wave Rider takes recent news for each ticker, assigns one of five stages to each technology wave (AI, robotics, rockets/spacecraft, engineered biology, quantum, nuclear — fission and fusion, plus a catch-all general_markets), and translates that stage into a small multiplicative tilt on the optimizer's expected-return vector. The internal identifier for the nuclear bucket is `nuclear_fusion` (kept for backward compatibility with the persisted `wave_history.csv` schema); the user-facing label is "nuclear".
 
 This document consolidates the full pipeline. For narrower angles see the cross-references at the end.
 

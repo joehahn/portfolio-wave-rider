@@ -50,4 +50,4 @@ Listed roughly in order of when material commercial impact is likely to land:
 - **Robotics**: will lower labor costs across physical industries.
 - **Engineered biology**: will lower the cost of programming biology (gene editing, designer proteins, programmable cells), with payoffs across medicine, agriculture, and bio-manufacturing.
 - **Quantum computing**: will make hard computations faster and cheaper.
-- **Nuclear fusion**: will make energy abundant and lower-cost.
+- **Nuclear (fission and fusion)**: will make energy abundant and lower-cost. Near-term exposure comes from the fission renaissance (uranium, SMRs, utility PPAs with AI data centers); fusion is the longer-horizon thesis behind the same wave.
