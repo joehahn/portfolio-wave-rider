@@ -1524,7 +1524,7 @@ def build_dashboard(
             no_rebal = (pivot[common] * initial_shares[common]).sum(axis=1)
             fig.add_trace(
                 go.Scatter(x=no_rebal.index, y=no_rebal.values, mode="lines",
-                           name="No rebalancing (buy-and-hold)",
+                           name="buy-and-hold",
                            line={"width": 1.5, "color": "#8c564b", "dash": "dashdot"},
                            legend="legend"),
                 row=1, col=1,
