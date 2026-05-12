@@ -74,7 +74,7 @@ The headline pieces are spelled out below: how `holdings.csv` shapes a run, and 
 `holdings.csv` is the watchlist universe, both LLM subagents and the optimizer operate on exactly the set of tickers in this file:
 
 - **News scope.** The `news-researcher` only fetches headlines for those tickers.
-- **Optimizer eligibility.** When `/review-portfolio` executes it passes the ticker list to `optimize_portfolio`, which builds a covariance matrix and an expected-return vector over only that set. The optimizer cannot assign weight to a ticker that isn't in the file.
+- **Optimizer eligibility.** When `/review-portfolio` executes it passes the ticker list to a portfolio optimizer, and that optimizer cannot assign weight to a ticker that isn't in the file.
 - **`shares = 0` is meaningful.** A row with zero shares puts the ticker on the watchlist (news is fetched, the optimizer can assign weight, the dashboard tracks its price) without representing an actual position. Use this when researching a candidate before buying, or when you want price-only history for context.
 - **To add a ticker:** append a row `<TICKER>,0` to `holdings.csv` and run `/review-portfolio` (or wait for the next cron). The next run picks it up automatically — no other config changes needed.
 - **To remove a ticker:** delete the row. Subsequent runs skip it. The historical rows in `data/snapshots.csv` and `data/recommendations.csv` are not pruned (so old charts still render correctly), but no new rows accumulate.
