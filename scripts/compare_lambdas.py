@@ -169,7 +169,7 @@ _no_rebal = pd.Series(
     name="No rebalancing",
 )
 fig.add_trace(go.Scatter(x=_no_rebal.index, y=_no_rebal.values, mode="lines",
-                         name="buy-and-hold (λ=1 initial)",
+                         name="buy-and-hold",
                          line={"width": 1.5, "color": "#8c564b", "dash": "dashdot"},
                          hovertemplate="No rebalance<br>%{x|%Y-%m-%d}<br>$%{y:,.0f}<extra></extra>"))
 
