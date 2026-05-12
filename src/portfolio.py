@@ -2082,7 +2082,11 @@ def build_dashboard(
 
     fig.update_layout(
         height=340 * n_rows,
-        title_text=title_text,
+        # Pin the page title above the plotting area and reserve top
+        # margin space, so it doesn't overlap chart 1's multi-line
+        # subplot title.
+        title={"text": title_text, "y": 0.995, "yanchor": "top"},
+        margin={"t": 100},
         # `closest` shows one trace's popup at a time, so hovering chart 1
         # shows portfolio $ OR SPY but not both (and chart 3 shows one
         # ticker's portfolio % at a time, which is cleaner with 7+ lines).
