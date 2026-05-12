@@ -1594,21 +1594,21 @@ def build_dashboard(
                                legend="legend"),
                     row=1, col=1,
                 )
-        # Constant-CAGR reference curves: dotted lines showing what the
-        # thesis baseline portfolio would be worth if it grew steadily
-        # at 20% / 30% / 50% annualized from day zero. Live dashboard
-        # only (the thesis-baseline date is the natural anchor).
+        # Constant-rate reference curves: dotted lines showing what the
+        # thesis baseline portfolio would be worth at 5% / 10% / 15%
+        # per week from day zero. Live dashboard only — anchored at the
+        # thesis-baseline date.
         if is_live and len(snaps) > 0:
             anchor_date = snaps["date"].min()
             anchor_value = float(totals.iloc[0])
             ref_dates = pd.to_datetime(totals.index)
-            ref_shades = {0.50: "#cccccc", 1.00: "#888888", 2.00: "#444444"}
+            ref_shades = {0.05: "#cccccc", 0.10: "#888888", 0.15: "#444444"}
             for rate, color in ref_shades.items():
                 days = (ref_dates - anchor_date).days
-                ref_vals = anchor_value * (1 + rate) ** (days / 365.0)
+                ref_vals = anchor_value * (1 + rate) ** (days / 7.0)
                 fig.add_trace(
                     go.Scatter(x=ref_dates, y=ref_vals, mode="lines",
-                               name=f"{int(rate * 100)}%/yr",
+                               name=f"{int(rate * 100)}%/wk",
                                line={"width": 1, "color": color, "dash": "dot"},
                                legend="legend"),
                     row=1, col=1,
