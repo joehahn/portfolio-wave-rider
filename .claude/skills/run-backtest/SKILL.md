@@ -1,6 +1,6 @@
 ---
 name: run-backtest
-description: Run a 12-month walk-forward backtest of the optimizer using mean_variance λ=1, time-varying wave tilts from data/wave_history.csv, and the current 12-ticker watchlist. Auto-renders both data/backtest/dashboard.html and docs/backtest.html, and updates the public-demo backtest page in one shot.
+description: Run a 12-month walk-forward backtest of the optimizer using mean_variance λ=1, time-varying wave tilts from data/wave_history.csv, and the current 12-ticker watchlist. Auto-renders both data/backtest/dashboard.html and docs/backtest.html, then re-runs the lambda sweep so docs/lambda_comparison.html refreshes in the same invocation.
 ---
 
 # /run-backtest
@@ -27,13 +27,21 @@ python -m src.cli backtest \
 
 The CLI writes to `data/backtest/` (snapshots.csv, recommendations.csv, report.md) and **auto-renders** both the local `data/backtest/dashboard.html` and the public `docs/backtest.html`. Capture the realized return, max drawdown, vs-SPY active return, and the rendered paths from the JSON return.
 
-## Step 2 — final output to the user
+## Step 2 — refresh the lambda sweep (Bash)
+
+```
+python scripts/compare_lambdas.py
+```
+
+Runs the same 12-month walk-forward six times (one per λ in `[0.0, 0.33, 1.0, 3.3, 10.0, 33.3]`) and writes `data/backtest/lambda_comparison.html` and `docs/lambda_comparison.html`. Both backtest pages live in the nav strip so the user can flip between them.
+
+## Step 3 — final output to the user
 
 One short message:
 
 - Backtest summary: realized return, max drawdown, vs SPY (one line each).
-- Rendered paths: `data/backtest/dashboard.html` (local) and `docs/backtest.html` (public, ready to push).
-- Suggest committing `docs/backtest.html` to publish the refresh: `git add docs/backtest.html && git commit -m "Refresh backtest dashboard" && git push`.
+- Rendered paths: `data/backtest/dashboard.html` (local), `docs/backtest.html` (public), and `docs/lambda_comparison.html` (public lambda sweep).
+- Suggest committing both public pages to publish the refresh: `git add docs/backtest.html docs/lambda_comparison.html && git commit -m "Refresh backtest + lambda sweep" && git push`.
 
 ## Rules
 
