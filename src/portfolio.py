@@ -1594,6 +1594,25 @@ def build_dashboard(
                                legend="legend"),
                     row=1, col=1,
                 )
+        # Constant-CAGR reference curves: dotted lines showing what the
+        # thesis baseline portfolio would be worth if it grew steadily
+        # at 20% / 30% / 50% annualized from day zero. Live dashboard
+        # only (the thesis-baseline date is the natural anchor).
+        if is_live and len(snaps) > 0:
+            anchor_date = snaps["date"].min()
+            anchor_value = float(totals.iloc[0])
+            ref_dates = pd.to_datetime(totals.index)
+            ref_shades = {0.20: "#cccccc", 0.30: "#888888", 0.50: "#444444"}
+            for rate, color in ref_shades.items():
+                days = (ref_dates - anchor_date).days
+                ref_vals = anchor_value * (1 + rate) ** (days / 365.0)
+                fig.add_trace(
+                    go.Scatter(x=ref_dates, y=ref_vals, mode="lines",
+                               name=f"{int(rate * 100)}%/yr",
+                               line={"width": 1, "color": color, "dash": "dot"},
+                               legend="legend"),
+                    row=1, col=1,
+                )
         # No-rebalance counterfactual: hold the first-snapshot share
         # counts for the entire window. Backtest only — in live mode the
         # snapshots span the post-/initialize-portfolio period during
