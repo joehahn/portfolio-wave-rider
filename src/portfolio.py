@@ -1419,55 +1419,93 @@ def build_dashboard(
     # and skips chart 6 — a backtest has no "most recent /review-portfolio"
     # anchor in the live sense, so the chart is meaningless there.
     is_live = thesis_baseline_path is not None and Path(thesis_baseline_path).exists()
+    # Backtest dashboards get an AI-lift chart (= portfolio$ / no-tilts$)
+    # inserted as row 2 when the no-tilts companion series exists on
+    # disk. Live dashboards don't (live state hasn't been replayed
+    # without AI tilts).
+    has_ai_lift = (not is_live) and (snap_path.parent / "no_tilts_totals.csv").exists()
 
-    title_chart6 = (
-        "6. Cumulative $ gain per holding since the most recent /review-portfolio rebalance"
-        "<br><sub><i>Per-ticker P&L attribution from the most recent /review-portfolio rebalance date through today."
-        "<br>Shows how the current allocation has performed since the latest optimizer fire.</i></sub>"
-    )
+    # Row layout: charts shift down by 1 when AI-lift is inserted.
+    R_PORTFOLIO       = 1
+    R_AI_LIFT         = 2 if has_ai_lift else None
+    _shift            = 1 if has_ai_lift else 0
+    R_TURNOVER        = 2 + _shift
+    R_REC_WAVE        = 3 + _shift
+    R_LATEST_WEIGHTS  = 4 + _shift
+    R_GAIN_INIT       = 5 + _shift
+    R_GAIN_REVIEW     = (6 + _shift) if is_live else None
+    R_WAVE_STAGE      = (7 + _shift) if is_live else (6 + _shift)
+    R_ARTICLES        = R_WAVE_STAGE + 1
+    R_ASSET_USD       = R_WAVE_STAGE + 2
+    R_WAVE_USD        = R_WAVE_STAGE + 3
+    n_rows            = R_WAVE_USD
+
     _chart5_anchor = "/initialize-portfolio executed" if is_live else "backtest start"
     _chart5_tail = (
         "Bars sum to total realized portfolio gain since the thesis was set. Green = winners, red = losers."
         if is_live else
         "Bars sum to total realized portfolio gain over the backtest window. Green = winners, red = losers."
     )
-    titles_pre6 = (
-        "1. Portfolio value over time"
-        "<br><sub><i>Σ(actual shares × close price) per day."
-        "<br>monthly rebalance, no AI tilt re-runs the optimizer each month with all wave-stage multipliers set to 1.0, so the LLM's news-driven tilts never enter μ.</i></sub>",
-        "2. Rebalance turnover (% of portfolio dollars that changed holdings)"
-        "<br><sub><i>At each rebalance, ½·||Δw||₁ — half the L1 distance between consecutive weight vectors. Equals the fraction of portfolio value that moved between tickers."
-        "<br>Step-function: each value holds until the next rebalance.</i></sub>",
-        "3. Recommended portfolio % segregated by wave, versus time"
-        "<br><sub><i>Each optimizer run produces target weights per ticker; this chart sums them by wave bucket so each line is the wave's total target allocation.</i></sub>",
-        "4. Latest recommended portfolio %"
-        "<br><sub><i>The most recent optimizer's target weight per ticker. Bars at the cap signal the optimizer wanted more than the concentration constraint allowed.</i></sub>",
-        f"5. Cumulative $ gain per holding since {_chart5_anchor}"
-        "<br><sub><i>Per-ticker P&L attribution from the day-zero snapshot through today: Σ(prior-day shares × price change)."
-        f"<br>{_chart5_tail}</i></sub>",
-    )
-    # Number the post-6 charts based on whether chart 6 is present.
-    _next = 7 if is_live else 6
-    titles_post6 = (
-        f"{_next}. Wave-stage trajectories (0=neutral, 1=buildup, 2=surge, 3=peak, 4=digestion)"
-        "<br><sub><i>How the news-researcher classified each wave's cycle stage. Forward-filled across the snapshot window so each business day shows the most-recent-at-or-before classification."
-        "<br>Right axis shows the tilt multiplier applied to that wave's tickers' expected returns.</i></sub>",
-        f"{_next+1}. Articles harvested per wave over time"
-        "<br><sub><i>Bullet count per wave per /review-portfolio run, from the archived news payloads. Forward-filled across the window so the latest count holds until the next /review-portfolio refreshes the payload.</i></sub>",
-        f"{_next+2}. Actual portfolio $ by asset class over time"
-        "<br><sub><i>Your real holdings (from holdings.csv × close prices), grouped by asset class. Sums to total portfolio value (chart 1). Log y-axis keeps small allocations visible.</i></sub>",
-        f"{_next+3}. Actual portfolio $ by wave over time"
-        "<br><sub><i>Your real holdings (from holdings.csv × close prices), grouped by wave. This is what you own today — not the optimizer's recommendation. Compare to chart 4 (latest recommended %) to see how far the actual portfolio sits from the latest recommendation. Log y-axis.</i></sub>",
-    )
-    titles_all = titles_pre6 + ((title_chart6,) if is_live else ()) + titles_post6
 
-    # Wave-stage trajectory row needs secondary_y for the tilt-multiplier axis.
-    # Row index depends on whether chart 6 is included (5 rows before + chart 6 + wave-stage = row 7, else row 6).
-    R_WAVE_STAGE  = 7 if is_live else 6
-    R_ARTICLES    = R_WAVE_STAGE + 1
-    R_ASSET_USD   = R_WAVE_STAGE + 2
-    R_WAVE_USD    = R_WAVE_STAGE + 3
-    n_rows = R_WAVE_USD
+    # Build the title list in row order, numbering as we go.
+    titles_list: list[str] = []
+    _chart1_extra = (
+        "<br>monthly rebalance (no AI tilt) re-runs the optimizer each month with all wave-stage multipliers set to 1.0, so the LLM's news-driven tilts never enter μ."
+        if has_ai_lift else ""
+    )
+    titles_list.append(
+        f"{R_PORTFOLIO}. Portfolio value over time"
+        "<br><sub><i>Σ(actual shares × close price) per day."
+        f"{_chart1_extra}</i></sub>"
+    )
+    if R_AI_LIFT is not None:
+        titles_list.append(
+            f"{R_AI_LIFT}. AI lift = portfolio $ / monthly rebalance (no AI tilt)"
+            "<br><sub><i>Ratio of the with-tilt portfolio value to the no-AI-tilt counterpart at each business day. Above 1.0 means the LLM's wave-stage tilts added value; below 1.0 means they cost value; 1.0 means no contribution.</i></sub>"
+        )
+    titles_list.append(
+        f"{R_TURNOVER}. Rebalance turnover (% of portfolio dollars that changed holdings)"
+        "<br><sub><i>At each rebalance, ½·||Δw||₁ — half the L1 distance between consecutive weight vectors. Equals the fraction of portfolio value that moved between tickers."
+        "<br>Step-function: each value holds until the next rebalance.</i></sub>"
+    )
+    titles_list.append(
+        f"{R_REC_WAVE}. Recommended portfolio % segregated by wave, versus time"
+        "<br><sub><i>Each optimizer run produces target weights per ticker; this chart sums them by wave bucket so each line is the wave's total target allocation.</i></sub>"
+    )
+    titles_list.append(
+        f"{R_LATEST_WEIGHTS}. Latest recommended portfolio %"
+        "<br><sub><i>The most recent optimizer's target weight per ticker. Bars at the cap signal the optimizer wanted more than the concentration constraint allowed.</i></sub>"
+    )
+    titles_list.append(
+        f"{R_GAIN_INIT}. Cumulative $ gain per holding since {_chart5_anchor}"
+        "<br><sub><i>Per-ticker P&L attribution from the day-zero snapshot through today: Σ(prior-day shares × price change)."
+        f"<br>{_chart5_tail}</i></sub>"
+    )
+    if R_GAIN_REVIEW is not None:
+        titles_list.append(
+            f"{R_GAIN_REVIEW}. Cumulative $ gain per holding since the most recent /review-portfolio rebalance"
+            "<br><sub><i>Per-ticker P&L attribution from the most recent /review-portfolio rebalance date through today."
+            "<br>Shows how the current allocation has performed since the latest optimizer fire.</i></sub>"
+        )
+    titles_list.append(
+        f"{R_WAVE_STAGE}. Wave-stage trajectories (0=neutral, 1=buildup, 2=surge, 3=peak, 4=digestion)"
+        "<br><sub><i>How the news-researcher classified each wave's cycle stage. Forward-filled across the snapshot window so each business day shows the most-recent-at-or-before classification."
+        "<br>Right axis shows the tilt multiplier applied to that wave's tickers' expected returns.</i></sub>"
+    )
+    titles_list.append(
+        f"{R_ARTICLES}. Articles harvested per wave over time"
+        "<br><sub><i>Bullet count per wave per /review-portfolio run, from the archived news payloads. Forward-filled across the window so the latest count holds until the next /review-portfolio refreshes the payload.</i></sub>"
+    )
+    titles_list.append(
+        f"{R_ASSET_USD}. Actual portfolio $ by asset class over time"
+        "<br><sub><i>Your real holdings (from holdings.csv × close prices), grouped by asset class. Sums to total portfolio value (chart 1). Log y-axis keeps small allocations visible.</i></sub>"
+    )
+    titles_list.append(
+        f"{R_WAVE_USD}. Actual portfolio $ by wave over time"
+        "<br><sub><i>Your real holdings (from holdings.csv × close prices), grouped by wave. This is what you own today — not the optimizer's recommendation. Compare to chart 4 (latest recommended %) to see how far the actual portfolio sits from the latest recommendation. Log y-axis.</i></sub>"
+    )
+    titles_all = tuple(titles_list)
+
     specs = [[{}] for _ in range(n_rows)]
     specs[R_WAVE_STAGE - 1] = [{"secondary_y": True}]
 
@@ -1579,11 +1617,29 @@ def build_dashboard(
                 nt = pd.read_csv(nt_path, parse_dates=["date"]).set_index("date")["total_value"]
                 fig.add_trace(
                     go.Scatter(x=nt.index, y=nt.values, mode="lines",
-                               name="monthly rebalance, no AI tilt",
+                               name="monthly rebalance (no AI tilt)",
                                line={"width": 1.5, "color": "#9467bd", "dash": "dot"},
                                legend="legend"),
-                    row=1, col=1,
+                    row=R_PORTFOLIO, col=1,
                 )
+                # AI-lift ratio chart (row 2 in backtest mode): main
+                # portfolio $ divided by no-tilt portfolio $, at each
+                # business day. > 1.0 means the LLM's wave-stage tilts
+                # added value; < 1.0 means they cost value.
+                if R_AI_LIFT is not None:
+                    common = totals.index.intersection(nt.index)
+                    if len(common) > 0:
+                        ratio = totals.loc[common] / nt.loc[common]
+                        fig.add_trace(
+                            go.Scatter(x=ratio.index, y=ratio.values, mode="lines",
+                                       name="AI lift",
+                                       line={"width": 2, "color": "#9467bd"},
+                                       showlegend=False,
+                                       hovertemplate="%{x|%Y-%m-%d}<br>%{y:.3f}×<extra></extra>"),
+                            row=R_AI_LIFT, col=1,
+                        )
+                        fig.add_hline(y=1.0, line_dash="dot", line_width=1,
+                                      line_color="#888", row=R_AI_LIFT, col=1)
 
     # 2. Recommended portfolio % segregated by wave, versus time.
     # Sum each wave's tickers' weights into one line per wave so the
@@ -1623,7 +1679,7 @@ def build_dashboard(
                            customdata=true_pct,
                            hovertemplate=f"{wave}<br>%{{x|%Y-%m-%d}}"
                                          "<br>%{customdata:.2f}%<extra></extra>"),
-                row=3, col=1,
+                row=R_REC_WAVE, col=1,
             )
         latest_date = recs["date"].max()
         latest_weights = recs[recs["date"] == latest_date].sort_values("weight", ascending=False)
@@ -1656,7 +1712,7 @@ def build_dashboard(
             go.Bar(x=tickers_in_chart, y=latest_weights["weight"],
                    name=f"As of {latest_weights['date'].iloc[0].date()}",
                    showlegend=False),
-            row=4, col=1,
+            row=R_LATEST_WEIGHTS, col=1,
         )
         # Horizontal dashed line at the concentration cap (read from
         # investor_profile.md top-level YAML). Plotted as a Scatter trace
@@ -1675,14 +1731,14 @@ def build_dashboard(
                        mode="lines", name=f"Concentration cap ({_cap*100:.0f}%)",
                        line={"color": "#d62728", "width": 1.5, "dash": "dot"},
                        hoverinfo="skip", showlegend=True, legend="legend7"),
-            row=4, col=1,
+            row=R_LATEST_WEIGHTS, col=1,
         )
         fig.update_xaxes(
             tickmode="array",
             tickvals=tickers_in_chart,
             ticktext=ticktext_3,
             tickangle=0,
-            row=4, col=1,
+            row=R_LATEST_WEIGHTS, col=1,
         )
 
     # 4. Cumulative $ gain per holding over the snapshot window. For each
@@ -1717,22 +1773,22 @@ def build_dashboard(
             go.Bar(x=gain_tickers, y=gain_values,
                    marker_color=bar_colors,
                    name="Cumulative $ gain", showlegend=False),
-            row=5, col=1,
+            row=R_GAIN_INIT, col=1,
         )
         fig.update_xaxes(
             tickmode="array",
             tickvals=gain_tickers,
             ticktext=ticktext_4,
             tickangle=0,
-            row=5, col=1,
+            row=R_GAIN_INIT, col=1,
         )
-        # Inject total gain into the chart-5 title via annotation 4
-        # (subplot titles map 1:1 to the figure's annotations in row
-        # order).
+        # Inject total gain into the chart's title via the annotation at
+        # position (R_GAIN_INIT - 1) — subplot titles map 1:1 to the
+        # figure's annotations in row order.
         _total_init = sum(gain_values)
-        _chart5_prefix = f"5. Cumulative $ gain per holding since {_chart5_anchor}"
-        fig.layout.annotations[4].update(
-            text=fig.layout.annotations[4].text.replace(
+        _chart5_prefix = f"{R_GAIN_INIT}. Cumulative $ gain per holding since {_chart5_anchor}"
+        fig.layout.annotations[R_GAIN_INIT - 1].update(
+            text=fig.layout.annotations[R_GAIN_INIT - 1].text.replace(
                 _chart5_prefix,
                 f"{_chart5_prefix} (total: ${_total_init:+,.0f})",
             )
@@ -1765,21 +1821,22 @@ def build_dashboard(
                 go.Bar(x=gain_tickers, y=recent_values,
                        marker_color=recent_colors,
                        name="Since last rebalance", showlegend=False),
-                row=6, col=1,
+                row=R_GAIN_REVIEW, col=1,
             )
             fig.update_xaxes(
                 tickmode="array",
                 tickvals=gain_tickers,
                 ticktext=ticktext_4,
                 tickangle=0,
-                row=6, col=1,
+                row=R_GAIN_REVIEW, col=1,
             )
-            # Inject total gain into the chart-6 title.
+            # Inject total gain into the chart's title.
             _total_recent = sum(recent_values)
-            fig.layout.annotations[5].update(
-                text=fig.layout.annotations[5].text.replace(
-                    "6. Cumulative $ gain per holding since the most recent /review-portfolio rebalance",
-                    f"6. Cumulative $ gain per holding since the most recent /review-portfolio rebalance (total: ${_total_recent:+,.0f})",
+            _chart6_prefix = f"{R_GAIN_REVIEW}. Cumulative $ gain per holding since the most recent /review-portfolio rebalance"
+            fig.layout.annotations[R_GAIN_REVIEW - 1].update(
+                text=fig.layout.annotations[R_GAIN_REVIEW - 1].text.replace(
+                    _chart6_prefix,
+                    f"{_chart6_prefix} (total: ${_total_recent:+,.0f})",
                 )
             )
 
@@ -1998,7 +2055,7 @@ def build_dashboard(
                                line={"color": "#1f77b4", "width": 2, "shape": "hv"},
                                hovertemplate="%{x|%Y-%m-%d}<br>%{y:.1f}%<extra></extra>",
                                showlegend=False),
-                    row=2, col=1,
+                    row=R_TURNOVER, col=1,
                 )
                 fig.add_trace(
                     go.Scatter(x=marker_x, y=marker_y,
@@ -2008,7 +2065,7 @@ def build_dashboard(
                                        "color": "#ff7f0e", "line": {"width": 2}},
                                hoverinfo="skip",
                                showlegend=False),
-                    row=2, col=1,
+                    row=R_TURNOVER, col=1,
                 )
 
     # Per-row top y in paper coords: row_top_k = 1 - (k-1) * (row_h + vsp)
@@ -2072,13 +2129,15 @@ def build_dashboard(
             yref="paper", y=_row_top(R_WAVE_USD), yanchor="top",
         ),
     )
-    fig.update_yaxes(title_text="$", row=1, col=1)
-    fig.update_yaxes(title_text="portfolio %", row=3, col=1, tickformat=".0%")
-    fig.update_yaxes(title_text="portfolio %", row=4, col=1, tickformat=".0%")
-    fig.update_yaxes(title_text="$ gain", row=5, col=1, zeroline=True,
+    fig.update_yaxes(title_text="$", row=R_PORTFOLIO, col=1)
+    if R_AI_LIFT is not None:
+        fig.update_yaxes(title_text="ratio", row=R_AI_LIFT, col=1)
+    fig.update_yaxes(title_text="portfolio %", row=R_REC_WAVE, col=1, tickformat=".0%")
+    fig.update_yaxes(title_text="portfolio %", row=R_LATEST_WEIGHTS, col=1, tickformat=".0%")
+    fig.update_yaxes(title_text="$ gain", row=R_GAIN_INIT, col=1, zeroline=True,
                      zerolinewidth=1, zerolinecolor="#888")
-    if is_live:
-        fig.update_yaxes(title_text="$ gain", row=6, col=1, zeroline=True,
+    if R_GAIN_REVIEW is not None:
+        fig.update_yaxes(title_text="$ gain", row=R_GAIN_REVIEW, col=1, zeroline=True,
                          zerolinewidth=1, zerolinecolor="#888")
     # Chart 5: y-axis ticks show stage names alongside the numeric rank
     # so a reader can read the trajectory directly without remembering
@@ -2116,7 +2175,7 @@ def build_dashboard(
     # robotics/biology lines hovering near a few hundred dollars) don't
     # collapse to the floor next to the dominant general_markets line.
     fig.update_yaxes(title_text="$ (log)", row=R_WAVE_USD, col=1, type="log")
-    fig.update_yaxes(title_text="turnover (%)", row=2, col=1, rangemode="tozero")
+    fig.update_yaxes(title_text="turnover (%)", row=R_TURNOVER, col=1, rangemode="tozero")
 
     # Apply the padded snapshots-derived range to every time-series
     # subplot so data points don't sit flush against the axis edges
@@ -2126,7 +2185,10 @@ def build_dashboard(
     # weights) and 4 (gain bars) are bar charts with categorical
     # x-axes so the range setter is a no-op there.
     if xrange is not None:
-        xrange_rows = (1, 2, 3, R_WAVE_STAGE, R_ARTICLES, R_ASSET_USD, R_WAVE_USD)
+        xrange_rows = (R_PORTFOLIO, R_TURNOVER, R_REC_WAVE,
+                       R_WAVE_STAGE, R_ARTICLES, R_ASSET_USD, R_WAVE_USD)
+        if R_AI_LIFT is not None:
+            xrange_rows = xrange_rows + (R_AI_LIFT,)
         for r in xrange_rows:
             fig.update_xaxes(range=list(xrange), row=r, col=1)
 
