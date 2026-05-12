@@ -1433,7 +1433,9 @@ def build_dashboard(
     )
     titles_pre6 = (
         "1. Portfolio value over time"
-        "<br><sub><i>Σ(actual shares × close price) per day. SPY rescaled to share starting value for comparison.</i></sub>",
+        "<br><sub><i>Σ(actual shares × close price) per day. SPY rescaled to share starting value for comparison."
+        "<br>buy-and-hold holds the first-rebalance share counts for the full window, no further trades."
+        "<br>monthly rebalance, no AI tilt re-runs the optimizer on every first trading day of each month with all wave-stage multipliers set to 1.0, so the LLM's news-driven tilts never enter μ. Gap to the main portfolio line is the AI tilt contribution; gap to buy-and-hold is the pure-math re-optimization contribution.</i></sub>",
         "2. Rebalance turnover (% of portfolio dollars that changed holdings)"
         "<br><sub><i>At each rebalance, ½·||Δw||₁ — half the L1 distance between consecutive weight vectors. Equals the fraction of portfolio value that moved between tickers."
         "<br>Step-function: each value holds until the next rebalance.</i></sub>",
@@ -1578,7 +1580,7 @@ def build_dashboard(
                 nt = pd.read_csv(nt_path, parse_dates=["date"]).set_index("date")["total_value"]
                 fig.add_trace(
                     go.Scatter(x=nt.index, y=nt.values, mode="lines",
-                               name="rebalance, no AI tilt",
+                               name="monthly rebalance, no AI tilt",
                                line={"width": 1.5, "color": "#9467bd", "dash": "dot"},
                                legend="legend"),
                     row=1, col=1,
