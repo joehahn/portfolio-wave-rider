@@ -1602,7 +1602,7 @@ def build_dashboard(
             anchor_date = snaps["date"].min()
             anchor_value = float(totals.iloc[0])
             ref_dates = pd.to_datetime(totals.index)
-            ref_shades = {0.20: "#cccccc", 0.30: "#888888", 0.50: "#444444"}
+            ref_shades = {0.50: "#cccccc", 1.00: "#888888", 2.00: "#444444"}
             for rate, color in ref_shades.items():
                 days = (ref_dates - anchor_date).days
                 ref_vals = anchor_value * (1 + rate) ** (days / 365.0)
