@@ -1660,12 +1660,12 @@ def build_dashboard(
         # allocated across the wave buckets at each monthly rebalance.
         for wave in wv_order:
             fig.add_trace(
-                go.Bar(x=wv_weight.index, y=wv_weight[wave] * 100,
+                go.Bar(x=wv_weight.index, y=wv_weight[wave],
                        name=WAVE_DISPLAY_LABEL.get(wave, wave),
                        legend="legend5",
                        marker_color=WAVE_COLORS.get(wave),
                        hovertemplate=f"{wave}<br>%{{x|%Y-%m-%d}}"
-                                     "<br>%{y:.2f}%<extra></extra>"),
+                                     "<br>%{y:.2%}<extra></extra>"),
                 row=R_REC_WAVE, col=1,
             )
         # Force stacking on the chart-4 y-axis. barmode is figure-wide
@@ -1698,15 +1698,29 @@ def build_dashboard(
     if latest_weights is not None and not latest_weights.empty:
         tickers_in_chart = latest_weights["ticker"].tolist()
         ticktext_3 = [_ticker_label(t) for t in tickers_in_chart]
-        fig.add_trace(
-            go.Bar(x=tickers_in_chart, y=latest_weights["weight"],
-                   name=f"As of {latest_weights['date'].iloc[0].date()}",
-                   showlegend=False),
-            row=R_LATEST_WEIGHTS, col=1,
+        # Group tickers by wave and emit one Bar trace per wave so the
+        # legend matches chart 4 (wave colors and labels), not a
+        # per-ticker spaghetti. Categorical x-axis order is set
+        # explicitly so the bars still read in weight-descending order.
+        latest_with_wave = latest_weights.copy()
+        latest_with_wave["wave_bucket"] = latest_with_wave["ticker"].map(
+            lambda t: TICKER_WAVE.get(t, "general_markets")
         )
-        # Horizontal dashed line at the concentration cap (read from
-        # investor_profile.md top-level YAML). Plotted as a Scatter trace
-        # so it shows up in the legend with a descriptive label.
+        fig.update_xaxes(categoryorder="array", categoryarray=tickers_in_chart,
+                         row=R_LATEST_WEIGHTS, col=1)
+        waves_in_chart = [w for w in _WAVE_DISPLAY_ORDER
+                          if w in latest_with_wave["wave_bucket"].values]
+        for wave in waves_in_chart:
+            sub = latest_with_wave[latest_with_wave["wave_bucket"] == wave]
+            fig.add_trace(
+                go.Bar(x=sub["ticker"], y=sub["weight"],
+                       name=WAVE_DISPLAY_LABEL.get(wave, wave),
+                       marker_color=WAVE_COLORS.get(wave),
+                       legend="legend7",
+                       hovertemplate=f"%{{x}}<br>{wave}<br>%{{y:.2%}}<extra></extra>"),
+                row=R_LATEST_WEIGHTS, col=1,
+            )
+        # Concentration cap reference line, drawn but no longer in the legend.
         try:
             import yaml as _yaml
             import re as _re
@@ -1718,9 +1732,9 @@ def build_dashboard(
             _cap = 0.25
         fig.add_trace(
             go.Scatter(x=tickers_in_chart, y=[_cap] * len(tickers_in_chart),
-                       mode="lines", name=f"Concentration cap ({_cap*100:.0f}%)",
+                       mode="lines",
                        line={"color": "#d62728", "width": 1.5, "dash": "dot"},
-                       hoverinfo="skip", showlegend=True, legend="legend7"),
+                       hoverinfo="skip", showlegend=False),
             row=R_LATEST_WEIGHTS, col=1,
         )
         fig.update_xaxes(
@@ -2088,17 +2102,19 @@ def build_dashboard(
         legend=dict(
             title_text="Portfolio value",
             xref="paper", x=1.02,
-            yref="paper", y=_row_top(1), yanchor="top",
+            yref="paper", y=_row_top(R_PORTFOLIO), yanchor="top",
         ),
         legend5=dict(
             title_text="Portfolio % by wave",
             xref="paper", x=1.02,
-            yref="paper", y=_row_top(3), yanchor="top",
+            yref="paper", y=_row_top(R_REC_WAVE), yanchor="top",
         ),
-        # Chart 4 (latest weights): small legend just for the cap line.
+        # Latest-recommended-weights chart: wave-colored bars, same legend
+        # title as chart 4 so the reader sees the parallel.
         legend7=dict(
+            title_text="Wave (latest weights)",
             xref="paper", x=1.02,
-            yref="paper", y=_row_top(4), yanchor="top",
+            yref="paper", y=_row_top(R_LATEST_WEIGHTS), yanchor="top",
         ),
         # Wave-stage chart has a secondary y-axis on the right; push this
         # legend further out (x=1.06) to clear that axis.
