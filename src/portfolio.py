@@ -1529,7 +1529,7 @@ def build_dashboard(
         fig.add_trace(
             go.Scatter(x=tickers_in_chart, y=[_cap] * len(tickers_in_chart),
                        mode="lines", name=f"Concentration cap ({_cap*100:.0f}%)",
-                       line={"color": "#888", "width": 1.5, "dash": "dash"},
+                       line={"color": "#d62728", "width": 1.5, "dash": "dot"},
                        hoverinfo="skip", showlegend=True, legend="legend7"),
             row=4, col=1,
         )
@@ -1796,13 +1796,19 @@ def build_dashboard(
                 row=10, col=1,
             )
         if zero_waves:
+            # Anchored bottom-right of chart 10. On a log scale rising
+            # over time, the bottom-right is the lowest non-zero wave
+            # at the most recent date — typically the smallest active
+            # wave bucket — so this corner has the most empty space.
+            # Opaque white background occludes any line that does
+            # happen to pass through.
             fig.add_annotation(
                 xref="x10 domain", yref="y10 domain",
-                x=0.99, y=0.97, xanchor="right", yanchor="top",
+                x=0.99, y=0.03, xanchor="right", yanchor="bottom",
                 text="At $0 today: " + ", ".join(zero_waves),
                 showarrow=False,
                 font={"size": 11, "color": "#666"},
-                bgcolor="rgba(255,255,255,0.7)",
+                bgcolor="rgba(255,255,255,0.95)",
                 bordercolor="#bbb", borderwidth=1, borderpad=4,
             )
 
