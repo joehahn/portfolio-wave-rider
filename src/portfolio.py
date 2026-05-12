@@ -594,6 +594,8 @@ def backtest(
     benchmarks: list[str] | None = None,
     wave_history_path: str | None = None,
     publish_docs: bool = True,
+    cadence: str = "monthly",
+    docs_out_path: str = "docs/backtest.html",
 ) -> dict[str, Any]:
     """Walk-forward monthly-rebalance backtest of the lightweight Python-only path.
 
@@ -678,24 +680,30 @@ def backtest(
             for t in tickers
         }
 
-    # Iterate. Friday = rebalance; every trading day = snapshot.
+    # Rebalance trigger: fires on the first trading day of each new
+    # period. Period is the month (default, matches /review-portfolio's
+    # monthly cadence) or the calendar quarter (for the 5y experiment).
+    if cadence not in {"monthly", "quarterly"}:
+        raise ValueError(f"cadence must be 'monthly' or 'quarterly', got {cadence!r}")
+
+    def _period_id(d: pd.Timestamp) -> tuple[int, int]:
+        if cadence == "quarterly":
+            return (d.year, (d.month - 1) // 3)
+        return (d.year, d.month)
+
+    # Iterate. Period boundary = rebalance; every trading day = snapshot.
     snap_rows: list[dict[str, Any]] = []
     rec_rows: list[dict[str, Any]] = []
     current_shares: dict[str, float] | None = None
     last_weights: dict[str, float] | None = None
     weight_l1_distances: list[float] = []
-    last_rebalance_month: int | None = None
+    last_period: tuple[int, int] | None = None
 
     for date in daily_dates:
-        # Monthly rebalance cadence: fire on the first trading day of each
-        # month. Matches the live system's /review-portfolio cadence and the
-        # /review-portfolio-driven update of wave_history.csv (which has at
-        # most one row per month, so weekly rebalances between month-ends
-        # added no new wave information anyway).
-        is_new_month = date.month != last_rebalance_month
+        is_new_period = _period_id(date) != last_period
         is_first_day = date == daily_dates[0]
 
-        if is_new_month or (is_first_day and current_shares is None):
+        if is_new_period or (is_first_day and current_shares is None):
             # Run optimizer with a `lookback_years`-long window ending today.
             lookback_start = date - pd.Timedelta(days=365 * lookback_years)
             slice_prices = full_prices.loc[lookback_start:date]
@@ -739,7 +747,7 @@ def backtest(
                     "sharpe_ratio": opt["sharpe_ratio"],
                     "objective": objective,
                 })
-            last_rebalance_month = date.month
+            last_period = _period_id(date)
 
         # Daily snapshot (always, once we have shares).
         if current_shares is not None:
@@ -773,11 +781,11 @@ def backtest(
     # re-optimization contribution.
     nt_totals: list[dict[str, Any]] = []
     nt_shares: dict[str, float] | None = None
-    nt_last_month: int | None = None
+    nt_last_period: tuple[int, int] | None = None
     for date in daily_dates:
-        is_new_month = date.month != nt_last_month
+        is_new_period = _period_id(date) != nt_last_period
         is_first_day = date == daily_dates[0]
-        if is_new_month or (is_first_day and nt_shares is None):
+        if is_new_period or (is_first_day and nt_shares is None):
             lookback_start = date - pd.Timedelta(days=365 * lookback_years)
             slice_prices = full_prices.loc[lookback_start:date]
             if len(slice_prices) < 30:
@@ -794,7 +802,7 @@ def backtest(
             nt_pv = (initial_usd if nt_shares is None
                      else sum(nt_shares[t] * float(full_prices.loc[date, t]) for t in tickers))
             nt_shares = {t: nt_w[t] * nt_pv / float(full_prices.loc[date, t]) for t in tickers}
-            nt_last_month = date.month
+            nt_last_period = _period_id(date)
         if nt_shares is not None:
             nt_totals.append({
                 "date": str(date.date()),
@@ -894,10 +902,12 @@ def backtest(
     # callers that don't want to clobber the public dashboard can pass
     # publish_docs=False.
     # No nav strip on either backtest copy — backtest is a leaf page
-    # reachable only from the README.
+    # reachable only from the README. The docs-side copy goes to
+    # docs_out_path (default docs/backtest.html); the 5y experiment
+    # passes docs/backtest_5y.html to avoid clobbering the live page.
     targets = [(str(out / "dashboard.html"), None)]
     if publish_docs:
-        targets.append(("docs/backtest.html", None))
+        targets.append((docs_out_path, None))
     rendered: list[str] = []
     for path, nav in targets:
         try:

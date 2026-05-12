@@ -136,6 +136,14 @@ def main(argv: list[str] | None = None) -> int:
     p_bt.add_argument("--benchmarks", nargs="*", default=["SPY"],
                       help="benchmark tickers compared against the backtest's realized return "
                            "(default: SPY). Pass an empty list to skip the benchmark section.")
+    p_bt.add_argument("--cadence", default="monthly",
+                      choices=["monthly", "quarterly"],
+                      help="rebalance cadence: monthly (default, matches live "
+                           "/review-portfolio) or quarterly (used by the 5y backtest)")
+    p_bt.add_argument("--docs-out", default="docs/backtest.html",
+                      help="path for the public-demo copy of the dashboard "
+                           "(default docs/backtest.html). 5y backtest passes "
+                           "docs/backtest_5y.html to avoid clobbering the live page.")
 
     p_dash = sub.add_parser("dashboard", help="generate docs/index.html from snapshots + recommendations + news + wave history")
     p_dash.add_argument("--snapshots", default="data/snapshots.csv")
@@ -190,6 +198,8 @@ def main(argv: list[str] | None = None) -> int:
                 risk_free_rate=args.risk_free_rate,
                 benchmarks=args.benchmarks,
                 wave_history_path=args.wave_history,
+                cadence=args.cadence,
+                docs_out_path=args.docs_out,
             )
         elif args.cmd == "analyze":
             result = portfolio.analyze(
