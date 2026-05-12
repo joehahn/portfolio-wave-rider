@@ -1495,6 +1495,9 @@ def build_dashboard(
                     row=1, col=1,
                 )
         # Benchmark overlays normalized to the portfolio's starting value.
+        # SPY-style benchmarks are rendered in light green and dashed so
+        # they're visually distinct from the portfolio (blue) and the
+        # no-rebalance counterfactual (brown, dash-dot, below).
         if benchmarks and len(totals) > 1:
             benchmark_curves = _fetch_benchmark_curves(
                 benchmarks, totals.index[0], totals.index[-1], float(totals.iloc[0]),
@@ -1502,10 +1505,30 @@ def build_dashboard(
             for b, curve in benchmark_curves.items():
                 fig.add_trace(
                     go.Scatter(x=curve.index, y=curve.values, mode=_ts_mode,
-                               name=f"{b} (rebased)", line={"width": 1, "dash": "dash"},
+                               name=f"{b} (rebased)",
+                               line={"width": 1.5, "color": "#66c266", "dash": "dash"},
                                legend="legend"),
                     row=1, col=1,
                 )
+        # No-rebalance counterfactual: hold the first-snapshot share
+        # counts for the entire window. Backtest only — in live mode the
+        # snapshots span the post-/initialize-portfolio period during
+        # which the user has manually rebalanced, so a single buy-and-hold
+        # comparison from day 1 is moot.
+        if not is_live and len(snaps) > 0:
+            first_date = snaps["date"].min()
+            initial_shares = (snaps[snaps["date"] == first_date]
+                              .set_index("ticker")["shares"])
+            pivot = snaps.pivot_table(index="date", columns="ticker", values="price").sort_index()
+            common = [t for t in initial_shares.index if t in pivot.columns]
+            no_rebal = (pivot[common] * initial_shares[common]).sum(axis=1)
+            fig.add_trace(
+                go.Scatter(x=no_rebal.index, y=no_rebal.values, mode="lines",
+                           name="No rebalancing (buy-and-hold)",
+                           line={"width": 1.5, "color": "#8c564b", "dash": "dashdot"},
+                           legend="legend"),
+                row=1, col=1,
+            )
 
     # 2. Recommended portfolio % segregated by wave, versus time.
     # Sum each wave's tickers' weights into one line per wave so the

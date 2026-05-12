@@ -181,8 +181,35 @@ for i, lb in enumerate(LOOKBACKS_YEARS):
                              line={"width": 2, "color": color},
                              hovertemplate=f"LB={lb}y<br>%{{x|%Y-%m-%d}}<br>$%{{y:,.0f}}<extra></extra>"))
 fig.add_trace(go.Scatter(x=spy.index, y=spy.values, mode="lines",
-                         name="SPY (rebased)", line={"width": 1.5, "color": "#444", "dash": "dash"},
+                         name="SPY (rebased)", line={"width": 1.5, "color": "#66c266", "dash": "dash"},
                          hovertemplate="SPY<br>%{x|%Y-%m-%d}<br>$%{y:,.0f}<extra></extra>"))
+
+# No-rebalance counterfactual: take lookback=1.3y (headline) first-month
+# allocation and hold for the full window. Same treatment as the
+# backtest dashboard and other sweeps.
+_headline_lb = 1.3
+_headline_tickers = universes[_headline_lb]
+_headline_prices = all_prices[_headline_tickers].dropna()
+_first = daily_dates[0]
+_lookback_start = _first - pd.Timedelta(days=int(round(365 * _headline_lb)))
+_returns = compute_returns(_headline_prices.loc[_lookback_start:_first])
+_opt = optimize_portfolio(
+    _returns, objective="mean_variance", risk_free_rate=RISK_FREE,
+    max_weight=MAX_WEIGHT, risk_aversion=LAMBDA,
+    wave_views=wave_views_at(wh_df, _first, _headline_tickers),
+)
+_weights = _opt["weights"]
+_init_shares = {t: _weights[t] * INITIAL_USD / float(_headline_prices.loc[_first, t])
+                for t in _headline_tickers}
+_no_rebal = pd.Series(
+    {d: sum(_init_shares[t] * float(_headline_prices.loc[d, t]) for t in _headline_tickers)
+     for d in daily_dates},
+    name="No rebalancing",
+)
+fig.add_trace(go.Scatter(x=_no_rebal.index, y=_no_rebal.values, mode="lines",
+                         name="No rebalancing (buy-and-hold, LB=1.3y initial)",
+                         line={"width": 1.5, "color": "#8c564b", "dash": "dashdot"},
+                         hovertemplate="No rebalance<br>%{x|%Y-%m-%d}<br>$%{y:,.0f}<extra></extra>"))
 
 # Rebalance indicators
 for d in rebalance_dates:

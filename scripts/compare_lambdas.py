@@ -146,9 +146,32 @@ for i, lam in enumerate(LAMBDAS):
     fig.add_trace(go.Scatter(x=s.index, y=s.values, mode="lines",
                              name=f"λ={lam}", line={"width": 2, "color": color},
                              hovertemplate=f"λ={lam}<br>%{{x|%Y-%m-%d}}<br>$%{{y:,.0f}}<extra></extra>"))
+# SPY in light green, consistent across all backtest + sweep dashboards.
 fig.add_trace(go.Scatter(x=spy.index, y=spy.values, mode="lines",
-                         name="SPY (rebased)", line={"width": 1.5, "color": "#444", "dash": "dash"},
+                         name="SPY (rebased)", line={"width": 1.5, "color": "#66c266", "dash": "dash"},
                          hovertemplate="SPY<br>%{x|%Y-%m-%d}<br>$%{y:,.0f}<extra></extra>"))
+
+# No-rebalance counterfactual: take lambda=1's first-month allocation
+# and hold it for the full window. One brown dashdot line, consistent
+# with the backtest dashboard's no-rebalance treatment.
+_first = daily_dates[0]
+_lookback_start = _first - pd.Timedelta(days=365 * LOOKBACK_YEARS)
+_returns = compute_returns(prices.loc[_lookback_start:_first])
+_opt = optimize_portfolio(
+    _returns, objective="mean_variance", risk_free_rate=RISK_FREE,
+    max_weight=MAX_WEIGHT, risk_aversion=1.0,
+    wave_views=wave_views_at(wh_df, _first),
+)
+_weights = _opt["weights"]
+_init_shares = {t: _weights[t] * INITIAL_USD / float(prices.loc[_first, t]) for t in TICKERS}
+_no_rebal = pd.Series(
+    {d: sum(_init_shares[t] * float(prices.loc[d, t]) for t in TICKERS) for d in daily_dates},
+    name="No rebalancing",
+)
+fig.add_trace(go.Scatter(x=_no_rebal.index, y=_no_rebal.values, mode="lines",
+                         name="No rebalancing (buy-and-hold, λ=1 initial)",
+                         line={"width": 1.5, "color": "#8c564b", "dash": "dashdot"},
+                         hovertemplate="No rebalance<br>%{x|%Y-%m-%d}<br>$%{y:,.0f}<extra></extra>"))
 
 # Rebalance indicators: orange dotted vertical lines at each rebalance
 # date, behind all the line traces. Same orange as the square markers
