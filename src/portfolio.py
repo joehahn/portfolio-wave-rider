@@ -1435,9 +1435,13 @@ def build_dashboard(
     R_GAIN_INIT       = 5 + _shift
     R_GAIN_REVIEW     = (6 + _shift) if is_live else None
     R_WAVE_STAGE      = (7 + _shift) if is_live else (6 + _shift)
-    R_ARTICLES        = R_WAVE_STAGE + 1
-    R_ASSET_USD       = R_WAVE_STAGE + 2
-    R_WAVE_USD        = R_WAVE_STAGE + 3
+    # Articles-per-wave chart is live-only; backtest reads as-of-date
+    # news but the chart adds little signal there (12 monthly snapshots,
+    # no live evolution to track).
+    R_ARTICLES        = (R_WAVE_STAGE + 1) if is_live else None
+    _after_articles   = R_WAVE_STAGE + (2 if is_live else 1)
+    R_ASSET_USD       = _after_articles
+    R_WAVE_USD        = _after_articles + 1
     n_rows            = R_WAVE_USD
 
     _chart5_anchor = "/initialize-portfolio executed" if is_live else "backtest start"
@@ -1492,10 +1496,11 @@ def build_dashboard(
         "<br><sub><i>How the news-researcher classified each wave's cycle stage. Forward-filled across the snapshot window so each business day shows the most-recent-at-or-before classification."
         "<br>Right axis shows the tilt multiplier applied to that wave's tickers' expected returns.</i></sub>"
     )
-    titles_list.append(
-        f"{R_ARTICLES}. Articles harvested per wave over time"
-        "<br><sub><i>Bullet count per wave per /review-portfolio run, from the archived news payloads. Forward-filled across the window so the latest count holds until the next /review-portfolio refreshes the payload.</i></sub>"
-    )
+    if R_ARTICLES is not None:
+        titles_list.append(
+            f"{R_ARTICLES}. Articles harvested per wave over time"
+            "<br><sub><i>Bullet count per wave per /review-portfolio run, from the archived news payloads. Forward-filled across the window so the latest count holds until the next /review-portfolio refreshes the payload.</i></sub>"
+        )
     titles_list.append(
         f"{R_ASSET_USD}. Actual portfolio $ by asset class over time"
         "<br><sub><i>Your real holdings (from holdings.csv × close prices), grouped by asset class. Sums to total portfolio value (chart 1). Log y-axis keeps small allocations visible.</i></sub>"
@@ -1897,15 +1902,12 @@ def build_dashboard(
                 row=R_WAVE_STAGE, col=1,
             )
 
-    # 6. Articles harvested per wave over time. Reads each archived
+    # Articles-per-wave chart: live-only. Reads each archived
     # data/news/<date>-news.json file and counts bullets per wave_bucket.
-    # This answers "is the wave-stage classification (chart 5 above)
-    # backed by lots of evidence on each date, or thin coverage?"
-    # Backtest dashboard reads the as-of-date pilot archive (the actual
-    # inputs the simulated wave classifications drew from); live dashboard
-    # reads the rolling /review-portfolio archive.
-    news_dir = Path("data/news" if is_live else "data/news_asof")
-    if news_dir.is_dir():
+    # Answers "is the wave-stage classification (above) backed by lots
+    # of evidence on each date?"
+    news_dir = Path("data/news")
+    if R_ARTICLES is not None and news_dir.is_dir():
         article_rows: list[dict[str, Any]] = []
         for f in sorted(news_dir.glob("*-news.json")):
             try:
@@ -2126,7 +2128,9 @@ def build_dashboard(
         legend4=dict(
             title_text="Articles per wave",
             xref="paper", x=1.02,
-            yref="paper", y=_row_top(R_ARTICLES), yanchor="top",
+            yref="paper",
+            y=_row_top(R_ARTICLES) if R_ARTICLES is not None else 0.0,
+            yanchor="top",
         ),
         legend2=dict(
             title_text="Asset class $",
@@ -2179,7 +2183,8 @@ def build_dashboard(
                      ticktext=multiplier_ticktext,
                      showgrid=False,
                      automargin=True)
-    fig.update_yaxes(title_text="articles", row=R_ARTICLES, col=1, rangemode="tozero")
+    if R_ARTICLES is not None:
+        fig.update_yaxes(title_text="articles", row=R_ARTICLES, col=1, rangemode="tozero")
     fig.update_yaxes(title_text="$ (log)", row=R_ASSET_USD, col=1, type="log")
     # Log scale on chart 8 so small wave allocations (e.g., zero-weighted
     # robotics/biology lines hovering near a few hundred dollars) don't
@@ -2195,10 +2200,12 @@ def build_dashboard(
     # weights) and 4 (gain bars) are bar charts with categorical
     # x-axes so the range setter is a no-op there.
     if xrange is not None:
-        xrange_rows = (R_PORTFOLIO, R_TURNOVER, R_REC_WAVE,
-                       R_WAVE_STAGE, R_ARTICLES, R_ASSET_USD, R_WAVE_USD)
+        xrange_rows = [R_PORTFOLIO, R_TURNOVER, R_REC_WAVE,
+                       R_WAVE_STAGE, R_ASSET_USD, R_WAVE_USD]
         if R_AI_LIFT is not None:
-            xrange_rows = xrange_rows + (R_AI_LIFT,)
+            xrange_rows.append(R_AI_LIFT)
+        if R_ARTICLES is not None:
+            xrange_rows.append(R_ARTICLES)
         for r in xrange_rows:
             fig.update_xaxes(range=list(xrange), row=r, col=1)
 
