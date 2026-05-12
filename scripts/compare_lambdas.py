@@ -157,8 +157,16 @@ for d in rebalance_dates:
     fig.add_vline(x=d, line_dash="dot", line_width=1, line_color="#ff7f0e",
                   layer="below")
 
+# Pad the x-axis a couple percent on each side so the leftmost and
+# rightmost data points sit inside the plotting frame rather than on
+# the edge. Same pad applied to every sweep dashboard.
+_x_span = daily_dates[-1] - daily_dates[0]
+_x_pad = _x_span * 0.02
+_x_range = [daily_dates[0] - _x_pad, daily_dates[-1] + _x_pad]
+fig.update_xaxes(range=_x_range)
 fig.update_layout(
-    title="Portfolio value over time, mean_variance objective swept across λ",
+    title=f"Portfolio value over time, mean_variance objective swept across λ "
+          f"(executed {END.date()})",
     xaxis_title="date",
     yaxis_title="$",
     height=600,
