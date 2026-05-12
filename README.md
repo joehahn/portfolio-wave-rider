@@ -3,7 +3,7 @@
 **Author:** Joe Hahn  
 **Email:** jmh.datasciences@gmail.com  
 **Date:** 2026-May-08 <br>
-**branch:** main
+**branch:** 5y-backtest
 
 A Claude Code demo for long-horizon portfolio optimization. You declare your goals, constraints, and a wave thesis (which technology waves you believe will drive future returns) in `investor_profile.md`, as well as a watchlist of tickers in `holdings.csv`. The system then pulls the last few years of price history via yfinance, runs a mean-variance optimizer (scipy.optimize) over those tickers, and recommends weights that maximize risk-adjusted return subject to your concentration cap (drift from your asset-class targets is reported in each run's Profile conflicts section, not enforced). A monthly `/review-portfolio` slash command sends two Claude subagents out for fresh news per ticker, classifies each wave's stage (buildup → surge → peak → digestion), tilts the optimizer's expected-return vector accordingly, and writes a profile-aware report. The result accumulates into a static Plotly dashboard so you can watch the recommended weights, the wave classifications, and the realized portfolio value evolve over time.
 
@@ -16,6 +16,7 @@ A Claude Code demo for long-horizon portfolio optimization. You declare your goa
   - [Concentration-cap sweep](https://joehahn.github.io/portfolio-wave-rider/max_weight_comparison.html) (per-ticker weight ceiling)
   - [Lookback sweep](https://joehahn.github.io/portfolio-wave-rider/lookback_comparison.html) (price-history window for μ and Σ)
 - [News](https://joehahn.github.io/portfolio-wave-rider/news.html) — the bullets the news-researcher used to classify each wave's stage at the most recent `/review-portfolio` run.
+- [5-year backtest experiment](https://raw.githack.com/joehahn/portfolio-wave-rider/5y-backtest/docs/backtest_5y.html) (this branch only) — 20 quarterly rebalances over 2021-2026 with strict as-of-date news-researcher tilts, fixed Sept 2021 starting portfolio, and a three-path comparison (buy-and-hold vs rebalance vs rebalance+AI tilts). See `REFERENCE.md` and `docs/backtest_5y.html` for the full setup and findings.
 
 See [GLOSSARY.md](GLOSSARY.md) for finance and stats terms (`σ`, `μ`, `Σ`, Sharpe ratio, risk aversion `λ`, mean-variance optimization, max drawdown, VaR/CVaR, etc.) and [REFERENCE.md](REFERENCE.md) for the CLI flags, repo layout, output files, architecture overview, and testing instructions.
 
