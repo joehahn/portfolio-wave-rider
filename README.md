@@ -65,13 +65,9 @@ Each cron call refreshes the local copy of `docs/index.html` (the dashboard CLI'
 
 Install with `crontab -e` and paste. Adjust `PROJ` to your clone path. Verify with `crontab -l`. cron only fires while the machine is awake; missed runs do not auto-replay. Use `--date YYYY-MM-DD` on `snapshot` to backfill a missed day.
 
-## What it does
+## How `holdings.csv` shapes a run
 
-The headline pieces are spelled out below: how `holdings.csv` shapes a run, and how the news-researcher's wave classifications affect the optimizer's expected returns.
-
-### How `holdings.csv` shapes a run
-
-`holdings.csv` is the watchlist universe, both LLM subagents and the optimizer operate on exactly the set of tickers in this file:
+`holdings.csv` is the watchlist that the subagents and the optimizer operate on.
 
 - **News scope.** The `news-researcher` only fetches headlines for those tickers.
 - **Optimizer eligibility.** When `/review-portfolio` executes it passes the ticker list to a portfolio optimizer, and that optimizer cannot assign weight to a ticker that isn't in the file.
@@ -79,7 +75,7 @@ The headline pieces are spelled out below: how `holdings.csv` shapes a run, and 
 - **To add a ticker:** append a row `<TICKER>,0` to `holdings.csv` and run `/review-portfolio` (or wait for the next cron). The next run picks it up automatically — no other config changes needed.
 - **To remove a ticker:** delete the row. Subsequent runs skip it. The historical rows in `data/snapshots.csv` and `data/recommendations.csv` are not pruned (so old charts still render correctly), but no new rows accumulate.
 
-### How wave-stage tilts enter the math
+## How wave-stage tilts enter the math
 
 The news-researcher's only job that touches the optimizer is to assign each ticker a wave stage (`buildup`, `surge`, `neutral`, `digestion`, `peak`). The skill then passes these classifications to `analyze`, which scales each ticker's expected return by the stage's multiplier *before* running the optimizer. The math is one line:
 
