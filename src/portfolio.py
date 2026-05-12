@@ -954,7 +954,7 @@ def backtest(
                 snapshots_path=str(out / "snapshots.csv"),
                 recommendations_path=str(out / "recommendations.csv"),
                 out_path=path,
-                wave_history_path="data/wave_history.csv",
+                wave_history_path=wave_history_path or "data/wave_history.csv",
                 benchmarks=benchmarks,
                 nav_current=nav,
                 thesis_baseline_path=None,
@@ -1734,14 +1734,21 @@ def build_dashboard(
         wv_order = [w for w in _WAVE_DISPLAY_ORDER if w in wv_weight.columns]
         # Stacked bar chart: one vertical bar per rebalance date, each
         # bar's height = 100%, partitioned into wave-colored segments.
-        # Reads as a portfolio-composition timeline: how the optimizer
-        # allocated across the wave buckets at each monthly rebalance.
+        # Bar width = ~80% of the median time gap between rebalances so
+        # bars stay visible at any cadence and any x-axis range (monthly
+        # ~2.5e9 ms wide; quarterly ~7e9 ms wide).
+        if len(wv_weight) >= 2:
+            _gaps = wv_weight.index.to_series().diff().dropna().dt.total_seconds() * 1000
+            _bar_width = float(_gaps.median()) * 0.8
+        else:
+            _bar_width = None
         for wave in wv_order:
             fig.add_trace(
                 go.Bar(x=wv_weight.index, y=wv_weight[wave],
                        name=WAVE_DISPLAY_LABEL.get(wave, wave),
                        legend="legend5",
                        marker_color=WAVE_COLORS.get(wave),
+                       width=_bar_width,
                        hovertemplate=f"{wave}<br>%{{x|%Y-%m-%d}}"
                                      "<br>%{y:.2%}<extra></extra>"),
                 row=R_REC_WAVE, col=1,
