@@ -765,6 +765,45 @@ def backtest(
     snap_df.to_csv(out / "snapshots.csv", index=False)
     rec_df.to_csv(out / "recommendations.csv", index=False)
 
+    # No-tilts companion walk-forward: same monthly-rebalance loop but
+    # with wave_views=None at every rebalance, so the AI's per-month
+    # wave-stage classifications never enter μ. Lets the dashboard
+    # render an "AI tilt isolation" curve: gap to the main curve is the
+    # AI contribution; gap to buy-and-hold is the pure-math
+    # re-optimization contribution.
+    nt_totals: list[dict[str, Any]] = []
+    nt_shares: dict[str, float] | None = None
+    nt_last_month: int | None = None
+    for date in daily_dates:
+        is_new_month = date.month != nt_last_month
+        is_first_day = date == daily_dates[0]
+        if is_new_month or (is_first_day and nt_shares is None):
+            lookback_start = date - pd.Timedelta(days=365 * lookback_years)
+            slice_prices = full_prices.loc[lookback_start:date]
+            if len(slice_prices) < 30:
+                continue
+            returns = compute_returns(slice_prices)
+            nt_opt = optimize_portfolio(
+                returns, objective=objective, risk_free_rate=risk_free_rate,
+                max_weight=max_weight, risk_aversion=risk_aversion,
+                wave_views=None, tilt_schedule=tilt_schedule,
+            )
+            if not nt_opt.get("success"):
+                continue
+            nt_w = nt_opt["weights"]
+            nt_pv = (initial_usd if nt_shares is None
+                     else sum(nt_shares[t] * float(full_prices.loc[date, t]) for t in tickers))
+            nt_shares = {t: nt_w[t] * nt_pv / float(full_prices.loc[date, t]) for t in tickers}
+            nt_last_month = date.month
+        if nt_shares is not None:
+            nt_totals.append({
+                "date": str(date.date()),
+                "total_value": round(
+                    sum(nt_shares[t] * float(full_prices.loc[date, t]) for t in tickers), 2),
+            })
+    if nt_totals:
+        pd.DataFrame(nt_totals).to_csv(out / "no_tilts_totals.csv", index=False)
+
     # Summary metrics for the report.
     totals = snap_df.groupby("date")["total_value"].first().sort_index()
     initial_v = float(totals.iloc[0])
@@ -1529,6 +1568,21 @@ def build_dashboard(
                            legend="legend"),
                 row=1, col=1,
             )
+            # AI-tilt isolation: monthly-rebalance walk-forward with
+            # wave_views=None. Written by backtest() to no_tilts_totals.csv.
+            # Gap between the main portfolio line and this curve is the
+            # AI tilt contribution; gap between this curve and buy-and-hold
+            # is the pure-math re-optimization contribution.
+            nt_path = snap_path.parent / "no_tilts_totals.csv"
+            if nt_path.exists():
+                nt = pd.read_csv(nt_path, parse_dates=["date"]).set_index("date")["total_value"]
+                fig.add_trace(
+                    go.Scatter(x=nt.index, y=nt.values, mode="lines",
+                               name="rebalance, no AI tilt",
+                               line={"width": 1.5, "color": "#9467bd", "dash": "dot"},
+                               legend="legend"),
+                    row=1, col=1,
+                )
 
     # 2. Recommended portfolio % segregated by wave, versus time.
     # Sum each wave's tickers' weights into one line per wave so the
