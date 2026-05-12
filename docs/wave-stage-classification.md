@@ -6,7 +6,7 @@ This document consolidates the full pipeline. For narrower angles see the cross-
 
 ## Why classify waves at all
 
-The optimizer estimates expected return μ from a 3-year price-history window. That estimate is backward-looking by construction. If you have a structural belief that one wave is in early adoption (cheap) and another is at peak enthusiasm (expensive), the price-history μ does not encode that belief. It only encodes "what happened recently."
+The optimizer estimates expected return μ from a price-history window (default 1.3 years, set in `investor_profile.md`). That estimate is backward-looking by construction. If you have a structural belief that one wave is in early adoption (cheap) and another is at peak enthusiasm (expensive), the price-history μ does not encode that belief. It only encodes "what happened recently."
 
 The wave-stage tilt is a small, symmetric, evidence-grounded knob to nudge μ toward the user's wave thesis without overriding it. Multipliers range from 0.80 (peak) to 1.20 (buildup), so a "surge" call shifts μ by 10% before optimization. The optimizer still uses the price-history Σ for variance, and the concentration cap still applies. The tilt is one input, not a directive.
 
@@ -96,7 +96,7 @@ Everything except the language-model judgment is parameterized.
 - `WAVE_STAGE_TILT` defaults: `src/portfolio.py:39`. Override per investor in `investor_profile.md`'s `financial_model.wave_stage_tilts` block.
 - `TICKER_WAVE`: ticker-to-wave mapping in `src/portfolio.py`. Hand-curated; add new tickers here when extending the watchlist.
 - Wave list: hardcoded in `_WAVE_DISPLAY_ORDER` in `src/portfolio.py`. Adding a wave means adding to this list, to `news_sources.md`, to the news-researcher prompt's wave vocabulary in `.claude/agents/news-researcher.md`, and to `TICKER_WAVE` for any tickers in the new wave.
-- Lookback window for the optimizer's μ: `lookback_period` in the profile YAML, default 3y.
+- Lookback window for the optimizer's μ: `lookback_period` in the profile YAML, default 1.3y. Chosen via the lookback sweep (`docs/lookback_comparison.html`) as the longest setting that retains all 12 wave-thematic tickers including NUKZ, which launched 2024-01-24.
 - The strict-as-of-date prompt template that drove the pilot rebuild lives in the commit message of `416f4a2`. Each per-date prompt names the as-of date, gives a training-data suppression list, and includes the WebSearch `before:` filter.
 
 ## Code and document cross-references

@@ -28,7 +28,7 @@ Eight subcommands. `/review-portfolio` calls `init-holdings` (first-run branch o
 #   mean_variance - maximize μᵀw - λ·wᵀΣw. λ (`--risk-aversion`) slides along the
 #                   frontier: small λ favors return (more equity-heavy), large λ
 #                   favors variance reduction (more bond/cash-heavy).
-.venv/bin/python -m src.cli analyze --tickers AAPL MSFT NVDA --period 3y --max-weight 0.25
+.venv/bin/python -m src.cli analyze --tickers AAPL MSFT NVDA --period 1.3y --max-weight 0.25
 .venv/bin/python -m src.cli analyze --tickers AAPL MSFT NVDA --objective mean_variance --risk-aversion 1.0
 
 # Time-series logging

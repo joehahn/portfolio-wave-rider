@@ -77,7 +77,7 @@ The cron call refreshes `docs/index.html` (the dashboard CLI's default `--out`).
 
 Set `PROJ` to wherever you cloned the repo, then `crontab -e` and paste. Works the same on macOS and Linux. cron only fires when the machine is awake at the trigger time; missed runs do not auto-replay. Use `--date YYYY-MM-DD` to backfill.
 
-`recommend` lives only inside `/review-portfolio` now. The skill calls `python -m src.cli recommend --force` after `analyze` so `data/recommendations.csv` accumulates one row block per monthly review. There used to be a weekly Friday `recommend` cron too, but it produced near-duplicate rows between monthly reviews (wave classifications don't change between /review-portfolio runs and 7 days of new prices barely move μ over a 3-year lookback), so it was retired.
+`recommend` lives only inside `/review-portfolio` now. The skill calls `python -m src.cli recommend --force` after `analyze` so `data/recommendations.csv` accumulates one row block per monthly review. There used to be a weekly Friday `recommend` cron too, but it produced near-duplicate rows between monthly reviews (wave classifications don't change between /review-portfolio runs and 7 days of new prices barely move μ over the lookback window), so it was retired.
 
 ## Repo rules
 

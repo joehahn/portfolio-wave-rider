@@ -41,7 +41,7 @@ Runs the same 12-month walk-forward six times (one per λ in `[0.0, 0.33, 1.0, 3
 python scripts/compare_lookbacks.py
 ```
 
-Runs the same 12-month walk-forward five times (one per lookback in `[0.25, 0.5, 0.75, 1.0, 1.3]` years) and writes `data/backtest/lookback_comparison.html` and `docs/lookback_comparison.html`. Sweep is capped at 1.3y because NUKZ launched 2024-01-24; longer lookbacks would all collapse to the same effective window.
+Runs the same 12-month walk-forward nine times (one per lookback in `[0.25, 0.5, 0.75, 1.0, 1.3, 2.0, 3.0, 4.0, 5.0]` years) and writes `data/backtest/lookback_comparison.html` and `docs/lookback_comparison.html`. A ticker is included in the universe only if its history extends back at least LB years before the backtest start, so NUKZ drops for LB ≥ 2y (launched 2024-01-24) and RKLB also drops at LB = 5y (started 2020-11-24). Universes are not identical across the sweep, which is flagged in the chart caption.
 
 ## Step 4 — final output to the user
 
