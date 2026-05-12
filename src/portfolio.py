@@ -114,13 +114,37 @@ def load_financial_model(profile_path: str = "investor_profile.md") -> dict[str,
 # Market data: fetch prices and turn them into a returns bundle.
 # ---------------------------------------------------------------------------
 
+def _period_to_start(period: str) -> pd.Timestamp | None:
+    """Parse a period string like '1.3y' or '6mo' into a start Timestamp.
+
+    Returns None for non-numeric periods like 'max' or 'ytd', which
+    yfinance handles natively. Used to support fractional periods
+    (e.g., '1.3y') that yfinance's period= argument rejects."""
+    import re
+    m = re.fullmatch(r"(\d+(?:\.\d+)?)(d|mo|y)", period.strip())
+    if not m:
+        return None
+    n = float(m.group(1))
+    unit = m.group(2)
+    days = {"d": n, "mo": n * 30, "y": n * 365}[unit]
+    return pd.Timestamp.today().normalize() - pd.Timedelta(days=days)
+
+
 def fetch_prices(tickers: list[str], period: str = "3y", interval: str = "1d") -> pd.DataFrame:
     """Download adjusted-close prices for the given tickers via yfinance."""
     if not tickers:
         raise ValueError("tickers must be non-empty")
     clean = [t.upper().strip() for t in tickers]
-    data = yf.download(clean, period=period, interval=interval,
-                       auto_adjust=True, progress=False, group_by="column")
+    # yfinance's period= only accepts canonical strings (1y, 2y, 5y...).
+    # For fractional periods like '1.3y' we convert to explicit start/end.
+    start = _period_to_start(period)
+    if start is not None:
+        end = pd.Timestamp.today().normalize() + pd.Timedelta(days=1)
+        data = yf.download(clean, start=start, end=end, interval=interval,
+                           auto_adjust=True, progress=False, group_by="column")
+    else:
+        data = yf.download(clean, period=period, interval=interval,
+                           auto_adjust=True, progress=False, group_by="column")
     if data.empty:
         raise RuntimeError(f"yfinance returned no data for {clean} over {period}")
 
