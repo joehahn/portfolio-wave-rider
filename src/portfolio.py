@@ -2461,3 +2461,280 @@ def render_news_page(
     o_path.parent.mkdir(parents=True, exist_ok=True)
     o_path.write_text(page, encoding="utf-8")
     return {"out_path": str(o_path), "news_payload_present": n_path.exists()}
+
+
+# ---------------------------------------------------------------------------
+# Curator-backtest dashboard. Reads the curator_backtest output dir plus the
+# runs dir, renders three baseline curves on one chart and a watchlist-
+# composition timeline on a second, into a single static HTML file.
+# ---------------------------------------------------------------------------
+
+_STARTER_WAVE_DEFAULTS: dict[str, str] = {
+    "AAPL": "AI", "MSFT": "AI", "GOOGL": "AI", "NVDA": "AI", "TSM": "AI",
+    "SMH": "AI",
+    "SPY": "general_markets", "AGG": "general_markets",
+    "BIL": "general_markets", "IAU": "general_markets",
+    "VIG": "general_markets",
+}
+
+
+def _build_ticker_periods(
+    runs_dir: str, starter_tickers: list[str], end_date: pd.Timestamp,
+) -> tuple[list[tuple[str, pd.Timestamp, pd.Timestamp, str]], pd.Timestamp]:
+    """Reconstruct each ticker's on-watchlist period(s) from the runs dir.
+
+    Returns a list of (ticker, start, end, wave_bucket) tuples, sorted by
+    earliest start date, and the first add date across the run. A ticker
+    re-added after a remove gets multiple entries in the list.
+    """
+    runs = Path(runs_dir)
+    starter_json = runs / "_starter.json"
+    if starter_json.exists():
+        cfg = json.loads(starter_json.read_text())
+        run_start = pd.Timestamp(cfg["start_date"])
+    else:
+        run_start = pd.Timestamp("1900-01-01")
+
+    # Collect curation events in chronological order from the runs dir.
+    files = sorted(runs.glob("*-curation.json"))
+    open_periods: dict[str, tuple[pd.Timestamp, str]] = {}
+    completed: list[tuple[str, pd.Timestamp, pd.Timestamp, str]] = []
+
+    for t in starter_tickers:
+        open_periods[t] = (run_start, _STARTER_WAVE_DEFAULTS.get(t, "general_markets"))
+
+    for f in files:
+        payload = json.loads(f.read_text())
+        d = pd.Timestamp(payload.get("as_of_date") or f.stem.replace("-curation", ""))
+        for a in (payload.get("adds") or []):
+            if not isinstance(a, dict): continue
+            tk = a.get("ticker")
+            wb = a.get("wave_bucket") or "general_markets"
+            if not tk or tk in open_periods:
+                continue  # invalid or duplicate-of-open
+            open_periods[tk] = (d, wb)
+        for r in (payload.get("removes") or []):
+            if not isinstance(r, dict): continue
+            tk = r.get("ticker")
+            if not tk or tk not in open_periods:
+                continue
+            start, wb = open_periods.pop(tk)
+            completed.append((tk, start, d, wb))
+
+    # Tickers still open at end of run get end_date as their close.
+    for tk, (start, wb) in open_periods.items():
+        completed.append((tk, start, end_date, wb))
+
+    completed.sort(key=lambda x: (x[1], x[0]))
+    return completed, run_start
+
+
+def build_curator_dashboard(
+    backtest_dir: str = "data/backtest_curator_5y",
+    runs_dir: str = "data/curator_runs/5y-quarterly",
+    out_path: str = "docs/backtest_curator.html",
+    benchmarks: list[str] | None = None,
+) -> dict[str, Any]:
+    """Render a single static HTML dashboard for one curator-backtest run.
+
+    Two main charts:
+      1. Equity-curve race: curator strategy vs fixed-watchlist baseline
+         vs buy-and-hold baseline vs benchmarks (default SPY).
+      2. Watchlist composition over time: a Gantt-style timeline showing
+         when each ticker entered and exited the watchlist, color-coded
+         by wave bucket.
+
+    Also includes a small summary table of curation events. No interactive
+    backend - this is one static HTML file readable by any browser.
+    """
+    import plotly.graph_objects as go
+    from plotly.subplots import make_subplots
+
+    bd = Path(backtest_dir)
+    snaps_path = bd / "snapshots.csv"
+    baselines_path = bd / "baselines_totals.csv"
+    summary_path = bd / "curation_summary.json"
+    if not snaps_path.exists() or not baselines_path.exists():
+        raise FileNotFoundError(
+            f"backtest dir missing required files: {snaps_path} or {baselines_path}"
+        )
+
+    snaps = pd.read_csv(snaps_path, parse_dates=["date"])
+    baselines = pd.read_csv(baselines_path, parse_dates=["date"])
+    totals = snaps.groupby("date")["total_value"].first().sort_index()
+    start = totals.index[0]
+    end = totals.index[-1]
+    initial = float(totals.iloc[0])
+
+    # Benchmark curves, normalized to the same starting value.
+    if benchmarks is None:
+        benchmarks = ["SPY"]
+    bench_curves = _fetch_benchmark_curves(benchmarks, start, end, initial) if benchmarks else {}
+
+    # Watchlist periods for the Gantt chart.
+    starter_tickers: list[str] = []
+    runs_starter = Path(runs_dir) / "_starter.json"
+    if runs_starter.exists():
+        starter_tickers = json.loads(runs_starter.read_text()).get("starter_watchlist", [])
+    periods, _ = _build_ticker_periods(runs_dir, starter_tickers, end)
+
+    # Realized return numbers for the headline summary.
+    final = float(totals.iloc[-1])
+    cur_return = (final / initial) - 1.0
+    fix_initial = float(baselines["fixed_total"].dropna().iloc[0]) if "fixed_total" in baselines else initial
+    fix_final = float(baselines["fixed_total"].dropna().iloc[-1]) if "fixed_total" in baselines else initial
+    fix_return = (fix_final / fix_initial) - 1.0
+    bnh_initial = float(baselines["bnh_total"].dropna().iloc[0]) if "bnh_total" in baselines else initial
+    bnh_final = float(baselines["bnh_total"].dropna().iloc[-1]) if "bnh_total" in baselines else initial
+    bnh_return = (bnh_final / bnh_initial) - 1.0
+
+    fig = make_subplots(
+        rows=2, cols=1, vertical_spacing=0.10,
+        row_heights=[0.55, 0.45],
+        subplot_titles=(
+            "Realized portfolio value: curator vs baselines vs benchmark",
+            "Watchlist composition over time (one row per ticker; color = wave bucket)",
+        ),
+    )
+
+    # Chart 1: equity-curve race.
+    fig.add_trace(
+        go.Scatter(x=totals.index, y=totals.values, name="Curator-driven",
+                   mode="lines", line={"color": "#d97706", "width": 2.5}),
+        row=1, col=1,
+    )
+    if "bnh_total" in baselines.columns:
+        bnh = baselines.dropna(subset=["bnh_total"])
+        fig.add_trace(
+            go.Scatter(x=bnh["date"], y=bnh["bnh_total"], name="Buy-and-hold starter",
+                       mode="lines", line={"color": "#3b82f6", "width": 1.8}),
+            row=1, col=1,
+        )
+    if "fixed_total" in baselines.columns:
+        fix = baselines.dropna(subset=["fixed_total"])
+        fig.add_trace(
+            go.Scatter(x=fix["date"], y=fix["fixed_total"], name="Fixed watchlist rebalance",
+                       mode="lines", line={"color": "#6b7280", "width": 1.8}),
+            row=1, col=1,
+        )
+    for b, curve in bench_curves.items():
+        fig.add_trace(
+            go.Scatter(x=curve.index, y=curve.values, name=f"{b} benchmark",
+                       mode="lines", line={"color": "#10b981", "width": 1.5, "dash": "dot"}),
+            row=1, col=1,
+        )
+    fig.update_yaxes(title_text="portfolio value ($)", tickformat="$,.0f", row=1, col=1)
+
+    # Chart 2: watchlist Gantt. One row per ticker, color = wave_bucket.
+    # Sort tickers so the first-added is at the top, latest at the bottom.
+    seen: list[str] = []
+    for tk, _s, _e, _wb in periods:
+        if tk not in seen: seen.append(tk)
+    seen.reverse()  # so top of chart is first-added
+    y_index = {tk: i for i, tk in enumerate(seen)}
+
+    legend_seen: set[str] = set()
+    for tk, p_start, p_end, wb in periods:
+        color = WAVE_COLORS.get(wb, "#888")
+        show_legend = wb not in legend_seen
+        legend_seen.add(wb)
+        fig.add_trace(
+            go.Scatter(
+                x=[p_start, p_end], y=[y_index[tk], y_index[tk]],
+                mode="lines",
+                line={"color": color, "width": 14},
+                name=wb, legendgroup=wb, showlegend=show_legend,
+                hovertemplate=f"<b>{tk}</b><br>{wb}<br>"
+                              f"%{{x|%Y-%m-%d}}<extra></extra>",
+            ),
+            row=2, col=1,
+        )
+
+    fig.update_yaxes(
+        tickmode="array", tickvals=list(range(len(seen))), ticktext=seen,
+        autorange="reversed", row=2, col=1,
+    )
+    fig.update_xaxes(range=[start, end], row=2, col=1)
+
+    fig.update_layout(
+        height=900, margin={"t": 70, "b": 60, "l": 80, "r": 30},
+        title={
+            "text": (
+                f"<b>Curator backtest, {start.date()} to {end.date()}</b><br>"
+                f"<span style='font-size:14px;color:#555;'>"
+                f"Curator-driven: {cur_return * 100:+.2f}%  "
+                f"·  Buy-and-hold: {bnh_return * 100:+.2f}%  "
+                f"·  Fixed rebalance: {fix_return * 100:+.2f}%  "
+                f"·  Active vs fixed: {(cur_return - fix_return) * 100:+.2f}pp"
+                f"</span>"
+            ),
+            "x": 0.5, "xanchor": "center",
+        },
+        plot_bgcolor="#fafafa",
+        legend={"orientation": "v", "y": 0.95},
+    )
+
+    # Curation event log table at the bottom.
+    log_html = ""
+    if summary_path.exists():
+        log = json.loads(summary_path.read_text())
+        rows = []
+        for ev in log:
+            d = ev.get("date", "")
+            adds = ", ".join(ev.get("adds") or []) or "—"
+            removes = ", ".join(ev.get("removes") or []) or "—"
+            rej = ev.get("rejections", 0)
+            rej_cell = str(rej) if rej else "—"
+            rows.append(
+                f"<tr><td>{_html.escape(d)}</td>"
+                f"<td style='color:#0a7a3a;'>{_html.escape(adds)}</td>"
+                f"<td style='color:#b91c1c;'>{_html.escape(removes)}</td>"
+                f"<td>{_html.escape(rej_cell)}</td></tr>"
+            )
+        log_html = (
+            "<h2 style='margin-top:2em;'>Curation log</h2>"
+            "<p style='color:#555;'>Each row is one quarterly curator call. "
+            "Rejections happen when an add or remove violates a contract rule "
+            "(listing date, max watchlist size, ticker already in / not in current "
+            "watchlist).</p>"
+            "<table style='border-collapse:collapse;width:100%;font-size:14px;'>"
+            "<thead><tr style='border-bottom:2px solid #ccc;text-align:left;'>"
+            "<th style='padding:6px;'>Date</th>"
+            "<th style='padding:6px;'>Adds</th>"
+            "<th style='padding:6px;'>Removes</th>"
+            "<th style='padding:6px;'>Rejections</th></tr></thead>"
+            f"<tbody>{''.join(rows)}</tbody></table>"
+        )
+
+    chart_html = fig.to_html(full_html=False, include_plotlyjs="cdn", config={"displayModeBar": False})
+    page = (
+        '<!doctype html><html><head><meta charset="utf-8">'
+        '<title>Portfolio Wave Rider — curator backtest</title>'
+        '<style>body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;'
+        'max-width:1180px;margin:0 auto;padding:0 1.5em;color:#222;line-height:1.5;}'
+        'h1,h2{color:#111;}'
+        'table{margin-top:0.5em;}'
+        'th,td{border-bottom:1px solid #eee;}'
+        '</style></head><body>'
+        '<h1>Curator-driven backtest</h1>'
+        '<p style="color:#555;max-width:780px;">The watchlist-curator agent was called '
+        f'{len(periods) if periods else "N"} times over a {(end - start).days}-day window. '
+        'At each rebalance it proposed adds and removes against the active watchlist; '
+        'the optimizer then ran vanilla mean-variance on whatever set resulted. The two '
+        'baselines below isolate the contribution of the curation (vs fixed watchlist same '
+        'cadence) and of any rebalancing at all (vs buy-and-hold of the day-0 set).</p>'
+        + chart_html
+        + log_html
+        + '</body></html>'
+    )
+    o = Path(out_path)
+    o.parent.mkdir(parents=True, exist_ok=True)
+    o.write_text(page, encoding="utf-8")
+    return {
+        "out_path": str(o),
+        "n_tickers_ever_held": len(seen),
+        "curator_return": round(cur_return, 4),
+        "fixed_baseline_return": round(fix_return, 4),
+        "bnh_baseline_return": round(bnh_return, 4),
+        "benchmarks": {b: float(c.iloc[-1] / c.iloc[0] - 1.0) for b, c in bench_curves.items()},
+    }

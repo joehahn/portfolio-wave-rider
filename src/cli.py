@@ -143,6 +143,14 @@ def main(argv: list[str] | None = None) -> int:
                         help="if the file exists, time-series charts are scoped to dates "
                              ">= the thesis date. Pass an empty string to disable (the "
                              "backtest dashboard does this since its data predates any thesis).")
+    p_dash.add_argument("--curator-backtest-dir", default=None,
+                        help="if set, generate the curator-backtest dashboard instead of "
+                             "the live dashboard. Reads snapshots.csv, baselines_totals.csv, "
+                             "and curation_summary.json from this directory.")
+    p_dash.add_argument("--curator-runs-dir", default=None,
+                        help="only used with --curator-backtest-dir. Path to the runs dir "
+                             "(contains _starter.json + dated *-curation.json files) so "
+                             "the Gantt chart can color tickers by wave_bucket.")
 
     args = parser.parse_args(argv)
 
@@ -204,24 +212,37 @@ def main(argv: list[str] | None = None) -> int:
                 as_of_date=args.as_of_date,
             )
         else:  # dashboard
-            result = portfolio.build_dashboard(
-                snapshots_path=args.snapshots,
-                recommendations_path=args.recommendations,
-                out_path=args.out,
-                benchmarks=args.benchmarks,
-                nav_current=args.nav_current,
-                thesis_baseline_path=args.thesis_baseline or None,
-            )
-            # Side-effect: refresh docs/news.html from the latest
-            # /review-portfolio news payload so cron and the slash command
-            # keep the news page in sync with the dashboard. Path is
-            # derived from --out so e.g. data/dashboard.html keeps its
-            # news next to it at data/news.html.
-            news_out = str(Path(args.out).with_name("news.html"))
-            news_result = portfolio.render_news_page(
-                news_path=args.news, out_path=news_out,
-            )
-            result["news_page"] = news_result
+            if args.curator_backtest_dir:
+                # When --curator-backtest-dir is set, default --out flips to
+                # docs/backtest_curator.html unless the caller overrode it.
+                out_path = args.out
+                if out_path == "docs/index.html":
+                    out_path = "docs/backtest_curator.html"
+                result = portfolio.build_curator_dashboard(
+                    backtest_dir=args.curator_backtest_dir,
+                    runs_dir=args.curator_runs_dir or "",
+                    out_path=out_path,
+                    benchmarks=args.benchmarks,
+                )
+            else:
+                result = portfolio.build_dashboard(
+                    snapshots_path=args.snapshots,
+                    recommendations_path=args.recommendations,
+                    out_path=args.out,
+                    benchmarks=args.benchmarks,
+                    nav_current=args.nav_current,
+                    thesis_baseline_path=args.thesis_baseline or None,
+                )
+                # Side-effect: refresh docs/news.html from the latest
+                # /review-portfolio news payload so cron and the slash command
+                # keep the news page in sync with the dashboard. Path is
+                # derived from --out so e.g. data/dashboard.html keeps its
+                # news next to it at data/news.html.
+                news_out = str(Path(args.out).with_name("news.html"))
+                news_result = portfolio.render_news_page(
+                    news_path=args.news, out_path=news_out,
+                )
+                result["news_page"] = news_result
     except Exception as e:  # noqa: BLE001 — surface any failure as a JSON error line
         print(json.dumps({"error": f"{type(e).__name__}: {e}"}), file=sys.stderr)
         return 1
