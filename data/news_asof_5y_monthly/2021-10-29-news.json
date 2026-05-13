@@ -1,0 +1,247 @@
+{
+  "as_of_date": "2021-10-29",
+  "per_ticker": {
+    "NVDA": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "NVIDIA Q2 FY2022 results (August 18 2021): revenue $6.51B up 68% YoY; data-center $2.37B up 35% YoY; gaming $3.06B up 85% YoY; Q3 guidance set at $6.80B (implied +44% YoY). Both segments described as record.",
+          "source": "NVIDIA Newsroom",
+          "url": "https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-second-quarter-fiscal-2022",
+          "date": "2021-08-18"
+        },
+        {
+          "summary": "NVDA stock surged 23% in October 2021, with the sharpest move coming after Meta's October 25 announcement of $29-34B in 2022 capex on data centers and servers; investors connected this infrastructure spend directly to demand for NVIDIA GPUs. Stock up 102% year-to-date through early November.",
+          "source": "The Motley Fool",
+          "url": "https://www.fool.com/investing/2021/11/02/why-nvidia-stock-surged-23-in-october/",
+          "date": "2021-10-31"
+        },
+        {
+          "summary": "Nasdaq article dated October 13 2021 noted NVIDIA gaining on strong GPU adoption across both gaming and data-center segments ahead of the November earnings report.",
+          "source": "Nasdaq",
+          "url": "https://www.nasdaq.com/articles/nvidia-nvda-gains-on-strong-gpu-adoption-in-gaming-data-center-2021-10-13",
+          "date": "2021-10-13"
+        }
+      ]
+    },
+    "GOOGL": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Alphabet Q3 2021 results (October 26 2021): total revenue $65.1B up 41% YoY, beating the $63.34B estimate; Google Cloud up 45% to $4.99B; advertising revenue up 43% to $53.13B; EPS $27.99 vs $23.48 expected; Cloud operating loss narrowed to $644M from $1.21B.",
+          "source": "9to5Google",
+          "url": "https://9to5google.com/2021/10/26/alphabet-reports-q3-2021-revenue-of-65-1-billion/",
+          "date": "2021-10-26"
+        },
+        {
+          "summary": "SEC EDGAR filing for Alphabet Q3 2021 (dated October 26 2021) confirms CFO Ruth Porat cited 'digital transformation and shift to hybrid work' as sustained demand driver for Google Cloud services.",
+          "source": "SEC EDGAR",
+          "url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204421000054/googexhibit991q32021.htm",
+          "date": "2021-10-26"
+        }
+      ]
+    },
+    "MSFT": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Microsoft Q1 FY2022 results (October 26 2021): revenue $45.32B up 22% YoY (fastest growth since 2018); Azure grew 48% in constant currency (accelerating from 45% prior quarter); net income $20.5B up 48%; EPS $2.27 adjusted beat $2.07 estimate.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2021/10/26/microsoft-msft-earnings-q1-2022.html",
+          "date": "2021-10-26"
+        },
+        {
+          "summary": "Microsoft Q2 FY2022 revenue guidance set at $50.15B-$51.05B, implying continued double-digit growth; Productivity and Business Processes (Office, LinkedIn, Dynamics) contributed $15.04B up 22%.",
+          "source": "Microsoft Investor Relations",
+          "url": "https://www.microsoft.com/en-us/investor/earnings/fy-2022-q1/press-release-webcast",
+          "date": "2021-10-26"
+        }
+      ]
+    },
+    "AAPL": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Apple Q4 FY2021 results (October 28 2021): revenue $83.4B up 29% YoY but missed the $84.85B estimate -- the first revenue miss since May 2017 and first EPS miss since April 2016; CEO Tim Cook cited $6B supply constraint from chip shortages and COVID-related manufacturing disruption.",
+          "source": "Apple Newsroom",
+          "url": "https://www.apple.com/newsroom/2021/10/apple-reports-fourth-quarter-results/",
+          "date": "2021-10-28"
+        },
+        {
+          "summary": "iPhone revenue $38.87B up 47% YoY but missed the $41.51B estimate due to supply constraints; Services revenue $18.28B up 25.6% was the only segment to beat; Apple declined to provide formal Q1 FY2022 guidance.",
+          "source": "9to5Mac",
+          "url": "https://9to5mac.com/2021/10/28/apple-q4-2021-earnings-results/",
+          "date": "2021-10-28"
+        },
+        {
+          "summary": "Apple annual FY2021 revenue $366B up 33% from FY2020; quarterly profit $20.6B; despite strong annual results, the supply-driven miss in the final quarter introduced uncertainty about Q1 FY2022 holiday-season volumes.",
+          "source": "MacRumors",
+          "url": "https://www.macrumors.com/2021/10/28/apple-4q-2021-earnings/",
+          "date": "2021-10-28"
+        }
+      ]
+    },
+    "SPY": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "As of October 29 2021, 56% of S&P 500 companies had reported Q3 results; 82% beat EPS estimates (above the 5-year average of 76%); blended earnings growth rate reached 36.6% -- third-highest since Q2 2010.",
+          "source": "MarketScreener / FactSet",
+          "url": "https://www.marketscreener.com/quote/stock/FACTSET-RESEARCH-SYSTEMS--12584/news/S-P-500-Earnings-Season-Update-October-29-2021-36835556/",
+          "date": "2021-10-29"
+        },
+        {
+          "summary": "S&P 500 rose 6.9% and the Nasdaq rose 7.3% in October 2021, with the index near all-time highs; SPY full-year 2021 return was 31.22%.",
+          "source": "The Motley Fool",
+          "url": "https://www.fool.com/investing/2021/11/02/why-nvidia-stock-surged-23-in-october/",
+          "date": "2021-10-31"
+        }
+      ]
+    },
+    "AGG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "US 10-year breakeven inflation rate broke through 2.4% in early October 2021 and finished the month 30bps higher month-over-month, the highest level in nine years; rising inflation expectations pressured investment-grade bonds; the Fed tapering was widely anticipated by late October.",
+          "source": "World Gold Council",
+          "url": "https://www.gold.org/goldhub/research/gold-market-commentary-october-2021",
+          "date": "2021-10-31"
+        }
+      ]
+    },
+    "BIL": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "As of October 29 2021, the Federal Reserve maintained the federal funds target rate at 0-0.25%; 1-3 month T-bill yields were near zero, making BIL a near-zero-yielding cash-equivalent; Fed tapering of asset purchases was anticipated but not yet formally announced.",
+          "source": "Federal Reserve",
+          "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20211103a.htm",
+          "date": "2021-11-03"
+        }
+      ]
+    },
+    "IAU": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Gold gained approximately 1.5% in October 2021 as US 10-year breakeven inflation rates hit a 9-year high; net inflows into COMEX futures provided technical support; USD weakness versus AUD and CNY contributed.",
+          "source": "World Gold Council",
+          "url": "https://www.gold.org/goldhub/research/gold-market-commentary-october-2021",
+          "date": "2021-10-31"
+        }
+      ]
+    },
+    "BOTZ": {
+      "wave_bucket": "robotics",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "BOTZ (Global X Robotics and AI ETF) top holdings as of 2021 included Keyence, Fanuc, Intuitive Surgical, ABB, and NVIDIA -- all industrials and automation names seeing strong demand from post-COVID manufacturing recovery; no specific October 2021 news events surfaced for the ETF itself.",
+          "source": "Global X ETFs",
+          "url": "https://www.globalxetfs.com/funds/botz",
+          "date": "2021-10-29"
+        }
+      ]
+    },
+    "QTUM": {
+      "wave_bucket": "quantum",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "QTUM (Defiance Quantum ETF) returned 35.18% for full-year 2021, driven by constituent holdings in quantum and machine-learning technology companies; no specific material news events dated on or before October 29 2021 were surfaced in curated or open search.",
+          "source": "Defiance ETFs",
+          "url": "https://www.defianceetfs.com/qtum/",
+          "date": "2021-10-29"
+        }
+      ]
+    },
+    "VIG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "VIG (Vanguard Dividend Appreciation ETF) tracks the S&P US Dividend Growers Index, requiring at least 10 consecutive years of dividend growth; no material October 2021 specific news events surfaced in curated or open search.",
+          "source": "Vanguard",
+          "url": "https://investor.vanguard.com/investment-products/etfs/profile/vig",
+          "date": "2021-10-29"
+        }
+      ]
+    }
+  },
+  "ticker_stages": {
+    "NVDA": {
+      "stage": "surge",
+      "rationale": "Q2 FY2022 results showed revenue up 68% YoY with data-center and gaming both at records (2021-08-18), and the stock surged 23% in October driven by Meta's $29-34B capex commitment to GPU-intensive infrastructure (2021-10-25), confirming real revenue compounding with further catalysts ahead.",
+      "evidence_bullet_dates": [
+        "2021-08-18",
+        "2021-10-13",
+        "2021-10-31"
+      ]
+    },
+    "GOOGL": {
+      "stage": "surge",
+      "rationale": "Q3 2021 results (2021-10-26) showed Google Cloud up 45% to $4.99B with a narrowing operating loss, advertising up 43%, and a substantial EPS beat, indicating real and accelerating revenue growth across core and cloud segments.",
+      "evidence_bullet_dates": [
+        "2021-10-26"
+      ]
+    },
+    "MSFT": {
+      "stage": "surge",
+      "rationale": "Q1 FY2022 results (2021-10-26) showed Azure accelerating to 48% constant-currency growth from 45% the prior quarter, total revenue growing at the fastest rate since 2018, and net income up 48%, all indicating compounding adoption across cloud and productivity platforms.",
+      "evidence_bullet_dates": [
+        "2021-10-26"
+      ]
+    },
+    "AAPL": {
+      "stage": "digestion",
+      "rationale": "Q4 FY2021 results (2021-10-28) produced Apple's first revenue miss since May 2017 and first EPS miss since April 2016, driven by a $6B supply constraint that compressed iPhone volumes below estimates, a post-crest disruption with no fundamental thesis breach.",
+      "evidence_bullet_dates": [
+        "2021-10-28"
+      ]
+    },
+    "SPY": {
+      "stage": "neutral",
+      "rationale": "SPY is a broad-market ETF in the general_markets bucket; no SPY-specific fundamental news was surfaced, so neutral is applied per guideline.",
+      "evidence_bullet_dates": []
+    },
+    "AGG": {
+      "stage": "neutral",
+      "rationale": "AGG is a general-markets bond ETF; only macro rate and inflation context was surfaced, not AGG-specific fundamental news sufficient for a non-neutral call.",
+      "evidence_bullet_dates": []
+    },
+    "BIL": {
+      "stage": "neutral",
+      "rationale": "BIL is a cash-equivalent T-bill ETF in general_markets; no BIL-specific news was surfaced, and by design BIL carries no wave exposure.",
+      "evidence_bullet_dates": []
+    },
+    "IAU": {
+      "stage": "neutral",
+      "rationale": "IAU is a general-markets gold ETF; a single bullet on gold's 1.5% October gain (World Gold Council, 2021-10-31) is contextual macro data, not IAU-specific fundamental news sufficient to assign a non-neutral wave stage.",
+      "evidence_bullet_dates": []
+    },
+    "BOTZ": {
+      "stage": "neutral",
+      "rationale": "No specific October 2021 news events were surfaced for BOTZ or its constituent robotics holdings with dates on or before 2021-10-29; the fallback search returned only holdings composition, insufficient for a non-neutral call.",
+      "evidence_bullet_dates": []
+    },
+    "QTUM": {
+      "stage": "neutral",
+      "rationale": "The only IBM quantum milestone found (Eagle 127-qubit processor) was announced 2021-11-16, which is post-date and discarded; no pre-date QTUM-specific event was surfaced, leaving insufficient evidence for a non-neutral call.",
+      "evidence_bullet_dates": []
+    },
+    "VIG": {
+      "stage": "neutral",
+      "rationale": "VIG is a general-markets dividend-growth ETF; no material October 2021 specific news events were surfaced in curated or open search.",
+      "evidence_bullet_dates": []
+    }
+  },
+  "self_critique_downgrades": []
+}

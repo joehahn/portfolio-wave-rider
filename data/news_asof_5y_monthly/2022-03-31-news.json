@@ -1,0 +1,261 @@
+{
+  "as_of_date": "2022-03-31",
+  "per_ticker": {
+    "NVDA": {
+      "wave_bucket": "AI",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Nvidia Q4 FY22 (ended Jan 30 2022): record total revenue of $7.64B (+53% YoY); data center revenue a record $3.26B (+71% YoY, +11% QoQ); Q1 FY23 guidance of $8.10B (+/- 2%). Demand continues to exceed supply.",
+          "source": "NVIDIA Newsroom / SEC EDGAR",
+          "url": "https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-fourth-quarter-and-fiscal-2022",
+          "date": "2022-02-16"
+        },
+        {
+          "summary": "Nvidia Q1 FY23 revenue tracking above $5.30B outlook, with all market platforms driving upside. Company expects demand to continue to exceed supply for much of the year.",
+          "source": "NVIDIA Newsroom",
+          "url": "https://nvidianews.nvidia.com/news/nvidia-announces-first-quarter-fiscal-2022-revenue-tracking-above-outlook",
+          "date": "2022-03-22"
+        }
+      ]
+    },
+    "GOOGL": {
+      "wave_bucket": "AI",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Alphabet Q4 2021 earnings (reported Feb 1 2022): Google Cloud revenue +45% YoY to $5.54B; cloud backlog grew 70%+ to $51B; 65% YoY growth in cloud deals worth over $1B.",
+          "source": "CNBC / Alphastreet",
+          "url": "https://www.cnbc.com/2022/02/01/alphabet-googl-q4-2021-earnings.html",
+          "date": "2022-02-01"
+        },
+        {
+          "summary": "Alphabet total Q4 2021 revenue +32% YoY; YouTube and Search ad revenue both beat estimates; management characterizes cloud opportunity as 'very early innings'.",
+          "source": "Alphastreet Earnings Transcript",
+          "url": "https://news.alphastreet.com/alphabet-inc-googl-q4-2021-earnings-call-transcript/",
+          "date": "2022-02-01"
+        }
+      ]
+    },
+    "MSFT": {
+      "wave_bucket": "AI",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Microsoft Q2 FY22 (ended Dec 2021, reported Jan 25 2022): Azure and cloud services revenue +46% YoY; overall cloud revenue $22.1B (+32% YoY); EPS $2.48 adjusted vs $2.31 expected.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2022/01/25/microsoft-msft-earnings-q2-2022.html",
+          "date": "2022-01-25"
+        },
+        {
+          "summary": "Microsoft Intelligent Cloud segment revenue increased 29% driven by Azure; commercial cloud revenue surpassed $22B quarterly run-rate for the first time.",
+          "source": "Microsoft Investor Relations",
+          "url": "https://www.microsoft.com/en-us/investor/earnings/fy-2022-q2/press-release-webcast",
+          "date": "2022-01-25"
+        }
+      ]
+    },
+    "AAPL": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Apple Q1 FY22 (ended Dec 2021, reported Jan 27 2022): all-time record quarterly revenue of $123.9B (+11% YoY), beating $118.3B estimate; iPhone revenue $71.6B (+9% YoY); Services $19.5B (+24% YoY); 785M paid subscribers.",
+          "source": "CNBC / Apple Newsroom",
+          "url": "https://www.cnbc.com/2022/01/27/apple-aapl-earnings-q1-2022.html",
+          "date": "2022-01-27"
+        },
+        {
+          "summary": "Apple CEO Tim Cook guided for solid YoY revenue growth in the March quarter, with supply constraints expected to be less severe than the December quarter.",
+          "source": "Hollywood Reporter / Apple Newsroom",
+          "url": "https://www.hollywoodreporter.com/business/digital/apple-q1-2022-earnings-1235082244/",
+          "date": "2022-01-27"
+        }
+      ]
+    },
+    "SPY": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "S&amp;P 500 returned -4.6% in Q1 2022; the 10-year Treasury yield rose from 1.51% to 2.32% over the quarter; the Fed delivered its first rate hike since 2018 in March 2022 and signaled six more hikes for the year.",
+          "source": "Nasdaq.com",
+          "url": "https://www.nasdaq.com/articles/what-happened-in-q1-2022",
+          "date": "2022-03-31"
+        },
+        {
+          "summary": "Markets staged a relief rally after the March 16 Fed rate hike as investors found comfort in the rate-hike path being clarified; S&amp;P 500 snapped a three-day losing streak, bouncing off correction lows.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2022/03/16/stock-futures-rise-slightly-as-market-looks-to-build-on-rally-following-fed-rate-hike.html",
+          "date": "2022-03-16"
+        }
+      ]
+    },
+    "AGG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "AGG (iShares Core U.S. Aggregate Bond ETF) lost approximately 5.9% in Q1 2022, its worst quarterly return in decades, as the Fed began raising rates and the 10-year yield surged from 1.51% to 2.32%.",
+          "source": "TCV Trust &amp; Wealth Management Q1 2022 Review",
+          "url": "https://www.tcvwealth.com/2022-q1-review-and-outlook-stocks-and-bonds-and-yield-curves-oh-my/",
+          "date": "2022-03-31"
+        }
+      ]
+    },
+    "BIL": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "BIL (SPDR Bloomberg 1-3 Month T-Bill ETF) holds ultra-short Treasuries with minimal duration; as of Q1 2022, yields were near zero and just beginning to rise with the Fed's first rate hike in March 2022; the fund is effectively a cash proxy.",
+          "source": "State Street SPDR",
+          "url": "https://www.ssga.com/us/en/intermediary/etfs/state-street-spdr-bloomberg-1-3-month-t-bill-etf-bil",
+          "date": "2022-03-31"
+        }
+      ]
+    },
+    "IAU": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Gold jumped 6% in February 2022 on safe-haven demand tied to Russia's invasion of Ukraine; LBMA Gold Price PM ended February at $1,910/oz. Gold reached a peak of $1,973.96 in early March 2022, its highest since September 2020.",
+          "source": "World Gold Council / NAJ.co.uk",
+          "url": "https://www.gold.org/goldhub/research/gold-market-commentary-february-2022",
+          "date": "2022-02-28"
+        },
+        {
+          "summary": "After peaking near $1,974 in early March 2022, gold retreated as the Fed's March rate hike lifted real yields; the metal remained above $1,900 but gave back roughly half its war-premium.",
+          "source": "NAJ.co.uk",
+          "url": "https://www.naj.co.uk/news/gold-prices-jumped-on-safe-haven-appeal-after-russian-invasion-of-ukraine",
+          "date": "2022-03-16"
+        }
+      ]
+    },
+    "BOTZ": {
+      "wave_bucket": "robotics",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Broad Q1 2022 tech/growth selloff hit thematic ETFs hard; the Nasdaq-100 fell 8.9% in Q1 2022 and smaller speculative growth names and thematic funds experienced steeper losses than large-cap tech.",
+          "source": "Fortune",
+          "url": "https://fortune.com/2022/03/31/tech-stocks-q1-apple-amazon-microsoft-inflation-interest-rates/",
+          "date": "2022-03-31"
+        }
+      ]
+    },
+    "QTUM": {
+      "wave_bucket": "quantum",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "IBM unveiled its 127-qubit Eagle quantum processor at the IBM Quantum Summit on November 16, 2021, described as the first processor whose scale makes classical simulation infeasible; IBM roadmap targets 433-qubit Osprey in 2022 and 1,121-qubit Condor in 2023.",
+          "source": "IBM Newsroom",
+          "url": "https://newsroom.ibm.com/2021-11-16-IBM-Unveils-Breakthrough-127-Qubit-Quantum-Processor",
+          "date": "2021-11-16"
+        },
+        {
+          "summary": "IBM Eagle qubit coherence time reached 300 microseconds by early 2022 \u2014 roughly triple the median for superconducting qubits; performance benchmarks presented at APS March Meeting 2022.",
+          "source": "IBM Quantum Blog",
+          "url": "https://www.ibm.com/quantum/blog/eagle-quantum-processor-performance",
+          "date": "2022-03-01"
+        }
+      ]
+    },
+    "VIG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "VIG (Vanguard Dividend Appreciation ETF) focuses on companies with multi-year dividend growth records; in the Q1 2022 risk-off environment driven by Fed rate hikes and Ukraine war, quality/dividend-growth strategies generally held up better than growth-heavy names.",
+          "source": "Vanguard / Yahoo Finance",
+          "url": "https://investor.vanguard.com/investment-products/etfs/profile/vig",
+          "date": "2022-03-31"
+        }
+      ]
+    }
+  },
+  "ticker_stages": {
+    "NVDA": {
+      "stage": "surge",
+      "rationale": "Q4 FY22 data center revenue hit a record $3.26B (+71% YoY) on Feb 16 2022, with Q1 FY23 guidance of $8.10B and demand continuing to exceed supply, indicating compounding adoption with clear revenue proof.",
+      "evidence_bullet_dates": [
+        "2022-02-16",
+        "2022-03-22"
+      ]
+    },
+    "GOOGL": {
+      "stage": "surge",
+      "rationale": "Q4 2021 earnings (reported Feb 1 2022) showed Google Cloud +45% YoY to $5.54B and backlog growing 70%+ to $51B, with management framing cloud as 'early innings', consistent with compounding adoption.",
+      "evidence_bullet_dates": [
+        "2022-02-01"
+      ]
+    },
+    "MSFT": {
+      "stage": "surge",
+      "rationale": "Q2 FY22 results (reported Jan 25 2022) showed Azure +46% YoY and commercial cloud surpassing a $22B quarterly run-rate for the first time, with EPS beating estimates.",
+      "evidence_bullet_dates": [
+        "2022-01-25"
+      ]
+    },
+    "AAPL": {
+      "stage": "surge",
+      "rationale": "Q1 FY22 results (reported Jan 27 2022) showed all-time record quarterly revenue of $123.9B beating estimates across all major product categories, with Services growing 24% YoY to $19.5B and 785M paid subscribers.",
+      "evidence_bullet_dates": [
+        "2022-01-27"
+      ]
+    },
+    "SPY": {
+      "stage": "neutral",
+      "rationale": "SPY is a general-markets broad index ETF; Q1 2022 returned -4.6% on macro headwinds (Fed rate hikes, Ukraine war) with no wave-specific signal.",
+      "evidence_bullet_dates": [
+        "2022-03-31"
+      ]
+    },
+    "AGG": {
+      "stage": "neutral",
+      "rationale": "AGG is a broad investment-grade bond ETF in the general_markets bucket; its -5.9% Q1 2022 loss is a macro rate-rising event with no wave classification applicable.",
+      "evidence_bullet_dates": [
+        "2022-03-31"
+      ]
+    },
+    "BIL": {
+      "stage": "neutral",
+      "rationale": "BIL is an ultra-short T-bill ETF in the general_markets bucket; no wave signal and minimal per-ticker news materialized from searches.",
+      "evidence_bullet_dates": [
+        "2022-03-31"
+      ]
+    },
+    "IAU": {
+      "stage": "neutral",
+      "rationale": "IAU is a precious metals ETF in the general_markets bucket; the Ukraine safe-haven move is a macro geopolitical event, not a wave-cycle classification.",
+      "evidence_bullet_dates": [
+        "2022-02-28"
+      ]
+    },
+    "BOTZ": {
+      "stage": "neutral",
+      "rationale": "No BOTZ-specific dated news article was found from before 2022-04-01; the only available bullet covers the broad Nasdaq/growth-ETF selloff in Q1 2022, which is not BOTZ-specific.",
+      "evidence_bullet_dates": []
+    },
+    "QTUM": {
+      "stage": "neutral",
+      "rationale": "Downgraded from buildup: the IBM Eagle and coherence-time bullets document the quantum sector's research progress but are not QTUM-specific (no QTUM fund news, flows, or company-level event found before 2022-04-01); per the grounding rule, a non-neutral call requires a ticker-specific bullet.",
+      "evidence_bullet_dates": []
+    },
+    "VIG": {
+      "stage": "neutral",
+      "rationale": "VIG is a dividend-appreciation ETF in general_markets; the single sourced bullet is a general description rather than a dated event specific to VIG.",
+      "evidence_bullet_dates": []
+    }
+  },
+  "self_critique_downgrades": [
+    {
+      "ticker": "QTUM",
+      "from_stage": "buildup",
+      "to_stage": "neutral",
+      "reason": "IBM Eagle and coherence benchmarks are quantum-sector milestones, not QTUM-fund-specific events. The grounding rule requires at least one bullet specific to the ticker (QTUM) to support a non-neutral call; no such QTUM-specific dated article was retrieved before 2022-04-01."
+    }
+  ]
+}

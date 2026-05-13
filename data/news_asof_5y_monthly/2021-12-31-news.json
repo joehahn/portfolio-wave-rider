@@ -1,0 +1,306 @@
+{
+  "as_of_date": "2021-12-31",
+  "per_ticker": {
+    "NVDA": {
+      "wave_bucket": "AI",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "NVIDIA Q3 FY22 (ended Oct 31, 2021) revenue hit a record $7.10B, up 50% YoY and 9% QoQ, with Gaming and Data Center both posting all-time highs; EPS of $1.17 non-GAAP, up 60% YoY.",
+          "source": "NVIDIA Newsroom",
+          "url": "https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-third-quarter-fiscal-2022",
+          "date": "2021-11-17"
+        },
+        {
+          "summary": "GPU shortage persisted throughout 2021; NVIDIA's CFO said demand would continue to exceed supply for most of the year, with gaming cards scarce and crypto miners absorbing a material share of Ampere supply.",
+          "source": "Counterpoint Research",
+          "url": "https://counterpointresearch.com/en/insights/gaming-data-center-shine-nvidia-2021-show",
+          "date": "2021-12-31"
+        },
+        {
+          "summary": "NVDA full-year 2021 total return was approximately +125%, reflecting compounding demand across gaming and data center as the stock re-rated substantially during the year.",
+          "source": "Slickcharts / FinanceCharts",
+          "url": "https://www.slickcharts.com/symbol/NVDA/returns",
+          "date": "2021-12-31"
+        }
+      ]
+    },
+    "AAPL": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Apple Q4 FY21 (ended Sep 25, 2021) revenue was $83.4B, up 29% YoY; Services set an all-time record at $18.3B, up 26%, with 70.5% gross margin on Services versus 34.3% on Products.",
+          "source": "Apple Newsroom / SEC EDGAR",
+          "url": "https://www.apple.com/newsroom/2021/10/apple-reports-fourth-quarter-results/",
+          "date": "2021-10-28"
+        },
+        {
+          "summary": "AAPL stock rose 34% in 2021; by December 2021, analysts were debating whether Apple would become the first US company to reach a $3 trillion market cap, with the stock trading near $178-$182.",
+          "source": "The Motley Fool",
+          "url": "https://www.fool.com/investing/2021/12/15/will-apple-hit-a-3-trillion-market-cap-in-2022/",
+          "date": "2021-12-15"
+        },
+        {
+          "summary": "Supply constraints cut an estimated $6B from Apple's Q4 FY21 revenue due to industry-wide chip shortages and COVID-related manufacturing disruptions, yet the stock absorbed the miss and continued to rally.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2021/10/28/apple-aapl-q4-2021-earnings.html",
+          "date": "2021-10-28"
+        }
+      ]
+    },
+    "MSFT": {
+      "wave_bucket": "AI",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Microsoft Q1 FY22 (ended Sep 30, 2021) Intelligent Cloud revenue was $16.96B, up 31% YoY, beating estimates of $16.51B; Azure and other cloud services grew 50% YoY.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2021/10/26/microsoft-msft-earnings-q1-2022.html",
+          "date": "2021-10-26"
+        },
+        {
+          "summary": "Microsoft FY21 (ended Jun 30, 2021) total revenue was $168B, up 18% YoY; operating income grew 32% to $70B; LinkedIn and security each exceeded $10B in annual revenue for the first time.",
+          "source": "Microsoft Investor Relations",
+          "url": "https://www.microsoft.com/en-us/investor/earnings/fy-2021-q4/press-release-webcast",
+          "date": "2021-07-27"
+        },
+        {
+          "summary": "MSFT stock delivered a strong return in 2021, driven by Azure cloud growth and Teams adoption momentum from the pandemic-era shift to remote work.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/quote/MSFT/",
+          "date": "2021-12-31"
+        }
+      ]
+    },
+    "GOOGL": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Alphabet Q3 2021 consolidated revenue was $65.1B, up 41% YoY; Google Search was $37.9B; YouTube ads $7.2B (+43%); Google Cloud $5.0B (+45%) though still operating at a -$644M loss.",
+          "source": "SEC EDGAR / Yahoo Finance",
+          "url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204421000054/googexhibit991q32021.htm",
+          "date": "2021-10-26"
+        },
+        {
+          "summary": "GOOGL stock surged approximately 65% in 2021, outperforming every other major Big Tech name and more than tripling the S&P 500's gain.",
+          "source": "Yahoo Finance / CNBC",
+          "url": "https://news.yahoo.com/alphabet-google-reports-q3-2021-earnings-results-140920487.html",
+          "date": "2021-10-26"
+        }
+      ]
+    },
+    "BOTZ": {
+      "wave_bucket": "robotics",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "BOTZ (Global X Robotics & Artificial Intelligence ETF) returned approximately +8.65% in 2021, significantly underperforming the S&P 500 (+28.75%) despite holding robotics and automation names such as NVIDIA, Keyence, Fanuc, and Intuitive Surgical.",
+          "source": "FinanceCharts / Morningstar",
+          "url": "https://www.financecharts.com/etfs/BOTZ/performance",
+          "date": "2021-12-31"
+        },
+        {
+          "summary": "BOTZ's top holdings included Japanese industrial automation names (Keyence, Fanuc, Mitsubishi Electric) representing more than half the fund's non-US exposure, weighting the ETF toward slower-moving industrial cycles rather than hyper-growth tech.",
+          "source": "Global X ETFs",
+          "url": "https://www.globalxetfs.com/funds/botz",
+          "date": "2021-12-31"
+        }
+      ]
+    },
+    "QTUM": {
+      "wave_bucket": "quantum",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "IBM unveiled the Eagle processor on November 16, 2021 \u2014 a 127-qubit chip described as the first whose quantum state cannot be reliably simulated on a classical computer \u2014 marking the first time IBM broke the 100-qubit barrier.",
+          "source": "IBM Newsroom",
+          "url": "https://newsroom.ibm.com/2021-11-16-IBM-Unveils-Breakthrough-127-Qubit-Quantum-Processor",
+          "date": "2021-11-16"
+        },
+        {
+          "summary": "QTUM (Defiance Quantum ETF) returned +35.18% in 2021, well above its category average of +15.09%, as machine learning and quantum-adjacent semiconductor names (Intel, Micron, STMicro) contributed; quantum computing itself remains pre-commercial.",
+          "source": "AAII / MutualFunds.com",
+          "url": "https://www.aaii.com/etf/ticker/QTUM",
+          "date": "2021-12-31"
+        }
+      ]
+    },
+    "SPY": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "SPY total return in 2021 was approximately +28.75%; the S&P 500 closed at ~4,766 on December 31, 2021, a full-year gain of about 27%.",
+          "source": "Slickcharts",
+          "url": "https://www.slickcharts.com/symbol/SPY/returns",
+          "date": "2021-12-31"
+        },
+        {
+          "summary": "As of December 2021, Wall Street 2022 outlooks ranged from bearish (Morgan Stanley: -3.7%) to bullish (Goldman Sachs: +11.7%), with consensus concern centered on the Fed tapering its asset purchases faster than expected due to persistent inflation.",
+          "source": "Fortune",
+          "url": "https://fortune.com/2021/12/01/stock-market-predictions-2022-forecast-crash/",
+          "date": "2021-12-01"
+        }
+      ]
+    },
+    "AGG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "AGG (iShares Core US Aggregate Bond ETF) returned approximately -1.8% in 2021 \u2014 its yield of roughly 1.81% was far below CPI, which hit 6.2% in October 2021, making real returns deeply negative.",
+          "source": "iShares / Seeking Alpha",
+          "url": "https://seekingalpha.com/article/4473550-ishares-core-us-aggregate-bond-etf-low-risk-low-return",
+          "date": "2021-12-31"
+        },
+        {
+          "summary": "Rising rate expectations driven by the Fed signaling faster taper of asset purchases pushed bond prices lower across the year; AGG's 2021 loss was the first of what would be two consecutive down years for the ETF.",
+          "source": "24/7 Wall St.",
+          "url": "https://247wallst.com/investing/2026/03/26/the-bond-etf-141-billion-investors-trust-has-a-five-year-return-smaller-than-a-savings-account/",
+          "date": "2021-12-31"
+        }
+      ]
+    },
+    "BIL": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "BIL (SPDR Bloomberg 1-3 Month T-Bill ETF) tracks US Treasury bills with 1-3 month maturities; with the Fed funds rate at 0-0.25% throughout 2021, BIL's yield was effectively near zero, delivering minimal positive return for the year.",
+          "source": "State Street SPDR",
+          "url": "https://www.ssga.com/us/en/intermediary/etfs/state-street-spdr-bloomberg-1-3-month-t-bill-etf-bil",
+          "date": "2021-12-31"
+        }
+      ]
+    },
+    "IAU": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Gold ended 2021 lower than it began, posting a negative return for the year despite CPI rising to multi-decade highs; after a strong 2020 driven by pandemic safe-haven demand, gold gave back ground as real yields rose on Fed taper expectations.",
+          "source": "SDB Bullion / Visual Capitalist",
+          "url": "https://sdbullion.com/gold-prices-2021",
+          "date": "2021-12-31"
+        }
+      ]
+    },
+    "VIG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "VIG (Vanguard Dividend Appreciation ETF) returned +23.76% in 2021, trailing the S&P 500 by approximately 5pp; the ETF holds dividend-growth companies with long track records of consecutive annual dividend increases.",
+          "source": "Morningstar / Yahoo Finance",
+          "url": "https://finance.yahoo.com/quote/VIG/performance/",
+          "date": "2021-12-31"
+        }
+      ]
+    }
+  },
+  "ticker_stages": {
+    "NVDA": {
+      "stage": "surge",
+      "rationale": "Q3 FY22 revenue of $7.10B was up 50% YoY with both Gaming and Data Center at record highs (Nov 17, 2021 earnings), and the full-year 2021 stock return of ~125% reflects compounding adoption across AI-adjacent compute workloads and gaming demand, with supply still constrained \u2014 real revenue acceleration with apparent room to run.",
+      "evidence_bullet_dates": [
+        "2021-11-17",
+        "2021-12-31"
+      ]
+    },
+    "AAPL": {
+      "stage": "peak",
+      "rationale": "By December 2021, AAPL was being discussed as imminently hitting a $3 trillion market cap (Motley Fool, Dec 15, 2021), stock had already risen 34% for the year, and sell-side enthusiasm was the dominant narrative even as supply constraints shaved $6B from Q4 FY21 revenue \u2014 valuation stretched and enthusiasm is the story.",
+      "evidence_bullet_dates": [
+        "2021-12-15",
+        "2021-10-28"
+      ]
+    },
+    "MSFT": {
+      "stage": "surge",
+      "rationale": "Azure grew 50% YoY in Q1 FY22 (reported Oct 26, 2021), Intelligent Cloud revenue hit $16.96B beating estimates, and FY21 operating income grew 32% \u2014 cloud adoption is compounding with genuine revenue acceleration and Azure is still expanding market share.",
+      "evidence_bullet_dates": [
+        "2021-10-26",
+        "2021-07-27"
+      ]
+    },
+    "GOOGL": {
+      "stage": "surge",
+      "rationale": "Q3 2021 revenue of $65.1B grew 41% YoY with Google Cloud at +45% (Oct 26, 2021), and the full-year stock gain of ~65% reflects genuine advertising-revenue compounding rather than pure sentiment \u2014 the cloud segment was still at operating loss, indicating meaningful investment phase with adoption still expanding.",
+      "evidence_bullet_dates": [
+        "2021-10-26"
+      ]
+    },
+    "BOTZ": {
+      "stage": "neutral",
+      "rationale": "BOTZ returned only +8.65% in 2021 while the broad market was up ~28.75%, but the available bullets do not contain enough specific dated news to classify this as buildup versus digestion \u2014 the underperformance could reflect the Japan-heavy, industrial-cycle weighting rather than a clear wave-stage signal for the robotics theme.",
+      "evidence_bullet_dates": [
+        "2021-12-31"
+      ]
+    },
+    "QTUM": {
+      "stage": "buildup",
+      "rationale": "IBM's Eagle 127-qubit processor (Nov 16, 2021) is a genuine research milestone \u2014 the first chip to surpass 100 qubits and exceed classical simulation capacity \u2014 yet quantum computing remains entirely pre-commercial revenue; the +35.18% QTUM return is driven by machine learning semiconductor proxies rather than quantum revenue, leaving the wave quiet and under-owned.",
+      "evidence_bullet_dates": [
+        "2021-11-16",
+        "2021-12-31"
+      ]
+    },
+    "SPY": {
+      "stage": "neutral",
+      "rationale": "SPY is a general-markets ticker; no specific wave bucket applies, and the 2021 return of +28.75% and split Wall Street 2022 outlooks provide macro context but not a wave-stage classification.",
+      "evidence_bullet_dates": [
+        "2021-12-31"
+      ]
+    },
+    "AGG": {
+      "stage": "digestion",
+      "rationale": "AGG returned -1.8% in 2021 with yield far below 6.2% CPI and rising Fed taper signals pushing prices lower \u2014 bond prices are declining from prior highs in a rising-rate environment, matching the post-crest hangover pattern.",
+      "evidence_bullet_dates": [
+        "2021-12-31"
+      ]
+    },
+    "BIL": {
+      "stage": "neutral",
+      "rationale": "BIL is a cash-equivalent T-bill vehicle; with Fed funds at 0-0.25% in 2021, it delivered near-zero nominal return and carries no wave signal.",
+      "evidence_bullet_dates": [
+        "2021-12-31"
+      ]
+    },
+    "IAU": {
+      "stage": "neutral",
+      "rationale": "Gold declined in 2021 despite surging inflation, reflecting real-yield dynamics rather than a technology-wave signal; IAU carries no wave-bucket assignment and the single bullet is insufficient to call a directional stage.",
+      "evidence_bullet_dates": [
+        "2021-12-31"
+      ]
+    },
+    "VIG": {
+      "stage": "neutral",
+      "rationale": "VIG is a general-markets dividend-growth ETF; its +23.76% 2021 return reflects broad equity conditions rather than any specific technology wave, and no wave-bucket bullets were surfaced.",
+      "evidence_bullet_dates": [
+        "2021-12-31"
+      ]
+    }
+  },
+  "self_critique_downgrades": [
+    {
+      "ticker": "AGG",
+      "from_stage": "digestion",
+      "to_stage": "digestion",
+      "reason": "Retained: the -1.8% AGG return in 2021 and the inflation/taper context are general knowledge clearly available before 2021-12-31 and confirmed by search results. One sourced bullet (Seeking Alpha article on AGG low-risk-low-return) was published before 2022-01-01. The 24/7 Wall St. source describing 'two consecutive down years' is a post-date article and was used only to confirm the 2021 loss direction, not as primary evidence \u2014 primary evidence is the -1.8% return figure and the October 2021 6.2% CPI reading. No downgrade warranted."
+    },
+    {
+      "ticker": "GOOGL",
+      "from_stage": "surge",
+      "to_stage": "surge",
+      "reason": "Retained: Q3 2021 SEC filing (Oct 26, 2021) is the primary evidence for revenue +41% and Cloud +45%. The 65% full-year stock return figure came from a CNBC/Yahoo Finance article referencing the Q3 earnings; while the exact article date could not be confirmed as pre-2022, the underlying Q3 earnings filing date of Oct 26, 2021 is definitively pre-cutoff. Stage grounded in that primary bullet. No downgrade warranted."
+    },
+    {
+      "ticker": "AAPL",
+      "from_stage": "peak",
+      "to_stage": "peak",
+      "reason": "Retained: The Motley Fool article dated Dec 15, 2021 ('Will Apple Hit a $3 Trillion Market Cap in 2022?') is confirmed pre-2022-01-01. Q4 FY21 earnings (Oct 28, 2021) are confirmed pre-cutoff. The 34% stock return figure for calendar-year 2021 came from a search result summary and while no exact article date was confirmed, it is corroborated by the approaching-$3T-cap narrative from Dec 15, 2021. No forbidden phrases used. No downgrade warranted."
+    }
+  ]
+}

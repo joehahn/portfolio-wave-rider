@@ -1,0 +1,279 @@
+{
+  "as_of_date": "2022-02-28",
+  "per_ticker": {
+    "NVDA": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "NVIDIA reports record Q4 FY2022 results: total revenue $7.64B (+53% YoY), data center $3.26B (+71% YoY), gaming $3.42B (+37% YoY); GAAP EPS $1.18 (+103% YoY); Q1 FY2023 guidance of $8.10B issued.",
+          "source": "NVIDIA Newsroom",
+          "url": "https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-fourth-quarter-and-fiscal-2022",
+          "date": "2022-02-16"
+        },
+        {
+          "summary": "Despite record quarterly results, NVDA stock was approximately 43% below its November 2021 all-time high and trading at ~73x net profits versus a historical average of ~51x, indicating elevated valuation at peak and ongoing price correction.",
+          "source": "Yahoo Finance \u2014 ticker news",
+          "url": "https://finance.yahoo.com/quote/NVDA/",
+          "date": "2022-02-16"
+        },
+        {
+          "summary": "Nvidia Q4 FY2022 full fiscal year revenue was a record $26.91B (+61% YoY), with data center and gaming each reaching record annual revenue; SEC 8-K filing confirmed results.",
+          "source": "SEC EDGAR",
+          "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581022000008/q4fy22pr.htm",
+          "date": "2022-02-16"
+        }
+      ]
+    },
+    "GOOGL": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Alphabet reports Q4 2021 revenue of $75.3B (+32% YoY); Google Cloud revenue $5.54B (+45% YoY) with operating loss narrowing to $890M; backlog grew >70% to $51B.",
+          "source": "Yahoo Finance \u2014 ticker news",
+          "url": "https://finance.yahoo.com/video/alphabet-crushes-earnings-announces-20-212516853.html",
+          "date": "2022-02-01"
+        },
+        {
+          "summary": "Alphabet announces a 20-for-1 stock split alongside Q4 2021 earnings; shares rose more than 9% in after-hours trading on February 1, 2022.",
+          "source": "Yahoo Finance \u2014 ticker news",
+          "url": "https://finance.yahoo.com/quote/GOOGL/",
+          "date": "2022-02-01"
+        },
+        {
+          "summary": "Alphabet Q4 2021 earnings confirmed by SEC filing: broad-based revenue strength in advertiser spend, strong consumer online activity, and sustained Google Cloud growth.",
+          "source": "SEC EDGAR",
+          "url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204422000015/googexhibit991q42021.htm",
+          "date": "2022-02-01"
+        }
+      ]
+    },
+    "MSFT": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Microsoft Q2 FY2022 results (announced 2022-01-25): total revenue $51.73B (beat), Azure and other cloud services revenue +46% YoY; Microsoft Cloud revenue $22.1B (+32% YoY); Intelligent Cloud segment $18.33B (+26% YoY).",
+          "source": "Yahoo Finance \u2014 ticker news",
+          "url": "https://finance.yahoo.com/quote/MSFT/",
+          "date": "2022-01-25"
+        },
+        {
+          "summary": "Microsoft FY22 Q2 press release confirmed Azure double-digit growth acceleration; Microsoft Intelligent Cloud segment now growing at 26% with cloud commitments fueling revenue backlog.",
+          "source": "SEC EDGAR",
+          "url": "https://www.microsoft.com/en-us/investor/earnings/fy-2022-q2/press-release-webcast",
+          "date": "2022-01-25"
+        }
+      ]
+    },
+    "AAPL": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Apple Q1 FY2022 results (reported 2022-01-27): record quarterly revenue $123.9B (+11% YoY), EPS $2.10 (+25% YoY), iPhone revenue $71.63B (+9%), Services revenue $19.52B (+24% YoY).",
+          "source": "Yahoo Finance \u2014 ticker news",
+          "url": "https://finance.yahoo.com/quote/AAPL/financials/",
+          "date": "2022-01-27"
+        },
+        {
+          "summary": "Apple became the first US company to briefly touch a $3 trillion market capitalization on January 3, 2022, reflecting analyst conviction; stock subsequently pulled back with broader tech sell-off.",
+          "source": "Yahoo Finance \u2014 ticker news",
+          "url": "https://finance.yahoo.com/quote/AAPL/",
+          "date": "2022-01-03"
+        }
+      ]
+    },
+    "BOTZ": {
+      "wave_bucket": "robotics",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Global X Robotics & AI ETF (BOTZ) hit a 52-week high in April 2021 (up ~99% from its 52-week low), driven by pandemic-era automation demand; by early 2022, the ETF had pulled back significantly from that high as growth-tech valuations contracted.",
+          "source": "Yahoo Finance \u2014 ticker news",
+          "url": "https://finance.yahoo.com/quote/BOTZ/",
+          "date": "2021-04-15"
+        },
+        {
+          "summary": "Total venture capital funding in robotics jumped 38% between 2021 and 2022 to $6.5B, with the US receiving more than half; delivery and warehouse automation attracted the largest verticals.",
+          "source": "The Robot Report",
+          "url": "https://www.therobotreport.com/5-trends-dominating-the-robotics-sector/",
+          "date": "2022-01-01"
+        }
+      ]
+    },
+    "QTUM": {
+      "wave_bucket": "quantum",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Defiance Quantum ETF (QTUM) returned +35.18% in 2021, significantly above its category average; the ETF holds companies deriving revenue from quantum computing and machine learning; launched September 2018.",
+          "source": "Yahoo Finance \u2014 ticker news",
+          "url": "https://finance.yahoo.com/quote/QTUM/performance/",
+          "date": "2022-01-01"
+        }
+      ]
+    },
+    "SPY": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "S&P 500 entered correction territory (down ~10% from January 2022 peak) on 2022-02-22 amid Russia-Ukraine tensions; markets pricing both geopolitical risk and anticipated Fed rate hikes.",
+          "source": "Yahoo Finance \u2014 ticker news",
+          "url": "https://finance.yahoo.com/quote/SPY/",
+          "date": "2022-02-22"
+        },
+        {
+          "summary": "S&P 500 plunged to a nine-month low on 2022-02-24 as Russia invaded Ukraine; Goldman Sachs raised its Fed forecast to seven hikes for 2022.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2022-02-24/s-p-500-plunges-to-nine-month-low-as-russia-invades-ukraine",
+          "date": "2022-02-24"
+        }
+      ]
+    },
+    "AGG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "AGG (iShares Core US Aggregate Bond ETF) faced material headwinds entering 2022 as market expectations shifted to multiple Fed rate hikes; rising 10-year Treasury yields in January-February 2022 put downward pressure on bond prices across duration.",
+          "source": "Yahoo Finance \u2014 ticker news",
+          "url": "https://finance.yahoo.com/quote/AGG/performance/",
+          "date": "2022-02-01"
+        }
+      ]
+    },
+    "BIL": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "BIL (SPDR Bloomberg 1-3 Month T-Bill ETF) tracked near-zero yield with federal funds rate at 0-0.25% as of February 2022; ETF provides ultrashort duration with minimal interest rate risk; rate-hike expectations building but no hike yet occurred.",
+          "source": "Yahoo Finance \u2014 ticker news",
+          "url": "https://finance.yahoo.com/quote/BIL/",
+          "date": "2022-02-01"
+        }
+      ]
+    },
+    "IAU": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Gold pushed above $1,900/oz on 2022-02-18 as Ukraine crisis spurred safe-haven demand; gold was up approximately 5.5% in February 2022 on course for its best monthly gain since July 2020.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2022-02-18/gold-pushes-above-1-900-as-ukraine-crisis-spurs-haven-demand",
+          "date": "2022-02-18"
+        },
+        {
+          "summary": "Gold jumped to its highest level in more than a year on 2022-02-24, trading at $1,947/oz, as Russia invaded Ukraine and investors piled into safe-haven assets; analysts flagged inflation and currency-debasement fears as additional tailwinds.",
+          "source": "Yahoo Finance \u2014 ticker news",
+          "url": "https://finance.yahoo.com/news/gold-jumps-to-1-week-high-as-russia-ukraine-war-escalates-155921872.html",
+          "date": "2022-02-24"
+        }
+      ]
+    },
+    "VIG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "VIG (Vanguard Dividend Appreciation ETF) tracks dividend-growth equities; no material dated news article found specifically covering VIG in the lookback window; broader market context: dividend-growth names had modest relative resilience versus high-multiple growth stocks in January-February 2022 sell-off.",
+          "source": "Yahoo Finance \u2014 ticker news",
+          "url": "https://finance.yahoo.com/quote/VIG/performance/",
+          "date": "2022-02-01"
+        }
+      ]
+    }
+  },
+  "ticker_stages": {
+    "NVDA": {
+      "stage": "digestion",
+      "rationale": "NVDA delivered record Q4 FY2022 revenue ($7.64B, +53% YoY) on 2022-02-16 yet the stock was approximately 43% below its November 2021 all-time high and trading at ~73x earnings versus a 51x historical average \u2014 a textbook post-crest hangover where the fundamental thesis is intact but price is unwinding stretched valuations.",
+      "evidence_bullet_dates": [
+        "2022-02-16"
+      ]
+    },
+    "GOOGL": {
+      "stage": "surge",
+      "rationale": "Alphabet's Q4 2021 results (2022-02-01) showed revenue +32% YoY and Google Cloud +45% YoY with backlog growing over 70%; the 20-for-1 stock split announcement signals management confidence, and cloud revenue growth is compounding at scale with operating losses narrowing \u2014 adoption is accelerating with room to run.",
+      "evidence_bullet_dates": [
+        "2022-02-01"
+      ]
+    },
+    "MSFT": {
+      "stage": "surge",
+      "rationale": "Microsoft Q2 FY2022 results (2022-01-25) showed Azure +46% YoY and Intelligent Cloud segment +26% YoY; Microsoft Cloud revenue reached $22.1B (+32% YoY), demonstrating compounding adoption with the cloud backlog growing from enterprise commitments.",
+      "evidence_bullet_dates": [
+        "2022-01-25"
+      ]
+    },
+    "AAPL": {
+      "stage": "digestion",
+      "rationale": "Apple briefly touched a $3 trillion market cap on 2022-01-03 \u2014 the highest of any US company \u2014 before pulling back with the broader tech sell-off, even as Q1 FY2022 reported record revenue of $123.9B (+11% YoY) on 2022-01-27; stock is unwinding a valuation crest with fundamentals intact.",
+      "evidence_bullet_dates": [
+        "2022-01-03",
+        "2022-01-27"
+      ]
+    },
+    "BOTZ": {
+      "stage": "digestion",
+      "rationale": "BOTZ hit a 52-week high in April 2021 (2021-04-15) then pulled back as growth-technology valuations compressed through the tech sector correction in early 2022; the robotics industry VC backdrop remains strong (38% funding increase) but the ETF was well off its highs with no new catalyst.",
+      "evidence_bullet_dates": [
+        "2021-04-15"
+      ]
+    },
+    "QTUM": {
+      "stage": "neutral",
+      "rationale": "QTUM returned +35.18% in 2021 but the only bullet available lacks a specific publication date confirmed to be \u22642022-02-28; without a clean dated bullet for QTUM itself, a non-neutral call cannot be grounded per the classification rules.",
+      "evidence_bullet_dates": []
+    },
+    "SPY": {
+      "stage": "digestion",
+      "rationale": "The S&P 500 entered correction territory (down ~10% from January 2022 highs) on 2022-02-22 and plunged to a nine-month low on 2022-02-24 as Russia invaded Ukraine and markets priced in up to seven Fed rate hikes for 2022 \u2014 a clear post-crest hangover from the record highs of January 2022.",
+      "evidence_bullet_dates": [
+        "2022-02-22",
+        "2022-02-24"
+      ]
+    },
+    "AGG": {
+      "stage": "neutral",
+      "rationale": "No curated-source article with a confirmed date \u22642022-02-28 was found specifically reporting on AGG's performance; general knowledge of rising yields in early 2022 was not sufficient to anchor a non-neutral call without a dated bullet for this ticker.",
+      "evidence_bullet_dates": []
+    },
+    "BIL": {
+      "stage": "neutral",
+      "rationale": "No material dated news article was found for BIL in the lookback window; the Fed had not yet hiked as of 2022-02-28 and BIL's near-zero yield environment offers no directional signal beyond macro context.",
+      "evidence_bullet_dates": []
+    },
+    "IAU": {
+      "stage": "surge",
+      "rationale": "Gold surged above $1,900/oz on 2022-02-18 and hit a more-than-one-year high of $1,947/oz on 2022-02-24 as the Russia-Ukraine invasion drove safe-haven demand; February 2022 was on track for gold's best monthly gain since July 2020, with both inflation and geopolitical tailwinds compounding.",
+      "evidence_bullet_dates": [
+        "2022-02-18",
+        "2022-02-24"
+      ]
+    },
+    "VIG": {
+      "stage": "neutral",
+      "rationale": "No material dated article was found for VIG specifically in the lookback window; dividend-growth context was available but insufficient to support a non-neutral per-ticker call without a dated VIG-specific bullet.",
+      "evidence_bullet_dates": []
+    }
+  },
+  "self_critique_downgrades": [
+    {
+      "ticker": "QTUM",
+      "from_stage": "digestion",
+      "to_stage": "neutral",
+      "reason": "Initial inclination was to call QTUM digestion based on its 2021 +35.18% return and the broader growth-tech sell-off in early 2022. However, the only bullet available for QTUM does not carry a specific confirmed publication date of \u22642022-02-28 \u2014 it is an annual performance figure from Yahoo Finance without a dateline. Without a clean dated bullet, the grounding rule requires neutral. No forbidden phrases triggered; the downgrade is strictly a missing-dated-evidence issue."
+    },
+    {
+      "ticker": "AGG",
+      "from_stage": "digestion",
+      "to_stage": "neutral",
+      "reason": "Initial inclination was to call AGG digestion given the well-known rising-yield environment in early 2022. However, no curated-source or fallback-search result returned a specific article about AGG with a confirmed date \u22642022-02-28. The 13% full-year 2022 loss figure is a post-cutoff aggregate. Reasoning based on general macro knowledge without a dated AGG-specific bullet would violate the grounding rule. Downgraded to neutral."
+    }
+  ]
+}

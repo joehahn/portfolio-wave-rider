@@ -16,7 +16,7 @@ A Claude Code demo for long-horizon portfolio optimization. You declare your goa
   - [Concentration-cap sweep](https://joehahn.github.io/portfolio-wave-rider/max_weight_comparison.html) (per-ticker weight ceiling)
   - [Lookback sweep](https://joehahn.github.io/portfolio-wave-rider/lookback_comparison.html) (price-history window for μ and Σ)
 - [News](https://joehahn.github.io/portfolio-wave-rider/news.html) — the bullets the news-researcher used to classify each wave's stage at the most recent `/review-portfolio` run.
-- [5-year backtest experiment](https://raw.githack.com/joehahn/portfolio-wave-rider/5y-backtest/docs/backtest_5y.html) (this branch only) — 20 quarterly rebalances over 2021-2026 with strict as-of-date news-researcher tilts, fixed Sept 2021 starting portfolio, and a three-path comparison (buy-and-hold vs rebalance vs rebalance+AI tilts). See `REFERENCE.md` and `docs/backtest_5y.html` for the full setup and findings.
+- [5-year backtest experiment](https://raw.githack.com/joehahn/portfolio-wave-rider/5y-backtest/docs/backtest_5y.html) (this branch only) — 20 quarterly rebalances over 2021-2026 with strict as-of-date news-researcher tilts, fixed Sept 2021 starting portfolio, and a three-path comparison (buy-and-hold vs rebalance vs rebalance+AI tilts). This branch is now frozen as a research artifact; see [FINDINGS.md](FINDINGS.md) for the full writeup of what we tried, what it cost, and why we pivoted.
 
 See [GLOSSARY.md](GLOSSARY.md) for finance and stats terms (`σ`, `μ`, `Σ`, Sharpe ratio, risk aversion `λ`, mean-variance optimization, max drawdown, VaR/CVaR, etc.) and [REFERENCE.md](REFERENCE.md) for the CLI flags, repo layout, output files, architecture overview, and testing instructions.
 
