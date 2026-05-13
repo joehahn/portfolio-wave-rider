@@ -1,0 +1,27 @@
+{
+  "as_of_date": "2024-09-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "NUKZ",
+      "wave_bucket": "nuclear",
+      "rationale": "Nuclear-for-AI thesis is crystallizing with the MSFT-Constellation Three Mile Island PPA; NUKZ is the cleanest pure-play ETF for the nuclear renaissance the profile names as a near-term next wave.",
+      "news_evidence": [
+        {"summary": "Microsoft signs 20-year PPA with Constellation Energy to restart Three Mile Island Unit 1 to power AI data centers - first major hyperscaler-nuclear deal of this cycle.", "source": "Reuters", "url": "https://www.reuters.com/business/energy/constellation-inks-power-supply-deal-with-microsoft-2024-09-20/", "date": "2024-09-20"},
+        {"summary": "Range Nuclear Renaissance Index ETF (NUKZ) launched in January 2024, offering diversified exposure to utilities, SMR developers, uranium miners, and reactor-component suppliers.", "source": "ETF.com", "url": "https://www.etf.com/sections/news/range-launches-nuclear-renaissance-etf-nukz", "date": "2024-01-25"}
+      ]
+    },
+    {
+      "ticker": "ISRG",
+      "wave_bucket": "robotics",
+      "rationale": "Intuitive Surgical is the clearest installed-base play on commercial robotics, with the new da Vinci 5 platform ramping - fits the profile's call for early exposure to robotics as a likely next wave.",
+      "news_evidence": [
+        {"summary": "Intuitive Surgical reports Q2 2024 da Vinci procedure growth of 17% and begins phased rollout of da Vinci 5; raises full-year procedure growth guidance.", "source": "Reuters", "url": "https://www.reuters.com/business/healthcare-pharmaceuticals/intuitive-surgical-beats-quarterly-revenue-estimates-da-vinci-procedures-grow-2024-07-18/", "date": "2024-07-18"},
+        {"summary": "FDA clears da Vinci 5 in March 2024; Intuitive begins limited commercial launch at flagship US hospital systems.", "source": "Bloomberg", "url": "https://www.bloomberg.com/news/articles/2024-03-14/intuitive-surgical-wins-fda-clearance-for-da-vinci-5-robot", "date": "2024-03-14"}
+      ]
+    }
+  ],
+  "removes": [],
+  "no_changes": false,
+  "rationale_overall": "Watchlist sits at 12 of 12, so additions should be paired with removes - but no current holding has a clean fundamental-breach or peak-enthusiasm case as of Sep 30 2024 that justifies eviction. The MSFT-Constellation PPA is a material nuclear-for-AI inflection that deserves expression, and robotics is under-represented relative to the profile's stated next-wave priorities."
+}

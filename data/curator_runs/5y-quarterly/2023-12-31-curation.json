@@ -1,0 +1,44 @@
+{
+  "as_of_date": "2023-12-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "ARKX",
+      "wave_bucket": "rockets_spacecraft",
+      "rationale": "Fills the rockets/spacecraft gap named in the profile thesis; SpaceX's two 2023 Starship test flights and a growing commercial-launch backlog mark this wave's buildup phase.",
+      "news_evidence": [
+        {"summary": "SpaceX's first full Starship integrated test flight on April 20, 2023; industry observers framed the flight as a milestone for ultra-low-cost launch economics.", "source": "NPR", "url": "https://www.npr.org/2023/04/16/1169734535/spacex-prepares-to-launch-its-mammoth-rocket-starship", "date": "2023-04-16"},
+        {"summary": "Industry analysis on Starship's potential to transform the launch market via dramatic per-kg cost reductions and an early commercial backlog.", "source": "Axios", "url": "https://www.axios.com/2023/04/18/spacex-starship-transform-industry", "date": "2023-04-18"},
+        {"summary": "Trade press piece arguing the broader space economy is positioning around Starship-class capacity becoming available later in the decade.", "source": "Via Satellite", "url": "https://interactive.satellitetoday.com/via/september-2023/prepare-for-a-space-economy-that-can-leverage-spacexs-starship", "date": "2023-09-01"}
+      ]
+    },
+    {
+      "ticker": "ARKQ",
+      "wave_bucket": "robotics",
+      "rationale": "Broadens robotics exposure beyond BOTZ and the single-stock TSLA bet; ARKQ adds autonomous-vehicle, drone, and 3D-printing names that map to the robotics next-wave bucket the profile calls out.",
+      "news_evidence": [
+        {"summary": "ARKQ ended 2023 up ~40.7%, well above the autonomy/robotics category average of ~21.4%, signaling investor flows into the autonomy/robotics theme.", "source": "Morningstar via ETF.com", "url": "https://www.etf.com/tools/etf-comparison/BOTZ-vs-ARKQ", "date": "2023-12-31"},
+        {"summary": "Industry coverage of robotics moving past trade-show demos into real deployments in manufacturing, logistics, and fulfillment as labor constraints bite.", "source": "ARK Invest fund page", "url": "https://www.ark-funds.com/funds/arkq", "date": "2023-12-15"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "AAPL",
+      "rationale": "AI bucket is over-stacked (5 of 12); among the megacaps AAPL has the weakest articulated AI commercial strategy at year-end 2023, with no announced flagship AI product while MSFT (Copilot/OpenAI), GOOGL (Gemini Dec 6, 2023), and NVDA (data-center GPU surge) each carry clearer AI revenue stories.",
+      "news_evidence": [
+        {"summary": "Nvidia's data-center revenue surge through 2023 highlighted that AI infrastructure spend was flowing to GPU/cloud incumbents, not to AAPL's device franchise.", "source": "Reuters/NVDA May 2023 earnings coverage", "url": "https://www.reuters.com/technology/nvidia-forecasts-second-quarter-revenue-above-estimates-2023-05-24/", "date": "2023-05-24"},
+        {"summary": "Google publicly launched its Gemini multimodal model in December 2023, sharpening the megacap AI race and underscoring that AAPL had not yet entered the consumer-AI fray.", "source": "Google/Alphabet newsroom", "url": "https://blog.google/technology/ai/google-gemini-ai/", "date": "2023-12-06"}
+      ]
+    },
+    {
+      "ticker": "LMT",
+      "rationale": "Defense primes are not part of the profile's named wave thesis (AI, robotics, rockets, nuclear, quantum, engineered biology); SPY already covers diversified large-cap exposure and the watchlist slot is better used on a thesis-aligned ticker.",
+      "news_evidence": [
+        {"summary": "Lockheed Martin reported Q3 2023 results showing flat-to-down sales growth and ongoing F-35 delivery delays, with the thesis driven more by sustained geopolitical demand than by any technology-wave inflection.", "source": "Lockheed Martin Q3 2023 press release", "url": "https://news.lockheedmartin.com/2023-10-17-Lockheed-Martin-Reports-Third-Quarter-2023-Financial-Results", "date": "2023-10-17"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Net-zero on watchlist size (12 in, 12 out) but a thematic re-shape: trim the over-stacked AI megacap bucket (drop AAPL, the laggard on AI commercial milestones at year-end 2023) and drop LMT (defense, off-thesis), redeploying both slots into next-wave buckets the profile explicitly names but the current watchlist underweights - rockets/spacecraft via ARKX and broader robotics/autonomy via ARKQ."
+}

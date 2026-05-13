@@ -1,0 +1,166 @@
+[
+  {
+    "date": "2021-09-30",
+    "adds": [
+      "ARKX",
+      "BOTZ",
+      "URA"
+    ],
+    "removes": [],
+    "rejections": 0
+  },
+  {
+    "date": "2021-12-31",
+    "adds": [
+      "SMH",
+      "ICLN",
+      "NVDA"
+    ],
+    "removes": [],
+    "rejections": 0
+  },
+  {
+    "date": "2022-03-31",
+    "adds": [
+      "CCJ"
+    ],
+    "removes": [],
+    "rejections": 2
+  },
+  {
+    "date": "2022-06-30",
+    "adds": [],
+    "removes": [],
+    "rejections": 3
+  },
+  {
+    "date": "2022-09-30",
+    "adds": [],
+    "removes": [],
+    "rejections": 3
+  },
+  {
+    "date": "2022-12-31",
+    "adds": [
+      "LMT"
+    ],
+    "removes": [
+      "ARKX"
+    ],
+    "rejections": 0
+  },
+  {
+    "date": "2023-03-31",
+    "adds": [
+      "TSLA"
+    ],
+    "removes": [
+      "ICLN"
+    ],
+    "rejections": 0
+  },
+  {
+    "date": "2023-06-30",
+    "adds": [],
+    "removes": [],
+    "rejections": 0
+  },
+  {
+    "date": "2023-09-30",
+    "adds": [],
+    "removes": [],
+    "rejections": 2
+  },
+  {
+    "date": "2023-12-31",
+    "adds": [
+      "ARKX",
+      "ARKQ"
+    ],
+    "removes": [
+      "AAPL",
+      "LMT"
+    ],
+    "rejections": 0
+  },
+  {
+    "date": "2024-03-31",
+    "adds": [
+      "NUKZ"
+    ],
+    "removes": [
+      "TSLA"
+    ],
+    "rejections": 2
+  },
+  {
+    "date": "2024-06-30",
+    "adds": [],
+    "removes": [],
+    "rejections": 2
+  },
+  {
+    "date": "2024-09-30",
+    "adds": [],
+    "removes": [],
+    "rejections": 2
+  },
+  {
+    "date": "2024-12-31",
+    "adds": [
+      "RKLB"
+    ],
+    "removes": [
+      "ARKX"
+    ],
+    "rejections": 0
+  },
+  {
+    "date": "2025-03-31",
+    "adds": [
+      "IONQ"
+    ],
+    "removes": [
+      "SMH"
+    ],
+    "rejections": 0
+  },
+  {
+    "date": "2025-06-30",
+    "adds": [],
+    "removes": [
+      "ARKQ"
+    ],
+    "rejections": 1
+  },
+  {
+    "date": "2025-09-30",
+    "adds": [
+      "LEU"
+    ],
+    "removes": [],
+    "rejections": 1
+  },
+  {
+    "date": "2025-12-31",
+    "adds": [
+      "ARKQ",
+      "TSM"
+    ],
+    "removes": [
+      "IONQ",
+      "BOTZ"
+    ],
+    "rejections": 0
+  },
+  {
+    "date": "2026-03-31",
+    "adds": [
+      "ARKG"
+    ],
+    "removes": [
+      "URA"
+    ],
+    "rejections": 0
+  }
+]

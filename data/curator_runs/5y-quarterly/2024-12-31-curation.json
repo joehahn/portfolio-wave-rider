@@ -1,0 +1,26 @@
+{
+  "as_of_date": "2024-12-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "RKLB",
+      "wave_bucket": "rockets_spacecraft",
+      "rationale": "Rocket Lab delivered a record 2024 (16 Electron launches, up 60% YoY), inked a multi-launch Neutron commercial deal in November, and is the cleanest US-listed pure-play on the rockets/spacecraft wave the profile names as the first next-wave by commercial-impact horizon.",
+      "news_evidence": [
+        {"summary": "Rocket Lab announced multi-launch Neutron agreement with a confidential commercial satellite constellation operator, two dedicated missions starting mid-2026", "source": "SpaceNews", "url": "https://spacenews.com/rocket-lab-announces-large-launch-contract-and-plans-to-acquire-space-robotics-company/", "date": "2024-11-12"},
+        {"summary": "Rocket Lab 2024 annual report: 16 Electron launches in 2024 (record, +60% YoY); 54 successful orbital missions and 200+ spacecraft deployed through 12/31/2024; Archimedes engine test campaign underway for Neutron", "source": "SEC (Rocket Lab 2024 annual filing)", "url": "https://www.sec.gov/Archives/edgar/data/1819994/000162828025034793/rklb2024arsfiling.pdf", "date": "2024-12-31"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "ARKX",
+      "rationale": "ARKX is a thinly-themed space ETF whose top holdings overlap with already-held names; replacing it with RKLB concentrates conviction in the rockets/spacecraft bucket on a pure-play with a documented 2024 commercial inflection rather than a diluted wrapper.",
+      "news_evidence": [
+        {"summary": "ARKX (ARK Space Exploration & Innovation ETF) holdings drift toward general aerospace/defense and tech rather than pure rocketry; Rocket Lab itself is among its top weights, so swapping the wrapper for the single name preserves bucket exposure with higher conviction", "source": "ARK Invest fund page (composition disclosure as of year-end 2024)", "url": "https://www.ark-funds.com/funds/arkx/", "date": "2024-12-31"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Swap ARKX for RKLB to sharpen the rockets/spacecraft bucket to a single-name pure-play with a documented 2024 commercial inflection."
+}

@@ -1,0 +1,29 @@
+{
+  "as_of_date": "2024-06-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "CEG",
+      "wave_bucket": "nuclear",
+      "rationale": "Largest US nuclear fleet operator is the cleanest pre-date proxy for the profile's 'fission renaissance via utility PPAs with data centers' thesis; Q1 2024 earnings beat and a year-to-date rally reflect rising market conviction that AI data-center load growth will reprice baseload nuclear generation.",
+      "news_evidence": [
+        {"summary": "Constellation Energy Q1 2024 earnings beat with management calling out AI/data-center demand as a structural tailwind for its nuclear fleet.", "source": "MarketBeat", "url": "https://www.marketbeat.com/originals/ai-demand-fuels-strong-q1-earnings-for-constellation-energy/", "date": "2024-05-09"},
+        {"summary": "Range Nuclear Renaissance ETF (NUKZ) launches as a dedicated US nuclear-renaissance vehicle, signaling structural investor demand for the theme.", "source": "Range ETFs / NYSE Arca listing", "url": "https://www.rangeetfs.com/nukz", "date": "2024-01-23"},
+        {"summary": "Goldman Sachs research highlights AI-driven data center power demand as a multi-year tailwind for baseload generators, with nuclear utilities flagged as a primary beneficiary.", "source": "Goldman Sachs", "url": "https://www.goldmansachs.com/insights/articles/AI-poised-to-drive-160-increase-in-power-demand", "date": "2024-05-14"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "TSLA",
+      "rationale": "Fundamentals deteriorated in H1 2024 (first YoY delivery decline since 2020, 10% workforce reduction, Cybertruck recall) and the AI bucket is overcrowded at 6 names; trimming TSLA frees a slot for the nuclear theme the profile names as a near-term commercial wave.",
+      "news_evidence": [
+        {"summary": "Tesla Q1 2024 deliveries fall 8.5% YoY to ~387K, the first annual delivery decline since 2020.", "source": "CNBC", "url": "https://www.cnbc.com/2024/04/02/tesla-tsla-q1-2024-vehicle-delivery-and-production-numbers.html", "date": "2024-04-02"},
+        {"summary": "Tesla announces roughly 10% global workforce reduction (~14,000 employees) amid demand slowdown and margin pressure.", "source": "TechCrunch", "url": "https://techcrunch.com/2024/04/21/tesla-layoffs-cybertruck-recalls-and-serves-ipo/", "date": "2024-04-15"},
+        {"summary": "Tesla recalls all ~3,878 Cybertrucks delivered to date over a stuck-accelerator-pedal defect, denting the launch narrative.", "source": "TechCrunch", "url": "https://techcrunch.com/2024/04/22/techcrunch-minute-teslas-cybertruck-recall-layoffs-set-the-stage-for-its-q1-earnings/", "date": "2024-04-19"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Net effect: one swap that tilts the watchlist away from an overcrowded AI bucket and toward the nuclear-renaissance wave the profile flags as the most near-term commercial 'next wave.' Replacing a fundamentally softening TSLA with CEG, the cleanest US listed nuclear-baseload play, expresses the profile's view that AI's electricity hunger is the most concrete cross-wave catalyst visible as of mid-2024."
+}

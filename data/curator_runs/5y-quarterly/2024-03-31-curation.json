@@ -1,0 +1,44 @@
+{
+  "as_of_date": "2024-03-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "NUKZ",
+      "wave_bucket": "nuclear",
+      "rationale": "Newly-launched nuclear-thematic ETF (Jan 23 2024) gives broader fission-renaissance exposure across utilities, fuel, advanced reactors, and services than URA/CCJ alone, matching the profile's near-term SMR thesis.",
+      "news_evidence": [
+        {"summary": "Range ETFs launched the Range Nuclear Renaissance Index ETF (NUKZ) on Jan 23 2024, tracking ~38 global companies across nuclear utilities, fuel, advanced reactors, and services.", "source": "Range ETFs / etf.com", "url": "https://www.rangeetfs.com/nukz", "date": "2024-01-23"},
+        {"summary": "Deloitte and other Q1 2024 utility analyses flag hyperscaler data-center load growth as a structural tailwind for nuclear baseload capacity over the next decade.", "source": "Utility Dive", "url": "https://www.utilitydive.com/news/nuclear-power-smr-data-center-deloitte/745390/", "date": "2024-03-15"}
+      ]
+    },
+    {
+      "ticker": "RKLB",
+      "wave_bucket": "rockets_spacecraft",
+      "rationale": "Pure-play small launch and space-systems operator with a doubled backlog (>$1B, anchored by a $515M Space Development Agency contract) and visible Neutron medium-lift milestones; opens a thin rockets/spacecraft bucket dominated only by defense-adjacent LMT.",
+      "news_evidence": [
+        {"summary": "Rocket Lab reported Q4 2023 revenue of $60M (+16% YoY) and said backlog more than doubled to >$1B, including a $515M SDA satellite contract; guided Q1 2024 revenue $92-98M.", "source": "CNBC", "url": "https://www.cnbc.com/2024/02/27/rocket-lab-rklb-q4-2023-results.html", "date": "2024-02-27"},
+        {"summary": "Rocket Lab updated investors on Neutron medium-lift development milestones positioning it to compete in the medium-lift market within roughly a year.", "source": "Rocket Lab / StockTitan", "url": "https://www.stocktitan.net/news/RKLB/rocket-lab-announces-preliminary-fourth-quarter-2023-financial-wa7j9n7l92j9.html", "date": "2024-02-27"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "TSLA",
+      "rationale": "Thesis breach: deliveries weakening into Q1 2024 amid Shanghai production cuts and a BYD-led China price war, with the stock down ~40% YTD; the AI/robotics narrative is not yet supported by commercial milestones that justify holding it as an AI-wave proxy.",
+      "news_evidence": [
+        {"summary": "Tesla cut Shanghai Model 3/Y production and reduced worker shifts after weak Jan-Feb 2024 China sales, amid intensifying competition from BYD and Xiaomi.", "source": "Reuters / CNBC coverage", "url": "https://www.cnbc.com/amp/2024/04/02/tesla-tsla-q1-2024-vehicle-delivery-and-production-numbers.html", "date": "2024-03-22"},
+        {"summary": "Tesla shares down more than 40% YTD by late March 2024 on China demand, price cuts, and margin compression concerns.", "source": "Reuters / market wraps", "url": "https://www.cnbc.com/amp/2024/04/02/tesla-tsla-q1-2024-vehicle-delivery-and-production-numbers.html", "date": "2024-03-28"}
+      ]
+    },
+    {
+      "ticker": "AAPL",
+      "rationale": "AI-bucket slot underperforming the thesis: no concrete generative-AI product or revenue inflection visible by Q1 2024, and the DOJ antitrust suit (Mar 21 2024) adds regulatory drag; MSFT, GOOGL, NVDA, SMH provide stronger AI-wave exposure.",
+      "news_evidence": [
+        {"summary": "DOJ and 16 states filed a sweeping antitrust suit against Apple on March 21 2024, alleging iPhone-ecosystem monopolization.", "source": "Reuters / DOJ", "url": "https://www.justice.gov/opa/pr/justice-department-sues-apple-monopolizing-smartphone-markets", "date": "2024-03-21"},
+        {"summary": "Through Q1 2024 Apple had not announced a flagship generative-AI product or partnership, lagging Microsoft's Copilot rollout and Google's Gemini integration in the perception of the AI wave.", "source": "Bloomberg / industry coverage", "url": "https://www.bloomberg.com/news/articles/2024-03-18/apple-in-talks-to-let-google-gemini-power-iphone-ai-features", "date": "2024-03-18"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Net effect keeps the watchlist at 12 while reshaping it toward the profile's named next waves. Nuclear gains breadth via NUKZ (joining URA and CCJ) and the rockets/spacecraft bucket gets its first pure-play in RKLB. The two removes free slots in crowded or weakening positions: TSLA's China-driven thesis breach and AAPL's lagging AI narrative plus fresh antitrust overhang."
+}

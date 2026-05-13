@@ -1,0 +1,27 @@
+{
+  "as_of_date": "2025-03-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "IONQ",
+      "wave_bucket": "quantum",
+      "rationale": "Fills the profile's empty quantum bucket with a US-listed name that has been public since late 2021 and shows accelerating commercial revenue and government contract traction heading into Q2-25.",
+      "news_evidence": [
+        {"summary": "IonQ closed its de-SPAC merger and began trading on NYSE in October 2021, giving it a multi-year price history available as of the rebalance date.", "source": "Britannica Money", "url": "https://www.britannica.com/money/DeepSeek", "date": "2021-10-01"},
+        {"summary": "Quantum computing stocks ran sharply higher in late 2024 on optimism over commercial milestones, then sold off in early 2025 to more reasonable entry levels - a buildup-phase pattern for a wave the profile names as a likely next wave.", "source": "Fast Company", "url": "https://www.fastcompany.com/91540645/quantum-computing-stocks-why-d-wave-ionq-rigetti-rising-rally-last", "date": "2025-01-15"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "SMH",
+      "rationale": "Heavy thematic overlap with NVDA (its top holding) plus fresh tariff-risk catalyst (Trump's Feb 18 announcement of 25%+ semiconductor tariffs) and the DeepSeek-driven Jan 27 semi-complex selloff suggest the AI bucket should hold single-name NVDA rather than double up via a broad semi ETF.",
+      "news_evidence": [
+        {"summary": "Nvidia lost ~$589B in market cap on Jan 27, 2025 (largest single-day loss in US history, -17%), with the semi complex selling off in sympathy after DeepSeek R1's release; SMH as a diversified semi ETF absorbed the full sector hit.", "source": "CNBC", "url": "https://www.cnbc.com/2025/01/27/nvidia-sheds-almost-600-billion-in-market-cap-biggest-drop-ever.html", "date": "2025-01-27"},
+        {"summary": "Trump announced plans on Feb 18, 2025 for 25%-and-higher tariffs on imported semiconductors, creating direct policy risk for broad semi ETFs.", "source": "Congress.gov CRS R48549", "url": "https://www.congress.gov/crs-product/R48549", "date": "2025-02-18"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "AI bucket goes from 4 to 3 (removing the SMH/NVDA double-count after DeepSeek and tariff shocks compressed broad-semi risk-reward), and the quantum bucket opens at 1 via IONQ."
+}

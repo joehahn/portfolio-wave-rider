@@ -1,0 +1,60 @@
+{
+  "as_of_date": "2021-09-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "ARKX",
+      "wave_bucket": "rockets_spacecraft",
+      "rationale": "Fills the rockets/spacecraft thematic gap named in the profile as a likely next wave; a six-month-old actively-managed ETF gives the watchlist diversified exposure to launch, satellite-services, and aerospace-enabling-tech names without picking single-stock winners early in the buildup phase.",
+      "news_evidence": [
+        {
+          "summary": "ARK Invest launches the ARK Space Exploration & Innovation ETF (ARKX), an actively-managed fund investing in orbital and suborbital aerospace companies, satellite-services beneficiaries, and enabling-technology firms across robotics, AI, materials, 3D printing, and energy storage.",
+          "source": "ARK Invest / ETFdb",
+          "url": "https://etfdb.com/etf/ARKX/",
+          "date": "2021-03-30"
+        }
+      ]
+    },
+    {
+      "ticker": "BOTZ",
+      "wave_bucket": "robotics",
+      "rationale": "Fills the robotics thematic gap; a long-listed, liquid ETF holding global automation and industrial-robotics names is the cheapest way to get early, diversified exposure to the labor-cost-reduction wave the profile names, and current-cycle signals show humanoid-robotics R&D moving from labs to product roadmaps.",
+      "news_evidence": [
+        {
+          "summary": "Tesla unveils the Tesla Bot humanoid prototype and the Dojo D1 training chip at AI Day, signaling that AI compute and humanoid robotics are now an explicit product roadmap at a megacap manufacturer rather than a research curiosity.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2021/08/19/tesla-unveils-dojo-d1-chip-at-ai-day.html",
+          "date": "2021-08-19"
+        },
+        {
+          "summary": "TechCrunch coverage of Tesla AI Day highlights Tesla Bot, Dojo, and the company's plan to repurpose its self-driving AI stack for a general-purpose humanoid robot.",
+          "source": "TechCrunch",
+          "url": "https://techcrunch.com/2021/08/19/top-five-highlights-of-elon-musks-tesla-ai-day/",
+          "date": "2021-08-19"
+        }
+      ]
+    },
+    {
+      "ticker": "URA",
+      "wave_bucket": "nuclear",
+      "rationale": "Fills the nuclear thematic gap via uranium miners; the recently-launched Sprott Physical Uranium Trust is absorbing pounds out of the spot market and lifting uranium prices for the first time in years, an early structural-supply signal that the nuclear-fuel cycle is entering a buildup phase.",
+      "news_evidence": [
+        {
+          "summary": "Sprott converts the former Uranium Participation Corporation into the Sprott Physical Uranium Trust (inception July 19, 2021), and within weeks the trust's aggressive spot-market buying drives the first sustained uranium-price rally since the post-Fukushima decline.",
+          "source": "Sprott",
+          "url": "https://sprott.com/investment-strategies/exchange-listed-products/physical-commodity-funds/uranium/",
+          "date": "2021-07-19"
+        },
+        {
+          "summary": "Uranium spot prices and miner equities rally sharply in September on tight supply and capital flows into uranium ETFs and the Sprott physical trust.",
+          "source": "Sprott Uranium Watch",
+          "url": "https://sprott.com/uranium-watch/",
+          "date": "2021-09-15"
+        }
+      ]
+    }
+  ],
+  "removes": [],
+  "no_changes": false,
+  "rationale_overall": "Day-0 expansion of a thin starter watchlist (AAPL/MSFT/GOOGL/SPY/AGG) from five tickers to eight by filling three thematic gaps the profile explicitly named as likely next waves: rockets/spacecraft via ARKX, robotics via BOTZ, and nuclear via URA. All three adds are diversified ETFs rather than single-stock bets, which is the right posture early in a wave's buildup phase when winners are not yet obvious. The AI bucket already has three megacap proxies (AAPL, MSFT, GOOGL); no churn there yet. Quantum and engineered-biology buckets are intentionally deferred - quantum pure-plays are still effectively pre-listing or sub-scale, and the profile orders synbio later on the commercial-impact horizon. Total post-change watchlist size is 8 of a 12 cap, leaving room to add single-stock conviction names or fill remaining buckets at subsequent quarterly rebalances."
+}
