@@ -15,6 +15,8 @@ financial_model:                  # optimizer math; CLI flags override at runtim
   risk_aversion: 1.0              # λ in mean_variance utility (μᵀw − λ·wᵀΣw); ignored otherwise
   risk_free_rate: 0.04            # ≈ 1y Treasury yield; used in Sharpe and as numeraire
   lookback_period: 1.3y           # history window for estimating μ and Σ
+  rebalance_period: monthly       # monthly | quarterly | semi_annual | annual; how often the watchlist-curator runs
+  max_watchlist_size: 12          # hard cap on how many tickers the curator may hold simultaneously
 ---
 
 # Goals

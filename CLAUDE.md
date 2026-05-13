@@ -11,11 +11,19 @@ This project was developed using Claude Code. The github is at https://github.co
 
 ## Status: in-flight rebuild
 
-`main` is currently in a transitional state. The previous wave-stage-tilt design (an LLM-driven `wave_views` tilt on μ) didn't pan out in 5-year backtests — see FINDINGS.md on the `5y-backtest` branch for the postmortem. The replacement design (an LLM-as-watchlist-curator that proposes the universe of tickers rather than tilting μ) is being built in the next commit. Until then:
+`main` is currently in a transitional state. The previous wave-stage-tilt design (an LLM-driven `wave_views` tilt on μ) didn't pan out in 5-year backtests; see FINDINGS.md on the `5y-backtest` branch for the postmortem. The replacement design is an LLM-as-watchlist-curator: the LLM proposes which tickers should be in the watchlist over time, the optimizer runs vanilla mean-variance on whatever watchlist results.
 
-- `backtest`, `analyze`, `snapshot`, `recommend`, and `dashboard` CLI subcommands still work.
-- `/review-portfolio` and `/run-backtest` slash-commands are gone and will return "skill not found" until the curator design lands.
-- The `1y-baseline` branch holds the last working 1-year demo if you want to look at the old behavior.
+Progress on the rebuild:
+
+- **Stage A (done):** ripped all tilt code from main. Six CLI subcommands still work.
+- **Stage B (done):** defined the curator contract. `.claude/agents/watchlist-curator.md` specifies the inputs the agent receives, the JSON it returns, and the guardrails on its proposed adds. `investor_profile.example.md` gains `rebalance_period` and `max_watchlist_size` fields. No code consumes the contract yet.
+- **Stage C (next):** wire the contract. New `curate` CLI subcommand applies adds/removes to `holdings.csv` and appends to `data/curation_history.csv`. The `backtest` subcommand grows a curator-driven walk-forward variant that calls the agent at each rebalance with `as_of_date` discipline.
+- **Stage D:** rewrite `/review-portfolio` and `/run-backtest` skills against the new flow; update `report-writer.md`; refresh `docs/*.html`.
+
+Until stage D lands:
+
+- `/review-portfolio` and `/run-backtest` slash commands return "skill not found".
+- The `1y-baseline` branch holds the last working 1-year demo.
 - GitHub Pages serves from `1y-baseline`, so the public demo URL is unaffected by main's scaffolding.
 
 ## Ground rules
@@ -26,7 +34,7 @@ Keep everything as simple and explainable as possible. Fewest files, least code,
 
 ## The source of truth: `investor_profile.md`
 
-`investor_profile.md` at the repo root is the source of truth for every recommendation. It declares the user's goals, strategy, constraints, exclusions, and the optimizer's mathematical model (`financial_model` YAML section: `objective`, `risk_aversion` λ, `risk_free_rate`, `lookback_period`). The CLI's argparse loads the `financial_model` defaults via `portfolio.load_financial_model()`; CLI flags (`--objective`, `--risk-aversion`, etc.) override per invocation. Every skill and subagent must load the profile before reasoning about allocations.
+`investor_profile.md` at the repo root is the source of truth for every recommendation. It declares the user's goals, strategy, constraints, exclusions, and the optimizer's mathematical model (`financial_model` YAML section: `objective`, `risk_aversion` λ, `risk_free_rate`, `lookback_period`, `rebalance_period`, `max_watchlist_size`). The CLI's argparse loads the `financial_model` defaults via `portfolio.load_financial_model()`; CLI flags (`--objective`, `--risk-aversion`, etc.) override per invocation. Every skill and subagent must load the profile before reasoning about allocations.
 
 If `investor_profile.md` is missing or empty, stop and tell the user to copy `investor_profile.example.md` to `investor_profile.md` and edit it. Do not fall back to a default profile.
 
@@ -44,8 +52,9 @@ The user decides. Never silently clamp a recommendation to fit the profile.
 
 ## Architecture
 
-- Subagents (`.claude/agents/`): one LLM specialist with a narrow tool allowlist.
-  - `report-writer`: synthesizes the analysis and news payloads into the final markdown report. (A second subagent — the watchlist-curator — lands in the next commit.)
+- Subagents (`.claude/agents/`): two LLM specialists with narrow tool allowlists.
+  - `watchlist-curator`: reads recent news and the investor's wave thesis at each rebalance; proposes adds and removes to the active watchlist (subject to a `max_watchlist_size` cap and a listing-date guardrail enforced by the harness). Returns JSON; does not write files. Contract is defined as of stage B but no Python code consumes it yet.
+  - `report-writer`: synthesizes the analysis and curator payloads into the final markdown report. Inputs will change once stage D wires the curator into `/review-portfolio`.
 - Skills (`.claude/skills/`): one slash command active right now.
   - `/initialize-portfolio` (one-shot): reads the profile and an all-zero holdings.csv, produces a thesis-driven dollar allocation across the watchlist, calls `init-holdings` to convert dollars to shares, runs `snapshot --force`, persists the allocation to `data/thesis_baseline.json`, and writes a thesis-only report. No optimizer, no news. Refuses to run if holdings already has positions or thesis_baseline.json already exists.
   - `/review-portfolio` and `/run-backtest` are absent on this branch; both come back in the curator rebuild.
@@ -65,6 +74,7 @@ The user decides. Never silently clamp a recommendation to fit the profile.
 
 - `data/snapshots.csv`: daily per-ticker $ values. Schema: `date, ticker, shares, price, value, total_value`. Idempotent on date; pass `--force` to overwrite.
 - `data/recommendations.csv`: optimizer output, one row block per `recommend` run. Schema: `date, ticker, weight, expected_return, annual_volatility, sharpe_ratio, objective`. Idempotent on date; pass `--force` to overwrite same-day runs.
+- `data/curation_history.csv` *(lands in stage C)*: append-only log of every watchlist change. Schema: `date, action, ticker, wave_bucket, rationale, news_evidence_urls`. `action` is `add` or `remove`; `news_evidence_urls` is a `;`-separated list. The active watchlist at any date is reconstructable by replaying this file from day 0 against `holdings.csv`'s initial rows. Drives the dashboard's watchlist-composition-over-time chart.
 - `data/thesis_baseline.json`: one-time artifact written by `/initialize-portfolio`. Schema: `{date, allocations_usd, reasoning, holdings}`. Read-only after creation; `build_dashboard` reads its `date` to scope the live dashboard's time-series charts. Delete the file manually only if you want to redo the thesis from scratch (then re-run `/initialize-portfolio`).
 
 These are the user's history. Don't break their schemas. If you must extend them, add columns at the end and keep existing ones.

@@ -42,16 +42,19 @@ _FINANCIAL_MODEL_DEFAULTS: dict[str, Any] = {
     "risk_aversion": 1.0,
     "risk_free_rate": 0.04,
     "lookback_period": "3y",
+    "rebalance_period": "monthly",
+    "max_watchlist_size": 12,
 }
 
 
 def load_financial_model(profile_path: str = "investor_profile.md") -> dict[str, Any]:
     """Read `financial_model` from investor_profile.md's YAML front matter.
 
-    Returns a dict with the four fields (`objective`, `risk_aversion`,
-    `risk_free_rate`, `lookback_period`); any missing field falls back to
-    the hard-coded default. If the profile file doesn't exist or has no
-    front matter, all defaults are returned.
+    Returns a dict with the six fields (`objective`, `risk_aversion`,
+    `risk_free_rate`, `lookback_period`, `rebalance_period`,
+    `max_watchlist_size`); any missing field falls back to the hard-coded
+    default. If the profile file doesn't exist or has no front matter,
+    all defaults are returned.
     """
     import re
     import yaml
