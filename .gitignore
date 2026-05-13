@@ -18,6 +18,9 @@ data/news_feed.json
 data/wave_history.csv
 data/news/
 data/backtest/
+data/curator_latest.json
+data/curator_runs/*/_sandbox_*
+data/backtest_curator_*/sandbox/
 # data/dashboard.html removed — docs/index.html is the single dashboard now (commit 53d4929)
 
 # personal data — never push
