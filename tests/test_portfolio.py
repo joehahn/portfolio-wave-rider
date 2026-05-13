@@ -53,29 +53,6 @@ def test_min_variance_beats_equal_weight(returns: dict) -> None:
     assert opt["annual_volatility"] <= eq_metrics["annual_volatility"] + 1e-4
 
 
-def test_apply_wave_tilt_math() -> None:
-    mu = pd.Series({"AAA": 0.10, "BBB": 0.08, "CCC": 0.12})
-    tilted = portfolio.apply_wave_tilt(mu, {"AAA": "buildup", "BBB": "peak", "CCC": "neutral"})
-    assert tilted["AAA"] == pytest.approx(0.10 * 1.20)
-    assert tilted["BBB"] == pytest.approx(0.08 * 0.80)
-    assert tilted["CCC"] == pytest.approx(0.12)
-    # Original is not mutated.
-    assert mu["AAA"] == pytest.approx(0.10)
-
-
-def test_wave_tilt_propagates_through_optimizer(returns: dict) -> None:
-    tickers = list(returns["mean"].index)
-    views = {tickers[0]: "buildup", tickers[1]: "peak", tickers[2]: "digestion"}
-    base = portfolio.optimize_portfolio(returns, objective="max_sharpe", max_weight=0.5)
-    tilted = portfolio.optimize_portfolio(
-        returns, objective="max_sharpe", max_weight=0.5, wave_views=views,
-    )
-    assert base["success"] and tilted["success"]
-    assert tilted["applied_wave_views"] == views
-    diffs = [abs(tilted["weights"][t] - base["weights"][t]) for t in tickers]
-    assert max(diffs) > 1e-3
-
-
 def test_risk_metrics_basic_shape(returns: dict) -> None:
     weights = {"AAA": 1 / 3, "BBB": 1 / 3, "CCC": 1 / 3}
     out = portfolio.risk_metrics(returns, weights)
@@ -173,55 +150,6 @@ def test_render_news_section_emits_expandable_headlines() -> None:
     assert 'href="https://example.com/nvda"' in out
     # AI bucket is rendered before general_markets per the wave display order.
     assert out.index("NVDA") < out.index("AGG")
-
-
-def test_append_wave_history_writes_one_row_per_wave(tmp_path) -> None:
-    out = tmp_path / "wave_history.csv"
-    wave_stages = {
-        "AI": {"stage": "surge", "rationale": "Real revenue compounding.",
-               "evidence_tickers": ["NVDA", "MSFT", "GOOGL"]},
-        "rockets_spacecraft": {"stage": "buildup", "rationale": "RKLB pre-Neutron.",
-                                "evidence_tickers": ["RKLB"]},
-        "general_markets": {"stage": "neutral", "rationale": "Macro instruments.",
-                            "evidence_tickers": ["AGG", "BIL", "IAU", "IBIT"]},
-    }
-    result = portfolio.append_wave_history(wave_stages, date="2026-05-04",
-                                            out_path=str(out))
-    assert result["n_rows_appended"] == 3
-    df = pd.read_csv(out)
-    assert list(df.columns) == ["date", "wave", "stage", "evidence_tickers", "rationale", "seeded"]
-    ai_row = df[df["wave"] == "AI"].iloc[0]
-    assert ai_row["stage"] == "surge"
-    assert ai_row["evidence_tickers"] == "NVDA;MSFT;GOOGL"
-
-
-def test_append_wave_history_idempotent_on_date(tmp_path) -> None:
-    out = tmp_path / "wave_history.csv"
-    wave_stages = {"AI": {"stage": "surge", "rationale": "Same.", "evidence_tickers": ["NVDA"]}}
-    portfolio.append_wave_history(wave_stages, date="2026-05-04", out_path=str(out))
-    second = portfolio.append_wave_history(wave_stages, date="2026-05-04", out_path=str(out))
-    assert second.get("skipped") is True
-    # Force overwrite produces same row count, not duplicated.
-    portfolio.append_wave_history(wave_stages, date="2026-05-04",
-                                   out_path=str(out), force=True)
-    df = pd.read_csv(out)
-    assert len(df) == 1
-
-
-def test_append_wave_history_appends_across_dates(tmp_path) -> None:
-    out = tmp_path / "wave_history.csv"
-    portfolio.append_wave_history(
-        {"AI": {"stage": "surge", "rationale": "...", "evidence_tickers": ["NVDA"]}},
-        date="2026-04-15", out_path=str(out),
-    )
-    portfolio.append_wave_history(
-        {"AI": {"stage": "peak", "rationale": "...", "evidence_tickers": ["NVDA"]}},
-        date="2026-05-15", out_path=str(out),
-    )
-    df = pd.read_csv(out).sort_values("date").reset_index(drop=True)
-    assert len(df) == 2
-    assert df.loc[0, "stage"] == "surge"
-    assert df.loc[1, "stage"] == "peak"
 
 
 def test_backtest_runs_against_seeded_prices(tmp_path, monkeypatch) -> None:

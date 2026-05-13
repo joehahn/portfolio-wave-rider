@@ -9,6 +9,15 @@ This repository is a Claude Code demo: optimize a long-horizon stock and ETF por
 
 This project was developed using Claude Code. The github is at https://github.com/joehahn/portfolio-wave-rider.
 
+## Status: in-flight rebuild
+
+`main` is currently in a transitional state. The previous wave-stage-tilt design (an LLM-driven `wave_views` tilt on μ) didn't pan out in 5-year backtests — see FINDINGS.md on the `5y-backtest` branch for the postmortem. The replacement design (an LLM-as-watchlist-curator that proposes the universe of tickers rather than tilting μ) is being built in the next commit. Until then:
+
+- `backtest`, `analyze`, `snapshot`, `recommend`, and `dashboard` CLI subcommands still work.
+- `/review-portfolio` and `/run-backtest` slash-commands are gone and will return "skill not found" until the curator design lands.
+- The `1y-baseline` branch holds the last working 1-year demo if you want to look at the old behavior.
+- GitHub Pages serves from `1y-baseline`, so the public demo URL is unaffected by main's scaffolding.
+
 ## Ground rules
 
 Keep everything as simple and explainable as possible. Fewest files, least code, fewest functions. Write simple code that is well commented and understood at a glance. This is a demo, not a production system.
@@ -17,11 +26,11 @@ Keep everything as simple and explainable as possible. Fewest files, least code,
 
 ## The source of truth: `investor_profile.md`
 
-`investor_profile.md` at the repo root is the source of truth for every recommendation. It declares the user's goals, strategy, constraints, exclusions, and the optimizer's mathematical model (`financial_model` YAML section: `objective`, `risk_aversion` λ, `risk_free_rate`, `lookback_period`, `wave_stage_tilts`). The CLI's argparse loads the `financial_model` defaults via `portfolio.load_financial_model()`; CLI flags (`--objective`, `--risk-aversion`, etc.) override per invocation. Every skill and subagent must load the profile before reasoning about allocations.
+`investor_profile.md` at the repo root is the source of truth for every recommendation. It declares the user's goals, strategy, constraints, exclusions, and the optimizer's mathematical model (`financial_model` YAML section: `objective`, `risk_aversion` λ, `risk_free_rate`, `lookback_period`). The CLI's argparse loads the `financial_model` defaults via `portfolio.load_financial_model()`; CLI flags (`--objective`, `--risk-aversion`, etc.) override per invocation. Every skill and subagent must load the profile before reasoning about allocations.
 
 If `investor_profile.md` is missing or empty, stop and tell the user to copy `investor_profile.example.md` to `investor_profile.md` and edit it. Do not fall back to a default profile.
 
-A second user-authored file, `news_sources.md`, lists preferred news sources grouped by the technology waves named in the profile. The `news-researcher` subagent tries these sources first before falling back to open web search. Missing `news_sources.md` is not fatal.
+A second user-authored file, `news_sources.md`, lists preferred news sources grouped by the technology waves named in the profile. Missing `news_sources.md` is not fatal.
 
 ## How conflicts are handled
 
@@ -35,31 +44,28 @@ The user decides. Never silently clamp a recommendation to fit the profile.
 
 ## Architecture
 
-- Subagents (`.claude/agents/`): two LLM specialists with narrow tool allowlists.
-  - `news-researcher`: picks wave-aligned news per ticker, classifies each wave's stage, returns a `wave_views` mapping that the optimizer consumes as a tilt on expected returns.
-  - `report-writer`: synthesizes the analysis and news payloads into the final markdown report.
-- Skills (`.claude/skills/`): three slash commands.
+- Subagents (`.claude/agents/`): one LLM specialist with a narrow tool allowlist.
+  - `report-writer`: synthesizes the analysis and news payloads into the final markdown report. (A second subagent — the watchlist-curator — lands in the next commit.)
+- Skills (`.claude/skills/`): one slash command active right now.
   - `/initialize-portfolio` (one-shot): reads the profile and an all-zero holdings.csv, produces a thesis-driven dollar allocation across the watchlist, calls `init-holdings` to convert dollars to shares, runs `snapshot --force`, persists the allocation to `data/thesis_baseline.json`, and writes a thesis-only report. No optimizer, no news. Refuses to run if holdings already has positions or thesis_baseline.json already exists.
-  - `/review-portfolio` (recurring): reads the profile, holdings, and `data/thesis_baseline.json` (if present); gathers news via news-researcher; runs the `analyze` CLI with wave tilts; invokes the report-writer (which renders the thesis-vs-recommended comparison whenever the baseline exists); refreshes the live dashboard at `docs/index.html`. Empty-holdings guard sends the user to `/initialize-portfolio` if holdings.csv is all-zero.
-  - `/run-backtest` (on demand): wraps `python -m src.cli backtest` with the demo-headline configuration (mean_variance λ=1, time-varying wave tilts from data/wave_history.csv, SPY benchmark). Auto-renders both `data/backtest/dashboard.html` and `docs/backtest.html`.
+  - `/review-portfolio` and `/run-backtest` are absent on this branch; both come back in the curator rebuild.
 - All Python in two files:
-  - `src/portfolio.py`: every math function (fetch_prices, compute_returns, optimize_portfolio, risk_metrics, analyze, initialize_holdings, snapshot_holdings, recommend_portfolio, append_wave_history, backtest, build_dashboard, render_news_page).
-  - `src/cli.py`: one entry point with eight subcommands (`init-holdings`, `wave-history`, `seed-wave-history`, `analyze`, `snapshot`, `recommend`, `backtest`, `dashboard`) that the skill and cron jobs invoke via Bash. `backtest` is a one-off spot-check tool, not part of any cron flow. `seed-wave-history` is a one-time backfill for the wave-stage trajectory chart (chart 5).
+  - `src/portfolio.py`: every math function (fetch_prices, compute_returns, optimize_portfolio, risk_metrics, analyze, initialize_holdings, snapshot_holdings, recommend_portfolio, backtest, build_dashboard, render_news_page).
+  - `src/cli.py`: one entry point with six subcommands (`init-holdings`, `analyze`, `snapshot`, `recommend`, `backtest`, `dashboard`) that the skill and cron jobs invoke via Bash. `backtest` is a one-off spot-check tool, not part of any cron flow.
 - Reports are written to `data/reports/YYYY-MM-DD-<skill>.md`.
-- Dashboard is a single static `docs/index.html`, regenerated after each snapshot or recommend run and at the end of `/review-portfolio`. The same file is what GitHub Pages serves at the public-demo URL; cron does not auto-push, so `git add docs/index.html && git commit && git push` is the manual publish step whenever you want the live demo refreshed.
+- Dashboard is a single static `docs/index.html`, regenerated after each snapshot or recommend run. The same file is what GitHub Pages serves at the public-demo URL; cron does not auto-push, so `git add docs/index.html && git commit && git push` is the manual publish step whenever you want the live demo refreshed.
 
 ## User-maintained inputs
 
 - `investor_profile.md`: goals, constraints, exclusions.
-- `holdings.csv`: `ticker,shares` for every ticker the user wants tracked. This file is the **watchlist universe** — the set of tickers passed to both the news-researcher (so news is harvested only for these tickers) and to `optimize_portfolio` (so the optimizer can only assign weight to these tickers). `shares=0` is valid: it adds the ticker to the universe for news and optimization without representing a real position. To add a ticker, append `<TICKER>,0` and the next run picks it up; to remove one, delete the row.
+- `holdings.csv`: `ticker,shares` for every ticker the user wants tracked. This file is the **watchlist universe** — the set of tickers passed to `optimize_portfolio` (so the optimizer can only assign weight to these tickers). `shares=0` is valid: it adds the ticker to the universe for optimization without representing a real position. To add a ticker, append `<TICKER>,0` and the next run picks it up; to remove one, delete the row.
 - `news_sources.md`: optional curated wave sources.
 
 ## Time-series outputs (appended, not overwritten)
 
 - `data/snapshots.csv`: daily per-ticker $ values. Schema: `date, ticker, shares, price, value, total_value`. Idempotent on date; pass `--force` to overwrite.
-- `data/recommendations.csv`: optimizer output, one row block per `/review-portfolio` run. Schema: `date, ticker, weight, expected_return, annual_volatility, sharpe_ratio, objective`. Idempotent on date; the skill passes `--force` to overwrite if the user re-runs the review on the same day.
-- `data/wave_history.csv`: per-wave stage classifications, one row per (date, wave). Schema: `date, wave, stage, evidence_tickers, rationale, seeded`. `seeded=True` rows are post-hoc judgments from `seed-wave-history`; `seeded=False` rows are organic from `/review-portfolio` runs or from running the news-researcher with strict as-of-date instructions. Drives the dashboard's wave-stage trajectory chart.
-- `data/thesis_baseline.json`: one-time artifact written by `/initialize-portfolio`. Schema: `{date, allocations_usd, reasoning, holdings}`. Read-only after creation: `/review-portfolio` reads it on every run to render the thesis-vs-recommended comparison; `build_dashboard` reads its `date` to scope the live dashboard's time-series charts. Delete the file manually only if you want to redo the thesis from scratch (then re-run `/initialize-portfolio`).
+- `data/recommendations.csv`: optimizer output, one row block per `recommend` run. Schema: `date, ticker, weight, expected_return, annual_volatility, sharpe_ratio, objective`. Idempotent on date; pass `--force` to overwrite same-day runs.
+- `data/thesis_baseline.json`: one-time artifact written by `/initialize-portfolio`. Schema: `{date, allocations_usd, reasoning, holdings}`. Read-only after creation; `build_dashboard` reads its `date` to scope the live dashboard's time-series charts. Delete the file manually only if you want to redo the thesis from scratch (then re-run `/initialize-portfolio`).
 
 These are the user's history. Don't break their schemas. If you must extend them, add columns at the end and keep existing ones.
 
@@ -77,7 +83,7 @@ The cron call refreshes `docs/index.html` (the dashboard CLI's default `--out`).
 
 Set `PROJ` to wherever you cloned the repo, then `crontab -e` and paste. Works the same on macOS and Linux. cron only fires when the machine is awake at the trigger time; missed runs do not auto-replay. Use `--date YYYY-MM-DD` to backfill.
 
-`recommend` lives only inside `/review-portfolio` now. The skill calls `python -m src.cli recommend --force` after `analyze` so `data/recommendations.csv` accumulates one row block per monthly review. There used to be a weekly Friday `recommend` cron too, but it produced near-duplicate rows between monthly reviews (wave classifications don't change between /review-portfolio runs and 7 days of new prices barely move μ over the lookback window), so it was retired.
+`recommend` is currently a manual invocation. The curator rebuild will reattach it to the next-gen `/review-portfolio` skill.
 
 ## Repo rules
 

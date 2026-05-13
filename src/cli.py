@@ -1,17 +1,13 @@
 """Single CLI for every portfolio operation.
 
-Eight subcommands. Each calls one function in ``src/portfolio.py`` and
+Six subcommands. Each calls one function in ``src/portfolio.py`` and
 prints the result as JSON to stdout. The /review-portfolio skill
-invokes ``init-holdings`` (first-run branch only), ``wave-history``
-(after each news pass), and ``analyze``; the cron jobs invoke
-``snapshot``, ``recommend``, and ``dashboard``. ``backtest`` is a
-one-off spot-check tool, not part of any cron flow. ``seed-wave-history``
-is a one-time backfill for chart 4 trajectories.
+invokes ``init-holdings`` (first-run branch only) and ``analyze``;
+the cron jobs invoke ``snapshot``, ``recommend``, and ``dashboard``.
+``backtest`` is a one-off spot-check tool, not part of any cron flow.
 
 Usage:
     python -m src.cli init-holdings      --allocations '{"AAPL": 5000, ...}' --out holdings.csv
-    python -m src.cli wave-history       [--news data/news_latest.json] [--force]
-    python -m src.cli seed-wave-history  [--force]
     python -m src.cli analyze            --tickers AAPL MSFT NVDA --period 3y --max-weight 0.25
     python -m src.cli snapshot           [--date YYYY-MM-DD] [--force]
     python -m src.cli recommend          [--max-weight 0.25] [--force]
@@ -27,12 +23,6 @@ import sys
 from pathlib import Path
 
 from . import portfolio
-
-
-def _load_wave_views(arg: str) -> dict[str, str]:
-    """Accept either a JSON literal or a path to a JSON file mapping ticker -> stage."""
-    raw = json.loads(arg) if arg.startswith("{") else json.loads(Path(arg).read_text())
-    return {str(k).upper(): str(v) for k, v in raw.items()}
 
 
 def _load_allocations(arg: str) -> dict[str, float]:
@@ -56,20 +46,6 @@ def main(argv: list[str] | None = None) -> int:
                         help="JSON literal or path mapping ticker -> dollars")
     p_init.add_argument("--out", default="holdings.csv")
 
-    p_wh = sub.add_parser("wave-history",
-                          help="append wave-stage classifications from news_latest.json to data/wave_history.csv")
-    p_wh.add_argument("--news", default="data/news_latest.json",
-                      help="path to news_latest.json (must contain top-level `date` and `wave_stages`)")
-    p_wh.add_argument("--out", default="data/wave_history.csv")
-    p_wh.add_argument("--force", action="store_true",
-                      help="overwrite any existing rows for the news file's date")
-
-    p_seed = sub.add_parser("seed-wave-history",
-                            help="backfill wave_history.csv with 12 months of post-hoc monthly classifications (seeded=True)")
-    p_seed.add_argument("--out", default="data/wave_history.csv")
-    p_seed.add_argument("--force", action="store_true",
-                        help="overwrite any existing rows for the seeded dates")
-
     p_an = sub.add_parser("analyze", help="fetch + optimize + risk in one call")
     p_an.add_argument("--tickers", nargs="+", required=True)
     p_an.add_argument("--period", default=fm["lookback_period"])
@@ -80,9 +56,6 @@ def main(argv: list[str] | None = None) -> int:
     p_an.add_argument("--risk-aversion", type=float, default=fm["risk_aversion"],
                       help="lambda in mean_variance objective (μᵀw - λ·wᵀΣw); "
                            "small λ favors return, large λ favors variance reduction")
-    p_an.add_argument("--wave-views", default=None,
-                      help="JSON literal or path mapping ticker -> wave stage "
-                           "(buildup|surge|peak|digestion|neutral). Tilts expected returns.")
 
     p_snap = sub.add_parser("snapshot", help="append today's $ values to data/snapshots.csv")
     p_snap.add_argument("--holdings", default="holdings.csv")
@@ -94,8 +67,6 @@ def main(argv: list[str] | None = None) -> int:
     p_rec = sub.add_parser("recommend", help="optimize and append weights to data/recommendations.csv")
     p_rec.add_argument("--holdings", default="holdings.csv")
     p_rec.add_argument("--out", default="data/recommendations.csv")
-    p_rec.add_argument("--wave-history", default="data/wave_history.csv",
-                       help="apply tilts from this file's most recent row at/before today; pass '' to skip")
     p_rec.add_argument("--period", default=fm["lookback_period"])
     p_rec.add_argument("--max-weight", type=float, default=0.25)
     p_rec.add_argument("--risk-free-rate", type=float, default=fm["risk_free_rate"])
@@ -107,7 +78,7 @@ def main(argv: list[str] | None = None) -> int:
     p_rec.add_argument("--force", action="store_true")
 
     p_bt = sub.add_parser("backtest",
-                           help="walk-forward weekly-rebalance backtest of the cron 'recommend' path; outputs to data/backtest/")
+                           help="walk-forward monthly-rebalance backtest; outputs to data/backtest/")
     p_bt.add_argument("--holdings", default="holdings.csv",
                       help="watchlist source; only the ticker column is used")
     p_bt.add_argument("--start-date", default=None,
@@ -128,20 +99,15 @@ def main(argv: list[str] | None = None) -> int:
                       choices=["max_sharpe", "min_variance", "mean_variance"])
     p_bt.add_argument("--risk-aversion", type=float, default=fm["risk_aversion"],
                       help="lambda in mean_variance objective; see analyze --risk-aversion")
-    p_bt.add_argument("--wave-history", default=None,
-                      help="path to wave_history.csv; if given, the optimizer applies "
-                           "time-varying wave-stage tilts at each rebalance based on the "
-                           "most recent classification at or before that date")
     p_bt.add_argument("--risk-free-rate", type=float, default=fm["risk_free_rate"])
     p_bt.add_argument("--benchmarks", nargs="*", default=["SPY"],
                       help="benchmark tickers compared against the backtest's realized return "
                            "(default: SPY). Pass an empty list to skip the benchmark section.")
 
-    p_dash = sub.add_parser("dashboard", help="generate docs/index.html from snapshots + recommendations + news + wave history")
+    p_dash = sub.add_parser("dashboard", help="generate docs/index.html from snapshots + recommendations + news")
     p_dash.add_argument("--snapshots", default="data/snapshots.csv")
     p_dash.add_argument("--recommendations", default="data/recommendations.csv")
     p_dash.add_argument("--news", default="data/news_latest.json")
-    p_dash.add_argument("--wave-history", default="data/wave_history.csv")
     p_dash.add_argument("--benchmarks", nargs="*", default=["SPY"],
                         help="benchmark tickers to overlay on the portfolio-value chart "
                              "(default: SPY). Pass an empty list to suppress overlays.")
@@ -164,20 +130,6 @@ def main(argv: list[str] | None = None) -> int:
             prices_df = portfolio.fetch_prices(list(allocations.keys()), period="7d")
             last_prices = {t: float(prices_df[t].iloc[-1]) for t in prices_df.columns}
             result = portfolio.initialize_holdings(allocations, last_prices, holdings_path=args.out)
-        elif args.cmd == "wave-history":
-            news_path = Path(args.news)
-            if not news_path.exists():
-                raise FileNotFoundError(f"news file not found: {news_path}")
-            news = json.loads(news_path.read_text())
-            wave_stages = news.get("wave_stages") or {}
-            news_date = news.get("date") or ""
-            if not news_date:
-                raise ValueError(f"{news_path} has no top-level `date` field")
-            result = portfolio.append_wave_history(
-                wave_stages, date=news_date, out_path=args.out, force=args.force,
-            )
-        elif args.cmd == "seed-wave-history":
-            result = portfolio.seed_wave_history(out_path=args.out, force=args.force)
         elif args.cmd == "backtest":
             result = portfolio.backtest(
                 holdings_path=args.holdings,
@@ -186,18 +138,14 @@ def main(argv: list[str] | None = None) -> int:
                 lookback_years=args.lookback_years,
                 max_weight=args.max_weight, objective=args.objective,
                 risk_aversion=args.risk_aversion,
-                tilt_schedule=fm["wave_stage_tilts"],
                 risk_free_rate=args.risk_free_rate,
                 benchmarks=args.benchmarks,
-                wave_history_path=args.wave_history,
             )
         elif args.cmd == "analyze":
             result = portfolio.analyze(
                 args.tickers, period=args.period, objective=args.objective,
                 max_weight=args.max_weight, risk_free_rate=args.risk_free_rate,
                 risk_aversion=args.risk_aversion,
-                tilt_schedule=fm["wave_stage_tilts"],
-                wave_views=_load_wave_views(args.wave_views) if args.wave_views else None,
             )
         elif args.cmd == "snapshot":
             result = portfolio.snapshot_holdings(
@@ -207,11 +155,9 @@ def main(argv: list[str] | None = None) -> int:
         elif args.cmd == "recommend":
             result = portfolio.recommend_portfolio(
                 holdings_path=args.holdings, out_path=args.out,
-                wave_history_path=args.wave_history or "",
                 period=args.period, max_weight=args.max_weight,
                 risk_free_rate=args.risk_free_rate, objective=args.objective,
                 risk_aversion=args.risk_aversion,
-                tilt_schedule=fm["wave_stage_tilts"],
                 date=args.date, force=args.force,
             )
         else:  # dashboard
@@ -219,7 +165,6 @@ def main(argv: list[str] | None = None) -> int:
                 snapshots_path=args.snapshots,
                 recommendations_path=args.recommendations,
                 out_path=args.out,
-                wave_history_path=args.wave_history,
                 benchmarks=args.benchmarks,
                 nav_current=args.nav_current,
                 thesis_baseline_path=args.thesis_baseline or None,

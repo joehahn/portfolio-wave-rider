@@ -13,30 +13,6 @@ Finance and stats terms used in the README, reports, and dashboard.
 - `cummax(V)_t` = the running max of `V` through time `t`. Same semantics as pandas' `Series.cummax()`.
 - `α` = quantile level (e.g., `α = 0.05` picks out the 5% tail of the return distribution).
 
-## Wave-stage cycle
-
-The four wave stages map onto a typical investment cycle. Each stage gets a multiplier on `μ` (the expected-return vector) that the optimizer applies before solving:
-
-```
-                peak (×0.80)
-                  ╱╲
-       surge   ╱     ╲   digestion
-      (×1.10) ╱       ╲  (×0.90)
-            ╱           ╲
-  buildup ╱               ╲___ neutral
-  (×1.20)                     (×1.00)
-```
-
-The multiplier reflects how much we think the **recent historical μ** (estimated from the lookback window) **understates or overstates the forward μ** at that point in the cycle. The optimizer's μ is naïvely the past; the tilt nudges it toward the future:
-
-- **buildup ×1.20** — wave is quiet, under-owned, cheap. The thesis hasn't been priced in yet, so historical μ likely **understates** forward μ. Biggest upward nudge.
-- **surge ×1.10** — adoption compounding, real revenue, but some of the move is in the price now. Still room to run; smaller upward nudge than buildup.
-- **peak ×0.80** — enthusiasm priced in, valuations stretched, sell-side unanimous. Historical μ likely **overstates** forward μ; mean reversion dominates from here. Biggest downward nudge.
-- **digestion ×0.90** — post-crest hangover. Most overvaluation has burned off but there's still drag; smaller downward nudge than peak.
-- **neutral ×1.00** — no wave thesis applies at all (broad-market ETFs, bonds, cash, gold). We have no view either way, so trust the historical μ as-is.
-
-The multipliers above are the defaults; they can be overridden per-investor in `investor_profile.md`'s `financial_model.wave_stage_tilts`. See the **Wave-stage tilt** entry below for the math.
-
 ## Terms
 
 | Term | Plain definition |
@@ -54,9 +30,8 @@ The multipliers above are the defaults; they can be overridden per-investor in `
 | **Concentration cap** | Box constraint on the optimizer: `w_i ≤ max_weight` for every asset. Profile default 0.25. |
 | **Asset class** | Coarse bucket: equities, bonds, precious metals, cash. |
 | **Asset-class drift** | Deviation of recommended weights summed by class from the user's declared target percentages. Reported but not enforced. |
-| **Wave-stage tilt** | Multiplicative scaling on `μ` (the expected-return vector) before optimization. `μ_tilted[i] = stage_multiplier × μ[i]`. The five stages and their multipliers are loaded from `investor_profile.md`'s `financial_model.wave_stage_tilts` (defaults in `src/portfolio.py:WAVE_STAGE_TILT`). |
 | **Rebalance** | Execute trades to move current portfolio weights back toward target weights. This project produces recommendations; the user does the trading. |
-| **Wave thesis** | The user's belief that long technology waves drive returns: enter early in a wave (buildup, surge), trim near the crest (peak), avoid the hangover (digestion). The profile prose names the current wave (AI) and the next ones (rockets/spacecraft, robotics, engineered biology, quantum computing, nuclear — fission renaissance near-term, fusion long-term). |
-| **Thesis allocation** | The user's wave thesis expressed as concrete dollar amounts per ticker, with no math involved (no optimizer, no Sharpe). Set once by `/initialize-portfolio`, persisted to `data/thesis_baseline.json`. Every subsequent `/review-portfolio` re-renders a "Thesis allocation" section in the report, comparing it side-by-side to the optimizer's current Recommended allocation. The gap between the two measures the marginal contribution of the optimizer relative to the user's prior. |
-| **`general_markets` bucket** | Catch-all wave bucket for tickers not tied to a specific technology wave (broad-market ETFs, bonds, cash, gold). Always classified `neutral` — no tilt applied. Acts as ballast for diversification rather than a wave bet. |
-| **Watchlist universe** | The set of tickers in `holdings.csv`. Both the news-researcher and the optimizer operate on exactly this set: news is harvested only for these tickers, and the optimizer can only assign weight to these tickers. Adding a ticker with `shares=0` adds it to the universe without owning it; deleting a row removes it from future runs. |
+| **Wave thesis** | The user's belief that long technology waves drive returns. The profile prose names the current wave (AI) and the next ones (rockets/spacecraft, robotics, engineered biology, quantum computing, nuclear — fission renaissance near-term, fusion long-term). |
+| **Thesis allocation** | The user's wave thesis expressed as concrete dollar amounts per ticker, with no math involved (no optimizer, no Sharpe). Set once by `/initialize-portfolio`, persisted to `data/thesis_baseline.json`. |
+| **`general_markets` bucket** | Catch-all wave bucket for tickers not tied to a specific technology wave (broad-market ETFs, bonds, cash, gold). Acts as ballast for diversification rather than a wave bet. |
+| **Watchlist universe** | The set of tickers in `holdings.csv`. The optimizer operates on exactly this set and can only assign weight to these tickers. Adding a ticker with `shares=0` adds it to the universe without owning it; deleting a row removes it from future runs. |

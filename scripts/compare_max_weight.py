@@ -1,8 +1,8 @@
 """Walk-forward backtest swept across concentration_cap (max_weight) values.
 
 For each max_weight in MAX_WEIGHTS, runs a 12-month monthly-rebalance
-walk-forward on the 12-ticker watchlist with mean_variance λ=1 and
-time-varying wave tilts from data/wave_history.csv. Outputs:
+walk-forward on the 12-ticker watchlist with mean_variance λ=1.
+Outputs:
 
   - one Plotly chart: 4 portfolio-value curves + SPY benchmark
   - a summary table (realized return, vol, Sharpe, max DD, vs SPY)
@@ -21,14 +21,14 @@ import plotly.graph_objects as go
 
 from src.portfolio import (
     compute_returns, optimize_portfolio, _fetch_benchmark_curves,
-    TICKER_WAVE, _render_nav_strip,
+    _render_nav_strip,
 )
 
 TICKERS = ["AGG", "BIL", "IAU", "GOOGL", "RKLB", "NVDA", "MSFT", "BOTZ", "ARKG", "QTUM", "NUKZ", "VIG"]
 MAX_WEIGHTS = [0.25, 0.33, 0.50, 1.00]
 LAMBDA = 1.0
 # Rolling 12-month window ending today, so reruns automatically pick up
-# the most recent prices and the most recent wave_history.csv classifications.
+# the most recent prices.
 END = pd.Timestamp.today().normalize()
 START = (END - pd.DateOffset(years=1)).normalize()
 INITIAL_USD = 50_000.0
@@ -36,21 +36,7 @@ LOOKBACK_YEARS = 1.3
 RISK_FREE = 0.04
 
 
-def wave_views_at(wh_df: pd.DataFrame, date: pd.Timestamp) -> dict[str, str] | None:
-    """Build {ticker: stage} from the most recent wave_history row at-or-before date."""
-    if wh_df is None:
-        return None
-    relevant = wh_df[wh_df["date"] <= date]
-    if relevant.empty:
-        return None
-    latest_date = relevant["date"].max()
-    latest = relevant[relevant["date"] == latest_date]
-    wave_to_stage = dict(zip(latest["wave"], latest["stage"]))
-    return {t: wave_to_stage.get(TICKER_WAVE.get(t, "general_markets"), "neutral")
-            for t in TICKERS}
-
-
-def run_walk_forward(prices: pd.DataFrame, daily_dates, wh_df, max_weight: float):
+def run_walk_forward(prices: pd.DataFrame, daily_dates, max_weight: float):
     """Returns (totals_series, snapshots_df). snapshots_df has columns
     date, ticker, shares, price for the per-ticker P&L computation."""
     shares = None
@@ -69,7 +55,6 @@ def run_walk_forward(prices: pd.DataFrame, daily_dates, wh_df, max_weight: float
             opt = optimize_portfolio(
                 returns, objective="mean_variance", risk_free_rate=RISK_FREE,
                 max_weight=max_weight, risk_aversion=LAMBDA,
-                wave_views=wave_views_at(wh_df, date),
             )
             if not opt.get("success"):
                 continue
@@ -131,14 +116,12 @@ prices = raw["Close"].dropna(how="all").ffill().dropna()
 daily_dates = prices.loc[START:END].index
 print(f"{len(daily_dates)} trading days in [{START.date()}, {END.date()}]")
 
-wh_df = pd.read_csv("data/wave_history.csv", parse_dates=["date"])
-
 curves: dict[float, pd.Series] = {}
 gains: dict[float, dict[str, float]] = {}
 final_values: dict[float, dict[str, float]] = {}
 for mw in MAX_WEIGHTS:
     print(f"running mean_variance walk-forward, max_weight={mw} ...")
-    totals, snaps = run_walk_forward(prices, daily_dates, wh_df, mw)
+    totals, snaps = run_walk_forward(prices, daily_dates, mw)
     curves[mw] = totals
     gains[mw] = per_ticker_gain(snaps)
     final_values[mw] = per_ticker_final_value(snaps)
@@ -181,7 +164,6 @@ _returns = compute_returns(prices.loc[_lookback_start:_first])
 _opt = optimize_portfolio(
     _returns, objective="mean_variance", risk_free_rate=RISK_FREE,
     max_weight=0.25, risk_aversion=LAMBDA,
-    wave_views=wave_views_at(wh_df, _first),
 )
 _weights = _opt["weights"]
 _init_shares = {t: _weights[t] * INITIAL_USD / float(prices.loc[_first, t]) for t in TICKERS}
@@ -235,7 +217,7 @@ summary_rows = "".join(
     for mw in MAX_WEIGHTS
 )
 summary_table = (
-    f"<h2>Summary, {START.date()} to {END.date()}, 12-ticker watchlist, mean_variance λ=1, organic wave-tilts</h2>"
+    f"<h2>Summary, {START.date()} to {END.date()}, 12-ticker watchlist, mean_variance λ=1</h2>"
     f"<table style='border-collapse:collapse;font-size:0.95em'>"
     f"<thead><tr style='border-bottom:1px solid #888'>"
     f"<th style='padding:4px 12px;text-align:right'>Concentration cap</th>"
@@ -373,8 +355,8 @@ out_paths = [
 chart_caption = (
     f"<p style='color:#666;font-size:0.9em;max-width:65em;margin:0 auto;padding:0 1.5em;'>"
     f"<i>Walk-forward 12-month backtest run four times, once per concentration cap. "
-    f"Each line is the same simulation (mean_variance λ=1, organic wave-history tilts) "
-    f"with a different per-position max weight. SPY rescaled to share the starting value. "
+    f"Each line is the same simulation (mean_variance λ=1) with a different per-position "
+    f"max weight. SPY rescaled to share the starting value. "
     f"Orange dotted vertical lines mark rebalance dates.</i>"
     f"</p>"
 )

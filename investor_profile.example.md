@@ -15,12 +15,6 @@ financial_model:                  # optimizer math; CLI flags override at runtim
   risk_aversion: 1.0              # λ in mean_variance utility (μᵀw − λ·wᵀΣw); ignored otherwise
   risk_free_rate: 0.04            # ≈ 1y Treasury yield; used in Sharpe and as numeraire
   lookback_period: 1.3y           # history window for estimating μ and Σ
-  wave_stage_tilts:               # multipliers on μ before optimization
-    buildup:   1.20
-    surge:     1.10
-    neutral:   1.00
-    digestion: 0.90
-    peak:      0.80
 ---
 
 # Goals

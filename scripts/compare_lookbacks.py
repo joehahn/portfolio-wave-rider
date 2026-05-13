@@ -2,8 +2,7 @@
 
 For each LB in LOOKBACKS_YEARS, runs a 12-month monthly-rebalance
 walk-forward with mean_variance λ=1, recomputing μ and Σ from a window
-of length LB years at each rebalance. Wave-stage tilts come from
-data/wave_history.csv (same as the headline backtest).
+of length LB years at each rebalance.
 
 The ticker universe is determined per lookback: a ticker is included
 only if its history extends back at least LB years before the backtest
@@ -30,7 +29,7 @@ import plotly.graph_objects as go
 
 from src.portfolio import (
     compute_returns, optimize_portfolio, _fetch_benchmark_curves,
-    _render_nav_strip, TICKER_WAVE,
+    _render_nav_strip,
 )
 
 TICKERS = ["AGG", "BIL", "IAU", "GOOGL", "RKLB", "NVDA", "MSFT", "BOTZ", "ARKG", "QTUM", "NUKZ", "VIG"]
@@ -41,20 +40,6 @@ START = (END - pd.DateOffset(years=1)).normalize()
 INITIAL_USD = 50_000.0
 MAX_WEIGHT = 0.25
 RISK_FREE = 0.04
-WAVE_HISTORY_PATH = "data/wave_history.csv"
-
-
-def wave_views_at(wh_df: pd.DataFrame, date: pd.Timestamp,
-                  tickers: list[str]) -> dict[str, str] | None:
-    """Build {ticker: stage} from the most recent wave_history row at-or-before date."""
-    relevant = wh_df[wh_df["date"] <= date]
-    if relevant.empty:
-        return None
-    latest_date = relevant["date"].max()
-    latest = relevant[relevant["date"] == latest_date]
-    wave_to_stage = dict(zip(latest["wave"], latest["stage"]))
-    return {t: wave_to_stage.get(TICKER_WAVE.get(t, "general_markets"), "neutral")
-            for t in tickers}
 
 
 def tickers_with_history(all_prices: pd.DataFrame, lookback_years: float,
@@ -72,7 +57,7 @@ def tickers_with_history(all_prices: pd.DataFrame, lookback_years: float,
 
 
 def run_walk_forward(all_prices: pd.DataFrame, daily_dates,
-                     lookback_years: float, wh_df: pd.DataFrame,
+                     lookback_years: float,
                      tickers: list[str]) -> pd.Series:
     """Walk-forward backtest with this lookback and ticker universe."""
     sub_prices = all_prices[tickers].dropna()
@@ -94,7 +79,6 @@ def run_walk_forward(all_prices: pd.DataFrame, daily_dates,
             opt = optimize_portfolio(
                 returns, objective="mean_variance", risk_free_rate=RISK_FREE,
                 max_weight=MAX_WEIGHT, risk_aversion=LAMBDA,
-                wave_views=wave_views_at(wh_df, date, tickers),
             )
             if not opt.get("success"):
                 continue
@@ -128,16 +112,13 @@ full_window_prices = all_prices.dropna()
 daily_dates = full_window_prices.loc[START:END].index
 print(f"{len(daily_dates)} trading days in [{START.date()}, {END.date()}]")
 
-print(f"loading wave history from {WAVE_HISTORY_PATH} ...")
-wh_df = pd.read_csv(WAVE_HISTORY_PATH, parse_dates=["date"])
-
 curves: dict[float, pd.Series] = {}
 universes: dict[float, list[str]] = {}
 for lb in LOOKBACKS_YEARS:
     universe = tickers_with_history(all_prices, lb, START)
     universes[lb] = universe
     print(f"running walk-forward, lookback={lb}y ({len(universe)} tickers) ...")
-    curves[lb] = run_walk_forward(all_prices, daily_dates, lb, wh_df, universe)
+    curves[lb] = run_walk_forward(all_prices, daily_dates, lb, universe)
 
 spy = _fetch_benchmark_curves(["SPY"], daily_dates[0], daily_dates[-1], INITIAL_USD)["SPY"]
 
@@ -196,7 +177,6 @@ _returns = compute_returns(_headline_prices.loc[_lookback_start:_first])
 _opt = optimize_portfolio(
     _returns, objective="mean_variance", risk_free_rate=RISK_FREE,
     max_weight=MAX_WEIGHT, risk_aversion=LAMBDA,
-    wave_views=wave_views_at(wh_df, _first, _headline_tickers),
 )
 _weights = _opt["weights"]
 _init_shares = {t: _weights[t] * INITIAL_USD / float(_headline_prices.loc[_first, t])
@@ -249,7 +229,7 @@ rows = "".join(
     for lb in LOOKBACKS_YEARS
 )
 table_html = (
-    f"<h2>Summary, {START.date()} to {END.date()}, mean_variance λ=1, organic wave-tilts</h2>"
+    f"<h2>Summary, {START.date()} to {END.date()}, mean_variance λ=1</h2>"
     f"<table style='border-collapse:collapse;font-size:0.95em'>"
     f"<thead><tr style='border-bottom:1px solid #888'>"
     f"<th style='padding:4px 12px;text-align:right'>lookback</th>"
@@ -273,8 +253,8 @@ table_html = (
     f"backtest. NUKZ launched 2024-01-24, so it drops for LB ≥ 2y; "
     f"RKLB started 2020-11-24, so it also drops at LB = 5y. Lines with "
     f"different ticker counts aren't strictly comparable — the LB ≥ 2y "
-    f"runs are missing the nuclear-energy bucket entirely, which is the "
-    f"strongest wave tilt over this 12-month window."
+    f"runs are missing the nuclear-energy bucket entirely, which was the "
+    f"strongest mover over this 12-month window."
     f"</p>"
 )
 
@@ -286,9 +266,9 @@ out_paths = [
 chart_caption = (
     f"<p style='color:#666;font-size:0.9em;max-width:65em;margin:0 auto;padding:0 1.5em;'>"
     f"<i>Walk-forward 12-month backtest run nine times, once per lookback "
-    f"window. Each line is the same simulation (mean_variance λ=1, time-varying "
-    f"wave tilts from data/wave_history.csv) with a different lookback for "
-    f"estimating μ and Σ at each monthly rebalance. The ticker universe "
+    f"window. Each line is the same simulation (mean_variance λ=1) with a "
+    f"different lookback for estimating μ and Σ at each monthly rebalance. "
+    f"The ticker universe "
     f"shrinks for longer lookbacks: LB ≥ 2y drops NUKZ (launched 2024-01-24), "
     f"LB = 5y also drops RKLB. SPY rescaled to share the starting value. "
     f"Orange dotted vertical lines mark rebalance dates.</i>"

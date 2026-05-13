@@ -79,7 +79,7 @@ The report-writer should produce only the **The ask**, **Thesis allocation**, **
 python -m src.cli dashboard --out docs/index.html
 ```
 
-Renders the live dashboard. Most charts will be sparse (one date of snapshots, no recommendations yet, no wave-history yet) — that's expected. The first `/review-portfolio` will fill them in.
+Renders the live dashboard. Most charts will be sparse (one date of snapshots, no recommendations yet) — that's expected. The first `/review-portfolio` will fill them in.
 
 ## Final output to the user
 

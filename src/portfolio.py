@@ -9,7 +9,6 @@ Six public functions plus one orchestrator:
 - ``analyze`` — one-shot: fetch + returns + optimize + risk in one call
 - ``snapshot_holdings`` — append daily $ values to data/snapshots.csv
 - ``recommend_portfolio`` — append weekly weights to data/recommendations.csv
-- ``append_wave_history`` — append per-wave stage classifications to data/wave_history.csv
 - ``build_dashboard`` — render a static HTML dashboard from the CSVs plus the latest news payload
 
 Functions pass DataFrames in-memory; there is no on-disk handle store. The
@@ -31,38 +30,6 @@ from scipy.optimize import minimize
 
 TRADING_DAYS = 252
 
-# Wave-cycle tilt multipliers applied to expected returns when the caller
-# supplies a wave_views dict (ticker -> stage). Implements the profile's
-# "ride the wave, exit before the crest" thesis: lean into early waves,
-# trim late ones. Numbers are intentionally small and symmetric so the
-# tilt nudges the optimizer rather than dominating it.
-WAVE_STAGE_TILT = {
-    "buildup":   1.20,   # early, under-owned — lean in hard
-    "surge":     1.10,   # adoption compounding — lean in
-    "peak":      0.80,   # enthusiasm priced in — trim
-    "digestion": 0.90,   # post-crest hangover — mild underweight
-    "neutral":   1.00,   # no wave signal — leave alone
-}
-
-
-def apply_wave_tilt(
-    mu: pd.Series,
-    wave_views: dict[str, str],
-    tilt_schedule: dict[str, float] | None = None,
-) -> pd.Series:
-    """Multiply annualized mean returns by each ticker's stage tilt.
-
-    ``tilt_schedule`` maps each stage to its multiplier. Defaults to
-    ``WAVE_STAGE_TILT``; pass a different dict (e.g., from the profile's
-    `financial_model.wave_stage_tilts` field) to override.
-    """
-    schedule = tilt_schedule or WAVE_STAGE_TILT
-    tilted = mu.copy()
-    for ticker, stage in wave_views.items():
-        if ticker in tilted.index:
-            tilted[ticker] = tilted[ticker] * schedule.get(stage, 1.0)
-    return tilted
-
 
 # ---------------------------------------------------------------------------
 # Profile loader. Reads the YAML front matter of investor_profile.md and
@@ -75,17 +42,16 @@ _FINANCIAL_MODEL_DEFAULTS: dict[str, Any] = {
     "risk_aversion": 1.0,
     "risk_free_rate": 0.04,
     "lookback_period": "3y",
-    "wave_stage_tilts": dict(WAVE_STAGE_TILT),
 }
 
 
 def load_financial_model(profile_path: str = "investor_profile.md") -> dict[str, Any]:
     """Read `financial_model` from investor_profile.md's YAML front matter.
 
-    Returns a dict with the five fields (`objective`, `risk_aversion`,
-    `risk_free_rate`, `lookback_period`, `wave_stage_tilts`); any missing
-    field falls back to the hard-coded default. If the profile file
-    doesn't exist or has no front matter, all defaults are returned.
+    Returns a dict with the four fields (`objective`, `risk_aversion`,
+    `risk_free_rate`, `lookback_period`); any missing field falls back to
+    the hard-coded default. If the profile file doesn't exist or has no
+    front matter, all defaults are returned.
     """
     import re
     import yaml
@@ -101,12 +67,6 @@ def load_financial_model(profile_path: str = "investor_profile.md") -> dict[str,
     fm = data.get("financial_model") or {}
     out = dict(_FINANCIAL_MODEL_DEFAULTS)
     out.update(fm)
-    # Merge wave_stage_tilts so a partial override only changes the named
-    # stages and the rest fall back to defaults.
-    if isinstance(fm.get("wave_stage_tilts"), dict):
-        merged = dict(WAVE_STAGE_TILT)
-        merged.update(fm["wave_stage_tilts"])
-        out["wave_stage_tilts"] = merged
     return out
 
 
@@ -178,9 +138,7 @@ def optimize_portfolio(
     target_return: float | None = None,
     max_weight: float = 1.0,
     min_weight: float = 0.0,
-    wave_views: dict[str, str] | None = None,
     risk_aversion: float = 1.0,
-    tilt_schedule: dict[str, float] | None = None,
 ) -> dict[str, Any]:
     """Solve the mean-variance problem and return weights + summary stats.
 
@@ -201,8 +159,7 @@ def optimize_portfolio(
         raise ValueError("risk_aversion (lambda) must be >= 0 for mean_variance objective")
 
     tickers = list(returns["mean"].index)
-    mean_series = apply_wave_tilt(returns["mean"], wave_views, tilt_schedule) if wave_views else returns["mean"]
-    mu = mean_series.to_numpy(dtype=float)
+    mu = returns["mean"].to_numpy(dtype=float)
     sigma = returns["cov"].to_numpy(dtype=float)
     n = len(tickers)
 
@@ -247,7 +204,6 @@ def optimize_portfolio(
         "annual_volatility": vol,
         "sharpe_ratio": (ret - risk_free_rate) / vol if vol > 1e-10 else None,
         "assets_at_boundary": at_bound,
-        "applied_wave_views": wave_views or None,
         "concentration_warning": (
             f"Top holding is {max(weights, key=weights.get)} at "
             f"{max(weights.values()) * 100:.1f}%."
@@ -309,17 +265,14 @@ def analyze(
     objective: str = "max_sharpe",
     max_weight: float = 0.25,
     risk_free_rate: float = 0.04,
-    wave_views: dict[str, str] | None = None,
     risk_aversion: float = 1.0,
-    tilt_schedule: dict[str, float] | None = None,
 ) -> dict[str, Any]:
     """Run the full pipeline and return a single JSON-serializable dict."""
     prices = fetch_prices(tickers, period=period)
     returns = compute_returns(prices)
     opt = optimize_portfolio(
         returns, objective=objective, risk_free_rate=risk_free_rate,
-        max_weight=max_weight, wave_views=wave_views,
-        risk_aversion=risk_aversion, tilt_schedule=tilt_schedule,
+        max_weight=max_weight, risk_aversion=risk_aversion,
     )
     risk = risk_metrics(returns, opt["weights"], risk_free_rate=risk_free_rate) \
         if opt.get("success") else None
@@ -471,26 +424,18 @@ def snapshot_holdings(
 def recommend_portfolio(
     holdings_path: str = "holdings.csv",
     out_path: str = "data/recommendations.csv",
-    wave_history_path: str = "data/wave_history.csv",
     period: str = "3y",
     max_weight: float = 0.25,
     risk_free_rate: float = 0.04,
     objective: str = "max_sharpe",
     risk_aversion: float = 1.0,
-    tilt_schedule: dict[str, float] | None = None,
     date: str | None = None,
     force: bool = False,
 ) -> dict[str, Any]:
-    """Run an optimization with the most recent wave-stage tilts and
-    append per-ticker weights to a CSV.
+    """Run an optimization and append per-ticker weights to a CSV.
 
-    The cron-friendly sibling of /review-portfolio: pure Python, no news
-    pulls, no LLM. Tilts are applied from the most recent
-    ``wave_history.csv`` row dated on or before today (same as-of-date
-    lookup used by ``backtest`` and the sweep scripts), so the weekly
-    cron's recommendation stays consistent with the wave thesis between
-    monthly /review-portfolio runs without needing to re-classify the
-    waves itself. Universe = the tickers listed in ``holdings_path``.
+    Pure Python, no news pulls, no LLM. Universe = the tickers listed in
+    ``holdings_path``.
 
     Schema appended to ``out_path``:
         date, ticker, weight, expected_return, annual_volatility,
@@ -515,27 +460,9 @@ def recommend_portfolio(
                     "reason": "recommendation already exists; pass force=True to overwrite"}
         existing = existing[existing["date"] != str(rec_date)]
 
-    # Build wave_views from the most recent wave_history row at or before
-    # rec_date. Mirrors the as-of-date lookup helpers in backtest() and
-    # the sweep scripts.
-    wave_views: dict[str, str] | None = None
-    wh_path = Path(wave_history_path)
-    if wh_path.exists():
-        wh_df = pd.read_csv(wh_path, parse_dates=["date"])
-        relevant = wh_df[wh_df["date"] <= pd.Timestamp(rec_date)]
-        if not relevant.empty:
-            latest_date = relevant["date"].max()
-            latest = relevant[relevant["date"] == latest_date]
-            wave_to_stage = dict(zip(latest["wave"], latest["stage"]))
-            wave_views = {
-                t: wave_to_stage.get(TICKER_WAVE.get(t, "general_markets"), "neutral")
-                for t in tickers
-            }
-
     result = analyze(tickers, period=period, objective=objective,
                      max_weight=max_weight, risk_free_rate=risk_free_rate,
-                     wave_views=wave_views,
-                     risk_aversion=risk_aversion, tilt_schedule=tilt_schedule)
+                     risk_aversion=risk_aversion)
     opt = result["optimization"]
     if not opt.get("success"):
         raise RuntimeError(f"optimization failed: {opt.get('message')}")
@@ -564,7 +491,6 @@ def recommend_portfolio(
         "expected_annual_return": opt["expected_annual_return"],
         "annual_volatility": opt["annual_volatility"],
         "sharpe_ratio": opt["sharpe_ratio"],
-        "wave_views_applied": wave_views,
         "n_rows_appended": len(new_rows),
         "out_path": str(o_path),
     }
@@ -589,10 +515,8 @@ def backtest(
     max_weight: float = 0.25,
     objective: str = "max_sharpe",
     risk_aversion: float = 1.0,
-    tilt_schedule: dict[str, float] | None = None,
     risk_free_rate: float = 0.04,
     benchmarks: list[str] | None = None,
-    wave_history_path: str | None = None,
     publish_docs: bool = True,
 ) -> dict[str, Any]:
     """Walk-forward monthly-rebalance backtest of the lightweight Python-only path.
@@ -600,9 +524,9 @@ def backtest(
     For each Friday in [start_date, end_date], runs the optimizer with a
     `lookback_years`-long window ending that Friday and rebalances the
     portfolio to those weights. Daily snapshots in between record the
-    drifting value. No transaction costs are modeled. No news, no wave
-    tilts. The point is to verify that the math-only system produces
-    stable, profitable recommendations on real historical data.
+    drifting value. No transaction costs are modeled. The point is to
+    verify that the math-only system produces stable, profitable
+    recommendations on real historical data.
 
     Outputs (under ``out_dir``):
       - snapshots.csv (same schema as live data/snapshots.csv)
@@ -653,31 +577,6 @@ def backtest(
     if len(daily_dates) < 5:
         raise RuntimeError(f"only {len(daily_dates)} trading days in [{start.date()}, {end.date()}]")
 
-    # Time-varying wave views, if a wave_history file is given. At each
-    # rebalance we look up the most recent classification at or before
-    # that date, then map each ticker to its wave's stage. Tickers whose
-    # wave_bucket isn't classified yet (or whose wave is missing) get
-    # `neutral` (no tilt).
-    wh_df = None
-    if wave_history_path is not None:
-        wh_path_obj = Path(wave_history_path)
-        if wh_path_obj.exists():
-            wh_df = pd.read_csv(wh_path_obj, parse_dates=["date"])
-
-    def _wave_views_at(date: pd.Timestamp) -> dict[str, str] | None:
-        if wh_df is None:
-            return None
-        relevant = wh_df[wh_df["date"] <= date]
-        if relevant.empty:
-            return None
-        latest_date = relevant["date"].max()
-        latest = relevant[relevant["date"] == latest_date]
-        wave_to_stage = dict(zip(latest["wave"], latest["stage"]))
-        return {
-            t: wave_to_stage.get(TICKER_WAVE.get(t, "general_markets"), "neutral")
-            for t in tickers
-        }
-
     # Iterate. Friday = rebalance; every trading day = snapshot.
     snap_rows: list[dict[str, Any]] = []
     rec_rows: list[dict[str, Any]] = []
@@ -688,10 +587,7 @@ def backtest(
 
     for date in daily_dates:
         # Monthly rebalance cadence: fire on the first trading day of each
-        # month. Matches the live system's /review-portfolio cadence and the
-        # /review-portfolio-driven update of wave_history.csv (which has at
-        # most one row per month, so weekly rebalances between month-ends
-        # added no new wave information anyway).
+        # month. Matches the live system's /review-portfolio cadence.
         is_new_month = date.month != last_rebalance_month
         is_first_day = date == daily_dates[0]
 
@@ -705,7 +601,6 @@ def backtest(
             opt = optimize_portfolio(
                 returns, objective=objective, risk_free_rate=risk_free_rate,
                 max_weight=max_weight, risk_aversion=risk_aversion,
-                wave_views=_wave_views_at(date), tilt_schedule=tilt_schedule,
             )
             if not opt.get("success"):
                 continue
@@ -764,45 +659,6 @@ def backtest(
     rec_df = pd.DataFrame(rec_rows)
     snap_df.to_csv(out / "snapshots.csv", index=False)
     rec_df.to_csv(out / "recommendations.csv", index=False)
-
-    # No-tilts companion walk-forward: same monthly-rebalance loop but
-    # with wave_views=None at every rebalance, so the AI's per-month
-    # wave-stage classifications never enter μ. Lets the dashboard
-    # render an "AI tilt isolation" curve: gap to the main curve is the
-    # AI contribution; gap to buy-and-hold is the pure-math
-    # re-optimization contribution.
-    nt_totals: list[dict[str, Any]] = []
-    nt_shares: dict[str, float] | None = None
-    nt_last_month: int | None = None
-    for date in daily_dates:
-        is_new_month = date.month != nt_last_month
-        is_first_day = date == daily_dates[0]
-        if is_new_month or (is_first_day and nt_shares is None):
-            lookback_start = date - pd.Timedelta(days=365 * lookback_years)
-            slice_prices = full_prices.loc[lookback_start:date]
-            if len(slice_prices) < 30:
-                continue
-            returns = compute_returns(slice_prices)
-            nt_opt = optimize_portfolio(
-                returns, objective=objective, risk_free_rate=risk_free_rate,
-                max_weight=max_weight, risk_aversion=risk_aversion,
-                wave_views=None, tilt_schedule=tilt_schedule,
-            )
-            if not nt_opt.get("success"):
-                continue
-            nt_w = nt_opt["weights"]
-            nt_pv = (initial_usd if nt_shares is None
-                     else sum(nt_shares[t] * float(full_prices.loc[date, t]) for t in tickers))
-            nt_shares = {t: nt_w[t] * nt_pv / float(full_prices.loc[date, t]) for t in tickers}
-            nt_last_month = date.month
-        if nt_shares is not None:
-            nt_totals.append({
-                "date": str(date.date()),
-                "total_value": round(
-                    sum(nt_shares[t] * float(full_prices.loc[date, t]) for t in tickers), 2),
-            })
-    if nt_totals:
-        pd.DataFrame(nt_totals).to_csv(out / "no_tilts_totals.csv", index=False)
 
     # Summary metrics for the report.
     totals = snap_df.groupby("date")["total_value"].first().sort_index()
@@ -875,11 +731,9 @@ def backtest(
         f"flipped between two disjoint sets every week.)\n\n"
         f"## Caveats\n\n"
         f"- No transaction costs, taxes, or market-impact slippage.\n"
-        f"- No news, no wave-stage tilts. This is the cron `recommend` "
-        f"path's behavior, not `/review-portfolio`'s.\n"
-        f"- Look-ahead-bias-free: each Friday's optimizer sees only prices "
-        f"up to that Friday.\n"
-        f"- The 3-year lookback is the same window the live system uses, so "
+        f"- Look-ahead-bias-free: each rebalance's optimizer sees only prices "
+        f"up to that date.\n"
+        f"- The lookback window is the same one the live system uses, so "
         f"this backtest reflects how the live system would have decided.\n"
     )
     (out / "report.md").write_text(report)
@@ -905,7 +759,6 @@ def backtest(
                 snapshots_path=str(out / "snapshots.csv"),
                 recommendations_path=str(out / "recommendations.csv"),
                 out_path=path,
-                wave_history_path="data/wave_history.csv",
                 benchmarks=benchmarks,
                 nav_current=nav,
                 thesis_baseline_path=None,
@@ -927,177 +780,6 @@ def backtest(
         "weight_stability_l1": round(weight_stability, 4),
         "benchmark_returns": {b: round(r, 4) for b, r in benchmark_returns.items()},
         "dashboards_rendered": rendered,
-    }
-
-
-# ---------------------------------------------------------------------------
-# Wave-stage history. Appended each /review-portfolio run so the dashboard
-# can chart how each wave's stage classification evolves between rebalances.
-# ---------------------------------------------------------------------------
-
-# Stage rank used for the trajectory chart. Monotonic in cycle position so
-# a rising line means the wave is heating up; a falling line after the peak
-# row means digestion. neutral = 0 because general_markets tickers carry no
-# wave thesis and shouldn't visually bias the chart.
-WAVE_STAGE_RANK = {
-    "neutral":   0,
-    "buildup":   1,
-    "surge":     2,
-    "peak":      3,
-    "digestion": 4,
-}
-
-
-def append_wave_history(
-    wave_stages: dict[str, dict[str, Any]],
-    date: str,
-    out_path: str = "data/wave_history.csv",
-    force: bool = False,
-    seeded: bool = False,
-) -> dict[str, Any]:
-    """Append today's wave-stage classifications to wave_history.csv.
-
-    Schema: date, wave, stage, evidence_tickers, rationale, seeded.
-    `evidence_tickers` is semicolon-joined inside the cell so the file
-    stays a flat 2D CSV. `seeded` is True for synthetic backfill rows
-    (from `seed_wave_history`) and False for organic /review-portfolio
-    output. Idempotent on (date, wave): if rows already exist for
-    ``date``, the call is a no-op unless force=True (in which case
-    existing rows for that date are dropped first).
-    """
-    if not wave_stages:
-        return {"skipped": True, "reason": "wave_stages is empty"}
-    if not date:
-        raise ValueError("date is required")
-
-    o_path = Path(out_path)
-    existing = pd.read_csv(o_path) if o_path.exists() else None
-    if existing is not None and (existing["date"] == str(date)).any():
-        if not force:
-            return {"skipped": True, "date": str(date),
-                    "reason": "wave-history rows already exist for this date; pass force=True to overwrite"}
-        existing = existing[existing["date"] != str(date)]
-
-    rows = []
-    for wave, info in wave_stages.items():
-        rows.append({
-            "date": str(date),
-            "wave": wave,
-            "stage": info.get("stage", "neutral"),
-            "evidence_tickers": ";".join(info.get("evidence_tickers") or []),
-            "rationale": (info.get("rationale") or "").replace("\n", " ").strip(),
-            "seeded": bool(seeded),
-        })
-
-    new_rows = pd.DataFrame(rows)
-    out = pd.concat([existing, new_rows], ignore_index=True) if existing is not None else new_rows
-    o_path.parent.mkdir(parents=True, exist_ok=True)
-    out.to_csv(o_path, index=False)
-
-    return {
-        "date": str(date),
-        "waves": list(wave_stages.keys()),
-        "n_rows_appended": len(new_rows),
-        "out_path": str(o_path),
-    }
-
-
-# ---------------------------------------------------------------------------
-# Seeded historical wave-stage classifications. Used once on a fresh repo
-# to populate ~12 months of trajectory so the dashboard's chart 4 isn't
-# empty. These are post-hoc judgments grounded in real news flow over
-# 2025-2026 (AI revenue compounding mid-2025, humanoid surge late 2025,
-# nuclear-energy run-up Q4 2025 then digestion in Q1 2026, etc.).
-# Tagged seeded=True so they're distinguishable from organic /review-
-# portfolio output. Rationales are keyed by (wave, stage) and reused
-# across months in the same stage.
-# ---------------------------------------------------------------------------
-
-# Twelve end-of-month classifications, May 2025 through April 2026.
-# Each entry is (date, {wave: stage}).
-_SEEDED_MONTHLY_STAGES: list[tuple[str, dict[str, str]]] = [
-    ("2025-05-31", {"AI": "buildup", "rockets_spacecraft": "buildup", "robotics": "buildup", "engineered_biology": "buildup", "quantum": "buildup", "nuclear_fusion": "buildup", "general_markets": "neutral"}),
-    ("2025-06-30", {"AI": "surge",   "rockets_spacecraft": "buildup", "robotics": "buildup", "engineered_biology": "buildup", "quantum": "buildup", "nuclear_fusion": "buildup", "general_markets": "neutral"}),
-    ("2025-07-31", {"AI": "surge",   "rockets_spacecraft": "buildup", "robotics": "buildup", "engineered_biology": "buildup", "quantum": "buildup", "nuclear_fusion": "buildup", "general_markets": "neutral"}),
-    ("2025-08-31", {"AI": "surge",   "rockets_spacecraft": "buildup", "robotics": "buildup", "engineered_biology": "buildup", "quantum": "buildup", "nuclear_fusion": "buildup", "general_markets": "neutral"}),
-    ("2025-09-30", {"AI": "surge",   "rockets_spacecraft": "buildup", "robotics": "buildup", "engineered_biology": "buildup", "quantum": "buildup", "nuclear_fusion": "buildup", "general_markets": "neutral"}),
-    ("2025-10-31", {"AI": "surge",   "rockets_spacecraft": "buildup", "robotics": "surge",   "engineered_biology": "buildup", "quantum": "buildup", "nuclear_fusion": "surge",   "general_markets": "neutral"}),
-    ("2025-11-30", {"AI": "surge",   "rockets_spacecraft": "buildup", "robotics": "surge",   "engineered_biology": "buildup", "quantum": "buildup", "nuclear_fusion": "surge",   "general_markets": "neutral"}),
-    ("2025-12-31", {"AI": "surge",   "rockets_spacecraft": "buildup", "robotics": "surge",   "engineered_biology": "buildup", "quantum": "buildup", "nuclear_fusion": "surge",   "general_markets": "neutral"}),
-    ("2026-01-31", {"AI": "surge",   "rockets_spacecraft": "buildup", "robotics": "surge",   "engineered_biology": "buildup", "quantum": "surge",   "nuclear_fusion": "buildup", "general_markets": "neutral"}),
-    ("2026-02-28", {"AI": "surge",   "rockets_spacecraft": "buildup", "robotics": "surge",   "engineered_biology": "buildup", "quantum": "surge",   "nuclear_fusion": "buildup", "general_markets": "neutral"}),
-    ("2026-03-31", {"AI": "surge",   "rockets_spacecraft": "buildup", "robotics": "surge",   "engineered_biology": "buildup", "quantum": "surge",   "nuclear_fusion": "buildup", "general_markets": "neutral"}),
-    ("2026-04-30", {"AI": "surge",   "rockets_spacecraft": "buildup", "robotics": "surge",   "engineered_biology": "buildup", "quantum": "buildup", "nuclear_fusion": "buildup", "general_markets": "neutral"}),
-]
-
-# Rationale keyed by (wave, stage). Same text repeats across months in
-# the same stage. Phrased as a brief post-hoc summary, not pretending
-# to be a real-time classification.
-_SEEDED_RATIONALES: dict[tuple[str, str], str] = {
-    ("AI", "buildup"): "Pre-mid-2025: AI capex still primarily speculative; revenue compounding had not yet broadly shown up in hyperscaler results.",
-    ("AI", "surge"): "Mid-2025 onward: GOOGL Cloud, MSFT Azure, NVDA datacenter all growing 30-70% YoY; enterprise AI revenue compounding, hyperscalers competing to buy capacity.",
-    ("rockets_spacecraft", "buildup"): "RKLB Electron cadence growing throughout 2025 ($1.85B backlog by year-end); Neutron pre-launch the entire window. Real commercial revenue from a small base.",
-    ("robotics", "buildup"): "Industrial automation steady through mid-2025; humanoid programs raising capital but pre-deployment.",
-    ("robotics", "surge"): "Late-2025 onward: Tesla Optimus Fremont production announced for Q2 2026, Figure AI $700M raise, humanoid demos dominate CES 2026. Adoption beginning to catch up with hype.",
-    ("engineered_biology", "buildup"): "Gene-editing therapies clearing clinical milestones (Casgevy commercial; Intellia Phase 3 in vivo CRISPR April 2026), but ARKG ~80% below 2021 peak. Wave under-owned and cheap relative to scientific trajectory.",
-    ("quantum", "buildup"): "Hardware milestones (Willow, Majorana 1, IBM Chicago hub) but no commercial deployment at scale. QCR 2026 explicitly forecasts no commercial scale this year.",
-    ("quantum", "surge"): "Q1 2026 inflection: QTUM hit $4B AUM with 5-star Morningstar; +77% trailing year; March 20 rebalance toward hardware specialists. Quantinuum IPO catalyst flagged.",
-    ("nuclear_fusion", "buildup"): "Private investment growing, IEA 2030 first-plant target, regulatory frameworks being built. Pure-play fusion still pre-IPO.",
-    ("nuclear_fusion", "surge"): "Q4 2025 nuclear-energy run-up: NUKZ ran from ~$42 to $75 on AI-data-center electricity demand narrative (Meta 6.6 GW PPAs, Microsoft Three Mile Island). Adjacent, not pure fusion.",
-    ("general_markets", "neutral"): "AGG/BIL/IAU/VIG are macro instruments, no wave attachment. Always neutral by construction.",
-}
-
-
-def seed_wave_history(
-    out_path: str = "data/wave_history.csv",
-    force: bool = False,
-) -> dict[str, Any]:
-    """Backfill wave_history.csv with 12 months of post-hoc classifications.
-
-    Writes one row per (date, wave) for the 12 end-of-month dates in
-    `_SEEDED_MONTHLY_STAGES`, using rationales from `_SEEDED_RATIONALES`.
-    All rows are tagged `seeded=True`. Run once on a fresh repo so chart
-    4 (wave-stage trajectories) renders meaningfully before /review-
-    portfolio has had time to accumulate organic history.
-
-    Idempotent on date: if a date already exists in the CSV (organic or
-    seeded), the call skips it unless force=True.
-    """
-    o_path = Path(out_path)
-    existing = pd.read_csv(o_path) if o_path.exists() else None
-    existing_dates = set(existing["date"].astype(str)) if existing is not None else set()
-
-    rows = []
-    for date, stages in _SEEDED_MONTHLY_STAGES:
-        if date in existing_dates and not force:
-            continue
-        for wave, stage in stages.items():
-            rows.append({
-                "date": date,
-                "wave": wave,
-                "stage": stage,
-                "evidence_tickers": "",
-                "rationale": _SEEDED_RATIONALES.get((wave, stage), ""),
-                "seeded": True,
-            })
-
-    if not rows:
-        return {"skipped": True, "reason": "all seeded dates already present; pass force=True to overwrite"}
-
-    new_rows = pd.DataFrame(rows)
-    if force and existing is not None:
-        existing = existing[~existing["date"].astype(str).isin(
-            {d for d, _ in _SEEDED_MONTHLY_STAGES}
-        )]
-    out = pd.concat([existing, new_rows], ignore_index=True) if existing is not None else new_rows
-    out = out.sort_values(["date", "wave"]).reset_index(drop=True)
-    o_path.parent.mkdir(parents=True, exist_ok=True)
-    out.to_csv(o_path, index=False)
-
-    return {
-        "n_rows_appended": len(new_rows),
-        "n_dates": len({r["date"] for r in rows}),
-        "out_path": str(o_path),
     }
 
 
@@ -1387,7 +1069,6 @@ def build_dashboard(
     snapshots_path: str = "data/snapshots.csv",
     recommendations_path: str = "data/recommendations.csv",
     out_path: str = "docs/index.html",
-    wave_history_path: str = "data/wave_history.csv",
     benchmarks: list[str] | None = None,
     nav_current: str | None = None,
     thesis_baseline_path: str | None = "data/thesis_baseline.json",
@@ -1408,7 +1089,6 @@ def build_dashboard(
 
     snap_path = Path(snapshots_path)
     rec_path = Path(recommendations_path)
-    wh_path = Path(wave_history_path)
     if not snap_path.exists() and not rec_path.exists():
         raise FileNotFoundError(
             f"neither {snap_path} nor {rec_path} exists; run snapshot/recommend first"
@@ -1420,29 +1100,17 @@ def build_dashboard(
     # and skips chart 6 — a backtest has no "most recent /review-portfolio"
     # anchor in the live sense, so the chart is meaningless there.
     is_live = thesis_baseline_path is not None and Path(thesis_baseline_path).exists()
-    # Backtest dashboards get an AI-lift chart (= portfolio$ / no-tilts$)
-    # inserted as row 2 when the no-tilts companion series exists on
-    # disk. Live dashboards don't (live state hasn't been replayed
-    # without AI tilts).
-    has_ai_lift = (not is_live) and (snap_path.parent / "no_tilts_totals.csv").exists()
 
-    # Row layout: charts shift down by 1 when AI-lift is inserted.
+    # Row layout.
     R_PORTFOLIO       = 1
-    R_AI_LIFT         = 2 if has_ai_lift else None
-    _shift            = 1 if has_ai_lift else 0
-    R_TURNOVER        = 2 + _shift
-    R_REC_WAVE        = 3 + _shift
-    R_LATEST_WEIGHTS  = 4 + _shift
-    R_GAIN_INIT       = 5 + _shift
-    R_GAIN_REVIEW     = (6 + _shift) if is_live else None
-    R_WAVE_STAGE      = (7 + _shift) if is_live else (6 + _shift)
-    # Articles-per-wave chart is live-only; backtest reads as-of-date
-    # news but the chart adds little signal there (12 monthly snapshots,
-    # no live evolution to track).
-    R_ARTICLES        = (R_WAVE_STAGE + 1) if is_live else None
-    _after_articles   = R_WAVE_STAGE + (2 if is_live else 1)
-    R_ASSET_USD       = _after_articles
-    R_WAVE_USD        = _after_articles + 1
+    R_TURNOVER        = 2
+    R_REC_WAVE        = 3
+    R_LATEST_WEIGHTS  = 4
+    R_GAIN_INIT       = 5
+    R_GAIN_REVIEW     = 6 if is_live else None
+    _after_gain       = 7 if is_live else 6
+    R_ASSET_USD       = _after_gain
+    R_WAVE_USD        = _after_gain + 1
     n_rows            = R_WAVE_USD
 
     _chart5_anchor = "/initialize-portfolio executed" if is_live else "backtest start"
@@ -1454,20 +1122,10 @@ def build_dashboard(
 
     # Build the title list in row order, numbering as we go.
     titles_list: list[str] = []
-    _chart1_extra = (
-        "<br>monthly rebalance (no AI tilt) re-runs the optimizer each month with all wave-stage multipliers set to 1.0, so the LLM's news-driven tilts never enter μ."
-        if has_ai_lift else ""
-    )
     titles_list.append(
         f"{R_PORTFOLIO}. Portfolio value over time"
-        "<br><sub><i>Σ(actual shares × close price) per day."
-        f"{_chart1_extra}</i></sub>"
+        "<br><sub><i>Σ(actual shares × close price) per day.</i></sub>"
     )
-    if R_AI_LIFT is not None:
-        titles_list.append(
-            f"{R_AI_LIFT}. AI lift = portfolio $ / monthly rebalance (no AI tilt)"
-            "<br><sub><i>Ratio of the with-tilt portfolio value to the no-AI-tilt counterpart at each business day.</i></sub>"
-        )
     titles_list.append(
         f"{R_TURNOVER}. Rebalance turnover (% of portfolio dollars that changed holdings)"
         "<br><sub><i>At each rebalance, ½·||Δw||₁ — half the L1 distance between consecutive weight vectors. Equals the fraction of portfolio value that moved between tickers."
@@ -1493,16 +1151,6 @@ def build_dashboard(
             "<br>Shows how the current allocation has performed since the latest optimizer fire.</i></sub>"
         )
     titles_list.append(
-        f"{R_WAVE_STAGE}. Wave-stage trajectories (0=neutral, 1=buildup, 2=surge, 3=peak, 4=digestion)"
-        "<br><sub><i>How the news-researcher classified each wave's cycle stage. Forward-filled across the snapshot window so each business day shows the most-recent-at-or-before classification."
-        "<br>Right axis shows the tilt multiplier applied to that wave's tickers' expected returns.</i></sub>"
-    )
-    if R_ARTICLES is not None:
-        titles_list.append(
-            f"{R_ARTICLES}. Articles harvested per wave over time"
-            "<br><sub><i>Bullet count per wave per /review-portfolio run, from the archived news payloads. Forward-filled across the window so the latest count holds until the next /review-portfolio refreshes the payload.</i></sub>"
-        )
-    titles_list.append(
         f"{R_ASSET_USD}. Actual portfolio $ by asset class over time"
         "<br><sub><i>Your real holdings (from holdings.csv × close prices), grouped by asset class. Sums to total portfolio value (chart 1). Log y-axis keeps small allocations visible.</i></sub>"
     )
@@ -1512,24 +1160,17 @@ def build_dashboard(
     )
     titles_all = tuple(titles_list)
 
-    specs = [[{}] for _ in range(n_rows)]
-    specs[R_WAVE_STAGE - 1] = [{"secondary_y": True}]
-
     fig = make_subplots(
         rows=n_rows, cols=1,
         subplot_titles=titles_all,
         vertical_spacing=0.06,
-        specs=specs,
     )
 
     # Compute a shared x-axis range from the daily-cadence data
     # (snapshots.csv min/max) and pad each end by a fixed fraction so
     # data points don't sit flush against the axis edges. Applied to
     # every time-series subplot on both the live and backtest dashboards
-    # so the charts align visually even when sparser data sources
-    # (wave_history.csv updates on /review-portfolio cadence;
-    # data/news/ accumulates one file per /review-portfolio) extend
-    # beyond the snapshots range. No hardcoded dates: the range rolls
+    # so the charts align visually. No hardcoded dates: the range rolls
     # forward each business day as the cron appends new snapshots.
     xrange: tuple[pd.Timestamp, pd.Timestamp] | None = None
     latest_snap_date: pd.Timestamp | None = None
@@ -1632,39 +1273,6 @@ def build_dashboard(
                            legend="legend"),
                 row=1, col=1,
             )
-            # AI-tilt isolation: monthly-rebalance walk-forward with
-            # wave_views=None. Written by backtest() to no_tilts_totals.csv.
-            # Gap between the main portfolio line and this curve is the
-            # AI tilt contribution; gap between this curve and buy-and-hold
-            # is the pure-math re-optimization contribution.
-            nt_path = snap_path.parent / "no_tilts_totals.csv"
-            if nt_path.exists():
-                nt = pd.read_csv(nt_path, parse_dates=["date"]).set_index("date")["total_value"]
-                fig.add_trace(
-                    go.Scatter(x=nt.index, y=nt.values, mode="lines",
-                               name="monthly rebalance (no AI tilt)",
-                               line={"width": 1.5, "color": "#9467bd", "dash": "dot"},
-                               legend="legend"),
-                    row=R_PORTFOLIO, col=1,
-                )
-                # AI-lift ratio chart (row 2 in backtest mode): main
-                # portfolio $ divided by no-tilt portfolio $, at each
-                # business day. > 1.0 means the LLM's wave-stage tilts
-                # added value; < 1.0 means they cost value.
-                if R_AI_LIFT is not None:
-                    common = totals.index.intersection(nt.index)
-                    if len(common) > 0:
-                        ratio = totals.loc[common] / nt.loc[common]
-                        fig.add_trace(
-                            go.Scatter(x=ratio.index, y=ratio.values, mode="lines",
-                                       name="AI lift",
-                                       line={"width": 2, "color": "#9467bd"},
-                                       showlegend=False,
-                                       hovertemplate="%{x|%Y-%m-%d}<br>%{y:.3f}×<extra></extra>"),
-                            row=R_AI_LIFT, col=1,
-                        )
-                        fig.add_hline(y=1.0, line_dash="dot", line_width=1,
-                                      line_color="#888", row=R_AI_LIFT, col=1)
 
     # 2. Recommended portfolio % segregated by wave, versus time.
     # Sum each wave's tickers' weights into one line per wave so the
@@ -1869,114 +1477,6 @@ def build_dashboard(
                 )
             )
 
-    # 7. Wave-stage trajectories (one line per wave, from wave_history.csv).
-    # Forward-filled across the snapshot window so each business day
-    # carries the most-recent-at-or-before classification, even though
-    # wave_history.csv itself only updates on /review-portfolio cadence.
-    # Produces a step-function trace per wave that's visible across the
-    # whole window instead of degenerating to single dots on the few
-    # actual classification dates.
-    if wh_path.exists() and xrange is not None:
-        wh_full = pd.read_csv(wh_path, parse_dates=["date"])
-        # Snapshot dates anchor the x-axis. Use unique trading days
-        # in the snapshot window.
-        if snap_path.exists():
-            snap_dates = pd.read_csv(snap_path, parse_dates=["date"])["date"].drop_duplicates().sort_values()
-            window_dates = snap_dates[(snap_dates >= xrange[0]) & (snap_dates <= xrange[1])]
-        else:
-            window_dates = pd.Series(dtype="datetime64[ns]")
-        # Order legend by display priority so AI is at the top, general_markets last.
-        ordered = sorted(
-            wh_full["wave"].unique(),
-            key=lambda w: _WAVE_DISPLAY_ORDER.index(w) if w in _WAVE_DISPLAY_ORDER else 99,
-        )
-        # Per-wave vertical offset so multiple waves at the same stage
-        # rank don't render on top of each other. Cosmetic only; hover
-        # shows the actual stage label.
-        wh_offset_step = 0.05  # in stage-rank units (0..4)
-        for i, wave in enumerate(ordered):
-            wave_history = (wh_full[wh_full["wave"] == wave]
-                            .sort_values("date")
-                            .set_index("date"))
-            if window_dates.empty or wave_history.empty:
-                continue
-            # For each business day in the window, look up the most
-            # recent classification at or before that day.
-            ff = wave_history.reindex(pd.DatetimeIndex(window_dates), method="ffill").dropna(subset=["stage"])
-            if ff.empty:
-                continue
-            ff = ff.reset_index().rename(columns={"index": "date"})
-            ff["stage_rank"] = ff["stage"].map(WAVE_STAGE_RANK).fillna(0).astype(int)
-            sub = ff
-            offset = i * wh_offset_step
-            # Hover shows the actual stage label, not just the rank.
-            wave_label = WAVE_DISPLAY_LABEL.get(wave, wave)
-            hover = [f"{wave_label}<br>stage: {s}<br>tickers: {t}"
-                     for s, t in zip(sub["stage"], sub["evidence_tickers"].fillna(""))]
-            fig.add_trace(
-                go.Scatter(x=sub["date"], y=sub["stage_rank"] + offset,
-                           mode=_ts_mode,
-                           name=wave_label, legend="legend6",
-                           line={"color": WAVE_COLORS.get(wave)},
-                           hovertext=hover, hoverinfo="text+x"),
-                row=R_WAVE_STAGE, col=1,
-            )
-
-    # Articles-per-wave chart: live-only. Reads each archived
-    # data/news/<date>-news.json file and counts bullets per wave_bucket.
-    # Answers "is the wave-stage classification (above) backed by lots
-    # of evidence on each date?"
-    news_dir = Path("data/news")
-    if R_ARTICLES is not None and news_dir.is_dir():
-        article_rows: list[dict[str, Any]] = []
-        for f in sorted(news_dir.glob("*-news.json")):
-            try:
-                payload = json.loads(f.read_text())
-            except (OSError, json.JSONDecodeError):
-                continue
-            d = payload.get("date")
-            if not d:
-                continue
-            counts: dict[str, int] = {}
-            for ticker_info in (payload.get("per_ticker") or {}).values():
-                wave = ticker_info.get("wave_bucket", "general_markets")
-                # Normalize legacy synthetic_biology label so the chart
-                # legend doesn't split into two near-identical lines.
-                if wave == "synthetic_biology":
-                    wave = "engineered_biology"
-                counts[wave] = counts.get(wave, 0) + len(ticker_info.get("bullets") or [])
-            for wave, n in counts.items():
-                article_rows.append({"date": pd.Timestamp(d), "wave": wave, "count": n})
-        if article_rows:
-            adf = pd.DataFrame(article_rows)
-            if xrange is not None:
-                adf = adf[(adf["date"] >= xrange[0]) & (adf["date"] <= xrange[1])]
-            for wave in [w for w in _WAVE_DISPLAY_ORDER if w in adf["wave"].unique()]:
-                sub = adf[adf["wave"] == wave].sort_values("date")
-                # Extend the most recent bullet count horizontally to
-                # the right edge of the window so the chart spans the
-                # full snapshot range. Markers stay only at real
-                # /review-portfolio dates.
-                xs = list(sub["date"])
-                ys = list(sub["count"])
-                if latest_snap_date is not None and xs and xs[-1] < latest_snap_date:
-                    xs.append(latest_snap_date)
-                    ys.append(ys[-1])
-                fig.add_trace(
-                    go.Scatter(x=xs, y=ys, mode="lines",
-                               name=WAVE_DISPLAY_LABEL.get(wave, wave),
-                               legend="legend4",
-                               line={"color": WAVE_COLORS.get(wave)}),
-                    row=R_ARTICLES, col=1,
-                )
-                fig.add_trace(
-                    go.Scatter(x=sub["date"], y=sub["count"], mode="markers",
-                               name=f"{WAVE_DISPLAY_LABEL.get(wave, wave)} mark", legend="legend4",
-                               marker={"color": WAVE_COLORS.get(wave), "size": 7},
-                               hoverinfo="skip", showlegend=False),
-                    row=R_ARTICLES, col=1,
-                )
-
     # 7. $ by asset class over time and 8. $ by wave over time. Both
     # roll up the per-ticker per-day $ values from snapshots.csv. Each
     # ticker contributes to exactly one bucket in each chart, so the sum
@@ -2138,20 +1638,6 @@ def build_dashboard(
             xref="paper", x=1.02,
             yref="paper", y=_row_top(R_LATEST_WEIGHTS), yanchor="top",
         ),
-        # Wave-stage chart has a secondary y-axis on the right; push this
-        # legend further out (x=1.06) to clear that axis.
-        legend6=dict(
-            title_text="Wave stages",
-            xref="paper", x=1.06,
-            yref="paper", y=_row_top(R_WAVE_STAGE), yanchor="top",
-        ),
-        legend4=dict(
-            title_text="Articles per wave",
-            xref="paper", x=1.02,
-            yref="paper",
-            y=_row_top(R_ARTICLES) if R_ARTICLES is not None else 0.0,
-            yanchor="top",
-        ),
         legend2=dict(
             title_text="Asset class $",
             xref="paper", x=1.02,
@@ -2164,8 +1650,6 @@ def build_dashboard(
         ),
     )
     fig.update_yaxes(title_text="$", row=R_PORTFOLIO, col=1)
-    if R_AI_LIFT is not None:
-        fig.update_yaxes(title_text="ratio", row=R_AI_LIFT, col=1)
     fig.update_yaxes(title_text="portfolio %", row=R_REC_WAVE, col=1, tickformat=".0%")
     fig.update_yaxes(title_text="portfolio %", row=R_LATEST_WEIGHTS, col=1, tickformat=".0%")
     fig.update_yaxes(title_text="$ gain", row=R_GAIN_INIT, col=1, zeroline=True,
@@ -2173,38 +1657,6 @@ def build_dashboard(
     if R_GAIN_REVIEW is not None:
         fig.update_yaxes(title_text="$ gain", row=R_GAIN_REVIEW, col=1, zeroline=True,
                          zerolinewidth=1, zerolinecolor="#888")
-    # Chart 5: y-axis ticks show stage names alongside the numeric rank
-    # so a reader can read the trajectory directly without remembering
-    # 0=neutral, 1=buildup, 2=surge, etc.
-    rank_to_stage = {v: k for k, v in WAVE_STAGE_RANK.items()}
-    stage_ticktext = [f"{r} {rank_to_stage.get(r, '')}" for r in range(5)]
-    fig.update_yaxes(title_text="stage", row=R_WAVE_STAGE, col=1, secondary_y=False,
-                     range=[-0.3, 4.3],
-                     tickmode="array",
-                     tickvals=list(range(5)),
-                     ticktext=stage_ticktext)
-    # Right-side y-axis: the wave_stage_tilts multiplier for each rank,
-    # loaded from the profile's financial_model section (falls back to
-    # the WAVE_STAGE_TILT defaults). Same range and tickvals as the
-    # primary y-axis so the rows line up. (No-op on the backtest
-    # dashboard, which has no wave_history.csv input — chart 5 has no
-    # primary traces there, so the secondary axis renders empty.)
-    try:
-        _tilts = load_financial_model()["wave_stage_tilts"]
-    except Exception:  # noqa: BLE001 — profile is optional; fall back to defaults
-        _tilts = WAVE_STAGE_TILT
-    multiplier_ticktext = [
-        f"×{_tilts.get(rank_to_stage.get(r, ''), 1.0):.2f}" for r in range(5)
-    ]
-    fig.update_yaxes(title_text="tilt", row=R_WAVE_STAGE, col=1, secondary_y=True,
-                     range=[-0.3, 4.3],
-                     tickmode="array",
-                     tickvals=list(range(5)),
-                     ticktext=multiplier_ticktext,
-                     showgrid=False,
-                     automargin=True)
-    if R_ARTICLES is not None:
-        fig.update_yaxes(title_text="articles", row=R_ARTICLES, col=1, rangemode="tozero")
     fig.update_yaxes(title_text="$ (log)", row=R_ASSET_USD, col=1, type="log")
     # Log scale on chart 8 so small wave allocations (e.g., zero-weighted
     # robotics/biology lines hovering near a few hundred dollars) don't
@@ -2214,18 +1666,12 @@ def build_dashboard(
 
     # Apply the padded snapshots-derived range to every time-series
     # subplot so data points don't sit flush against the axis edges
-    # and all 6 time-series charts share the same visual window even
-    # when wave_history (chart 5) and articles (chart 6) update on
-    # /review-portfolio cadence rather than daily. Charts 3 (latest
-    # weights) and 4 (gain bars) are bar charts with categorical
+    # and all time-series charts share the same visual window. Charts 3
+    # (latest weights) and 4 (gain bars) are bar charts with categorical
     # x-axes so the range setter is a no-op there.
     if xrange is not None:
         xrange_rows = [R_PORTFOLIO, R_TURNOVER, R_REC_WAVE,
-                       R_WAVE_STAGE, R_ASSET_USD, R_WAVE_USD]
-        if R_AI_LIFT is not None:
-            xrange_rows.append(R_AI_LIFT)
-        if R_ARTICLES is not None:
-            xrange_rows.append(R_ARTICLES)
+                       R_ASSET_USD, R_WAVE_USD]
         for r in xrange_rows:
             fig.update_xaxes(range=list(xrange), row=r, col=1)
 
@@ -2251,7 +1697,6 @@ def build_dashboard(
         "out_path": str(o_path),
         "snapshots_rows": int(len(pd.read_csv(snap_path))) if snap_path.exists() else 0,
         "recommendations_rows": int(len(pd.read_csv(rec_path))) if rec_path.exists() else 0,
-        "wave_history_rows": int(len(pd.read_csv(wh_path))) if wh_path.exists() else 0,
         "benchmarks_overlaid": list(benchmark_curves.keys()),
     }
 
