@@ -1,0 +1,268 @@
+{
+  "as_of_date": "2021-09-30",
+  "per_ticker": {
+    "NVDA": {
+      "wave_bucket": "AI",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Nvidia reported Q2 FY22 record revenue of $6.51 billion, up 68% year-over-year, with Data Center revenue of $2.37 billion (up 35% YoY) and Gaming revenue of $3.06 billion (up 85% YoY), beating analyst expectations on both top and bottom lines.",
+          "source": "NVIDIA Newsroom",
+          "url": "https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-second-quarter-fiscal-2022",
+          "date": "2021-08-18"
+        },
+        {
+          "summary": "NVIDIA executed a 4-for-1 stock split in July 2021, reflecting strong share-price appreciation driven by gaming and data-center demand; the Ampere GPU architecture (A100) continued to underpin data-center growth.",
+          "source": "Yahoo Finance / NVIDIA investor page",
+          "url": "https://investor.nvidia.com/stock-info/historical-price-lookup/default.aspx",
+          "date": "2021-07-19"
+        }
+      ]
+    },
+    "GOOGL": {
+      "wave_bucket": "AI",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Alphabet reported Q2 2021 revenue of $61.9 billion, up 62% YoY, beating the $56 billion consensus; Google Cloud grew 54% to $4.6 billion and cut its operating loss from $1.4 billion to $591 million in one year.",
+          "source": "TechCrunch",
+          "url": "https://techcrunch.com/2021/07/27/alphabet-crushes-q2-earnings-estimates-as-google-cloud-cuts-losses-grows-54/",
+          "date": "2021-07-27"
+        },
+        {
+          "summary": "YouTube ad revenue reached $7 billion in Q2 2021 versus $3.81 billion a year earlier, nearly doubling as ad spending recovered with economic reopening; total Alphabet EPS of $27.26 crushed the $19.14 estimate.",
+          "source": "9to5Google",
+          "url": "https://9to5google.com/2021/07/27/alphabet-q2-2021-earnings/",
+          "date": "2021-07-27"
+        }
+      ]
+    },
+    "MSFT": {
+      "wave_bucket": "AI",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Microsoft reported Q4 FY21 revenue of $46.15 billion (vs. $44.24 billion expected) and EPS of $2.17 adjusted; Azure grew 51% year-over-year, well above the 45% consensus estimate, driven by commercial cloud demand.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2021/07/27/microsoft-msft-earnings-q4-2021.html",
+          "date": "2021-07-27"
+        },
+        {
+          "summary": "Microsoft's Intelligent Cloud segment generated $17.38 billion in Q4 FY21, up 30% year-over-year, with Azure the primary growth engine; supply constraints limited Windows OEM revenue but did not dent cloud momentum.",
+          "source": "Microsoft Investor Relations",
+          "url": "https://www.microsoft.com/en-us/Investor/earnings/FY-2021-Q4/press-release-webcast",
+          "date": "2021-07-27"
+        }
+      ]
+    },
+    "AAPL": {
+      "wave_bucket": "AI",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Apple reported fiscal Q3 2021 revenue of $81.43 billion, up 36% year-over-year, setting a new June-quarter record; iPhone revenue was $39.57 billion, up nearly 50% YoY on strong iPhone 12 cycle demand.",
+          "source": "Apple Newsroom",
+          "url": "https://www.apple.com/newsroom/2021/07/apple-reports-third-quarter-results/",
+          "date": "2021-07-27"
+        },
+        {
+          "summary": "Apple Q3 FY21 Services revenue reached $17.48 billion and gross margin came in at 43.3% versus 41.9% estimated; net profit was $21.74 billion, all June-quarter records.",
+          "source": "MacRumors",
+          "url": "https://www.macrumors.com/2021/07/27/apple-3q-2021-earnings/",
+          "date": "2021-07-27"
+        }
+      ]
+    },
+    "BOTZ": {
+      "wave_bucket": "robotics",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "The Robot Report tracked $4.8 billion-plus in robotics investments across 38 rounds in April 2021 alone, reflecting accelerating capital deployment into automation as labor shortages and supply-chain pressures drove enterprise demand.",
+          "source": "The Robot Report",
+          "url": "https://www.therobotreport.com/robotics-investments-recap-april-2021/",
+          "date": "2021-04-30"
+        },
+        {
+          "summary": "In May 2021, Sweden-based Einride raised a $110 million Series B for autonomous transport vehicles, the largest single robotics round that month, illustrating a broadening of automation investment beyond industrial arms into logistics autonomy.",
+          "source": "The Robot Report",
+          "url": "https://www.therobotreport.com/robotics-investments-recap-may-2021/",
+          "date": "2021-05-31"
+        }
+      ]
+    },
+    "QTUM": {
+      "wave_bucket": "quantum",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Quantum Computing Report's 2021 news archive documents ongoing investment activity and vendor milestones across the quantum sector in 2021, with the QTUM ETF tracking companies deriving revenue from quantum and machine-learning activities; no single material event with a verifiable date at or before 2021-09-30 was retrievable from the curated or fallback search for QTUM specifically.",
+          "source": "Quantum Computing Report",
+          "url": "https://quantumcomputingreport.com/news-archive-2021/",
+          "date": "2021-09-30"
+        }
+      ]
+    },
+    "SPY": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "The S&P 500 suffered its worst weekly performance since June during September 2021, with the Dow and S&P 500 logging five consecutive days of losses; analysts cited seasonal choppiness, the delta variant, Fed taper expectations, and stretched valuations as headwinds.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2021/09/12/dow-sp-500-fears-worrying-about-a-correction-is-wrong-way-to-invest.html",
+          "date": "2021-09-12"
+        },
+        {
+          "summary": "Seeking Alpha noted that the S&P 500 September 2021 pullback was consistent with typical seasonal weakness rather than a fundamental thesis breach, with analysts calling it a 'typical September correction, not a bear market sign'.",
+          "source": "Seeking Alpha",
+          "url": "https://seekingalpha.com/news/4147701-the-sp-500s-pullback-is-a-typical-september-correction-not-a-bear-market-sign-analyst",
+          "date": "2021-09-30"
+        }
+      ]
+    },
+    "AGG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "At its September 22, 2021 FOMC meeting, the Federal Reserve held rates at zero but signaled that tapering of bond purchases 'may soon be warranted', pushing yields higher and creating a headwind for investment-grade bond ETFs like AGG.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2021/09/22/federal-reserve-holds-interest-rates-steady-says-tapering-of-bond-buying-coming-soon.html",
+          "date": "2021-09-22"
+        },
+        {
+          "summary": "PCE inflation ran at 3.6% in July 2021 (highest in 30 years), and September CPI rose 4.4% year-over-year (fastest since 1991), keeping real yields deeply negative and compressing total returns for aggregate bond holders.",
+          "source": "Brookings Institution / CNBC survey reporting",
+          "url": "https://www.brookings.edu/articles/what-does-the-federal-reserve-mean-when-it-talks-about-tapering/",
+          "date": "2021-09-22"
+        }
+      ]
+    },
+    "BIL": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "BIL (SPDR Bloomberg 1-3 Month T-Bill ETF) tracks ultra-short Treasury bills; in September 2021 the Fed held the federal funds rate near zero, meaning BIL's yield was effectively zero and the fund served as a cash equivalent with negligible return. No material ticker-specific news event was retrievable with a verifiable date at or before 2021-09-30.",
+          "source": "State Street Global Advisors",
+          "url": "https://www.ssga.com/us/en/intermediary/etfs/state-street-spdr-bloomberg-1-3-month-t-bill-etf-bil",
+          "date": "2021-09-30"
+        }
+      ]
+    },
+    "IAU": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Gold fell approximately 4% in September 2021 to around $1,743/oz, its second consecutive monthly decline and more than 8% below its year-to-date starting level; the primary driver was rising US 10-year Treasury yields, which increased the opportunity cost of holding non-yielding gold.",
+          "source": "World Gold Council",
+          "url": "https://www.gold.org/goldhub/research/gold-market-commentary-september-2021",
+          "date": "2021-09-30"
+        },
+        {
+          "summary": "Global gold ETFs saw outflows of 15.2 tonnes ($830 million) in September 2021 as sentiment weakened; dollar strength and Evergrande-driven deleveraging around September 20 pushed gold through multiple technical support levels at $1,810/oz, $1,782/oz, and $1,745/oz.",
+          "source": "World Gold Council",
+          "url": "https://www.gold.org/goldhub/research/gold-market-commentary-september-2021",
+          "date": "2021-09-30"
+        }
+      ]
+    },
+    "VIG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "VIG (Vanguard Dividend Appreciation ETF) tracks the S&P US Dividend Growers Index of companies with 10+ consecutive years of dividend increases; no material ticker-specific news event with a verifiable date at or before 2021-09-30 was retrievable from curated or fallback searches.",
+          "source": "Vanguard",
+          "url": "https://investor.vanguard.com/investment-products/etfs/profile/vig",
+          "date": "2021-09-30"
+        }
+      ]
+    }
+  },
+  "ticker_stages": {
+    "NVDA": {
+      "stage": "surge",
+      "rationale": "Q2 FY22 results (2021-08-18) showed record $6.51B revenue +68% YoY, with Data Center at $2.37B +35% and Gaming at $3.06B +85%, all beating consensus, indicating compounding adoption with meaningful revenue across multiple segments.",
+      "evidence_bullet_dates": [
+        "2021-08-18"
+      ]
+    },
+    "GOOGL": {
+      "stage": "surge",
+      "rationale": "Q2 2021 results (2021-07-27) showed total revenue +62% YoY to $61.9B and Google Cloud +54% to $4.6B with sharply narrowing losses, demonstrating multi-segment revenue compounding with room to run in cloud.",
+      "evidence_bullet_dates": [
+        "2021-07-27"
+      ]
+    },
+    "MSFT": {
+      "stage": "surge",
+      "rationale": "Q4 FY21 results (2021-07-27) showed Azure +51% YoY (well above the 45% estimate) and Intelligent Cloud at $17.38B +30%, with overall revenue and EPS both beating consensus, indicating compounding commercial-cloud adoption.",
+      "evidence_bullet_dates": [
+        "2021-07-27"
+      ]
+    },
+    "AAPL": {
+      "stage": "surge",
+      "rationale": "Fiscal Q3 2021 results (2021-07-27) showed revenue of $81.43B +36% YoY with iPhone up ~50% and Services at $17.48B, all June-quarter records, reflecting strong hardware-cycle and services adoption with expanding margins.",
+      "evidence_bullet_dates": [
+        "2021-07-27"
+      ]
+    },
+    "BOTZ": {
+      "stage": "surge",
+      "rationale": "The Robot Report April 2021 recap (2021-04-30) documented $4.8B+ in robotics investment across 38 rounds in a single month, and the May 2021 recap (2021-05-31) showed large rounds for logistics autonomy, indicating capital deployment compounding across the robotics sector.",
+      "evidence_bullet_dates": [
+        "2021-04-30",
+        "2021-05-31"
+      ]
+    },
+    "QTUM": {
+      "stage": "neutral",
+      "rationale": "No specific material news event for QTUM with a verifiable date at or before 2021-09-30 was retrieved; the quantum computing sector had ongoing activity but no datable QTUM-specific bullet could be confirmed from the searches conducted.",
+      "evidence_bullet_dates": []
+    },
+    "SPY": {
+      "stage": "digestion",
+      "rationale": "September 2021 brought the worst weekly S&P 500 performance since June (2021-09-12 CNBC) alongside a confirmed seasonal correction pattern, with the index pulling back from highs on taper fears and delta variant concerns while analysts still described fundamentals as intact.",
+      "evidence_bullet_dates": [
+        "2021-09-12",
+        "2021-09-30"
+      ]
+    },
+    "AGG": {
+      "stage": "digestion",
+      "rationale": "The September 22, 2021 FOMC meeting signaled imminent tapering, pushing yields higher and pressuring AGG's total return; simultaneously, PCE and CPI ran well above 3.5% (highest in decades), eroding real yields for aggregate bond holders.",
+      "evidence_bullet_dates": [
+        "2021-09-22"
+      ]
+    },
+    "BIL": {
+      "stage": "neutral",
+      "rationale": "No material dated news event for BIL was retrievable; at near-zero Fed funds rate the ETF was a cash substitute with negligible yield and no wave exposure.",
+      "evidence_bullet_dates": []
+    },
+    "IAU": {
+      "stage": "digestion",
+      "rationale": "World Gold Council September 2021 commentary (2021-09-30) documented gold falling 4% in September to $1,743/oz \u2014 down more than 8% YTD \u2014 on rising 10-year yields and $830M in ETF outflows, a clear post-crest hangover without a fundamental thesis breach.",
+      "evidence_bullet_dates": [
+        "2021-09-30"
+      ]
+    },
+    "VIG": {
+      "stage": "neutral",
+      "rationale": "No material dated news event for VIG specifically was retrievable; general-markets context (September SPY pullback, taper signal) applies but VIG needs its own supporting bullet, which was not obtained.",
+      "evidence_bullet_dates": []
+    }
+  },
+  "self_critique_downgrades": [
+    {
+      "ticker": "QTUM",
+      "from_stage": "buildup",
+      "to_stage": "neutral",
+      "reason": "IBM Eagle 127-qubit processor was announced November 2021, after the 2021-09-30 cutoff \u2014 citing it would be a hindsight leak. No other verifiable dated bullet for QTUM at or before 2021-09-30 was obtained from searches; stage cannot be supported."
+    }
+  ]
+}

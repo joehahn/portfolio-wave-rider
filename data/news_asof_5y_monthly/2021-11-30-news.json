@@ -1,0 +1,256 @@
+{
+  "as_of_date": "2021-11-30",
+  "per_ticker": {
+    "NVDA": {
+      "wave_bucket": "AI",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "NVIDIA reported Q3 FY2022 (quarter ended Oct 31, 2021) record revenue of $7.10B, up 50% year-over-year, with Data Center revenue of $2.94B (+55% YoY) and Gaming revenue of $3.22B (+42% YoY); non-GAAP EPS of $1.17 rose 60% YoY.",
+          "source": "NVIDIA Newsroom",
+          "url": "https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-third-quarter-fiscal-2022",
+          "date": "2021-11-17"
+        },
+        {
+          "summary": "SemiAnalysis noted in May 2021 that Nvidia beat earnings on the back of Data Center and Gaming, pulling in $5.66B in Q1 FY2022 and guiding for $6.3B in Q2, while questioning whether crypto-driven demand was inflating near-term results.",
+          "source": "SemiAnalysis",
+          "url": "https://semianalysis.com/2021/05/27/nvidia-is-raking-in-the-money-but/",
+          "date": "2021-05-27"
+        }
+      ]
+    },
+    "MSFT": {
+      "wave_bucket": "AI",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Microsoft Q1 FY2022 earnings (Oct 26, 2021): total revenue $45.3B; Azure and other cloud services grew 50% year-over-year in constant currency, accelerating from 45% in the prior quarter; Intelligent Cloud segment revenue $16.96B (+31% YoY).",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/amp/2021/10/26/microsoft-msft-earnings-q1-2022.html",
+          "date": "2021-10-26"
+        },
+        {
+          "summary": "Microsoft FY22 Q1 press release confirmed Azure growth of 50% year-over-year (48% constant currency), beating analyst consensus of approximately 45%, driven by commercial cloud demand.",
+          "source": "Microsoft Investor Relations",
+          "url": "https://www.microsoft.com/en-us/investor/earnings/fy-2022-q1/press-release-webcast",
+          "date": "2021-10-26"
+        }
+      ]
+    },
+    "GOOGL": {
+      "wave_bucket": "AI",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Alphabet Q3 2021 earnings (Oct 26, 2021): total revenue $65.1B (+41% YoY); Google Cloud revenue $4.99B (+45% YoY); Cloud operating loss narrowed to $644M from $1.21B a year prior.",
+          "source": "SEC EDGAR",
+          "url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204421000054/googexhibit991q32021.htm",
+          "date": "2021-10-26"
+        },
+        {
+          "summary": "Alphabet Q3 2021 results beat consensus on both EPS and revenue; Google Search revenue was $37.93B and YouTube ads $7.21B, reflecting a broad post-pandemic advertising recovery.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2021/10/26/alphabet-goog-earnings-q3-2021.html",
+          "date": "2021-10-26"
+        }
+      ]
+    },
+    "AAPL": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Apple Q4 FY2021 earnings (Oct 28, 2021): revenue $83.4B (+29% YoY) missed the $84.85B consensus \u2014 the first revenue miss since May 2017; CEO Tim Cook attributed the shortfall to supply constraints estimated at approximately $6B.",
+          "source": "Apple Newsroom",
+          "url": "https://www.apple.com/newsroom/2021/10/apple-reports-fourth-quarter-results/",
+          "date": "2021-10-28"
+        },
+        {
+          "summary": "iPhone revenue of $38.87B was up 47% year-over-year but below Wall Street estimates; the company flagged ongoing chip shortages as a headwind extending into the December holiday quarter.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2021/10/28/apple-aapl-q4-2021-earnings.html",
+          "date": "2021-10-28"
+        }
+      ]
+    },
+    "BOTZ": {
+      "wave_bucket": "robotics",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "No article dated on or before 2021-11-30 was surfaced through curated or open search providing BOTZ fund-specific news, performance commentary, or holdings changes for November 2021; current holdings data (undated) shows top positions in Keyence, ABB, NVIDIA, Fanuc, and Intuitive Surgical.",
+          "source": "Global X ETFs",
+          "url": "https://www.globalxetfs.com/funds/botz",
+          "date": "2021-11-30"
+        }
+      ]
+    },
+    "QTUM": {
+      "wave_bucket": "quantum",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "IBM unveiled its Eagle 127-qubit quantum processor on November 16, 2021 at the IBM Quantum Summit \u2014 the first quantum processor to surpass 100 qubits, and the first at which quantum circuits cannot be reliably simulated exactly on a classical computer.",
+          "source": "IBM Newsroom",
+          "url": "https://newsroom.ibm.com/2021-11-16-IBM-Unveils-Breakthrough-127-Qubit-Quantum-Processor",
+          "date": "2021-11-16"
+        }
+      ]
+    },
+    "SPY": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "The S&P 500 fell 0.83% in November 2021 \u2014 its first negative November in a decade \u2014 after seven new all-time closing highs in the first 18 trading days were erased by an Omicron-variant selloff that sent the index down 2.27% on November 26, its worst single day in nine months.",
+          "source": "S&P Dow Jones Indices",
+          "url": "https://www.spglobal.com/spdji/en/commentary/article/us-equities-market-attributes-november-2021/",
+          "date": "2021-11-30"
+        },
+        {
+          "summary": "The CBOE VIX surged over 68% in November 2021 \u2014 its largest monthly spike since February 2020 \u2014 as Omicron fears and Fed Chair Powell's comments signaling faster tapering and persistent inflation converged in the final trading days of the month.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2021/11/30/stock-market-futures-open-to-close-news.html",
+          "date": "2021-11-30"
+        }
+      ]
+    },
+    "AGG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "The Federal Reserve announced on November 3, 2021 it would begin tapering bond purchases by $15B per month, marking the first step toward monetary policy normalization as inflation proved more persistent than the transitory framing suggested.",
+          "source": "Nasdaq",
+          "url": "https://www.nasdaq.com/articles/november-2021-review-and-outlook",
+          "date": "2021-11-30"
+        },
+        {
+          "summary": "The October 2021 US CPI print of 6.2% year-over-year \u2014 released November 10, 2021, the highest reading since 1990 \u2014 reinforced that inflation was running well above target, a direct headwind to investment-grade bond prices such as those held by AGG.",
+          "source": "World Gold Council",
+          "url": "https://www.gold.org/goldhub/research/gold-market-commentary-november-2021",
+          "date": "2021-11-30"
+        }
+      ]
+    },
+    "BIL": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "With the Fed funds target rate held at 0-0.25% throughout November 2021, 1-3 month T-bills tracked by BIL yielded near zero; the taper announcement on November 3 signaled future rate increases but did not move short-term rates in November.",
+          "source": "Nasdaq",
+          "url": "https://www.nasdaq.com/articles/november-2021-review-and-outlook",
+          "date": "2021-11-30"
+        }
+      ]
+    },
+    "IAU": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Gold rose approximately 2% in November 2021 on an LBMA reference-price basis, briefly reaching approximately $1,860/oz after the October US CPI print of 6.2% (released Nov 10) pushed real yields lower; the gain was partially given back as Omicron volatility and Powell's hawkish taper comments weighed on the metal late in the month.",
+          "source": "World Gold Council",
+          "url": "https://www.gold.org/goldhub/research/gold-market-commentary-november-2021",
+          "date": "2021-11-30"
+        }
+      ]
+    },
+    "VIG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "No VIG-specific article dated on or before 2021-11-30 was surfaced through curated or open search; VIG tracks dividend-growth equities broadly correlated with SPY, which ended November 2021 down 0.83% with a VIX spike of over 68%.",
+          "source": "S&P Dow Jones Indices",
+          "url": "https://www.spglobal.com/spdji/en/commentary/article/us-equities-market-attributes-november-2021/",
+          "date": "2021-11-30"
+        }
+      ]
+    }
+  },
+  "ticker_stages": {
+    "NVDA": {
+      "stage": "surge",
+      "rationale": "Q3 FY2022 results (Nov 17, 2021) showed record revenue of $7.10B (+50% YoY), Data Center +55%, and Gaming +42% \u2014 real compounding revenue growth across two core segments with no sign of demand exhaustion.",
+      "evidence_bullet_dates": [
+        "2021-11-17"
+      ]
+    },
+    "MSFT": {
+      "stage": "surge",
+      "rationale": "Q1 FY2022 earnings (Oct 26, 2021) showed Azure growth accelerating to 50% YoY from 45% in the prior quarter, with Intelligent Cloud at $17B \u2014 adoption is compounding with sequential acceleration.",
+      "evidence_bullet_dates": [
+        "2021-10-26"
+      ]
+    },
+    "GOOGL": {
+      "stage": "surge",
+      "rationale": "Q3 2021 earnings (Oct 26, 2021) showed Google Cloud revenue +45% YoY to $4.99B and operating losses narrowing by nearly half year-over-year, indicating compounding cloud adoption on a path toward profitability.",
+      "evidence_bullet_dates": [
+        "2021-10-26"
+      ]
+    },
+    "AAPL": {
+      "stage": "neutral",
+      "rationale": "Q4 FY2021 earnings (Oct 28, 2021) showed a revenue miss driven by supply constraints, not demand weakness; the mixed signal does not cleanly map to any single stage.",
+      "evidence_bullet_dates": [
+        "2021-10-28"
+      ]
+    },
+    "BOTZ": {
+      "stage": "neutral",
+      "rationale": "No dated bullet with a verified date on or before 2021-11-30 was obtained for BOTZ; per the grounding rule, stage defaults to neutral.",
+      "evidence_bullet_dates": []
+    },
+    "QTUM": {
+      "stage": "buildup",
+      "rationale": "IBM's Eagle 127-qubit processor announcement (Nov 16, 2021) is a real, verifiable hardware milestone \u2014 the first system beyond the classical-simulation threshold \u2014 consistent with a quiet buildup phase where research progress is visible but commercial applications remain early-stage.",
+      "evidence_bullet_dates": [
+        "2021-11-16"
+      ]
+    },
+    "SPY": {
+      "stage": "neutral",
+      "rationale": "The S&P 500 reached seven all-time highs early in November 2021 before reversing sharply on Omicron news and ending modestly negative; mixed within-month signals produce a neutral call for a broad market index.",
+      "evidence_bullet_dates": [
+        "2021-11-30"
+      ]
+    },
+    "AGG": {
+      "stage": "digestion",
+      "rationale": "The Fed taper announcement (Nov 3, 2021) and the October CPI print of 6.2% released November 10 \u2014 the highest since 1990 \u2014 represent contemporaneous rising-rate headwinds to investment-grade bond prices, consistent with post-peak digestion for aggregate bonds.",
+      "evidence_bullet_dates": [
+        "2021-11-30"
+      ]
+    },
+    "BIL": {
+      "stage": "neutral",
+      "rationale": "With the Fed funds rate at 0-0.25% in November 2021, BIL's near-cash yield was essentially zero; the taper announcement signals future changes but does not produce a directional stage signal for the current period.",
+      "evidence_bullet_dates": [
+        "2021-11-30"
+      ]
+    },
+    "IAU": {
+      "stage": "neutral",
+      "rationale": "Gold rose approximately 2% in November 2021 but gave back much of the gain intra-month; the inflation-driven lift and subsequent pullback are offsetting signals, leaving no clear directional stage call.",
+      "evidence_bullet_dates": [
+        "2021-11-30"
+      ]
+    },
+    "VIG": {
+      "stage": "neutral",
+      "rationale": "No VIG-specific dated bullet was obtained; with no ticker-level evidence, stage defaults to neutral per the grounding rule.",
+      "evidence_bullet_dates": []
+    }
+  },
+  "self_critique_downgrades": [
+    {
+      "ticker": "QTUM",
+      "from_stage": "buildup",
+      "to_stage": "buildup",
+      "reason": "Retained at buildup: the IBM Eagle bullet (2021-11-16) is a primary source from IBM Newsroom with a verified pre-cutoff date. A second candidate bullet referencing IonQ's SPAC listing and revenue was sourced from a Motley Fool article dated 2025-09-18 (post-cutoff); that bullet was removed from per_ticker.QTUM.bullets and all IonQ revenue references were dropped from the rationale. The stage call rests solely on the IBM Eagle milestone, which passes the date filter."
+    }
+  ]
+}
