@@ -117,6 +117,14 @@ def main(argv: list[str] | None = None) -> int:
     p_bt.add_argument("--benchmarks", nargs="*", default=["SPY"],
                       help="benchmark tickers compared against the backtest's realized return "
                            "(default: SPY). Pass an empty list to skip the benchmark section.")
+    p_bt.add_argument("--curator-runs-dir", default=None,
+                      help="path to a directory of curator JSON payloads "
+                           "(<dir>/_starter.json + <date>-curation.json files). "
+                           "When present, switches backtest into curator-driven mode: "
+                           "walks the dir chronologically, applies each payload to a "
+                           "sandboxed holdings + history, optimizes on the resulting "
+                           "watchlist, and computes two baselines (fixed-watchlist same "
+                           "cadence; buy-and-hold of starter) for comparison.")
 
     p_dash = sub.add_parser("dashboard", help="generate docs/index.html from snapshots + recommendations + news")
     p_dash.add_argument("--snapshots", default="data/snapshots.csv")
@@ -145,16 +153,27 @@ def main(argv: list[str] | None = None) -> int:
             last_prices = {t: float(prices_df[t].iloc[-1]) for t in prices_df.columns}
             result = portfolio.initialize_holdings(allocations, last_prices, holdings_path=args.out)
         elif args.cmd == "backtest":
-            result = portfolio.backtest(
-                holdings_path=args.holdings,
-                start_date=args.start_date, end_date=args.end_date,
-                initial_usd=args.initial_usd, out_dir=args.out_dir,
-                lookback_years=args.lookback_years,
-                max_weight=args.max_weight, objective=args.objective,
-                risk_aversion=args.risk_aversion,
-                risk_free_rate=args.risk_free_rate,
-                benchmarks=args.benchmarks,
-            )
+            if args.curator_runs_dir:
+                result = portfolio.curator_backtest(
+                    runs_dir=args.curator_runs_dir,
+                    out_dir=args.out_dir,
+                    max_weight=args.max_weight,
+                    objective=args.objective,
+                    risk_aversion=args.risk_aversion,
+                    risk_free_rate=args.risk_free_rate,
+                    benchmarks=args.benchmarks,
+                )
+            else:
+                result = portfolio.backtest(
+                    holdings_path=args.holdings,
+                    start_date=args.start_date, end_date=args.end_date,
+                    initial_usd=args.initial_usd, out_dir=args.out_dir,
+                    lookback_years=args.lookback_years,
+                    max_weight=args.max_weight, objective=args.objective,
+                    risk_aversion=args.risk_aversion,
+                    risk_free_rate=args.risk_free_rate,
+                    benchmarks=args.benchmarks,
+                )
         elif args.cmd == "analyze":
             result = portfolio.analyze(
                 args.tickers, period=args.period, objective=args.objective,

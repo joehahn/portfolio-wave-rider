@@ -16,9 +16,12 @@ This project was developed using Claude Code. The github is at https://github.co
 Progress on the rebuild:
 
 - **Stage A (done):** ripped all tilt code from main. Six CLI subcommands still work.
-- **Stage B (done):** defined the curator contract. `.claude/agents/watchlist-curator.md` specifies the inputs the agent receives, the JSON it returns, and the guardrails on its proposed adds. `investor_profile.example.md` gains `rebalance_period` and `max_watchlist_size` fields. No code consumes the contract yet.
-- **Stage C (next):** wire the contract. New `curate` CLI subcommand applies adds/removes to `holdings.csv` and appends to `data/curation_history.csv`. The `backtest` subcommand grows a curator-driven walk-forward variant that calls the agent at each rebalance with `as_of_date` discipline.
-- **Stage D:** rewrite `/review-portfolio` and `/run-backtest` skills against the new flow; update `report-writer.md`; refresh `docs/*.html`.
+- **Stage B (done):** defined the curator contract. `.claude/agents/watchlist-curator.md` specifies the inputs the agent receives, the JSON it returns, and the guardrails on its proposed adds. `investor_profile.example.md` gains `rebalance_period` and `max_watchlist_size` fields.
+- **Stage C1 (done):** new `curate` CLI subcommand consumes a curator JSON payload, validates it (listing date via yfinance, max_watchlist_size, no double-adds, etc.), applies adds/removes to `holdings.csv`, and appends one row per change to `data/curation_history.csv`. Helper `portfolio.reconstruct_watchlist_at(date, day_zero, history_path)` replays history for any date.
+- **Stage C2a (done):** `python -m src.cli backtest --curator-runs-dir <dir>` is the pure-Python replay path. Reads `<dir>/_starter.json` for the run config, walks the dir chronologically applying each `<date>-curation.json` payload to a sandboxed holdings + history, runs mean-variance on the resulting watchlist, and computes two baselines in the same loop (fixed-watchlist same cadence; buy-and-hold of starter). Outputs `snapshots.csv`, `recommendations.csv`, `baselines_totals.csv`, `curation_summary.json`, `report.md`. No LLM in the loop; ideal for iterating on the math.
+- **Stage C2b (next):** the skill that fires the curator agents in batches and assembles a runs dir. Targets the 5-year window (Sept 2021 → Apr 2026), starter watchlist `{AAPL, MSFT, GOOGL, SPY, AGG}`, monthly cadence, `max_watchlist_size=12`. ~56 LLM calls in batches of 4 to stay under rate limits.
+- **Stage C2c:** run the experiment end-to-end and read the dashboard.
+- **Stage D:** rewrite `/review-portfolio` skill against the new flow; update `report-writer.md`; extend `build_dashboard` to overlay the curator strategy vs the two baselines on the same chart; refresh `docs/*.html`.
 
 Until stage D lands:
 
@@ -74,7 +77,9 @@ The user decides. Never silently clamp a recommendation to fit the profile.
 
 - `data/snapshots.csv`: daily per-ticker $ values. Schema: `date, ticker, shares, price, value, total_value`. Idempotent on date; pass `--force` to overwrite.
 - `data/recommendations.csv`: optimizer output, one row block per `recommend` run. Schema: `date, ticker, weight, expected_return, annual_volatility, sharpe_ratio, objective`. Idempotent on date; pass `--force` to overwrite same-day runs.
-- `data/curation_history.csv` *(lands in stage C)*: append-only log of every watchlist change. Schema: `date, action, ticker, wave_bucket, rationale, news_evidence_urls`. `action` is `add` or `remove`; `news_evidence_urls` is a `;`-separated list. The active watchlist at any date is reconstructable by replaying this file from day 0 against `holdings.csv`'s initial rows. Drives the dashboard's watchlist-composition-over-time chart.
+- `data/curation_history.csv`: append-only log of every watchlist change. Schema: `date, action, ticker, wave_bucket, rationale, news_evidence_urls`. `action` is `add` or `remove`; `news_evidence_urls` is a `;`-separated list. The active watchlist at any date is reconstructable by replaying this file from day 0 against `holdings.csv`'s initial rows. Drives the dashboard's watchlist-composition-over-time chart (lands in stage D).
+- `data/curator_runs/<run_id>/_starter.json`: per-run input file for `backtest --curator-runs-dir`. Schema: `{starter_watchlist: [...], start_date, end_date, rebalance_period, initial_usd, lookback_years, max_watchlist_size}`. Created by the stage C2b skill before it fires the curator agents.
+- `data/curator_runs/<run_id>/<YYYY-MM-DD>-curation.json`: one file per rebalance, written by the stage C2b skill from each `watchlist-curator` agent's JSON return. Schema matches the agent's output contract.
 - `data/thesis_baseline.json`: one-time artifact written by `/initialize-portfolio`. Schema: `{date, allocations_usd, reasoning, holdings}`. Read-only after creation; `build_dashboard` reads its `date` to scope the live dashboard's time-series charts. Delete the file manually only if you want to redo the thesis from scratch (then re-run `/initialize-portfolio`).
 
 These are the user's history. Don't break their schemas. If you must extend them, add columns at the end and keep existing ones.

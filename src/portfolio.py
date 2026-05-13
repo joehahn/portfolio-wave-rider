@@ -1075,6 +1075,408 @@ def backtest(
 
 
 # ---------------------------------------------------------------------------
+# Curator-driven backtest: replay a directory of watchlist-curator JSON
+# payloads through the mean-variance optimizer, computing two baselines
+# (fixed-watchlist same cadence; buy-and-hold of starter) in the same loop.
+# No LLM is invoked here — the agent decisions are pre-collected upstream
+# (the /run-curator-backtest skill in stage C2b fires the curator agents).
+# ---------------------------------------------------------------------------
+
+def _cadence_period_id(date: pd.Timestamp, cadence: str) -> tuple[int, ...]:
+    """Period bucket used to detect rebalance boundaries."""
+    if cadence == "monthly":
+        return (date.year, date.month)
+    if cadence == "quarterly":
+        return (date.year, (date.month - 1) // 3)
+    if cadence == "semi_annual":
+        return (date.year, (date.month - 1) // 6)
+    if cadence == "annual":
+        return (date.year,)
+    raise ValueError(f"unknown cadence: {cadence!r}")
+
+
+def _optimize_or_equal_weight(
+    returns: dict[str, Any], tickers: list[str], objective: str,
+    max_weight: float, risk_aversion: float, risk_free_rate: float,
+) -> dict[str, float]:
+    """Run the optimizer, falling back to equal-weight if it can't converge
+    or if max_weight is too tight for the watchlist size.
+
+    Auto-relaxes max_weight so n * max_weight >= 1 always holds; otherwise
+    the optimizer raises and a small watchlist (curator trimmed below the
+    feasibility floor) would crash the backtest mid-run.
+    """
+    n = max(1, len(tickers))
+    eff_cap = max(max_weight, 1.0 / n + 1e-6)
+    eff_cap = min(eff_cap, 1.0)
+    opt = optimize_portfolio(
+        returns, objective=objective, risk_free_rate=risk_free_rate,
+        max_weight=eff_cap, risk_aversion=risk_aversion,
+    )
+    if opt.get("success"):
+        return opt
+    # Fall back to equal-weight if the optimizer doesn't converge.
+    weights = {t: 1.0 / n for t in tickers}
+    return {
+        "success": False, "weights": weights,
+        "expected_annual_return": 0.0, "annual_volatility": 0.0,
+        "sharpe_ratio": 0.0,
+    }
+
+
+def curator_backtest(
+    runs_dir: str,
+    out_dir: str = "data/backtest/",
+    max_weight: float = 0.25,
+    objective: str = "mean_variance",
+    risk_aversion: float = 1.0,
+    risk_free_rate: float = 0.04,
+    benchmarks: list[str] | None = None,
+) -> dict[str, Any]:
+    """Replay a curator-runs directory through the optimizer.
+
+    Reads ``<runs_dir>/_starter.json`` for the run config (starter watchlist,
+    start/end dates, rebalance cadence, initial USD, lookback years). Then
+    for each rebalance date reads ``<runs_dir>/<date>-curation.json`` if
+    present and applies it via ``apply_curator_decisions`` to a sandboxed
+    holdings + history pair under ``<out_dir>/sandbox/``. Runs the optimizer
+    on the resulting watchlist and walks forward day-by-day.
+
+    Two baselines are computed in the same loop and emitted as a separate
+    totals CSV that the dashboard can overlay later:
+
+      - **Fixed-watchlist**: same cadence and optimizer, watchlist locked
+        to the starter set forever. Isolates whether the curation is
+        actually adding value vs just the mean-variance rebalancing.
+      - **Buy-and-hold**: one optimizer call on day 0 against the starter,
+        then no rebalancing. Isolates whether the rebalancing matters.
+
+    Outputs under ``out_dir``:
+      - ``snapshots.csv`` — curator strategy, same schema as live data
+      - ``recommendations.csv`` — one row block per rebalance, curator strategy
+      - ``baselines_totals.csv`` — date, fixed_total, bnh_total
+      - ``report.md``
+    """
+    out = Path(out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    runs = Path(runs_dir)
+    if not runs.exists():
+        raise FileNotFoundError(f"runs dir not found: {runs}")
+
+    starter_path = runs / "_starter.json"
+    if not starter_path.exists():
+        raise FileNotFoundError(f"runs dir missing _starter.json: {runs}")
+    starter = json.loads(starter_path.read_text())
+    starter_watchlist = [t.upper() for t in starter["starter_watchlist"]]
+    start_date = pd.Timestamp(starter["start_date"])
+    end_date = pd.Timestamp(starter["end_date"])
+    cadence = starter.get("rebalance_period", "monthly")
+    initial_usd = float(starter.get("initial_usd", 50000.0))
+    lookback_years = float(starter.get("lookback_years", 1.3))
+    max_size = int(starter.get("max_watchlist_size", 12))
+
+    # Union of every ticker that could appear across the run, so the
+    # bulk yfinance fetch only happens once.
+    union: set[str] = set(starter_watchlist)
+    curation_files: dict[pd.Timestamp, Path] = {}
+    for p in sorted(runs.glob("*-curation.json")):
+        d = pd.Timestamp(p.stem.replace("-curation", ""))
+        curation_files[d] = p
+        payload = json.loads(p.read_text())
+        for a in payload.get("adds") or []:
+            if isinstance(a, dict) and a.get("ticker"):
+                union.add(a["ticker"].upper())
+    universe = sorted(union)
+
+    fetch_start = start_date - pd.Timedelta(days=365 * lookback_years + 30)
+    raw = yf.download(universe, start=fetch_start,
+                      end=end_date + pd.Timedelta(days=1),
+                      auto_adjust=True, progress=False, group_by="column")
+    if raw.empty:
+        raise RuntimeError(f"yfinance returned no data for {universe}")
+    full_prices = raw["Close"] if isinstance(raw.columns, pd.MultiIndex) \
+        else raw[["Close"]].rename(columns={"Close": universe[0]})
+    full_prices = full_prices.dropna(how="all").ffill()
+    daily_dates = full_prices.loc[start_date:end_date].dropna(how="all").index
+    if len(daily_dates) < 5:
+        raise RuntimeError(f"only {len(daily_dates)} trading days in window")
+
+    # Sandboxed holdings + history files that the curate path mutates.
+    sandbox = out / "sandbox"
+    sandbox.mkdir(parents=True, exist_ok=True)
+    sandbox_holdings = sandbox / "holdings.csv"
+    sandbox_history = sandbox / "curation_history.csv"
+    pd.DataFrame({"ticker": starter_watchlist,
+                  "shares": [0] * len(starter_watchlist)}).to_csv(
+        sandbox_holdings, index=False)
+    if sandbox_history.exists():
+        sandbox_history.unlink()
+    sandbox_profile = sandbox / "profile.md"
+    sandbox_profile.write_text(
+        f"---\nfinancial_model:\n  max_watchlist_size: {max_size}\n---\n"
+    )
+
+    # Three parallel walk-forwards.
+    cur_shares: dict[str, float] = {}
+    fix_shares: dict[str, float] = {}
+    bnh_shares: dict[str, float] = {}
+    snap_rows: list[dict[str, Any]] = []
+    rec_rows: list[dict[str, Any]] = []
+    baseline_rows: list[dict[str, Any]] = []
+    weight_l1: list[float] = []
+    last_weights: dict[str, float] | None = None
+    last_period: tuple | None = None
+    curation_summary: list[dict[str, Any]] = []
+
+    def _value(shares: dict[str, float], date: pd.Timestamp) -> float:
+        return sum(s * float(full_prices.loc[date, t])
+                   for t, s in shares.items()
+                   if t in full_prices.columns
+                   and not pd.isna(full_prices.loc[date, t]))
+
+    for date in daily_dates:
+        period = _cadence_period_id(date, cadence)
+        is_new_period = period != last_period
+        is_first_day = date == daily_dates[0]
+
+        if is_new_period or is_first_day:
+            # 1) Apply that date's curation payload (if any) to the sandbox.
+            #    Match payload to the trading day on/after its as_of_date.
+            applied_keys = [
+                k for k in curation_files
+                if (last_period is None and k <= date)
+                or (last_period is not None and k <= date and k > pd.Timestamp(
+                    daily_dates[max(0, list(daily_dates).index(date) - 35)]))
+            ]
+            for k in sorted(applied_keys):
+                if k in curation_files:
+                    payload = json.loads(curation_files[k].read_text())
+                    try:
+                        result = apply_curator_decisions(
+                            payload,
+                            holdings_path=str(sandbox_holdings),
+                            history_path=str(sandbox_history),
+                            profile_path=str(sandbox_profile),
+                            listing_check=False,  # universe already prefetched
+                            as_of_date=str(k.date()),
+                        )
+                        curation_summary.append({
+                            "date": str(k.date()),
+                            "adds": result["applied_adds"],
+                            "removes": result["applied_removes"],
+                            "rejections": len(result["rejections"]),
+                        })
+                    except Exception as e:  # noqa: BLE001
+                        curation_summary.append({
+                            "date": str(k.date()),
+                            "error": str(e),
+                        })
+                    del curation_files[k]
+
+            # 2) Current curator watchlist after applying.
+            cur_watchlist = pd.read_csv(sandbox_holdings)["ticker"].astype(str).tolist()
+            cur_watchlist = [t for t in cur_watchlist if t in full_prices.columns]
+
+            # 3) Lookback slice and optimizer call for curator strategy.
+            lookback_start = date - pd.Timedelta(days=365 * lookback_years)
+            slice_cur = full_prices.loc[lookback_start:date, cur_watchlist].dropna(how="any", axis=1)
+            cur_watchlist = list(slice_cur.columns)
+            if len(slice_cur) < 30 or not cur_watchlist:
+                # Not enough history yet; carry forward without rebalancing.
+                last_period = period
+                continue
+            returns = compute_returns(slice_cur)
+            opt = _optimize_or_equal_weight(
+                returns, cur_watchlist, objective, max_weight,
+                risk_aversion, risk_free_rate,
+            )
+            cur_weights = opt["weights"]
+
+            cur_value = _value(cur_shares, date) if cur_shares else initial_usd
+            cur_shares = {
+                t: (cur_weights[t] * cur_value) / float(full_prices.loc[date, t])
+                for t in cur_watchlist
+            }
+            for t in cur_watchlist:
+                rec_rows.append({
+                    "date": str(date.date()),
+                    "ticker": t,
+                    "weight": cur_weights[t],
+                    "expected_return": opt.get("expected_annual_return", 0.0),
+                    "annual_volatility": opt.get("annual_volatility", 0.0),
+                    "sharpe_ratio": opt.get("sharpe_ratio", 0.0),
+                    "objective": objective,
+                })
+            if last_weights is not None:
+                l1 = sum(abs(cur_weights.get(t, 0) - last_weights.get(t, 0))
+                          for t in set(cur_weights) | set(last_weights))
+                weight_l1.append(l1)
+            last_weights = cur_weights
+
+            # 4) Fixed-watchlist baseline: same optimizer, locked watchlist.
+            slice_fix = full_prices.loc[lookback_start:date, starter_watchlist].dropna(how="any", axis=1)
+            fix_watch = list(slice_fix.columns)
+            if len(slice_fix) >= 30 and fix_watch:
+                fix_returns = compute_returns(slice_fix)
+                fix_opt = _optimize_or_equal_weight(
+                    fix_returns, fix_watch, objective, max_weight,
+                    risk_aversion, risk_free_rate,
+                )
+                fix_value = _value(fix_shares, date) if fix_shares else initial_usd
+                fix_shares = {
+                    t: (fix_opt["weights"][t] * fix_value) / float(full_prices.loc[date, t])
+                    for t in fix_watch
+                }
+
+            # 5) Buy-and-hold baseline: optimize once on day 0, then hold.
+            if not bnh_shares:
+                bnh_value = initial_usd
+                bnh_shares = {
+                    t: (fix_opt["weights"][t] * bnh_value) / float(full_prices.loc[date, t])
+                    for t in fix_watch
+                }
+
+            last_period = period
+
+        # Daily snapshot for the curator strategy.
+        if cur_shares:
+            day_total = _value(cur_shares, date)
+            for t, sh in cur_shares.items():
+                px = float(full_prices.loc[date, t])
+                snap_rows.append({
+                    "date": str(date.date()),
+                    "ticker": t,
+                    "shares": round(sh, 4),
+                    "price": px,
+                    "value": round(sh * px, 2),
+                    "total_value": round(day_total, 2),
+                })
+        # Daily baseline totals (single row per date).
+        if fix_shares or bnh_shares:
+            baseline_rows.append({
+                "date": str(date.date()),
+                "fixed_total": round(_value(fix_shares, date), 2) if fix_shares else None,
+                "bnh_total": round(_value(bnh_shares, date), 2) if bnh_shares else None,
+            })
+
+    if not snap_rows:
+        raise RuntimeError("curator_backtest produced no snapshots")
+
+    snap_df = pd.DataFrame(snap_rows)
+    rec_df = pd.DataFrame(rec_rows)
+    baselines_df = pd.DataFrame(baseline_rows)
+    snap_df.to_csv(out / "snapshots.csv", index=False)
+    rec_df.to_csv(out / "recommendations.csv", index=False)
+    baselines_df.to_csv(out / "baselines_totals.csv", index=False)
+    (out / "curation_summary.json").write_text(json.dumps(curation_summary, indent=2))
+
+    totals = snap_df.groupby("date")["total_value"].first().sort_index()
+    initial_v = float(totals.iloc[0])
+    final_v = float(totals.iloc[-1])
+    realized_return = (final_v / initial_v) - 1.0
+    days = (pd.Timestamp(totals.index[-1]) - pd.Timestamp(totals.index[0])).days or 1
+    annualized = (final_v / initial_v) ** (365.0 / days) - 1.0
+    equity = totals.values
+    peak = np.maximum.accumulate(equity)
+    dd = (equity - peak) / peak
+    max_dd = float(dd.min())
+
+    fix_initial = baselines_df["fixed_total"].dropna().iloc[0] if "fixed_total" in baselines_df else None
+    fix_final = baselines_df["fixed_total"].dropna().iloc[-1] if "fixed_total" in baselines_df else None
+    fix_return = (fix_final / fix_initial - 1.0) if fix_initial else None
+    bnh_initial = baselines_df["bnh_total"].dropna().iloc[0] if "bnh_total" in baselines_df else None
+    bnh_final = baselines_df["bnh_total"].dropna().iloc[-1] if "bnh_total" in baselines_df else None
+    bnh_return = (bnh_final / bnh_initial - 1.0) if bnh_initial else None
+
+    if benchmarks is None:
+        benchmarks = ["SPY"]
+    benchmark_returns: dict[str, float] = {}
+    if benchmarks:
+        b_curves = _fetch_benchmark_curves(
+            benchmarks, totals.index[0], totals.index[-1], 1.0,
+        )
+        for b, curve in b_curves.items():
+            benchmark_returns[b] = float(curve.iloc[-1] - 1.0)
+
+    bench_lines = "".join(
+        f"| {b} | {ret * 100:+.2f}% | {(realized_return - ret) * 100:+.2f}pp |\n"
+        for b, ret in benchmark_returns.items()
+    )
+
+    n_rebalances = len(weight_l1) + 1
+    n_curations = sum(1 for c in curation_summary if "error" not in c)
+    n_adds = sum(len(c.get("adds", [])) for c in curation_summary)
+    n_removes = sum(len(c.get("removes", [])) for c in curation_summary)
+    weight_stability = float(np.mean(weight_l1)) if weight_l1 else 0.0
+    fix_str = f"{fix_return * 100:+.2f}%" if fix_return is not None else "n/a"
+    bnh_str = f"{bnh_return * 100:+.2f}%" if bnh_return is not None else "n/a"
+    fix_active = (f"{(realized_return - fix_return) * 100:+.2f}pp"
+                  if fix_return is not None else "n/a")
+    bnh_active = (f"{(realized_return - bnh_return) * 100:+.2f}pp"
+                  if bnh_return is not None else "n/a")
+    report = (
+        f"# Curator backtest report\n\n"
+        f"**Window:** {totals.index[0]} to {totals.index[-1]} "
+        f"({days} calendar days, {len(totals)} trading days)\n"
+        f"**Starter watchlist:** {', '.join(starter_watchlist)}\n"
+        f"**Cadence:** {cadence}\n"
+        f"**Optimizer:** `{objective}`, lookback {lookback_years}y, "
+        f"max_weight {max_weight:.2f}\n\n"
+        f"## Curation activity\n\n"
+        f"| Metric | Value |\n|---|---|\n"
+        f"| Curation calls applied | {n_curations} |\n"
+        f"| Adds executed | {n_adds} |\n"
+        f"| Removes executed | {n_removes} |\n"
+        f"| Final watchlist size | {len(cur_shares)} |\n"
+        f"| Rebalances (optimizer calls) | {n_rebalances} |\n"
+        f"| Mean L1 weight distance rebalance-to-rebalance | {weight_stability:.4f} |\n\n"
+        f"## Realized performance vs baselines\n\n"
+        f"| Strategy | Ending value | Total return | Active vs curator |\n"
+        f"|---|---|---|---|\n"
+        f"| Curator-driven | ${final_v:,.2f} | {realized_return * 100:+.2f}% | — |\n"
+        f"| Fixed watchlist (same cadence, no curation) | "
+        f"${fix_final:,.2f} | {fix_str} | {fix_active} |\n"
+        f"| Buy-and-hold starter (day-0 optimize, then hold) | "
+        f"${bnh_final:,.2f} | {bnh_str} | {bnh_active} |\n\n"
+        f"## Risk and benchmarks\n\n"
+        f"| Metric | Value |\n|---|---|\n"
+        f"| Annualized return (curator) | {annualized * 100:+.2f}% |\n"
+        f"| Max drawdown (curator) | {max_dd * 100:.2f}% |\n\n"
+        f"### Benchmarks (over the same window)\n\n"
+        f"| Benchmark | Return | Active vs curator |\n|---|---|---|\n"
+        f"{bench_lines}\n"
+        f"## Caveats\n\n"
+        f"- No transaction costs or taxes modeled.\n"
+        f"- Look-ahead-bias guard: each optimizer call sees prices only up "
+        f"to that date; the curator payloads in this run were generated "
+        f"with strict as-of-date discipline (see the watchlist-curator agent spec).\n"
+        f"- Tickers added by the curator that have less than 30 trading days "
+        f"of history at the rebalance date are dropped from the optimizer's "
+        f"slice for that rebalance only.\n"
+    )
+    (out / "report.md").write_text(report)
+
+    return {
+        "out_dir": str(out),
+        "window": {"start": str(totals.index[0]), "end": str(totals.index[-1]), "days": int(days)},
+        "n_rebalances": n_rebalances,
+        "n_curations_applied": n_curations,
+        "n_adds": n_adds,
+        "n_removes": n_removes,
+        "final_watchlist": sorted(cur_shares.keys()),
+        "initial_value": round(initial_v, 2),
+        "final_value": round(final_v, 2),
+        "realized_return": round(realized_return, 4),
+        "annualized_return": round(annualized, 4),
+        "max_drawdown": round(max_dd, 4),
+        "weight_stability_l1": round(weight_stability, 4),
+        "fixed_baseline_return": round(fix_return, 4) if fix_return is not None else None,
+        "bnh_baseline_return": round(bnh_return, 4) if bnh_return is not None else None,
+        "benchmark_returns": {b: round(r, 4) for b, r in benchmark_returns.items()},
+    }
+
+
+# ---------------------------------------------------------------------------
 # Static HTML dashboard. Reads the two append-only CSVs and emits one file
 # the user can open in a browser. No server, no Streamlit.
 # ---------------------------------------------------------------------------

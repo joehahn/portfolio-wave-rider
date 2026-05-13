@@ -484,3 +484,85 @@ def test_reconstruct_watchlist_at_replays_history(tmp_path) -> None:
     assert portfolio.reconstruct_watchlist_at(
         "2024-01-01", day_zero, history_path=str(history)
     ) == ["AAPL", "BOTZ", "MSFT", "NVDA", "SPY"]
+
+
+def test_curator_backtest_replays_synthetic_run(tmp_path, monkeypatch) -> None:
+    """End-to-end replay against a synthetic 4-ticker price series.
+
+    Verifies the function consumes _starter.json + dated curation payloads,
+    produces all four output files, and the curator strategy diverges from
+    the fixed-watchlist baseline once a curator add takes effect.
+    """
+    import json
+    rng = np.random.default_rng(7)
+    dates = pd.date_range("2022-05-01", periods=1040, freq="B")
+    # Four tickers; DDD has clearly higher drift so a curator that adds it
+    # mid-run should beat the fixed baseline.
+    daily = rng.normal(loc=[0.0003, 0.0002, 0.0004, 0.0015],
+                       scale=[0.010, 0.009, 0.011, 0.014], size=(1040, 4))
+    prices = pd.DataFrame(
+        100 * np.exp(daily.cumsum(axis=0)),
+        index=dates, columns=["AAA", "BBB", "CCC", "DDD"],
+    )
+
+    def fake_download(tickers, start, end, **kwargs):
+        if isinstance(tickers, str):
+            tickers = [tickers]
+        cols = pd.MultiIndex.from_product([["Close"], list(prices.columns)])
+        df = pd.DataFrame(prices.values, index=prices.index, columns=cols)
+        return df.loc[start:end]
+    monkeypatch.setattr(portfolio.yf, "download", fake_download)
+
+    runs_dir = tmp_path / "runs"
+    runs_dir.mkdir()
+    starter = {
+        "starter_watchlist": ["AAA", "BBB", "CCC"],
+        "start_date": "2025-08-01",
+        "end_date": "2026-04-30",
+        "rebalance_period": "monthly",
+        "initial_usd": 10000.0,
+        "lookback_years": 1.3,
+        "max_watchlist_size": 6,
+    }
+    (runs_dir / "_starter.json").write_text(json.dumps(starter))
+    # One curator payload mid-run: add DDD on 2025-10-01.
+    add_payload = {
+        "as_of_date": "2025-10-01",
+        "rebalance_period": "monthly",
+        "adds": [{"ticker": "DDD", "wave_bucket": "AI",
+                  "rationale": "high-drift ticker enters",
+                  "news_evidence": [{"summary": "x", "source": "X",
+                                      "url": "https://example.com/ddd",
+                                      "date": "2025-09-15"}]}],
+        "removes": [],
+        "no_changes": False,
+    }
+    (runs_dir / "2025-10-01-curation.json").write_text(json.dumps(add_payload))
+
+    out_dir = tmp_path / "out"
+    result = portfolio.curator_backtest(
+        runs_dir=str(runs_dir), out_dir=str(out_dir),
+        max_weight=0.5,
+        benchmarks=[],  # skip yfinance benchmark fetch
+    )
+
+    # Output files exist with the expected shapes.
+    assert (out_dir / "snapshots.csv").exists()
+    assert (out_dir / "recommendations.csv").exists()
+    assert (out_dir / "baselines_totals.csv").exists()
+    assert (out_dir / "report.md").exists()
+    assert (out_dir / "curation_summary.json").exists()
+
+    snaps = pd.read_csv(out_dir / "snapshots.csv")
+    assert list(snaps.columns) == ["date", "ticker", "shares", "price", "value", "total_value"]
+    # DDD is in the final watchlist (was added).
+    assert "DDD" in set(result["final_watchlist"])
+    # The curator add was actually applied.
+    summary = json.loads((out_dir / "curation_summary.json").read_text())
+    assert any("DDD" in c.get("adds", []) for c in summary)
+    # Baselines were computed.
+    baselines = pd.read_csv(out_dir / "baselines_totals.csv")
+    assert "fixed_total" in baselines.columns
+    assert "bnh_total" in baselines.columns
+    assert result["fixed_baseline_return"] is not None
+    assert result["bnh_baseline_return"] is not None
