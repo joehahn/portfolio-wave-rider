@@ -298,3 +298,189 @@ def test_render_news_section_falls_back_when_headline_missing() -> None:
     assert "Other context follows" in out
     # Click-to-expand wrapper is still present.
     assert "<details" in out
+
+
+# ---------------------------------------------------------------------------
+# Watchlist curator: validation + holdings/history mutation.
+# ---------------------------------------------------------------------------
+
+def _payload(adds=(), removes=(), as_of_date="2024-06-01") -> dict:
+    """Build a minimal curator JSON payload for testing."""
+    def add(t, bucket="AI"):
+        return {
+            "ticker": t,
+            "wave_bucket": bucket,
+            "rationale": f"adopt {t} based on news",
+            "news_evidence": [{"summary": "x", "source": "Bloomberg",
+                                "url": f"https://example.com/{t}",
+                                "date": as_of_date}],
+        }
+    def rem(t):
+        return {"ticker": t, "rationale": f"drop {t}",
+                "news_evidence": [{"summary": "y", "source": "WSJ",
+                                    "url": f"https://example.com/rm-{t}",
+                                    "date": as_of_date}]}
+    return {
+        "as_of_date": as_of_date,
+        "rebalance_period": "monthly",
+        "adds": [add(t) for t in adds],
+        "removes": [rem(t) for t in removes],
+        "no_changes": not (adds or removes),
+        "rationale_overall": "test",
+    }
+
+
+def _write_holdings(path, tickers, shares=None) -> None:
+    shares = shares or [0] * len(tickers)
+    pd.DataFrame({"ticker": tickers, "shares": shares}).to_csv(path, index=False)
+
+
+def _write_profile(path, max_size=12) -> None:
+    path.write_text(
+        f"---\nfinancial_model:\n  max_watchlist_size: {max_size}\n---\n# profile\n"
+    )
+
+
+def test_curator_applies_valid_add_and_remove(tmp_path) -> None:
+    holdings = tmp_path / "holdings.csv"
+    history = tmp_path / "curation_history.csv"
+    profile = tmp_path / "profile.md"
+    _write_holdings(holdings, ["AAPL", "MSFT", "SPY", "AGG"])
+    _write_profile(profile, max_size=12)
+    payload = _payload(adds=["NVDA"], removes=["AGG"])
+    result = portfolio.apply_curator_decisions(
+        payload, holdings_path=str(holdings), history_path=str(history),
+        profile_path=str(profile), listing_check=False,
+    )
+    assert result["applied_adds"] == ["NVDA"]
+    assert result["applied_removes"] == ["AGG"]
+    assert result["rejections"] == []
+    assert set(result["post_watchlist"]) == {"AAPL", "MSFT", "SPY", "NVDA"}
+    # history has one row per applied change
+    hist = pd.read_csv(history)
+    assert len(hist) == 2
+    assert set(hist["action"]) == {"add", "remove"}
+
+
+def test_curator_rejects_add_already_in_watchlist(tmp_path) -> None:
+    holdings = tmp_path / "holdings.csv"
+    profile = tmp_path / "profile.md"
+    _write_holdings(holdings, ["AAPL", "NVDA"])
+    _write_profile(profile)
+    payload = _payload(adds=["NVDA"])
+    result = portfolio.apply_curator_decisions(
+        payload, holdings_path=str(holdings),
+        history_path=str(tmp_path / "h.csv"),
+        profile_path=str(profile), listing_check=False,
+    )
+    assert result["applied_adds"] == []
+    assert any(r["ticker"] == "NVDA" and "already" in r["reason"]
+               for r in result["rejections"])
+
+
+def test_curator_rejects_remove_of_unheld_ticker(tmp_path) -> None:
+    holdings = tmp_path / "holdings.csv"
+    profile = tmp_path / "profile.md"
+    _write_holdings(holdings, ["AAPL"])
+    _write_profile(profile)
+    payload = _payload(removes=["NVDA"])
+    result = portfolio.apply_curator_decisions(
+        payload, holdings_path=str(holdings),
+        history_path=str(tmp_path / "h.csv"),
+        profile_path=str(profile), listing_check=False,
+    )
+    assert result["applied_removes"] == []
+    assert any(r["ticker"] == "NVDA" and "not in" in r["reason"]
+               for r in result["rejections"])
+
+
+def test_curator_rejects_remove_with_live_position(tmp_path) -> None:
+    holdings = tmp_path / "holdings.csv"
+    profile = tmp_path / "profile.md"
+    _write_holdings(holdings, ["AAPL", "MSFT"], shares=[10, 0])
+    _write_profile(profile)
+    payload = _payload(removes=["AAPL"])
+    result = portfolio.apply_curator_decisions(
+        payload, holdings_path=str(holdings),
+        history_path=str(tmp_path / "h.csv"),
+        profile_path=str(profile), listing_check=False,
+    )
+    assert result["applied_removes"] == []
+    assert any(r["ticker"] == "AAPL" and "liquidate" in r["reason"]
+               for r in result["rejections"])
+
+
+def test_curator_enforces_max_watchlist_size(tmp_path) -> None:
+    holdings = tmp_path / "holdings.csv"
+    profile = tmp_path / "profile.md"
+    _write_holdings(holdings, ["A", "B", "C", "D"])
+    _write_profile(profile, max_size=5)
+    # 4 existing + 3 adds = 7 > cap of 5; expect 2 of the 3 adds rejected
+    payload = _payload(adds=["E", "F", "G"])
+    result = portfolio.apply_curator_decisions(
+        payload, holdings_path=str(holdings),
+        history_path=str(tmp_path / "h.csv"),
+        profile_path=str(profile), listing_check=False,
+    )
+    assert len(result["applied_adds"]) == 1
+    assert sum(1 for r in result["rejections"]
+               if "max_watchlist_size" in r["reason"]) == 2
+
+
+def test_curator_rejects_overlapping_adds_and_removes(tmp_path) -> None:
+    holdings = tmp_path / "holdings.csv"
+    profile = tmp_path / "profile.md"
+    _write_holdings(holdings, ["AAPL"])
+    _write_profile(profile)
+    payload = _payload(adds=["NVDA"], removes=["AAPL"])
+    payload["adds"][0]["ticker"] = "AAPL"  # force the overlap
+    with pytest.raises(ValueError, match="both adds and removes"):
+        portfolio.apply_curator_decisions(
+            payload, holdings_path=str(holdings),
+            history_path=str(tmp_path / "h.csv"),
+            profile_path=str(profile), listing_check=False,
+        )
+
+
+def test_curator_listing_check_blocks_pre_listing_add(tmp_path, monkeypatch) -> None:
+    """Mock yfinance: ticker has no data on the as_of_date, so add is rejected."""
+    def empty_download(*_a, **_kw):
+        return pd.DataFrame()
+    monkeypatch.setattr(portfolio.yf, "download", empty_download)
+    holdings = tmp_path / "holdings.csv"
+    profile = tmp_path / "profile.md"
+    _write_holdings(holdings, ["AAPL"])
+    _write_profile(profile)
+    payload = _payload(adds=["NUKZ"], as_of_date="2022-01-01")
+    result = portfolio.apply_curator_decisions(
+        payload, holdings_path=str(holdings),
+        history_path=str(tmp_path / "h.csv"),
+        profile_path=str(profile), listing_check=True,
+    )
+    assert result["applied_adds"] == []
+    assert any("listing-date" in r["reason"] for r in result["rejections"])
+
+
+def test_reconstruct_watchlist_at_replays_history(tmp_path) -> None:
+    history = tmp_path / "h.csv"
+    pd.DataFrame([
+        {"date": "2022-03-01", "action": "add", "ticker": "NVDA",
+         "wave_bucket": "AI", "rationale": "x", "news_evidence_urls": ""},
+        {"date": "2022-06-01", "action": "remove", "ticker": "AGG",
+         "wave_bucket": "", "rationale": "y", "news_evidence_urls": ""},
+        {"date": "2023-01-01", "action": "add", "ticker": "BOTZ",
+         "wave_bucket": "robotics", "rationale": "z", "news_evidence_urls": ""},
+    ]).to_csv(history, index=False)
+    day_zero = ["AAPL", "MSFT", "SPY", "AGG"]
+    # Before the first event - day-0 watchlist unchanged.
+    assert portfolio.reconstruct_watchlist_at(
+        "2022-01-01", day_zero, history_path=str(history)
+    ) == ["AAPL", "AGG", "MSFT", "SPY"]
+    # After first add, before remove.
+    assert portfolio.reconstruct_watchlist_at(
+        "2022-04-01", day_zero, history_path=str(history)
+    ) == ["AAPL", "AGG", "MSFT", "NVDA", "SPY"]
+    # After all events.
+    assert portfolio.reconstruct_watchlist_at(
+        "2024-01-01", day_zero, history_path=str(history)
+    ) == ["AAPL", "BOTZ", "MSFT", "NVDA", "SPY"]

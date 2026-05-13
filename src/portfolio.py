@@ -424,6 +424,294 @@ def snapshot_holdings(
     }
 
 
+# ---------------------------------------------------------------------------
+# Watchlist curation: consume a watchlist-curator payload, validate it, and
+# mutate holdings.csv + data/curation_history.csv accordingly.
+# ---------------------------------------------------------------------------
+
+_VALID_WAVE_BUCKETS = {
+    "AI", "robotics", "rockets_spacecraft", "nuclear", "quantum",
+    "engineered_biology", "general_markets",
+}
+
+
+def _check_ticker_listing_date(ticker: str, as_of_date: str) -> tuple[bool, str]:
+    """Return (existed_on_as_of_date, reason). Uses yfinance to fetch a small
+    window centered on as_of_date and checks for any returned rows.
+
+    A return of (False, "...") means the ticker either did not exist yet or
+    yfinance has no data for it on or near that date. The harness rejects
+    such adds. yfinance errors propagate as (False, error_msg) rather than
+    crashing, so a transient network problem won't take down the whole
+    curate run.
+    """
+    try:
+        d = pd.Timestamp(as_of_date)
+    except Exception as e:
+        return False, f"unparseable as_of_date: {e}"
+    start = (d - pd.Timedelta(days=14)).strftime("%Y-%m-%d")
+    end = (d + pd.Timedelta(days=1)).strftime("%Y-%m-%d")
+    try:
+        df = yf.download(ticker, start=start, end=end, interval="1d",
+                         auto_adjust=True, progress=False, threads=False)
+    except Exception as e:
+        return False, f"yfinance error: {e}"
+    if df is None or df.empty:
+        return False, f"no price data on or before {as_of_date}"
+    return True, "ok"
+
+
+def _validate_curator_payload(
+    payload: dict[str, Any],
+    current_watchlist: list[str],
+    max_watchlist_size: int,
+    listing_check: bool = True,
+    as_of_date: str | None = None,
+) -> dict[str, Any]:
+    """Validate a watchlist-curator JSON payload against the contract rules.
+
+    Returns a dict with `valid_adds`, `valid_removes`, and `rejections`
+    (list of {ticker, action, reason}). Does not mutate any files.
+
+    Rules enforced:
+      - Top-level shape: as_of_date, adds, removes, no_changes must be present
+      - At most 3 adds and 3 removes per call
+      - adds must carry ticker, wave_bucket, rationale, news_evidence
+      - wave_bucket must be in _VALID_WAVE_BUCKETS
+      - news_evidence must be a non-empty list with at least one bullet
+      - no ticker can appear in both adds and removes
+      - adds cannot target tickers already in current_watchlist
+      - removes must target tickers in current_watchlist
+      - post-change watchlist size must be <= max_watchlist_size
+      - if listing_check, each add's ticker must have yfinance data on
+        the as_of_date (either the payload's or the override)
+    """
+    rejections: list[dict[str, str]] = []
+    raw_adds = payload.get("adds") or []
+    raw_removes = payload.get("removes") or []
+    if not isinstance(raw_adds, list) or not isinstance(raw_removes, list):
+        raise ValueError("adds and removes must be lists")
+    if len(raw_adds) > 3:
+        raise ValueError(f"at most 3 adds per call; got {len(raw_adds)}")
+    if len(raw_removes) > 3:
+        raise ValueError(f"at most 3 removes per call; got {len(raw_removes)}")
+
+    add_tickers = {a.get("ticker") for a in raw_adds if isinstance(a, dict)}
+    remove_tickers = {r.get("ticker") for r in raw_removes if isinstance(r, dict)}
+    overlap = add_tickers & remove_tickers
+    if overlap:
+        raise ValueError(f"ticker(s) appear in both adds and removes: {sorted(overlap)}")
+
+    current_set = set(current_watchlist)
+    valid_adds: list[dict[str, Any]] = []
+    asof = as_of_date or payload.get("as_of_date")
+
+    for add in raw_adds:
+        t = add.get("ticker")
+        wb = add.get("wave_bucket")
+        rationale = (add.get("rationale") or "").strip()
+        evidence = add.get("news_evidence") or []
+        if not t:
+            rejections.append({"ticker": str(t), "action": "add", "reason": "missing ticker"})
+            continue
+        if t in current_set:
+            rejections.append({"ticker": t, "action": "add",
+                               "reason": "already in current_watchlist"})
+            continue
+        if wb not in _VALID_WAVE_BUCKETS:
+            rejections.append({"ticker": t, "action": "add",
+                               "reason": f"invalid wave_bucket: {wb!r}"})
+            continue
+        if not rationale:
+            rejections.append({"ticker": t, "action": "add",
+                               "reason": "empty rationale"})
+            continue
+        if not isinstance(evidence, list) or len(evidence) == 0:
+            rejections.append({"ticker": t, "action": "add",
+                               "reason": "news_evidence must be a non-empty list"})
+            continue
+        if listing_check and asof:
+            ok, msg = _check_ticker_listing_date(t, asof)
+            if not ok:
+                rejections.append({"ticker": t, "action": "add",
+                                   "reason": f"listing-date check failed: {msg}"})
+                continue
+        valid_adds.append(add)
+
+    valid_removes: list[dict[str, Any]] = []
+    for rem in raw_removes:
+        t = rem.get("ticker")
+        rationale = (rem.get("rationale") or "").strip()
+        if not t:
+            rejections.append({"ticker": str(t), "action": "remove",
+                               "reason": "missing ticker"})
+            continue
+        if t not in current_set:
+            rejections.append({"ticker": t, "action": "remove",
+                               "reason": "not in current_watchlist"})
+            continue
+        if not rationale:
+            rejections.append({"ticker": t, "action": "remove",
+                               "reason": "empty rationale"})
+            continue
+        valid_removes.append(rem)
+
+    # Cap check: post-change size = current - removes + adds.
+    post_size = len(current_set
+                    - {r["ticker"] for r in valid_removes}
+                    | {a["ticker"] for a in valid_adds})
+    if post_size > max_watchlist_size:
+        excess = post_size - max_watchlist_size
+        dropped = [a["ticker"] for a in valid_adds[-excess:]]
+        for t in dropped:
+            rejections.append({"ticker": t, "action": "add",
+                               "reason": f"would exceed max_watchlist_size={max_watchlist_size}"})
+        valid_adds = valid_adds[:-excess]
+
+    return {
+        "valid_adds": valid_adds,
+        "valid_removes": valid_removes,
+        "rejections": rejections,
+    }
+
+
+def apply_curator_decisions(
+    payload: dict[str, Any],
+    holdings_path: str = "holdings.csv",
+    history_path: str = "data/curation_history.csv",
+    profile_path: str = "investor_profile.md",
+    listing_check: bool = True,
+    as_of_date: str | None = None,
+) -> dict[str, Any]:
+    """Validate a watchlist-curator payload and apply it to holdings.csv.
+
+    Adds are appended to holdings.csv at shares=0. Removes delete the row
+    (positions with shares>0 are blocked from removal; the user must zero
+    out their position first in the brokerage and update holdings.csv).
+    Every applied change is appended as a row to curation_history.csv.
+
+    Returns a result dict with applied/rejected lists and the post-change
+    watchlist.
+    """
+    fm = load_financial_model(profile_path)
+    max_size = int(fm.get("max_watchlist_size", 12))
+
+    h_path = Path(holdings_path)
+    if not h_path.exists():
+        raise FileNotFoundError(f"holdings file not found: {h_path}")
+    holdings = pd.read_csv(h_path)
+    if "ticker" not in holdings.columns or "shares" not in holdings.columns:
+        raise ValueError(f"{h_path} must have ticker,shares columns")
+    current_watchlist = holdings["ticker"].astype(str).tolist()
+
+    validated = _validate_curator_payload(
+        payload, current_watchlist, max_size,
+        listing_check=listing_check, as_of_date=as_of_date,
+    )
+    valid_adds = validated["valid_adds"]
+    valid_removes = validated["valid_removes"]
+    rejections = validated["rejections"]
+
+    # Block removes for tickers with shares > 0 - the user has a live
+    # position that must be liquidated in the brokerage first.
+    held = {row["ticker"]: float(row["shares"]) for _, row in holdings.iterrows()}
+    safe_removes: list[dict[str, Any]] = []
+    for rem in valid_removes:
+        t = rem["ticker"]
+        if held.get(t, 0.0) > 0.0:
+            rejections.append({"ticker": t, "action": "remove",
+                               "reason": f"current shares={held[t]} > 0; liquidate first"})
+        else:
+            safe_removes.append(rem)
+    valid_removes = safe_removes
+
+    # Apply adds (append rows at shares=0) and removes (delete rows).
+    new_rows = pd.DataFrame([{"ticker": a["ticker"], "shares": 0}
+                             for a in valid_adds])
+    if not new_rows.empty:
+        holdings = pd.concat([holdings, new_rows], ignore_index=True)
+    if valid_removes:
+        rm_set = {r["ticker"] for r in valid_removes}
+        holdings = holdings[~holdings["ticker"].isin(rm_set)].reset_index(drop=True)
+
+    holdings.to_csv(h_path, index=False)
+
+    # Append to curation_history.csv. One row per applied change.
+    history_p = Path(history_path)
+    history_p.parent.mkdir(parents=True, exist_ok=True)
+    asof = as_of_date or payload.get("as_of_date") or pd.Timestamp.today().strftime("%Y-%m-%d")
+    rows: list[dict[str, Any]] = []
+    for a in valid_adds:
+        urls = ";".join(e.get("url", "") for e in (a.get("news_evidence") or [])
+                        if isinstance(e, dict))
+        rows.append({
+            "date": asof,
+            "action": "add",
+            "ticker": a["ticker"],
+            "wave_bucket": a.get("wave_bucket", ""),
+            "rationale": a.get("rationale", "").strip(),
+            "news_evidence_urls": urls,
+        })
+    for r in valid_removes:
+        urls = ";".join(e.get("url", "") for e in (r.get("news_evidence") or [])
+                        if isinstance(e, dict))
+        rows.append({
+            "date": asof,
+            "action": "remove",
+            "ticker": r["ticker"],
+            "wave_bucket": "",
+            "rationale": r.get("rationale", "").strip(),
+            "news_evidence_urls": urls,
+        })
+
+    if rows:
+        new_history = pd.DataFrame(rows)
+        if history_p.exists():
+            existing = pd.read_csv(history_p)
+            new_history = pd.concat([existing, new_history], ignore_index=True)
+        new_history.to_csv(history_p, index=False)
+
+    return {
+        "as_of_date": asof,
+        "applied_adds": [a["ticker"] for a in valid_adds],
+        "applied_removes": [r["ticker"] for r in valid_removes],
+        "rejections": rejections,
+        "post_watchlist": holdings["ticker"].astype(str).tolist(),
+        "holdings_path": str(h_path),
+        "history_path": str(history_p),
+    }
+
+
+def reconstruct_watchlist_at(
+    target_date: str,
+    day_zero_tickers: list[str],
+    history_path: str = "data/curation_history.csv",
+) -> list[str]:
+    """Replay curation_history.csv forward from day 0 up through target_date.
+
+    The caller provides the day-0 starter watchlist (typically the keys of
+    thesis_baseline.json's `holdings`, or the day-0 starter list for a
+    backtest run). Returns the sorted list of tickers active on target_date.
+    """
+    watchlist = set(day_zero_tickers)
+    history_p = Path(history_path)
+    if not history_p.exists():
+        return sorted(watchlist)
+    df = pd.read_csv(history_p)
+    if df.empty:
+        return sorted(watchlist)
+    target = pd.Timestamp(target_date)
+    df = df.copy()
+    df["date"] = pd.to_datetime(df["date"])
+    df = df[df["date"] <= target].sort_values("date")
+    for _, row in df.iterrows():
+        if row["action"] == "add":
+            watchlist.add(str(row["ticker"]))
+        elif row["action"] == "remove":
+            watchlist.discard(str(row["ticker"]))
+    return sorted(watchlist)
+
+
 def recommend_portfolio(
     holdings_path: str = "holdings.csv",
     out_path: str = "data/recommendations.csv",

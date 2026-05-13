@@ -1,14 +1,16 @@
 """Single CLI for every portfolio operation.
 
-Six subcommands. Each calls one function in ``src/portfolio.py`` and
-prints the result as JSON to stdout. The /review-portfolio skill
-invokes ``init-holdings`` (first-run branch only) and ``analyze``;
-the cron jobs invoke ``snapshot``, ``recommend``, and ``dashboard``.
-``backtest`` is a one-off spot-check tool, not part of any cron flow.
+Seven subcommands. Each calls one function in ``src/portfolio.py`` and
+prints the result as JSON to stdout. The cron job invokes ``snapshot``
+and ``dashboard``. ``curate`` applies a watchlist-curator JSON payload
+to holdings.csv and appends to data/curation_history.csv. ``backtest``
+is a math-only spot-check tool with no LLM in the loop; a curator-driven
+walk-forward variant lands in stage C2.
 
 Usage:
     python -m src.cli init-holdings      --allocations '{"AAPL": 5000, ...}' --out holdings.csv
     python -m src.cli analyze            --tickers AAPL MSFT NVDA --period 3y --max-weight 0.25
+    python -m src.cli curate             --input curator_payload.json [--as-of-date YYYY-MM-DD]
     python -m src.cli snapshot           [--date YYYY-MM-DD] [--force]
     python -m src.cli recommend          [--max-weight 0.25] [--force]
     python -m src.cli backtest           [--start-date YYYY-MM-DD] [--end-date YYYY-MM-DD] [--initial-usd 50000]
@@ -76,6 +78,18 @@ def main(argv: list[str] | None = None) -> int:
                        help="lambda in mean_variance objective; see analyze --risk-aversion")
     p_rec.add_argument("--date", default=None)
     p_rec.add_argument("--force", action="store_true")
+
+    p_cur = sub.add_parser("curate",
+                            help="apply a watchlist-curator JSON payload to holdings.csv + curation_history.csv")
+    p_cur.add_argument("--input", required=True,
+                       help="path to the curator agent's JSON output")
+    p_cur.add_argument("--holdings", default="holdings.csv")
+    p_cur.add_argument("--history", default="data/curation_history.csv")
+    p_cur.add_argument("--profile", default="investor_profile.md")
+    p_cur.add_argument("--as-of-date", default=None,
+                       help="override the payload's as_of_date (used in backtest replays)")
+    p_cur.add_argument("--no-listing-check", action="store_true",
+                       help="skip the yfinance listing-date check on adds (offline tests)")
 
     p_bt = sub.add_parser("backtest",
                            help="walk-forward monthly-rebalance backtest; outputs to data/backtest/")
@@ -159,6 +173,16 @@ def main(argv: list[str] | None = None) -> int:
                 risk_free_rate=args.risk_free_rate, objective=args.objective,
                 risk_aversion=args.risk_aversion,
                 date=args.date, force=args.force,
+            )
+        elif args.cmd == "curate":
+            payload = json.loads(Path(args.input).read_text())
+            result = portfolio.apply_curator_decisions(
+                payload,
+                holdings_path=args.holdings,
+                history_path=args.history,
+                profile_path=args.profile,
+                listing_check=not args.no_listing_check,
+                as_of_date=args.as_of_date,
             )
         else:  # dashboard
             result = portfolio.build_dashboard(
