@@ -16,7 +16,7 @@ See [GLOSSARY.md](GLOSSARY.md) for finance and stats terms (`σ`, `μ`, `Σ`, Sh
 
 ## Setup
 
-Four steps: install Python, fill in your profile + watchlist, bootstrap the portfolio, then install cron so the dashboard accumulates history.
+Four steps: install dependencies, edit the configuration files to your taste, bootstrap your initial portfolio, and install the daily cron job.
 
 ### 1. Install dependencies
 
