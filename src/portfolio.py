@@ -38,7 +38,6 @@ TRADING_DAYS = 252
 # ---------------------------------------------------------------------------
 
 _FINANCIAL_MODEL_DEFAULTS: dict[str, Any] = {
-    "objective": "max_sharpe",
     "risk_aversion": 1.0,
     "risk_free_rate": 0.04,
     "lookback_period": "3y",
@@ -50,11 +49,16 @@ _FINANCIAL_MODEL_DEFAULTS: dict[str, Any] = {
 def load_financial_model(profile_path: str = "investor_profile.md") -> dict[str, Any]:
     """Read `financial_model` from investor_profile.md's YAML front matter.
 
-    Returns a dict with the six fields (`objective`, `risk_aversion`,
-    `risk_free_rate`, `lookback_period`, `rebalance_period`,
-    `max_watchlist_size`); any missing field falls back to the hard-coded
-    default. If the profile file doesn't exist or has no front matter,
-    all defaults are returned.
+    Returns a dict with five fields (`risk_aversion`, `risk_free_rate`,
+    `lookback_period`, `rebalance_period`, `max_watchlist_size`); any missing
+    field falls back to the hard-coded default. If the profile file doesn't
+    exist or has no front matter, all defaults are returned.
+
+    The optimizer objective is intentionally not configurable here: this
+    project commits to mean-variance maximization with ``risk_aversion`` (λ)
+    as the only investor-facing knob on the return/variance tradeoff.
+    Library callers of ``optimize_portfolio`` can still pass an explicit
+    ``objective=`` to override per call.
     """
     import re
     import yaml

@@ -51,13 +51,12 @@ def main(argv: list[str] | None = None) -> int:
     p_an = sub.add_parser("analyze", help="fetch + optimize + risk in one call")
     p_an.add_argument("--tickers", nargs="+", required=True)
     p_an.add_argument("--period", default=fm["lookback_period"])
-    p_an.add_argument("--objective", default=fm["objective"],
-                      choices=["max_sharpe", "min_variance", "mean_variance"])
     p_an.add_argument("--max-weight", type=float, default=0.25)
     p_an.add_argument("--risk-free-rate", type=float, default=fm["risk_free_rate"])
     p_an.add_argument("--risk-aversion", type=float, default=fm["risk_aversion"],
-                      help="lambda in mean_variance objective (μᵀw - λ·wᵀΣw); "
-                           "small λ favors return, large λ favors variance reduction")
+                      help="lambda in the mean-variance utility μᵀw - λ·wᵀΣw; "
+                           "small λ favors return, large λ favors variance reduction. "
+                           "The optimizer is always mean-variance — λ is the only knob.")
 
     p_snap = sub.add_parser("snapshot", help="append today's $ values to data/snapshots.csv")
     p_snap.add_argument("--holdings", default="holdings.csv")
@@ -72,10 +71,8 @@ def main(argv: list[str] | None = None) -> int:
     p_rec.add_argument("--period", default=fm["lookback_period"])
     p_rec.add_argument("--max-weight", type=float, default=0.25)
     p_rec.add_argument("--risk-free-rate", type=float, default=fm["risk_free_rate"])
-    p_rec.add_argument("--objective", default=fm["objective"],
-                       choices=["max_sharpe", "min_variance", "mean_variance"])
     p_rec.add_argument("--risk-aversion", type=float, default=fm["risk_aversion"],
-                       help="lambda in mean_variance objective; see analyze --risk-aversion")
+                       help="lambda in the mean-variance utility; see analyze --risk-aversion")
     p_rec.add_argument("--date", default=None)
     p_rec.add_argument("--force", action="store_true")
 
@@ -113,10 +110,8 @@ def main(argv: list[str] | None = None) -> int:
     p_bt.add_argument("--lookback-years", type=float, default=_default_lookback_years,
                       help="optimizer lookback window in years (default from investor_profile)")
     p_bt.add_argument("--max-weight", type=float, default=0.25)
-    p_bt.add_argument("--objective", default=fm["objective"],
-                      choices=["max_sharpe", "min_variance", "mean_variance"])
     p_bt.add_argument("--risk-aversion", type=float, default=fm["risk_aversion"],
-                      help="lambda in mean_variance objective; see analyze --risk-aversion")
+                      help="lambda in the mean-variance utility; see analyze --risk-aversion")
     p_bt.add_argument("--risk-free-rate", type=float, default=fm["risk_free_rate"])
     p_bt.add_argument("--benchmarks", nargs="*", default=["SPY"],
                       help="benchmark tickers compared against the backtest's realized return "
@@ -164,7 +159,7 @@ def main(argv: list[str] | None = None) -> int:
                     runs_dir=args.curator_runs_dir,
                     out_dir=args.out_dir,
                     max_weight=args.max_weight,
-                    objective=args.objective,
+                    objective="mean_variance",
                     risk_aversion=args.risk_aversion,
                     risk_free_rate=args.risk_free_rate,
                     benchmarks=args.benchmarks,
@@ -175,14 +170,14 @@ def main(argv: list[str] | None = None) -> int:
                     start_date=args.start_date, end_date=args.end_date,
                     initial_usd=args.initial_usd, out_dir=args.out_dir,
                     lookback_years=args.lookback_years,
-                    max_weight=args.max_weight, objective=args.objective,
+                    max_weight=args.max_weight, objective="mean_variance",
                     risk_aversion=args.risk_aversion,
                     risk_free_rate=args.risk_free_rate,
                     benchmarks=args.benchmarks,
                 )
         elif args.cmd == "analyze":
             result = portfolio.analyze(
-                args.tickers, period=args.period, objective=args.objective,
+                args.tickers, period=args.period, objective="mean_variance",
                 max_weight=args.max_weight, risk_free_rate=args.risk_free_rate,
                 risk_aversion=args.risk_aversion,
             )
@@ -195,7 +190,7 @@ def main(argv: list[str] | None = None) -> int:
             result = portfolio.recommend_portfolio(
                 holdings_path=args.holdings, out_path=args.out,
                 period=args.period, max_weight=args.max_weight,
-                risk_free_rate=args.risk_free_rate, objective=args.objective,
+                risk_free_rate=args.risk_free_rate, objective="mean_variance",
                 risk_aversion=args.risk_aversion,
                 date=args.date, force=args.force,
             )

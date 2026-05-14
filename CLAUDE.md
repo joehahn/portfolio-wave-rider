@@ -25,7 +25,7 @@ Keep everything as simple and explainable as possible. Fewest files, least code,
 
 ## The source of truth: `investor_profile.md`
 
-`investor_profile.md` at the repo root is the source of truth for every recommendation. It declares the user's goals, strategy, constraints, exclusions, and the optimizer's mathematical model (`financial_model` YAML section: `objective`, `risk_aversion` λ, `risk_free_rate`, `lookback_period`, `rebalance_period`, `max_watchlist_size`). The CLI's argparse loads the `financial_model` defaults via `portfolio.load_financial_model()`; CLI flags (`--objective`, `--risk-aversion`, etc.) override per invocation. Every skill and subagent must load the profile before reasoning about allocations.
+`investor_profile.md` at the repo root is the source of truth for every recommendation. It declares the user's goals, strategy, constraints, exclusions, and the optimizer's mathematical model (`financial_model` YAML section: `risk_aversion` λ, `risk_free_rate`, `lookback_period`, `rebalance_period`, `max_watchlist_size`). The optimizer is always mean-variance; `λ` is the only investor-facing knob on the return/variance tradeoff. The CLI's argparse loads the `financial_model` defaults via `portfolio.load_financial_model()`; CLI flags (`--risk-aversion`, etc.) override per invocation. Every skill and subagent must load the profile before reasoning about allocations.
 
 If `investor_profile.md` is missing or empty, stop and tell the user to copy `investor_profile.example.md` to `investor_profile.md` and edit it. Do not fall back to a default profile.
 

@@ -13,14 +13,12 @@ Seven subcommands. The daily cron calls `snapshot` and `dashboard`. The `/review
 .venv/bin/python -m src.cli init-holdings --allocations '{"NVDA": 5000, "MSFT": 5000, ...}' --out holdings.csv
 
 # One-shot analysis (fetch prices + compute log-returns + optimize + risk metrics).
-# Three objectives:
-#   max_sharpe    - default; maximize (μᵀw - r_free) / √(wᵀΣw). Risk-adjusted optimum.
-#   min_variance  - minimize wᵀΣw. Lowest-vol point on the frontier.
-#   mean_variance - maximize μᵀw - λ·wᵀΣw. λ (`--risk-aversion`) slides along the
-#                   frontier: small λ favors return (more equity-heavy), large λ
-#                   favors variance reduction (more bond/cash-heavy).
+# The optimizer always maximizes the mean-variance utility μᵀw - λ·wᵀΣw subject
+# to ∑wᵢ=1, wᵢ≥0, and wᵢ≤max_weight. λ (`--risk-aversion`) is the only knob on
+# the return/variance tradeoff: small λ favors return (more equity-heavy), large
+# λ favors variance reduction (more bond/cash-heavy).
 .venv/bin/python -m src.cli analyze --tickers AAPL MSFT NVDA --period 1.3y --max-weight 0.25
-.venv/bin/python -m src.cli analyze --tickers AAPL MSFT NVDA --objective mean_variance --risk-aversion 1.0
+.venv/bin/python -m src.cli analyze --tickers AAPL MSFT NVDA --risk-aversion 1.0
 
 # Apply a watchlist-curator JSON payload to holdings.csv and data/curation_history.csv.
 # Validates against the contract (listing date via yfinance, max_watchlist_size,
@@ -187,7 +185,7 @@ Headline experiment that justified the watchlist-curator design (over the previo
 
 The curator beat the fixed-watchlist rebalance by **+55pp** (≈12pp annualized) — that gap is the active contribution of the LLM curator over 4.6 years. Annualized return 20.5%, max drawdown −39.9% during the 2022 bear market.
 
-To reproduce: `python -m src.cli backtest --curator-runs-dir data/curator_runs/5y-quarterly --out-dir data/backtest_curator_5y --max-weight 0.25 --objective mean_variance --risk-aversion 1.0`. Replays the saved JSONs through the optimizer in a few seconds. Re-running the curator agents from scratch costs another ~$3.
+To reproduce: `python -m src.cli backtest --curator-runs-dir data/curator_runs/5y-quarterly --out-dir data/backtest_curator_5y --max-weight 0.25 --risk-aversion 1.0`. Replays the saved JSONs through the optimizer in a few seconds. Re-running the curator agents from scratch costs another ~$3.
 
 ### Prior wave-stage tilt experiment (frozen on `5y-backtest` branch)
 
