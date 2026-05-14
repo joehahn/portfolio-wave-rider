@@ -1599,79 +1599,6 @@ WAVE_DISPLAY_LABEL: dict[str, str] = {
 }
 
 
-def _render_news_section(payload: dict, title: str, intro: str) -> str:
-    """Render one news section (title + intro + per-ticker click-to-expand bullets).
-
-    Returns an empty string if payload has no per_ticker bullets. Used by
-    ``render_news_page`` for the dashboard's wave-stage news section.
-    Schema: per_ticker -> {bullets: [{headline, summary, source, url,
-    date, optional wave_bucket}]}.
-    """
-    per_ticker = payload.get("per_ticker") or {}
-    if not per_ticker:
-        return ""
-
-    run_date = payload.get("date") or "unknown date"
-
-    def _wave_rank(ticker: str) -> tuple[int, str]:
-        wave = per_ticker[ticker].get("wave_bucket", "general_markets")
-        rank = _WAVE_DISPLAY_ORDER.index(wave) if wave in _WAVE_DISPLAY_ORDER else 99
-        return (rank, ticker)
-
-    ordered_tickers = sorted(per_ticker.keys(), key=_wave_rank)
-
-    # Titles and intros are caller-controlled constants, not user input,
-    # so they're rendered as-is. Only date and bullet fields are escaped.
-    parts = [
-        '<h2 style="border-bottom:1px solid #ddd;padding-bottom:0.3em;margin-top:1.5em;">'
-        f'{title} '
-        f'<span style="color:#888;font-weight:normal;font-size:0.7em;">'
-        f'({_html.escape(str(run_date))})</span></h2>',
-        f'<p style="color:#666;font-size:0.9em;">{intro}</p>',
-    ]
-
-    for ticker in ordered_tickers:
-        info = per_ticker[ticker]
-        bullets = info.get("bullets") or []
-        if not bullets:
-            continue
-        wave = info.get("wave_bucket")
-        if wave:
-            ticker_html = (f'{_html.escape(ticker)} '
-                           f'<small style="color:#999;font-weight:normal;">'
-                           f'({_html.escape(wave)})</small>')
-        else:
-            ticker_html = _html.escape(ticker)
-        parts.append(
-            f'<h3 style="margin-top:1.5em;color:#222;">{ticker_html}</h3>'
-        )
-        for b in bullets:
-            summary_text = str(b.get("summary", ""))
-            # Headline: prefer the explicit field; fall back to a truncated summary.
-            headline = str(b.get("headline") or "").strip()
-            if not headline:
-                trimmed = summary_text.strip().split(". ")[0]
-                headline = (trimmed[:100] + "…") if len(trimmed) > 100 else trimmed
-            url = _html.escape(str(b.get("url", "#")), quote=True)
-            source = _html.escape(str(b.get("source", "")))
-            date = _html.escape(str(b.get("date", "")))
-            meta = " · ".join(x for x in (source, date) if x)
-            parts.append(
-                '<details style="margin:0.5em 0;padding:0.4em 0.6em;'
-                'border-left:3px solid #e0e0e0;">'
-                '<summary style="cursor:pointer;line-height:1.4;color:#222;">'
-                f'<span style="font-weight:600;">{_html.escape(headline)}</span>'
-                f' <small style="color:#999;font-weight:normal;">{meta}</small>'
-                '</summary>'
-                '<div style="margin:0.6em 0 0.4em;line-height:1.55;color:#333;">'
-                f'<p style="margin:0 0 0.5em;">{_html.escape(summary_text)}</p>'
-                f'<a href="{url}" target="_blank" rel="noopener" '
-                'style="color:#1a73e8;text-decoration:none;font-size:0.9em;">'
-                'Read full article →</a>'
-                '</div></details>'
-            )
-
-    return "\n".join(parts)
 
 
 
@@ -1728,10 +1655,6 @@ def build_dashboard(
     thesis_baseline_path: str | None = "data/thesis_baseline.json",
 ) -> dict[str, Any]:
     """Render the time-series + bar charts into one HTML file.
-
-    News content is rendered separately by ``render_news_page`` into
-    docs/news.html; the dashboard CLI calls both together so cron and
-    /review-portfolio refresh both files in one go.
 
     If ``benchmarks`` is provided (or defaulted to ``["SPY"]``), each
     benchmark ticker's price curve is fetched via yfinance for the
@@ -2333,11 +2256,6 @@ def build_dashboard(
     o_path.parent.mkdir(parents=True, exist_ok=True)
     fig.write_html(str(o_path), include_plotlyjs="cdn")
 
-    # News content is no longer rendered into the dashboard HTML. The
-    # latest /review-portfolio news payload (the one that drives the
-    # wave-stage classifications) lives on its own page at
-    # docs/news.html — see render_news_page().
-
     return {
         "out_path": str(o_path),
         "snapshots_rows": int(len(pd.read_csv(snap_path))) if snap_path.exists() else 0,
@@ -2346,70 +2264,6 @@ def build_dashboard(
     }
 
 
-def render_news_page(
-    news_path: str = "data/news_latest.json",
-    out_path: str = "docs/news.html",
-) -> dict[str, Any]:
-    """Render docs/news.html: a standalone page showing the latest
-    /review-portfolio news payload (the bullets the news-researcher
-    surfaced and used to classify each wave's stage).
-
-    Companion to build_dashboard; the dashboard CLI calls this after
-    writing index.html so cron + /review-portfolio refresh both files
-    together. The news payload at ``news_path`` is overwritten on each
-    /review-portfolio run, so this page always reflects the most recent
-    classification rationale.
-    """
-    n_path = Path(news_path)
-    if not n_path.exists():
-        # No /review-portfolio has run yet. Write a minimal placeholder
-        # so the nav-strip link doesn't break.
-        body = (
-            '<h2 style="margin-top:1.5em;">No wave-stage news yet</h2>'
-            '<p style="color:#666;">Run <code>/review-portfolio</code> '
-            'to surface the news that drives the optimizer\'s wave-stage '
-            'tilts. The latest run\'s bullets will appear here.</p>'
-        )
-    else:
-        try:
-            payload = json.loads(n_path.read_text())
-            body = _render_news_section(
-                payload,
-                title="Wave-stage news from last /review-portfolio",
-                intro="The bullets below are the evidence the news-researcher "
-                      "surfaced for each ticker on the most recent "
-                      "<code>/review-portfolio</code> run. They drive each wave's "
-                      "stage classification (chart 5 of the live dashboard) and "
-                      "the per-ticker tilt the optimizer applies. Click any "
-                      "headline to expand the LLM-written, portfolio-relevance "
-                      "summary plus a link to the source. Tickers grouped by wave bucket.",
-            )
-            if not body:
-                body = (
-                    '<h2 style="margin-top:1.5em;">News payload is empty</h2>'
-                    '<p style="color:#666;">The latest <code>news_latest.json</code> '
-                    'has no per-ticker bullets.</p>'
-                )
-        except (json.JSONDecodeError, OSError) as e:
-            body = (
-                '<h2 style="margin-top:1.5em;">Could not read news payload</h2>'
-                f'<p style="color:#666;">{_html.escape(type(e).__name__)}: '
-                f'{_html.escape(str(e))}</p>'
-            )
-
-    page = (
-        '<!doctype html><html><head><meta charset="utf-8">'
-        '<title>Portfolio Wave Rider — news</title>'
-        '<style>body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;'
-        'max-width:980px;margin:0 auto;padding:0 1.5em;color:#222;line-height:1.5;}</style>'
-        '</head><body>\n'
-        + body
-        + '\n</body></html>'
-    )
-    o_path = Path(out_path)
-    o_path.parent.mkdir(parents=True, exist_ok=True)
-    o_path.write_text(page, encoding="utf-8")
-    return {"out_path": str(o_path), "news_payload_present": n_path.exists()}
 
 
 # ---------------------------------------------------------------------------

@@ -1,0 +1,280 @@
+{
+  "per_ticker": {
+    "NVDA": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "NVIDIA Q1 FY2026 (ended April 27, 2025) revenue came in at $44.1B, up 69% YoY; Data Center revenue reached $39.1B, up 73% YoY -- the company's largest segment and the primary AI-compute engine driving results.",
+          "source": "CNBC / NVIDIA Investor Relations",
+          "url": "https://www.cnbc.com/2025/05/28/nvidia-nvda-earnings-report-q1-2026.html",
+          "date": "2025-05-28"
+        },
+        {
+          "summary": "China export controls on H20 chips resulted in a $4.5B inventory charge in Q1 FY2026. Q2 guidance of ~$45B implies H20-related revenue headwind of ~$8B; Stratechery noted 'the loss of China is a problem in the long run' and that inference workloads are increasingly driving demand.",
+          "source": "Stratechery",
+          "url": "https://stratechery.com/2025/nvidia-earnings-nvidias-china-argument-nvlink-fusion/",
+          "date": "2025-06-02"
+        }
+      ]
+    },
+    "MSFT": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Microsoft Q3 FY2025 (ended March 31, 2025) revenue grew 13% YoY to $70.1B; Intelligent Cloud segment rose 21% to $26.8B, with Azure up 33% YoY -- AI services alone contributed 16 percentage points to Azure growth.",
+          "source": "Microsoft Investor Relations / Futurum Group",
+          "url": "https://futurumgroup.com/insights/microsoft-q3-fy-2025-earnings-beat-on-strong-cloud-and-ai-services-growth/",
+          "date": "2025-04-30"
+        },
+        {
+          "summary": "Stratechery reported that Microsoft's Azure beat was partly driven by new data-center capacity coming online ahead of schedule, relieving supply constraints; non-AI Azure workloads also reaccelerated alongside AI.",
+          "source": "Stratechery",
+          "url": "https://stratechery.com/2025/microsoft-earnings-microsofts-core-capability-amazon-earnings/",
+          "date": "2025-05-01"
+        }
+      ]
+    },
+    "GOOGL": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Alphabet Q1 2025 (reported April 24, 2025): total revenue up 12% YoY to $90.2B; Google Cloud revenue rose 28% to $12.3B, led by AI infrastructure and Generative AI solutions on GCP.",
+          "source": "SEC EDGAR (Alphabet Q1 2025 exhibit)",
+          "url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204425000040/googexhibit991q12025.htm",
+          "date": "2025-04-24"
+        },
+        {
+          "summary": "Stratechery (June 2025) headlined 'Google doubles down on AI in the cloud' following strong quarterly results; paywalled detail but the public headline confirms Cloud-led AI execution was the market narrative heading into June 2025.",
+          "source": "Stratechery",
+          "url": "https://stratechery.com/2025/google-earnings-google-flips-the-switch-on-cloud-search-notes/",
+          "date": "2025-06-24"
+        }
+      ]
+    },
+    "RKLB": {
+      "wave_bucket": "rockets_spacecraft",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Rocket Lab's Q1 2025 results (reported May 2025) showed revenue of $122.6M, up 32% YoY; Q2 2025 guidance set at $130-140M with GAAP gross margins of 30-32%. Neutron medium-lift rocket remained on track for H2 2025 first launch.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/news/rocket-lab-usa-inc-rklb-075200036.html",
+          "date": "2025-05-08"
+        },
+        {
+          "summary": "On June 28, 2025, Rocket Lab successfully completed its 68th Electron mission ('Symphony In The Stars') from Launch Complex 1, setting a record launch-turnaround at that site; the company also added two new missions to its 2025 manifest and signed its first direct ESA navigation contract during the month.",
+          "source": "Business Wire / NASASpaceFlight",
+          "url": "https://www.businesswire.com/news/home/20250628346094/en/Rocket-Lab-Completes-Record-Launch-Turnaround-From-Launch-Complex-1-Successfully-Deploys-68th-Electron-Mission",
+          "date": "2025-06-28"
+        }
+      ]
+    },
+    "BOTZ": {
+      "wave_bucket": "robotics",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "The Robot Report and IEEE Spectrum curated sources did not surface material BOTZ-specific news within the June 2025 window. Open search confirmed BOTZ (Global X Robotics and AI ETF) holds Nvidia, Keyence, and Mitsubishi Electric as top positions; the fund tracks the Indxx Global Robotics & AI Thematic Index spanning industrial automation and non-industrial robots.",
+          "source": "The Robot Report",
+          "url": "https://www.therobotreport.com/botz-robotics-etf-picks-diverse-tech-winners-for-investors/",
+          "date": "2025-06-01"
+        },
+        {
+          "summary": "A 2024 year-end piece from The Robot Report noted that robotics investment went 'from surge to sobriety' in 2024 with funding moderating after a venture peak; by mid-2025 the industrial automation subset (a BOTZ core holding) was reasserting itself through AI-driven integration, while humanoid-robot hype remained pre-commercial.",
+          "source": "The Robot Report",
+          "url": "https://www.therobotreport.com/from-surge-to-sobriety-the-state-of-robotics-investment-in-2024/",
+          "date": "2025-06-01"
+        }
+      ]
+    },
+    "ARKG": {
+      "wave_bucket": "engineered_biology",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "STAT News (February 2025) published 'The CRISPR gene editing revolution loses its mojo,' citing financial underperformance and layoffs at CRISPR Therapeutics despite the Casgevy approval; an April 2025 STAT piece reinforced that investors should stop expecting large leaps in near-term CRISPR commercial results.",
+          "source": "STAT News",
+          "url": "https://www.statnews.com/2025/02/06/crispr-gene-editing-medical-breakthrough-not-matched-by-financial-success/",
+          "date": "2025-02-06"
+        },
+        {
+          "summary": "BioPharma Dive reported in June 2025 that the FDA unveiled a new 'plausible mechanism' regulatory pathway specifically designed to accelerate bespoke gene-therapy approvals for rare diseases -- a structural positive for ARKG's core gene-editing holdings over the medium term, though near-term revenue impact is limited.",
+          "source": "BioPharma Dive",
+          "url": "https://www.biopharmadive.com/news/fda-plausible-mechanism-pathway-n-of-1-crispr/805235/",
+          "date": "2025-06-01"
+        }
+      ]
+    },
+    "QTUM": {
+      "wave_bucket": "quantum",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Quantum Computing Report noted IonQ (a QTUM core holding) hit the #AQ 64 milestone on its 100-qubit Tempo system ahead of schedule in mid-2025, with commercial advantage expected for energy-grid, drug-discovery, and supply-chain applications; D-Wave also expanded its optimization platform at its Qubits 2025 conference.",
+          "source": "Quantum Computing Report",
+          "url": "https://quantumcomputingreport.com/ionq-reaches-aq-64-milestone-on-100-qubit-tempo-system-ahead-of-schedule/",
+          "date": "2025-06-01"
+        },
+        {
+          "summary": "Quantum Computing Report's January 2025 editorial, 'The End of the Hype-Fueled Easy Era,' cautioned that after outsized 2024 gains (QTUM returned ~50% in 2024), the sector needed to demonstrate real commercial traction; the field was described as entering a credibility-proving phase in 2025.",
+          "source": "Quantum Computing Report",
+          "url": "https://quantumcomputingreport.com/the-beginning-of-the-international-year-of-quantum-and-the-end-of-the-hype-fueled-easy-era/",
+          "date": "2025-01-01"
+        }
+      ]
+    },
+    "NUKZ": {
+      "wave_bucket": "nuclear_fusion",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "World Nuclear News reported Meta announced 'landmark' agreements with Vistra, TerraPower, and Oklo for up to 6.6 GW of new and existing nuclear capacity by 2035, including an Oklo advanced-reactor campus in Ohio -- directly benefiting NUKZ holdings in advanced-reactor developers.",
+          "source": "World Nuclear News",
+          "url": "https://www.world-nuclear-news.org/articles/meta-announces-landmark-agreements-for-new-nuclear",
+          "date": "2025-06-01"
+        },
+        {
+          "summary": "Oklo and Centrus Energy broadened their MoU in mid-2025 covering Aurora powerhouse development and HALEU fuel supply (Centrus completing operational readiness at its Piketon, Ohio HALEU cascade); both companies are core NUKZ holdings.",
+          "source": "World Nuclear News",
+          "url": "https://world-nuclear-news.org/Articles/Oklo-and-Centrus-Energy-broaden-links-with-MoU",
+          "date": "2025-06-01"
+        }
+      ]
+    },
+    "AGG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "In late June 2025, the 10-year Treasury yield was around 4.3% with traders pricing ~42 bps of Fed cuts by year-end; bond traders were boosting bets the 10-year would drift toward 4%, a supportive environment for investment-grade bond holdings like AGG.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2025-06-24/bond-traders-boost-bets-that-us-10-year-yield-to-dive-toward-4",
+          "date": "2025-06-24"
+        }
+      ]
+    },
+    "BIL": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "With the Fed on hold through June 2025 and the 2-year note trading around 4.02%, short-duration T-bill ETFs like BIL continued to generate positive carry; traders priced modest but non-zero odds of rate cuts later in 2025.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2025-06-11/treasury-yields-rise-before-key-inflation-data-10-year-auction",
+          "date": "2025-06-11"
+        }
+      ]
+    },
+    "IAU": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Gold was up roughly 27% YTD entering June 2025; in June, spot gold traded around $3,328-$3,444, driven by Trump tariff uncertainty (doubled steel/aluminum tariffs announced June 4), central-bank buying, and rate-cut expectations; Yahoo Finance noted gold 'moves higher on tariff uncertainty' in early June.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/personal-finance/investing/article/gold-price-today-tuesday-june-3-2025-gold-moves-higher-on-tariff-uncertainty-134527822.html",
+          "date": "2025-06-03"
+        }
+      ]
+    },
+    "VIG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "VIG (Vanguard Dividend Appreciation ETF) returned approximately 14% in 2025 overall; its top holdings included MSFT, AAPL, and Broadcom, giving it a ~23% tech tilt that benefited from AI-driven equity gains. No material VIG-specific corporate events surfaced in June 2025.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/quote/VIG/performance/",
+          "date": "2025-06-30"
+        }
+      ]
+    }
+  },
+  "wave_stages": {
+    "AI": {
+      "stage": "surge",
+      "rationale": "Real, accelerating revenue is the dominant signal: NVDA Data Center up 73% YoY, Azure up 33% with AI contributing 16 ppts, Google Cloud up 28% -- all beating expectations. Supply is still the binding constraint, not demand. No sign yet of valuation exhaustion supplanting fundamentals as the story.",
+      "evidence_tickers": [
+        "NVDA",
+        "MSFT",
+        "GOOGL"
+      ]
+    },
+    "rockets_spacecraft": {
+      "stage": "surge",
+      "rationale": "Rocket Lab is posting 32% YoY revenue growth, setting launch cadence records, winning first-ever ESA contracts, and growing its backlog -- real revenue compounding from a still-small base with clear runway to Neutron.",
+      "evidence_tickers": [
+        "RKLB"
+      ]
+    },
+    "robotics": {
+      "stage": "buildup",
+      "rationale": "The Robot Report's 'surge to sobriety' framing for 2024 investment levels, combined with humanoid robots remaining pre-commercial, places the sector in early-stage accumulation rather than broad adoption; industrial automation is recovering but not yet in a confirmed re-acceleration.",
+      "evidence_tickers": [
+        "BOTZ"
+      ]
+    },
+    "engineered_biology": {
+      "stage": "digestion",
+      "rationale": "STAT News and BioPharma Dive coverage through June 2025 is dominated by CRISPR's financial underperformance, layoffs at CRISPR Therapeutics, and investor skepticism about near-term commercialization -- classic post-crest digestion after the 2020-2021 ARK/ARKG peak. The new FDA pathway is a positive structural signal but has not yet changed the revenue picture.",
+      "evidence_tickers": [
+        "ARKG"
+      ]
+    },
+    "quantum": {
+      "stage": "buildup",
+      "rationale": "IonQ's #AQ 64 milestone ahead of schedule and D-Wave's platform expansions are genuine research-cadence milestones, but Quantum Computing Report's editorial explicitly named the end of the 'hype-fueled easy era' -- suggesting the field has shed excess enthusiasm and is back to quiet capability-building, the definition of buildup.",
+      "evidence_tickers": [
+        "QTUM"
+      ]
+    },
+    "nuclear_fusion": {
+      "stage": "buildup",
+      "rationale": "Meta's 6.6 GW nuclear commitment with Oklo and TerraPower, and the Oklo-Centrus HALEU fuel MoU, signal growing hyperscaler demand pull for advanced nuclear -- but all projects are 2028-2035 vintage with no commercial revenue flowing yet. The thesis is early and still cheap.",
+      "evidence_tickers": [
+        "NUKZ"
+      ]
+    },
+    "general_markets": {
+      "stage": "neutral",
+      "rationale": "AGG, BIL, IAU, and VIG are non-wave instruments. Gold's 27% YTD rally driven by tariff safe-haven demand is macro, not wave-specific. No wave classification applies.",
+      "evidence_tickers": [
+        "AGG",
+        "BIL",
+        "IAU",
+        "VIG"
+      ]
+    }
+  },
+  "wave_views": {
+    "NVDA": "surge",
+    "MSFT": "surge",
+    "GOOGL": "surge",
+    "RKLB": "surge",
+    "BOTZ": "buildup",
+    "ARKG": "digestion",
+    "QTUM": "buildup",
+    "NUKZ": "buildup",
+    "AGG": "neutral",
+    "BIL": "neutral",
+    "IAU": "neutral",
+    "VIG": "neutral"
+  },
+  "exclusion_conflicts": [],
+  "thematic_concerns": [
+    {
+      "ticker": "NVDA",
+      "concern": "China export controls are a structural headwind that could dampen Data Center revenue growth. The $4.5B H20 charge and ~$8B Q2 headwind are real losses of an addressable market. If controls tighten further, NVDA's growth trajectory is impaired.",
+      "evidence": "NVIDIA Q1 FY2026 press release: $4.5B inventory charge; Q2 guidance reflects $8B H20 revenue hole due to export restrictions."
+    },
+    {
+      "ticker": "ARKG",
+      "concern": "The profile flags 'engineered biology' as a next wave to enter while still cheap. ARKG, by contrast, sits in post-peak digestion: CRISPR Therapeutics laid off staff, Casgevy uptake has been slower than expected, and STAT News and BioPharma Dive both ran skeptical coverage in H1 2025. The ETF's concentration in listed CRISPR names means it may not represent the early-stage exposure the profile seeks.",
+      "evidence": "STAT News (2025-02-06): 'The CRISPR revolution loses its mojo'; April 2025 STAT: 'Stop expecting CRISPR science to make big leaps.'"
+    }
+  ],
+  "date": "2025-06-30"
+}

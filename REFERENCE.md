@@ -109,7 +109,6 @@ portfolio-wave-rider/
 │   └── *.log                   # cron output (gitignored)
 └── docs/                       # GitHub Pages publishing root
     ├── index.html              # live dashboard (regenerated daily by cron)
-    ├── news.html               # news evidence side-page (placeholder until render_news_page consumes curator schema)
     └── backtest_curator.html   # 5y curator-backtest dashboard (committed)
 ```
 

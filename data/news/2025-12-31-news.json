@@ -1,0 +1,285 @@
+{
+  "per_ticker": {
+    "NVDA": {
+      "wave_bucket": "AI",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "NVDA reported Q3 FY2026 revenue of $57.0B, with data center revenue of $51.2B (record), and guided Q4 to $65.0B (\u00b12%). Blackwell GPU demand described by CEO Jensen Huang as 'off the charts'; cloud GPU allocations reported sold out. Stock up ~40% for 2025, trading $187-$190 in late December.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/news/nvidia-soars-39-2025-stock-123200959.html",
+          "date": "2025-12-26"
+        },
+        {
+          "summary": "Mid-December sentiment showed a tension between undeniable Blackwell infrastructure buildout evidence and rising skepticism about whether future dominance is already priced in. Analyst forecasts in December noted a $0.5T Blackwell/Rubin pipeline and projected 40% long-term revenue CAGR.",
+          "source": "Yahoo Finance",
+          "url": "https://ts2.tech/en/nvidia-nvda-stock-today-ai-funding-jitters-blackwell-demand-signals-and-fresh-analyst-forecasts-dec-18-2025/",
+          "date": "2025-12-18"
+        }
+      ]
+    },
+    "GOOGL": {
+      "wave_bucket": "AI",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Google launched Gemini 3 Flash in December 2025, making it the default model in the Gemini app. The model incorporates Gemini 3 Pro reasoning capabilities at a lower cost and faster speed, positioning Google as having closed its perceived AI gap versus OpenAI.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2025-12-17/google-releases-more-efficient-gemini-3-ai-model-across-products",
+          "date": "2025-12-17"
+        },
+        {
+          "summary": "Year-end narrative: Google 'started 2025 behind in the AI race and ended 2025 on top,' driven by Gemini model cadence, AI Pro/Ultra pricing tiers, and NotebookLM growth. Secondary quantum exposure: Google's Willow chip (announced Dec 2024) continued to anchor GOOGL's quantum credibility heading into 2025 year-end.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/news/google-started-the-year-behind-in-the-ai-race-it-ended-2025-on-top-150352574.html",
+          "date": "2025-12-31"
+        }
+      ]
+    },
+    "MSFT": {
+      "wave_bucket": "AI",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Microsoft launched Microsoft 365 Copilot Business (targeting SMBs under 300 users at $21/user/month) in December 2025, with a 15% promotional discount running through March 2026. Azure Copilot announced as an agentic cloud-management interface at Ignite 2025.",
+          "source": "Microsoft Azure Blog",
+          "url": "https://azure.microsoft.com/en-us/blog/announcing-azure-copilot-agents-and-ai-infrastructure-innovations/",
+          "date": "2025-12-01"
+        },
+        {
+          "summary": "Q2 FY2026 (quarter ending Dec 31, 2025): Microsoft spent approximately $37.5B on AI infrastructure, placing it on a ~$150B annualized capex run rate. AI infrastructure spending signals continued commitment but also raises questions about near-term margin pressure.",
+          "source": "tech-insider.org",
+          "url": "https://tech-insider.org/microsoft-ai-spending-azure-copilot-2026/",
+          "date": "2025-12-31"
+        }
+      ]
+    },
+    "RKLB": {
+      "wave_bucket": "rockets_spacecraft",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Rocket Lab awarded an $816M prime contract by the U.S. Space Development Agency on Dec 19, 2025 to design and build 18 Tracking Layer Tranche 3 (TRKT3) missile-defense satellites. Combined with a prior $515M SDA award, RKLB now holds over $1.3B in SDA contract value. Stock surged ~22% on the announcement.",
+          "source": "GlobeNewswire",
+          "url": "https://www.globenewswire.com/news-release/2025/12/19/3208731/0/en/Rocket-Lab-Awarded-816M-Prime-Contract-to-Build-Missile-Defense-Satellite-Constellation-for-U-S-Space-Force.html",
+          "date": "2025-12-19"
+        },
+        {
+          "summary": "RKLB ended 2025 with 21 Electron launches and 100% mission success rate, establishing a track record that supports the company's transition from launch provider to satellite prime contractor.",
+          "source": "StockTitan",
+          "url": "https://www.stocktitan.net/news/RKLB/rocket-lab-successfully-launches-for-i-qps-ends-2025-with-21-jvv3dukgezth.html",
+          "date": "2025-12-31"
+        }
+      ]
+    },
+    "BOTZ": {
+      "wave_bucket": "robotics",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "The Robot Report's Top 10 Robotics Developments of December 2025 highlighted humanoid entry into commercial use: Mercado Libre signed an agreement to deploy Agility Robotics' Digit humanoid in its San Antonio facility; iREX 2025 trade show set attendance records with 673 exhibitors and 156,110 visitors, with order intake recovering after two years of decline.",
+          "source": "The Robot Report",
+          "url": "https://www.therobotreport.com/top-10-robotics-developments-december-2025/",
+          "date": "2025-12-31"
+        },
+        {
+          "summary": "A Motley Fool analysis published Dec 30, 2025 examined whether BOTZ could triple in three years, citing the global robotics market valued at ~$108B in 2025 with forecasts of ~$416B by 2035. The ETF closed 2025 at $36.55, with BOTZ holdings spanning industrial automation and AI-enabled robot makers.",
+          "source": "Motley Fool",
+          "url": "https://www.fool.com/investing/2025/12/30/is-the-global-x-robotics-artificial-intelligence-e/",
+          "date": "2025-12-30"
+        }
+      ]
+    },
+    "ARKG": {
+      "wave_bucket": "engineered_biology",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "ARKG returned approximately -7.1% in December 2025, underperforming the health category average of -1.8% for the month. Despite the December pullback, the fund posted ~23% for full-year 2025, outpacing broader health benchmarks.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/quote/ARKG/",
+          "date": "2025-12-31"
+        },
+        {
+          "summary": "Top ARKG holdings as of December 2025: CRISPR Therapeutics (9.71%), Twist Bioscience (9.68%), Tempus AI (9.58%), 10x Genomics (6.64%), Beam Therapeutics (5.52%). ARK Invest disclosed active trading in ARKG holdings in early December, consistent with tactical rebalancing.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/quote/ARKG/",
+          "date": "2025-12-31"
+        }
+      ]
+    },
+    "QTUM": {
+      "wave_bucket": "quantum",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "BTQ Technologies joined the Defiance Quantum ETF (QTUM) effective December 15, 2025, following the semi-annual reconstitution of the BlueStar Machine Learning and Quantum Computing Index (BQTUM). BTQ entered via a strategic Keypair IP acquisition.",
+          "source": "Quantum Computing Report",
+          "url": "https://quantumcomputingreport.com/btq-technologies-acquires-post-quantum-ip-via-strategic-keypair-investment-and-joins-qtum-etf/",
+          "date": "2025-12-15"
+        },
+        {
+          "summary": "Quantum Computing Report's year-end piece noted 2025 as 'the end of the hype-fueled easy era,' with serious hardware milestones (IBM, Google, Microsoft error-correction progress) alongside a call to distinguish genuine breakthroughs from incremental claims. The wave is advancing but commercial applications remain pre-revenue for most players.",
+          "source": "Quantum Computing Report",
+          "url": "https://quantumcomputingreport.com/the-beginning-of-the-international-year-of-quantum-and-the-end-of-the-hype-fueled-easy-era/",
+          "date": "2025-12-31"
+        }
+      ]
+    },
+    "NUKZ": {
+      "wave_bucket": "nuclear_fusion",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "NUKZ (Range Nuclear Renaissance Index ETF) returned approximately 56.58% for full-year 2025, driven by AI data-center power demand, Trump administration support for nuclear, and bipartisan legislative momentum. Energy Secretary Chris Wright gave a high-profile speech at Idaho National Laboratory in early December underscoring White House backing.",
+          "source": "ETF Trends",
+          "url": "https://www.etftrends.com/nuclear-energy-content-hub/nukz-growth-expected-accelerated-nuclear-infrastructure-spending/",
+          "date": "2025-12-01"
+        },
+        {
+          "summary": "GE Vernova Hitachi Nuclear Energy announced a strategic alliance with Samsung C&T in December 2025 to advance deployment of the BWRX-300 small modular reactor in Sweden (five units planned). This is a concrete SMR commercial partnership, a key constituent theme for NUKZ.",
+          "source": "American Nuclear Society / Nuclear Newswire",
+          "url": "https://www.ans.org/news/article-7562/industry-updatedecember-2025/",
+          "date": "2025-12-31"
+        }
+      ]
+    },
+    "AGG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "The FOMC cut the federal funds rate 25 bps on December 10, 2025 to a target range of 3.50-3.75%, the third cut of the year. The dot plot signaled only one additional cut in 2026 and one in 2027, implying the easing cycle is near its end. The 10-year Treasury yield traded near 4.3% at year-end.",
+          "source": "Federal Reserve",
+          "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20251210a.htm",
+          "date": "2025-12-10"
+        }
+      ]
+    },
+    "BIL": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "BIL (SPDR Bloomberg 1-3 Month T-Bill ETF) traded at approximately $91.50 as of early December 2025, returning ~4.23% over the trailing year. The December FOMC 25 bps cut to 3.50-3.75% will modestly reduce forward yield. The dot plot's signal of only one 2026 cut limits further yield compression, keeping BIL's yield attractive relative to pre-2022 norms.",
+          "source": "ValueRay / SSGA",
+          "url": "https://www.ssga.com/us/en/intermediary/etfs/state-street-spdr-bloomberg-1-3-month-t-bill-etf-bil",
+          "date": "2025-12-05"
+        }
+      ]
+    },
+    "IAU": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Gold (tracked by IAU) was one of 2025's standout performers, with GLD gaining approximately 27% for the year versus ~8% for SPY. Gold reached new record highs in Q2 2025 (seventh consecutive quarterly high) and continued to be bid as a geopolitical hedge and inflation store. IAU's 52-week range through year-end was roughly $59.71-$104.40.",
+          "source": "Yahoo Finance / Seeking Alpha",
+          "url": "https://finance.yahoo.com/quote/IAU/",
+          "date": "2025-12-31"
+        }
+      ]
+    },
+    "VIG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "VIG (Vanguard Dividend Appreciation ETF) tracks the S&P US Dividend Growers Index, selecting stocks with at least 10 consecutive years of dividend growth. The fund returned approximately 19% in 2024 but underperformed its category index by 7 percentage points that year. No material December-specific corporate actions surfaced for VIG in the lookback window; it functions as a quality-equity anchor in the portfolio.",
+          "source": "Morningstar / Vanguard",
+          "url": "https://investor.vanguard.com/investment-products/etfs/profile/vig",
+          "date": "2025-12-31"
+        }
+      ]
+    }
+  },
+  "wave_stages": {
+    "AI": {
+      "stage": "peak",
+      "rationale": "All three AI names (NVDA, GOOGL, MSFT) show real, compounding revenue \u2014 NVDA Q3 data-center at $51.2B, MSFT on a $150B annualized AI capex run rate \u2014 but December headlines explicitly flag that NVDA's upside may already be priced in, analyst notes are unanimous on demand, and MSFT's capex scale raises near-term margin questions. Sell-side sentiment is uniformly bullish; new entrants are chasing; valuations are stretched. These are peak-cycle symptoms.",
+      "evidence_tickers": [
+        "NVDA",
+        "GOOGL",
+        "MSFT"
+      ]
+    },
+    "rockets_spacecraft": {
+      "stage": "surge",
+      "rationale": "RKLB's $816M SDA contract win and 100% Electron launch success in 2025 show the transition from launch startup to credible defense prime is now generating real, large-scale revenue and backlog. The wave is clearly past buildup but has not yet hit peak enthusiasm \u2014 the satellite prime role is new and the Neutron rocket program still represents significant upside. Adoption is compounding with room to run.",
+      "evidence_tickers": [
+        "RKLB"
+      ]
+    },
+    "robotics": {
+      "stage": "buildup",
+      "rationale": "BOTZ's December 2025 backdrop shows order intake just beginning to recover after two years of decline, and humanoid robots are entering commercial use for the first time (Mercado Libre/Digit deployment). The iREX trade show set records, signaling rising industry attention, but actual commercial revenue from humanoids remains early-stage. This is the quiet, cheap, under-owned phase of the humanoid sub-wave.",
+      "evidence_tickers": [
+        "BOTZ"
+      ]
+    },
+    "engineered_biology": {
+      "stage": "digestion",
+      "rationale": "ARKG fell 7.1% in December 2025 against a category average of -1.8%, reflecting sector-level selling pressure despite strong full-year gains. The genomics/gene-editing wave surged in earlier years (especially 2020-2021) and is now in a multi-year digestion. Underlying science is advancing but commercial timelines are long and investor patience is short.",
+      "evidence_tickers": [
+        "ARKG"
+      ]
+    },
+    "quantum": {
+      "stage": "buildup",
+      "rationale": "The Quantum Computing Report's year-end piece explicitly called out 'the end of the hype-fueled easy era,' suggesting the market is becoming more discriminating. QTUM reconstituted to add BTQ Technologies but players remain pre-revenue. Hardware milestones (IBM, Google, Microsoft) are real but commercial applications are still years away. Classic buildup: genuine scientific progress, under-owned by the broad market.",
+      "evidence_tickers": [
+        "QTUM"
+      ]
+    },
+    "nuclear_fusion": {
+      "stage": "surge",
+      "rationale": "NUKZ returned 56.58% for 2025 \u2014 that is a surge-level return. The catalysts are concrete: government backing, AI data-center power demand pulling in nuclear utilities, and SMR commercial partnerships (GE Vernova Hitachi / Samsung C&T BWRX-300 in Sweden). This is not purely speculative enthusiasm; revenue and policy tailwinds are real. However the 56% annual return warrants monitoring for approaching peak.",
+      "evidence_tickers": [
+        "NUKZ"
+      ]
+    },
+    "general_markets": {
+      "stage": "neutral",
+      "rationale": "AGG, BIL, IAU, and VIG are macro/asset-class instruments without a technology-wave thesis. The December FOMC cut and gold's strong 2025 run are noteworthy context but do not map to a wave stage.",
+      "evidence_tickers": [
+        "AGG",
+        "BIL",
+        "IAU",
+        "VIG"
+      ]
+    }
+  },
+  "wave_views": {
+    "NVDA": "peak",
+    "GOOGL": "peak",
+    "MSFT": "peak",
+    "RKLB": "surge",
+    "BOTZ": "buildup",
+    "ARKG": "digestion",
+    "QTUM": "buildup",
+    "NUKZ": "surge",
+    "AGG": "neutral",
+    "BIL": "neutral",
+    "IAU": "neutral",
+    "VIG": "neutral"
+  },
+  "exclusion_conflicts": [],
+  "thematic_concerns": [
+    {
+      "ticker": "NVDA",
+      "concern": "The investor profile calls for trimming AI exposure before the crest. December 2025 headlines flag unanimous sell-side bullishness, funding-durability skepticism, and valuation stretch \u2014 classic pre-crest signals. The wave_stage call of 'peak' directly triggers the profile's 'trim before it crests' operating rule.",
+      "evidence": "ts2.tech Dec 18 2025: 'opposing forces \u2014 undeniable evidence of ongoing AI infrastructure buildouts versus rising skepticism about funding durability and how much future dominance is already priced in.'"
+    },
+    {
+      "ticker": "MSFT",
+      "concern": "Same AI-peak concern as NVDA. $37.5B quarterly AI capex (~$150B annualized) is a margin risk if AI monetization slows. Profile rule 1 applies: ride the AI wave but trim before it crests.",
+      "evidence": "tech-insider.org: Microsoft on a $150B annualized AI capex run rate as of Q2 FY2026 (ending Dec 31, 2025)."
+    },
+    {
+      "ticker": "NUKZ",
+      "concern": "NUKZ is mapped to the nuclear_fusion wave bucket by ticker theme, but the ETF's actual holdings are primarily fission utilities, fuel, and construction \u2014 not pure-play fusion. The profile's 'nuclear fusion' next-wave thesis is pre-commercial; NUKZ captures near-term fission/SMR exposure rather than fusion directly. This mismatch should be noted when interpreting the surge stage for the fusion wave.",
+      "evidence": "Range Nuclear Renaissance ETF fund description: 'advanced reactors, utilities, construction & services, and fuel' \u2014 fission-dominant holdings, not fusion startups."
+    }
+  ],
+  "date": "2025-12-31"
+}

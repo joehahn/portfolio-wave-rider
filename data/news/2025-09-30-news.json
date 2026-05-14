@@ -1,0 +1,287 @@
+{
+  "per_ticker": {
+    "NVDA": {
+      "wave_bucket": "AI",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "NVDA reported Q2 FY2026 revenue of $46.7B (+56% YoY), with Data Center at $41.1B (+56% YoY). Q3 guidance was set at $54B (+/-2%), implying continued double-digit sequential growth and reflecting robust Blackwell ramp demand. Company explicitly excluded any H20 China shipments from the outlook.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2025/08/27/nvidia-nvda-earnings-report-q2-2026.html",
+          "date": "2025-08-27"
+        },
+        {
+          "summary": "Networking revenue surged 98% YoY to $7.3B, well above the $5.1B consensus, highlighting that AI infrastructure spending extended beyond GPUs into the full interconnect stack. Non-GAAP gross margin of 72.7% was broadly maintained, countering concerns that Blackwell margin dilution would be severe.",
+          "source": "Futurum Group",
+          "url": "https://futurumgroup.com/insights/nvidia-q2-fy-2026-earnings-networking-steals-the-spotlight/",
+          "date": "2025-08-27"
+        }
+      ]
+    },
+    "GOOGL": {
+      "wave_bucket": "AI",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Alphabet reported Q2 FY2025 consolidated revenue of $96.4B (+14% YoY); Google Cloud grew 32% to $13.6B, with Gemini-powered GCP products and AI Infrastructure cited as primary drivers. Alphabet committed $75B in 2025 capex for data centers and AI infrastructure.",
+          "source": "SEC EDGAR",
+          "url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204425000056/googexhibit991q22025.htm",
+          "date": "2025-07-29"
+        },
+        {
+          "summary": "Google Quantum AI published two peer-reviewed milestones in September 2025: (1) a 68-qubit demonstration of 'generative quantum advantage' \u2014 the first experimental evidence that quantum systems can learn and generate distributions beyond classical reach; (2) a 58-qubit realization of a Floquet topologically ordered state, a phase of matter previously only theorized. Both results strengthen GOOGL's quantum research leadership, relevant to the quantum secondary wave.",
+          "source": "Quantum Computing Report",
+          "url": "https://quantumcomputingreport.com/google-quantum-ai-researchers-demonstrate-generative-quantum-advantage-for-classical-and-quantum-problems/",
+          "date": "2025-09-15"
+        }
+      ]
+    },
+    "MSFT": {
+      "wave_bucket": "AI",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "On September 24, 2025, Microsoft expanded model choice in Microsoft 365 Copilot to include Anthropic's Claude Sonnet 4 and Opus 4.1 alongside OpenAI models \u2014 a strategic signal that Copilot is becoming a multi-model platform rather than an OpenAI-exclusive product, broadening enterprise AI adoption surface.",
+          "source": "Microsoft 365 Blog",
+          "url": "https://www.microsoft.com/en-us/microsoft-365/blog/2025/09/24/expanding-model-choice-in-microsoft-365-copilot/",
+          "date": "2025-09-24"
+        },
+        {
+          "summary": "Microsoft launched 'Fairwater,' described as its largest AI data center campus, in September 2025, joining a Wisconsin facility as a planet-scale 'AI superfactory' using high-density liquid cooling and a flat GPU-interconnect network architecture. Q1 FY2026 capex (quarter ending Sept 30) was $34.9B, with AI capacity planned to grow over 80% in FY2026.",
+          "source": "Microsoft Azure Blog",
+          "url": "https://azure.microsoft.com/en-us/blog/announcing-azure-copilot-agents-and-ai-infrastructure-innovations/",
+          "date": "2025-09-01"
+        }
+      ]
+    },
+    "RKLB": {
+      "wave_bucket": "rockets_spacecraft",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Rocket Lab reported Q2 2025 revenue of $144.5M (+36% YoY), beating guidance, at GAAP gross margin of 32.1%. The company completed five Electron launches in the quarter, including two within two days. Total launch backlog reached 41 contracts, its largest ever. Neutron was on schedule, with Launch Complex 3 officially opened.",
+          "source": "SpaceNews",
+          "url": "https://spacenews.com/rocket-lab-reaffirms-2025-first-launch-of-neutron/",
+          "date": "2025-08-07"
+        },
+        {
+          "summary": "As of September 2025, Rocket Lab had three Neutron missions in backlog and was projecting 20+ Electron launches for the full year, on pace to set an annual launch record. Retail investors and analysts entering Q3 were focused on whether Neutron's late-2025 debut target remained achievable and on margin expansion from higher Electron average selling prices.",
+          "source": "StockTwits / Motley Fool earnings transcript",
+          "url": "https://www.fool.com/earnings/call-transcripts/2025/08/08/rocket-lab-rklb-q2-2025-earnings-call-transcript/",
+          "date": "2025-08-08"
+        }
+      ]
+    },
+    "BOTZ": {
+      "wave_bucket": "robotics",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "The Robot Report's September 2025 roundup highlighted Figure AI surpassing $1B in committed capital via its Series C (post-money valuation $39B), and UBTECH securing a $1B credit line for humanoid production scale-up. Both are privately held and not direct BOTZ holdings, but validate accelerating capital formation in humanoid robotics \u2014 the primary demand driver for BOTZ top-10 holding NVDA and automation component suppliers in the ETF.",
+          "source": "The Robot Report",
+          "url": "https://www.therobotreport.com/top-10-robotics-developments-of-september-2025/",
+          "date": "2025-09-30"
+        },
+        {
+          "summary": "Rethink Robotics shut down for a second time in September 2025, and Guardian Agriculture ceased operations in August 2025 \u2014 a reminder that the robotics wave is not uniform: industrial-automation incumbents (Fanuc, ABB, Keyence \u2014 all top BOTZ holdings) continue to dominate revenue while early-stage platforms continue to fail. BOTZ's tilt toward large industrials provides relative stability.",
+          "source": "The Robot Report",
+          "url": "https://www.therobotreport.com/top-10-robotics-developments-of-september-2025/",
+          "date": "2025-09-30"
+        }
+      ]
+    },
+    "ARKG": {
+      "wave_bucket": "engineered_biology",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "The Arc Institute published a landmark paper in Science on September 25, 2025 demonstrating that bridge recombinases, optimized for human cells, can rearrange genomic regions up to ~1 million base pairs \u2014 far beyond CRISPR's single-letter edit or even prime editing's short-phrase corrections. This expands the therapeutic addressable space to repeat-expansion diseases (Huntington's, Friedreich's ataxia) and structural genome disorders.",
+          "source": "phys.org / Arc Institute",
+          "url": "https://phys.org/news/2025-09-bridge-recombinases-optimized-human-cells.html",
+          "date": "2025-09-25"
+        },
+        {
+          "summary": "ARK Invest's newsletter flagged the Arc Institute's bridge-editing advance as a wave-defining moment for the genomic revolution. ARKG's top holdings include CRSP (10.1%), TEM (8.6%), and TWST (8.2%), all with direct gene-editing exposure. ARKG posted ~23% NAV gains in 2025 through the period, outpacing most health benchmarks.",
+          "source": "ARK Invest newsletter",
+          "url": "https://www.ark-invest.com/newsletters/issue-481",
+          "date": "2025-09-25"
+        }
+      ]
+    },
+    "QTUM": {
+      "wave_bucket": "quantum",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Defiance's QTUM ETF surpassed $2B in AUM as of September 4, 2025, driven by surging retail and institutional interest in quantum computing. The fund holds a 5-star overall Morningstar rating. The milestone coincided with HSBC reporting it used IBM's Heron quantum processor to improve bond-trading prediction accuracy \u2014 described as the first documented quantum-enabled edge in algorithmic trading.",
+          "source": "The Quantum Insider",
+          "url": "https://thequantuminsider.com/2025/09/04/defiances-quantum-computing-etf-surpasses-2-billion-aum/",
+          "date": "2025-09-04"
+        },
+        {
+          "summary": "GOOGL's two September 2025 quantum papers (generative quantum advantage on 68 qubits; Floquet topological order on 58 qubits) are directly relevant to QTUM, as Alphabet is a significant holding in the ETF. The research cadence suggests quantum is transitioning from milestone-counting to demonstrating task-specific advantage \u2014 a prerequisite for commercial adoption.",
+          "source": "Quantum Computing Report",
+          "url": "https://quantumcomputingreport.com/google-quantum-ai-researchers-demonstrate-generative-quantum-advantage-for-classical-and-quantum-problems/",
+          "date": "2025-09-15"
+        }
+      ]
+    },
+    "NUKZ": {
+      "wave_bucket": "nuclear_fusion",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Vistra Energy (VST), a top NUKZ holding, signed a 20-year power purchase agreement (PPA) with an investment-grade customer for its Comanche Peak nuclear facility in Texas in late September 2025. This follows Microsoft's Crane Clean Energy Center PPA and Meta's Clinton Clean Energy Center PPA with Constellation Energy (CEG) \u2014 both also NUKZ holdings \u2014 cementing big-tech nuclear demand as a structural tailwind.",
+          "source": "ETF Trends / Advisor Perspectives",
+          "url": "https://www.advisorperspectives.com/commentaries/2025/10/06/data-centers-nuclear-smrs-artificial-intelligence-needs",
+          "date": "2025-09-30"
+        },
+        {
+          "summary": "NUKZ gained approximately 41.6% year-to-date through September 2025, with its one-month return turning mildly negative (-3.4%), suggesting some near-term consolidation after a sharp run-up driven by AI data-center power demand narratives and the SMR policy tailwind.",
+          "source": "WTOP News / ETFdb",
+          "url": "https://wtop.com/news/2025/09/5-best-nuclear-energy-stocks-and-etfs-to-watch/",
+          "date": "2025-09-01"
+        }
+      ]
+    },
+    "AGG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "The Federal Reserve cut the federal funds rate by 25 basis points in September 2025, initiating an easing cycle. This is directionally positive for AGG (iShares Core U.S. Aggregate Bond ETF, duration ~6 years), as falling yields lift bond prices. AUM in AGG exceeded $100B through October 2025.",
+          "source": "iShares / Bloomberg",
+          "url": "https://www.ishares.com/us/insights/fed-outlook-2026-interest-rate-forecast",
+          "date": "2025-09-17"
+        },
+        {
+          "summary": "Following the cut, the Bloomberg U.S. Aggregate Bond Index offered a yield-to-worst of approximately 4.3% with ~6-year duration, presenting a reasonable income-vs-risk tradeoff relative to cash. The rate path beyond September remained uncertain, limiting AGG's capital-appreciation upside.",
+          "source": "etf.com",
+          "url": "https://www.etf.com/sections/advisor-center/sgov-agg-tlt-bond-etf-playbook-2025",
+          "date": "2025-09-01"
+        }
+      ]
+    },
+    "BIL": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "With the Fed's September 25bp cut, 1-3 month T-bill yields began declining from their cycle high, modestly compressing BIL's forward yield. BIL remains the lowest-risk position in any wave-rider portfolio \u2014 near-zero duration, near-zero credit risk \u2014 but its relative attractiveness vs. AGG narrows as rates fall.",
+          "source": "State Street SPDR / etfdb.com",
+          "url": "https://etfdb.com/etf/BIL/",
+          "date": "2025-09-17"
+        }
+      ]
+    },
+    "IAU": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Spot gold hit a record high of $3,790.82/oz on September 23, 2025, with IAU (iShares Gold Trust) tracking the move. Drivers were the Fed's 25bp rate cut on September 17 and heightened geopolitical risk (NATO-Russia tensions, Ukraine conflict escalation language from the Trump administration). Gold posted its fifth consecutive weekly gain heading into September month-end.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2025/09/24/gold-holds-near-record-high-on-rate-cut-bets-geopolitical-tensions.html",
+          "date": "2025-09-24"
+        }
+      ]
+    },
+    "VIG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "VIG (Vanguard Dividend Appreciation ETF) tracked 337 large-cap dividend growers with a 30-day SEC yield of 1.63% and an expense ratio of 0.05% as of September 2025. The ETF requires at least 10 consecutive years of dividend growth for inclusion, giving it a quality-factor tilt. No material structure or holdings changes were reported during the lookback window.",
+          "source": "Vanguard / stockanalysis.com",
+          "url": "https://investor.vanguard.com/investment-products/etfs/profile/vig",
+          "date": "2025-09-30"
+        }
+      ]
+    }
+  },
+  "wave_stages": {
+    "AI": {
+      "stage": "surge",
+      "rationale": "Real, compounding revenue is visible across all three AI tickers: NVDA posted 56% YoY Data Center growth with 72%+ gross margins and guided for another $54B quarter; GOOGL Cloud grew 32% YoY on Gemini demand; MSFT committed $34.9B in a single quarter to AI capex and expanded Copilot to a multi-model platform. Enthusiasm is high, but revenue is substantive and still accelerating \u2014 this is surge, not peak.",
+      "evidence_tickers": [
+        "NVDA",
+        "GOOGL",
+        "MSFT"
+      ]
+    },
+    "rockets_spacecraft": {
+      "stage": "surge",
+      "rationale": "RKLB delivered its largest-ever quarterly revenue ($144.5M, +36% YoY), its largest launch backlog (41 contracts), and opened Neutron's dedicated launch complex. Commercial launch demand is compounding. The wave has moved well past buildup but Neutron has not yet flown, so the transformational medium-lift market is still ahead \u2014 consistent with early-to-mid surge.",
+      "evidence_tickers": [
+        "RKLB"
+      ]
+    },
+    "robotics": {
+      "stage": "buildup",
+      "rationale": "Capital formation is intense (Figure AI $1B+ Series C at $39B valuation; UBTECH $1B credit line) but humanoid robots are not yet generating material public-market revenue. BOTZ's top holdings are mature industrials (Fanuc, ABB, Keyence) whose robotics revenue is real but slow-growing; the humanoid upside is still pre-commercial. Legacy players coexist with startup failures (Rethink, Guardian Ag). The mix signals buildup transitioning toward early surge.",
+      "evidence_tickers": [
+        "BOTZ"
+      ]
+    },
+    "engineered_biology": {
+      "stage": "buildup",
+      "rationale": "The Arc Institute's bridge-editing paper (September 25, 2025) is a foundational research milestone \u2014 analogous to early CRISPR papers \u2014 not a clinical revenue event. ARKG's 23% YTD performance reflects rising sentiment around gene-editing potential, but the therapeutics are still in development pipelines. The wave is accumulating scientific credibility faster than commercial revenue.",
+      "evidence_tickers": [
+        "ARKG"
+      ]
+    },
+    "quantum": {
+      "stage": "buildup",
+      "rationale": "QTUM's AUM crossing $2B and Google's two peer-reviewed September milestones (generative advantage; Floquet topological order) indicate rising institutional awareness and research velocity. However, the HSBC bond-trading application is an edge-case demonstration, not a broad commercial product. Quantum is deepening its scientific proof base and attracting ETF flows \u2014 classic buildup with an accelerating cadence.",
+      "evidence_tickers": [
+        "QTUM",
+        "GOOGL"
+      ]
+    },
+    "nuclear_fusion": {
+      "stage": "surge",
+      "rationale": "Note: NUKZ is predominantly a nuclear fission/renaissance ETF (Vistra, Constellation, Talen) rather than a pure fusion vehicle. For this wave bucket as NUKZ is classified, the dynamics are surge: NUKZ gained ~42% YTD through September 2025 on AI data-center power-demand PPAs (Vistra Comanche Peak 20-year PPA, Microsoft Three Mile Island, Meta Clinton). Real long-term offtake agreements are being signed, creating durable revenue visibility for holding companies. The -3.4% one-month wobble is normal consolidation within a surge.",
+      "evidence_tickers": [
+        "NUKZ"
+      ]
+    },
+    "general_markets": {
+      "stage": "neutral",
+      "rationale": "AGG, BIL, IAU, and VIG are macro/asset-class instruments with no single wave attachment. The September Fed cut is directionally positive for AGG and negative for BIL yield; gold's record run reflects safe-haven and rate-cut tailwinds; VIG is a quality-factor equity anchor. No wave classification applies.",
+      "evidence_tickers": [
+        "AGG",
+        "BIL",
+        "IAU",
+        "VIG"
+      ]
+    }
+  },
+  "wave_views": {
+    "NVDA": "surge",
+    "GOOGL": "surge",
+    "MSFT": "surge",
+    "RKLB": "surge",
+    "BOTZ": "buildup",
+    "ARKG": "buildup",
+    "QTUM": "buildup",
+    "NUKZ": "surge",
+    "AGG": "neutral",
+    "BIL": "neutral",
+    "IAU": "neutral",
+    "VIG": "neutral"
+  },
+  "exclusion_conflicts": [],
+  "thematic_concerns": [
+    {
+      "ticker": "NUKZ",
+      "concern": "Wave-bucket mismatch: NUKZ is classified under 'nuclear_fusion' but its underlying index (Range Nuclear Renaissance) is dominated by operating fission utilities (Vistra, Constellation, Talen) and uranium fuel-chain companies, not fusion startups. The investor profile lists nuclear fusion as a 'next wave' thesis on the pre-commercial research horizon. NUKZ's actual exposure is primarily to a re-rating of existing fission infrastructure driven by AI power demand \u2014 a different, nearer-term thesis.",
+      "evidence": "NUKZ Holdings: Constellation Energy (CEG), Vistra (VST), Talen Energy (TLN) \u2014 all operating fission plants. ETFdb holdings list confirms no dedicated fusion-startup exposure."
+    },
+    {
+      "ticker": "GOOGL",
+      "concern": "GOOGL spans two waves: primary bucket is AI (Google Cloud, Gemini, $75B AI capex), with a meaningful secondary quantum exposure via Google Quantum AI's Willow processor research program. The September 2025 quantum milestones reinforce the secondary quantum thesis but are research-stage, not yet monetized.",
+      "evidence": "Google Cloud Q2 2025 +32% YoY (AI primary); two peer-reviewed quantum publications in September 2025 (secondary quantum)."
+    }
+  ],
+  "date": "2025-09-30"
+}

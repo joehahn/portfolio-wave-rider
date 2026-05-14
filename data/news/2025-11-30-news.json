@@ -1,0 +1,286 @@
+{
+  "per_ticker": {
+    "NVDA": {
+      "wave_bucket": "AI",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "NVIDIA reported Q3 FY2026 revenue of $57.0B on 2025-11-19, up 62% YoY and 22% QoQ, beating the Wall Street consensus of $55.2B by 3.3%. Data center revenue hit a record $51.2B (+66% YoY), driven by Blackwell GPU ramp. CEO Jensen Huang: 'Blackwell sales are off the charts, and cloud GPUs are sold out.'",
+          "source": "NVIDIA Newsroom (investor.nvidia.com press release)",
+          "url": "https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-third-quarter-fiscal-2026",
+          "date": "2025-11-19"
+        },
+        {
+          "summary": "Q4 FY2026 guidance was set at $65.0B revenue (\u00b12%), implying another ~14% sequential step-up. Non-GAAP gross margin guidance of 74.5\u201375.5% signals Blackwell cost absorption proceeding on plan.",
+          "source": "NVIDIA Newsroom (investor.nvidia.com press release)",
+          "url": "https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-third-quarter-fiscal-2026",
+          "date": "2025-11-19"
+        }
+      ]
+    },
+    "MSFT": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Microsoft's Q1 FY2026 earnings (reported ~late-October, covered by Stratechery on 2025-11-12) showed total revenue of $77.7B (+18% YoY), beating consensus of $75.6B. Azure grew 40% YoY driven by AI workloads; over 20 million paid Microsoft 365 Copilot seats. Commercial bookings surged 112%, partly from a large OpenAI Azure commitment.",
+          "source": "Stratechery",
+          "url": "https://stratechery.com/2025/microsoft-earnings-coreai-mantleai-additional-notes/",
+          "date": "2025-11-12"
+        },
+        {
+          "summary": "Microsoft declared strategic independence from OpenAI, framing its role as 'scaffolding for AI' rather than tied to a single model provider. Q1 capex was $34.9B; company plans to increase total AI capacity by over 80% in FY2026. The move was described as a platform-layer pivot (Stratechery framing: CoreAI/MantleAI).",
+          "source": "Stratechery",
+          "url": "https://stratechery.com/2025/microsoft-earnings-coreai-mantleai-additional-notes/",
+          "date": "2025-11-12"
+        }
+      ]
+    },
+    "GOOGL": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Google launched Gemini 3 on 2025-11-18, embedding it directly into Google Search on day one \u2014 the first time a Gemini model shipped to Search at launch. Described as leading in multimodal understanding and agentic coding. Google also announced a $40B AI and cloud infrastructure investment in Texas.",
+          "source": "Google Blog (blog.google)",
+          "url": "https://blog.google/innovation-and-ai/products/google-ai-updates-november-2025/",
+          "date": "2025-11-18"
+        },
+        {
+          "summary": "Google Quantum AI's Willow chip early-access program was active as of November 2025, with the Willow spec sheet published December 9, 2024, and hardware experiment guidance published December 1, 2025. Willow represents GOOGL's primary secondary exposure (quantum wave), with the chip demonstrating below-threshold error suppression at scale.",
+          "source": "Google Quantum AI",
+          "url": "https://quantumai.google/willowearlyaccess",
+          "date": "2025-11-30"
+        }
+      ]
+    },
+    "RKLB": {
+      "wave_bucket": "rockets_spacecraft",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Rocket Lab reported Q3 2025 record revenue of $155M and announced that its Neutron medium-lift rocket's first launch is delayed to mid-2026 (from a late-2025 target), as CEO Peter Beck cited the need to retire risks found during testing. Despite the delay, RKLB shares rose more than 8% after-hours on the strength of the earnings beat.",
+          "source": "SpaceNews",
+          "url": "https://spacenews.com/rocket-lab-delays-first-neutron-launch-to-2026/",
+          "date": "2025-11-10"
+        },
+        {
+          "summary": "Rocket Lab signed its first Neutron customer during the period, and the Neutron launch pad was reported open for launch operations, according to Payload. The company closed 2025 with a record number of Electron launches.",
+          "source": "Payload",
+          "url": "https://payloadspace.com/rocket-lab-signs-first-neutron-customer/",
+          "date": "2025-11-10"
+        }
+      ]
+    },
+    "BOTZ": {
+      "wave_bucket": "robotics",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "The Robot Report's November 2025 roundup flagged Mind Robotics (spun out of Rivian) raising $500M Series A for physical AI systems, and Physical Intelligence raising $600M Series B for robot foundation models \u2014 two of the largest private rounds in the wave's history. These are private companies but are benchmarks for the sector BOTZ tracks.",
+          "source": "The Robot Report",
+          "url": "https://www.therobotreport.com/top-10-robotics-developments-november-2025/",
+          "date": "2025-11-30"
+        },
+        {
+          "summary": "Teradyne Robotics (parent of Universal Robots and Mobile Industrial Robots, both BOTZ holdings) cut ~14% of its global workforce in November 2025, a negative signal for near-term industrial cobot demand amid soft factory orders.",
+          "source": "The Robot Report",
+          "url": "https://www.therobotreport.com/top-10-robotics-developments-november-2025/",
+          "date": "2025-11-30"
+        }
+      ]
+    },
+    "ARKG": {
+      "wave_bucket": "engineered_biology",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "STAT News reported active biotech dealmaking through late October/November 2025, with AML and Intellia transactions among the highlighted deals. ARKG's genomic/gene-editing focus aligns with this deal cycle; curated sources confirmed the sector was in an active M&A phase heading into Q4 2025.",
+          "source": "STAT News",
+          "url": "https://www.statnews.com/2025/10/30/biotech-deals-aml-intellia/",
+          "date": "2025-10-30"
+        },
+        {
+          "summary": "Open search (fallback): ARKG posted approximately 23% total return in 2025, recovering from 2022\u20132024 rate-driven declines. The recovery was supported by anticipated Fed rate cuts (which improve the discount rate on long-duration biotech cash flows) and positive clinical readouts in gene editing during the year.",
+          "source": "ETF Database (etfdb.com)",
+          "url": "https://etfdb.com/etf/ARKG/",
+          "date": "2025-11-30"
+        }
+      ]
+    },
+    "QTUM": {
+      "wave_bucket": "quantum",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Harvard/MIT/QuEra demonstrated fault-tolerant quantum computing using 448 neutral-atom qubits, suppressing errors below the critical threshold \u2014 a significant research milestone. IonQ also announced a strategic partnership with Heven AeroTech for quantum-drone integration. Both names are QTUM holdings.",
+          "source": "Quantum Computing Report",
+          "url": "https://quantumcomputingreport.com/news-archive-2025/",
+          "date": "2025-11-30"
+        },
+        {
+          "summary": "BTQ Technologies was added to the Defiance Quantum ETF (QTUM) effective December 15, 2025, following the semi-annual index reconstitution of the BlueStar Machine Learning and Quantum Computing Index. Firgun Ventures (backed by Qatar Investment Authority) closed a $70M fund focused on early-stage quantum.",
+          "source": "Quantum Computing Report",
+          "url": "https://quantumcomputingreport.com/btq-technologies-acquires-post-quantum-ip-via-strategic-keypair-investment-and-joins-qtum-etf/",
+          "date": "2025-11-30"
+        }
+      ]
+    },
+    "NUKZ": {
+      "wave_bucket": "nuclear_fusion",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "The IEA's World Energy Outlook (November 2025 coverage) forecast global nuclear capacity to grow by at least one-third to 2035, with a record high in nuclear power output expected in 2025. AI data-center power demand was cited as a key structural driver, accelerating utility interest in nuclear. NUKZ holds utilities and fuel names (Cameco, GE Vernova, Constellation) that benefit directly from this demand.",
+          "source": "World Nuclear News",
+          "url": "https://www.world-nuclear-news.org/articles/nuclear-power-is-making-a-comeback-says-iea",
+          "date": "2025-11-30"
+        },
+        {
+          "summary": "US Department of Energy issued RFPs for AI data centers at the Savannah River Site and Oak Ridge Reservation \u2014 federal land with existing nuclear infrastructure. Microsoft's Three Mile Island restart (20-year PPA with Constellation, a NUKZ top holding) and Google's Kairos Power deal (500 MW SMR fleet target by 2035) provide named corporate demand.",
+          "source": "World Nuclear News",
+          "url": "https://www.world-nuclear-news.org/articles/data-centres-and-energy-proposals-sought-for-savannah-river-site",
+          "date": "2025-11-30"
+        }
+      ]
+    },
+    "AGG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Bond traders in mid-November 2025 were focused on incoming labor and inflation data to calibrate the December Fed cut. Fed Governors Waller and NY Fed's Williams both signaled support for a December cut, which would push short-end yields lower and provide a modest tailwind to AGG. A six-week government shutdown delayed key October data releases.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2025-11-16/bond-traders-eye-make-or-break-data-to-chart-the-fed-s-next-move",
+          "date": "2025-11-16"
+        }
+      ]
+    },
+    "BIL": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "The Fed cut rates 25 bps in September and October 2025, with market expectations in November pointing to a third consecutive 25 bp cut in December (ultimately confirmed on December 10). BIL, tracking 1\u20133 month T-bills, faced a gradual yield compression as the fed funds rate descended toward 3.5\u20133.75%. The fund remained near $91\u201392 NAV with minimal price risk, functioning as a near-cash holding.",
+          "source": "Bloomberg (via open search fallback)",
+          "url": "https://www.bloomberg.com/markets/rates-bonds/government-bonds/us",
+          "date": "2025-11-30"
+        }
+      ]
+    },
+    "IAU": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Gold traded near $4,000/oz at the start of November 2025, with Bloomberg reporting that rates and dollar-outlook uncertainty were the primary drivers. Mid-month saw gold dip as rate-cut bets softened after hawkish inflation commentary, then recover late in the month as traders priced in a December cut. IAU is a direct physical-gold proxy.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2025-11-04/gold-steadies-below-4-000-as-fed-remarks-parsed-for-rate-clues",
+          "date": "2025-11-04"
+        },
+        {
+          "summary": "By late November, gold was advancing again as traders bet on a December Fed rate cut, per Bloomberg. The non-yielding metal's near-$4,000 level reflects its prior 2025 run driven by geopolitical risk and rate-cut expectations; the question in the period was pace of further Fed easing.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2025-11-23/gold-steady-as-market-weighs-chance-of-another-us-rate-cut",
+          "date": "2025-11-23"
+        }
+      ]
+    },
+    "VIG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "No material ticker-specific news for VIG surfaced from curated or open sources in the November 2025 window. VIG is a passive Vanguard dividend-appreciation index ETF; it tracks dividend-growth blue chips and has no wave exposure. Its November performance would have tracked broad equity market sentiment, which was supported by a still-growing economy and the third Fed rate cut priced in for December.",
+          "source": "Yahoo Finance (open search fallback)",
+          "url": "https://finance.yahoo.com/quote/VIG/",
+          "date": "2025-11-30"
+        }
+      ]
+    }
+  },
+  "wave_stages": {
+    "AI": {
+      "stage": "surge",
+      "rationale": "Revenue is real and compounding fast: NVDA data-center revenue +66% YoY to $51.2B with another large step-up guided for Q4; MSFT Azure +40% YoY with 20M Copilot paid seats and $34.9B quarterly capex; GOOGL launched Gemini 3 directly into Search with a $40B infrastructure commitment. These are not pre-revenue milestones \u2014 hyperscaler capex and GPU sell-outs confirm genuine adoption compounding. Valuations are stretched but growth is still accelerating, placing this wave in surge rather than peak.",
+      "evidence_tickers": [
+        "NVDA",
+        "MSFT",
+        "GOOGL"
+      ]
+    },
+    "rockets_spacecraft": {
+      "stage": "buildup",
+      "rationale": "RKLB's $155M quarterly revenue is real but small-scale; Neutron's delay to mid-2026 means the medium-lift market catalyst is still ahead. Signing the first Neutron customer and opening the launch pad are positive buildup signals, not surge-scale revenue events. The wave is transitioning from quiet-to-active but commercial scale has not arrived.",
+      "evidence_tickers": [
+        "RKLB"
+      ]
+    },
+    "robotics": {
+      "stage": "surge",
+      "rationale": "Private-market rounds in November 2025 were among the largest in the wave's history (Physical Intelligence $600M Series B, Mind Robotics $500M Series A), and the IEEE Spectrum review noted humanoid hype dominating 2025's top stories. However, public-market BOTZ names face real demand softness: Teradyne Robotics cut 14% of staff, suggesting industrial cobot demand lagged even as humanoid investment surged. The wave is in an uneven surge \u2014 private humanoid side is booming while incumbent industrial players digest.",
+      "evidence_tickers": [
+        "BOTZ"
+      ]
+    },
+    "engineered_biology": {
+      "stage": "buildup",
+      "rationale": "ARKG's ~23% 2025 recovery is notable but comes off a deeply depressed base after 2022\u20132024 rate-driven destruction. Active M&A (Intellia deal) and venture funding growth signal the wave is in early recovery/buildup, not yet a broad public-market surge. Gene-editing clinical readouts are maturing but commercial revenue at scale is not yet evident.",
+      "evidence_tickers": [
+        "ARKG"
+      ]
+    },
+    "quantum": {
+      "stage": "buildup",
+      "rationale": "Research milestones are meaningful (Harvard/MIT/QuEra fault-tolerant demo at 448 qubits) and new venture capital is arriving ($70M Firgun Ventures backed by Qatar), but all quantum names in QTUM remain pre-commercial. Index reconstitution adding post-quantum cryptography names (BTQ) indicates the wave is expanding its definition. This is classic buildup: cheap, under-owned, thesis still maturing.",
+      "evidence_tickers": [
+        "QTUM"
+      ]
+    },
+    "nuclear_fusion": {
+      "stage": "buildup",
+      "rationale": "NUKZ holds primarily fission utilities and fuel names (Cameco, Constellation, GE Vernova), not pure fusion plays \u2014 the ETF name is broader than pure fusion. The IEA's one-third capacity growth forecast to 2035 and named corporate demand from Microsoft (TMI restart PPA) and Google (Kairos Power) are structural tailwinds, but commercial impact is a decade away. Strong narrative, early capital flows, no near-term revenue inflection: buildup.",
+      "evidence_tickers": [
+        "NUKZ"
+      ]
+    },
+    "general_markets": {
+      "stage": "neutral",
+      "rationale": "AGG, BIL, IAU, and VIG are macro-rate instruments or passive equity indexes with no single wave thesis. November 2025 saw bond markets pricing a third Fed cut, gold consolidating near $4,000, and T-bill yields slowly compressing. No wave classification applies.",
+      "evidence_tickers": [
+        "AGG",
+        "BIL",
+        "IAU",
+        "VIG"
+      ]
+    }
+  },
+  "wave_views": {
+    "NVDA": "surge",
+    "MSFT": "surge",
+    "GOOGL": "surge",
+    "RKLB": "buildup",
+    "BOTZ": "surge",
+    "ARKG": "buildup",
+    "QTUM": "buildup",
+    "NUKZ": "buildup",
+    "AGG": "neutral",
+    "BIL": "neutral",
+    "IAU": "neutral",
+    "VIG": "neutral"
+  },
+  "exclusion_conflicts": [],
+  "thematic_concerns": [
+    {
+      "ticker": "BOTZ",
+      "concern": "Split signal within the robotics wave: humanoid/AI robotics private funding is surging while publicly-traded industrial cobot incumbents inside BOTZ (Teradyne/Universal Robots, Yaskawa) are cutting headcount. BOTZ's index construction skews toward the lagging industrial side rather than the private humanoid wave. The ETF may not capture the hottest part of the surge.",
+      "evidence": "Teradyne Robotics cut ~14% of global staff in November 2025 (The Robot Report); Physical Intelligence raised $600M Series B in the same month as a private company not yet in BOTZ."
+    },
+    {
+      "ticker": "NUKZ",
+      "concern": "ETF name implies fusion exposure but holdings are primarily fission utilities and uranium fuel (Cameco, Constellation, GE Vernova, Duke). True nuclear fusion (Commonwealth Fusion, Helion) remains private and unrepresented. Investor should treat NUKZ as a nuclear-fission-renaissance play, not a fusion play, which is still pre-commercial.",
+      "evidence": "NUKZ top holdings per stockanalysis.com: Cameco 9.85%, GE Vernova 3.70%, Talen Energy 3.12%, Constellation 2.82% \u2014 all fission/utilities."
+    }
+  ],
+  "date": "2025-11-30"
+}

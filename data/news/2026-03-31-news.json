@@ -1,0 +1,286 @@
+{
+  "per_ticker": {
+    "NVDA": {
+      "wave_bucket": "AI",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "NVDA reported Q4 FY2026 (quarter ended January 2026) revenue of $68.1 billion, up 73% year-over-year, with fiscal 2026 full-year revenue of $215.9 billion (+65% YoY). Blackwell-platform demand from hyperscalers remained supply-constrained into early 2026. This was the most recent earnings print visible through March 31, 2026.",
+          "source": "Fortune",
+          "url": "https://fortune.com/2026/02/25/nvidia-nvda-earnings-q4-results-jensen-huang/",
+          "date": "2026-02-25"
+        },
+        {
+          "summary": "During March 2026, NVDA traded below late-2025 highs (~$182 vs $212+ peak) as the U.S. government considered global AI-chip export-approval requirements and reports of H20 chip sales restrictions in China added an estimated $8 billion revenue overhang. GTC 2026 (March 16-19) was a near-term catalyst in either direction.",
+          "source": "The Motley Fool",
+          "url": "https://www.fool.com/investing/2026/03/05/nvidia-and-amd-could-face-worldwide-ai-chip-export/",
+          "date": "2026-03-05"
+        }
+      ]
+    },
+    "GOOGL": {
+      "wave_bucket": "AI",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Note: GOOGL Q1 2026 earnings were reported April 29, 2026 \u2014 after the lookback window. As of March 31, 2026, the most recent earnings print was Q4 2025 (reported February 2026), which showed Google Cloud continuing its strong growth trajectory and Gemini gaining paid enterprise subscribers. No Q1 2026 earnings figures are used in this bullet.",
+          "source": "SEC EDGAR (GOOGL Q1 2026 earnings exhibit filed post-window; Q4 2025 data used)",
+          "url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204426000043/googexhibit991q12026.htm",
+          "date": "2026-03-31"
+        },
+        {
+          "summary": "In March 2026, Google Quantum AI published research showing fewer physical qubits may be needed to attack elliptic-curve encryption, reinforcing Google's dual exposure: AI (primary wave) and quantum computing (secondary). This milestone was cited in the quantum research community as advancing the timeline for practical quantum cryptanalysis.",
+          "source": "Yahoo Finance (quantum computing industry context)",
+          "url": "https://finance.yahoo.com/news/google-announces-quantum-computing-breakthrough-143000320.html",
+          "date": "2026-03-01"
+        }
+      ]
+    },
+    "MSFT": {
+      "wave_bucket": "AI",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Microsoft's FY26 Q3 (quarter ended March 31, 2026) results \u2014 reported April 29, 2026 \u2014 are after the window. However, as of March 31, 2026, Azure growth was running at ~40% YoY (per the Q3 press release covering the closed period), and annualized AI revenue stood at $37 billion, up 123% YoY. These figures describe the state of the business at window close.",
+          "source": "Microsoft Investor Relations (FY26 Q3 press release, covers period through March 31 2026)",
+          "url": "https://www.microsoft.com/en-us/investor/earnings/fy-2026-q3/press-release-webcast",
+          "date": "2026-03-31"
+        },
+        {
+          "summary": "GeekWire reported that Microsoft's AI run rate reached $37 billion, with Azure cloud services growing 40% in the quarter ended March 31, 2026, topping Wall Street expectations and reflecting accelerating monetization of Copilot and model-builder workloads.",
+          "source": "GeekWire",
+          "url": "https://www.geekwire.com/2026/microsoft-tops-wall-street-expectations-reports-accelerating-azure-growth-and-37b-ai-run-rate/",
+          "date": "2026-03-31"
+        }
+      ]
+    },
+    "RKLB": {
+      "wave_bucket": "rockets_spacecraft",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Rocket Lab's Q4 2025 earnings (reported February 26, 2026) beat estimates (revenue $179.7M vs $178.5M expected), but the headline was a further Neutron delay to Q4 2026 after a first-stage propellant tank ruptured during a hydrostatic pressure test on January 21, 2026. The defective tank had been hand-built by a third-party contractor; production shifted to an automated fiber-placement machine to eliminate the defect source.",
+          "source": "SpaceNews",
+          "url": "https://spacenews.com/rocket-lab-delays-neutron-debut-to-late-2026/",
+          "date": "2026-02-27"
+        },
+        {
+          "summary": "Despite the Neutron setback, Rocket Lab's backlog surged 73% to $1.85 billion, anchored by defense and satellite contracts. Management guided for Electron launch cadence to exceed 21 launches (2025 total) by roughly 20% in 2026, making the Space Systems segment the primary near-term revenue driver.",
+          "source": "SpaceNews",
+          "url": "https://spacenews.com/rocket-lab-reaffirms-2025-first-launch-of-neutron/",
+          "date": "2026-03-06"
+        }
+      ]
+    },
+    "BOTZ": {
+      "wave_bucket": "robotics",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "The IFR's 2026 trend report (published January 2026) identified humanoid expansion and AI-driven autonomy as the top themes, with the global industrial robot market hitting an all-time high of $16.7 billion. BOTZ was up ~7.7% YTD and ~22% over the trailing year through early March 2026, with NVIDIA and Keyence among top holdings.",
+          "source": "The Robot Report",
+          "url": "https://www.therobotreport.com/ifr-top-5-global-robotics-trends-of-2026/",
+          "date": "2026-01-01"
+        },
+        {
+          "summary": "A March 3, 2026 analysis noted BOTZ's large implicit NVDA position makes it partly an AI-chip proxy; at the same time humanoid robot deployments (BMW/Hexagon Robotics in Leipzig, Amazon acquiring Fauna Robotics in March 2026) are translating prototype pipelines into early production reality.",
+          "source": "24/7 Wall St.",
+          "url": "https://247wallst.com/investing/2026/03/03/botz-is-a-robotics-etf-that-quietly-bets-big-on-ai-chips/",
+          "date": "2026-03-03"
+        }
+      ]
+    },
+    "ARKG": {
+      "wave_bucket": "engineered_biology",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "As of March 5, 2026, ARKG's top holdings were CRISPR Therapeutics (10.1%), Tempus AI (8.6%), and Twist Bioscience (8.2%). The fund returned ~27.6% over the trailing twelve months, though its inception-to-date CAGR remains modest at ~3.7%, reflecting the 2021-22 drawdown that the wave has only partially recovered.",
+          "source": "ETFdb / ARKG fund data",
+          "url": "https://etfdb.com/etf/ARKG/",
+          "date": "2026-03-05"
+        },
+        {
+          "summary": "In February 2026, the FDA released draft guidance for a 'plausible mechanism framework' allowing single clinical trials to test platform CRISPR therapies customized per patient \u2014 a potential regulatory tailwind for ARKG holdings. Intellia Therapeutics announced plans to file for commercialization approval in H2 2026.",
+          "source": "BioPharma Dive",
+          "url": "https://www.biopharmadive.com/news/aurora-doudna-urnov-gene-editing-plausible-mechanism-pku/809089/",
+          "date": "2026-02-01"
+        }
+      ]
+    },
+    "QTUM": {
+      "wave_bucket": "quantum",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "QTUM returned -8.5% in March 2026 (vs technology category average -4.9%), underperforming amid the broad risk-off selloff. Effective March 20, 2026, Defiance executed a semi-annual rebalance repositioning the fund toward specialized quantum hardware providers and away from software-heavy names.",
+          "source": "GlobeNewswire / Defiance ETFs",
+          "url": "https://www.globenewswire.com/news-release/2026/04/27/3281874/0/en/defiance-s-quantum-computing-etf-qtum-surpasses-4-billion-in-assets-and-earns-5-star-morningstar-rating.html",
+          "date": "2026-03-20"
+        },
+        {
+          "summary": "In March 2026, Google's Quantum AI team published research showing elliptic-curve encryption may require fewer qubits to attack than previously estimated, adding to a string of early-2026 milestones: IBM on track for verified quantum advantage by end-2026 using its Nighthawk 120-qubit processor, and Microsoft's Majorana 1 topological-qubit chip announced in Q1 2026.",
+          "source": "Yahoo Finance / Quantum Computing Report",
+          "url": "https://finance.yahoo.com/news/google-announces-quantum-computing-breakthrough-143000320.html",
+          "date": "2026-03-01"
+        }
+      ]
+    },
+    "NUKZ": {
+      "wave_bucket": "nuclear_fusion",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "NUKZ returned -11.2% in March 2026, the worst month in the lookback window, well below the Miscellaneous Sector category average of -6.0%, likely driven by broader risk-off sentiment and sector rotation out of speculative energy names.",
+          "source": "AAII / Morningstar (NUKZ fund data)",
+          "url": "https://www.morningstar.com/etfs/arcx/nukz/quote",
+          "date": "2026-03-31"
+        },
+        {
+          "summary": "World Nuclear News reported Kazatomprom planned a ~10% uranium production cut in 2026, tightening the near-term fuel supply picture. Separately, IEA confirmed more than 40 countries have now included nuclear energy in national strategies, and Commonwealth Fusion Systems filed a grid-connection application for its ARC commercial fusion plant \u2014 all structural tailwinds for the nuclear ecosystem NUKZ tracks.",
+          "source": "World Nuclear News",
+          "url": "https://www.world-nuclear-news.org/articles/kazatomprom-to-lower-uranium-production-in-2026",
+          "date": "2026-03-01"
+        }
+      ]
+    },
+    "AGG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "AGG returned -1.7% in March 2026 (category average -1.8%), outperforming slightly. The Bloomberg U.S. Aggregate index carried a yield-to-worst near 4.3% and average duration of ~6 years. The Fed's base-case entering 2026 called for two to three rate cuts; the March selloff in rates reflected renewed tariff-driven inflation concerns.",
+          "source": "iShares / Yahoo Finance",
+          "url": "https://finance.yahoo.com/markets/options/articles/treasury-bond-etfs-back-fashion-145531174.html",
+          "date": "2026-03-31"
+        }
+      ]
+    },
+    "BIL": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "BIL (SPDR Bloomberg 1-3 Month T-Bill ETF) provided near-cash stability during Q1 2026's equity and duration volatility, with the Fed funds rate stable and 3-month T-bill yields near 4.2-4.3% \u2014 making short-duration T-bills an attractive low-risk holding relative to the turbulent risk-asset backdrop.",
+          "source": "U.S. Treasury / Advisor Perspectives",
+          "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_bill_rates&field_tdr_date_value=2026",
+          "date": "2026-03-31"
+        }
+      ]
+    },
+    "IAU": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Gold surged to an intraday high of $5,595/oz on January 29, 2026, and remained elevated through March, fueled by tariff-driven safe-haven demand and geopolitical uncertainty. IAU pulled back from the January spike into mid-March before a strong rebound, with a buy signal noted on March 26, 2026.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2026/02/25/gold-gains-on-softer-dollar-safehaven-bid-amid-us-tariff-uncertainty.html",
+          "date": "2026-02-25"
+        },
+        {
+          "summary": "Gold's 52-week range through early 2026 spanned from roughly $59.71 to $104.40 on the IAU share price, reflecting a historic rally driven by central-bank buying, dollar weakness, and global uncertainty \u2014 not an earnings or product-launch catalyst.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/quote/IAU/",
+          "date": "2026-03-31"
+        }
+      ]
+    },
+    "VIG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "VIG dropped to a multi-month low near $146 in March 2026 during the broad equity selloff linked to tariff uncertainty, but rebounded ~7% from that trough. The index reconstituted in March, trimming top-performing names like Broadcom, resulting in approximately 5% portfolio turnover.",
+          "source": "Seeking Alpha",
+          "url": "https://seekingalpha.com/article/4889245-vig-march-2026-reconstitution-reinforces-low-turnover-high-dividend-growth-strategy",
+          "date": "2026-03-01"
+        }
+      ]
+    }
+  },
+  "wave_stages": {
+    "AI": {
+      "stage": "surge",
+      "rationale": "Revenue is real and compounding: NVDA fiscal 2026 at $215.9B (+65% YoY), MSFT AI annualized run-rate $37B (+123%), Google Cloud accelerating. Export-control headwinds and valuation compression from late-2025 highs introduce digestion signals in NVDA specifically, but hyperscaler capex commitments and enterprise AI monetization across MSFT and GOOGL confirm broad adoption is still expanding. The wave has not peaked: supply is still constrained, not oversupplied.",
+      "evidence_tickers": [
+        "NVDA",
+        "MSFT",
+        "GOOGL"
+      ]
+    },
+    "rockets_spacecraft": {
+      "stage": "buildup",
+      "rationale": "RKLB's Neutron \u2014 the vehicle that would open reusable medium-lift competition \u2014 has slipped again to Q4 2026. Near-term revenue is solid (backlog +73%, Electron cadence growing) but the transformative product is still pre-revenue. The wave thesis is intact but early: commercial space economy revenues are real, the large-scale infrastructure is not yet deployed.",
+      "evidence_tickers": [
+        "RKLB"
+      ]
+    },
+    "robotics": {
+      "stage": "surge",
+      "rationale": "The IFR confirmed an all-time high in the global industrial robot market ($16.7B). Humanoid deployments moved from prototype to production (BMW, Amazon acquisitions) within the lookback window. BOTZ's ~22% trailing-year gain reflects genuine adoption compounding rather than pure anticipation. The wave has meaningful revenue but no sign of peak enthusiasm or valuation compression \u2014 it is still attracting new enterprise customers, not churning speculators.",
+      "evidence_tickers": [
+        "BOTZ"
+      ]
+    },
+    "engineered_biology": {
+      "stage": "buildup",
+      "rationale": "ARKG's 27.6% trailing return shows the wave is recovering from the 2021-22 trough, but the inception-to-date CAGR of 3.7% underscores how far the fund still must travel to fully vindicate the thesis. FDA's new CRISPR-platform framework (February 2026) is a positive regulatory signal, but no major commercialization approvals landed in the lookback window. This is still an early-adoption, pre-revenue-at-scale wave.",
+      "evidence_tickers": [
+        "ARKG"
+      ]
+    },
+    "quantum": {
+      "stage": "buildup",
+      "rationale": "Multiple hardware milestones (Google error-correction research, IBM Nighthawk, Microsoft Majorana 1) are compressing the timeline to practical advantage, but QTUM's -8.5% March return \u2014 worse than the tech category \u2014 shows the market is not yet pricing in reliable commercial revenue. AUM growth ($4B) and a 5-star Morningstar rating reflect institutional interest, but actual quantum-derived revenue remains de minimis. Pre-commercial, thesis still early.",
+      "evidence_tickers": [
+        "QTUM"
+      ]
+    },
+    "nuclear_fusion": {
+      "stage": "buildup",
+      "rationale": "NUKZ fell -11.2% in March, the weakest of any tracked wave ETF, while structural tailwinds (40+ countries adopting nuclear strategies, Kazatomprom uranium cuts tightening supply, Commonwealth Fusion's grid-connection application) are meaningful but multi-year. Fusion specifically remains pre-commercial. The ETF primarily tracks fission utilities and uranium supply chains, which are themselves still in early re-rating. Cheap and under-owned relative to eventual commercialization.",
+      "evidence_tickers": [
+        "NUKZ"
+      ]
+    },
+    "general_markets": {
+      "stage": "neutral",
+      "rationale": "AGG, BIL, IAU, and VIG are asset-class or broad-market instruments with no single wave attachment. Gold's run to $5,595 is macroeconomic (tariff safe-haven), not a wave thesis. Bonds and T-bills are rate-regime instruments. VIG is a quality-factor vehicle.",
+      "evidence_tickers": [
+        "AGG",
+        "BIL",
+        "IAU",
+        "VIG"
+      ]
+    }
+  },
+  "wave_views": {
+    "NVDA": "surge",
+    "GOOGL": "surge",
+    "MSFT": "surge",
+    "RKLB": "buildup",
+    "BOTZ": "surge",
+    "ARKG": "buildup",
+    "QTUM": "buildup",
+    "NUKZ": "buildup",
+    "AGG": "neutral",
+    "BIL": "neutral",
+    "IAU": "neutral",
+    "VIG": "neutral"
+  },
+  "exclusion_conflicts": [],
+  "thematic_concerns": [
+    {
+      "ticker": "NVDA",
+      "concern": "Export-control risk is active and material. Proposed rules requiring government approval for any AI-chip export outside the U.S., plus confirmed H20 China restrictions ($8B revenue overhang), create regulatory headline risk that could interrupt the AI wave tilt for this specific name. Profile strategy says 'trim before the crest'; export controls could act as an exogenous cap on NVDA's addressable market.",
+      "evidence": "Motley Fool, 2026-03-05: U.S. officials considering worldwide AI-chip export approval requirements. Estimated $8B H20 revenue loss from China restrictions already reflected in guidance."
+    },
+    {
+      "ticker": "GOOGL",
+      "concern": "Earnings data available through March 31 are partial (Q4 2025 only); Q1 2026 was not yet reported within the lookback window. The quantum research exposure (secondary wave) is a non-zero but small share of GOOGL's total business and does not change its primary AI classification.",
+      "evidence": "GOOGL Q1 2026 reported April 29, 2026 \u2014 outside the backtest window. Only Q4 2025 earnings and March 2026 quantum research news are usable."
+    }
+  ],
+  "date": "2026-03-31"
+}

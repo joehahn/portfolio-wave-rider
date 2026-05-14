@@ -98,58 +98,8 @@ def test_initialize_holdings_rejects_negative_allocation() -> None:
         portfolio.initialize_holdings({"AAA": -100.0}, {"AAA": 50.0})
 
 
-def test_render_news_page_writes_placeholder_when_file_missing(tmp_path) -> None:
-    """If no /review-portfolio has run yet, render_news_page still writes a page
-    so any link to docs/news.html doesn't 404."""
-    out_path = tmp_path / "news.html"
-    portfolio.render_news_page(news_path=str(tmp_path / "missing.json"),
-                               out_path=str(out_path))
-    assert out_path.exists()
-    assert "No wave-stage news yet" in out_path.read_text()
 
 
-def test_render_news_section_emits_expandable_headlines() -> None:
-    news = {
-        "date": "2026-05-02",
-        "per_ticker": {
-            "NVDA": {
-                "wave_bucket": "AI",
-                "bullets": [
-                    {"headline": "NVDA Q1 revenue +69% YoY",
-                     "summary": "Revenue $44.1B, Data Center $39.1B...",
-                     "source": "NVIDIA",
-                     "url": "https://example.com/nvda", "date": "2025-05-28"},
-                ],
-            },
-            "AGG": {
-                "wave_bucket": "general_markets",
-                "bullets": [
-                    {"headline": "Fed holds rates at 3.50-3.75%",
-                     "summary": "Powell's final FOMC; sticky inflation...",
-                     "source": "CNBC",
-                     "url": "https://example.com/agg", "date": "2026-04-29"},
-                ],
-            },
-        },
-    }
-    out = portfolio._render_news_section(news, title="Test", intro="Intro.")
-    # Date appears in header.
-    assert "2026-05-02" in out
-    # Both tickers and their wave buckets appear as headers.
-    assert "NVDA" in out and "AI" in out
-    assert "AGG" in out and "general_markets" in out
-    # Each bullet is wrapped in <details> so headlines are click-to-expand.
-    assert out.count("<details") == 2
-    assert out.count("<summary") == 2
-    # Headlines are the click target (visible in the summary tag).
-    assert "NVDA Q1 revenue +69% YoY" in out
-    assert "Fed holds rates at 3.50-3.75%" in out
-    # The expanded body contains the longer summary text and a "Read full article" link.
-    assert "Revenue $44.1B, Data Center $39.1B" in out
-    assert "Read full article" in out
-    assert 'href="https://example.com/nvda"' in out
-    # AI bucket is rendered before general_markets per the wave display order.
-    assert out.index("NVDA") < out.index("AGG")
 
 
 def test_backtest_runs_against_seeded_prices(tmp_path, monkeypatch) -> None:
@@ -245,58 +195,8 @@ def test_fetch_benchmark_curves_returns_empty_on_yfinance_failure(monkeypatch) -
     assert curves == {}
 
 
-def test_render_news_page_writes_html_with_wave_bucket_label(tmp_path) -> None:
-    """render_news_page produces a standalone HTML file with per-ticker bullets,
-    grouped under their wave bucket."""
-    import json
-    latest = {
-        "date": "2026-05-02",
-        "per_ticker": {
-            "NVDA": {"wave_bucket": "AI", "bullets": [
-                {"headline": "LLM headline for NVDA", "summary": "Portfolio-relevance summary.",
-                 "source": "SemiAnalysis", "url": "https://example.com/llm-nvda",
-                 "date": "2026-04-23"},
-            ]},
-        },
-    }
-    news_path = tmp_path / "news_latest.json"
-    out_path = tmp_path / "news.html"
-    news_path.write_text(json.dumps(latest))
-
-    portfolio.render_news_page(news_path=str(news_path), out_path=str(out_path))
-    out = out_path.read_text()
-
-    # Section title appears.
-    assert "Wave-stage news from last /review-portfolio" in out
-    # Source URL renders.
-    assert 'href="https://example.com/llm-nvda"' in out
-    # wave_bucket label appears next to the ticker.
-    assert "(AI)" in out
 
 
-def test_render_news_section_falls_back_when_headline_missing() -> None:
-    """Older news_latest.json without a headline field still renders cleanly:
-    the click target falls back to the first sentence of the summary body."""
-    news = {
-        "date": "2026-05-02",
-        "per_ticker": {
-            "NVDA": {
-                "wave_bucket": "AI",
-                "bullets": [
-                    {"summary": "Revenue jumped 69 percent year over year. Other context follows.",
-                     "source": "NVIDIA",
-                     "url": "https://example.com/nvda", "date": "2025-05-28"},
-                ],
-            },
-        },
-    }
-    out = portfolio._render_news_section(news, title="Test", intro="Intro.")
-    # Click target (the <summary>) falls back to the first sentence of the body.
-    assert "Revenue jumped 69 percent year over year" in out
-    # Full body still appears in the expanded section.
-    assert "Other context follows" in out
-    # Click-to-expand wrapper is still present.
-    assert "<details" in out
 
 
 # ---------------------------------------------------------------------------

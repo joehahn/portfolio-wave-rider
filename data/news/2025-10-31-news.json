@@ -1,0 +1,299 @@
+{
+  "per_ticker": {
+    "AGG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "The Fed cut the federal funds rate by 25 bp to 3.75\u20134.00% at its October 28-29 FOMC meeting, its second consecutive cut. Chair Powell immediately signaled December was not a foregone conclusion, pushing the 10-year yield back toward 4.45%. AGG, which holds investment-grade bonds across maturities, faced a headwind from rising long-end yields amid still-elevated inflation and Middle East-driven oil-price spikes.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2025/10/29/fed-rate-decision-october-2025.html",
+          "date": "2025-10-29"
+        },
+        {
+          "summary": "The 10-year Treasury yield rose to roughly 4.456%, its highest since July 2025, as geopolitical tensions pushed energy prices higher and reinforced inflation uncertainty. Rising long yields compress bond prices; AGG's intermediate duration (~6 years) makes it sensitive to this move.",
+          "source": "Yahoo Finance \u2014 ticker news",
+          "url": "https://finance.yahoo.com/quote/AGG/",
+          "date": "2025-10-27"
+        }
+      ]
+    },
+    "BIL": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "The FOMC cut the federal funds rate by 25 bp on October 29 to 3.75\u20134.00%, the second cut of the easing cycle. BIL (1\u20133 month T-bills) tracks the front end of the yield curve, so the cut mechanically reduces BIL's forward yield; with Powell flagging a December pause, T-bill rates will drift down more slowly than markets had priced.",
+          "source": "Federal Reserve Board",
+          "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20251029a.htm",
+          "date": "2025-10-29"
+        },
+        {
+          "summary": "Markets priced a 67% probability of a December cut after Powell's cautious post-meeting remarks, down from 90% a day earlier. A slower pace of easing prolongs BIL's elevated yield relative to intermediate bonds, but signals the cash-yield tailwind is fading.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2025/10/29/fed-rate-decision-october-2025.html",
+          "date": "2025-10-29"
+        }
+      ]
+    },
+    "IAU": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "Gold rallied sharply through mid-October 2025, up roughly 61% year-to-date and 26% over the trailing six months, driven by strong ETF inflows, central-bank buying, and a weaker dollar. IAU closely tracks spot gold and participated in the run.",
+          "source": "Yahoo Finance \u2014 ticker news",
+          "url": "https://finance.yahoo.com/news/gold-etfs-spotlight-2025-draws-133300658.html",
+          "date": "2025-10-20"
+        },
+        {
+          "summary": "Gold suffered its largest single-day slump in years on October 21, 2025, after U.S.\u2013China trade tensions eased and the dollar strengthened. IAU lost approximately 5.33% over the following week as of October 27, snapping the year-long rally and triggering 'overbought' technical signals.",
+          "source": "Yahoo Finance \u2014 ticker news",
+          "url": "https://finance.yahoo.com/news/gold-etfs-suffer-rout-over-153700612.html",
+          "date": "2025-10-22"
+        }
+      ]
+    },
+    "VIG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "VIG (Vanguard Dividend Appreciation ETF) was up roughly 10\u201311% for the year through late October 2025, in line with broad equity markets. Its 23% tech weight \u2014 led by Broadcom, Apple, and Microsoft \u2014 means it carries meaningful AI-adjacent exposure. No fund-specific corporate events surfaced in the lookback window.",
+          "source": "Yahoo Finance \u2014 ticker news",
+          "url": "https://finance.yahoo.com/markets/stocks/articles/vanguard-dividend-appreciation-etf-buy-095100681.html",
+          "date": "2025-10-15"
+        }
+      ]
+    },
+    "GOOGL": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Alphabet posted Q3 2025 revenue of $102.3 billion (+16% YoY), its first-ever $100 billion quarter. Google Cloud grew 34% to $15.2 billion, driven by generative AI solutions; the cloud backlog hit $155 billion, up 82% YoY. Management raised full-year capex guidance to $91\u201393 billion to fund AI infrastructure.",
+          "source": "Futurum (citing Alphabet Q3 press release)",
+          "url": "https://futurumgroup.com/insights/alphabet-q3-fy-2025-earnings-show-broad-based-ai-driven-growth/",
+          "date": "2025-10-29"
+        },
+        {
+          "summary": "Google Quantum AI demonstrated the first verifiable quantum advantage on hardware on October 22, using the Willow chip and the 'Quantum Echoes' algorithm \u2014 13,000x faster than the fastest classical supercomputer for that task. A partnership with Atlantic Quantum to accelerate fault-tolerant quantum computing was also announced October 2.",
+          "source": "Quantum Computing Report",
+          "url": "https://quantumcomputingreport.com/google-quantum-ai-achieves-verifiable-quantum-advantage-on-willow-chip-with-quantum-echoes-algorithm/",
+          "date": "2025-10-22"
+        }
+      ]
+    },
+    "NVDA": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "SemiAnalysis reported through October 2025 that Blackwell mass production was ramping under TSMC CoWoS-L packaging with demand far exceeding supply. Customers skipped AMD's MI325X in favor of Blackwell, which delivered lower cost-per-performance. GB200 rack builds at ~125 kW/rack represented a density milestone. Q3 FY2026 data-center results (reported November 19) are outside the lookback window and excluded.",
+          "source": "SemiAnalysis",
+          "url": "https://newsletter.semianalysis.com/p/gb200-hardware-architecture-and-component",
+          "date": "2025-10-15"
+        },
+        {
+          "summary": "Stratechery (Ben Thompson) analyzed Nvidia's earnings cycle in October 2025, framing Blackwell's ramp as a supply-constrained surge with power density and scarcity as structural moats. Cloud GPU capacity was noted as effectively sold out heading into Q4.",
+          "source": "Stratechery",
+          "url": "https://stratechery.com/2025/nvidia-earnings-power-scarcity-and-marginal-costs-openai-hand-wringing/",
+          "date": "2025-10-20"
+        }
+      ]
+    },
+    "MSFT": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Microsoft reported Q1 FY2026 results on October 29, 2025: revenue $77.7 billion (+18% YoY), Azure +40% YoY (above guidance), Intelligent Cloud $30.9 billion (+28%), and non-GAAP EPS of $4.13 (+23%). Management guided Azure to +37% in Q2 at constant currency and said FY2026 capex growth would exceed the FY2025 rate.",
+          "source": "Microsoft Investor Relations",
+          "url": "https://www.microsoft.com/en-us/investor/earnings/fy-2026-q1/press-release-webcast",
+          "date": "2025-10-29"
+        },
+        {
+          "summary": "Stratechery covered Microsoft's Q1 FY2026 as a period when the company was reshaping its AI strategy around Azure scaffolding and CoreAI/MantleAI, adding Anthropic to GitHub Copilot. SemiAnalysis noted unprecedented MWs of self-built datacenter capacity added across 2024\u20132025 as Microsoft secured its AI infrastructure base.",
+          "source": "Stratechery",
+          "url": "https://stratechery.com/2025/microsoft-earnings-coreai-mantleai-additional-notes/",
+          "date": "2025-10-30"
+        }
+      ]
+    },
+    "RKLB": {
+      "wave_bucket": "rockets_spacecraft",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "In March 2025 (within the broader thesis context, already public in Oct), the U.S. Space Force selected Neutron for the National Security Space Launch (NSSL) Phase 3 Lane 1 IDIQ contract \u2014 a five-year, $5.6 billion pool shared by five launch providers, competing for at least 30 missions through 2029. Rocket Lab also won a Space Development Agency satellite development contract worth up to $816 million.",
+          "source": "SpaceNews",
+          "url": "https://spacenews.com/rocket-lab-signs-first-neutron-launch-customer/",
+          "date": "2025-10-01"
+        },
+        {
+          "summary": "NASASpaceflight reported in October 2025 that CEO Peter Beck said engineers were 'literally sleeping in the factories' to meet an ambitious 2025 first-flight timeline for Neutron. Launch Complex 3 at Wallops was operational. Rocket Lab signed its first commercial Neutron mission with a confidential satellite constellation operator.",
+          "source": "NASASpaceflight",
+          "url": "https://www.nasaspaceflight.com/2025/10/beck-neutron-update/",
+          "date": "2025-10-15"
+        }
+      ]
+    },
+    "BOTZ": {
+      "wave_bucket": "robotics",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "The Robot Report's October 2025 industry roundup noted ABB divested its Robotics & Discrete Automation division to SoftBank for $5.375 billion \u2014 a major ownership change for one of BOTZ's key industrial-robot holdings. The deal signals continued large-cap interest in robotics assets.",
+          "source": "The Robot Report",
+          "url": "https://www.therobotreport.com/top-10-october-2025-robotics-developments/",
+          "date": "2025-10-31"
+        },
+        {
+          "summary": "Figure AI released its third-generation humanoid Figure 03, and 1X Technologies opened consumer pre-orders for the NEO home humanoid in October 2025. Neither is a direct BOTZ holding (both are private), but the news heightens competitive pressure on BOTZ's held names and validates the humanoid robotics theme BOTZ is positioned to capture through public proxies.",
+          "source": "The Robot Report",
+          "url": "https://www.therobotreport.com/top-10-october-2025-robotics-developments/",
+          "date": "2025-10-31"
+        }
+      ]
+    },
+    "ARKG": {
+      "wave_bucket": "engineered_biology",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "STAT News and BioPharma Dive coverage through October 2025 documented a challenging fundraising environment for CRISPR-focused companies, with reduced venture capital activity and layoffs at several firms, consistent with ARKG's multi-year underperformance. The CRISPR gene editing wave has not matched its early financial promise, per a February 2025 STAT analysis that remained the prevailing narrative through Q3.",
+          "source": "STAT News",
+          "url": "https://www.statnews.com/2025/02/06/crispr-gene-editing-medical-breakthrough-not-matched-by-financial-success/",
+          "date": "2025-02-06"
+        },
+        {
+          "summary": "ARCH Venture Partners raised a new $3 billion biotech fund in 2025, targeting gene editing, mental health, and cell therapies \u2014 signaling institutional conviction in the long-term thesis despite near-term market headwinds. Endpoints News coverage of the raise highlighted the large gap between scientific progress and public-market valuations in genomics ETFs like ARKG.",
+          "source": "Endpoints News",
+          "url": "https://endpts.com/arch-announces-largest-fund-yet-raising-1-85b-to-back-mental-health-cell-and-gene-editing-approaches/",
+          "date": "2025-07-01"
+        }
+      ]
+    },
+    "QTUM": {
+      "wave_bucket": "quantum",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Google Quantum AI demonstrated verifiable quantum advantage on October 22, 2025, using the Willow chip \u2014 13,000x faster than classical supercomputers on the Quantum Echoes benchmark. This is the first result in this class of algorithm. QTUM holds companies across the quantum ecosystem (hardware, software, infrastructure) and the Willow result is the highest-profile validation of the wave's technical progress to date.",
+          "source": "Quantum Computing Report",
+          "url": "https://quantumcomputingreport.com/google-quantum-ai-achieves-verifiable-quantum-advantage-on-willow-chip-with-quantum-echoes-algorithm/",
+          "date": "2025-10-22"
+        },
+        {
+          "summary": "Quantum Computing Inc. (QCi) announced a $750 million oversubscribed private placement in early October 2025, bringing total capital raised since November 2024 to $1.64 billion. QCi is a small-cap name with quantum photonics exposure; the raise reflects strong speculative investor appetite for quantum plays held within funds like QTUM.",
+          "source": "Quantum Computing Report",
+          "url": "https://quantumcomputingreport.com/qci-announces-750-million-private-placement-and-debuts-quantum-secure-solution-at-ecoc-2025/",
+          "date": "2025-10-05"
+        }
+      ]
+    },
+    "NUKZ": {
+      "wave_bucket": "nuclear_fusion",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "The U.S. Department of Energy released a comprehensive Fusion Science and Technology Roadmap on October 20, 2025, setting a national strategy to commercialize fusion by the mid-2030s. The roadmap drew input from 600+ scientists and engineers. Commonwealth Fusion Systems concurrently applied to connect its first ARC fusion plant to PJM Interconnection, the largest U.S. wholesale power market.",
+          "source": "World Nuclear News",
+          "url": "https://www.world-nuclear-news.org/articles/usa-sets-out-roadmap-for-fusion-commercialisation",
+          "date": "2025-10-20"
+        },
+        {
+          "summary": "The Fusion Industry Association hosted the U.S. Fusion Forum in Washington, D.C. on October 15, 2025, with participation from Commonwealth Fusion Systems and TAE Technologies, among others. A separate World Nuclear News report noted that global private fusion investment has reached $6.21 billion, reflecting continued buildup-phase fundraising without near-term revenue.",
+          "source": "Fusion Industry Association",
+          "url": "https://www.fusionindustryassociation.org/event/us-fusion-forum/",
+          "date": "2025-10-15"
+        }
+      ]
+    }
+  },
+  "wave_stages": {
+    "AI": {
+      "stage": "surge",
+      "rationale": "Real and accelerating revenue: Alphabet's first $100B quarter with Cloud +34%, Microsoft Azure +40%, and NVDA Blackwell supply sold out and compounding. Adoption is measurable, capex is enormous and rising, and cloud backlogs are at record highs. The wave is not yet at peak \u2014 earnings still surprise to the upside and investment is still accelerating rather than plateauing.",
+      "evidence_tickers": [
+        "GOOGL",
+        "MSFT",
+        "NVDA"
+      ]
+    },
+    "rockets_spacecraft": {
+      "stage": "buildup",
+      "rationale": "Rocket Lab has secured landmark government and commercial contracts (NSSL Phase 3, $816M SDA award) and is sleeping in the factory to hit a first Neutron flight. Revenue is growing fast but from a small base and the company is still pre-profit on Neutron. The wave is de-risking structurally but commercial scale is still ahead.",
+      "evidence_tickers": [
+        "RKLB"
+      ]
+    },
+    "robotics": {
+      "stage": "buildup",
+      "rationale": "Major corporate consolidation (ABB/SoftBank deal) and consumer humanoid launches signal the wave is gaining momentum, but most leading humanoid players are still private. BOTZ's public holdings are industrial-automation incumbents; the next-generation humanoid thesis is visible but not yet in the revenue line of publicly traded names.",
+      "evidence_tickers": [
+        "BOTZ"
+      ]
+    },
+    "engineered_biology": {
+      "stage": "digestion",
+      "rationale": "Science is advancing (prime editing, CRISPR cardio trials) but the public-market story is a post-crest hangover: reduced VC activity, layoffs, and a wide gap between scientific progress and financial returns. STAT News explicitly called CRISPR's financial mojo 'lost.' ARKG remains well below its 2021 highs.",
+      "evidence_tickers": [
+        "ARKG"
+      ]
+    },
+    "quantum": {
+      "stage": "buildup",
+      "rationale": "Google's Willow quantum-advantage demonstration is a genuine research milestone, and QCi's oversubscribed $750M raise shows investor appetite. However, commercial applications and revenue are pre-material; the wave is in the quiet-but-de-risking buildup phase.",
+      "evidence_tickers": [
+        "QTUM",
+        "GOOGL"
+      ]
+    },
+    "nuclear_fusion": {
+      "stage": "buildup",
+      "rationale": "The DOE roadmap, FIA Forum, $6.21B in total private investment, and Commonwealth Fusion's grid-connection application are all thesis-confirming signals. But commercialization is a decade away and there is zero fusion revenue. Classic early buildup: policy support growing, capital accumulating, no product.",
+      "evidence_tickers": [
+        "NUKZ"
+      ]
+    },
+    "general_markets": {
+      "stage": "neutral",
+      "rationale": "AGG, BIL, IAU, and VIG are macro/income instruments. AGG faces yield headwinds; BIL benefits from still-elevated short rates but the tailwind is fading; IAU had a sharp rally and an equally sharp reversal; VIG is steady with AI-adjacent tech weight. No single wave label applies.",
+      "evidence_tickers": [
+        "AGG",
+        "BIL",
+        "IAU",
+        "VIG"
+      ]
+    }
+  },
+  "wave_views": {
+    "AGG": "neutral",
+    "BIL": "neutral",
+    "IAU": "neutral",
+    "VIG": "neutral",
+    "GOOGL": "surge",
+    "NVDA": "surge",
+    "MSFT": "surge",
+    "RKLB": "buildup",
+    "BOTZ": "buildup",
+    "ARKG": "digestion",
+    "QTUM": "buildup",
+    "NUKZ": "buildup"
+  },
+  "exclusion_conflicts": [],
+  "thematic_concerns": [
+    {
+      "ticker": "IAU",
+      "concern": "Gold's October rally reversed sharply on October 21-22 after U.S.-China trade tensions eased. A 5%+ week-over-week decline after a 60%+ YTD run raises the question of whether gold's safe-haven premium is being unwound alongside geopolitical de-escalation \u2014 relevant to the profile's 10% precious-metals target allocation.",
+      "evidence": "IAU lost ~5.33% in the week ending October 27, 2025, largest daily drop in years on October 21 per Yahoo Finance."
+    },
+    {
+      "ticker": "ARKG",
+      "concern": "ARKG's synthetic-biology wave is classified as 'digestion.' The profile calls for early-wave exposure while themes are still cheap. A digestion-phase ETF may conflict with the intent of 'invest early in the next waves while they are still cheap' \u2014 depending on whether the user views ARKG's current low price as re-entry opportunity or as ongoing value destruction.",
+      "evidence": "STAT News documented financial underperformance of CRISPR sector; ARKG 52-week range 20.25\u201334.39 as of late 2025, well below 2021 highs."
+    }
+  ],
+  "date": "2025-10-31"
+}

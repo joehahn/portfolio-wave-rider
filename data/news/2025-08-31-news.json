@@ -1,0 +1,309 @@
+{
+  "per_ticker": {
+    "AGG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "The 10-year Treasury yield was hovering near 4.3% through August 2025, with markets pricing in Fed rate cuts beginning in September. AGG (iShares Core U.S. Aggregate Bond \u2014 Treasuries, agency MBS, and investment-grade corporates) would have benefited modestly from rate-cut anticipation driving prices up and yields slightly lower into month-end.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2025-09-11/us-treasuries-rise-as-mixed-data-leave-fed-rate-cuts-intact",
+          "date": "2025-08-31"
+        },
+        {
+          "summary": "No ticker-specific earnings or regulatory news for AGG in the lookback window. Macro backdrop: Fed held rates steady through August; first cut came in September. Bond market was in a slow grind higher on rate-cut expectations. Curated sources (Bloomberg, Yahoo Finance) returned no August-specific material \u2014 open fallback used.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/quote/AGG/",
+          "date": "2025-08-31"
+        }
+      ]
+    },
+    "BIL": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "BIL (SPDR Bloomberg 1-3 Month T-Bill ETF) continued to deliver its rolling short-term yield through August 2025, with the Fed funds rate still elevated near its cycle peak. 3-month T-bill yields were approximately 5%+ before the Fed's September cut cycle began, making BIL a high-yield cash-equivalent for the portfolio.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/quote/BIL/",
+          "date": "2025-08-31"
+        },
+        {
+          "summary": "No material news events for BIL in the lookback window \u2014 it is a passthrough for T-bill yields. Curated sources returned no August-specific news; open fallback used. The key macro signal is that the Fed's first cut arrived in September, meaning BIL yields were near their cycle peak during this window.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/quote/BIL:US",
+          "date": "2025-08-31"
+        }
+      ]
+    },
+    "IAU": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Gold opened August 8, 2025 at a new record high of $3,487.90/oz (futures), reaching an intraday high of $3,534.10/oz. The catalyst was Trump's surprise tariff levies on imported 1kg and 100oz gold bars, disrupting the London-Switzerland-Hong Kong refining corridor and squeezing physical supply.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/personal-finance/investing/article/gold-price-today-friday-august-8-2025-gold-opens-at-record-high-after-reports-of-gold-tariffs-114904245.html",
+          "date": "2025-08-08"
+        },
+        {
+          "summary": "Gold remained below $3,400 on August 22 ahead of Powell's Jackson Hole speech, then reopened higher on August 29 as investors positioned ahead of fresh inflation data. IAU tracks spot gold 1:1 (minus 0.25% expense ratio), so all price milestones apply directly.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/personal-finance/investing/article/gold-price-today-friday-august-22-2025-gold-remains-below-3400-ahead-of-powell-speech-120258044.html",
+          "date": "2025-08-22"
+        }
+      ]
+    },
+    "GOOGL": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Alphabet Q2 2025 earnings (reported July 29): EPS of $2.31, beating estimates by 7.4%, up 22% YoY. Google Cloud revenue surged 32% YoY with operating margin expanding to 20.7%. Management raised full-year CapEx guidance to $85B to meet accelerating AI demand. Nearly all generative-AI unicorns are on Google Cloud.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/news/alphabet-inc-goog-q2-2025-071346968.html",
+          "date": "2025-07-29"
+        },
+        {
+          "summary": "Infrastructure constraint flagged: Alphabet cited tight supply of cloud compute infrastructure as limiting its ability to fully meet AI demand, a risk to near-term Cloud growth even as underlying demand is strong. GOOGL also has secondary quantum exposure via Google Quantum AI (Willow chip announced December 2024).",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/news/googl-q2-earnings-beat-estimates-155500709.html",
+          "date": "2025-07-29"
+        }
+      ]
+    },
+    "NVDA": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Nvidia Q2 FY2026 earnings (reported August 27, 2025): revenue of $46.7B, up 56% YoY, beating estimates. Data center revenue $41.1B (+56% YoY). EPS of $1.08, beating consensus. CEO Jensen Huang called Blackwell AI chip demand 'extraordinary,' with hyperscalers, governments, and enterprises all accelerating AI infrastructure investment.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/live-blog/2025-08-27/nvidia-second-quarter-earnings",
+          "date": "2025-08-27"
+        },
+        {
+          "summary": "Despite the beat, NVDA stock fell on the day of earnings because data center revenue came in marginally below the highest-end analyst forecasts, illustrating that the market's expectations bar had risen to the point where a 56% YoY revenue increase was not enough to avoid a sell-off.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/news/nvidia-stock-falls-after-data-center-sales-miss-forecasts-ceo-calls-blackwell-demand-extraordinary-162719403.html",
+          "date": "2025-08-27"
+        }
+      ]
+    },
+    "MSFT": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Microsoft Q4 FY2025 earnings (reported July 30, 2025): Azure revenue grew 39% YoY in the quarter; Microsoft Cloud surpassed $168B in annual revenue (+23%). AI business reached a $37B annual run rate, up 123% YoY, driven by Copilot and Azure OpenAI Service. Intelligent Cloud segment revenue was $29.9B (+26%).",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/news/microsoft-corp-msft-q4-2025-073702436.html",
+          "date": "2025-07-30"
+        },
+        {
+          "summary": "Azure remains capacity-constrained despite strong demand; CapEx is accelerating. A Reuters/Yahoo Finance analysis noted that AI investment drives cloud growth but raises CapEx concerns that could compress near-term free cash flow margins.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/news/msft-q4-deep-dive-ai-053430582.html",
+          "date": "2025-07-30"
+        }
+      ]
+    },
+    "RKLB": {
+      "wave_bucket": "rockets_spacecraft",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "Rocket Lab Q2 2025 results (reported August 7, 2025): record quarterly revenue of $144M, up 36% YoY, beating estimates by 6.7%, with gross margins expanding 650 basis points YoY. EPS missed estimates by 18%. Management reaffirmed Neutron debut by year-end and guided Q3 revenue to $145-155M at higher margins.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/news/rocket-lab-announces-second-quarter-201500598.html",
+          "date": "2025-08-07"
+        },
+        {
+          "summary": "Rocket Lab also announced a $275M acquisition of Geost (cash-plus-equity, plus up to $50M earnout) in August, expanding into space systems hardware. Meanwhile, Neutron's LC-3 launch complex opened in August with a 700-ton launch mount and a 757,000-liter water tower, putting the vehicle on track for its debut flight.",
+          "source": "NASASpaceFlight",
+          "url": "https://nasaspaceflight.com/2025/12/rocket-lab-2025-overview/",
+          "date": "2025-08-07"
+        }
+      ]
+    },
+    "BOTZ": {
+      "wave_bucket": "robotics",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "summary": "August 2025 robotics sector: global robotics investment reached at least $4.35B in July 2025 alone (93 funding rounds), with the U.S. and China dominating. Humanoid hype was the dominant narrative through 2025, though collaborative robots (cobots) and autonomous mobile robots (AMRs) were seen as the nearer-term industrial adoption story.",
+          "source": "The Robot Report",
+          "url": "https://www.therobotreport.com/top-10-robotics-developments-of-august-2025/",
+          "date": "2025-08-31"
+        },
+        {
+          "summary": "BOTZ (Global X Robotics & AI ETF) holds about 47% in industrials and 33% in technology. No ETF-level corporate action in the window. The curated robotics sources (The Robot Report, IEEE Spectrum) captured broad sector momentum but no BOTZ-specific news; open fallback used for macro context.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/quote/BOTZ/news/",
+          "date": "2025-08-31"
+        }
+      ]
+    },
+    "ARKG": {
+      "wave_bucket": "engineered_biology",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "In late August 2025, ARK Invest bought a combined $12.4M of CRISPR Therapeutics (CRSP) shares across ARKK and ARKG after the stock dropped ~6%, signaling continued high-conviction in gene-editing. On August 28, ARKK also purchased ~350,000 shares (~$4M) of Intellia Therapeutics, another ARKG top holding.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/news/ark-invest-boosts-gene-editing-172343739.html",
+          "date": "2025-08-28"
+        },
+        {
+          "summary": "ARKG's top holdings as of August 2025 include CRISPR Therapeutics (9.4%), Tempus AI (8.5%), Twist Bioscience (8.5%), and Beam Therapeutics (5.5%). ARK's buying on dips suggests internal conviction remains high despite ARKG's extended underperformance vs. the broader market since its 2021 peak.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/news/cathie-wood-shells-13-9-181700050.html",
+          "date": "2025-08-28"
+        }
+      ]
+    },
+    "QTUM": {
+      "wave_bucket": "quantum",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "QTUM (Defiance Quantum ETF) crossed $2B in AUM in early September 2025, a milestone that was accruing through August. The fund held a 5-star Morningstar rating as of June 30, 2025, and tracks a modified equal-weight index of companies deriving at least 50% of revenue from quantum computing and machine learning.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/news/defiance-qtum-quantum-computing-etf-120600686.html",
+          "date": "2025-08-31"
+        },
+        {
+          "summary": "Market narrative around QTUM in August 2025: the quantum computing sector is projected to reach $90B-$170B by 2040, fueling investor inflows. BTQ Technologies was added to the QTUM index during the period. GOOGL's Willow chip (December 2024) had already served as a sector catalyst, sustaining interest through the summer.",
+          "source": "Yahoo Finance",
+          "url": "https://ca.finance.yahoo.com/news/btq-technologies-added-defiance-quantum-123000750.html",
+          "date": "2025-08-31"
+        }
+      ]
+    },
+    "NUKZ": {
+      "wave_bucket": "nuclear_fusion",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "NUKZ (Range Nuclear Renaissance ETF) gained approximately 58% in the trailing year through mid-2025, driven by Big Tech's push to sign nuclear power purchase agreements for AI data centers (Microsoft, Amazon, Google, Meta). Trump signed multiple executive orders through 2025 targeting a quadrupling of U.S. nuclear capacity to 400 GW by 2050, easing reactor approvals and opening federal lands.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/news/nukz-etf-surges-58-nuclear-142147398.html",
+          "date": "2025-08-31"
+        },
+        {
+          "summary": "Top NUKZ holdings include Cameco (uranium, >10% of fund), Constellation Energy (nuclear utility fleet), GE Vernova, NuScale Power (SMRs), and Oklo. Fund AUM was ~$725M as of August 2025. Concentration risk flagged: top 3 holdings account for 21% of assets, and several SMR developers have no commercial reactors operating yet.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/news/nuclear-etfs-powering-ai-data-103508300.html",
+          "date": "2025-08-31"
+        }
+      ]
+    },
+    "VIG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "summary": "VIG (Vanguard Dividend Appreciation ETF, tracking the S&P U.S. Dividend Growers Index) was up approximately 5.27% YTD and +10.67% over the trailing year as of mid-July 2025, with a dividend yield of ~1.7%. No material ETF-level corporate actions in August. The fund continued to function as a quality-equity anchor, benefiting from the market's recovery from the April 2025 tariff shock.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/news/vanguard-dividend-appreciation-etf-vig-102002800.html",
+          "date": "2025-08-09"
+        },
+        {
+          "summary": "No ticker-specific earnings or regulatory events for VIG in August. The broader equity market (S&P 500) staged a recovery through summer 2025 from the April tariff-driven drawdown, which would have lifted VIG's large-cap quality holdings. Expense ratio 0.05%; curated sources returned no August-specific news beyond the mid-July performance snapshot.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/quote/VIG/",
+          "date": "2025-08-31"
+        }
+      ]
+    }
+  },
+  "wave_stages": {
+    "AI": {
+      "stage": "surge",
+      "rationale": "Real, accelerating revenue is the story: NVDA posted 56% YoY revenue growth and $41B in a single quarter from data center; MSFT's AI business hit a $37B annual run rate (+123% YoY); GOOGL Cloud grew 32% YoY with expanding margins. The post-earnings sell-off on NVDA despite a massive beat signals the market's bar is very high \u2014 a symptom of late-surge enthusiasm \u2014 but revenue compounding is still genuinely accelerating, not yet slowing. 'Peak' would require revenue deceleration, which is not in evidence.",
+      "evidence_tickers": [
+        "NVDA",
+        "MSFT",
+        "GOOGL"
+      ]
+    },
+    "rockets_spacecraft": {
+      "stage": "surge",
+      "rationale": "RKLB is printing record quarterly revenue (+36% YoY) with expanding gross margins, actively deploying capital via the Geost acquisition, and advancing Neutron launch site infrastructure. Revenue is real and compounding. The wave is past early buildup \u2014 contracts, infrastructure, and recurring launch cadence are established \u2014 but Neutron's maiden flight is still ahead, suggesting room to run before a true peak.",
+      "evidence_tickers": [
+        "RKLB"
+      ]
+    },
+    "robotics": {
+      "stage": "buildup",
+      "rationale": "Global robotics investment reached $4.35B in a single month (July 2025), but the humanoid narrative is still dominated by hype and pre-commercial demonstrations. BOTZ's industrial-automation holdings are profitable, but the high-growth humanoid thesis is still years from mass commercialization. Sector is between buildup and early surge \u2014 calling buildup because the dominant story is still funding rounds and prototypes, not mass-deployment revenue.",
+      "evidence_tickers": [
+        "BOTZ"
+      ]
+    },
+    "engineered_biology": {
+      "stage": "buildup",
+      "rationale": "ARK's ARKG is buying CRISPR Therapeutics and Intellia on dips \u2014 a bet on gene-editing that is still pre-commercial at scale. Top holdings like CRISPR Therapeutics and Beam Therapeutics have clinical assets but no large approved-drug revenue. Cathie Wood's conviction buys on weakness suggest the thesis remains early. The wave has not yet found its commercial catalyst.",
+      "evidence_tickers": [
+        "ARKG"
+      ]
+    },
+    "quantum": {
+      "stage": "buildup",
+      "rationale": "QTUM crossed $2B AUM, reflecting genuine investor interest, but the underlying companies are still pre-revenue or early-revenue. The 30-year $90B-$170B market projection underscores how far away commercial scale is. GOOGL's Willow chip was a research milestone, not a product launch. Quantum is quiet, under-owned relative to AI, and still early \u2014 classic buildup.",
+      "evidence_tickers": [
+        "QTUM"
+      ]
+    },
+    "nuclear_fusion": {
+      "stage": "surge",
+      "rationale": "NUKZ is up ~58% trailing-year, AUM has grown rapidly to $725M, and the demand narrative (AI data centers needing always-on baseload power) is concrete. Trump's executive orders provide a policy tailwind. Cameco and Constellation (fission, not fusion) are the value drivers. Note: NUKZ covers the broader nuclear sector (fission/SMRs/uranium), not pure fusion \u2014 the pure-fusion wave is still buildup. Classifying NUKZ's wave as surge because investor flows, policy support, and Big Tech demand are compounding, even if SMR deployments are still years out.",
+      "evidence_tickers": [
+        "NUKZ"
+      ]
+    },
+    "general_markets": {
+      "stage": "neutral",
+      "rationale": "AGG, BIL, IAU, and VIG are general-markets or macro-asset tickers without wave attachment. IAU hit record highs in August on tariff-driven safe-haven demand \u2014 a macro signal, not a technology wave. BIL yields were near their cycle peak ahead of the September Fed cut. No wave classification applies.",
+      "evidence_tickers": [
+        "AGG",
+        "BIL",
+        "IAU",
+        "VIG"
+      ]
+    }
+  },
+  "wave_views": {
+    "AGG": "neutral",
+    "BIL": "neutral",
+    "IAU": "neutral",
+    "VIG": "neutral",
+    "GOOGL": "surge",
+    "NVDA": "surge",
+    "MSFT": "surge",
+    "RKLB": "surge",
+    "BOTZ": "buildup",
+    "ARKG": "buildup",
+    "QTUM": "buildup",
+    "NUKZ": "surge"
+  },
+  "exclusion_conflicts": [],
+  "thematic_concerns": [
+    {
+      "ticker": "NVDA",
+      "concern": "Peak-enthusiasm signal embedded in surge: NVDA stock fell on August 27 despite 56% YoY revenue growth and a Q2 beat, because the market's expectations bar had risen above even exceptional results. This is an early warning of approaching peak dynamics within the AI wave \u2014 not yet peak, but the gap between fundamental performance and market expectations is narrowing.",
+      "evidence": "Yahoo Finance: 'Nvidia stock falls after data center sales miss forecasts' (2025-08-27) \u2014 beat on revenue, miss on highest-end forecasts, stock down on the day."
+    },
+    {
+      "ticker": "NUKZ",
+      "concern": "NUKZ is classified under nuclear_fusion in the wave bucket per the investor profile vocabulary, but the fund's actual holdings are predominantly nuclear fission assets (Cameco uranium, Constellation Energy, GE Vernova) and early-stage SMR developers \u2014 not fusion companies. Pure fusion (Commonwealth Fusion, TAE Technologies) is private and not in NUKZ. The profile's thesis for 'nuclear fusion' as a next wave may be imperfectly served by NUKZ, which is better described as a nuclear fission/renaissance play.",
+      "evidence": "Yahoo Finance NUKZ profile: top holdings Cameco, Constellation Energy, GE Vernova, NuScale Power, Oklo \u2014 all fission or uranium, none pure fusion."
+    },
+    {
+      "ticker": "GOOGL",
+      "concern": "Infrastructure supply constraint flagged by Alphabet management: tight cloud compute supply is limiting Google Cloud's ability to fulfill AI demand, creating a near-term ceiling on Cloud revenue growth even as underlying demand is strong. This is a revenue-cap risk, not a demand risk.",
+      "evidence": "Yahoo Finance: Q2 2025 earnings call highlights cite 'tight supply environment for cloud infrastructure' as an active constraint."
+    }
+  ],
+  "date": "2025-08-31"
+}

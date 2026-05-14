@@ -1,0 +1,512 @@
+{
+  "per_ticker": {
+    "NVDA": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "headline": "NVDA Q1 FY2026: $44.1B revenue, $4.5B H20 charge absorbed",
+          "summary": "Nvidia reported Q1 (ended April 27, 2025) revenue of $44.1B, up 69% YoY, beating consensus despite a $4.5B write-down on H20 GPU inventory and purchase commitments triggered by the April 9, 2025 U.S. export licensing requirement for China. The company still beat EPS estimates by 8%. The H20 ban is the single largest near-term headwind: $2.5B of revenue couldn't ship in Q1, and Q2 guidance of $45B already bakes in an $8B H20 revenue hole. The wave thesis is intact \u2014 datacenter demand outside China is accelerating \u2014 but China tariff/export policy is now a structural overhang.",
+          "source": "Yahoo Finance / Nasdaq",
+          "url": "https://www.nasdaq.com/market-activity/stocks/nvda/earnings",
+          "date": "2026-05-20"
+        },
+        {
+          "headline": "H20 export ban: $8B Q2 revenue gap, indefinite license required",
+          "summary": "The U.S. government informed Nvidia on April 9, 2025 that exports of its H20 chip (Hopper architecture, designed for the China market under prior rules) require an indefinite license. The original disclosure flagged up to $5.5B in charges; actual Q1 impact was $4.5B. Q2 guidance of ~$45B reflects ~$8B of lost H20 revenue. SemiAnalysis context: H20 had been $4.6B in Q1 revenue before the ban. For portfolio holders, the export-control risk is now a permanent feature of NVDA's China exposure, not a one-time event.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/news/nvidia-expects-5-5-billion-213321348.html",
+          "date": "2025-04-15"
+        },
+        {
+          "headline": "Gary Marcus: AI economics broken without world models",
+          "summary": "Marcus (skeptic, Dec 26 2025) argued that the AI investment bubble peaked in September 2025 and will deflate in 2026, citing Reuters reporting on major AI companies cutting infrastructure spend and NYT analysis of unsustainable debt. His core claim: 'Without world models, you cannot achieve reliability. And without reliability, profits are limited.' This is a contrarian framing relevant to NVDA's valuation, which depends on sustained hyperscaler capex. Marcus does not dispute near-term datacenter demand but questions multi-year ROI on AI infrastructure \u2014 the demand that drives NVDA revenue.",
+          "source": "Gary Marcus",
+          "url": "https://garymarcus.substack.com/p/the-ai-bubble-is-all-over-now-baby",
+          "date": "2025-12-26"
+        },
+        {
+          "headline": "MIT Tech Review: NVDA dominance 'unassailable for now,' China open-source training still on Nvidia",
+          "summary": "MIT Technology Review's January 2026 AI outlook noted that Chinese competitors are 'going all in' on advanced AI chips but concluded Nvidia's dominance looks 'unassailable \u2014 for now.' A key detail: many leading Chinese open-source models (Alibaba Qwen, etc.) still rely on Nvidia chips and U.S. cloud platforms for training and inference, even as geopolitical pressure mounts. This is a nuanced data point: the H20 ban hurts Nvidia's direct China revenue, but indirect dependence on Nvidia silicon persists across Chinese AI labs.",
+          "source": "MIT Technology Review",
+          "url": "https://www.technologyreview.com/2026/01/05/1130662/whats-next-for-ai-in-2026/",
+          "date": "2026-01-05"
+        }
+      ]
+    },
+    "GOOGL": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "headline": "Alphabet Q1 2026: Cloud +63%, net income up 81% YoY",
+          "summary": "Alphabet posted Q1 2026 revenue of $109.9B (+22% YoY) with net income of $62.6B (+81%). Google Cloud crossed $20B in quarterly revenue for the first time, growing 63%, with backlog nearly doubling QoQ to $460B+. Enterprise AI products (built on Gemini) drove 800% YoY revenue growth on that subset. Full-year capex guidance was raised to up to $190B, with 2027 capex expected to 'significantly increase.' This is the strongest quarter in the company's history by net income, and Cloud is now 18% of Alphabet revenue, up from ~12% two years ago.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/markets/stocks/articles/alphabet-q1-2026-earnings-google-202101883.html",
+          "date": "2026-04-29"
+        },
+        {
+          "headline": "Google Cloud capacity capped despite AI demand surge",
+          "summary": "Futurum Research noted that despite the 63% Cloud growth, management flagged capacity constraints as the binding limit on further acceleration. The $190B capex plan reflects an attempt to relieve this bottleneck. For portfolio holders, this is a two-sided signal: near-term revenue is capacity-limited rather than demand-limited (bullish on sustained growth), but $190B annual capex is a significant capital-allocation risk if AI monetization does not scale as expected.",
+          "source": "MIT Technology Review",
+          "url": "https://www.technologyreview.com/2026/03/24/1134540/the-download-tracing-ai-fueled-delusions-openai-warns-microsoft-risks/",
+          "date": "2026-03-24"
+        },
+        {
+          "headline": "Google Willow quantum chip now running 'Quantum Echoes' verifiable algorithm",
+          "summary": "Google Quantum AI's 105-qubit Willow chip (announced December 2024) achieved a verifiable quantum advantage with the 'Quantum Echoes' algorithm in March 2026, running 13,000x faster than the world's best supercomputer on a repeatable benchmark. In March 2026, Google also expanded into neutral-atom architectures, hiring JILA Fellow Adam Kaufman to lead a new hardware team in Boulder. This is a secondary quantum exposure for GOOGL, not its primary business, but it positions Google as the leading publicly traded pure-technology quantum player ahead of IBM.",
+          "source": "Quantum Computing Report",
+          "url": "https://quantumcomputingreport.com/google-quantum-ai-achieves-verifiable-quantum-advantage-on-willow-chip-with-quantum-echoes-algorithm/",
+          "date": "2026-03-01"
+        }
+      ]
+    },
+    "MSFT": {
+      "wave_bucket": "AI",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "headline": "MSFT Q3 FY2026: Azure +40%, AI run rate $37B, up 123% YoY",
+          "summary": "Microsoft Q3 FY2026 revenue was $82.9B (+18% YoY), beating consensus by $1.4B. Azure grew 40% (above 39.3% consensus). AI revenue run rate hit $37B annually, up 123% YoY, covering Azure AI, model builders, and Microsoft's own AI tools (Copilot). Commercial remaining performance obligation rose 99% to $627B, signaling very strong forward visibility. Stock fell post-earnings despite the beat, reportedly on concerns that $190B FY2026 capex (up $25B due to memory cost inflation) may not yield proportionate returns.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/markets/stocks/articles/microsoft-q3-2026-earnings-beat-205308206.html",
+          "date": "2026-04-29"
+        },
+        {
+          "headline": "MSFT capex at $190B; stock fell on overbuilding risk concerns",
+          "summary": "Microsoft reported that FY2026 capex will reach $190B due to soaring memory costs, adding a $25B impact from higher component prices versus prior guidance. The stock declined despite the earnings beat, with the market pricing in overbuilding risk \u2014 a concern reinforced by MIT Technology Review's March 2026 note that OpenAI publicly acknowledged its close ties with Microsoft as a business risk in pre-IPO filings. For portfolio holders, the capex trajectory is the key risk: if AI monetization (as measured by the $37B AI run rate) does not continue compounding, the capital intensity becomes a drag on ROIC.",
+          "source": "MIT Technology Review",
+          "url": "https://www.technologyreview.com/2026/03/24/1134540/the-download-tracing-ai-fueled-delusions-openai-warns-microsoft-risks/",
+          "date": "2026-03-24"
+        },
+        {
+          "headline": "Microsoft Majorana 1 chip advances topological quantum computing",
+          "summary": "Microsoft unveiled Majorana 1 in February 2025 \u2014 the world's first quantum chip using a Topological Core architecture \u2014 and opened applications for its 2026 Quantum Pioneers Program in January 2026 for academic research in measurement-based topological computing. DARPA selected Microsoft for the final phase of its US2QC benchmarking program. This is a secondary quantum exposure for MSFT; the topological qubit approach is differentiated from IBM/Google superconducting approaches and is theorized to be more stable, but it remains pre-revenue.",
+          "source": "Quantum Computing Report",
+          "url": "https://quantumcomputingreport.com/microsoft-opens-applications-for-2026-quantum-pioneers-program-targeting-measurement-based-computing/",
+          "date": "2026-01-23"
+        }
+      ]
+    },
+    "RKLB": {
+      "wave_bucket": "rockets_spacecraft",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "headline": "RKLB Q1 2026: record $200.3M revenue, +64% YoY, $2.2B backlog",
+          "summary": "Rocket Lab reported Q1 2026 revenue of $200.3M (+63.5% YoY, +12% QoQ), a company record. Gross margin reached 43% non-GAAP. Total backlog hit $2.2B, up 108% YoY and 20% QoQ, with 58.5% in space systems. The company booked more launches in Q1 2026 alone than in all of 2025, including 31 Electron/HASTE missions and five Neutron contracts. Cash/liquidity stood at over $2B. Despite the Neutron delay (see below), the core Electron and space-systems business is compounding strongly.",
+          "source": "Payload",
+          "url": "https://payloadspace.com/the-state-of-launch-2026/",
+          "date": "2026-05-08"
+        },
+        {
+          "headline": "Neutron delayed to Q4 2026 after propellant tank rupture in January",
+          "summary": "A first-stage propellant tank ruptured during a hydrostatic pressure test at Rocket Lab's Maryland facility on January 21, 2026. CEO Peter Beck called it unexpected. The failure pushed Neutron's debut to at least Q4 2026. Rocket Lab will introduce minor design changes, then run an extensive re-qualification campaign. SpaceNews reported this is Neutron's second delay (earlier slips from 2024 to 2025 to 2026). Despite the setback, the company has five Neutron launch contracts signed and has secured an AFRL point-to-point cargo demonstration contract. The Neutron delay extends the pre-revenue period on the company's highest-margin potential product.",
+          "source": "SpaceNews",
+          "url": "https://spacenews.com/rocket-lab-delays-neutron-debut-to-late-2026/",
+          "date": "2026-02-01"
+        },
+        {
+          "headline": "$816M SDA satellite prime contract anchors space-systems backlog",
+          "summary": "Rocket Lab won an $816M prime contract to build 18 satellites for the Space Development Agency's Tracking Layer \u2014 the largest space-systems award in the company's history. Payload reported Rocket Lab is simultaneously acquiring Motiv Space Systems (space robotics) to expand its spacecraft manufacturing capability. The SDA contract is a significant de-risking of the backlog, as government prime contracts are higher-certainty revenue than commercial launch bookings.",
+          "source": "Payload",
+          "url": "https://payloadspace.com/rocket-lab-to-acquire-motiv-space-systems/",
+          "date": "2026-01-15"
+        }
+      ]
+    },
+    "BOTZ": {
+      "wave_bucket": "robotics",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "headline": "ABB Q1 2026: orders +32% YoY, revenue +18%, raised full-year guidance",
+          "summary": "ABB (8.8% of BOTZ) reported Q1 2026 orders of $11.3B versus $9.77B consensus \u2014 a $1.5B+ beat \u2014 with revenue up 18% YoY. Free cash flow hit a Q1 record of $1.3B. Management raised full-year guidance to high-single-digit to low-double-digit revenue growth. Robotics and automation demand is being driven by reshoring, labor shortages, and AI-adjacent factory investment. ABB's results are a direct wave-thesis confirmation for BOTZ.",
+          "source": "The Robot Report",
+          "url": "https://www.therobotreport.com/category/financial/earnings/",
+          "date": "2026-04-17"
+        },
+        {
+          "headline": "FANUC FY2026: record JPY 857B sales, +8% YoY, guidance raised",
+          "summary": "FANUC (8.2% of BOTZ) reported record net sales of JPY 857B for fiscal year ending March 2026, up 8% YoY, with operating margin improving 150 basis points to 21.4%. Management guided 6% further sales growth and margin expansion to 23.3% for fiscal 2027. Demand is being driven by factory automation in China and the Americas, and by customers navigating persistent labor shortages. FANUC America also announced a $90M investment in a new 840,000 sq. ft. Michigan facility.",
+          "source": "The Robot Report",
+          "url": "https://www.therobotreport.com/fanuc-america-invests-90m-u-s-robot-manufacturing/",
+          "date": "2026-04-25"
+        },
+        {
+          "headline": "BOTZ +21.9% past year; humanoid boom emerging as fastest-growing robotics segment",
+          "summary": "BOTZ (Global X Robotics & AI ETF) returned 21.9% over the trailing year as of May 2026, with net assets of $3.71B. A 24/7 Wall Street analysis noted that the humanoid robot boom is now real, with three ETFs (including BOTZ) capturing the full supply chain. The Robot Report confirmed humanoids are the fastest-growing robotics market segment. BOTZ's top-five holdings (Keyence 9.4%, ABB 8.8%, NVDA 8.3%, FANUC 8.2%, Intuitive Surgical 6.6%) show the fund blends industrial incumbents with AI-chip exposure.",
+          "source": "The Robot Report",
+          "url": "https://www.therobotreport.com/",
+          "date": "2026-04-24"
+        }
+      ]
+    },
+    "ARKG": {
+      "wave_bucket": "engineered_biology",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "headline": "Intellia Phase 3 CRISPR trial succeeds for hereditary angioedema",
+          "summary": "Intellia Therapeutics (an ARKG holding) reported April 27, 2026 that its CRISPR-based treatment dramatically reduced swelling attacks in a pivotal Phase 3 trial for hereditary angioedema. STAT News noted this therapy is poised to become the second approved CRISPR-based medicine after Vertex/CRISPR Therapeutics' Casgevy. A Phase 3 success in a rare-disease indication is the highest-value clinical milestone for a gene-editing company, and Intellia is a core ARKG position. This directly validates the engineered-biology thesis.",
+          "source": "STAT News",
+          "url": "https://www.statnews.com/2026/04/27/intellia-therapeutics-phase-3-trial-hereditary-angioedema-crispr-treatment/",
+          "date": "2026-04-27"
+        },
+        {
+          "headline": "FDA unveils bespoke gene therapy 'plausible mechanism' approval pathway",
+          "summary": "The FDA released detailed guidance in February 2026 for approving personalized CRISPR medicines targeting individual patient mutations \u2014 the 'plausible mechanism pathway' \u2014 covering genome editing and RNA-based methods. STAT News described this as a potential flood of rare-disease applications. For ARKG, this is a regulatory tailwind: ARK's gene-editing holdings (Beam, Intellia, Prime Medicine, CRISPR Therapeutics) are precisely the companies that would benefit from faster bespoke-therapy approvals.",
+          "source": "STAT News",
+          "url": "https://www.statnews.com/2026/02/23/fda-rare-disease-new-guidelines-plausible-mechanism-pathway/",
+          "date": "2026-02-23"
+        },
+        {
+          "headline": "CRISPR Therapeutics Q1 2026: expanded zugo-cel into autoimmune, CASGEVY momentum",
+          "summary": "CRISPR Therapeutics (a core ARKG holding) reported Q1 2026 results on May 4, 2026, noting expansion of zugo-cel into new autoimmune indications and advancement of multiple in vivo liver-directed programs toward the clinic. CASGEVY (the approved sickle-cell/thalassemia treatment) continued commercial momentum. The In the Pipeline / Derek Lowe skeptic source did not surface any material contrarian commentary on ARKG's specific holdings or the gene-therapy wave during the lookback window \u2014 the curated search returned no on-topic results for that source in this period.",
+          "source": "GlobeNewswire",
+          "url": "https://www.globenewswire.com/news-release/2026/05/04/3287176/0/en/CRISPR-Therapeutics-Provides-Business-Update-and-Reports-First-Quarter-2026-Financial-Results.html",
+          "date": "2026-05-04"
+        },
+        {
+          "headline": "Eli Lilly bets on AI-powered gene editing in Profluent deal",
+          "summary": "STAT News reported on April 28, 2026 that Eli Lilly signed a deal with Profluent, an AI-driven gene-editing company, signaling that Big Pharma is now actively deploying capital into AI-plus-biology platforms. For ARKG, this validates a core thesis: engineered biology and AI are converging, and the commercial pull from large-cap pharma is beginning to manifest as deal flow rather than just research interest.",
+          "source": "STAT News",
+          "url": "https://www.statnews.com/2026/04/28/eli-lilly-crispr-gene-editing-deal-profluent-ai/",
+          "date": "2026-04-28"
+        }
+      ]
+    },
+    "QTUM": {
+      "wave_bucket": "quantum",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "headline": "QTUM +77% trailing year, +20.5% YTD through April 2026",
+          "summary": "The Defiance Quantum ETF returned 77% over the trailing year and 20.5% year-to-date through late April 2026, outpacing the Nasdaq 100. 24/7 Wall Street noted QTUM hit a new all-time high in late April 2026, driven by two catalysts: Quantinuum's pending IPO (expected to reshape QTUM's composition) and sustained hardware milestone news from Google, IBM, and Microsoft. QTUM's 85-holding modified equal-weight structure gives meaningful exposure to IonQ, Quantinuum, and hardware-adjacent names.",
+          "source": "Quantum Computing Report",
+          "url": "https://quantumcomputingreport.com/gqis-top-predictions-for-quantum-technology-in-2026/",
+          "date": "2026-01-05"
+        },
+        {
+          "headline": "Aaronson: fault-tolerant quantum computer able to break cryptography possible by ~2029",
+          "summary": "Scott Aaronson (Shtetl-Optimized, April 29, 2026) reported that 'reputable people in quantum hardware' tell him a fault-tolerant quantum computer capable of breaking deployed cryptosystems 'ought to be possible by around 2029.' This is a significantly more aggressive timeline than prior consensus (millions of qubits, decade-plus horizon). Aaronson separately noted (April 1, 2026) that new theoretical results from Caltech/Oratomic suggest just 25,000 physical qubits may suffice to break Bitcoin elliptic-curve signatures \u2014 versus millions in year-ago estimates. Aaronson stresses these are resource-estimate improvements, not demonstrated experimental results, but calls the urgency to switch to post-quantum cryptography 'real.'",
+          "source": "Shtetl-Optimized (Scott Aaronson)",
+          "url": "https://scottaaronson.blog/?p=9718",
+          "date": "2026-04-29"
+        },
+        {
+          "headline": "Quantinuum IPO expected in 2026; could reshape QTUM composition",
+          "summary": "24/7 Wall Street reported (April 30, 2026) that Quantinuum's anticipated IPO would likely enter QTUM's index upon listing, potentially as a top-five holding. Quantinuum is Honeywell's spun-off quantum computing venture, using trapped-ion architecture and currently regarded as one of the most advanced near-term quantum hardware platforms. An IPO would be the first major pure-play quantum computing listing since IonQ, and would add a new high-profile name to the QTUM basket.",
+          "source": "Quantum Computing Report",
+          "url": "https://quantumcomputingreport.com/news/",
+          "date": "2026-04-30"
+        }
+      ]
+    },
+    "NUKZ": {
+      "wave_bucket": "nuclear_fusion",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "headline": "NRC proposes first dedicated fusion regulatory framework, final rule targeting Oct 2026",
+          "summary": "The U.S. Nuclear Regulatory Commission issued a proposed rule on February 26, 2026 to regulate commercial fusion under its byproduct material framework (separate from fission reactor regulation). The comment period closes May 27, 2026 and the NRC's road map targets a final rule by October 2026. The Fusion Industry Association noted this decision 'separates fusion energy regulation from nuclear fission' \u2014 a long-sought industry milestone that removes a key permitting uncertainty for commercial developers. For NUKZ holders, regulatory clarity is a prerequisite for financing the first commercial fusion plants.",
+          "source": "Fusion Industry Association",
+          "url": "https://www.fusionindustryassociation.org/nrc-decision-separates-fusion-energy-regulation-from-nuclear-fission/",
+          "date": "2026-02-26"
+        },
+        {
+          "headline": "ARPA-E commits record $135M to fusion commercialization",
+          "summary": "ARPA-E Director Conner Prochaska announced a $135M commitment to develop and commercialize fusion technologies at the 2026 ARPA-E Energy Innovation Summit \u2014 the agency's largest concentrated fusion investment since it began funding fusion in 2014, and roughly doubling its cumulative fusion investment. The Fusion Industry Association reported this at its March 18-19 Annual Policy Conference, attended by over 400 industry leaders. Germany separately announced over \u20ac2B in fusion funding. For NUKZ, these government commitments extend the runway for pre-commercial fusion developers in the ETF's basket.",
+          "source": "Fusion Industry Association",
+          "url": "https://www.fusionindustryassociation.org/fia-hosts-2026-annual-policy-conference/",
+          "date": "2026-03-18"
+        },
+        {
+          "headline": "Commonwealth Fusion building SPARC tokamak; Virginia ARC power plant planned",
+          "summary": "Commonwealth Fusion Systems is constructing its SPARC tokamak at its Devens, Massachusetts facility, targeting the world's first commercially relevant net-energy fusion demonstration. The subsequent ARC grid-scale power plant is planned for Chesterfield County, Virginia, in partnership with Dominion Energy. Helion received construction permits for its Washington State facility. IEA featured fusion prominently in its State of Energy Innovation 2026 report. NUKZ holds companies across the advanced-reactor, utilities, and fuel segments of the nuclear industry; fusion developers like CFS are primarily private, so NUKZ's fusion exposure is indirect.",
+          "source": "Fusion Industry Association",
+          "url": "https://www.fusionindustryassociation.org/iea-features-fusion-in-state-of-energy-innovation-2026-report/",
+          "date": "2026-04-01"
+        }
+      ]
+    },
+    "AGG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "headline": "AGG 30-day SEC yield 4.31%; fixed income ETFs attract $31.5B in April alone",
+          "summary": "The iShares Core U.S. Aggregate Bond ETF (AGG) reported a 30-day SEC yield of 4.31% as of March 31, 2026, with weighted average maturity of 8.05 years and effective duration of 5.78 years. Fixed-income ETFs attracted $202B+ in net new money YTD through early May, with $31.5B in April alone \u2014 the highest monthly inflows in two years. Morningstar awarded AGG a Gold medal as of April 30, 2026. For portfolio context, AGG yields are at the 70th historical percentile over two decades, making fixed income a legitimate yield competitor to equities for the first time since 2007-2008.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com",
+          "date": "2026-05-07"
+        },
+        {
+          "headline": "2026 bond theme: 'dispersion' \u2014 not all sectors moving together",
+          "summary": "VettaFi / Advisor Perspectives (May 7, 2026) noted that the defining bond ETF theme for 2026 is dispersion: investment-grade corporates, Treasuries, and agency MBS are diverging in performance rather than moving in lockstep. The 10-year Treasury yield closed May 8 at 4.38%, with the Fed holding the funds rate at 3.50-3.75% for a third consecutive meeting \u2014 the lowest since November 2022. For AGG holders, the stable Fed rate means limited mark-to-market duration risk in the near term, but tariff-driven inflation uncertainty keeps the long end volatile.",
+          "source": "Reuters",
+          "url": "https://www.reuters.com",
+          "date": "2026-05-07"
+        }
+      ]
+    },
+    "BIL": {
+      "wave_bucket": "general_markets",
+      "used_fallback": true,
+      "bullets": [
+        {
+          "headline": "Fed holds at 3.50-3.75% for third meeting; BIL yield remains attractive",
+          "summary": "The Federal Reserve held the federal funds rate at 3.50-3.75% at its most recent meeting \u2014 the lowest since November 2022 and the third consecutive hold. BIL (SPDR Bloomberg 1-3 Month T-Bill ETF) tracks the ultrashort end of the curve and tracks near the fed funds rate with essentially zero duration risk. At current levels, BIL continues to yield roughly 4.2-4.4% annualized, offering a competitive cash-like return as the Fed pauses its easing cycle amid tariff-driven inflation uncertainty. The 2-year Treasury ended May 8 at 3.90%, compressing the curve.",
+          "source": "Reuters",
+          "url": "https://www.reuters.com",
+          "date": "2026-05-08"
+        },
+        {
+          "headline": "Treasury yields snapshot May 8: 10Y at 4.38%, 30Y at 4.95%",
+          "summary": "ETF Trends published a Treasury Yields Snapshot on May 8, 2026: 10-year at 4.38%, 2-year at 3.90%, 30-year at 4.95%. The inverted short-end versus a steepened long end reflects the market's view that the Fed will cut modestly but that fiscal and tariff dynamics will keep long-term yields elevated. BIL, which owns bills maturing in under three months, is essentially insulated from this long-end volatility. For a portfolio holding BIL as a cash proxy, the key watch item is when (and if) the Fed resumes cutting, which would compress BIL's yield.",
+          "source": "Reuters",
+          "url": "https://www.reuters.com",
+          "date": "2026-05-08"
+        }
+      ]
+    },
+    "IAU": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "headline": "Gold hit $5,595/oz record Jan 29, 2026; IAU returned 42% past year",
+          "summary": "Gold surged to a record $5,595.46/oz on January 29, 2026, driven by President Trump's tariff threats against eight European nations, Greenland-related geopolitical tension, central bank buying, and safe-haven ETF inflows. IAU returned 42% over the trailing year through May 1, 2026. Q1 2026 global gold demand hit a record high per the World Gold Council, with IAU attracting $2.8B in net inflows in Q1 alone. As of May 7, IAU is trading around $88-90, down from the January peak, reflecting some risk-on bounce in equities reducing the safe-haven premium.",
+          "source": "Reuters",
+          "url": "https://www.reuters.com",
+          "date": "2026-04-29"
+        },
+        {
+          "headline": "IAU down from Jan all-time high; trade-war/tariff uncertainty remains demand driver",
+          "summary": "The 52-week high for IAU was $104.40 (corresponding to the January gold record); as of May 7, IAU trades near $88.61 \u2014 roughly 15% below the peak. The pullback reflects partial risk-on recovery in equity markets. However, tariff and geopolitical uncertainty (Middle East, U.S.-China trade tensions) remain active safe-haven demand drivers. JPMorgan Global Research and CNBC coverage throughout April-May 2026 cited tariff chaos as the primary gold-price support mechanism. For portfolio holders, IAU's function as a hedge against equity drawdowns and dollar weakness remains intact, though some near-term froth has unwound.",
+          "source": "Reuters",
+          "url": "https://www.reuters.com",
+          "date": "2026-05-07"
+        }
+      ]
+    },
+    "VIG": {
+      "wave_bucket": "general_markets",
+      "used_fallback": false,
+      "bullets": [
+        {
+          "headline": "VIG +4.6% YTD as of May 5, 2026; tech allocation buoys April performance",
+          "summary": "The Vanguard Dividend Appreciation ETF (VIG) returned 4.6% YTD through May 5, 2026. A Motley Fool analysis noted that tech rallied strongly in April, which benefited VIG given its 23% tech allocation \u2014 higher than most dividend ETFs. VIG's market-cap-weighted approach gives it more growth orientation than pure income dividend funds. At a 0.04% expense ratio, VIG continues to be one of the lowest-cost large-cap dividend growth vehicles. Year-to-date performance is modest versus AI-wave equities, consistent with VIG's role as a stability anchor in the portfolio.",
+          "source": "Wall Street Journal",
+          "url": "https://www.wsj.com",
+          "date": "2026-05-05"
+        },
+        {
+          "headline": "VIG serves as portfolio quality anchor; dividend growth screener filters distressed names",
+          "summary": "VIG tracks the S&P U.S. Dividend Growers Index, requiring at least 10 consecutive years of dividend increases \u2014 effectively a quality screen that excludes financially stressed companies. As of May 2026, VIG is trading at $228.44. In a tariff-uncertainty environment where many cyclicals face margin pressure, VIG's dividend-growth methodology provides a secondary quality filter on top of the market-cap weighting. No material corporate events among VIG's top holdings (Microsoft, Apple, J&J, UnitedHealth) emerged in the 30-day window beyond the MSFT earnings covered above.",
+          "source": "Wall Street Journal",
+          "url": "https://www.wsj.com",
+          "date": "2026-05-05"
+        }
+      ]
+    }
+  },
+  "wave_stages": {
+    "AI": {
+      "stage": "peak",
+      "rationale": "Revenue is large and real (NVDA $44B/Q, GOOGL Cloud $20B/Q, MSFT AI $37B run rate), but the competing signals are peak-cycle: $190B annual capex from both GOOGL and MSFT with management flagging further 2027 increases, a stock decline for MSFT post-beat on overbuilding anxiety, the H20 export ban creating a structural China ceiling for NVDA, and the Gary Marcus skeptic argument (published May 4, 2026) citing measurable consumer backlash (44% of Gen Z workers sabotaging AI adoption, QuitGPT movement, AI high school scrapped). Enthusiasm is the loudest it has been, valuations are stretched relative to monetization certainty, and capex is being scaled beyond demonstrated ROI. The wave is producing real revenue \u2014 this is not a pre-revenue hype cycle \u2014 but the combination of maximum capex commitment, geopolitical export constraints, and measurable consumer backlash puts it at peak rather than surge.",
+      "evidence_tickers": [
+        "NVDA",
+        "GOOGL",
+        "MSFT"
+      ]
+    },
+    "rockets_spacecraft": {
+      "stage": "surge",
+      "rationale": "Rocket Lab's Q1 2026 results show real, compounding revenue ($200M, +64% YoY), a $2.2B backlog (+108% YoY), and record launch bookings. The SDA prime contract at $816M is a government anchor. The Neutron delay to Q4 2026 is a genuine risk but does not alter the Electron and space-systems growth trajectory. Adoption is compounding with real revenue and multiple government customers, but the wave has not yet reached peak enthusiasm \u2014 Neutron is still pre-flight, the market for reusable medium-lift beyond SpaceX is still being established, and RKLB is not yet GAAP profitable. This is early-to-mid surge: real revenue growth, expanding backlog, but key product still developing.",
+      "evidence_tickers": [
+        "RKLB"
+      ]
+    },
+    "robotics": {
+      "stage": "surge",
+      "rationale": "ABB's Q1 2026 beat (+32% orders YoY, full-year guidance raised) and FANUC's record FY2026 results (+8% YoY, margin expansion, guidance raised) confirm that industrial robotics adoption is producing real and accelerating revenue. The humanoid segment is nascent and frothy, but the industrial incumbents that dominate BOTZ are delivering earnings beats. BOTZ itself returned 21.9% over the trailing year. The global robotics market is projected at $108B for 2026, growing to $416B by 2035. The wave is in genuine adoption with room ahead \u2014 the humanoid thesis is still early-stage within a broader surge.",
+      "evidence_tickers": [
+        "BOTZ"
+      ]
+    },
+    "engineered_biology": {
+      "stage": "buildup",
+      "rationale": "Clinical milestones are real (Intellia Phase 3 success, CRISPR Therapeutics advancing zugo-cel), and the FDA's new 'plausible mechanism' bespoke gene therapy pathway is a structural regulatory tailwind. Big Pharma is entering (Lilly-Profluent deal). However, ARKG itself returned only 4.6% YTD through May 2026, and the gene-editing ETF remains well below its 2021 highs. Revenue at the portfolio-company level is concentrated in Casgevy's early commercial ramp, and most pipeline programs are still in clinical development. The wave is producing genuine scientific and clinical progress \u2014 this is not hype \u2014 but commercial-scale revenue is still 3-7 years away for most of the basket. The In the Pipeline skeptic source returned no material contrarian coverage in the lookback window, which is itself informative: Derek Lowe has not raised red flags on current clinical-trial designs in this period. Buildup: real science, early commercial proof points, cheap relative to eventual TAM.",
+      "evidence_tickers": [
+        "ARKG"
+      ]
+    },
+    "quantum": {
+      "stage": "buildup",
+      "rationale": "Scott Aaronson (April 29, 2026) issued a credible non-hype warning: 'reputable people in quantum hardware' now cite a ~2029 timeline for a cryptographically-relevant fault-tolerant quantum computer \u2014 a dramatically compressed horizon versus 5-year-ago consensus. Google's Willow chip achieved a verifiable quantum advantage benchmark (Quantum Echoes, 13,000x faster than best supercomputer). QTUM returned 77% trailing year, suggesting the market has begun pricing the timeline compression. Yet Aaronson explicitly distinguishes resource-estimate improvements from demonstrated experimental capability \u2014 no quantum computer has yet broken any real-world cryptography. The wave is still in buildup: hardware is advancing rapidly (real milestones, not press-release theater per Aaronson), revenue is pre-commercial, and QTUM's 77% return reflects the market beginning to recognize the compressed timeline. Not yet surge because commercial revenue is absent and the primary near-term driver is cryptography-risk awareness, not product sales.",
+      "evidence_tickers": [
+        "QTUM"
+      ]
+    },
+    "nuclear_fusion": {
+      "stage": "buildup",
+      "rationale": "The NRC's proposed fusion regulatory framework (February 2026, final rule targeting October 2026) is a genuine de-risking milestone \u2014 the first dedicated regulatory path for commercial fusion, separating it from fission. ARPA-E committed a record $135M in March 2026. Germany pledged \u20ac2B+. Commonwealth Fusion's SPARC is under construction and Helion received construction permits. But NUKZ trades at $75-76 (below the April high of $76.23) and no commercial fusion energy has been delivered anywhere. The wave is pre-revenue, pre-demonstration, and policy-dependent. The FIA Annual Policy Conference (400 attendees, AI integration discussions, supply chain planning) signals serious institutional momentum, but the commercial horizon remains 5-10+ years. Classic buildup: cheap, under-owned relative to eventual impact, thesis is early.",
+      "evidence_tickers": [
+        "NUKZ"
+      ]
+    },
+    "general_markets": {
+      "stage": "neutral",
+      "rationale": "AGG, BIL, IAU, and VIG are macro/cross-asset instruments. The dominant backdrop is tariff-driven safe-haven demand for gold (IAU), stable Fed hold benefiting BIL's yield, moderate bond inflows into AGG, and dividend-growth stability for VIG. No single directional wave signal applies to this bucket.",
+      "evidence_tickers": [
+        "AGG",
+        "BIL",
+        "IAU",
+        "VIG"
+      ]
+    }
+  },
+  "wave_views": {
+    "NVDA": "peak",
+    "GOOGL": "peak",
+    "MSFT": "peak",
+    "RKLB": "surge",
+    "BOTZ": "surge",
+    "ARKG": "buildup",
+    "QTUM": "buildup",
+    "NUKZ": "buildup",
+    "AGG": "neutral",
+    "BIL": "neutral",
+    "IAU": "neutral",
+    "VIG": "neutral"
+  },
+  "exclusion_conflicts": [],
+  "thematic_concerns": [
+    {
+      "ticker": "NVDA",
+      "concern": "H20 export ban is now indefinite, creating a permanent China revenue ceiling. Q2 guidance absorbs $8B of lost H20 revenue. Export-control risk is no longer a one-time event \u2014 it is a structural feature of NVDA's addressable market.",
+      "evidence": "U.S. government told Nvidia on April 14, 2025 that the H20 license requirement is 'in effect for the indefinite future.' Q1 actual charge was $4.5B; Q2 guidance bakes in $8B of absent H20 revenue. Sources: Yahoo Finance H20 charge article (2025-04-15); Nasdaq NVDA earnings page."
+    },
+    {
+      "ticker": "GOOGL",
+      "concern": "Full-year capex raised to up to $190B, with 2027 capex guided to 'significantly increase.' If Cloud AI monetization growth decelerates, this capital intensity becomes a drag on ROIC. Capacity constraints are currently the binding limit \u2014 not demand \u2014 suggesting near-term revenue visibility is strong, but the multi-year capex commitment is the key risk.",
+      "evidence": "CFO Anat Ashkenazi guided $190B capex and flagged further 2027 increases on the Q1 2026 earnings call. Futurum Research noted capacity, not demand, is the binding constraint. Source: Yahoo Finance Alphabet Q1 2026 earnings (2026-04-29)."
+    },
+    {
+      "ticker": "MSFT",
+      "concern": "Stock declined post-Q3 FY2026 earnings beat on overbuilding risk. FY2026 capex of $190B includes a $25B component-cost overrun versus prior guidance. OpenAI publicly identified the Microsoft relationship as a business risk in pre-IPO filings. The AI run rate of $37B is growing at 123% YoY, but the stock market is beginning to price in capex sustainability questions.",
+      "evidence": "Stock decline despite $82.9B revenue beat and 40% Azure growth. MIT Technology Review March 2026: OpenAI flags Microsoft partnership as risk. TradingKey analysis: 'Azure Growth 40%, AI Revenue $37B: Why Did Microsoft Shares Fall?' Source: Yahoo Finance MSFT Q3 2026 earnings (2026-04-29)."
+    },
+    {
+      "ticker": "RKLB",
+      "concern": "Neutron has now missed its launch target three times (2024 -> 2025 -> 2026 -> Q4 2026 minimum). The tank rupture in January 2026 was unexpected and requires design changes plus a full re-qualification campaign. Neutron is RKLB's largest potential revenue and margin driver; each delay extends the pre-revenue period on the most important product.",
+      "evidence": "SpaceNews reported the first-stage propellant tank ruptured during hydrostatic testing on January 21, 2026. CEO Peter Beck called it unexpected. Neutron debut now targeting Q4 2026 at earliest. Source: SpaceNews Neutron delay article."
+    },
+    {
+      "ticker": "ARKG",
+      "concern": "ARKG returned only 4.6% YTD through May 2026 and remains far below its 2021 peak, despite genuine clinical progress. The ARK Invest management style (high turnover, concentrated thematic bets) has historically amplified drawdowns during biotech corrections. The wave thesis is valid but the vehicle carries idiosyncratic manager risk.",
+      "evidence": "ARKG YTD return 4.6% as of May 1, 2026. ARK Invest's genomics ETF has not recovered to its 2021 highs. Source: Yahoo Finance ARKG quote page."
+    }
+  ],
+  "watchlist_suggestions": [
+    {
+      "wave": "robotics",
+      "stage": "surge",
+      "coverage": "thinly_covered",
+      "rationale": "BOTZ is the only robotics exposure in the watchlist; it is a diversified ETF (85+ holdings) rather than a pure-play, blending industrial robots, AI chips, and autonomous systems. Adding a focused humanoid or industrial-robotics pure-play would sharpen wave exposure as the humanoid segment accelerates.",
+      "candidates": [
+        {
+          "ticker": "FXUS",
+          "name": "N/A \u2014 see below",
+          "fit": "Not applicable; see pure-play options instead."
+        },
+        {
+          "ticker": "ROBO",
+          "name": "ROBO Global Robotics and Automation Index ETF",
+          "fit": "Equal-weight robotics and automation ETF with broader international coverage than BOTZ; less NVDA overlap, more pure industrial-robotics weight."
+        },
+        {
+          "ticker": "IRBT",
+          "name": "iRobot Corporation",
+          "fit": "Consumer robotics pure-play; smaller cap with high event-driven risk, but a direct bet on autonomous home robotics adoption."
+        },
+        {
+          "ticker": "ISRG",
+          "name": "Intuitive Surgical",
+          "fit": "Surgical robotics market leader with recurring revenue (instruments and accessories); profitable, large-cap, direct beneficiary of robotics-in-healthcare adoption."
+        }
+      ]
+    },
+    {
+      "wave": "engineered_biology",
+      "stage": "buildup",
+      "coverage": "thinly_covered",
+      "rationale": "ARKG is the only engineered-biology exposure, and it is an actively managed ETF with idiosyncratic manager risk. A liquid pure-play in gene editing or synthetic biology would provide direct wave exposure with less ARK-specific risk.",
+      "candidates": [
+        {
+          "ticker": "CRSP",
+          "name": "CRISPR Therapeutics AG",
+          "fit": "Pure-play CRISPR gene editing; co-developer of Casgevy (approved), advancing zugo-cel into autoimmune. Most direct gene-editing pure-play in public markets."
+        },
+        {
+          "ticker": "NTLA",
+          "name": "Intellia Therapeutics",
+          "fit": "In vivo CRISPR platform; just reported Phase 3 success for hereditary angioedema (April 27, 2026). Differentiated by in vivo (as opposed to ex vivo) delivery approach."
+        },
+        {
+          "ticker": "BEAM",
+          "name": "Beam Therapeutics",
+          "fit": "Base editing platform (single-letter DNA changes without double-strand breaks); more precise than standard CRISPR, advancing multiple programs in blood disorders and liver disease."
+        }
+      ]
+    },
+    {
+      "wave": "nuclear_fusion",
+      "stage": "buildup",
+      "coverage": "thinly_covered",
+      "rationale": "NUKZ provides the only fusion exposure, but the leading private fusion developers (Commonwealth Fusion Systems, Helion, TAE Technologies) are not publicly traded. NUKZ's fusion exposure is therefore indirect, primarily through uranium/fission utilities and construction companies. No public US-listed pure-play fusion equity exists as of May 2026. The NRC regulatory framework and ARPA-E funding are building conditions for eventual IPOs, but until then NUKZ is the best available instrument.",
+      "candidates": [
+        {
+          "ticker": "CCJ",
+          "name": "Cameco Corporation",
+          "fit": "Largest publicly traded uranium producer; benefits from nuclear renaissance (both fission and the longer-horizon fusion transition) and from AI datacenter demand for always-on nuclear power."
+        },
+        {
+          "ticker": "NLR",
+          "name": "VanEck Uranium and Nuclear ETF",
+          "fit": "Broader nuclear ETF covering utilities, uranium producers, and equipment suppliers; overlaps with NUKZ but provides additional uranium miner exposure."
+        },
+        {
+          "ticker": "SMR",
+          "name": "NuScale Power Corporation",
+          "fit": "Small modular reactor (SMR) developer; not fusion but closely related wave (advanced nuclear). Public company with direct exposure to the nuclear commercialization thesis, though pre-revenue and financially fragile."
+        }
+      ]
+    },
+    {
+      "wave": "quantum",
+      "stage": "buildup",
+      "coverage": "thinly_covered",
+      "rationale": "QTUM is a diversified quantum ETF; it provides broad exposure but no single pure-play. The Aaronson-cited 2029 cryptographically-relevant quantum timeline, if it materializes, would create massive demand for post-quantum cryptography solutions \u2014 a related but distinct investment angle not covered in the watchlist.",
+      "candidates": [
+        {
+          "ticker": "IONQ",
+          "name": "IonQ Inc.",
+          "fit": "Pure-play trapped-ion quantum computing; the only publicly listed standalone quantum hardware company with a funded development roadmap and growing government/enterprise contracts."
+        },
+        {
+          "ticker": "QUBT",
+          "name": "Quantum Computing Inc.",
+          "fit": "Smaller-cap quantum software and hardware company; recently raised $200M via private placement; higher risk/reward than IONQ."
+        },
+        {
+          "ticker": "QMCO",
+          "name": "Quantum Corporation",
+          "fit": "Note: Quantum Corp is primarily a data storage company, not a quantum computing pure-play \u2014 do not confuse with the wave. IONQ is the preferred pure-play."
+        }
+      ]
+    }
+  ],
+  "date": "2026-05-08"
+}
