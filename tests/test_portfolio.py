@@ -100,10 +100,10 @@ def test_initialize_holdings_rejects_negative_allocation() -> None:
 
 def test_render_news_page_writes_placeholder_when_file_missing(tmp_path) -> None:
     """If no /review-portfolio has run yet, render_news_page still writes a page
-    so the nav-strip link doesn't 404."""
+    so any link to docs/news.html doesn't 404."""
     out_path = tmp_path / "news.html"
     portfolio.render_news_page(news_path=str(tmp_path / "missing.json"),
-                               out_path=str(out_path), nav_current=None)
+                               out_path=str(out_path))
     assert out_path.exists()
     assert "No wave-stage news yet" in out_path.read_text()
 
@@ -263,8 +263,7 @@ def test_render_news_page_writes_html_with_wave_bucket_label(tmp_path) -> None:
     out_path = tmp_path / "news.html"
     news_path.write_text(json.dumps(latest))
 
-    portfolio.render_news_page(news_path=str(news_path), out_path=str(out_path),
-                               nav_current=None)
+    portfolio.render_news_page(news_path=str(news_path), out_path=str(out_path))
     out = out_path.read_text()
 
     # Section title appears.

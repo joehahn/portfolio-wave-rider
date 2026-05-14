@@ -92,8 +92,7 @@ portfolio-wave-rider/
 │   └── cli.py                  # one CLI, seven subcommands
 ├── scripts/
 │   ├── setup_curator_run.py    # creates a curator runs dir + _starter.json
-│   ├── post_date_events.py     # chronological event timeline; suppression list for as-of-date backtests
-│   └── compare_*.py            # ad-hoc parameter-sweep scripts (lambda, lookback, max_weight)
+│   └── post_date_events.py     # chronological event timeline; suppression list for as-of-date backtests
 ├── tests/
 ├── data/                       # gitignored except curator_runs/ and backtest_curator_*/
 │   ├── snapshots.csv           # daily, appended (your history)
