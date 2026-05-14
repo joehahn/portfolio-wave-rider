@@ -92,7 +92,11 @@ def main(argv: list[str] | None = None) -> int:
                        help="skip the yfinance listing-date check on adds (offline tests)")
 
     p_bt = sub.add_parser("backtest",
-                           help="walk-forward monthly-rebalance backtest; outputs to data/backtest/")
+                           help="walk-forward backtest; outputs to data/backtest/. The math-only "
+                                "path (no --curator-runs-dir) is hardcoded to monthly rebalances "
+                                "and ignores investor_profile.md's rebalance_period; only the "
+                                "curator-driven path (--curator-runs-dir) respects the profile's "
+                                "cadence via the runs dir's _starter.json")
     p_bt.add_argument("--holdings", default="holdings.csv",
                       help="watchlist source; only the ticker column is used")
     p_bt.add_argument("--start-date", default=None,

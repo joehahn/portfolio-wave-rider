@@ -812,12 +812,19 @@ def backtest(
 ) -> dict[str, Any]:
     """Walk-forward monthly-rebalance backtest of the lightweight Python-only path.
 
-    For each Friday in [start_date, end_date], runs the optimizer with a
-    `lookback_years`-long window ending that Friday and rebalances the
-    portfolio to those weights. Daily snapshots in between record the
-    drifting value. No transaction costs are modeled. The point is to
-    verify that the math-only system produces stable, profitable
-    recommendations on real historical data.
+    On the first trading day of each month in [start_date, end_date], runs the
+    optimizer with a `lookback_years`-long window ending that day and rebalances
+    the portfolio to those weights. Daily snapshots in between record the
+    drifting value. No transaction costs are modeled. The point is to verify
+    that the math-only system produces stable, profitable recommendations on
+    real historical data.
+
+    **Cadence is hardcoded to monthly** in this path; the profile's
+    `rebalance_period` field is NOT consulted here. For cadence-aware backtests
+    use ``curator_backtest`` (CLI: ``backtest --curator-runs-dir <dir>``),
+    which reads ``rebalance_period`` from the runs dir's ``_starter.json`` and
+    branches via ``_cadence_period_id`` on monthly / quarterly / semi_annual /
+    annual.
 
     Outputs (under ``out_dir``):
       - snapshots.csv (same schema as live data/snapshots.csv)
