@@ -75,13 +75,9 @@ These are the user's history. Don't break their schemas. If you must extend them
 
 ## Automation (cron, cross-platform)
 
-One cron entry handles daily price snapshots. The shipped `scripts/cron_snapshot.sh` resolves its own location (no `PROJ` variable to maintain) and runs snapshot + dashboard in sequence, appending timestamped output to `data/snapshot.log`. Generate the crontab line from the project root with:
+One cron entry handles daily price snapshots. Install with `./scripts/install_cron.sh`, which appends one line to the user's crontab pointing at `scripts/cron_snapshot.sh` (which in turn resolves its own location and runs snapshot + dashboard, appending timestamped output to `data/snapshot.log`). Both scripts are pure-bash and idempotent; re-running `install_cron.sh` detects an existing entry and skips. Works the same on macOS and Linux.
 
-```bash
-echo "30 16 * * 1-5  $(pwd)/scripts/cron_snapshot.sh"
-```
-
-Then `crontab -e` and paste. Works the same on macOS and Linux. cron only fires when the machine is awake at the trigger time; missed runs do not auto-replay. Use `--date YYYY-MM-DD` on `snapshot` to backfill.
+cron only fires when the machine is awake at the trigger time; missed runs do not auto-replay. Use `--date YYYY-MM-DD` on `snapshot` to backfill.
 
 The cron call refreshes `docs/index.html` (the dashboard CLI's default `--out`). The file is git-tracked but cron does not push — `git status` will show it modified after each run, and a manual `git add docs/index.html && git commit && git push` publishes the refresh.
 

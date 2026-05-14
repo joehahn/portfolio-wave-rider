@@ -193,15 +193,15 @@ The previously-attempted design (LLM classified each technology wave's cycle sta
 
 ## Automation (cron)
 
-One cron entry handles daily price snapshots and dashboard refresh. From the project root, generate the line:
+One cron entry handles daily price snapshots and dashboard refresh. Install with:
 
 ```bash
-echo "30 16 * * 1-5  $(pwd)/scripts/cron_snapshot.sh"
+./scripts/install_cron.sh
 ```
 
-Open your crontab (`crontab -e`), paste that one line, save. Verify with `crontab -l`. The shipped `scripts/cron_snapshot.sh` resolves its own location (no `PROJ` variable to mis-edit), runs `snapshot` then `dashboard`, and appends timestamped output to `data/snapshot.log`.
+The helper appends one line to your crontab (preserving anything else there) that fires `scripts/cron_snapshot.sh` Mon-Fri at 16:30 local. Both scripts resolve their own location, so there's no `PROJ` variable to maintain. `install_cron.sh` is idempotent (re-running is safe; it detects an existing entry and skips). To uninstall: `crontab -e` and delete the matching line.
 
-cron only fires when the machine is awake; missed runs do not auto-replay. Use `--date YYYY-MM-DD` on `snapshot` to backfill a missed day.
+Each fire runs `snapshot` then `dashboard`, appending timestamped output to `data/snapshot.log`. cron only fires when the machine is awake; missed runs do not auto-replay. Use `--date YYYY-MM-DD` on `snapshot` to backfill a missed day.
 
 The cron refreshes `docs/index.html`. The file is git-tracked but cron does not push — `git status` will show it modified after each run, and a manual `git add docs/index.html && git commit && git push` publishes the refresh.
 

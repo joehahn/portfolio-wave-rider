@@ -45,15 +45,13 @@ Run `/initialize-portfolio` in Claude Code. This distributes your starting dolla
 
 Without cron the dashboard has no daily price history to plot, so the time-series charts stay empty after step 3.
 
-The repo ships a `scripts/cron_snapshot.sh` helper that resolves its own location, so the cron entry contains no `PROJ` variable for you to mis-edit. From the project root, generate the exact line to install:
-
 ```bash
-echo "30 16 * * 1-5  $(pwd)/scripts/cron_snapshot.sh"
+./scripts/install_cron.sh
 ```
 
-Open your crontab (`crontab -e`), paste that one line, save and exit. Verify with `crontab -l`. The same line works on macOS and Linux. cron only fires while the machine is awake; missed runs do not auto-replay — use `--date YYYY-MM-DD` on `snapshot` to backfill a missed day.
+That's it. The helper script appends one line to your crontab (preserving any other entries you already have) that fires `scripts/cron_snapshot.sh` Mon-Fri at 16:30 local. The script resolves its own location, so there's no `PROJ` variable to mis-edit. Re-running `install_cron.sh` is idempotent. To uninstall: `crontab -e` and delete the line containing `cron_snapshot.sh`.
 
-Each fire of the script runs `snapshot` (appending a row per ticker to `data/snapshots.csv`) and then `dashboard` (regenerating `docs/index.html`). Both outputs append to `data/snapshot.log` with a timestamp so you can grep for failures. The dashboard file is git-tracked but cron does not push: `git status` will show it modified after each run, and a manual `git add docs/index.html && git commit && git push` publishes the refresh to GitHub Pages.
+Each fire of `cron_snapshot.sh` runs `snapshot` (appending a row per ticker to `data/snapshots.csv`) and then `dashboard` (regenerating `docs/index.html`). Both outputs append to `data/snapshot.log` with a timestamp so you can grep for failures. cron only fires while the machine is awake; missed runs do not auto-replay — use `--date YYYY-MM-DD` on `snapshot` to backfill a missed day. The dashboard file is git-tracked but cron does not push: `git status` will show it modified after each run, and a manual `git add docs/index.html && git commit && git push` publishes the refresh to GitHub Pages.
 
 ## Runs
 
