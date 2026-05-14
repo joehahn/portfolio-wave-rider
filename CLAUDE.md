@@ -2,32 +2,20 @@
 
 **Author:** Joe Hahn  
 **Email:** jmh.datasciences@gmail.com  
-**Date:** 2026-May-04 <br>
+**Date:** 2026-May-14 <br>
 **branch:** main
 
 This repository is a Claude Code demo: optimize a long-horizon stock and ETF portfolio against a user-authored investor profile. The README has the user-facing tour. This file is the rules Claude follows when operating in this repo.
 
 This project was developed using Claude Code. The github is at https://github.com/joehahn/portfolio-wave-rider.
 
-## Status: in-flight rebuild
+## Design at a glance
 
-`main` is currently in a transitional state. The previous wave-stage-tilt design (an LLM-driven `wave_views` tilt on μ) didn't pan out in 5-year backtests; see FINDINGS.md on the `5y-backtest` branch for the postmortem. The replacement design is an LLM-as-watchlist-curator: the LLM proposes which tickers should be in the watchlist over time, the optimizer runs vanilla mean-variance on whatever watchlist results.
+The LLM's job is **watchlist curation**, not numeric tilts on expected returns. At each rebalance the `watchlist-curator` agent reads recent news, proposes which tickers should be in the watchlist (adds and removes against the current set), and emits one JSON object. The Python harness validates the JSON against a contract (listing date via yfinance, `max_watchlist_size` cap, no double-adds, no stale removes), applies what survived to `holdings.csv` and `data/curation_history.csv`, then runs vanilla mean-variance on the post-change watchlist. The optimizer never sees any LLM-derived μ adjustments.
 
-Progress on the rebuild:
+A previously-attempted design tilted μ by per-wave "cycle stage" multipliers (buildup 1.20, surge 1.10, peak 0.80, etc.). That subtracted 2–5% of final value across 1y, corner-pick 5y, and fair-start 5y backtests — postmortem in FINDINGS.md on the `5y-backtest` branch. The current design replaces it; the wave-tilt code was stripped from main.
 
-- **Stage A (done):** ripped all tilt code from main. Six CLI subcommands still work.
-- **Stage B (done):** defined the curator contract. `.claude/agents/watchlist-curator.md` specifies the inputs the agent receives, the JSON it returns, and the guardrails on its proposed adds. `investor_profile.example.md` gains `rebalance_period` and `max_watchlist_size` fields.
-- **Stage C1 (done):** new `curate` CLI subcommand consumes a curator JSON payload, validates it (listing date via yfinance, max_watchlist_size, no double-adds, etc.), applies adds/removes to `holdings.csv`, and appends one row per change to `data/curation_history.csv`. Helper `portfolio.reconstruct_watchlist_at(date, day_zero, history_path)` replays history for any date.
-- **Stage C2a (done):** `python -m src.cli backtest --curator-runs-dir <dir>` is the pure-Python replay path. Reads `<dir>/_starter.json` for the run config, walks the dir chronologically applying each `<date>-curation.json` payload to a sandboxed holdings + history, runs mean-variance on the resulting watchlist, and computes two baselines in the same loop (fixed-watchlist same cadence; buy-and-hold of starter). Outputs `snapshots.csv`, `recommendations.csv`, `baselines_totals.csv`, `curation_summary.json`, `report.md`. No LLM in the loop; ideal for iterating on the math.
-- **Stage C2b (next):** the skill that fires the curator agents in batches and assembles a runs dir. Targets the 5-year window (Sept 2021 → Apr 2026), starter watchlist `{AAPL, MSFT, GOOGL, SPY, AGG}`, monthly cadence, `max_watchlist_size=12`. ~56 LLM calls in batches of 4 to stay under rate limits.
-- **Stage C2c:** run the experiment end-to-end and read the dashboard.
-- **Stage D:** rewrite `/review-portfolio` skill against the new flow; update `report-writer.md`; extend `build_dashboard` to overlay the curator strategy vs the two baselines on the same chart; refresh `docs/*.html`.
-
-Until stage D lands:
-
-- `/review-portfolio` and `/run-backtest` slash commands return "skill not found".
-- The `1y-baseline` branch holds the last working 1-year demo.
-- GitHub Pages serves from `1y-baseline`, so the public demo URL is unaffected by main's scaffolding.
+The current 5y backtest (Sept 2021 → Apr 2026, starter watchlist of AAPL/MSFT/GOOGL/SPY/AGG, 20 quarterly curator calls) lifts realized return to **+135.5%** vs **+103.7%** buy-and-hold, **+80.2%** fixed-watchlist rebalance, and **+78.2%** SPY. Rendered at [docs/backtest_curator.html](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html). The full setup and reproducibility notes live in `REFERENCE.md` and `data/backtest_curator_5y/report.md`.
 
 ## Ground rules
 
@@ -56,16 +44,16 @@ The user decides. Never silently clamp a recommendation to fit the profile.
 ## Architecture
 
 - Subagents (`.claude/agents/`): two LLM specialists with narrow tool allowlists.
-  - `watchlist-curator`: reads recent news and the investor's wave thesis at each rebalance; proposes adds and removes to the active watchlist (subject to a `max_watchlist_size` cap and a listing-date guardrail enforced by the harness). Returns JSON; does not write files. Contract is defined as of stage B but no Python code consumes it yet.
-  - `report-writer`: synthesizes the analysis and curator payloads into the final markdown report. Inputs will change once stage D wires the curator into `/review-portfolio`.
-- Skills (`.claude/skills/`): one slash command active right now.
+  - `watchlist-curator` (Sonnet): reads recent news and the investor's wave thesis at each rebalance; proposes adds and removes to the active watchlist subject to a `max_watchlist_size` cap and a listing-date guardrail (enforced by the Python harness). Returns JSON; does not write files. When the harness passes a historical as-of date (backtest mode) the agent applies strict discipline: persona reset, WebSearch `before:` filters, suppression list from `scripts/post_date_events.py`, self-critique pass. Live mode skips all of that since the agent should use current information.
+  - `report-writer` (Sonnet): synthesizes the analyze output and curator output into the final markdown report.
+- Skills (`.claude/skills/`): two slash commands.
   - `/initialize-portfolio` (one-shot): reads the profile and an all-zero holdings.csv, produces a thesis-driven dollar allocation across the watchlist, calls `init-holdings` to convert dollars to shares, runs `snapshot --force`, persists the allocation to `data/thesis_baseline.json`, and writes a thesis-only report. No optimizer, no news. Refuses to run if holdings already has positions or thesis_baseline.json already exists.
-  - `/review-portfolio` and `/run-backtest` are absent on this branch; both come back in the curator rebuild.
+  - `/review-portfolio` (recurring): the live curator-driven monthly review. Fires the watchlist-curator against today's date, applies adds/removes via `curate`, runs `analyze` and `recommend` on the post-change watchlist, calls the report-writer, and refreshes the dashboard. See `.claude/skills/review-portfolio/SKILL.md` for the six-step flow.
 - All Python in two files:
-  - `src/portfolio.py`: every math function (fetch_prices, compute_returns, optimize_portfolio, risk_metrics, analyze, initialize_holdings, snapshot_holdings, recommend_portfolio, backtest, build_dashboard, render_news_page).
-  - `src/cli.py`: one entry point with six subcommands (`init-holdings`, `analyze`, `snapshot`, `recommend`, `backtest`, `dashboard`) that the skill and cron jobs invoke via Bash. `backtest` is a one-off spot-check tool, not part of any cron flow.
+  - `src/portfolio.py`: every math function (fetch_prices, compute_returns, optimize_portfolio, risk_metrics, analyze, initialize_holdings, snapshot_holdings, recommend_portfolio, apply_curator_decisions, reconstruct_watchlist_at, backtest, curator_backtest, build_dashboard, build_curator_dashboard, render_news_page).
+  - `src/cli.py`: one entry point with seven subcommands (`init-holdings`, `analyze`, `curate`, `snapshot`, `recommend`, `backtest`, `dashboard`) that the skills and cron jobs invoke via Bash.
 - Reports are written to `data/reports/YYYY-MM-DD-<skill>.md`.
-- Dashboard is a single static `docs/index.html`, regenerated after each snapshot or recommend run. The same file is what GitHub Pages serves at the public-demo URL; cron does not auto-push, so `git add docs/index.html && git commit && git push` is the manual publish step whenever you want the live demo refreshed.
+- Dashboard is a single static `docs/index.html`, regenerated daily by cron. `docs/backtest_curator.html` is the (one-off, hand-refreshed) curator-backtest dashboard. Both are git-tracked and served by GitHub Pages from `main/docs/`. cron does not auto-push, so `git add docs/index.html && git commit && git push` is the manual publish step whenever you want the live demo refreshed.
 
 ## User-maintained inputs
 
@@ -77,9 +65,10 @@ The user decides. Never silently clamp a recommendation to fit the profile.
 
 - `data/snapshots.csv`: daily per-ticker $ values. Schema: `date, ticker, shares, price, value, total_value`. Idempotent on date; pass `--force` to overwrite.
 - `data/recommendations.csv`: optimizer output, one row block per `recommend` run. Schema: `date, ticker, weight, expected_return, annual_volatility, sharpe_ratio, objective`. Idempotent on date; pass `--force` to overwrite same-day runs.
-- `data/curation_history.csv`: append-only log of every watchlist change. Schema: `date, action, ticker, wave_bucket, rationale, news_evidence_urls`. `action` is `add` or `remove`; `news_evidence_urls` is a `;`-separated list. The active watchlist at any date is reconstructable by replaying this file from day 0 against `holdings.csv`'s initial rows. Drives the dashboard's watchlist-composition-over-time chart (lands in stage D).
-- `data/curator_runs/<run_id>/_starter.json`: per-run input file for `backtest --curator-runs-dir`. Schema: `{starter_watchlist: [...], start_date, end_date, rebalance_period, initial_usd, lookback_years, max_watchlist_size}`. Created by the stage C2b skill before it fires the curator agents.
-- `data/curator_runs/<run_id>/<YYYY-MM-DD>-curation.json`: one file per rebalance, written by the stage C2b skill from each `watchlist-curator` agent's JSON return. Schema matches the agent's output contract.
+- `data/curation_history.csv`: append-only log of every watchlist change. Schema: `date, action, ticker, wave_bucket, rationale, news_evidence_urls`. `action` is `add` or `remove`; `news_evidence_urls` is a `;`-separated list. The active watchlist at any date is reconstructable by replaying this file from day 0 against `holdings.csv`'s initial rows.
+- `data/curator_runs/<run_id>/_starter.json`: per-run input file for `backtest --curator-runs-dir`. Schema: `{starter_watchlist: [...], start_date, end_date, rebalance_period, initial_usd, lookback_years, max_watchlist_size}`. Created by `scripts/setup_curator_run.py` (for backtest runs) or implicit (for live runs).
+- `data/curator_runs/<run_id>/<YYYY-MM-DD>-curation.json`: one file per rebalance, the full JSON return from a watchlist-curator agent call. Schema matches the agent's output contract. The `5y-quarterly/` subdir holds the 20 backtest payloads; `live/` accumulates one file per `/review-portfolio` run.
+- `data/curator_latest.json`: the most recent `/review-portfolio` curator output. Overwritten each run; gitignored.
 - `data/thesis_baseline.json`: one-time artifact written by `/initialize-portfolio`. Schema: `{date, allocations_usd, reasoning, holdings}`. Read-only after creation; `build_dashboard` reads its `date` to scope the live dashboard's time-series charts. Delete the file manually only if you want to redo the thesis from scratch (then re-run `/initialize-portfolio`).
 
 These are the user's history. Don't break their schemas. If you must extend them, add columns at the end and keep existing ones.
@@ -98,7 +87,7 @@ The cron call refreshes `docs/index.html` (the dashboard CLI's default `--out`).
 
 Set `PROJ` to wherever you cloned the repo, then `crontab -e` and paste. Works the same on macOS and Linux. cron only fires when the machine is awake at the trigger time; missed runs do not auto-replay. Use `--date YYYY-MM-DD` to backfill.
 
-`recommend` is currently a manual invocation. The curator rebuild will reattach it to the next-gen `/review-portfolio` skill.
+`recommend` is invoked by `/review-portfolio` at each monthly review; cron only runs `snapshot` and `dashboard`. There is no daily/weekly cron entry for `recommend` — the curator's add/remove decisions are the only thing changing the optimizer's universe between monthly reviews, so a between-review `recommend` would produce a near-duplicate row.
 
 ## Repo rules
 
