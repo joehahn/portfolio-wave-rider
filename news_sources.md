@@ -1,12 +1,14 @@
 # News sources
 
-Curated list of news sources the `news-researcher` subagent consults
-first when researching a ticker. Grouped by the technology waves named
-in `investor_profile.md`. Sections appear in the same order the profile
-lists them: the current wave (AI) first, then the next waves in
-nearest-term-impact order, with general markets last as a catch-all.
+Curated list of news sources the `watchlist-curator` subagent consults
+first when researching tickers each rebalance period. Grouped by the
+technology waves named in `investor_profile.md`. Sections appear in the
+same order the profile lists them: the current wave (AI) first, then the
+next waves in nearest-term-impact order, with general markets last as a
+catch-all.
 
-**How this is used.** For each ticker, the news-researcher picks the
+**How this is used.** For each ticker the curator is considering (an
+add candidate, a current holding, or a potential remove), it picks the
 most relevant wave bucket (or `general_markets`) and tries the curated
 sources there first via `WebSearch` scoped to their domains. If the
 curated search returns nothing material for that ticker in the lookback

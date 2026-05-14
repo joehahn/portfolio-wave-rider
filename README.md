@@ -35,7 +35,7 @@ cp holdings.example.csv holdings.csv
 - `investor_profile.md`: here you declare your goals, constraints, exclusions, asset-class targets, the wave-thesis prose, and the optimizer's settings (risk aversion `λ`, risk-free rate, lookback window, rebalance period, max watchlist size). Each field is documented with explanatory comments in `investor_profile.example.md`. Every recommendation cites lines from this file.
 - `holdings.csv`: a two-column CSV (`ticker,shares`) acting as your starter watchlist. Initialize with 0 shares; the `/initialize-portfolio` skill will allocate dollars across the watchlist during its first run.
 
-Optional: `news_sources.md`, a curated list of preferred sources grouped by technology wave. The watchlist-curator reads it if present and falls back to general WebSearch otherwise; missing is fine.
+`news_sources.md` is pre-populated with a curated list of preferred news sources (Bloomberg, Reuters, company newsrooms, SEC filings, etc.) grouped by your profile's technology waves. The watchlist-curator searches these domains first and falls back to open WebSearch otherwise. Tailor to your own taste — add sources you trust, drop ones that paywall heavily or go off-topic.
 
 ### 3. Bootstrap the portfolio
 
