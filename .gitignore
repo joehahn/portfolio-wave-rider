@@ -14,6 +14,7 @@ htmlcov/
 data_cache/
 data/reports/
 data/wave_history.csv
+data/news/
 data/backtest/
 data/curator_latest.json
 data/curation_history.csv
