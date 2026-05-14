@@ -7,10 +7,6 @@
 
 A Claude Code demo for long-horizon portfolio optimization. You declare your goals, constraints, and a wave thesis (which technology waves you believe will drive future returns) in `investor_profile.md`, as well as a watchlist of tickers in `holdings.csv`. The system then pulls the last few years of price history via yfinance, runs a mean-variance optimizer (scipy.optimize) over those tickers, and recommends weights that maximize risk-adjusted return subject to your concentration cap (drift from your asset-class targets is reported in each run's Profile conflicts section, not enforced). The result accumulates into a static Plotly dashboard so you can watch the recommended weights and the realized portfolio value evolve over time.
 
-> **Status: post-rebuild.** `main` has been refactored around a new watchlist-curator design (the previous wave-stage-tilt design didn't survive 5-year backtests; postmortem in FINDINGS.md on the [`5y-backtest`](https://github.com/joehahn/portfolio-wave-rider/tree/5y-backtest) branch). What works on `main` today: the `/review-portfolio` slash command (live curator-driven monthly review), the `backtest --curator-runs-dir <dir>` replay path, the new `curate` CLI subcommand, and the curator-backtest dashboard linked below. The live dashboard (`docs/index.html`) is regenerated daily by cron. The `/run-backtest` skill and the lambda/lookback/max-weight sweep pages from the prior design were not carried over to the curator design; the frozen 1-year version of the prior design lives on [`1y-baseline`](https://github.com/joehahn/portfolio-wave-rider/tree/1y-baseline) as a reference.
-
-**Headline result: curator-driven backtest beats baselines.** Over 4.6 years (Sept 2021 → Apr 2026) starting from a 2021-tech-savvy portfolio (AAPL, MSFT, GOOGL, SPY, AGG), the watchlist-curator agent (20 quarterly LLM calls) lifted realized return to **+135.5%** vs. **+103.7%** for buy-and-hold of the day-0 starter, **+80.2%** for a fixed-watchlist same-cadence rebalance, and **+78.2%** for SPY. See the [curator backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html) and the full report in `data/backtest_curator_5y/report.md`.
-
 See [GLOSSARY.md](GLOSSARY.md) for finance and stats terms (`σ`, `μ`, `Σ`, Sharpe ratio, risk aversion `λ`, mean-variance optimization, max drawdown, VaR/CVaR, etc.) and [REFERENCE.md](REFERENCE.md) for the CLI flags, repo layout, output files, architecture overview, and testing instructions.
 
 ## Setup
@@ -89,6 +85,10 @@ subject to ∑ᵢ wᵢ = 1 (weights sum to one) and 0 ≤ wᵢ ≤ concentration
 - **Sample bias.** The realized Sharpe on a 1-2 year window is usually optimistic vs the forward-looking distribution. Returns are non-stationary; vol clusters; means are noisy.
 - **Estimation error in `μ`.** Mean-variance amplifies small errors in the expected-return estimate. A weight pinned at the concentration cap is often a symptom of estimation noise, not a real signal. This is the well-known Markowitz blow-up. Run `python -m src.cli backtest` to walk the optimizer forward on real historical data; if the weight-stability L1 metric is small (~0.02 means weights barely move week to week) the estimation noise isn't driving the solution.
 - **Numbers come from Python.** If a figure in a report did not come from `src.cli`, that's a bug. The LLM is allowed to write prose; it is not allowed to do arithmetic.
+
+## Headline result
+
+Over 4.6 years (Sept 2021 → Apr 2026) starting from a 2021-tech-savvy portfolio (AAPL, MSFT, GOOGL, SPY, AGG), the watchlist-curator agent (20 quarterly LLM calls) lifted realized return to **+135.5%** vs. **+103.7%** for buy-and-hold of the day-0 starter, **+80.2%** for a fixed-watchlist same-cadence rebalance, and **+78.2%** for SPY. See the [curator backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html) and the full report in `data/backtest_curator_5y/report.md`.
 
 ## Notes
 
