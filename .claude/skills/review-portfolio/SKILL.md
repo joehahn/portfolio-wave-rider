@@ -93,10 +93,14 @@ The report is written to `data/reports/YYYY-MM-DD-review-portfolio.md`.
 ### Step 6 — refresh dashboard (Bash)
 
 ```bash
-.venv/bin/python -m src.cli dashboard --nav-current live
+.venv/bin/python -m src.cli dashboard
 ```
 
 Regenerates `docs/index.html`. Time-series charts are scoped to dates >= `thesis_baseline.date` if the file exists.
+
+The dashboard's `--nav-current` flag is only valid for the three sweep pages (`lambda` / `max_weight` / `lookback`); the live dashboard is a leaf reachable from the README, so omit the flag.
+
+The dashboard also has a side effect of regenerating `docs/news.html` from `data/news_latest.json` — but the curator design writes its evidence to `data/curator_latest.json` instead, and `render_news_page` doesn't yet know how to consume that schema. Until `render_news_page` is updated, `docs/news.html` will be a "no news yet" placeholder after each run, which is correct (the per-add `news_evidence` is already rendered in the report's News evidence section).
 
 ## Final output to the user
 
