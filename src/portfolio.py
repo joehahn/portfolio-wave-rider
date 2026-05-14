@@ -434,8 +434,15 @@ def snapshot_holdings(
 # ---------------------------------------------------------------------------
 
 _VALID_WAVE_BUCKETS = {
+    # Technology waves the profile may name as current or next.
     "AI", "robotics", "rockets_spacecraft", "nuclear", "quantum",
-    "engineered_biology", "general_markets",
+    "engineered_biology",
+    # Non-technology waves the profile may name (geopolitical realignment,
+    # demographic shifts, commodity cycles, regulatory inflections).
+    "geopolitical", "demographics", "commodities", "regulatory",
+    # Catch-all for tickers that aren't tied to any specific wave thesis
+    # (broad-market ETFs, bonds, cash, gold as ballast).
+    "general_markets",
 }
 
 

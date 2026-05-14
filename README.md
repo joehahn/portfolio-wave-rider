@@ -5,7 +5,7 @@
 **Date:** 2026-May-14 <br>
 **branch:** main
 
-A Claude Code demo for long-horizon portfolio optimization with an LLM-driven watchlist curator. You declare your goals, constraints, and a wave thesis (which technology waves you believe will drive future returns) in `investor_profile.md` and a starter watchlist of tickers in `holdings.csv`. At each monthly rebalance the watchlist-curator subagent reads recent news, proposes adds and removes against the current watchlist (validated by the Python harness against listing dates, a max-watchlist-size cap, and the profile's exclusions), and the mean-variance optimizer (`scipy.optimize`) runs on the post-change watchlist. The result accumulates into a static Plotly dashboard so you can watch the watchlist composition, the recommended weights, and the realized portfolio value evolve over time.
+A Claude Code demo for long-horizon portfolio optimization with an LLM-driven watchlist curator. You declare your goals, constraints, and a wave thesis (which investment waves you believe will drive future returns — most are technology-driven, but waves can also be geopolitical, demographic, regulatory, or commodity-cycle in nature) in `investor_profile.md`, and a starter watchlist of tickers in `holdings.csv`. At each monthly rebalance the watchlist-curator subagent reads recent news, proposes adds and removes against the current watchlist (validated by the Python harness against listing dates, a max-watchlist-size cap, and the profile's exclusions), and the mean-variance optimizer (`scipy.optimize`) runs on the post-change watchlist. The result accumulates into a static Plotly dashboard so you can watch the watchlist composition, the recommended weights, and the realized portfolio value evolve over time.
 
 Two dashboards are served from GitHub Pages:
 
@@ -35,7 +35,7 @@ cp holdings.example.csv holdings.csv
 - `investor_profile.md`: here you declare your goals, constraints, exclusions, asset-class targets, the wave-thesis prose, and the optimizer's settings (risk aversion `λ`, risk-free rate, lookback window, rebalance period, max watchlist size). Each field is documented with explanatory comments in `investor_profile.example.md`. Every recommendation cites lines from this file.
 - `holdings.csv`: a two-column CSV (`ticker,shares`) acting as your starter watchlist. Initialize with 0 shares; the `/initialize-portfolio` skill will allocate dollars across the watchlist during its first run.
 
-`news_sources.md` is pre-populated with a curated list of preferred news sources (Bloomberg, Reuters, company newsrooms, SEC filings, etc.) grouped by your profile's technology waves. The watchlist-curator searches these domains first and falls back to open WebSearch otherwise. Tailor to your own taste — add sources you trust, drop ones that paywall heavily or go off-topic.
+`news_sources.md` is pre-populated with a curated list of preferred news sources (Bloomberg, Reuters, company newsrooms, SEC filings, etc.) grouped by your profile's waves. The watchlist-curator searches these domains first and falls back to open WebSearch otherwise. Tailor to your own taste — add sources you trust, drop ones that paywall heavily or go off-topic.
 
 ### 3. Bootstrap the portfolio
 

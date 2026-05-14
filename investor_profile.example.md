@@ -21,28 +21,35 @@ financial_model:                  # optimizer math; CLI flags override at runtim
 # Goals
 
 - Maximize long-term returns while keeping drawdowns tolerable.
-- Ride the current and future technology waves described below.
+- Ride identifiable investment waves to early exposure; trim before they crest.
 
 # Strategy & beliefs
 
 ## Core thesis: ride the wave, exit before the crest
 
-Investment returns are shaped by long technology waves. Each wave follows a rough pattern: quiet buildup, adoption surge, peak enthusiasm, digestion. The best risk-adjusted returns come from entering during the buildup or early surge and trimming exposure before the crest. Two operating rules follow:
+Investment returns are shaped by long waves — durable, structurally-driven shifts in what's worth owning. Most are technology-driven (the internet, mobile, AI), but some are geopolitical, demographic, regulatory, or commodity-cycle in nature. Each wave follows a rough pattern: quiet buildup, adoption surge, peak enthusiasm, digestion. The best risk-adjusted returns come from entering during the buildup or early surge and trimming exposure before the crest. Two operating rules follow:
 
-1. **Ride the current AI wave, but trim before it crests.**
+1. **Ride the current dominant wave (AI), but trim before it crests.**
 2. **Invest early in the next waves while they are still cheap.**
 
-## Past and current waves
+## Past and current technology waves
 
-- Past: the internet, mobile/cell phone technology.
+- Past: the internet, mobile/cell phones.
 - Current: **artificial intelligence**.
 
-## Likely next waves (where I want early exposure)
+## Likely next technology waves (where I want early exposure)
 
 Listed roughly in order of when material commercial impact is likely to land:
 
 - **Rockets & spacecraft**: will make space resources (asteroids, satellite services) accessible and commercially usable.
 - **Robotics**: will lower labor costs across physical industries.
-- **Engineered biology**: will lower the cost of programming biology (gene editing, designer proteins, programmable cells), with payoffs across medicine, agriculture, and bio-manufacturing.
-- **Quantum computing**: will make hard computations faster and cheaper.
-- **Nuclear (fission and fusion)**: will make energy abundant and lower-cost. Near-term exposure comes from the fission renaissance (uranium, SMRs, utility PPAs with AI data centers); fusion is the longer-horizon thesis behind the same wave.
+- **Engineered biology**: gene editing, designer proteins, programmable cells; payoffs across medicine, agriculture, and bio-manufacturing.
+- **Quantum computing**: faster and cheaper hard computations.
+- **Nuclear (fission and fusion)**: abundant lower-cost energy. Near-term: fission renaissance via SMRs and utility PPAs with AI data centers. Longer-horizon: fusion.
+
+## Non-technology waves I'm watching
+
+Not every durable repricing is tech-driven. Two current examples:
+
+- **Geopolitical realignment driving energy prices** *(active, Spring 2026)*. The Iran war is keeping oil and gas spot prices elevated. Tailwind for energy producers (majors, midstream) and tactical winners in oil tankers / LNG carriers if shipping reroutes around the Strait of Hormuz persist. Headwind for fuel-cost-sensitive sectors (airlines, trucking).
+- **Aging-population demographics** *(slow-burning, multi-decade)*. Japan, Germany, China, much of Europe are past peak working-age population. Beneficiaries: healthcare, eldercare REITs, and automation that backfills labor shortages.

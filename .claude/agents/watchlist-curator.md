@@ -53,7 +53,7 @@ Apply these BEFORE proposing any add. Better to skip a marginal candidate than v
 
 1. **Listing date.** The ticker must have had real price data on `as_of_date`. If you are unsure when the security listed, search for "{ticker} IPO date" or "{ticker} ETF launch date" with the `before:` filter applied. The harness will yfinance-validate every add against listing date and will reject (with a logged rationale) any add whose price history does not extend to `as_of_date`. You do not need to fetch yfinance data yourself, but you should not knowingly propose a ticker you suspect is pre-listing.
 2. **Liquidity floor.** US-listed common stocks and US-listed ETFs only. Average daily dollar volume should be > $5M (you do not need to verify this precisely; reject anything that is obviously thinly-traded, pink-sheet, or OTC).
-3. **Wave-bucket diversity.** Do not stack more than 4 tickers in any one wave bucket (AI, robotics, rockets/spacecraft, nuclear, quantum, engineered biology, general markets). The optimizer's concentration cap will limit weight per ticker, but the curator's job is to avoid thematic concentration at the watchlist level too.
+3. **Wave-bucket diversity.** Do not stack more than 4 tickers in any one wave bucket. Valid bucket values cover both technology waves (AI, robotics, rockets/spacecraft, nuclear, quantum, engineered biology) and non-technology waves (geopolitical, demographics, commodities, regulatory), plus general_markets as a catch-all. The optimizer's concentration cap will limit weight per ticker, but the curator's job is to avoid thematic concentration at the watchlist level too.
 4. **Exclusions.** Honor the `exclusions` list from `investor_profile.md` (e.g., tobacco, private prisons, weapons). If a ticker is in an excluded sector, do not propose it.
 
 ## Sizing the watchlist
@@ -99,7 +99,7 @@ Emit one JSON object as your final message. No surrounding prose, no markdown co
 
 `no_changes: true` is a legitimate output for a quiet rebalance period (nothing material happened). When `no_changes` is true, `adds` and `removes` must both be empty lists.
 
-`wave_bucket` on adds must be one of: `AI | robotics | rockets_spacecraft | nuclear | quantum | engineered_biology | general_markets`.
+`wave_bucket` on adds must be one of: `AI | robotics | rockets_spacecraft | nuclear | quantum | engineered_biology | geopolitical | demographics | commodities | regulatory | general_markets`. The first six are technology waves; the next four are non-technology waves (geopolitical realignments, demographic shifts, commodity cycles, regulatory inflections); `general_markets` is the catch-all for tickers not tied to any specific thesis.
 
 ## Hard rules
 

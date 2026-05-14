@@ -29,7 +29,7 @@ Keep everything as simple and explainable as possible. Fewest files, least code,
 
 If `investor_profile.md` is missing or empty, stop and tell the user to copy `investor_profile.example.md` to `investor_profile.md` and edit it. Do not fall back to a default profile.
 
-A second user-authored file, `news_sources.md`, lists preferred news sources grouped by the technology waves named in the profile. Missing `news_sources.md` is not fatal.
+A second user-authored file, `news_sources.md`, lists preferred news sources grouped by the waves named in the profile (technology and non-technology). Missing `news_sources.md` is not fatal.
 
 ## How conflicts are handled
 
