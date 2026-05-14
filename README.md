@@ -2,10 +2,10 @@
 
 **Author:** Joe Hahn  
 **Email:** jmh.datasciences@gmail.com  
-**Date:** 2026-May-08 <br>
+**Date:** 2026-May-14 <br>
 **branch:** main
 
-A Claude Code demo for long-horizon portfolio optimization. You declare your goals, constraints, and a wave thesis (which technology waves you believe will drive future returns) in `investor_profile.md`, as well as a watchlist of tickers in `holdings.csv`. The system then pulls the last few years of price history via yfinance, runs a mean-variance optimizer (scipy.optimize) over those tickers, and recommends weights that maximize risk-adjusted return subject to your concentration cap (drift from your asset-class targets is reported in each run's Profile conflicts section, not enforced). The result accumulates into a static Plotly dashboard so you can watch the recommended weights and the realized portfolio value evolve over time.
+A Claude Code demo for long-horizon portfolio optimization with an LLM-driven watchlist curator. You declare your goals, constraints, and a wave thesis (which technology waves you believe will drive future returns) in `investor_profile.md` and a starter watchlist of tickers in `holdings.csv`. At each monthly rebalance the watchlist-curator subagent reads recent news, proposes adds and removes against the current watchlist (validated by the Python harness against listing dates, a max-watchlist-size cap, and the profile's exclusions), and the mean-variance optimizer (`scipy.optimize`) runs on the post-change watchlist. The result accumulates into a static Plotly dashboard so you can watch the watchlist composition, the recommended weights, and the realized portfolio value evolve over time.
 
 See [GLOSSARY.md](GLOSSARY.md) for finance and stats terms (`σ`, `μ`, `Σ`, Sharpe ratio, risk aversion `λ`, mean-variance optimization, max drawdown, VaR/CVaR, etc.) and [REFERENCE.md](REFERENCE.md) for the CLI flags, repo layout, output files, architecture overview, and testing instructions.
 
@@ -23,33 +23,16 @@ cp holdings.example.csv holdings.csv
 
 The two files you maintain:
 
-- `investor_profile.md`: here you declare your goals, constraints, exclusions, asset-class targets, the wave-thesis prose, and the optimizer's settings (objective, risk aversion, risk-free rate, lookback window). Each field is documented with explanatory comments in `investor_profile.example.md`. Every recommendation cites lines from this file.
-- `holdings.csv`: a two-column CSV (`ticker,shares`) acting as your watchlist. Initialize that with 0; the `/initialize-portfolio` skill will then allocate dollars across that portfolio during its first run.
+- `investor_profile.md`: here you declare your goals, constraints, exclusions, asset-class targets, the wave-thesis prose, and the optimizer's settings (objective, risk aversion, risk-free rate, lookback window, rebalance period, max watchlist size). Each field is documented with explanatory comments in `investor_profile.example.md`. Every recommendation cites lines from this file.
+- `holdings.csv`: a two-column CSV (`ticker,shares`) acting as your starter watchlist. Initialize with 0 shares; the `/initialize-portfolio` skill will allocate dollars across that watchlist during its first run.
 
-Optional: `news_sources.md`, a curated list of sources per technology wave. The next-generation watchlist-curator subagent will read this; the current state of `main` does not.
+Optional: `news_sources.md`, a curated list of preferred sources grouped by technology wave. The watchlist-curator reads this if present and falls back to general WebSearch otherwise; missing is fine.
 
-To bootstrap a fresh portfolio, run `/initialize-portfolio` in Claude Code. The recurring `/review-portfolio` cycle returns in the curator rebuild.
+To bootstrap a fresh portfolio, run `/initialize-portfolio` in Claude Code. After that, install the cron job below — without it the dashboard has no daily price history to plot.
 
-## Runs
+### Cron (required)
 
-On this branch the active triggers are setup, daily price refresh, and on-demand backtest. The recurring `/review-portfolio` cycle is parked for the curator rebuild.
-
-- **Once, on a fresh repo** — you run `/initialize-portfolio` in Claude Code. This distributes your starting dollars across the watchlist noted in `holdings.csv` using only the qualitative inputs described in `investor_profile.md`. This results in a "beliefs in dollar form" initial baseline portfolio.
-- **Daily, Mon-Fri 16:30 local** — cron captures today's per-ticker shares and close price, and then updates the live dashboard.
-- **On demand** — `python -m src.cli backtest` runs a math-only walk-forward replay over a 12-month window of the fixed watchlist, or `python -m src.cli backtest --curator-runs-dir <dir>` replays a pre-collected directory of curator JSON payloads through the same optimizer and emits two extra baselines (fixed-watchlist same cadence, buy-and-hold of starter) on the same dashboard.
-
-Recommendations from `python -m src.cli recommend` do not execute trades — they only append optimizer output to `data/recommendations.csv`. To act on a recommendation, execute trades in your brokerage and then edit `holdings.csv` so the next daily snapshot picks up the new share counts.
-
-## Operations
-
-- Daily: nothing. The cron job appends a row per ticker to `data/snapshots.csv` and refreshes the local copy of `docs/index.html`.
-- Whenever you want to publish the cron-refreshed dashboard: `git add docs/index.html && git commit -m "Refresh live dashboard" && git push` since cron does not auto-push. (Note that the public demo currently serves from the `1y-baseline` branch, not `main`.)
-- After trading: edit `holdings.csv` to reflect new share counts. The next snapshot picks up the new positions.
-- Anytime: open `docs/index.html` in a browser for the local view, or visit the public-demo URL.
-
-### Optional: cron automation
-
-If you want the daily snapshot to update automatically, install this cron entry. Skip if you'd rather invoke the commands by hand. Works the same on macOS and Linux:
+The dashboard's time-series charts need a daily row in `data/snapshots.csv` to render anything beyond the day you ran `/initialize-portfolio`. Install this cron entry:
 
 ```cron
 PROJ=/path/to/portfolio-wave-rider
@@ -57,18 +40,37 @@ PROJ=/path/to/portfolio-wave-rider
 30 16 * * 1-5  cd $PROJ && .venv/bin/python -m src.cli snapshot && .venv/bin/python -m src.cli dashboard >> data/snapshot.log 2>&1
 ```
 
-Each cron call refreshes the local copy of `docs/index.html` (the dashboard CLI's default `--out`). The file is git-tracked but cron does not push — `git status` will show it modified after each run, and a manual `git add docs/index.html && git commit && git push` publishes the refresh.
+Install with `crontab -e` and paste. Adjust `PROJ` to your clone path. Verify with `crontab -l`. Works the same on macOS and Linux. cron only fires while the machine is awake; missed runs do not auto-replay — use `--date YYYY-MM-DD` on `snapshot` to backfill a missed day.
 
-Install with `crontab -e` and paste. Adjust `PROJ` to your clone path. Verify with `crontab -l`. cron only fires while the machine is awake; missed runs do not auto-replay. Use `--date YYYY-MM-DD` on `snapshot` to backfill a missed day.
+Each cron call refreshes the local copy of `docs/index.html`. The file is git-tracked but cron does not push: `git status` will show it modified after each run, and a manual `git add docs/index.html && git commit && git push` publishes the refresh to GitHub Pages.
+
+## Runs
+
+Four triggers cover the portfolio's lifecycle: setup, daily price refresh, monthly review, and on-demand backtest.
+
+- **Once, on a fresh repo** — you run `/initialize-portfolio` in Claude Code. This distributes your starting dollars across the watchlist noted in `holdings.csv` using only the qualitative inputs in `investor_profile.md`. The result is a "beliefs in dollar form" initial baseline portfolio, persisted to `data/thesis_baseline.json`.
+- **Daily, Mon-Fri 16:30 local** — cron captures today's per-ticker shares and close price into `data/snapshots.csv` and refreshes `docs/index.html`.
+- **Monthly, you decide** — you run `/review-portfolio` in Claude Code. The watchlist-curator agent reads recent news against your wave thesis, proposes adds and removes against the current watchlist; the `curate` CLI applies validated changes to `holdings.csv` and appends an audit row to `data/curation_history.csv`; mean-variance runs on the post-change watchlist; and a profile-aware report is written under `data/reports/`. Every report has a **Profile conflicts** section that flags when the optimizer wanted something the profile forbids and a **Watchlist changes** section that lists what the curator added, removed, or had rejected by the validator. Those are the two sections to read first.
+- **On demand** — `python -m src.cli backtest` runs a math-only walk-forward replay over a 12-month window of the fixed watchlist. `python -m src.cli backtest --curator-runs-dir <dir>` replays a pre-collected directory of curator JSON payloads through the same optimizer and emits two extra baselines (fixed-watchlist same cadence, buy-and-hold of starter) on the same dashboard. The curator-driven 5-year run under `data/curator_runs/5y-quarterly/` is committed and reproducible.
+
+Recommendations (from `recommend` and `/review-portfolio`) do not execute trades — they only append optimizer output to `data/recommendations.csv`. To act on a recommendation, execute trades in your brokerage and then edit `holdings.csv` so the next daily snapshot picks up the new share counts.
+
+## Operations
+
+- Daily: nothing. The cron job appends a row per ticker to `data/snapshots.csv` and refreshes the local copy of `docs/index.html`.
+- Whenever you want to publish the cron-refreshed dashboard: `git add docs/index.html && git commit -m "Refresh live dashboard" && git push`. GitHub Pages serves `docs/` from `main`, so the push goes live within a minute.
+- Monthly: run `/review-portfolio` in Claude Code. Read the report (especially **Profile conflicts** and **Watchlist changes**), decide on rebalances, execute trades in your brokerage, then update `holdings.csv`.
+- After trading: edit `holdings.csv` to reflect new share counts. The next snapshot picks up the new positions.
+- Anytime: open `docs/index.html` in a browser for the local view, or visit the public-demo URL.
 
 ## How `holdings.csv` shapes a run
 
-`holdings.csv` is the watchlist that the optimizer operates on.
+`holdings.csv` is the watchlist that the curator and the optimizer operate on.
 
 - **Optimizer eligibility.** The optimizer cannot assign weight to a ticker that isn't in the file.
-- **`shares = 0` is meaningful.** A row with zero shares puts the ticker on the watchlist (the optimizer can assign weight, the dashboard tracks its price) without representing an actual position. Use this when researching a candidate before buying, or when you want price-only history for context.
-- **To add a ticker:** append a row `<TICKER>,0` to `holdings.csv`. The next run picks it up automatically — no other config changes needed.
-- **To remove a ticker:** delete the row. Subsequent runs skip it. The historical rows in `data/snapshots.csv` and `data/recommendations.csv` are not pruned (so old charts still render correctly), but no new rows accumulate.
+- **`shares = 0` is meaningful.** A row with zero shares puts the ticker on the watchlist (the optimizer can assign weight, the dashboard tracks its price) without representing an actual position.
+- **Curator-driven adds and removes.** At each `/review-portfolio`, the watchlist-curator can append new rows (always at `shares=0`) and delete rows for tickers it wants to drop. The validator blocks removes for tickers with `shares > 0` — you must liquidate the live position in your brokerage first and zero out the row, then a future `/review-portfolio` can complete the remove. The full audit trail of applied changes lives in `data/curation_history.csv`.
+- **Manual edits still work.** Append `<TICKER>,0` to add by hand; delete a row to remove by hand (subject to the same liquidate-first rule for live positions). Historical rows in `data/snapshots.csv` and `data/recommendations.csv` are not pruned (so old charts still render correctly), but no new rows accumulate for a removed ticker.
 
 ## How the optimizer works
 
@@ -78,12 +80,13 @@ The optimizer used here selects a portfolio that maximizes the mean-variance obj
 μᵀw − λ·wᵀΣw
 ```
 
-subject to ∑ᵢ wᵢ = 1 (weights sum to one) and 0 ≤ wᵢ ≤ concentration_cap. The two inputs estimated from price history are `μ` (which is the per-ticker expected-return vector i.e. the annualized mean of daily log returns over the **price-history lookback**, default 1.3y, set in `investor_profile.md`) and `Σ` (the ticker × ticker covariance matrix — variances on the diagonal, pairwise covariances off-diagonal). `w` is the weight vector the optimizer is solving for, and `λ` (risk aversion) trades expected return against variance: when `λ = 0` the variance term drops out and the optimizer maximizes pure expected return, piling weight into the highest-`μ` tickers up to the concentration cap; as `λ` grows the variance penalty dominates and the solution approaches min-variance (heavy in bonds and cash). The profile default `λ = 1` (set in `investor_profile.md` as `risk_aversion: 1.0`) is a reasonable middle-of-the-frontier point for the curator backtest. An alternative objective is max-Sharpe — `(μᵀw − r_free) / √(wᵀΣw)` — which picks one specific point on the same efficient frontier. See [GLOSSARY.md](GLOSSARY.md) for the full definitions.
+subject to ∑ᵢ wᵢ = 1 (weights sum to one) and 0 ≤ wᵢ ≤ concentration_cap. The two inputs estimated from price history are `μ` (the per-ticker expected-return vector — annualized mean of daily log returns over the **price-history lookback**, default 1.3y, set in `investor_profile.md`) and `Σ` (the ticker × ticker covariance matrix — variances on the diagonal, pairwise covariances off-diagonal). `w` is the weight vector the optimizer is solving for. `λ` (risk aversion) trades expected return against variance: when `λ = 0` the variance term drops out and the optimizer maximizes pure expected return, piling weight into the highest-`μ` tickers up to the concentration cap; as `λ` grows the variance penalty dominates and the solution approaches min-variance (heavy in bonds and cash). The profile default `λ = 1` is a reasonable middle-of-the-frontier point. An alternative objective is max-Sharpe — `(μᵀw − r_free) / √(wᵀΣw)` — which picks one specific point on the same efficient frontier. See [GLOSSARY.md](GLOSSARY.md) for the full definitions.
 
 ## Things to watch
 
 - **Sample bias.** The realized Sharpe on a 1-2 year window is usually optimistic vs the forward-looking distribution. Returns are non-stationary; vol clusters; means are noisy.
 - **Estimation error in `μ`.** Mean-variance amplifies small errors in the expected-return estimate. A weight pinned at the concentration cap is often a symptom of estimation noise, not a real signal. This is the well-known Markowitz blow-up. Run `python -m src.cli backtest` to walk the optimizer forward on real historical data; if the weight-stability L1 metric is small (~0.02 means weights barely move week to week) the estimation noise isn't driving the solution.
+- **Curator hindsight risk in backtests.** When the curator runs against a historical as-of date, its job is to use only information available at that date. The agent spec enforces this with a persona reset, WebSearch `before:` filters, a suppression list of post-date events, and a self-critique pass — but the discipline is best-effort, not airtight. Sample a few of the cited evidence URLs against their dates before trusting a backtest's headline number.
 - **Numbers come from Python.** If a figure in a report did not come from `src.cli`, that's a bug. The LLM is allowed to write prose; it is not allowed to do arithmetic.
 
 ## Headline result
