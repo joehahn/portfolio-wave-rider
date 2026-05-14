@@ -12,7 +12,7 @@ asset_class_targets:              # rough guide, not a hard constraint
   cash: 0.05
 financial_model:                  # optimizer math; CLI flags override at runtime
   risk_aversion: 1.0              # λ in mean_variance utility (μᵀw − λ·wᵀΣw); the only knob on your return/variance tradeoff
-  risk_free_rate: 0.04            # ≈ 1y Treasury yield; used in Sharpe and as numeraire
+  risk_free_rate: 0.04            # ≈ 1y Treasury yield; baseline subtracted from E[r] in Sharpe-ratio calc
   lookback_period: 1.3y           # history window for estimating μ and Σ
   rebalance_period: monthly       # monthly | quarterly | semi_annual | annual; how often the watchlist-curator runs
   max_watchlist_size: 12          # hard cap on how many tickers the curator may hold simultaneously
