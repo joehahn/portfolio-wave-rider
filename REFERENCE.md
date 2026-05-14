@@ -193,17 +193,17 @@ The previously-attempted design (LLM classified each technology wave's cycle sta
 
 ## Automation (cron)
 
-One cron entry handles daily price snapshots and dashboard refresh:
+One cron entry handles daily price snapshots and dashboard refresh. From the project root, generate the line:
 
-```cron
-PROJ=/Users/joehahn/Library/CloudStorage/Dropbox/prog/claude/portfolio-wave-rider
-# Daily snapshot + dashboard refresh, Mon-Fri 16:30 local
-30 16 * * 1-5  cd $PROJ && .venv/bin/python -m src.cli snapshot && .venv/bin/python -m src.cli dashboard >> data/snapshot.log 2>&1
+```bash
+echo "30 16 * * 1-5  $(pwd)/scripts/cron_snapshot.sh"
 ```
 
-The cron refreshes `docs/index.html`. The file is git-tracked but cron does not push — `git status` will show it modified after each run, and a manual `git add docs/index.html && git commit && git push` publishes the refresh.
+Open your crontab (`crontab -e`), paste that one line, save. Verify with `crontab -l`. The shipped `scripts/cron_snapshot.sh` resolves its own location (no `PROJ` variable to mis-edit), runs `snapshot` then `dashboard`, and appends timestamped output to `data/snapshot.log`.
 
 cron only fires when the machine is awake; missed runs do not auto-replay. Use `--date YYYY-MM-DD` on `snapshot` to backfill a missed day.
+
+The cron refreshes `docs/index.html`. The file is git-tracked but cron does not push — `git status` will show it modified after each run, and a manual `git add docs/index.html && git commit && git push` publishes the refresh.
 
 ## Testing
 

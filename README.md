@@ -16,38 +16,44 @@ See [GLOSSARY.md](GLOSSARY.md) for finance and stats terms (`σ`, `μ`, `Σ`, Sh
 
 ## Setup
 
+Four steps: install Python, fill in your profile + watchlist, bootstrap the portfolio, then install cron so the dashboard accumulates history.
+
+### 1. Install dependencies
+
 ```bash
 python3.12 -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
 
-# Copy templates and edit:
+# Copy templates:
 cp investor_profile.example.md investor_profile.md
 cp holdings.example.csv holdings.csv
 ```
 
-The two files you maintain:
+### 2. Edit `investor_profile.md` and `holdings.csv`
 
 - `investor_profile.md`: here you declare your goals, constraints, exclusions, asset-class targets, the wave-thesis prose, and the optimizer's settings (risk aversion `λ`, risk-free rate, lookback window, rebalance period, max watchlist size). Each field is documented with explanatory comments in `investor_profile.example.md`. Every recommendation cites lines from this file.
-- `holdings.csv`: a two-column CSV (`ticker,shares`) acting as your starter watchlist. Initialize with 0 shares; the `/initialize-portfolio` skill will allocate dollars across that watchlist during its first run.
+- `holdings.csv`: a two-column CSV (`ticker,shares`) acting as your starter watchlist. Initialize with 0 shares; the `/initialize-portfolio` skill will allocate dollars across the watchlist during its first run.
 
-Optional: `news_sources.md`, a curated list of preferred sources grouped by technology wave. The watchlist-curator reads this if present and falls back to general WebSearch otherwise; missing is fine.
+Optional: `news_sources.md`, a curated list of preferred sources grouped by technology wave. The watchlist-curator reads it if present and falls back to general WebSearch otherwise; missing is fine.
 
-To bootstrap a fresh portfolio, run `/initialize-portfolio` in Claude Code. After that, install the cron job below — without it the dashboard has no daily price history to plot.
+### 3. Bootstrap the portfolio
 
-### Cron (required)
+Run `/initialize-portfolio` in Claude Code. This distributes your starting dollars across the watchlist using only the qualitative inputs in `investor_profile.md`, persists the result to `data/thesis_baseline.json`, and writes a thesis-only report under `data/reports/`.
 
-The dashboard's time-series charts need a daily row in `data/snapshots.csv` to render anything beyond the day you ran `/initialize-portfolio`. Install this cron entry:
+### 4. Install the daily cron job (required)
 
-```cron
-PROJ=/path/to/portfolio-wave-rider
-# Daily snapshot + dashboard refresh, Mon-Fri 16:30 local
-30 16 * * 1-5  cd $PROJ && .venv/bin/python -m src.cli snapshot && .venv/bin/python -m src.cli dashboard >> data/snapshot.log 2>&1
+Without cron the dashboard has no daily price history to plot, so the time-series charts stay empty after step 3.
+
+The repo ships a `scripts/cron_snapshot.sh` helper that resolves its own location, so the cron entry contains no `PROJ` variable for you to mis-edit. From the project root, generate the exact line to install:
+
+```bash
+echo "30 16 * * 1-5  $(pwd)/scripts/cron_snapshot.sh"
 ```
 
-Install with `crontab -e` and paste. Adjust `PROJ` to your clone path. Verify with `crontab -l`. Works the same on macOS and Linux. cron only fires while the machine is awake; missed runs do not auto-replay — use `--date YYYY-MM-DD` on `snapshot` to backfill a missed day.
+Open your crontab (`crontab -e`), paste that one line, save and exit. Verify with `crontab -l`. The same line works on macOS and Linux. cron only fires while the machine is awake; missed runs do not auto-replay — use `--date YYYY-MM-DD` on `snapshot` to backfill a missed day.
 
-Each cron call refreshes the local copy of `docs/index.html`. The file is git-tracked but cron does not push: `git status` will show it modified after each run, and a manual `git add docs/index.html && git commit && git push` publishes the refresh to GitHub Pages.
+Each fire of the script runs `snapshot` (appending a row per ticker to `data/snapshots.csv`) and then `dashboard` (regenerating `docs/index.html`). Both outputs append to `data/snapshot.log` with a timestamp so you can grep for failures. The dashboard file is git-tracked but cron does not push: `git status` will show it modified after each run, and a manual `git add docs/index.html && git commit && git push` publishes the refresh to GitHub Pages.
 
 ## Runs
 

@@ -75,17 +75,15 @@ These are the user's history. Don't break their schemas. If you must extend them
 
 ## Automation (cron, cross-platform)
 
-One cron entry handles daily price snapshots. The exact crontab installed on the author's machine:
+One cron entry handles daily price snapshots. The shipped `scripts/cron_snapshot.sh` resolves its own location (no `PROJ` variable to maintain) and runs snapshot + dashboard in sequence, appending timestamped output to `data/snapshot.log`. Generate the crontab line from the project root with:
 
-```cron
-PROJ=/Users/joehahn/Library/CloudStorage/Dropbox/prog/claude/portfolio-wave-rider
-# Daily snapshot + dashboard refresh, Mon-Fri 16:30 local
-30 16 * * 1-5  cd $PROJ && .venv/bin/python -m src.cli snapshot && .venv/bin/python -m src.cli dashboard >> data/snapshot.log 2>&1
+```bash
+echo "30 16 * * 1-5  $(pwd)/scripts/cron_snapshot.sh"
 ```
 
-The cron call refreshes `docs/index.html` (the dashboard CLI's default `--out`). The file is git-tracked but cron does not push — `git status` will show it modified after each run, and a manual `git add docs/index.html && git commit && git push` publishes the refresh.
+Then `crontab -e` and paste. Works the same on macOS and Linux. cron only fires when the machine is awake at the trigger time; missed runs do not auto-replay. Use `--date YYYY-MM-DD` on `snapshot` to backfill.
 
-Set `PROJ` to wherever you cloned the repo, then `crontab -e` and paste. Works the same on macOS and Linux. cron only fires when the machine is awake at the trigger time; missed runs do not auto-replay. Use `--date YYYY-MM-DD` to backfill.
+The cron call refreshes `docs/index.html` (the dashboard CLI's default `--out`). The file is git-tracked but cron does not push — `git status` will show it modified after each run, and a manual `git add docs/index.html && git commit && git push` publishes the refresh.
 
 `recommend` is invoked by `/review-portfolio` at each monthly review; cron only runs `snapshot` and `dashboard`. There is no daily/weekly cron entry for `recommend` — the curator's add/remove decisions are the only thing changing the optimizer's universe between monthly reviews, so a between-review `recommend` would produce a near-duplicate row.
 
