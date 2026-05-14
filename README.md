@@ -7,6 +7,11 @@
 
 A Claude Code demo for long-horizon portfolio optimization with an LLM-driven watchlist curator. You declare your goals, constraints, and a wave thesis (which technology waves you believe will drive future returns) in `investor_profile.md` and a starter watchlist of tickers in `holdings.csv`. At each monthly rebalance the watchlist-curator subagent reads recent news, proposes adds and removes against the current watchlist (validated by the Python harness against listing dates, a max-watchlist-size cap, and the profile's exclusions), and the mean-variance optimizer (`scipy.optimize`) runs on the post-change watchlist. The result accumulates into a static Plotly dashboard so you can watch the watchlist composition, the recommended weights, and the realized portfolio value evolve over time.
 
+Two dashboards are served from GitHub Pages:
+
+- **[Live dashboard](https://joehahn.github.io/portfolio-wave-rider/)** — today's portfolio: realized value over time, latest recommended weights, asset-class and wave-bucket breakdowns. Regenerated daily by cron.
+- **[5-year curator backtest](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html)** — equity-curve race (curator vs buy-and-hold vs fixed-watchlist rebalance vs SPY) plus a Gantt timeline of watchlist composition over 4.6 years.
+
 See [GLOSSARY.md](GLOSSARY.md) for finance and stats terms (`σ`, `μ`, `Σ`, Sharpe ratio, risk aversion `λ`, mean-variance optimization, max drawdown, VaR/CVaR, etc.) and [REFERENCE.md](REFERENCE.md) for the CLI flags, repo layout, output files, architecture overview, and testing instructions.
 
 ## Setup
