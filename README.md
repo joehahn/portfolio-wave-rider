@@ -59,21 +59,21 @@ To publish a refreshed dashboard to GitHub Pages: `git add docs/index.html && gi
 
 Four lifecycle activities. Step 1 happens once (right after Setup). Steps 2 through 4 are ongoing in parallel: daily cron, periodic review, and on-demand backtest.
 
-### 1. Once, on a fresh repo
+### 1. initialize (once)
 
 Run `/initialize-portfolio` in Claude Code. This distributes your starting dollars across the watchlist noted in `holdings.csv` using only the qualitative inputs in `investor_profile.md`. The result is a "beliefs in dollar form" initial baseline portfolio, persisted to `data/thesis_baseline.json`.
 
-### 2. Daily, Mon-Fri 16:30 local
+### 2. cron to monitor ticker changes (daily)
 
 Cron captures today's per-ticker shares and close price into `data/snapshots.csv` and refreshes `docs/index.html`.
 
-### 3. Monthly, quarterly, or whatever cadence you set in your profile
+### 3. update watchlist and optimize portfolio (monthly, quarterly, etc.)
 
 Run `/review-portfolio` in Claude Code. The cadence is declared in `investor_profile.md` under `financial_model.rebalance_period` (`monthly` / `quarterly` / `semi_annual` / `annual`); how often you actually invoke the skill is up to you. Each run: the curator reads recent news against your wave thesis, proposes adds and removes against the current watchlist; the `curate` CLI applies validated changes to `holdings.csv` and appends an audit row to `data/curation_history.csv`; mean-variance runs on the post-change watchlist; and a profile-aware report is written under `data/reports/`. Every report has a **Profile conflicts** section that flags when the optimizer wanted something the profile forbids and a **Watchlist changes** section that lists what the curator added, removed, or had rejected by the validator. Those are the two sections to read first.
 
 Note that recommendations do not execute trades — they only append optimizer output to `data/recommendations.csv`. To act on a recommendation, execute trades in your brokerage and then edit `holdings.csv` so the next daily snapshot picks up the new share counts.
 
-### 4. On demand, run the 5-year backtest to confirm the AI lift
+### 4. run 5-year backtest (whenever)
 
 Run `/run-backtest` in Claude Code. The skill collects any missing historical news, evolves the watchlist quarter-by-quarter against your wave thesis, optimizes the portfolio at each rebalance, measures the resulting lift over buy-and-hold, regenerates the dashboard, and auto-pushes so the public version always reflects the latest rolling 5-year window.
 
