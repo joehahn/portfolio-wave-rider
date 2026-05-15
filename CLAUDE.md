@@ -73,13 +73,11 @@ The user decides. Never silently clamp a recommendation to fit the profile.
 
 These are the user's history. Don't break their schemas. If you must extend them, add columns at the end and keep existing ones.
 
-## Automation (cron, macOS + Linux)
+## Automation (cron, cross-platform)
 
-One cron entry handles daily price snapshots. Install with `./scripts/install_cron.sh`, which appends one line to the user's crontab pointing at `scripts/cron_snapshot.sh` (which in turn resolves its own location and runs snapshot + dashboard, appending timestamped output to `data/snapshot.log`). Both scripts are pure-bash and idempotent.
+One cron entry handles daily price snapshots. Install with `./scripts/install_cron.sh`, which appends one line to the user's crontab pointing at `scripts/cron_snapshot.sh` (which in turn resolves its own location and runs snapshot + dashboard, appending timestamped output to `data/snapshot.log`). Both scripts are pure-bash and idempotent. Works the same on macOS and Linux.
 
-macOS-specific first-time setup: the cron daemon (`com.vix.cron`) is often unloaded by default on modern macOS. Check with `sudo launchctl list | grep cron`; if empty, load with `sudo launchctl load -w /System/Library/LaunchDaemons/com.vix.cron.plist`. Linux's cron daemon is running by default.
-
-cron is strictly time-based — if the machine is asleep at the trigger time, the run is missed (no replay). Use `--date YYYY-MM-DD` on `snapshot` to backfill.
+cron only fires while the machine is awake; missed runs do not auto-replay. Use `--date YYYY-MM-DD` on `snapshot` to backfill.
 
 The cron call refreshes `docs/index.html` (the dashboard CLI's default `--out`). The file is git-tracked but cron does not push — `git status` will show it modified after each run, and a manual `git add docs/index.html && git commit && git push` publishes the refresh.
 
