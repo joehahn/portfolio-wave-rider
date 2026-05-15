@@ -57,7 +57,7 @@ To publish a refreshed dashboard to GitHub Pages: `git add docs/index.html && gi
 
 ## Runs
 
-Four triggers cover the portfolio's lifecycle: setup, daily price refresh, monthly review, and on-demand backtest.
+Three triggers cover the portfolio's lifecycle: setup, daily price refresh, and periodic review.
 
 - **Once, on a fresh repo** — you run `/initialize-portfolio` in Claude Code. This distributes your starting dollars across the watchlist noted in `holdings.csv` using only the qualitative inputs in `investor_profile.md`. The result is a "beliefs in dollar form" initial baseline portfolio, persisted to `data/thesis_baseline.json`.
 - **Daily, Mon-Fri 16:30 local** — cron captures today's per-ticker shares and close price into `data/snapshots.csv` and refreshes `docs/index.html`.
