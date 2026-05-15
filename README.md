@@ -68,7 +68,7 @@ Four triggers cover the portfolio's lifecycle: setup, daily price refresh, perio
     .venv/bin/python -m src.cli backtest --curator-runs-dir data/curator_runs/5y-quarterly
     ```
 
-    Runs the 5-year backtest that produced this demo's headline numbers. The curator's 20 historical decisions are saved in the repo, so the run is fast (a few seconds) and fully reproducible on your machine. After it completes, open the refreshed backtest report and dashboard and compare against the +135.5% total / +6pp/yr-over-buy-and-hold figures quoted below. If your numbers match, the lift claim is verified end-to-end against your own checkout.
+    Runs the 5-year backtest that produced this demo's headline numbers. At each quarterly rebalance the curator reads news as of the rebalance date and proposes adds and removes to the watchlist; the optimizer then recomputes portfolio weights for whatever watchlist results, repeated over 4.6 years. Your run should produce the same headline shown on the [committed backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html): **+135.5% total** and **+6pp/yr over buy-and-hold**.
 
 Note that Recommendations (from `recommend` and `/review-portfolio`) do not execute trades — they only append optimizer output to `data/recommendations.csv`. To act on a recommendation, execute trades in your brokerage and then edit `holdings.csv` so the next daily snapshot picks up the new share counts.
 
