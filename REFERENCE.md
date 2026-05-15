@@ -81,15 +81,17 @@ portfolio-wave-rider/
 │   ├── agents/                 # 2 subagent specs
 │   │   ├── watchlist-curator.md  # proposes adds/removes per rebalance from news
 │   │   └── report-writer.md      # synthesizes analyze + curator into a report
-│   ├── skills/                 # 2 slash commands
+│   ├── skills/                 # 3 slash commands
 │   │   ├── initialize-portfolio/SKILL.md  # one-shot thesis allocation (day 0)
-│   │   └── review-portfolio/SKILL.md      # recurring curator-driven review
+│   │   ├── review-portfolio/SKILL.md      # recurring curator-driven review
+│   │   └── run-backtest/SKILL.md          # rolling-5y backtest refresh + auto-publish
 │   └── settings.json           # tool allowlist
 ├── src/
 │   ├── portfolio.py            # all math
 │   └── cli.py                  # one CLI, seven subcommands
 ├── scripts/
 │   ├── setup_curator_run.py    # creates a curator runs dir + _starter.json
+│   ├── compute_backtest_dates.py  # rolling-5y date diff used by /run-backtest
 │   └── post_date_events.py     # chronological event timeline; suppression list for as-of-date backtests
 ├── tests/
 ├── data/                       # gitignored except curator_runs/ and backtest_curator_*/

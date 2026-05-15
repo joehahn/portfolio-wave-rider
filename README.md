@@ -70,6 +70,8 @@ Four triggers cover the portfolio's lifecycle: setup, daily price refresh, perio
 
     This executes the 5-year backtest that produced this demo's headline numbers. At each quarterly rebalance the curator reads news as of the rebalance date and proposes adds and removes to the watchlist; the optimizer then recomputes portfolio weights for whatever watchlist results, repeated over 5 years. Compare results of your backtest to ours at [our backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html): +135.5% total and +6pp/yr over buy-and-hold.
 
+    To refresh the backtest against a rolling 5-year window ending **today** (instead of replaying the committed window), run `/run-backtest` in Claude Code. That fires fresh `watchlist-curator` calls for any quarter-ends not yet covered by committed JSONs (~$0.15 each, ~$3 if starting from a clean slate), regenerates the dashboard, and auto-pushes so the public version always reflects the latest rolling window. The fixed starter watchlist (AAPL/MSFT/GOOGL/SPY/AGG) is preserved across refreshes so day-0 conditions stay comparable.
+
 Note that Recommendations (from `recommend` and `/review-portfolio`) do not execute trades — they only append optimizer output to `data/recommendations.csv`. To act on a recommendation, execute trades in your brokerage and then edit `holdings.csv` so the next daily snapshot picks up the new share counts.
 
 ## Operations
