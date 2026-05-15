@@ -57,22 +57,31 @@ To publish a refreshed dashboard to GitHub Pages: `git add docs/index.html && gi
 
 ## Runs
 
-Four triggers cover the portfolio's lifecycle: setup, daily price refresh, periodic review, and the optional on-demand backtest a skeptical new user will likely want to run first to verify the demo's lift claim.
+Four lifecycle activities. Step 1 happens once (right after Setup). Steps 2 through 4 are ongoing in parallel: daily cron, periodic review, and on-demand backtest.
 
-- **Once, on a fresh repo** — you run `/initialize-portfolio` in Claude Code. This distributes your starting dollars across the watchlist noted in `holdings.csv` using only the qualitative inputs in `investor_profile.md`. The result is a "beliefs in dollar form" initial baseline portfolio, persisted to `data/thesis_baseline.json`.
-- **Daily, Mon-Fri 16:30 local** — cron captures today's per-ticker shares and close price into `data/snapshots.csv` and refreshes `docs/index.html`.
-- **Monthly, quarterly, or whatever cadence you set in your profile** — you run `/review-portfolio` in Claude Code. The cadence is declared in `investor_profile.md` under `financial_model.rebalance_period` (`monthly` / `quarterly` / `semi_annual` / `annual`); how often you actually invoke the skill is up to you. Each run: the curator reads recent news against your wave thesis, proposes adds and removes against the current watchlist; the `curate` CLI applies validated changes to `holdings.csv` and appends an audit row to `data/curation_history.csv`; mean-variance runs on the post-change watchlist; and a profile-aware report is written under `data/reports/`. Every report has a **Profile conflicts** section that flags when the optimizer wanted something the profile forbids and a **Watchlist changes** section that lists what the curator added, removed, or had rejected by the validator. Those are the two sections to read first.
-- **On demand, run the 5-year backtest to** - confirm the AI lift
+### 1. Once, on a fresh repo
 
-    ```bash
-    .venv/bin/python -m src.cli backtest --curator-runs-dir data/curator_runs/5y-quarterly
-    ```
+Run `/initialize-portfolio` in Claude Code. This distributes your starting dollars across the watchlist noted in `holdings.csv` using only the qualitative inputs in `investor_profile.md`. The result is a "beliefs in dollar form" initial baseline portfolio, persisted to `data/thesis_baseline.json`.
 
-    This executes the 5-year backtest that produced this demo's headline numbers. At each quarterly rebalance the curator reads news as of the rebalance date and proposes adds and removes to the watchlist; the optimizer then recomputes portfolio weights for whatever watchlist results, repeated over 5 years. Compare results of your backtest to ours at [our backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html): +135.5% total and +6pp/yr over buy-and-hold.
+### 2. Daily, Mon-Fri 16:30 local
 
-    To refresh the backtest against a rolling 5-year window ending **today** (instead of replaying the committed window), run `/run-backtest` in Claude Code. That fires fresh `watchlist-curator` calls for any quarter-ends not yet covered by committed JSONs (~$0.15 each, ~$3 if starting from a clean slate), regenerates the dashboard, and auto-pushes so the public version always reflects the latest rolling window. The fixed starter watchlist (AAPL/MSFT/GOOGL/SPY/AGG) is preserved across refreshes so day-0 conditions stay comparable.
+Cron captures today's per-ticker shares and close price into `data/snapshots.csv` and refreshes `docs/index.html`.
 
-Note that Recommendations (from `recommend` and `/review-portfolio`) do not execute trades — they only append optimizer output to `data/recommendations.csv`. To act on a recommendation, execute trades in your brokerage and then edit `holdings.csv` so the next daily snapshot picks up the new share counts.
+### 3. Monthly, quarterly, or whatever cadence you set in your profile
+
+Run `/review-portfolio` in Claude Code. The cadence is declared in `investor_profile.md` under `financial_model.rebalance_period` (`monthly` / `quarterly` / `semi_annual` / `annual`); how often you actually invoke the skill is up to you. Each run: the curator reads recent news against your wave thesis, proposes adds and removes against the current watchlist; the `curate` CLI applies validated changes to `holdings.csv` and appends an audit row to `data/curation_history.csv`; mean-variance runs on the post-change watchlist; and a profile-aware report is written under `data/reports/`. Every report has a **Profile conflicts** section that flags when the optimizer wanted something the profile forbids and a **Watchlist changes** section that lists what the curator added, removed, or had rejected by the validator. Those are the two sections to read first.
+
+Note that recommendations do not execute trades — they only append optimizer output to `data/recommendations.csv`. To act on a recommendation, execute trades in your brokerage and then edit `holdings.csv` so the next daily snapshot picks up the new share counts.
+
+### 4. On demand, run the 5-year backtest to confirm the AI lift
+
+```bash
+.venv/bin/python -m src.cli backtest --curator-runs-dir data/curator_runs/5y-quarterly
+```
+
+This executes the 5-year backtest that produced this demo's headline numbers. At each quarterly rebalance the curator reads news as of the rebalance date and proposes adds and removes to the watchlist; the optimizer then recomputes portfolio weights for whatever watchlist results, repeated over 5 years. Compare results of your backtest to ours at [our backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html): +135.5% total and +6pp/yr over buy-and-hold.
+
+To refresh the backtest against a rolling 5-year window ending **today** (instead of replaying the committed window), run `/run-backtest` in Claude Code. That fires fresh `watchlist-curator` calls for any quarter-ends not yet covered by committed JSONs (~$0.15 each, ~$3 if starting from a clean slate), regenerates the dashboard, and auto-pushes so the public version always reflects the latest rolling window. The fixed starter watchlist (AAPL/MSFT/GOOGL/SPY/AGG) is preserved across refreshes so day-0 conditions stay comparable.
 
 ## Operations
 
