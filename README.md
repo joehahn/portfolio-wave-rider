@@ -75,13 +75,9 @@ Note that recommendations do not execute trades — they only append optimizer o
 
 ### 4. On demand, run the 5-year backtest to confirm the AI lift
 
-```bash
-.venv/bin/python -m src.cli backtest --curator-runs-dir data/curator_runs/5y-quarterly
-```
+Run `/run-backtest` in Claude Code. The skill fires fresh `watchlist-curator` calls for any quarter-ends not yet covered by committed JSONs (~$0.15 each, ~$3 if starting from a clean slate), regenerates the dashboard, and auto-pushes so the public version always reflects the latest rolling 5-year window.
 
-This executes the 5-year backtest that produced this demo's headline numbers. At each quarterly rebalance the curator reads news as of the rebalance date and proposes adds and removes to the watchlist; the optimizer then recomputes portfolio weights for whatever watchlist results, repeated over 5 years. Compare results of your backtest to ours at [our backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html): +135.5% total and +6pp/yr over buy-and-hold.
-
-To refresh the backtest against a rolling 5-year window ending **today** (instead of replaying the committed window), run `/run-backtest` in Claude Code. That fires fresh `watchlist-curator` calls for any quarter-ends not yet covered by committed JSONs (~$0.15 each, ~$3 if starting from a clean slate), regenerates the dashboard, and auto-pushes so the public version always reflects the latest rolling window. The fixed starter watchlist (AAPL/MSFT/GOOGL/SPY/AGG) is preserved across refreshes so day-0 conditions stay comparable.
+At each quarterly rebalance the curator reads news as of the rebalance date and proposes adds and removes to the watchlist; the optimizer then recomputes portfolio weights for whatever watchlist results, repeated over 5 years. Compare results of your backtest to ours at [our backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html): +135.5% total and +6pp/yr over buy-and-hold.
 
 ## Operations
 
