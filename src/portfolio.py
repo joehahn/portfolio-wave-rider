@@ -1665,6 +1665,51 @@ def _fetch_benchmark_curves(
     return curves
 
 
+def _compute_expected_vs_realized(
+    rec_df: pd.DataFrame, snap_df: pd.DataFrame, window_days: int = 365,
+) -> pd.DataFrame:
+    """For each rebalance date in rec_df, compute the optimizer's
+    forward-looking expected_annual_return alongside the realized
+    annualized return over the next ``window_days`` days from
+    snap_df.total_value. Realized is NaN where there isn't enough
+    forward data (most recent rebalances).
+
+    Returns a DataFrame with columns ``date``, ``expected``,
+    ``realized`` sorted by date.
+    """
+    if rec_df.empty or snap_df.empty:
+        return pd.DataFrame(columns=["date", "expected", "realized"])
+
+    expected = rec_df.groupby("date")["expected_return"].first().sort_index()
+    totals = snap_df.groupby("date")["total_value"].first().sort_index()
+    totals.index = pd.to_datetime(totals.index)
+
+    rows: list[dict[str, Any]] = []
+    for d_str, exp in expected.items():
+        d = pd.Timestamp(d_str)
+        # Find the snapshot at or just after the rebalance.
+        valid_start = totals.index[totals.index >= d]
+        if len(valid_start) == 0:
+            continue
+        d_start = valid_start[0]
+        v_start = float(totals.loc[d_start])
+        if v_start <= 0:
+            continue
+        # Find the snapshot at or just after the rebalance + window.
+        d_end_target = d + pd.Timedelta(days=window_days)
+        valid_end = totals.index[totals.index >= d_end_target]
+        if len(valid_end) == 0:
+            realized: float | None = None
+        else:
+            d_end = valid_end[0]
+            v_end = float(totals.loc[d_end])
+            actual_days = max(1, (d_end - d_start).days)
+            realized = (v_end / v_start) ** (365.0 / actual_days) - 1.0
+        rows.append({"date": d, "expected": float(exp), "realized": realized})
+
+    return pd.DataFrame(rows).sort_values("date").reset_index(drop=True)
+
+
 def build_dashboard(
     snapshots_path: str = "data/snapshots.csv",
     recommendations_path: str = "data/recommendations.csv",
@@ -1706,7 +1751,8 @@ def build_dashboard(
     _after_gain       = 7 if is_live else 6
     R_ASSET_USD       = _after_gain
     R_WAVE_USD        = _after_gain + 1
-    n_rows            = R_WAVE_USD
+    R_EXP_VS_REAL     = R_WAVE_USD + 1
+    n_rows            = R_EXP_VS_REAL
 
     _chart5_anchor = "/initialize-portfolio executed" if is_live else "backtest start"
     _chart5_tail = (
@@ -1752,6 +1798,10 @@ def build_dashboard(
     titles_list.append(
         f"{R_WAVE_USD}. Actual portfolio $ by wave over time"
         "<br><sub><i>Your real holdings (from holdings.csv × close prices), grouped by wave. This is what you own today — not the optimizer's recommendation. Compare to chart 4 (latest recommended %) to see how far the actual portfolio sits from the latest recommendation. Log y-axis.</i></sub>"
+    )
+    titles_list.append(
+        f"{R_EXP_VS_REAL}. Expected vs realized annualized return per rebalance"
+        "<br><sub><i>At each rebalance, the optimizer's forward-looking expected annual return (μᵀw) versus the actual annualized return realized over the next 365 days (computed from total_value in snapshots.csv). Divergence is prediction error: expected high but realized low means the optimizer was over-confident on noisy μ estimates; expected low but realized high means it was too risk-averse for the regime. Recent rebalances show expected only — the 1-year forward window hasn't elapsed yet.</i></sub>"
     )
     titles_all = tuple(titles_list)
 
@@ -2189,6 +2239,39 @@ def build_dashboard(
                     row=R_TURNOVER, col=1,
                 )
 
+    # Expected vs realized annualized return per rebalance. Two lines
+    # over time. Recent rebalances drop the realized line where the
+    # 1-year forward window isn't complete yet — Plotly draws NaN as
+    # a gap, so the realized series naturally cuts off at the right.
+    if snap_path.exists() and rec_path.exists():
+        try:
+            _rec_evr = pd.read_csv(rec_path)
+            _snap_evr = pd.read_csv(snap_path)
+            evr = _compute_expected_vs_realized(_rec_evr, _snap_evr, window_days=365)
+        except (OSError, pd.errors.EmptyDataError):
+            evr = pd.DataFrame()
+        if not evr.empty:
+            fig.add_trace(
+                go.Scatter(
+                    x=evr["date"], y=evr["expected"],
+                    name="Expected (optimizer μᵀw)",
+                    mode="lines+markers",
+                    line={"color": "#3b82f6", "width": 2},
+                    hovertemplate="%{x|%Y-%m-%d}<br>expected %{y:.1%}<extra></extra>",
+                ),
+                row=R_EXP_VS_REAL, col=1,
+            )
+            fig.add_trace(
+                go.Scatter(
+                    x=evr["date"], y=evr["realized"],
+                    name="Realized (next 1y)",
+                    mode="lines+markers",
+                    line={"color": "#d97706", "width": 2},
+                    hovertemplate="%{x|%Y-%m-%d}<br>realized %{y:.1%}<extra></extra>",
+                ),
+                row=R_EXP_VS_REAL, col=1,
+            )
+
     # Per-row top y in paper coords: row_top_k = 1 - (k-1) * (row_h + vsp)
     # where row_h = (1 - (n-1)*vsp) / n, vsp = 0.06.
     _vsp = 0.06
@@ -2258,6 +2341,9 @@ def build_dashboard(
     # collapse to the floor next to the dominant general_markets line.
     fig.update_yaxes(title_text="$ (log)", row=R_WAVE_USD, col=1, type="log")
     fig.update_yaxes(title_text="turnover (%)", row=R_TURNOVER, col=1, rangemode="tozero")
+    fig.update_yaxes(title_text="annualized return", row=R_EXP_VS_REAL, col=1,
+                     tickformat=".0%", zeroline=True,
+                     zerolinewidth=1, zerolinecolor="#888")
 
     # Apply the padded snapshots-derived range to every time-series
     # subplot so data points don't sit flush against the axis edges
@@ -2266,7 +2352,7 @@ def build_dashboard(
     # x-axes so the range setter is a no-op there.
     if xrange is not None:
         xrange_rows = [R_PORTFOLIO, R_TURNOVER, R_REC_WAVE,
-                       R_ASSET_USD, R_WAVE_USD]
+                       R_ASSET_USD, R_WAVE_USD, R_EXP_VS_REAL]
         for r in xrange_rows:
             fig.update_xaxes(range=list(xrange), row=r, col=1)
 
@@ -2410,11 +2496,13 @@ def build_curator_dashboard(
     bnh_return = (bnh_final / bnh_initial) - 1.0
 
     fig = make_subplots(
-        rows=2, cols=1, vertical_spacing=0.10,
-        row_heights=[0.55, 0.45],
+        rows=3, cols=1, vertical_spacing=0.10,
+        row_heights=[0.45, 0.35, 0.20],
         subplot_titles=(
             "Realized portfolio value: curator vs baselines vs benchmark",
             "Watchlist composition over time (one row per ticker; color = wave bucket)",
+            "Expected vs realized annualized return per rebalance "
+            "(divergence is optimizer prediction error)",
         ),
     )
 
@@ -2477,8 +2565,45 @@ def build_curator_dashboard(
     )
     fig.update_xaxes(range=[start, end], row=2, col=1)
 
+    # Chart 3: expected vs realized annualized return per rebalance.
+    # Reads recommendations.csv (per-rebalance expected_return) plus
+    # snapshots.csv total_value; realized = forward-1y annualized return
+    # from each rebalance date. The last few rebalances will have NaN
+    # realized (1y forward window not complete within the backtest window).
+    rec_path = bd / "recommendations.csv"
+    if rec_path.exists() and snaps_path.exists():
+        try:
+            _rec = pd.read_csv(rec_path)
+            _snap = pd.read_csv(snaps_path)
+            evr = _compute_expected_vs_realized(_rec, _snap, window_days=365)
+        except (OSError, pd.errors.EmptyDataError):
+            evr = pd.DataFrame()
+        if not evr.empty:
+            fig.add_trace(
+                go.Scatter(x=evr["date"], y=evr["expected"],
+                           name="Expected (optimizer μᵀw)",
+                           mode="lines+markers",
+                           line={"color": "#3b82f6", "width": 2},
+                           legendgroup="evr", showlegend=True,
+                           hovertemplate="%{x|%Y-%m-%d}<br>expected %{y:.1%}<extra></extra>"),
+                row=3, col=1,
+            )
+            fig.add_trace(
+                go.Scatter(x=evr["date"], y=evr["realized"],
+                           name="Realized (next 1y)",
+                           mode="lines+markers",
+                           line={"color": "#d97706", "width": 2},
+                           legendgroup="evr", showlegend=True,
+                           hovertemplate="%{x|%Y-%m-%d}<br>realized %{y:.1%}<extra></extra>"),
+                row=3, col=1,
+            )
+            fig.update_yaxes(title_text="annualized return", tickformat=".0%",
+                             zeroline=True, zerolinewidth=1, zerolinecolor="#888",
+                             row=3, col=1)
+            fig.update_xaxes(range=[start, end], row=3, col=1)
+
     fig.update_layout(
-        height=900, margin={"t": 70, "b": 60, "l": 80, "r": 30},
+        height=1100, margin={"t": 70, "b": 60, "l": 80, "r": 30},
         title={
             "text": (
                 f"<b>Curator backtest, {start.date()} to {end.date()}</b><br>"
