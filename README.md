@@ -43,15 +43,15 @@ Run `/initialize-portfolio` in Claude Code. This distributes your starting dolla
 
 ### 4. Install the daily cron job (required)
 
-Without cron the dashboard has no daily price history to plot, so the time-series charts stay empty after step 3.
-
 ```bash
 ./scripts/install_cron.sh
 ```
 
-That's it. The helper script appends one line to your crontab (preserving any other entries you already have) that fires `scripts/cron_snapshot.sh` Mon-Fri at 16:30 local. Works the same on macOS and Linux. The job script resolves its own location, so there's no `PROJ` variable to mis-edit. Re-running `install_cron.sh` is idempotent. To uninstall: `crontab -e` and delete the line containing `cron_snapshot.sh`.
+Appends one crontab line (works on macOS and Linux) so Mon-Fri at 16:30 local, `scripts/cron_snapshot.sh` fires: snapshots today's per-ticker prices into `data/snapshots.csv` and regenerates `docs/index.html`. Output goes to `data/snapshot.log` with timestamps.
 
-Each fire of `cron_snapshot.sh` runs `snapshot` (appending a row per ticker to `data/snapshots.csv`) and then `dashboard` (regenerating `docs/index.html`). Both outputs append to `data/snapshot.log` with a timestamp so you can grep for failures. cron only fires while the machine is awake; missed runs do not auto-replay — use `--date YYYY-MM-DD` on `snapshot` to backfill a missed day. The dashboard file is git-tracked but cron does not push: `git status` will show it modified after each run, and a manual `git add docs/index.html && git commit && git push` publishes the refresh to GitHub Pages.
+cron doesn't replay missed runs, so if your laptop was asleep at 16:30, run `./scripts/cron_snapshot.sh` manually to fill in the missing day.
+
+To publish a refreshed dashboard to GitHub Pages: `git add docs/index.html && git commit && git push` (cron doesn't auto-push).
 
 ## Runs
 
