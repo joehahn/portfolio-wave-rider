@@ -57,7 +57,7 @@ To publish a refreshed dashboard to GitHub Pages: `git add docs/index.html && gi
 
 ## Runs
 
-Four lifecycle activities. Step 1 happens once (right after Setup). Steps 2 through 4 are ongoing in parallel: daily cron, periodic review, and on-demand backtest.
+Four activities for operating and verifying the portfolio.
 
 ### 1. initialize (once)
 
@@ -73,7 +73,7 @@ Run `/review-portfolio` in Claude Code. The cadence is declared in `investor_pro
 
 Note that recommendations do not execute trades — they only append optimizer output to `data/recommendations.csv`. To act on a recommendation, execute trades in your brokerage and then edit `holdings.csv` so the next daily snapshot picks up the new share counts.
 
-### 4. run 5-year backtest (whenever)
+### 4. run 5-year backtest (anytime)
 
 Run `/run-backtest` in Claude Code. The skill collects any missing historical news, evolves the watchlist quarter-by-quarter against your wave thesis, optimizes the portfolio at each rebalance, measures the resulting lift over buy-and-hold, regenerates the dashboard, and auto-pushes so the public version always reflects the latest rolling 5-year window.
 
