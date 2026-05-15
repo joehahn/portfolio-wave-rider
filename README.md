@@ -49,7 +49,7 @@ Run `/initialize-portfolio` in Claude Code. This converts your wave thesis and s
 ./scripts/install_cron.sh
 ```
 
-Appends one crontab line (works on macOS and Linux) so Mon-Fri at 16:30 local, `scripts/cron_snapshot.sh` fires: snapshots today's per-ticker prices into `data/snapshots.csv` and regenerates `docs/index.html`. Output goes to `data/snapshot.log` with timestamps.
+Appends one crontab line (works on macOS and Linux) that fires `scripts/cron_snapshot.sh` Mon-Fri at 16:30 local. The script snapshots today's per-ticker prices into `data/snapshots.csv` and regenerates `docs/index.html`. Output goes to `data/snapshot.log` with timestamps.
 
 cron doesn't replay missed runs, so if your laptop was asleep at 16:30, run `./scripts/cron_snapshot.sh` manually to fill in the missing day.
 
