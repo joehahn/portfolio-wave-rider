@@ -62,7 +62,6 @@ Four triggers cover the portfolio's lifecycle: setup, daily price refresh, month
 - **Once, on a fresh repo** — you run `/initialize-portfolio` in Claude Code. This distributes your starting dollars across the watchlist noted in `holdings.csv` using only the qualitative inputs in `investor_profile.md`. The result is a "beliefs in dollar form" initial baseline portfolio, persisted to `data/thesis_baseline.json`.
 - **Daily, Mon-Fri 16:30 local** — cron captures today's per-ticker shares and close price into `data/snapshots.csv` and refreshes `docs/index.html`.
 - **Monthly, quarterly, or whatever cadence you set in your profile** — you run `/review-portfolio` in Claude Code. The cadence is declared in `investor_profile.md` under `financial_model.rebalance_period` (`monthly` / `quarterly` / `semi_annual` / `annual`); how often you actually invoke the skill is up to you. Each run: the curator reads recent news against your wave thesis, proposes adds and removes against the current watchlist; the `curate` CLI applies validated changes to `holdings.csv` and appends an audit row to `data/curation_history.csv`; mean-variance runs on the post-change watchlist; and a profile-aware report is written under `data/reports/`. Every report has a **Profile conflicts** section that flags when the optimizer wanted something the profile forbids and a **Watchlist changes** section that lists what the curator added, removed, or had rejected by the validator. Those are the two sections to read first.
-- **On demand** — `python -m src.cli backtest` runs a math-only walk-forward replay over a 12-month window of the fixed watchlist. `python -m src.cli backtest --curator-runs-dir <dir>` replays a pre-collected directory of curator JSON payloads through the same optimizer and emits two extra baselines (fixed-watchlist same cadence, buy-and-hold of starter) on the same dashboard. The curator-driven 5-year run under `data/curator_runs/5y-quarterly/` is committed and reproducible.
 
 Recommendations (from `recommend` and `/review-portfolio`) do not execute trades — they only append optimizer output to `data/recommendations.csv`. To act on a recommendation, execute trades in your brokerage and then edit `holdings.csv` so the next daily snapshot picks up the new share counts.
 
@@ -103,6 +102,14 @@ subject to ∑ᵢ wᵢ = 1 (weights sum to one) and 0 ≤ wᵢ ≤ concentration
 ## Headline result
 
 Over 4.6 years (Sept 2021 → Apr 2026) starting from a 2021-tech-savvy portfolio (AAPL, MSFT, GOOGL, SPY, AGG), the curator (20 quarterly LLM calls) lifted realized return to **+135.5%** vs. **+103.7%** for buy-and-hold of the day-0 starter, **+80.2%** for a fixed-watchlist same-cadence rebalance, and **+78.2%** for SPY. See the [curator backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html) and the full report in `data/backtest_curator_5y/report.md`.
+
+**Reproducing this backtest.** The 20 curator JSON payloads are committed under `data/curator_runs/5y-quarterly/`, so replaying them through the optimizer is offline, deterministic, and takes a few seconds:
+
+```bash
+.venv/bin/python -m src.cli backtest --curator-runs-dir data/curator_runs/5y-quarterly
+```
+
+That regenerates the snapshots/recommendations/report files under `data/backtest_curator_5y/` and refreshes `docs/backtest_curator.html`. Re-collecting the curator payloads from scratch (firing 20 fresh LLM calls against the strict as-of-date prompt) is a separate, more expensive step that's not yet wrapped in a one-command skill.
 
 ## Notes
 
