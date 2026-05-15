@@ -2255,7 +2255,7 @@ def build_dashboard(
                 go.Scatter(
                     x=evr["date"], y=evr["expected"],
                     name="Expected (optimizer μᵀw)",
-                    mode="lines+markers",
+                    mode="lines+markers", legend="legend8",
                     line={"color": "#3b82f6", "width": 2},
                     hovertemplate="%{x|%Y-%m-%d}<br>expected %{y:.1%}<extra></extra>",
                 ),
@@ -2265,7 +2265,7 @@ def build_dashboard(
                 go.Scatter(
                     x=evr["date"], y=evr["realized"],
                     name="Realized (next 1y)",
-                    mode="lines+markers",
+                    mode="lines+markers", legend="legend8",
                     line={"color": "#d97706", "width": 2},
                     hovertemplate="%{x|%Y-%m-%d}<br>realized %{y:.1%}<extra></extra>",
                 ),
@@ -2325,6 +2325,11 @@ def build_dashboard(
             title_text="Wave $",
             xref="paper", x=1.02,
             yref="paper", y=_row_top(R_WAVE_USD), yanchor="top",
+        ),
+        legend8=dict(
+            title_text="Expected vs realized",
+            xref="paper", x=1.02,
+            yref="paper", y=_row_top(R_EXP_VS_REAL), yanchor="top",
         ),
     )
     fig.update_yaxes(title_text="$", row=R_PORTFOLIO, col=1)
@@ -2582,18 +2587,16 @@ def build_curator_dashboard(
             fig.add_trace(
                 go.Scatter(x=evr["date"], y=evr["expected"],
                            name="Expected (optimizer μᵀw)",
-                           mode="lines+markers",
+                           mode="lines+markers", legend="legend2",
                            line={"color": "#3b82f6", "width": 2},
-                           legendgroup="evr", showlegend=True,
                            hovertemplate="%{x|%Y-%m-%d}<br>expected %{y:.1%}<extra></extra>"),
                 row=3, col=1,
             )
             fig.add_trace(
                 go.Scatter(x=evr["date"], y=evr["realized"],
                            name="Realized (next 1y)",
-                           mode="lines+markers",
+                           mode="lines+markers", legend="legend2",
                            line={"color": "#d97706", "width": 2},
-                           legendgroup="evr", showlegend=True,
                            hovertemplate="%{x|%Y-%m-%d}<br>realized %{y:.1%}<extra></extra>"),
                 row=3, col=1,
             )
@@ -2617,7 +2620,15 @@ def build_curator_dashboard(
             "x": 0.5, "xanchor": "center",
         },
         plot_bgcolor="#fafafa",
-        legend={"orientation": "v", "y": 0.95},
+        # Main legend covers rows 1+2 (equity-race lines and the wave-bucket
+        # entries for the Gantt). legend2 is a second legend pinned to the
+        # right of row 3 (expected vs realized).
+        legend=dict(xref="paper", x=1.02, yref="paper", y=0.98, yanchor="top"),
+        legend2=dict(
+            title_text="Expected vs realized",
+            xref="paper", x=1.02,
+            yref="paper", y=0.18, yanchor="top",
+        ),
     )
 
     # Curation event log table at the bottom.
