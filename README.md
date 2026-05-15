@@ -75,7 +75,7 @@ Note that recommendations do not execute trades — they only append optimizer o
 
 ### 4. On demand, run the 5-year backtest to confirm the AI lift
 
-Run `/run-backtest` in Claude Code. The skill fires fresh `watchlist-curator` calls for any quarter-ends not yet covered by committed JSONs (~$0.15 each, ~$3 if starting from a clean slate), regenerates the dashboard, and auto-pushes so the public version always reflects the latest rolling 5-year window.
+Run `/run-backtest` in Claude Code. The skill collects any missing historical news, evolves the watchlist quarter-by-quarter against your wave thesis, optimizes the portfolio at each rebalance, measures the resulting lift over buy-and-hold, regenerates the dashboard, and auto-pushes so the public version always reflects the latest rolling 5-year window.
 
 At each quarterly rebalance the curator reads news as of the rebalance date and proposes adds and removes to the watchlist; the optimizer then recomputes portfolio weights for whatever watchlist results, repeated over 5 years. Compare results of your backtest to ours at [our backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html): +135.5% total and +6pp/yr over buy-and-hold.
 
