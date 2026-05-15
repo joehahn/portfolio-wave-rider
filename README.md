@@ -53,7 +53,7 @@ Appends one crontab line (works on macOS and Linux) that fires `scripts/cron_sna
 
 cron doesn't replay missed runs, so if your laptop was asleep at 16:30, run `./scripts/cron_snapshot.sh` manually to fill in the missing day.
 
-To publish a refreshed dashboard to GitHub Pages: `git add docs/index.html && git commit && git push` (cron doesn't auto-push).
+To publish a refreshed dashboard to GitHub Pages: `git add docs/index.html && git commit -m "Refresh live dashboard" && git push` (cron doesn't auto-push).
 
 ## Runs
 
