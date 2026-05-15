@@ -5,6 +5,7 @@ min_trade_size_usd: 500           # don't propose trades smaller than this
 exclusions:                       # sector / theme exclusions
   - tobacco
   - private_prisons
+  - renewables                    # solar, wind, biofuels, hydro, geothermal; nuclear is NOT excluded
 asset_class_targets:              # rough guide, not a hard constraint
   equities: 0.75
   precious metals: 0.10
