@@ -3,8 +3,8 @@ initial_investment_usd: 50000     # total dollars to allocate on day 0
 concentration_cap: 0.25           # no single position > 25% of portfolio
 min_trade_size_usd: 500           # don't propose trades smaller than this
 exclusions:                       # sector / theme exclusions
-  - solar energy
-  - wind energy
+  - solar energy (companies and ETFs)
+  - wind energy (companies and ETFs)
 asset_class_targets:              # rough guide, not a hard constraint
   equities: 0.75
   precious metals: 0.10
