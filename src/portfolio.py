@@ -2264,7 +2264,7 @@ def build_dashboard(
             fig.add_trace(
                 go.Scatter(
                     x=evr["date"], y=evr["realized"],
-                    name="Realized (next 1y)",
+                    name="Realized (1y forward)",
                     mode="lines+markers", legend="legend8",
                     line={"color": "#d97706", "width": 2},
                     hovertemplate="%{x|%Y-%m-%d}<br>realized %{y:.1%}<extra></extra>",
@@ -2594,7 +2594,7 @@ def build_curator_dashboard(
             )
             fig.add_trace(
                 go.Scatter(x=evr["date"], y=evr["realized"],
-                           name="Realized (next 1y)",
+                           name="Realized (1y forward)",
                            mode="lines+markers", legend="legend2",
                            line={"color": "#d97706", "width": 2},
                            hovertemplate="%{x|%Y-%m-%d}<br>realized %{y:.1%}<extra></extra>"),
