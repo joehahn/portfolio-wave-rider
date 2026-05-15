@@ -18,7 +18,7 @@ See [GLOSSARY.md](GLOSSARY.md) for finance and stats terms (`σ`, `μ`, `Σ`, Sh
 
 ## Setup
 
-Four steps: install dependencies, edit the configuration files to your taste, bootstrap your initial portfolio, and install the daily cron job.
+Install dependencies, edit the configuration files to your taste, bootstrap your initial portfolio, and install the daily cron job.
 
 ### 1. Install dependencies
 
