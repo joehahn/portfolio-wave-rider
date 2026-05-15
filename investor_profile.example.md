@@ -44,7 +44,7 @@ Listed roughly in order of when material commercial impact is likely to land:
 - **Rockets & spacecraft**: will make space resources (asteroids, satellite services) accessible and commercially usable.
 - **Robotics**: will lower labor costs across physical industries.
 - **Quantum computing**: faster and cheaper hard computations.
-- **Nuclear (fission and fusion)**: abundant lower-cost energy. Near-term: fission renaissance via small modular reactors (SMRs — factory-built 50–300 MW units, faster to deploy than traditional 1,000+ MW plants) and long-term power purchase agreements (PPAs) selling utility output to AI data centers that need always-on baseload power. Longer-horizon: fusion.
+- **Nuclear (fission and fusion)**: abundant lower-cost energy. Near-term: fission renaissance via small modular reactors (SMRs) and long-term power purchase agreements (PPAs) selling utility output to AI data centers that need always-on baseload power. Longer-horizon: fusion.
 
 ## Non-technology waves I'm watching
 
