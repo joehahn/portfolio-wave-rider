@@ -202,15 +202,30 @@ actually applied (from `curate_result.applied_adds` and
 `curate_result.applied_removes`), and the size of the post-change
 watchlist (`curate_result.post_watchlist`).
 
-Then a table of applied adds with columns:
-ticker | asset name | wave bucket | rationale | evidence dates
+Then a bullet list of applied adds. Each bullet has this shape:
 
-Followed by a table of applied removes with columns:
-ticker | asset name | rationale | evidence dates
+  - **TICKER** — *Asset name* (wave bucket). Evidence dates: 2026-04-24; 2026-01-15.
+    Rationale: <verbatim rationale string, on its own line below>.
 
-The `evidence dates` column is a `;`-separated list of dates from
-the corresponding `news_evidence` array of each entry (so the reader
-can spot-check which catalysts drove the call).
+Render the rationale on its own indented line beneath the ticker
+header so the rationale's full sentence isn't forced into a narrow
+table column (table cells with a 200-character sentence make the
+page horizontally scrollable and unreadable). Indent the rationale
+line with two spaces so the markdown bullet stays attached. The
+list reads top-down rather than as a wide table; users scan it
+ticker-by-ticker.
+
+Followed by a bullet list of applied removes in the same shape, but
+without the wave-bucket parenthetical (removes don't carry a
+wave_bucket field in `curate_result`):
+
+  - **TICKER** — *Asset name*. Evidence dates: 2026-04-30; 2026-05-01.
+    Rationale: <verbatim rationale string>.
+
+Each `evidence dates` line is a `;`-separated list of dates from the
+corresponding `news_evidence` array of each entry (so the reader can
+spot-check which catalysts drove the call). If `news_evidence` is
+empty for an entry, omit the "Evidence dates: ..." part.
 
 If `curate_result.rejections` is non-empty, render a third subsection
 "Rejected by validator" listing each rejection's ticker, action, and
