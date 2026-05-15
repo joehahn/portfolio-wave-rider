@@ -62,15 +62,15 @@ Four triggers cover the portfolio's lifecycle: setup, daily price refresh, perio
 - **Once, on a fresh repo** — you run `/initialize-portfolio` in Claude Code. This distributes your starting dollars across the watchlist noted in `holdings.csv` using only the qualitative inputs in `investor_profile.md`. The result is a "beliefs in dollar form" initial baseline portfolio, persisted to `data/thesis_baseline.json`.
 - **Daily, Mon-Fri 16:30 local** — cron captures today's per-ticker shares and close price into `data/snapshots.csv` and refreshes `docs/index.html`.
 - **Monthly, quarterly, or whatever cadence you set in your profile** — you run `/review-portfolio` in Claude Code. The cadence is declared in `investor_profile.md` under `financial_model.rebalance_period` (`monthly` / `quarterly` / `semi_annual` / `annual`); how often you actually invoke the skill is up to you. Each run: the curator reads recent news against your wave thesis, proposes adds and removes against the current watchlist; the `curate` CLI applies validated changes to `holdings.csv` and appends an audit row to `data/curation_history.csv`; mean-variance runs on the post-change watchlist; and a profile-aware report is written under `data/reports/`. Every report has a **Profile conflicts** section that flags when the optimizer wanted something the profile forbids and a **Watchlist changes** section that lists what the curator added, removed, or had rejected by the validator. Those are the two sections to read first.
-- **On demand, run the 5-year backtest to confirm the curator's lift** —
+- **On demand, run the 5-year backtest to confirm the +6pp/yr lift over buy-and-hold** —
 
     ```bash
     .venv/bin/python -m src.cli backtest --curator-runs-dir data/curator_runs/5y-quarterly
     ```
 
-    Re-runs the 5-year backtest that produced this demo's headline numbers. The curator's 20 historical decisions are saved in the repo, so re-running is fast (a few seconds) and fully reproducible. After the run, the backtest report and dashboard are refreshed with the latest numbers, so a skeptic can confirm the +135% / +6pp-per-year lift this way before investing time in their own portfolio setup. (Re-running the curator from scratch to generate fresh decisions costs ~$3 in LLM calls and isn't a one-command step yet.)
+    Runs the 5-year backtest that produced this demo's headline numbers. The curator's 20 historical decisions are saved in the repo, so the run is fast (a few seconds) and fully reproducible on your machine. After it completes, open the refreshed backtest report and dashboard and compare against the +135.5% total / +6pp/yr-over-buy-and-hold figures quoted below. If your numbers match, the lift claim is verified end-to-end against your own checkout.
 
-Recommendations (from `recommend` and `/review-portfolio`) do not execute trades — they only append optimizer output to `data/recommendations.csv`. To act on a recommendation, execute trades in your brokerage and then edit `holdings.csv` so the next daily snapshot picks up the new share counts.
+Note that Recommendations (from `recommend` and `/review-portfolio`) do not execute trades — they only append optimizer output to `data/recommendations.csv`. To act on a recommendation, execute trades in your brokerage and then edit `holdings.csv` so the next daily snapshot picks up the new share counts.
 
 ## Operations
 
