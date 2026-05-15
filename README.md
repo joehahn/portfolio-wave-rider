@@ -51,7 +51,15 @@ Without cron the dashboard has no daily price history to plot, so the time-serie
 
 That's it. The helper script appends one line to your crontab (preserving any other entries you already have) that fires `scripts/cron_snapshot.sh` Mon-Fri at 16:30 local. The script resolves its own location, so there's no `PROJ` variable to mis-edit. Re-running `install_cron.sh` is idempotent. To uninstall: `crontab -e` and delete the line containing `cron_snapshot.sh`.
 
-Each fire of `cron_snapshot.sh` runs `snapshot` (appending a row per ticker to `data/snapshots.csv`) and then `dashboard` (regenerating `docs/index.html`). Both outputs append to `data/snapshot.log` with a timestamp so you can grep for failures. cron only fires while the machine is awake; missed runs do not auto-replay — use `--date YYYY-MM-DD` on `snapshot` to backfill a missed day. The dashboard file is git-tracked but cron does not push: `git status` will show it modified after each run, and a manual `git add docs/index.html && git commit && git push` publishes the refresh to GitHub Pages.
+**One extra step on macOS:** the cron daemon (`com.vix.cron`) is often not loaded by default on modern macOS. Check with `sudo launchctl list | grep cron`. If empty, load it once with:
+
+```bash
+sudo launchctl load -w /System/Library/LaunchDaemons/com.vix.cron.plist
+```
+
+The `-w` flag persists the load across reboots. Linux has the cron daemon running by default; no extra step.
+
+Each fire of `cron_snapshot.sh` runs `snapshot` (appending a row per ticker to `data/snapshots.csv`) and then `dashboard` (regenerating `docs/index.html`). Both outputs append to `data/snapshot.log` with a timestamp so you can grep for failures. cron is strictly time-based — if the machine is asleep at 16:30, the run is missed (no replay). Use `--date YYYY-MM-DD` on `snapshot` to backfill a missed day. The dashboard file is git-tracked but cron does not push: `git status` will show it modified after each run, and a manual `git add docs/index.html && git commit && git push` publishes the refresh to GitHub Pages.
 
 ## Runs
 

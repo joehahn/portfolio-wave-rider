@@ -191,7 +191,7 @@ To reproduce: `python -m src.cli backtest --curator-runs-dir data/curator_runs/5
 
 The previously-attempted design (LLM classified each technology wave's cycle stage and tilted μ accordingly) didn't survive multi-year backtests: AI tilts subtracted **−2.5%** to **−4.6%** of final value across the same 5y window. Postmortem and preserved artifacts on the [`5y-backtest`](https://github.com/joehahn/portfolio-wave-rider/tree/5y-backtest) branch in `FINDINGS.md`. Three things the tilt design got wrong: granularity (per-wave bucket too coarse — NVDA news ≠ GOOGL news), cadence (quarterly too slow for news with days-long half-life), and magnitude (±20% multiplier mis-calibrated). The curator design sidesteps all three by making the LLM's job a coarse-grained add/remove decision rather than a continuous numerical tilt.
 
-## Automation (cron)
+## Automation (cron, macOS + Linux)
 
 One cron entry handles daily price snapshots and dashboard refresh. Install with:
 
@@ -199,9 +199,11 @@ One cron entry handles daily price snapshots and dashboard refresh. Install with
 ./scripts/install_cron.sh
 ```
 
-The helper appends one line to your crontab (preserving anything else there) that fires `scripts/cron_snapshot.sh` Mon-Fri at 16:30 local. Both scripts resolve their own location, so there's no `PROJ` variable to maintain. `install_cron.sh` is idempotent (re-running is safe; it detects an existing entry and skips). To uninstall: `crontab -e` and delete the matching line.
+The helper appends one line to your crontab (preserving anything else there) that fires `scripts/cron_snapshot.sh` Mon-Fri at 16:30 local. Both scripts resolve their own location, so there's no `PROJ` variable to maintain. `install_cron.sh` is idempotent (re-running is safe). To uninstall: `crontab -e` and delete the matching line.
 
-Each fire runs `snapshot` then `dashboard`, appending timestamped output to `data/snapshot.log`. cron only fires when the machine is awake; missed runs do not auto-replay. Use `--date YYYY-MM-DD` on `snapshot` to backfill a missed day.
+**macOS first-time setup:** modern macOS often leaves the cron daemon unloaded. Check with `sudo launchctl list | grep cron`; if empty, load it once with `sudo launchctl load -w /System/Library/LaunchDaemons/com.vix.cron.plist` (the `-w` persists across reboots). Linux: cron is running by default; no extra step.
+
+Each fire runs `snapshot` then `dashboard`, appending timestamped output to `data/snapshot.log`. cron is strictly time-based — if the machine is asleep at 16:30, the run is missed (no replay). Use `--date YYYY-MM-DD` on `snapshot` to backfill a missed day.
 
 The cron refreshes `docs/index.html`. The file is git-tracked but cron does not push — `git status` will show it modified after each run, and a manual `git add docs/index.html && git commit && git push` publishes the refresh.
 
