@@ -51,4 +51,4 @@ Listed roughly in order of when material commercial impact is likely to land:
 Not every durable repricing is tech-driven. Two current examples:
 
 - **Geopolitical realignment driving energy prices** *(active, Spring 2026)*. The Iran war is keeping oil and gas spot prices elevated. Tailwind for energy producers (majors, midstream) and tactical winners in oil tankers / LNG carriers if shipping reroutes around the Strait of Hormuz persist. Headwind for fuel-cost-sensitive sectors (airlines, trucking).
-- **Aging-population demographics** *(slow-burning, multi-decade)*. Japan, Germany, China, much of Europe are past peak working-age population. Beneficiaries: healthcare, eldercare REITs, and automation that backfills labor shortages.
+- **Aging-population demographics** *(slow-burning, multi-decade)*. Japan, Germany, China, much of Europe are past peak working-age population. Beneficiaries: healthcare, eldercare REITs (real estate investment trusts that own senior-housing properties), and automation that backfills labor shortages.
