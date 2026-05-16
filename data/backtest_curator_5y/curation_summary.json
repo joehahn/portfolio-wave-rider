@@ -1,23 +1,37 @@
 [
   {
-    "date": "2021-09-30",
+    "date": "2021-03-31",
     "adds": [
+      "NVDA",
       "ARKX",
-      "BOTZ",
-      "URA"
+      "BOTZ"
     ],
     "removes": [],
     "rejections": 0
   },
   {
-    "date": "2021-12-31",
+    "date": "2021-06-30",
     "adds": [
-      "SMH",
-      "ICLN",
-      "NVDA"
+      "SMH"
     ],
     "removes": [],
-    "rejections": 0
+    "rejections": 2
+  },
+  {
+    "date": "2021-09-30",
+    "adds": [
+      "URA"
+    ],
+    "removes": [],
+    "rejections": 2
+  },
+  {
+    "date": "2021-12-31",
+    "adds": [
+      "ICLN"
+    ],
+    "removes": [],
+    "rejections": 2
   },
   {
     "date": "2022-03-31",
@@ -150,16 +164,6 @@
     "removes": [
       "IONQ",
       "BOTZ"
-    ],
-    "rejections": 0
-  },
-  {
-    "date": "2026-03-31",
-    "adds": [
-      "ARKG"
-    ],
-    "removes": [
-      "URA"
     ],
     "rejections": 0
   }

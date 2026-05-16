@@ -1,0 +1,48 @@
+{
+  "as_of_date": "2021-03-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "NVDA",
+      "wave_bucket": "AI",
+      "rationale": "Dominant AI compute provider; data-center GPU demand accelerating and the pending $40B Arm acquisition signals a deliberate move to consolidate the AI silicon stack.",
+      "news_evidence": [
+        {
+          "summary": "NVIDIA announces definitive agreement to acquire Arm from SoftBank for $40B, framed as creating the premier computing company for the age of AI.",
+          "source": "NVIDIA Newsroom",
+          "url": "https://nvidianews.nvidia.com/news/nvidia-to-acquire-arm-for-40-billion-creating-worlds-premier-computing-company-for-the-age-of-ai",
+          "date": "2020-09-13"
+        }
+      ]
+    },
+    {
+      "ticker": "ARKX",
+      "wave_bucket": "rockets_spacecraft",
+      "rationale": "Just-launched actively-managed space-exploration ETF gives diversified, listed exposure to the rockets-and-spacecraft wave without single-name SPAC risk.",
+      "news_evidence": [
+        {
+          "summary": "ARK Invest launches ARKX, the ARK Space Exploration & Innovation ETF, its first new ETF in two years; targets orbital and suborbital aerospace, enabling tech, and beneficiaries.",
+          "source": "ThinkAdvisor",
+          "url": "https://www.thinkadvisor.com/2021/03/29/cathie-woods-ark-to-launch-space-exploration-etf-tuesday/",
+          "date": "2021-03-29"
+        }
+      ]
+    },
+    {
+      "ticker": "BOTZ",
+      "wave_bucket": "robotics",
+      "rationale": "Global X Robotics & AI ETF gives diversified listed exposure to industrial automation, factory robotics, and autonomous-systems names that are the early on-ramp to the robotics wave.",
+      "news_evidence": [
+        {
+          "summary": "TSMC flags persistent chip-capacity tightness and accelerating demand from automotive and industrial automation customers, underscoring durable demand for the factory-automation names BOTZ holds.",
+          "source": "Supply Chain Dive",
+          "url": "https://www.supplychaindive.com/news/tsmc-semiconductor-capacity-manufacturing-automotive-chip/603525/",
+          "date": "2021-01-15"
+        }
+      ]
+    }
+  ],
+  "removes": [],
+  "no_changes": false,
+  "rationale_overall": "First quarterly rebalance: keep the entire day-0 watchlist intact and open three new wave-thesis positions. NVDA deepens AI exposure beyond mega-cap software; ARKX opens the rockets-and-spacecraft bucket via a diversified ETF on its first trading day; BOTZ opens the robotics bucket. Watchlist grows from 5 to 8 names, still well under the cap of 12."
+}

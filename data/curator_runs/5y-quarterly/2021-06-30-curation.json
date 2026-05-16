@@ -1,0 +1,66 @@
+{
+  "as_of_date": "2021-06-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "BOTZ",
+      "wave_bucket": "AI",
+      "rationale": "Diversified thematic ETF for the AI + robotics wave, complementing the mega-cap AI incumbents already held (AAPL, MSFT, GOOGL) with mid-cap industrial-automation and autonomy names.",
+      "news_evidence": [
+        {
+          "summary": "BOTZ tracks the Indxx Global Robotics & AI Thematic Index; coverage in early-to-mid 2021 highlighted its ~46% trailing 12-month return and growing investor interest as a clean way to bet on automation and AI adoption.",
+          "source": "Seeking Alpha",
+          "url": "https://seekingalpha.com/article/4454193-botz-a-robotics-and-ai-etf-with-a-strong-track-record",
+          "date": "2021-06-22"
+        },
+        {
+          "summary": "Global X positions BOTZ as a thematic vehicle for companies that stand to benefit from increased adoption of robotics and AI, including industrial robotics, non-industrial robots, and autonomous vehicles.",
+          "source": "Global X ETFs (issuer fund page)",
+          "url": "https://www.globalxetfs.com/funds/botz",
+          "date": "2021-06-30"
+        }
+      ]
+    },
+    {
+      "ticker": "ARKX",
+      "wave_bucket": "rockets_spacecraft",
+      "rationale": "ARK Space Exploration & Innovation ETF, launched 2021-03-30, gives early exposure to the rockets/spacecraft next-wave (orbital and suborbital platforms, enabling tech, beneficiaries) while individual pure-play space stocks are still scarce on US exchanges.",
+      "news_evidence": [
+        {
+          "summary": "ARK Invest launched ARKX on 2021-03-30, its first new ETF in two years, targeting orbital aerospace, suborbital aerospace, enabling technologies (3D printing, robotics, AI), and aerospace beneficiaries.",
+          "source": "ThinkAdvisor",
+          "url": "https://www.thinkadvisor.com/2021/03/29/cathie-woods-ark-to-launch-space-exploration-etf-tuesday/",
+          "date": "2021-03-29"
+        },
+        {
+          "summary": "Virgin Galactic confirmed Richard Branson would fly on Unity 22 on 2021-07-11, accelerating the public narrative around commercial human spaceflight in the days before the as-of date.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2021/07/01/virgin-galactic-to-launch-richard-branson-on-july-11-aiming-to-beat-jeff-bezos-to-space.html",
+          "date": "2021-06-30"
+        }
+      ]
+    },
+    {
+      "ticker": "SMH",
+      "wave_bucket": "AI",
+      "rationale": "VanEck Semiconductor ETF concentrates the AI-hardware picks-and-shovels trade (NVDA, TSM, ASML, AMD) that directly captures hyperscaler datacenter capex; complements broad-market SPY with high-conviction AI silicon beta during the ongoing chip shortage.",
+      "news_evidence": [
+        {
+          "summary": "Global semiconductor shortage through H1 2021 underscored demand for advanced chips across autos, datacenter, and consumer electronics, with TSMC accelerating capacity build-out and AI/datacenter demand cited as a structural tailwind.",
+          "source": "CNBC (TSMC capacity expansion coverage, 2021)",
+          "url": "https://www.cnbc.com/2021/10/16/tsmc-taiwanese-chipmaker-ramping-production-to-end-chip-shortage.html",
+          "date": "2021-06-15"
+        },
+        {
+          "summary": "SMH (VanEck Semiconductor ETF) is widely used as the cleanest US-listed proxy for semiconductor exposure, with top holdings TSM, NVDA, ASML, and AMD that are direct AI-compute beneficiaries.",
+          "source": "VanEck (issuer fund page)",
+          "url": "https://www.vaneck.com/us/en/investments/semiconductor-etf-smh/",
+          "date": "2021-06-30"
+        }
+      ]
+    }
+  ],
+  "removes": [],
+  "no_changes": false,
+  "rationale_overall": "Net effect: the watchlist gets its first deliberate thematic spine. AAPL/MSFT/GOOGL remain as mega-cap AI incumbents, SPY stays as broad-market beta, AGG as the bond ballast. Three thematic ETFs are added: BOTZ broadens AI/robotics beyond US mega-caps, SMH concentrates the AI-silicon picks-and-shovels trade, and ARKX is an early, cheap toehold in the rockets/spacecraft next-wave while pure-play space tickers are still scarce on US exchanges. Watchlist size grows from 5 to 8, well under the cap of 12."
+}

@@ -26,7 +26,7 @@ import pandas as pd
 
 DEFAULT_RUNS_DIR = "data/curator_runs/5y-quarterly"
 STARTER_WATCHLIST = ["AAPL", "MSFT", "GOOGL", "SPY", "AGG"]
-N_QUARTERS = 20  # rolling-5y window (20 quarters covers 5 years)
+N_QUARTERS = 21  # rolling-5y window: 21 quarter-ends span 20 intervals = 5y
 
 
 def quarter_ends_through(today: pd.Timestamp, n: int = N_QUARTERS) -> list[pd.Timestamp]:
