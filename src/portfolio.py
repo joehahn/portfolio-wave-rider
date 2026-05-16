@@ -1604,8 +1604,6 @@ TICKER_WAVE: dict[str, str] = {
 # Short display labels for chart 3 (Latest recommended portfolio %). Each
 # equity ticker gets a wave annotation under its asset class so a reader
 # can tell at a glance which wave thesis each stock or ETF belongs to.
-# `general_markets` renders as "defensive" because that bucket on equities
-# is a defensive / quality-tilted holding (e.g., VIG), not a thesis bet.
 WAVE_DISPLAY_LABEL: dict[str, str] = {
     "AI": "AI",
     "robotics": "robotics",
@@ -1613,7 +1611,7 @@ WAVE_DISPLAY_LABEL: dict[str, str] = {
     "engineered_biology": "biology",
     "quantum": "quantum",
     "nuclear_fusion": "nuclear",
-    "general_markets": "defensive",
+    "general_markets": "general_markets",
 }
 
 
@@ -2488,11 +2486,11 @@ def build_curator_dashboard(
         rows=5, cols=1, vertical_spacing=0.08,
         row_heights=[0.28, 0.20, 0.16, 0.16, 0.20],
         subplot_titles=(
-            "Realized portfolio value: curator vs baselines vs benchmark",
-            "Watchlist composition over time (one row per ticker; color = wave bucket)",
-            "Actual portfolio $ by asset class over time",
-            "Actual portfolio $ by wave over time",
-            "Expected vs realized annualized return per rebalance "
+            "1. Realized portfolio value: curator vs baselines vs benchmark",
+            "2. Watchlist composition over time (one row per ticker; color = wave bucket)",
+            "3. Actual portfolio $ by asset class over time",
+            "4. Actual portfolio $ by wave over time",
+            "5. Expected vs realized annualized return per rebalance "
             "(divergence is optimizer prediction error)",
         ),
     )
@@ -2544,6 +2542,7 @@ def build_curator_dashboard(
                 mode="lines",
                 line={"color": color, "width": 14},
                 name=wb, legendgroup=wb, showlegend=show_legend,
+                legend="legend5",
                 hovertemplate=f"<b>{tk}</b><br>{wb}<br>"
                               f"%{{x|%Y-%m-%d}}<extra></extra>",
             ),
@@ -2658,9 +2657,16 @@ def build_curator_dashboard(
         },
         plot_bgcolor="#fafafa",
         # Per-row legends, each pinned to its chart's vertical position
-        # in paper coords (1.0 = top, 0.0 = bottom). Main legend covers
-        # rows 1+2 (equity-race + wave-bucket Gantt entries).
-        legend=dict(xref="paper", x=1.02, yref="paper", y=0.98, yanchor="top"),
+        # in paper coords (1.0 = top, 0.0 = bottom).
+        legend=dict(
+            title_text="Portfolio value",
+            xref="paper", x=1.02, yref="paper", y=0.98, yanchor="top",
+        ),
+        legend5=dict(
+            title_text="Wave bucket",
+            xref="paper", x=1.02,
+            yref="paper", y=0.66, yanchor="top",
+        ),
         legend3=dict(
             title_text="Asset class",
             xref="paper", x=1.02,
@@ -2721,12 +2727,15 @@ def build_curator_dashboard(
         'th,td{border-bottom:1px solid #eee;}'
         '</style></head><body>'
         '<h1>Curator-driven backtest</h1>'
-        '<p style="color:#555;max-width:780px;">The watchlist-curator agent was called '
-        f'{len(list(Path(runs_dir).glob("*-curation.json")))} times over a {(end - start).days}-day window. '
+        '<p style="color:#555;max-width:780px;">The watchlist-curator agent was called quarterly over a 5 year historical window. '
         'At each rebalance it proposed adds and removes against the active watchlist; '
-        'the optimizer then ran vanilla mean-variance on whatever set resulted. The two '
+        'the optimizer then ran mean-variance on whatever set resulted. The two '
         'baselines below isolate the contribution of the curation (vs fixed watchlist same '
-        'cadence) and of any rebalancing at all (vs buy-and-hold of the day-0 set).</p>'
+        'cadence) and of any rebalancing at all (vs buy-and-hold of the day-0 set). '
+        'The <code>general_markets</code> wave bucket is the catch-all for tickers '
+        'not tied to any specific wave thesis — broad-market and quality / dividend / '
+        'utilities / staples ETFs (SPY, VIG, DVY, XLU, XLP) that function as defensive '
+        'ballast rather than thesis bets.</p>'
         + chart_html
         + log_html
         + '</body></html>'
