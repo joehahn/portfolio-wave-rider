@@ -9,11 +9,10 @@ This Claude Code demo uses AI to manage and optimize a long-horizon investment p
 
 **Who this helps.** An investor who has a thesis about where markets are going but not enough time to track news ticker by ticker. This demo helps such an investor pivot from a less-optimal static buy-and-hold portfolio to one that's lightly managed by AI. In the 5-year backtest detailed below, the AI-managed portfolio lifted realized return by about **13 percentage points per year** over a buy-and-hold of the starter watchlist (~65pp total), and by about 17pp/year over SPY. Past performance is not predictive; the curator's job is to compound a thesis you already hold, not to replace one you don't have.
 
-Dashboards served from GitHub Pages:
+Two dashboards are served from GitHub Pages:
 
 - **[Live dashboard](https://joehahn.github.io/portfolio-wave-rider/)** — today's portfolio: realized value over time, latest recommended weights, asset-class and wave-bucket breakdowns. Regenerated daily by cron.
 - **[5-year curator backtest](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html)** — equity-curve race (curator vs buy-and-hold vs SPY).
-- Optimizer-parameter sweeps: [risk aversion `λ`](https://joehahn.github.io/portfolio-wave-rider/sweep_risk_aversion.html), [price-history lookback](https://joehahn.github.io/portfolio-wave-rider/sweep_lookback.html), [concentration cap](https://joehahn.github.io/portfolio-wave-rider/sweep_max_weight.html). Same curator decisions, one knob varied.
 
 See [GLOSSARY.md](GLOSSARY.md) for finance and stats terms (`σ`, `μ`, `Σ`, Sharpe ratio, risk aversion `λ`, mean-variance optimization, etc.) and [REFERENCE.md](REFERENCE.md) for the CLI flags, repo layout, output files, architecture overview, and testing instructions.
 
@@ -86,7 +85,15 @@ At each quarterly rebalance the curator reads news as of the rebalance date and 
 ./scripts/run_sweeps.sh
 ```
 
-Replays the same curator JSONs against a range of risk-aversion `λ`, price-history lookback, and concentration-cap values. Pure Python, no LLM calls, takes a few seconds. Writes three overlay pages: `docs/sweep_risk_aversion.html`, `docs/sweep_lookback.html`, `docs/sweep_max_weight.html`. Each holds the curator's watchlist decisions fixed and varies one knob, so the spread between curves isolates the optimizer's sensitivity to that knob without confounding it with news-driven composition changes.
+Replays the same curator JSONs against a range of values for three optimizer knobs. Pure Python, no LLM calls, takes a few seconds. Each sweep holds the curator's watchlist decisions fixed and varies one knob, so the spread between curves isolates the optimizer's sensitivity to that knob without confounding it with news-driven composition changes.
+
+Three overlay pages are written and published to GitHub Pages:
+
+- **[Risk aversion `λ`](https://joehahn.github.io/portfolio-wave-rider/sweep_risk_aversion.html)** — values `[0, 0.33, 1, 3.3, 10, 33]`. Trades expected return against variance; default `λ = 1` is the middle of the tradeoff.
+- **[Price-history lookback](https://joehahn.github.io/portfolio-wave-rider/sweep_lookback.html)** — values `[0.5, 1, 1.3, 2, 3]` years. Length of the window used to estimate `μ` and `Σ`.
+- **[Concentration cap](https://joehahn.github.io/portfolio-wave-rider/sweep_max_weight.html)** — values `[0.10, 0.15, 0.25, 0.40, 1.00]`. Maximum weight any single ticker can carry.
+
+Each sweep page has a nav strip at the top for jumping between sweeps.
 
 ## How `holdings.csv` shapes outcomes
 
