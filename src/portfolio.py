@@ -2485,11 +2485,13 @@ def build_curator_dashboard(
     bnh_return = (bnh_final / bnh_initial) - 1.0
 
     fig = make_subplots(
-        rows=3, cols=1, vertical_spacing=0.10,
-        row_heights=[0.45, 0.35, 0.20],
+        rows=5, cols=1, vertical_spacing=0.08,
+        row_heights=[0.28, 0.20, 0.16, 0.16, 0.20],
         subplot_titles=(
             "Realized portfolio value: curator vs baselines vs benchmark",
             "Watchlist composition over time (one row per ticker; color = wave bucket)",
+            "Actual portfolio $ by asset class over time",
+            "Actual portfolio $ by wave over time",
             "Expected vs realized annualized return per rebalance "
             "(divergence is optimizer prediction error)",
         ),
@@ -2554,7 +2556,58 @@ def build_curator_dashboard(
     )
     fig.update_xaxes(range=[start, end], row=2, col=1)
 
-    # Chart 3: expected vs realized annualized return per rebalance.
+    # Charts 3 and 4: actual portfolio $ by asset class and by wave over
+    # time. Stacked area on linear y-axis: top edge = total portfolio
+    # value; each band's thickness = that bucket's $ contribution.
+    snaps_full = snaps.copy()
+    snaps_full["asset_bucket"] = snaps_full["ticker"].map(
+        lambda t: ASSET_CLASS_BUCKET.get(TICKER_ASSET_CLASS.get(t, "equity"), "equities")
+    )
+    snaps_full["wave_bucket"] = snaps_full["ticker"].map(
+        lambda t: TICKER_WAVE.get(t, "general_markets")
+    )
+    ac_colors = {
+        "equities":        "#1f77b4",
+        "bonds":           "#9467bd",
+        "cash":            "#7f7f7f",
+        "precious metals": "#bcbd22",
+        "crypto":          "#17becf",
+    }
+    ac = snaps_full.groupby(["date", "asset_bucket"])["value"].sum().unstack(fill_value=0)
+    ac_order = [c for c in ["equities", "bonds", "cash", "precious metals", "crypto"]
+                if c in ac.columns]
+    for bucket in ac_order:
+        fig.add_trace(
+            go.Scatter(x=ac.index, y=ac[bucket], mode="lines",
+                       name=bucket, legend="legend3",
+                       stackgroup="asset",
+                       line={"color": ac_colors.get(bucket, "#444"), "width": 0.5},
+                       hovertemplate=f"{bucket}<br>%{{x|%Y-%m-%d}}"
+                                     "<br>$%{y:,.0f}<extra></extra>"),
+            row=3, col=1,
+        )
+    wv = snaps_full.groupby(["date", "wave_bucket"])["value"].sum().unstack(fill_value=0)
+    wv_order = [w for w in _WAVE_DISPLAY_ORDER if w in wv.columns]
+    for wave in wv_order:
+        if (wv[wave] <= 0).all():
+            continue
+        fig.add_trace(
+            go.Scatter(x=wv.index, y=wv[wave], mode="lines",
+                       name=WAVE_DISPLAY_LABEL.get(wave, wave),
+                       legend="legend4",
+                       stackgroup="wave",
+                       line={"color": WAVE_COLORS.get(wave), "width": 0.5},
+                       hovertemplate=f"{WAVE_DISPLAY_LABEL.get(wave, wave)}"
+                                     "<br>%{x|%Y-%m-%d}"
+                                     "<br>$%{y:,.0f}<extra></extra>"),
+            row=4, col=1,
+        )
+    fig.update_yaxes(title_text="$", tickformat="$,.0f", row=3, col=1)
+    fig.update_yaxes(title_text="$", tickformat="$,.0f", row=4, col=1)
+    fig.update_xaxes(range=[start, end], row=3, col=1)
+    fig.update_xaxes(range=[start, end], row=4, col=1)
+
+    # Chart 5: expected vs realized annualized return per rebalance.
     # Reads recommendations.csv (per-rebalance expected_return) plus
     # snapshots.csv total_value; realized = forward-1y annualized return
     # from each rebalance date. The last few rebalances will have NaN
@@ -2574,7 +2627,7 @@ def build_curator_dashboard(
                            mode="lines+markers", legend="legend2",
                            line={"color": "#3b82f6", "width": 2},
                            hovertemplate="%{x|%Y-%m-%d}<br>expected %{y:.1%}<extra></extra>"),
-                row=3, col=1,
+                row=5, col=1,
             )
             fig.add_trace(
                 go.Scatter(x=evr["date"], y=evr["realized"],
@@ -2582,15 +2635,15 @@ def build_curator_dashboard(
                            mode="lines+markers", legend="legend2",
                            line={"color": "#d97706", "width": 2},
                            hovertemplate="%{x|%Y-%m-%d}<br>realized %{y:.1%}<extra></extra>"),
-                row=3, col=1,
+                row=5, col=1,
             )
             fig.update_yaxes(title_text="annualized return", tickformat=".0%",
                              zeroline=True, zerolinewidth=1, zerolinecolor="#888",
-                             row=3, col=1)
-            fig.update_xaxes(range=[start, end], row=3, col=1)
+                             row=5, col=1)
+            fig.update_xaxes(range=[start, end], row=5, col=1)
 
     fig.update_layout(
-        height=1100, margin={"t": 70, "b": 60, "l": 80, "r": 30},
+        height=1700, margin={"t": 70, "b": 60, "l": 80, "r": 30},
         title={
             "text": (
                 f"<b>Curator backtest, {start.date()} to {end.date()}</b><br>"
@@ -2604,14 +2657,24 @@ def build_curator_dashboard(
             "x": 0.5, "xanchor": "center",
         },
         plot_bgcolor="#fafafa",
-        # Main legend covers rows 1+2 (equity-race lines and the wave-bucket
-        # entries for the Gantt). legend2 is a second legend pinned to the
-        # right of row 3 (expected vs realized).
+        # Per-row legends, each pinned to its chart's vertical position
+        # in paper coords (1.0 = top, 0.0 = bottom). Main legend covers
+        # rows 1+2 (equity-race + wave-bucket Gantt entries).
         legend=dict(xref="paper", x=1.02, yref="paper", y=0.98, yanchor="top"),
+        legend3=dict(
+            title_text="Asset class",
+            xref="paper", x=1.02,
+            yref="paper", y=0.49, yanchor="top",
+        ),
+        legend4=dict(
+            title_text="Wave bucket",
+            xref="paper", x=1.02,
+            yref="paper", y=0.32, yanchor="top",
+        ),
         legend2=dict(
             title_text="Expected vs realized",
             xref="paper", x=1.02,
-            yref="paper", y=0.18, yanchor="top",
+            yref="paper", y=0.13, yanchor="top",
         ),
     )
 
