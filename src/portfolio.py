@@ -1451,8 +1451,6 @@ def curator_backtest(
         f"| Strategy | Ending value | Total return | Active vs curator |\n"
         f"|---|---|---|---|\n"
         f"| Curator-driven | ${final_v:,.2f} | {realized_return * 100:+.2f}% | — |\n"
-        f"| Fixed watchlist (same cadence, no curation) | "
-        f"${fix_final:,.2f} | {fix_str} | {fix_active} |\n"
         f"| Buy-and-hold starter (day-0 optimize, then hold) | "
         f"${bnh_final:,.2f} | {bnh_str} | {bnh_active} |\n\n"
         f"## Risk and benchmarks\n\n"
@@ -2508,13 +2506,6 @@ def build_curator_dashboard(
                        mode="lines", line={"color": "#3b82f6", "width": 1.8}),
             row=1, col=1,
         )
-    if "fixed_total" in baselines.columns:
-        fix = baselines.dropna(subset=["fixed_total"])
-        fig.add_trace(
-            go.Scatter(x=fix["date"], y=fix["fixed_total"], name="Fixed watchlist rebalance",
-                       mode="lines", line={"color": "#6b7280", "width": 1.8}),
-            row=1, col=1,
-        )
     for b, curve in bench_curves.items():
         fig.add_trace(
             go.Scatter(x=curve.index, y=curve.values, name=f"{b} benchmark",
@@ -2642,15 +2633,14 @@ def build_curator_dashboard(
             fig.update_xaxes(range=[start, end], row=5, col=1)
 
     fig.update_layout(
-        height=1700, margin={"t": 70, "b": 60, "l": 80, "r": 30},
+        height=1700, margin={"t": 120, "b": 60, "l": 80, "r": 30},
         title={
             "text": (
                 f"<b>Curator backtest, {start.date()} to {end.date()}</b><br>"
                 f"<span style='font-size:14px;color:#555;'>"
                 f"Curator-driven: {cur_return * 100:+.2f}%  "
                 f"·  Buy-and-hold: {bnh_return * 100:+.2f}%  "
-                f"·  Fixed rebalance: {fix_return * 100:+.2f}%  "
-                f"·  Active vs fixed: {(cur_return - fix_return) * 100:+.2f}pp"
+                f"·  Active vs buy-and-hold: {(cur_return - bnh_return) * 100:+.2f}pp"
                 f"</span>"
             ),
             "x": 0.5, "xanchor": "center",
@@ -2729,13 +2719,13 @@ def build_curator_dashboard(
         '<h1>Curator-driven backtest</h1>'
         '<p style="color:#555;max-width:780px;">The watchlist-curator agent was called quarterly over a 5 year historical window. '
         'At each rebalance it proposed adds and removes against the active watchlist; '
-        'the optimizer then ran mean-variance on whatever set resulted. The two '
-        'baselines below isolate the contribution of the curation (vs fixed watchlist same '
-        'cadence) and of any rebalancing at all (vs buy-and-hold of the day-0 set). '
+        'the optimizer then ran mean-variance on whatever set resulted. The '
+        'buy-and-hold baseline below isolates the contribution of any rebalancing '
+        'at all — curator-driven adds and removes plus optimizer re-weighting — '
+        'against day-0 weights held forever. '
         'The <code>general_markets</code> wave bucket is the catch-all for tickers '
         'not tied to any specific wave thesis — broad-market and quality / dividend / '
-        'utilities / staples ETFs (SPY, VIG, DVY, XLU, XLP) that function as defensive '
-        'ballast rather than thesis bets.</p>'
+        'utilities / staples ETFs that function as defensive ballast.</p>'
         + chart_html
         + log_html
         + '</body></html>'

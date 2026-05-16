@@ -122,8 +122,8 @@ def main(argv: list[str] | None = None) -> int:
                            "When present, switches backtest into curator-driven mode: "
                            "walks the dir chronologically, applies each payload to a "
                            "sandboxed holdings + history, optimizes on the resulting "
-                           "watchlist, and computes two baselines (fixed-watchlist same "
-                           "cadence; buy-and-hold of starter) for comparison.")
+                           "watchlist, and computes a buy-and-hold-of-starter baseline "
+                           "for comparison.")
 
     p_dash = sub.add_parser("dashboard", help="generate docs/index.html from snapshots + recommendations")
     p_dash.add_argument("--snapshots", default="data/snapshots.csv")

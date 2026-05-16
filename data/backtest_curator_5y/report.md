@@ -20,9 +20,8 @@
 
 | Strategy | Ending value | Total return | Active vs curator |
 |---|---|---|---|
-| Curator-driven | $131,255.37 | +162.51% | — |
-| Fixed watchlist (same cadence, no curation) | $93,906.48 | +87.81% | +74.70pp |
-| Buy-and-hold starter (day-0 optimize, then hold) | $98,731.24 | +97.46% | +65.05pp |
+| Curator-driven | $131,255.27 | +162.51% | — |
+| Buy-and-hold starter (day-0 optimize, then hold) | $98,731.31 | +97.46% | +65.05pp |
 
 ## Risk and benchmarks
 
