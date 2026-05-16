@@ -98,9 +98,9 @@ The optimizer used here selects a portfolio that maximizes the mean-variance obj
 
 subject to ∑ᵢ wᵢ = 1 (weights sum to one) and 0 ≤ wᵢ ≤ concentration_cap. The first term `μᵀw` is the portfolio's expected return (the weighted average of per-ticker expected returns); the second term `wᵀΣw` is the portfolio's return variance, scaled by `λ` to act as a risk penalty. `μ` is the per-ticker expected-return vector, computed as the annualized mean of daily log returns over a 1.3y price-history lookback set in `investor_profile.md`. `Σ` is the ticker × ticker covariance matrix estimated over the same window. `w` is the weight vector the optimizer is solving for. `λ` (risk aversion) trades expected return against variance:
 
-- `λ → 0`: variance term drops out; weight piles into the highest-`μ` tickers up to the concentration cap.
-- `λ = 1` (profile default): middle of the tradeoff.
-- `λ ≫ 1`: variance penalty dominates; solution approaches min-variance (heavy in bonds and cash).
+- `λ → 0`: the solution favors high-return tickers, which also tend to have greater variability.
+- `λ = 1`: the middle ground that favors winning tickers but also allows safer tickers when the market gets noisy. This is this project's default setting.
+- `λ ≫ 1`: the variance penalty dominates, so the solution tends toward a low-variance portfolio that is heavy in cash and bonds.
 
 This is the standard Markowitz mean-variance formulation (Markowitz 1952, *Portfolio Selection*, Journal of Finance 7:77-91), which is the textbook starting point for portfolio construction because it captures the central return-vs-risk tradeoff in a single closed-form quadratic program. See [GLOSSARY.md](GLOSSARY.md) for the full definitions.
 
