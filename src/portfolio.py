@@ -2494,7 +2494,12 @@ def build_curator_dashboard(
             "1. Realized portfolio value: curator vs baselines vs benchmark",
             "2. Watchlist composition over time (one row per ticker; color = wave bucket)",
             "3. Actual portfolio $ by asset class over time",
-            "4. Actual portfolio $ by wave over time",
+            "4. Actual portfolio $ by wave over time<br>"
+            "<span style='font-size:0.8em;color:#666;font-weight:400;'>"
+            "general_markets = defensive equity ETFs (broad-market / dividend / "
+            "utilities / staples); cashlike = bonds + cash-equivalents + precious "
+            "metals (e.g., AGG, BIL, IAU)"
+            "</span>",
             "5. Expected vs realized annualized return per rebalance "
             "(divergence is optimizer prediction error)",
         ),
@@ -2757,17 +2762,11 @@ def build_curator_dashboard(
         f'<span style="font-size:0.55em;color:#666;font-weight:400;">'
         f'— {start.date()} to {end.date()}</span></h1>'
         '<p style="color:#555;max-width:780px;">The watchlist-curator agent was called quarterly over a 5 year historical window. '
-        'At each rebalance it proposed adds and removes against the active watchlist; '
-        'the optimizer then ran mean-variance on whatever set resulted. The '
-        'buy-and-hold baseline below isolates the contribution of any rebalancing '
-        'at all — curator-driven adds and removes plus optimizer re-weighting — '
-        'against day-0 weights held forever. '
-        'The <code>general_markets</code> wave bucket is the catch-all for tickers '
-        'not tied to any specific wave thesis — broad-market and quality / dividend / '
-        'utilities / staples ETFs that function as defensive ballast. The '
-        '<code>cashlike</code> bucket holds bonds, cash-equivalents, and precious '
-        'metals (e.g., AGG, BIL, IAU) — the low-volatility ballast that hedges '
-        'equity drawdowns.</p>'
+        'At each rebalance it read the news of the preceding quarter and proposed '
+        'adds and removes against the active watchlist; the optimizer then ran '
+        'mean-variance on the revised watchlist. The buy-and-hold curve below is '
+        'the value of the initial portfolio (which never gets rebalanced or '
+        'optimized) over time.</p>'
         + chart_html
         + log_html
         + '</body></html>'
