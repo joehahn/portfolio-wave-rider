@@ -142,12 +142,31 @@ def main(argv: list[str] | None = None) -> int:
             f"<tbody>{rows}</tbody></table>"
         )
 
+        # Nav strip: links to the other two sweep pages so a reader can
+        # jump between them without going back to the README.
+        all_params = list(DEFAULTS.keys())
+        nav_parts = []
+        for p_other in all_params:
+            if p_other == args.param:
+                nav_parts.append(f'<strong>{p_other}</strong>')
+            else:
+                nav_parts.append(f'<a href="sweep_{p_other}.html">{p_other}</a>')
+        nav = (
+            '<nav style="font-size:14px;color:#555;margin-bottom:0.5em;'
+            'padding-bottom:0.5em;border-bottom:1px solid #eee;">'
+            '<a href="index.html">live dashboard</a> · '
+            '<a href="backtest_curator.html">5y backtest</a> · '
+            'sweeps: ' + ' · '.join(nav_parts) +
+            '</nav>'
+        )
+
         page = (
             '<!doctype html><html><head><meta charset="utf-8">'
             f'<title>Sweep: {args.param}</title>'
             '<style>body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;'
             'max-width:1180px;margin:0 auto;padding:1em 1.5em;color:#222;}'
             'th,td{border-bottom:1px solid #eee;}</style></head><body>'
+            + nav +
             f'<h1>Parameter sweep: <code>{args.param}</code></h1>'
             f'<p style="color:#555;max-width:780px;">Same curator JSONs replayed '
             f'through the optimizer at each <code>{args.param}</code> value. '
