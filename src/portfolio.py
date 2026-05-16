@@ -2135,9 +2135,9 @@ def build_dashboard(
             lambda t: TICKER_WAVE.get(t, "general_markets")
         )
 
-        # Asset-class chart (row 9). Sum $ per (date, bucket). Explicit
-        # colors so bonds (purple) and precious metals (gold) don't
-        # collide on the log y-axis when their dollar values are close.
+        # Asset-class chart. Stacked area on a linear y-axis: top edge
+        # of the stack equals total portfolio value over time; each
+        # band's thickness is that bucket's $ contribution.
         ac_colors = {
             "equities":        "#1f77b4",  # blue
             "bonds":           "#9467bd",  # purple
@@ -2151,46 +2151,33 @@ def build_dashboard(
                     if c in ac.columns]
         for bucket in ac_order:
             fig.add_trace(
-                go.Scatter(x=ac.index, y=ac[bucket], mode=_ts_mode,
+                go.Scatter(x=ac.index, y=ac[bucket], mode="lines",
                            name=bucket, legend="legend2",
-                           line={"color": ac_colors.get(bucket, "#444")}),
+                           stackgroup="asset",
+                           line={"color": ac_colors.get(bucket, "#444"), "width": 0.5},
+                           hovertemplate=f"{bucket}<br>%{{x|%Y-%m-%d}}"
+                                         "<br>$%{y:,.0f}<extra></extra>"),
                 row=R_ASSET_USD, col=1,
             )
 
-        # Wave chart (row 10). Same shape, different grouping. Waves
-        # with zero $ in the watchlist (e.g., the user has shares=0
-        # for every ticker in that wave) don't render on a log axis,
-        # so we list them in an annotation at the chart's top-right
-        # rather than silently dropping them.
+        # Wave chart. Same shape (stacked area, linear y-axis), grouped
+        # by wave bucket. Waves with $0 across the entire history are
+        # skipped to avoid empty legend entries.
         wv = snaps_full.groupby(["date", "wave_bucket"])["value"].sum().unstack(fill_value=0)
-        # Use the same display order as elsewhere in the dashboard.
         wv_order = [w for w in _WAVE_DISPLAY_ORDER if w in wv.columns]
-        zero_waves = [w for w in wv_order if (wv[w] <= 0).all()]
         for wave in wv_order:
-            if wave in zero_waves:
+            if (wv[wave] <= 0).all():
                 continue
             fig.add_trace(
-                go.Scatter(x=wv.index, y=wv[wave], mode=_ts_mode,
+                go.Scatter(x=wv.index, y=wv[wave], mode="lines",
                            name=WAVE_DISPLAY_LABEL.get(wave, wave),
                            legend="legend3",
-                           line={"color": WAVE_COLORS.get(wave)}),
+                           stackgroup="wave",
+                           line={"color": WAVE_COLORS.get(wave), "width": 0.5},
+                           hovertemplate=f"{WAVE_DISPLAY_LABEL.get(wave, wave)}"
+                                         "<br>%{x|%Y-%m-%d}"
+                                         "<br>$%{y:,.0f}<extra></extra>"),
                 row=R_WAVE_USD, col=1,
-            )
-        if zero_waves:
-            # Anchored bottom-right of chart 10. On a log scale rising
-            # over time, the bottom-right is the lowest non-zero wave
-            # at the most recent date — typically the smallest active
-            # wave bucket — so this corner has the most empty space.
-            # Opaque white background occludes any line that does
-            # happen to pass through.
-            fig.add_annotation(
-                xref=f"x{R_WAVE_USD} domain", yref=f"y{R_WAVE_USD} domain",
-                x=0.99, y=0.03, xanchor="right", yanchor="bottom",
-                text="At $0 today: " + ", ".join(WAVE_DISPLAY_LABEL.get(w, w) for w in zero_waves),
-                showarrow=False,
-                font={"size": 11, "color": "#666"},
-                bgcolor="rgba(255,255,255,0.95)",
-                bordercolor="#bbb", borderwidth=1, borderpad=4,
             )
 
     # 9. Rebalance turnover. Computed from recommendations.csv: at each
@@ -2340,11 +2327,8 @@ def build_dashboard(
     if R_GAIN_REVIEW is not None:
         fig.update_yaxes(title_text="$ gain", row=R_GAIN_REVIEW, col=1, zeroline=True,
                          zerolinewidth=1, zerolinecolor="#888")
-    fig.update_yaxes(title_text="$ (log)", row=R_ASSET_USD, col=1, type="log")
-    # Log scale on chart 8 so small wave allocations (e.g., zero-weighted
-    # robotics/biology lines hovering near a few hundred dollars) don't
-    # collapse to the floor next to the dominant general_markets line.
-    fig.update_yaxes(title_text="$ (log)", row=R_WAVE_USD, col=1, type="log")
+    fig.update_yaxes(title_text="$", row=R_ASSET_USD, col=1, tickformat="$,.0f")
+    fig.update_yaxes(title_text="$", row=R_WAVE_USD, col=1, tickformat="$,.0f")
     fig.update_yaxes(title_text="turnover (%)", row=R_TURNOVER, col=1, rangemode="tozero")
     fig.update_yaxes(title_text="annualized return", row=R_EXP_VS_REAL, col=1,
                      tickformat=".0%", zeroline=True,
