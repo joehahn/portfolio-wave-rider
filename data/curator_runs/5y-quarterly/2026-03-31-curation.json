@@ -1,1 +1,72 @@
-{"as_of_date": "2026-03-31", "rebalance_period": "quarterly", "adds": [{"ticker": "ARKG", "wave_bucket": "engineered_biology", "rationale": "Fills a thesis-named wave the watchlist has zero exposure to; ARKG is a liquid US-listed ETF basket of engineered-biology names (Ginkgo, CRISPR, Twist, Recursion) and the sector is showing concrete buildup-phase commercial signals.", "news_evidence": [{"summary": "Ginkgo Bioworks launches Ginkgo Cloud Lab, a web interface giving researchers remote access to its autonomous lab infrastructure built on >70 instruments and an AI protocol agent - a tangible commercialization step for engineered-biology platform tooling.", "source": "Stocktitan / Ginkgo press", "url": "https://www.stocktitan.net/news/DNA/", "date": "2026-03-02"}, {"summary": "Senti Biosciences receives FDA RMAT designation for SENTI-202, a logic-gated CAR-NK therapy - a regulatory inflection signal within the synthetic-biology therapeutics cohort that ARKG tracks.", "source": "Virtual Investor / Senti Biosciences", "url": "https://www.stocktitan.net/news/SNTI/", "date": "2026-01-14"}]}], "removes": [{"ticker": "URA", "rationale": "Nuclear bucket is at the 4-ticker thematic cap with URA, CCJ, NUKZ, LEU; URA (uranium-miner basket) is the most redundant since CCJ already gives concentrated uranium-miner exposure and NUKZ captures the broader nuclear-renaissance equities - exiting URA reduces thematic concentration while preserving wave exposure.", "news_evidence": [{"summary": "Kairos-TVA 50MW SMR PPA for Google data centers - the nuclear thesis is intact and best captured via NUKZ (SMR/utility-aligned basket) rather than URA's miner-only construct.", "source": "DatacenterDynamics", "url": "https://www.datacenterdynamics.com/en/news/tva-signs-50mw-ppa-with-smr-developer-kairos-for-google-data-centers-in-tennessee-and-alabama/", "date": "2026-03-15"}, {"summary": "DOE extended Centrus' HALEU production contract through June 2026, reinforcing that fuel-cycle exposure is better held through LEU than through a broad uranium-miner ETF.", "source": "Centrus Energy investor releases", "url": "https://investors.centrusenergy.com/news-releases/news-release-details/centrus-energy-secures-contract-extension-department-energy", "date": "2025-06-25"}]}], "no_changes": false, "rationale_overall": "One add, one remove keeps the watchlist at the 12-ticker cap while closing the engineered-biology gap the investor profile names as a likely next wave (currently zero exposure) and trimming a redundant nuclear-miner ETF."}
+{
+  "as_of_date": "2026-03-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "QTUM",
+      "wave_bucket": "quantum",
+      "rationale": "Opens quantum-wave exposure via a diversified ~86-holding equal-weighted ETF rather than a single pre-revenue pure-play, after Q1 2026 quantum earnings (IonQ +755% YoY revenue, Rigetti ~200% YoY, D-Wave record $33M bookings) confirmed commercial traction across the sub-sector.",
+      "news_evidence": [
+        {
+          "summary": "IonQ Q1 2026 revenue grew 755% YoY with raised full-year guidance; Rigetti Q1 revenue up ~200% with 108-qubit Cepheus-1 at general availability; D-Wave record $33.4M bookings up nearly 2,000% YoY including $20M Florida Atlantic University sale.",
+          "source": "Zacks / TipRanks Q1 2026 quantum earnings roundup",
+          "url": "https://www.zacks.com/stock/news/2920833/best-quantum-stock-following-q1-2026-ionq-qbts-or-rgti",
+          "date": "2026-03-15"
+        },
+        {
+          "summary": "Defiance Quantum ETF (QTUM) tracks the BlueStar Quantum Computing and Machine Learning Index across ~86 holdings using modified equal-weight (caps ~2% per name), expense ratio 0.40%, AUM over $3.6B in early 2026.",
+          "source": "Defiance ETFs / stockanalysis.com",
+          "url": "https://www.defianceetfs.com/qtum/",
+          "date": "2026-03-01"
+        }
+      ]
+    },
+    {
+      "ticker": "AVGO",
+      "wave_bucket": "AI",
+      "rationale": "Adds direct exposure to the AI-custom-silicon and AI-networking leg of the hyperscaler buildout that NVDA-plus-TSM does not fully capture, after Broadcom's Q1 FY26 print showed AI revenue +106% YoY to $8.4B, a $73B AI backlog, and OpenAI added as a sixth named custom-silicon customer.",
+      "news_evidence": [
+        {
+          "summary": "Broadcom Q1 FY26 (reported March 4, 2026): total revenue $19.31B (+29% YoY); AI semiconductor revenue $8.4B (+106% YoY); Q2 AI revenue guided to $13.1B; CEO Hock Tan cited 'clear line of sight' to >$100B annual AI chip revenue by late 2027/early 2028.",
+          "source": "Broadcom investor relations",
+          "url": "https://investors.broadcom.com/news-releases/news-release-details/broadcom-inc-announces-first-quarter-fiscal-year-2026-financial",
+          "date": "2026-03-04"
+        },
+        {
+          "summary": "Broadcom expanded named custom-silicon customer list from 5 to 6 with OpenAI joining Google, Anthropic, Meta, and two unnamed hyperscalers; AI backlog cited at $73B.",
+          "source": "FinancialContent coverage of Q1 FY26 print",
+          "url": "https://markets.financialcontent.com/stocks/article/marketminute-2026-3-24-broadcoms-ai-revenue-rockets-106-to-84-billion-as-custom-silicon-dominates-the-infrastructure-build-out",
+          "date": "2026-03-24"
+        }
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "NUKZ",
+      "rationale": "Nuclear bucket is at the 4-ticker diversity ceiling; NUKZ (broad nuclear-equity ETF) overlaps materially with CCJ/URA on uranium and adds the least incremental thesis exposure relative to LEU (HALEU enrichment, SMR-fuel critical) and the two uranium names, so trimming it keeps the nuclear thesis intact at 3 focused names and frees a slot for a named next-wave bet.",
+      "news_evidence": [
+        {
+          "summary": "Q1 2026 SMR-thesis news (Meta-Oklo 1.2 GW Ohio campus announced Jan 2026; NuScale-TVA 6 GW program) is captured by single-name nuclear holdings; a broad-basket nuclear ETF does not add differentiated exposure beyond CCJ + LEU + URA.",
+          "source": "WWT / DatacenterDynamics SMR coverage",
+          "url": "https://www.wwt.com/blog/big-techs-nuclear-bet-key-small-modular-reactors-for-cloud-power",
+          "date": "2026-01-28"
+        }
+      ]
+    },
+    {
+      "ticker": "TSM",
+      "rationale": "AI bucket would exceed the 4-ticker cap with AVGO added; TSM is the weakest direct AI exposure of the four mega-caps (foundry rather than AI compute/software end-demand owner) and carries the most geopolitical-tail risk, so swapping TSM for AVGO sharpens AI exposure toward custom silicon plus hyperscaler-software without expanding ticker count.",
+      "news_evidence": [
+        {
+          "summary": "Bank of America's 2026 AI-chip buy list names NVDA, AVGO, MRVL, AMD, AMAT, LRCX, CDNS, SNPS as the eight primary beneficiaries of the upgraded $1.3T 2026 semiconductor TAM; TSM appears in foundry rolls but is one step removed from AI-compute end-demand owners.",
+          "source": "Bank of America 2026 semiconductor outlook / Yahoo Finance summary",
+          "url": "https://finance.yahoo.com/news/top-semiconductor-stocks-2026-wall-120207279.html",
+          "date": "2026-03-10"
+        }
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Net effect: watchlist stays at the 12-ticker cap but rotates from broad-basket / indirect exposure toward more thesis-aligned positions. Nuclear concentration drops from 4 to 3 (CCJ, LEU, URA) by removing the broad NUKZ ETF, while quantum exposure opens at 1 (QTUM), filling a named next-wave gap the watchlist had zero exposure to. The AI bucket stays at 4 names (MSFT, GOOGL, NVDA, AVGO) but rotates from foundry (TSM) to custom-silicon and AI-networking (AVGO), aligning with the Q1 FY26 hyperscaler-capex evidence. Robotics (ARKQ), rockets (RKLB), and ballast (SPY, AGG) unchanged."
+}
