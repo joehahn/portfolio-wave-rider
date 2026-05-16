@@ -1501,7 +1501,7 @@ def curator_backtest(
 # quantum > fusion), with the current AI wave first and general_markets last.
 _WAVE_DISPLAY_ORDER = [
     "AI", "rockets_spacecraft", "robotics", "engineered_biology",
-    "quantum", "nuclear_fusion", "general_markets",
+    "quantum", "nuclear_fusion", "general_markets", "cashlike",
 ]
 
 # Stable wave -> color mapping so the same wave shows in the same color
@@ -1517,6 +1517,7 @@ WAVE_COLORS: dict[str, str] = {
     "quantum":            "#9467bd",  # purple
     "nuclear_fusion":     "#8c564b",  # brown
     "general_markets":    "#7f7f7f",  # gray
+    "cashlike":           "#0d9488",  # deep teal — distinct from any wave hue
 }
 
 # Asset-class labels for the dashboard's "Latest recommended weights" bar chart.
@@ -1610,6 +1611,7 @@ WAVE_DISPLAY_LABEL: dict[str, str] = {
     "quantum": "quantum",
     "nuclear_fusion": "nuclear",
     "general_markets": "general_markets",
+    "cashlike": "cashlike",
 }
 
 
@@ -2156,10 +2158,15 @@ def build_dashboard(
                 row=R_ASSET_USD, col=1,
             )
 
-        # Wave chart. Same shape (stacked area, linear y-axis), grouped
-        # by wave bucket. Waves with $0 across the entire history are
-        # skipped to avoid empty legend entries.
-        wv = snaps_full.groupby(["date", "wave_bucket"])["value"].sum().unstack(fill_value=0)
+        # Wave chart. Same shape (stacked area, linear y-axis). Tickers
+        # in cash/bonds/precious-metals/crypto buckets stack into a
+        # separate "cashlike" band so general_markets shows only
+        # defensive equities (SPY/VIG/DVY/XLU/XLP), not ballast.
+        is_cashlike = snaps_full["asset_bucket"].isin(
+            ["bonds", "cash", "precious metals", "crypto"]
+        )
+        snaps_full["display_bucket"] = snaps_full["wave_bucket"].mask(is_cashlike, "cashlike")
+        wv = snaps_full.groupby(["date", "display_bucket"])["value"].sum().unstack(fill_value=0)
         wv_order = [w for w in _WAVE_DISPLAY_ORDER if w in wv.columns]
         for wave in wv_order:
             if (wv[wave] <= 0).all():
@@ -2482,7 +2489,7 @@ def build_curator_dashboard(
 
     fig = make_subplots(
         rows=5, cols=1, vertical_spacing=0.08,
-        row_heights=[0.28, 0.20, 0.16, 0.16, 0.20],
+        row_heights=[0.24, 0.30, 0.13, 0.13, 0.20],
         subplot_titles=(
             "1. Realized portfolio value: curator vs baselines vs benchmark",
             "2. Watchlist composition over time (one row per ticker; color = wave bucket)",
@@ -2522,9 +2529,30 @@ def build_curator_dashboard(
     seen.reverse()  # so top of chart is first-added
     y_index = {tk: i for i, tk in enumerate(seen)}
 
+    # Per-wave shade variation: each ticker within a wave bucket gets a
+    # distinct lightness step of the wave's base color, so adjacent rows
+    # in the Gantt that share a wave (e.g., 8 AI tickers) are visually
+    # distinguishable while still grouping as the same hue family.
+    import colorsys
+    wave_tickers: dict[str, list[str]] = {}
+    for tk, _, _, wb in periods:
+        if tk not in wave_tickers.setdefault(wb, []):
+            wave_tickers[wb].append(tk)
+
+    def _shade(base_hex: str, idx: int, n: int) -> str:
+        h = base_hex.lstrip("#")
+        r, g, b = (int(h[i:i+2], 16) / 255 for i in (0, 2, 4))
+        hh, ll, ss = colorsys.rgb_to_hls(r, g, b)
+        # Spread lightness across [0.30, 0.70] so all variants stay legible.
+        new_l = ll if n <= 1 else 0.30 + (idx / (n - 1)) * 0.40
+        nr, ng, nb = colorsys.hls_to_rgb(hh, new_l, ss)
+        return f"#{int(nr*255):02x}{int(ng*255):02x}{int(nb*255):02x}"
+
     legend_seen: set[str] = set()
     for tk, p_start, p_end, wb in periods:
-        color = WAVE_COLORS.get(wb, "#888")
+        members = wave_tickers[wb]
+        idx = members.index(tk)
+        color = _shade(WAVE_COLORS.get(wb, "#888888"), idx, len(members))
         show_legend = wb not in legend_seen
         legend_seen.add(wb)
         fig.add_trace(
@@ -2576,7 +2604,14 @@ def build_curator_dashboard(
                                      "<br>$%{y:,.0f}<extra></extra>"),
             row=3, col=1,
         )
-    wv = snaps_full.groupby(["date", "wave_bucket"])["value"].sum().unstack(fill_value=0)
+    # Split cash/bonds/precious-metals/crypto out of general_markets into
+    # a separate "cashlike" band so general_markets shows only defensive
+    # equities (SPY/VIG/DVY/XLU/XLP), not ballast.
+    is_cashlike = snaps_full["asset_bucket"].isin(
+        ["bonds", "cash", "precious metals", "crypto"]
+    )
+    snaps_full["display_bucket"] = snaps_full["wave_bucket"].mask(is_cashlike, "cashlike")
+    wv = snaps_full.groupby(["date", "display_bucket"])["value"].sum().unstack(fill_value=0)
     wv_order = [w for w in _WAVE_DISPLAY_ORDER if w in wv.columns]
     for wave in wv_order:
         if (wv[wave] <= 0).all():
@@ -2633,14 +2668,15 @@ def build_curator_dashboard(
             fig.update_xaxes(range=[start, end], row=5, col=1)
 
     fig.update_layout(
-        height=1700, margin={"t": 120, "b": 60, "l": 80, "r": 30},
+        height=1900, margin={"t": 90, "b": 60, "l": 80, "r": 30},
         title={
             "text": (
-                f"<b>Curator backtest, {start.date()} to {end.date()}</b><br>"
                 f"<span style='font-size:14px;color:#555;'>"
-                f"Curator-driven: {cur_return * 100:+.2f}%  "
-                f"·  Buy-and-hold: {bnh_return * 100:+.2f}%  "
-                f"·  Active vs buy-and-hold: {(cur_return - bnh_return) * 100:+.2f}pp"
+                f"Curator-driven: {cur_return * 100:+.0f}%  "
+                f"·  Buy/hold: {bnh_return * 100:+.0f}%  "
+                f"·  Curator vs buy/hold: {(cur_return - bnh_return) * 100:+.0f}%  "
+                f"·  (curator - buy/hold)/(buy/hold): "
+                f"{(cur_return - bnh_return) / bnh_return * 100:+.0f}%"
                 f"</span>"
             ),
             "x": 0.5, "xanchor": "center",
@@ -2655,22 +2691,22 @@ def build_curator_dashboard(
         legend5=dict(
             title_text="Wave bucket",
             xref="paper", x=1.02,
-            yref="paper", y=0.66, yanchor="top",
+            yref="paper", y=0.655, yanchor="middle",
         ),
         legend3=dict(
             title_text="Asset class",
             xref="paper", x=1.02,
-            yref="paper", y=0.49, yanchor="top",
+            yref="paper", y=0.473, yanchor="top",
         ),
         legend4=dict(
             title_text="Wave bucket",
             xref="paper", x=1.02,
-            yref="paper", y=0.32, yanchor="top",
+            yref="paper", y=0.305, yanchor="top",
         ),
         legend2=dict(
             title_text="Expected vs realized",
             xref="paper", x=1.02,
-            yref="paper", y=0.13, yanchor="top",
+            yref="paper", y=0.137, yanchor="top",
         ),
     )
 
@@ -2694,9 +2730,10 @@ def build_curator_dashboard(
         log_html = (
             "<h2 style='margin-top:2em;'>Curation log</h2>"
             "<p style='color:#555;'>Each row is one quarterly curator call. "
-            "Rejections happen when an add or remove violates a contract rule "
-            "(listing date, max watchlist size, ticker already in / not in current "
-            "watchlist).</p>"
+            "The <em>Rejections</em> column counts adds and removes the validator "
+            "dropped as invalid (see "
+            "<a href='https://github.com/joehahn/portfolio-wave-rider/blob/main/REFERENCE.md#cli-reference'>"
+            "REFERENCE.md</a>).</p>"
             "<table style='border-collapse:collapse;width:100%;font-size:14px;'>"
             "<thead><tr style='border-bottom:2px solid #ccc;text-align:left;'>"
             "<th style='padding:6px;'>Date</th>"
@@ -2716,7 +2753,9 @@ def build_curator_dashboard(
         'table{margin-top:0.5em;}'
         'th,td{border-bottom:1px solid #eee;}'
         '</style></head><body>'
-        '<h1>Curator-driven backtest</h1>'
+        f'<h1>Curator-driven backtest '
+        f'<span style="font-size:0.55em;color:#666;font-weight:400;">'
+        f'— {start.date()} to {end.date()}</span></h1>'
         '<p style="color:#555;max-width:780px;">The watchlist-curator agent was called quarterly over a 5 year historical window. '
         'At each rebalance it proposed adds and removes against the active watchlist; '
         'the optimizer then ran mean-variance on whatever set resulted. The '
@@ -2725,7 +2764,10 @@ def build_curator_dashboard(
         'against day-0 weights held forever. '
         'The <code>general_markets</code> wave bucket is the catch-all for tickers '
         'not tied to any specific wave thesis — broad-market and quality / dividend / '
-        'utilities / staples ETFs that function as defensive ballast.</p>'
+        'utilities / staples ETFs that function as defensive ballast. The '
+        '<code>cashlike</code> bucket holds bonds, cash-equivalents, and precious '
+        'metals (e.g., AGG, BIL, IAU) — the low-volatility ballast that hedges '
+        'equity drawdowns.</p>'
         + chart_html
         + log_html
         + '</body></html>'
