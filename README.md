@@ -7,12 +7,12 @@
 
 This Claude Code demo uses AI to manage and optimize a long-horizon investment portfolio. You declare your goals, constraints, and an investment thesis (namely what you think will drive future returns), then initialize a starter watchlist of tickers you already want exposure to. At each periodic rebalance the curator agent reads recent news against your thesis and proposes adds and removes against the current watchlist; the mean-variance optimizer then recommends portfolio weights for whatever watchlist results. The result accumulates into a static Plotly dashboard so you can watch the watchlist composition, the recommended weights, and the realized portfolio value evolve over time.
 
-**Who this helps.** An investor who has a thesis about where markets are going but not enough time to track news ticker by ticker. This demo helps such an investor pivot from a less-optimal static buy-and-hold portfolio to one that's lightly managed by AI. In the 5-year backtest detailed below, the AI-managed portfolio lifted realized return by about **6 percentage points per year** over the same optimizer running on an unchanging starter watchlist (~55pp total over 4.6 years), and by about 7pp/year over SPY. Past performance is not predictive; the curator's job is to compound a thesis you already hold, not to replace one you don't have.
+**Who this helps.** An investor who has a thesis about where markets are going but not enough time to track news ticker by ticker. This demo helps such an investor pivot from a less-optimal static buy-and-hold portfolio to one that's lightly managed by AI. In the 5-year backtest detailed below, the AI-managed portfolio lifted realized return by about **13 percentage points per year** over a buy-and-hold of the starter watchlist (~65pp total), and by about 17pp/year over SPY. Past performance is not predictive; the curator's job is to compound a thesis you already hold, not to replace one you don't have.
 
 Two dashboards are served from GitHub Pages:
 
 - **[Live dashboard](https://joehahn.github.io/portfolio-wave-rider/)** — today's portfolio: realized value over time, latest recommended weights, asset-class and wave-bucket breakdowns. Regenerated daily by cron.
-- **[5-year curator backtest](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html)** — equity-curve race (curator vs buy-and-hold vs fixed-watchlist rebalance vs SPY).
+- **[5-year curator backtest](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html)** — equity-curve race (curator vs buy-and-hold vs SPY).
 
 See [GLOSSARY.md](GLOSSARY.md) for finance and stats terms (`σ`, `μ`, `Σ`, Sharpe ratio, risk aversion `λ`, mean-variance optimization, etc.) and [REFERENCE.md](REFERENCE.md) for the CLI flags, repo layout, output files, architecture overview, and testing instructions.
 
@@ -77,7 +77,7 @@ Note that recommendations do not execute trades — they only append optimizer o
 
 Run `/run-backtest` in Claude Code. This skill collects any missing historical news, evolves the watchlist quarter-by-quarter against your wave thesis, optimizes the portfolio at each rebalance, measures the resulting lift relative to a buy-and-hold investment strategy, and regenerates the backtest dashboard at `docs/backtest_curator.html` (open it locally in a browser to see your run).
 
-At each quarterly rebalance the curator reads news as of the rebalance date and proposes adds and removes to the watchlist; the optimizer then recomputes portfolio weights for whatever watchlist results, repeated over 5 years. Compare results of your backtest to ours at [our backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html): +135.5% total and +6pp/yr over buy-and-hold.
+At each quarterly rebalance the curator reads news as of the rebalance date and proposes adds and removes to the watchlist; the optimizer then recomputes portfolio weights for whatever watchlist results, repeated over 5 years. Compare results of your backtest to ours at [our backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html): +162.5% total and +13pp/yr over buy-and-hold.
 
 ## Operations
 
@@ -115,7 +115,7 @@ subject to ∑ᵢ wᵢ = 1 (weights sum to one) and 0 ≤ wᵢ ≤ concentration
 
 ## Headline result
 
-Over 4.6 years (Sept 2021 → Apr 2026) starting from a 2021-tech-savvy portfolio (AAPL, MSFT, GOOGL, SPY, AGG), the curator (20 quarterly LLM calls) lifted realized return to **+135.5%** vs. **+103.7%** for buy-and-hold of the day-0 starter, **+80.2%** for a fixed-watchlist same-cadence rebalance, and **+78.2%** for SPY. See the [curator backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html) and the full report in `data/backtest_curator_5y/report.md`. Reproduce locally with the on-demand backtest from the Runs section above.
+Over 5 years (Mar 2021 → Mar 2026) starting from a 2021-tech-savvy portfolio (AAPL, MSFT, GOOGL, SPY, AGG), the curator (21 quarterly LLM calls) lifted realized return to **+162.5%** vs. **+97.5%** for buy-and-hold of the day-0 starter and **+75.7%** for SPY. See the [curator backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html) and the full report in `data/backtest_curator_5y/report.md`. Reproduce locally with the on-demand backtest from the Runs section above.
 
 ## Notes
 
