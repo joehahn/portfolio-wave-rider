@@ -1149,6 +1149,7 @@ def curator_backtest(
     risk_aversion: float = 1.0,
     risk_free_rate: float = 0.04,
     benchmarks: list[str] | None = None,
+    lookback_years_override: float | None = None,
 ) -> dict[str, Any]:
     """Replay a curator-runs directory through the optimizer.
 
@@ -1189,7 +1190,8 @@ def curator_backtest(
     end_date = pd.Timestamp(starter["end_date"])
     cadence = starter.get("rebalance_period", "monthly")
     initial_usd = float(starter.get("initial_usd", 50000.0))
-    lookback_years = float(starter.get("lookback_years", 1.3))
+    lookback_years = float(lookback_years_override) if lookback_years_override is not None \
+        else float(starter.get("lookback_years", 1.3))
     max_size = int(starter.get("max_watchlist_size", 12))
 
     # Union of every ticker that could appear across the run, so the
