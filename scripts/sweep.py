@@ -24,8 +24,11 @@ import sys
 import tempfile
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
+
+RISK_FREE_RATE = 0.04  # matches portfolio.py default
 
 from src.portfolio import curator_backtest, _fetch_benchmark_curves
 
@@ -101,7 +104,10 @@ def main(argv: list[str] | None = None) -> int:
             final = float(s.iloc[-1])
             ret = (final / initial) - 1.0
             ann = (final / initial) ** (365.25 / (end - start).days) - 1.0
-            summary.append((v, final, ret, ann))
+            daily_ret = s.pct_change().dropna()
+            ann_vol = float(daily_ret.std() * np.sqrt(252))
+            sharpe = (ann - RISK_FREE_RATE) / ann_vol if ann_vol > 0 else float("nan")
+            summary.append((v, final, ret, ann, sharpe))
 
         fig = go.Figure()
         for i, (v, s) in enumerate(curves.items()):
@@ -129,8 +135,9 @@ def main(argv: list[str] | None = None) -> int:
         # Summary table.
         rows = "".join(
             f"<tr><td>{v}</td><td>${final:,.0f}</td>"
-            f"<td>{ret*100:+.1f}%</td><td>{ann*100:+.1f}%</td></tr>"
-            for v, final, ret, ann in summary
+            f"<td>{ret*100:+.1f}%</td><td>{ann*100:+.1f}%</td>"
+            f"<td>{sharpe:.2f}</td></tr>"
+            for v, final, ret, ann, sharpe in summary
         )
         table = (
             f"<h2>Summary</h2><table style='border-collapse:collapse;font-size:14px;'>"
@@ -138,8 +145,11 @@ def main(argv: list[str] | None = None) -> int:
             f"<th style='padding:4px 12px;'>{args.param}</th>"
             f"<th style='padding:4px 12px;'>Final value</th>"
             f"<th style='padding:4px 12px;'>Total return</th>"
-            f"<th style='padding:4px 12px;'>Annualized</th></tr></thead>"
+            f"<th style='padding:4px 12px;'>Annualized</th>"
+            f"<th style='padding:4px 12px;'>Sharpe</th></tr></thead>"
             f"<tbody>{rows}</tbody></table>"
+            f"<p style='font-size:13px;color:#666;'>Sharpe = (annualized return − "
+            f"{RISK_FREE_RATE * 100:.0f}% risk-free) / annualized daily-return σ × √252.</p>"
         )
 
         # Nav strip: links to the other two sweep pages so a reader can
