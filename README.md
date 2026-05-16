@@ -79,14 +79,6 @@ Run `/run-backtest` in Claude Code. This skill collects any missing historical n
 
 At each quarterly rebalance the curator reads news as of the rebalance date and proposes adds and removes to the watchlist; the optimizer then recomputes portfolio weights for whatever watchlist results, repeated over 5 years. Compare results of your backtest to ours at [our backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html): +162.5% total and +13pp/yr over buy-and-hold.
 
-## Operations
-
-- Daily: nothing. The cron job appends a row per ticker to `data/snapshots.csv` and refreshes the local copy of `docs/index.html`.
-- Whenever you want to publish the cron-refreshed dashboard: `git add docs/index.html && git commit -m "Refresh live dashboard" && git push`. GitHub Pages serves `docs/` from `main`, so the push goes live within a minute.
-- Monthly: run `/review-portfolio` in Claude Code. Read the report (especially **Profile conflicts** and **Watchlist changes**), decide on rebalances, execute trades in your brokerage, then update `holdings.csv`.
-- After trading: edit `holdings.csv` to reflect new share counts. The next snapshot picks up the new positions.
-- Anytime: open `docs/index.html` in a browser for the local view, or visit the public-demo URL.
-
 ## How `holdings.csv` shapes a run
 
 `holdings.csv` is the watchlist that the curator and the optimizer operate on.
