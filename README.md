@@ -79,12 +79,12 @@ Run `/run-backtest` in Claude Code. This skill collects any missing historical n
 
 At each quarterly rebalance the curator reads news as of the rebalance date and proposes adds and removes to the watchlist; the optimizer then recomputes portfolio weights for whatever watchlist results, repeated over 5 years. Compare results of your backtest to ours at [our backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html): +162.5% total and +13pp/yr over buy-and-hold.
 
-## How `holdings.csv` shapes a run
+## How `holdings.csv` shapes outcomes
 
 `holdings.csv` is the watchlist that the curator and the optimizer operate on.
 
 - **Optimizer eligibility.** The optimizer cannot assign weight to a ticker that isn't in the file.
-- **`shares = 0` is meaningful.** A row with zero shares puts the ticker on the watchlist (the optimizer can assign weight, the dashboard tracks its price) without representing an actual position.
+- **`shares = 0` is meaningful.** A row with zero shares puts the ticker on the watchlist, which allows the optimizer to assign nonzero weights and the dashboards to track that ticker's price without requiring you to own that position.
 - **Curator-driven adds and removes.** At each `/review-portfolio`, the curator can append new rows (always at `shares=0`) and delete rows for tickers it wants to drop. The validator blocks removes for tickers with `shares > 0` — you must liquidate the live position in your brokerage first and zero out the row, then a future `/review-portfolio` can complete the remove. The full audit trail of applied changes lives in `data/curation_history.csv`.
 - **Manual edits still work.** Append `<TICKER>,0` to add by hand; delete a row to remove by hand (subject to the same liquidate-first rule for live positions). Historical rows in `data/snapshots.csv` and `data/recommendations.csv` are not pruned (so old charts still render correctly), but no new rows accumulate for a removed ticker.
 
