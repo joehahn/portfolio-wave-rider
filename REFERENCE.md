@@ -127,6 +127,8 @@ portfolio-wave-rider/
 | `data/reports/YYYY-MM-DD-<skill>.md` | LLM-written narrative reports from `/initialize-portfolio` and `/review-portfolio`. | After each skill run |
 | `data/snapshot.log` | cron stdout/stderr. | If a scheduled run looks missing |
 
+Note: when a ticker is removed from `holdings.csv` (manually or via the curator), historical rows in `data/snapshots.csv` and `data/recommendations.csv` are not pruned, so old charts still render correctly. No new rows accumulate for the removed ticker going forward.
+
 The "Profile conflicts" section of any report is the most important thing to read. It tells you when the optimizer wanted something the profile forbids.
 
 ## How it's built
