@@ -79,6 +79,14 @@ Run `/run-backtest` in Claude Code. This skill collects any missing historical n
 
 At each quarterly rebalance the curator reads news as of the rebalance date and proposes adds and removes to the watchlist; the optimizer then recomputes portfolio weights for whatever watchlist results, repeated over 5 years. Compare results of your backtest to ours at [our backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html): +162.5% total and +13pp/yr over buy-and-hold.
 
+### 5. sweep optimizer parameters (anytime)
+
+```bash
+./scripts/run_sweeps.sh
+```
+
+Replays the same curator JSONs against a range of risk-aversion `λ`, price-history lookback, and concentration-cap values. Pure Python, no LLM calls, takes a few seconds. Writes three overlay pages: `docs/sweep_risk_aversion.html`, `docs/sweep_lookback.html`, `docs/sweep_max_weight.html`. Each holds the curator's watchlist decisions fixed and varies one knob, so the spread between curves isolates the optimizer's sensitivity to that knob without confounding it with news-driven composition changes.
+
 ## How `holdings.csv` shapes outcomes
 
 `holdings.csv` is the watchlist that the curator and the optimizer operate on.
