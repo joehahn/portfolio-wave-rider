@@ -107,7 +107,24 @@ subject to ∑ᵢ wᵢ = 1 (weights sum to one) and 0 ≤ wᵢ ≤ concentration
 
 ## Headline result
 
-Over 5 years (Mar 2021 → Mar 2026) starting from a 2021-tech-savvy portfolio (AAPL, MSFT, GOOGL, SPY, AGG), the curator (21 quarterly LLM calls) lifted realized return to **+162.5%** vs. **+97.5%** for buy-and-hold of the day-0 starter and **+75.7%** for SPY. See the [curator backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html) and the full report in `data/backtest_curator_5y/report.md`. Reproduce locally with the on-demand backtest from the Runs section above.
+**Setup:** 5y window (Mar 2021 → Mar 2026), starter watchlist `[AAPL, MSFT, GOOGL, SPY, AGG]`, 21 quarterly curator calls.
+
+**Total realized return over the 5 years:**
+
+| Strategy | Return |
+|---|---|
+| Curator-driven | **+162.5%** |
+| Buy-and-hold of day-0 starter | +97.5% |
+| SPY benchmark | +75.7% |
+
+**Curator's lift over buy-and-hold:**
+
+| Measure | Value |
+|---|---|
+| Absolute (curator − buy/hold) | +65pp |
+| Relative (curator − buy/hold) / (buy/hold) | +67% |
+
+See the [curator backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html) and the full report in `data/backtest_curator_5y/report.md`. Reproduce locally with the on-demand backtest from the Runs section above.
 
 ## Notes
 
