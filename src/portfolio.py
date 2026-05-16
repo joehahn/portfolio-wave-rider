@@ -2722,7 +2722,7 @@ def build_curator_dashboard(
         '</style></head><body>'
         '<h1>Curator-driven backtest</h1>'
         '<p style="color:#555;max-width:780px;">The watchlist-curator agent was called '
-        f'{len(periods) if periods else "N"} times over a {(end - start).days}-day window. '
+        f'{len(list(Path(runs_dir).glob("*-curation.json")))} times over a {(end - start).days}-day window. '
         'At each rebalance it proposed adds and removes against the active watchlist; '
         'the optimizer then ran vanilla mean-variance on whatever set resulted. The two '
         'baselines below isolate the contribution of the curation (vs fixed watchlist same '
