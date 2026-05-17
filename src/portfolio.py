@@ -1235,10 +1235,11 @@ def curator_backtest(
         f"---\nfinancial_model:\n  max_watchlist_size: {max_size}\n---\n"
     )
 
-    # Three parallel walk-forwards.
+    # Four parallel walk-forwards.
     cur_shares: dict[str, float] = {}
     fix_shares: dict[str, float] = {}
-    bnh_shares: dict[str, float] = {}
+    bnh_shares: dict[str, float] = {}      # optimizer day-0 weights held forever (ablation)
+    eq_shares: dict[str, float] = {}       # equal-weight starter held forever (headline)
     snap_rows: list[dict[str, Any]] = []
     rec_rows: list[dict[str, Any]] = []
     baseline_rows: list[dict[str, Any]] = []
@@ -1354,6 +1355,17 @@ def curator_backtest(
                     t: (fix_opt["weights"][t] * bnh_value) / float(full_prices.loc[date, t])
                     for t in fix_watch
                 }
+            # 6) Equal-weight buy-and-hold baseline: $initial_usd / N to
+            #    each starter ticker on day 0, then hold forever. This is
+            #    the headline comparator a typical 2021 retail investor
+            #    might actually have built without an optimizer's
+            #    concentration tilt.
+            if not eq_shares:
+                w_eq = 1.0 / len(fix_watch)
+                eq_shares = {
+                    t: (w_eq * initial_usd) / float(full_prices.loc[date, t])
+                    for t in fix_watch
+                }
 
             last_period = period
 
@@ -1371,11 +1383,12 @@ def curator_backtest(
                     "total_value": round(day_total, 2),
                 })
         # Daily baseline totals (single row per date).
-        if fix_shares or bnh_shares:
+        if fix_shares or bnh_shares or eq_shares:
             baseline_rows.append({
                 "date": str(date.date()),
                 "fixed_total": round(_value(fix_shares, date), 2) if fix_shares else None,
                 "bnh_total": round(_value(bnh_shares, date), 2) if bnh_shares else None,
+                "eq_total": round(_value(eq_shares, date), 2) if eq_shares else None,
             })
 
     if not snap_rows:
@@ -1403,8 +1416,11 @@ def curator_backtest(
     fix_initial = baselines_df["fixed_total"].dropna().iloc[0] if "fixed_total" in baselines_df else None
     fix_final = baselines_df["fixed_total"].dropna().iloc[-1] if "fixed_total" in baselines_df else None
     fix_return = (fix_final / fix_initial - 1.0) if fix_initial else None
-    bnh_initial = baselines_df["bnh_total"].dropna().iloc[0] if "bnh_total" in baselines_df else None
-    bnh_final = baselines_df["bnh_total"].dropna().iloc[-1] if "bnh_total" in baselines_df else None
+    # Headline buy-and-hold = equal-weight starter held forever (eq_total).
+    # bnh_total (optimizer day-0 weights held forever) remains in the CSV
+    # as a hidden ablation.
+    bnh_initial = baselines_df["eq_total"].dropna().iloc[0] if "eq_total" in baselines_df else None
+    bnh_final = baselines_df["eq_total"].dropna().iloc[-1] if "eq_total" in baselines_df else None
     bnh_return = (bnh_final / bnh_initial - 1.0) if bnh_initial else None
 
     if benchmarks is None:
@@ -1453,7 +1469,7 @@ def curator_backtest(
         f"| Strategy | Ending value | Total return | Active vs curator |\n"
         f"|---|---|---|---|\n"
         f"| Curator-driven | ${final_v:,.2f} | {realized_return * 100:+.2f}% | — |\n"
-        f"| Buy-and-hold starter (day-0 optimize, then hold) | "
+        f"| Buy-and-hold starter (equal-weight, then hold) | "
         f"${bnh_final:,.2f} | {bnh_str} | {bnh_active} |\n\n"
         f"## Risk and benchmarks\n\n"
         f"| Metric | Value |\n|---|---|\n"
@@ -2530,8 +2546,11 @@ def build_curator_dashboard(
     fix_initial = float(baselines["fixed_total"].dropna().iloc[0]) if "fixed_total" in baselines else initial
     fix_final = float(baselines["fixed_total"].dropna().iloc[-1]) if "fixed_total" in baselines else initial
     fix_return = (fix_final / fix_initial) - 1.0
-    bnh_initial = float(baselines["bnh_total"].dropna().iloc[0]) if "bnh_total" in baselines else initial
-    bnh_final = float(baselines["bnh_total"].dropna().iloc[-1]) if "bnh_total" in baselines else initial
+    # Headline buy-and-hold curve = equal-weight starter held forever
+    # (eq_total). bnh_total is the optimizer-day-0-weights ablation kept
+    # only in the CSV for researchers.
+    bnh_initial = float(baselines["eq_total"].dropna().iloc[0]) if "eq_total" in baselines else initial
+    bnh_final = float(baselines["eq_total"].dropna().iloc[-1]) if "eq_total" in baselines else initial
     bnh_return = (bnh_final / bnh_initial) - 1.0
 
     fig = make_subplots(
@@ -2559,10 +2578,11 @@ def build_curator_dashboard(
                    mode="lines", line={"color": "#d97706", "width": 2.5}),
         row=1, col=1,
     )
-    if "bnh_total" in baselines.columns:
-        bnh = baselines.dropna(subset=["bnh_total"])
+    if "eq_total" in baselines.columns:
+        eq = baselines.dropna(subset=["eq_total"])
         fig.add_trace(
-            go.Scatter(x=bnh["date"], y=bnh["bnh_total"], name="Buy-and-hold starter",
+            go.Scatter(x=eq["date"], y=eq["eq_total"],
+                       name="Buy-and-hold (20% each)",
                        mode="lines", line={"color": "#3b82f6", "width": 1.8}),
             row=1, col=1,
         )
@@ -2849,11 +2869,9 @@ def build_curator_dashboard(
         'the value of the initial portfolio (which never gets rebalanced or '
         'optimized) over time. The starter watchlist is <code>[AAPL, MSFT, GOOGL, '
         'SPY, AGG]</code>, a plausible portfolio for a tech-aware US investor in '
-        'early 2021. At the profile\'s current defaults '
-        '(<code>λ=0.5, max_weight=0.5, lookback=3y</code>) the optimizer\'s '
-        'day-0 weights on this watchlist come out to 50% AAPL, 50% MSFT, and 0% '
-        'each on GOOGL, SPY, and AGG; the buy-and-hold curve is that 50/50 '
-        'AAPL/MSFT split held forever.</p>'
+        'early 2021. The buy-and-hold baseline is the equal-weight allocation '
+        '(20% in each of the five tickers) bought on day 0 and held without '
+        'rebalancing through the end of the window.</p>'
         + chart_html
         + log_html
         + '</body></html>'
