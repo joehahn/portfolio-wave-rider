@@ -182,11 +182,11 @@ Headline experiment that justified the watchlist-curator design (over the previo
 
 | Strategy | Final ($50K start) | Return | Active vs SPY |
 |---|---|---|---|
-| **Curator-driven** | **$302,238** | **+504.48%** | **+428.8pp** |
+| **Curator-driven** | **$349,726** | **+599.45%** | **+523.8pp** |
 | Buy-and-hold starter (day-0 optimize then hold) | $94,236 | +88.47% | +12.8pp |
 | SPY benchmark (rebased) | $87,845 | +75.69% | — |
 
-Optimizer settings: `λ=0.5`, `lookback=2y`, `max_weight=0.50` (all from `investor_profile.md` defaults). The curator beat buy-and-hold by **+416pp** (≈30pp annualized), and is a 4.7× wealth multiple vs the buy-and-hold. Annualized return 43.3%, max drawdown −42.5%. The headline is sensitive to `max_weight` — the cap lets the optimizer concentrate heavily into a single winner (here NVDA), which is the Markowitz blow-up working in our favor over this specific window.
+Optimizer settings: `λ=0.5`, `lookback=3y`, `max_weight=0.50` (all from `investor_profile.md` defaults). The curator beat buy-and-hold by **+511pp** (≈34pp annualized), a 6.7× wealth multiple vs the buy-and-hold. Annualized return 47.5%, max drawdown −49.5%. The headline is sensitive to `max_weight` and `lookback` — both let the optimizer concentrate heavily into a single winner (here NVDA), which is the Markowitz blow-up working in our favor over this specific window.
 
 To reproduce: `python -m src.cli backtest --curator-runs-dir data/curator_runs/5y-quarterly --out-dir data/backtest_curator_5y --max-weight 0.25 --risk-aversion 1.0`. Replays the saved JSONs through the optimizer in a few seconds. Re-running the curator agents from scratch costs another ~$3.
 
