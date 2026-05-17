@@ -1617,6 +1617,21 @@ WAVE_DISPLAY_LABEL: dict[str, str] = {
 }
 
 
+def _ticker_label(t: str) -> str:
+    """Two-line tick label: ticker on top, wave bucket (equities) or
+    asset class (non-equities) on the line below.
+    Equities: 'TICKER<br><sub>wave</sub>'; equity ETFs: '... wave ETF';
+    non-equities: 'TICKER<br><sub>asset class</sub>'."""
+    cls = TICKER_ASSET_CLASS.get(t, "equity")
+    if cls == "equity":
+        wave = WAVE_DISPLAY_LABEL.get(TICKER_WAVE.get(t, "general_markets"), "")
+        return f"{t}<br><sub>{wave}</sub>"
+    if cls == "equity ETF":
+        wave = WAVE_DISPLAY_LABEL.get(TICKER_WAVE.get(t, "general_markets"), "")
+        return f"{t}<br><sub>{wave} ETF</sub>"
+    return f"{t}<br><sub>{cls}</sub>"
+
+
 
 
 
@@ -1981,19 +1996,9 @@ def build_dashboard(
         latest_date = recs["date"].max()
         latest_weights = recs[recs["date"] == latest_date].sort_values("weight", ascending=False)
 
-    # Label helper used by chart 3 (Latest recommended portfolio %) and
-    # chart 4 (Cumulative $ gain per holding). Equities get "TICKER /
-    # wave"; equity ETFs get "TICKER / wave ETF"; non-equities get
-    # "TICKER / asset class".
-    def _ticker_label(t: str) -> str:
-        cls = TICKER_ASSET_CLASS.get(t, "equity")
-        if cls == "equity":
-            wave = WAVE_DISPLAY_LABEL.get(TICKER_WAVE.get(t, "general_markets"), "")
-            return f"{t}<br><sub>{wave}</sub>"
-        if cls == "equity ETF":
-            wave = WAVE_DISPLAY_LABEL.get(TICKER_WAVE.get(t, "general_markets"), "")
-            return f"{t}<br><sub>{wave} ETF</sub>"
-        return f"{t}<br><sub>{cls}</sub>"
+    # _ticker_label is defined at module scope and reused by chart 3 of
+    # the live dashboard, chart 4 (gain bars), and the curator backtest's
+    # gain-per-holding chart.
 
     # 3. Latest recommended weights (bar chart). The x-axis tick text
     # shows ticker plus a small asset-class label so a reader can scan
@@ -2643,6 +2648,13 @@ def build_curator_dashboard(
                hovertemplate="%{x}<br>$%{y:,.0f}<extra></extra>"),
         row=3, col=1,
     )
+    fig.update_xaxes(
+        tickmode="array",
+        tickvals=_gain_tickers,
+        ticktext=[_ticker_label(t) for t in _gain_tickers],
+        tickangle=0,
+        row=3, col=1,
+    )
     fig.update_yaxes(title_text="$ gain", tickformat="$,.0f",
                      zeroline=True, zerolinewidth=1, zerolinecolor="#888",
                      row=3, col=1)
@@ -2747,9 +2759,9 @@ def build_curator_dashboard(
                 f"<span style='font-size:14px;color:#555;'>"
                 f"Curator-driven: {cur_return * 100:+.0f}%  "
                 f"·  Buy/hold: {bnh_return * 100:+.0f}%  "
-                f"·  Curator vs buy/hold: {(cur_return - bnh_return) * 100:+.0f}%  "
+                f"·  Curator - buy/hold: {(cur_return - bnh_return) * 100:+.0f}%  "
                 f"·  (curator - buy/hold)/(buy/hold): "
-                f"{(cur_return - bnh_return) / bnh_return * 100:+.0f}%"
+                f"{(cur_return - bnh_return) / bnh_return:.2f}"
                 f"</span>"
             ),
             "x": 0.5, "xanchor": "center",
