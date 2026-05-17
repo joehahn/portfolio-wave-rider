@@ -35,7 +35,7 @@ from src.portfolio import curator_backtest, _fetch_benchmark_curves, _nav_strip
 DEFAULTS = {
     "risk_aversion": [0.0, 0.33, 0.5, 0.67, 1.0, 2.0, 3.0, 10.0],
     "lookback":      [0.5, 1.0, 1.5, 2.0, 3.0, 5.0],
-    "max_weight":    [0.10, 0.25, 0.50, 0.75, 1.00],
+    "max_weight":    [0.10, 0.25, 0.33, 0.50, 0.75, 1.00],
 }
 
 PALETTE = [

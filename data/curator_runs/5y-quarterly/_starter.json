@@ -31,7 +31,7 @@
   ],
   "rebalance_period": "quarterly",
   "initial_usd": 50000.0,
-  "lookback_years": 2.0,
+  "lookback_years": 3.0,
   "max_watchlist_size": 12,
   "start_date": "2021-03-31",
   "end_date": "2026-03-31"
