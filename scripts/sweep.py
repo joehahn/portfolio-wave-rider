@@ -33,7 +33,7 @@ RISK_FREE_RATE = 0.04  # matches portfolio.py default
 from src.portfolio import curator_backtest, _fetch_benchmark_curves, _nav_strip
 
 DEFAULTS = {
-    "risk_aversion": [0.0, 0.1, 0.5, 1.0, 3.0, 10.0],
+    "risk_aversion": [0.0, 0.33, 0.5, 0.67, 1.0, 2.0, 3.0, 10.0],
     "lookback":      [0.5, 1.0, 1.3, 2.0, 3.0, 5.0],
     "max_weight":    [0.10, 0.25, 0.50, 0.75, 1.00],
 }
@@ -133,12 +133,27 @@ def main(argv: list[str] | None = None) -> int:
         )
 
         # Summary table.
-        rows = "".join(
-            f"<tr><td>{v}</td><td>${final:,.0f}</td>"
-            f"<td>{ret*100:+.1f}%</td><td>{ann*100:+.1f}%</td>"
-            f"<td>{sharpe:.2f}</td></tr>"
-            for v, final, ret, ann, sharpe in summary
-        )
+        # Identify the current investor_profile.md default value for this
+        # param so the corresponding table row can be rendered in bold.
+        if args.param == "risk_aversion":
+            default_v = args.base_risk_aversion
+        elif args.param == "max_weight":
+            default_v = args.base_max_weight
+        else:  # lookback — read the live default from _starter.json
+            import json as _json
+            _starter = _json.loads((Path(args.runs_dir) / "_starter.json").read_text())
+            default_v = float(_starter.get("lookback_years", 1.3))
+
+        def _fmt_row(v, final, ret, ann, sharpe):
+            tr = "<tr style='font-weight:bold;'>" if abs(v - default_v) < 1e-9 else "<tr>"
+            return (
+                f"{tr}<td>{v}</td><td>${final:,.0f}</td>"
+                f"<td>{ret*100:+.1f}%</td><td>{ann*100:+.1f}%</td>"
+                f"<td>{sharpe:.2f}</td></tr>"
+            )
+
+        rows = "".join(_fmt_row(v, final, ret, ann, sharpe)
+                       for v, final, ret, ann, sharpe in summary)
         table = (
             f"<h2>Summary</h2><table style='border-collapse:collapse;font-size:14px;'>"
             f"<thead><tr style='border-bottom:2px solid #ccc;text-align:left;'>"
