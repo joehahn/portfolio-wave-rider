@@ -89,7 +89,7 @@ Replays the same curator JSONs against a range of values for three optimizer kno
 
 Three overlay pages are written and published to GitHub Pages:
 
-- **[Risk aversion `λ`](https://joehahn.github.io/portfolio-wave-rider/sweep_risk_aversion.html)** — values `[0, 0.1, 0.5, 1, 3, 10]`. Trades expected return against variance; default `λ = 0.5` tilts toward return.
+- **[Risk aversion `λ`](https://joehahn.github.io/portfolio-wave-rider/sweep_risk_aversion.html)** — values `[0, 0.33, 0.5, 0.67, 1, 3, 10]`. Trades expected return against variance; default `λ = 0.5` tilts toward return.
 - **[Price-history lookback](https://joehahn.github.io/portfolio-wave-rider/sweep_lookback.html)** — values `[0.5, 1, 1.3, 2, 3, 5]` years. Length of the window used to estimate `μ` and `Σ`. Default 2y.
 - **[Concentration cap](https://joehahn.github.io/portfolio-wave-rider/sweep_max_weight.html)** — values `[0.10, 0.25, 0.50, 0.75, 1.00]`. Maximum weight any single ticker can carry. Default 0.50.
 
