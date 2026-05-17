@@ -1621,6 +1621,35 @@ WAVE_DISPLAY_LABEL: dict[str, str] = {
 
 
 
+# Pages and the labels they expose in the cross-page nav strip. Keys are
+# the bare filenames (no path) of the published GitHub Pages files.
+_NAV_PAGES: list[tuple[str, str]] = [
+    ("index.html", "live dashboard"),
+    ("backtest_curator.html", "5y backtest"),
+    ("sweep_risk_aversion.html", "sweep: risk_aversion"),
+    ("sweep_lookback.html", "sweep: lookback"),
+    ("sweep_max_weight.html", "sweep: max_weight"),
+]
+
+
+def _nav_strip(current: str) -> str:
+    """Return an HTML <nav> with links to all published pages.
+    The entry whose filename matches ``current`` is rendered as bold text
+    instead of a link, so a reader can see which page they're on."""
+    parts = []
+    for fname, label in _NAV_PAGES:
+        if fname == current:
+            parts.append(f"<strong>{label}</strong>")
+        else:
+            parts.append(f'<a href="{fname}">{label}</a>')
+    return (
+        '<nav style="font-size:14px;color:#555;margin:0 0 1em 0;'
+        'padding-bottom:0.5em;border-bottom:1px solid #eee;">'
+        + " · ".join(parts) +
+        '</nav>'
+    )
+
+
 def _fetch_benchmark_curves(
     benchmarks: list[str],
     start: pd.Timestamp | str,
@@ -2352,7 +2381,18 @@ def build_dashboard(
 
     o_path = Path(out_path)
     o_path.parent.mkdir(parents=True, exist_ok=True)
-    fig.write_html(str(o_path), include_plotlyjs="cdn")
+    chart_html = fig.to_html(full_html=False, include_plotlyjs="cdn")
+    page = (
+        '<!doctype html><html><head><meta charset="utf-8">'
+        '<title>Portfolio Wave Rider — live dashboard</title>'
+        '<style>body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;'
+        'max-width:1280px;margin:0 auto;padding:1em 1.5em;color:#222;}</style>'
+        '</head><body>'
+        + _nav_strip("index.html")
+        + chart_html +
+        '</body></html>'
+    )
+    o_path.write_text(page, encoding="utf-8")
 
     return {
         "out_path": str(o_path),
@@ -2760,6 +2800,7 @@ def build_curator_dashboard(
         'table{margin-top:0.5em;}'
         'th,td{border-bottom:1px solid #eee;}'
         '</style></head><body>'
+        + _nav_strip("backtest_curator.html") +
         f'<h1>Curator-driven backtest '
         f'<span style="font-size:0.55em;color:#666;font-weight:400;">'
         f'— {start.date()} to {end.date()}</span></h1>'

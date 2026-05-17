@@ -30,12 +30,12 @@ import plotly.graph_objects as go
 
 RISK_FREE_RATE = 0.04  # matches portfolio.py default
 
-from src.portfolio import curator_backtest, _fetch_benchmark_curves
+from src.portfolio import curator_backtest, _fetch_benchmark_curves, _nav_strip
 
 DEFAULTS = {
-    "risk_aversion": [0.0, 0.33, 1.0, 3.3, 10.0, 33.0],
-    "lookback":      [0.5, 1.0, 1.3, 2.0, 3.0],
-    "max_weight":    [0.10, 0.15, 0.25, 0.40, 1.00],
+    "risk_aversion": [0.0, 0.1, 0.5, 1.0, 3.0, 10.0],
+    "lookback":      [0.5, 1.0, 1.3, 2.0, 3.0, 5.0],
+    "max_weight":    [0.10, 0.25, 0.50, 0.75, 1.00],
 }
 
 PALETTE = [
@@ -79,8 +79,8 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--out", default=None,
                    help="output HTML path (default: docs/sweep_<param>.html)")
     p.add_argument("--benchmarks", nargs="*", default=["SPY"])
-    p.add_argument("--base-max-weight", type=float, default=0.25)
-    p.add_argument("--base-risk-aversion", type=float, default=1.0)
+    p.add_argument("--base-max-weight", type=float, default=0.50)
+    p.add_argument("--base-risk-aversion", type=float, default=0.5)
     args = p.parse_args(argv)
 
     values = ([float(v) for v in args.values.split(",")]
@@ -152,23 +152,7 @@ def main(argv: list[str] | None = None) -> int:
             f"{RISK_FREE_RATE * 100:.0f}% risk-free) / annualized daily-return σ × √252.</p>"
         )
 
-        # Nav strip: links to the other two sweep pages so a reader can
-        # jump between them without going back to the README.
-        all_params = list(DEFAULTS.keys())
-        nav_parts = []
-        for p_other in all_params:
-            if p_other == args.param:
-                nav_parts.append(f'<strong>{p_other}</strong>')
-            else:
-                nav_parts.append(f'<a href="sweep_{p_other}.html">{p_other}</a>')
-        nav = (
-            '<nav style="font-size:14px;color:#555;margin-bottom:0.5em;'
-            'padding-bottom:0.5em;border-bottom:1px solid #eee;">'
-            '<a href="index.html">live dashboard</a> · '
-            '<a href="backtest_curator.html">5y backtest</a> · '
-            'sweeps: ' + ' · '.join(nav_parts) +
-            '</nav>'
-        )
+        nav = _nav_strip(f"sweep_{args.param}.html")
 
         page = (
             '<!doctype html><html><head><meta charset="utf-8">'
