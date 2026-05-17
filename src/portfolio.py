@@ -2849,10 +2849,11 @@ def build_curator_dashboard(
         'the value of the initial portfolio (which never gets rebalanced or '
         'optimized) over time. The starter watchlist is <code>[AAPL, MSFT, GOOGL, '
         'SPY, AGG]</code>, a plausible portfolio for a tech-aware US investor in '
-        'early 2021: three AI-adjacent mega-caps, a broad-market index ETF, and '
-        'an aggregate bond ETF. The buy-and-hold curve is the mean-variance '
-        'optimizer\'s day-0 weights across these five tickers held forever, not '
-        'a thesis-driven allocation.</p>'
+        'early 2021. At the profile\'s current defaults '
+        '(<code>λ=0.5, max_weight=0.5, lookback=3y</code>) the optimizer\'s '
+        'day-0 weights on this watchlist come out to 50% AAPL, 50% MSFT, and 0% '
+        'each on GOOGL, SPY, and AGG; the buy-and-hold curve is that 50/50 '
+        'AAPL/MSFT split held forever.</p>'
         + chart_html
         + log_html
         + '</body></html>'
