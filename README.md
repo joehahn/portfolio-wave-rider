@@ -126,6 +126,8 @@ This is the standard Markowitz mean-variance formulation (Markowitz 1952, *Portf
 
 **Setup:** 5y window (Mar 2021 → Mar 2026), starter watchlist `[AAPL, MSFT, GOOGL, SPY, AGG]`, 21 quarterly curator calls.
 
+The starter is a plausible portfolio for a tech-aware US investor in early 2021: three AI-adjacent mega-caps, a broad-market index ETF, and an aggregate bond ETF. The buy-and-hold baseline below is the mean-variance optimizer's day-0 weights across these five tickers held forever, **not** the thesis-driven "beliefs in dollar form" allocation that `/initialize-portfolio` produces in the live workflow.
+
 **Total realized return over the 5 years:**
 
 | Strategy | Return | Annualized |
