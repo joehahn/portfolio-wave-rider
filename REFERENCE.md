@@ -183,10 +183,12 @@ Headline experiment that justified the watchlist-curator design (over the previo
 | Strategy | Final ($50K start) | Return | Active vs SPY |
 |---|---|---|---|
 | **Curator-driven** | **$349,726** | **+599.45%** | **+523.8pp** |
-| Buy-and-hold starter (day-0 optimize then hold) | $94,236 | +88.47% | +12.8pp |
+| Buy-and-hold starter (equal-weight, then hold) | $93,524 | +87.05% | +11.4pp |
 | SPY benchmark (rebased) | $87,845 | +75.69% | — |
 
-Optimizer settings: `λ=0.5`, `lookback=3y`, `max_weight=0.50` (all from `investor_profile.md` defaults). The curator beat buy-and-hold by **+511pp** (≈34pp annualized), a 6.7× wealth multiple vs the buy-and-hold. Annualized return 47.5%, max drawdown −49.5%. The headline is sensitive to `max_weight` and `lookback` — both let the optimizer concentrate heavily into a single winner (here NVDA), which is the Markowitz blow-up working in our favor over this specific window.
+Optimizer settings: `λ=0.5`, `lookback=3y`, `max_weight=0.50` (all from `investor_profile.md` defaults). The buy-and-hold baseline is an equal-weight allocation (20% in each of AAPL/MSFT/GOOGL/SPY/AGG) bought on day 0 and held without rebalancing. The curator beat that equal-weight baseline by **+512pp** (≈34pp annualized), a 7.0× wealth multiple. Annualized return 47.5%, max drawdown −49.5%. The headline is sensitive to `max_weight` and `lookback` — both let the optimizer concentrate heavily into a single winner (here NVDA), which is the Markowitz blow-up working in our favor over this specific window.
+
+`baselines_totals.csv` also includes a `bnh_total` column for an ablation baseline (the mean-variance optimizer's day-0 weights on the same 5 tickers, held forever). At the current defaults this comes out to 50% AAPL / 50% MSFT / 0% on the rest (Markowitz concentration at low λ + wide cap) and isn't representative of a real 2021 retail allocation; it's kept for researchers who want to compare against the math-only static comparator.
 
 To reproduce: `python -m src.cli backtest --curator-runs-dir data/curator_runs/5y-quarterly --out-dir data/backtest_curator_5y --max-weight 0.25 --risk-aversion 1.0`. Replays the saved JSONs through the optimizer in a few seconds. Re-running the curator agents from scratch costs another ~$3.
 

@@ -126,14 +126,14 @@ This is the standard Markowitz mean-variance formulation (Markowitz 1952, *Portf
 
 **Setup:** 5y window (Mar 2021 → Mar 2026), starter watchlist `[AAPL, MSFT, GOOGL, SPY, AGG]`, 21 quarterly curator calls.
 
-The starter is a plausible portfolio for a tech-aware US investor in early 2021. At the profile's current defaults (`λ=0.5, max_weight=0.5, lookback=3y`) the optimizer's day-0 weights on this watchlist come out to **50% AAPL, 50% MSFT, and 0% each on GOOGL, SPY, and AGG** — a 50/50 AAPL/MSFT bet held forever. (This is **not** the thesis-driven "beliefs in dollar form" allocation that `/initialize-portfolio` produces in the live workflow.)
+The buy-and-hold baseline is the **equal-weight allocation** (20% in each of the five tickers) bought on day 0 and held without rebalancing through the end of the window. The starter is a plausible 2021 tech-aware investor's portfolio; equal-weight is the simplest "no-judgment-call" weighting — what someone with no optimizer would have built. (This is **not** the thesis-driven "beliefs in dollar form" allocation that `/initialize-portfolio` produces in the live workflow.)
 
 **Total realized return over the 5 years:**
 
 | Strategy | Return | Annualized |
 |---|---|---|
 | Curator-driven | **+599.5%** | **+47.5%** |
-| Buy-and-hold of day-0 starter | +88.5% | +13.6% |
+| Buy-and-hold (equal-weight starter) | +87.0% | +13.3% |
 | SPY benchmark | +75.7% | +11.9% |
 
 Curator max drawdown over the window: **−49.5%**.
@@ -142,9 +142,9 @@ Curator max drawdown over the window: **−49.5%**.
 
 | Measure | Value |
 |---|---|
-| Absolute (curator − buy/hold), total | +511pp |
-| Absolute, annualized | +33.9pp/yr |
-| Relative (curator − buy/hold) / (buy/hold) | +578% |
+| Absolute (curator − buy/hold), total | +512pp |
+| Absolute, annualized | +34pp/yr |
+| Relative (curator − buy/hold) / (buy/hold) | 5.89 |
 
 See the [curator backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html) and the full report in `data/backtest_curator_5y/report.md`. Reproduce locally with the on-demand backtest from the Runs section above.
 

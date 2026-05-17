@@ -15,7 +15,7 @@ The LLM's job is **watchlist curation**, not numeric tilts on expected returns. 
 
 A previously-attempted design tilted μ by per-wave "cycle stage" multipliers (buildup 1.20, surge 1.10, peak 0.80, etc.). That subtracted 2–5% of final value across 1y, corner-pick 5y, and fair-start 5y backtests — postmortem in FINDINGS.md on the `5y-backtest` branch. The current design replaces it; the wave-tilt code was stripped from main.
 
-The current 5y backtest (Mar 2021 → Mar 2026, starter watchlist of AAPL/MSFT/GOOGL/SPY/AGG, 21 quarterly curator calls, profile defaults `λ=0.5 / lookback=3y / max_weight=0.5`) lifts realized return to **+599.5%** vs **+88.5%** buy-and-hold and **+75.7%** SPY, with a −49.5% max drawdown. Rendered at [docs/backtest_curator.html](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html). The full setup and reproducibility notes live in `REFERENCE.md` and `data/backtest_curator_5y/report.md`.
+The current 5y backtest (Mar 2021 → Mar 2026, starter watchlist of AAPL/MSFT/GOOGL/SPY/AGG, 21 quarterly curator calls, profile defaults `λ=0.5 / lookback=3y / max_weight=0.5`) lifts realized return to **+599.5%** vs **+87.0%** for an equal-weight buy-and-hold of the starter and **+75.7%** SPY, with a −49.5% max drawdown. Rendered at [docs/backtest_curator.html](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html). The full setup and reproducibility notes live in `REFERENCE.md` and `data/backtest_curator_5y/report.md`.
 
 ## Ground rules
 
