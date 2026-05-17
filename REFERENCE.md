@@ -182,11 +182,11 @@ Headline experiment that justified the watchlist-curator design (over the previo
 
 | Strategy | Final ($50K start) | Return | Active vs SPY |
 |---|---|---|---|
-| **Curator-driven** | **$131,255** | **+162.51%** | **+86.8pp** |
-| Buy-and-hold starter (day-0 optimize then hold) | $98,729 | +97.46% | +21.8pp |
+| **Curator-driven** | **$302,238** | **+504.48%** | **+428.8pp** |
+| Buy-and-hold starter (day-0 optimize then hold) | $94,236 | +88.47% | +12.8pp |
 | SPY benchmark (rebased) | $87,845 | +75.69% | — |
 
-The curator beat buy-and-hold by **+65pp** (≈13pp annualized) — that gap is the active contribution of the LLM curator over 5 years. Annualized return 21.3%, max drawdown −40.8% during the 2022 bear market.
+Optimizer settings: `λ=0.5`, `lookback=2y`, `max_weight=0.50` (all from `investor_profile.md` defaults). The curator beat buy-and-hold by **+416pp** (≈30pp annualized), and is a 4.7× wealth multiple vs the buy-and-hold. Annualized return 43.3%, max drawdown −42.5%. The headline is sensitive to `max_weight` — the cap lets the optimizer concentrate heavily into a single winner (here NVDA), which is the Markowitz blow-up working in our favor over this specific window.
 
 To reproduce: `python -m src.cli backtest --curator-runs-dir data/curator_runs/5y-quarterly --out-dir data/backtest_curator_5y --max-weight 0.25 --risk-aversion 1.0`. Replays the saved JSONs through the optimizer in a few seconds. Re-running the curator agents from scratch costs another ~$3.
 

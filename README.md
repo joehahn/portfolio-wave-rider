@@ -7,7 +7,7 @@
 
 This Claude Code demo uses AI to manage and optimize a long-horizon investment portfolio. You declare your goals, constraints, and an investment thesis (namely what you think will drive future returns), then initialize a starter watchlist of tickers you already want exposure to. At each periodic rebalance the curator agent reads recent news against your thesis and proposes adds and removes against the current watchlist; the mean-variance optimizer then recommends portfolio weights for whatever watchlist results. The result accumulates into a static Plotly dashboard so you can watch the watchlist composition, the recommended weights, and the realized portfolio value evolve over time.
 
-**Who this helps.** An investor who has a thesis about where markets are going but not enough time to track news ticker by ticker. This demo helps such an investor pivot from a less-optimal static buy-and-hold portfolio to one that's lightly managed by AI. In the 5-year backtest detailed below, the AI-managed portfolio lifted realized return by about **13 percentage points per year** over a buy-and-hold of the starter watchlist (~65pp total), and by about 17pp/year over SPY. Past performance is not predictive; the curator's job is to compound a thesis you already hold, not to replace one you don't have.
+**Who this helps.** An investor who has a thesis about where markets are going but not enough time to track news ticker by ticker. This demo helps such an investor pivot from a less-optimal static buy-and-hold portfolio to one that's lightly managed by AI. In the 5-year backtest detailed below, the AI-managed portfolio lifted realized return by about **30 percentage points per year annualized** over a buy-and-hold of the starter watchlist (+416pp total over 5y, or a 4.7× wealth multiple vs the buy-and-hold). Past performance is not predictive; the curator's job is to compound a thesis you already hold, not to replace one you don't have.
 
 Two dashboards are served from GitHub Pages:
 
@@ -77,7 +77,7 @@ Note that recommendations do not execute trades — they only append optimizer o
 
 Run `/run-backtest` in Claude Code. This skill collects any missing historical news, evolves the watchlist quarter-by-quarter against your wave thesis, optimizes the portfolio at each rebalance, measures the resulting lift relative to a buy-and-hold investment strategy, and regenerates the backtest dashboard at `docs/backtest_curator.html` (open it locally in a browser to see your run).
 
-At each quarterly rebalance the curator reads news as of the rebalance date and proposes adds and removes to the watchlist; the optimizer then recomputes portfolio weights for whatever watchlist results, repeated over 5 years. Compare results of your backtest to ours at [our backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html): +162.5% total and +13pp/yr over buy-and-hold.
+At each quarterly rebalance the curator reads news as of the rebalance date and proposes adds and removes to the watchlist; the optimizer then recomputes portfolio weights for whatever watchlist results, repeated over 5 years. Compare results of your backtest to ours at [our backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html): +504.5% total and about +30pp/yr annualized over buy-and-hold.
 
 ### 5. sweep optimizer parameters (anytime)
 
@@ -89,9 +89,9 @@ Replays the same curator JSONs against a range of values for three optimizer kno
 
 Three overlay pages are written and published to GitHub Pages:
 
-- **[Risk aversion `λ`](https://joehahn.github.io/portfolio-wave-rider/sweep_risk_aversion.html)** — values `[0, 0.33, 1, 3.3, 10, 33]`. Trades expected return against variance; default `λ = 1` is the middle of the tradeoff.
-- **[Price-history lookback](https://joehahn.github.io/portfolio-wave-rider/sweep_lookback.html)** — values `[0.5, 1, 1.3, 2, 3]` years. Length of the window used to estimate `μ` and `Σ`.
-- **[Concentration cap](https://joehahn.github.io/portfolio-wave-rider/sweep_max_weight.html)** — values `[0.10, 0.15, 0.25, 0.40, 1.00]`. Maximum weight any single ticker can carry.
+- **[Risk aversion `λ`](https://joehahn.github.io/portfolio-wave-rider/sweep_risk_aversion.html)** — values `[0, 0.1, 0.5, 1, 3, 10]`. Trades expected return against variance; default `λ = 0.5` tilts toward return.
+- **[Price-history lookback](https://joehahn.github.io/portfolio-wave-rider/sweep_lookback.html)** — values `[0.5, 1, 1.3, 2, 3, 5]` years. Length of the window used to estimate `μ` and `Σ`. Default 2y.
+- **[Concentration cap](https://joehahn.github.io/portfolio-wave-rider/sweep_max_weight.html)** — values `[0.10, 0.25, 0.50, 0.75, 1.00]`. Maximum weight any single ticker can carry. Default 0.50.
 
 Each sweep page has a nav strip at the top for jumping between sweeps.
 
@@ -112,10 +112,10 @@ The optimizer used here selects a portfolio that maximizes the mean-variance obj
 μᵀw − λ·wᵀΣw
 ```
 
-subject to ∑ᵢ wᵢ = 1 (weights sum to one) and 0 ≤ wᵢ ≤ concentration_cap. The first term `μᵀw` is the portfolio's expected return (the weighted average of per-ticker expected returns); the second term `wᵀΣw` is the portfolio's return variance, scaled by `λ` to act as a risk penalty. `μ` is the per-ticker expected-return vector, computed as the annualized mean of daily log returns over a 1.3y price-history lookback set in `investor_profile.md`. `Σ` is the ticker × ticker covariance matrix estimated over the same window. `w` is the weight vector the optimizer is solving for. `λ` (risk aversion) trades expected return against variance:
+subject to ∑ᵢ wᵢ = 1 (weights sum to one) and 0 ≤ wᵢ ≤ concentration_cap. The first term `μᵀw` is the portfolio's expected return (the weighted average of per-ticker expected returns); the second term `wᵀΣw` is the portfolio's return variance, scaled by `λ` to act as a risk penalty. `μ` is the per-ticker expected-return vector, computed as the annualized mean of daily log returns over a 2y price-history lookback set in `investor_profile.md`. `Σ` is the ticker × ticker covariance matrix estimated over the same window. `w` is the weight vector the optimizer is solving for. `λ` (risk aversion) trades expected return against variance:
 
 - `λ → 0`: the solution favors high-return tickers, which also tend to have greater variability.
-- `λ = 1`: the middle ground that favors winning tickers but also allows safer tickers when the market gets noisy. This is this project's default setting.
+- `λ = 0.5`: a return-tilted middle ground that still puts some weight on safer tickers when the market gets noisy. This is this project's default setting.
 - `λ ≫ 1`: the variance penalty dominates, so the solution tends toward a low-variance portfolio that is heavy in cash and bonds.
 
 This is the standard Markowitz mean-variance formulation (Markowitz 1952, *Portfolio Selection*, Journal of Finance 7:77-91), which is the textbook starting point for portfolio construction because it captures the central return-vs-risk tradeoff in a single closed-form quadratic expression. See [GLOSSARY.md](GLOSSARY.md) for the full definitions.
@@ -126,18 +126,21 @@ This is the standard Markowitz mean-variance formulation (Markowitz 1952, *Portf
 
 **Total realized return over the 5 years:**
 
-| Strategy | Return |
-|---|---|
-| Curator-driven | **+162.5%** |
-| Buy-and-hold of day-0 starter | +97.5% |
-| SPY benchmark | +75.7% |
+| Strategy | Return | Annualized |
+|---|---|---|
+| Curator-driven | **+504.5%** | **+43.3%** |
+| Buy-and-hold of day-0 starter | +88.5% | +13.6% |
+| SPY benchmark | +75.7% | +11.9% |
+
+Curator max drawdown over the window: **−42.5%**.
 
 **Curator's lift over buy-and-hold:**
 
 | Measure | Value |
 |---|---|
-| Absolute (curator − buy/hold) | +65pp |
-| Relative (curator − buy/hold) / (buy/hold) | +67% |
+| Absolute (curator − buy/hold), total | +416pp |
+| Absolute, annualized | +29.7pp/yr |
+| Relative (curator − buy/hold) / (buy/hold) | +470% |
 
 See the [curator backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html) and the full report in `data/backtest_curator_5y/report.md`. Reproduce locally with the on-demand backtest from the Runs section above.
 
