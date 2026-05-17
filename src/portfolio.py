@@ -2759,8 +2759,8 @@ def build_curator_dashboard(
                 f"<span style='font-size:14px;color:#555;'>"
                 f"Curator-driven: {cur_return * 100:+.0f}%  "
                 f"·  Buy/hold: {bnh_return * 100:+.0f}%  "
-                f"·  Curator - buy/hold: {(cur_return - bnh_return) * 100:+.0f}%  "
-                f"·  (curator - buy/hold)/(buy/hold): "
+                f"·  (Curator - buy/hold): {(cur_return - bnh_return) * 100:+.0f}%  "
+                f"·  (Curator - buy/hold)/(buy/hold): "
                 f"{(cur_return - bnh_return) / bnh_return:.2f}"
                 f"</span>"
             ),
@@ -2847,7 +2847,12 @@ def build_curator_dashboard(
         'adds and removes against the active watchlist; the optimizer then ran '
         'mean-variance on the revised watchlist. The buy-and-hold curve below is '
         'the value of the initial portfolio (which never gets rebalanced or '
-        'optimized) over time.</p>'
+        'optimized) over time. The starter watchlist is <code>[AAPL, MSFT, GOOGL, '
+        'SPY, AGG]</code>, a plausible portfolio for a tech-aware US investor in '
+        'early 2021: three AI-adjacent mega-caps, a broad-market index ETF, and '
+        'an aggregate bond ETF. The buy-and-hold curve is the mean-variance '
+        'optimizer\'s day-0 weights across these five tickers held forever, not '
+        'a thesis-driven allocation.</p>'
         + chart_html
         + log_html
         + '</body></html>'
