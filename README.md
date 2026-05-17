@@ -55,6 +55,8 @@ cron doesn't replay missed runs, so if your desktop was off at 16:30, run `./scr
 
 To publish a refreshed dashboard to GitHub Pages: `git add docs/index.html && git commit -m "Refresh live dashboard" && git push` since cron doesn't auto-push.
 
+To uninstall this project's cron entry later: run `crontab -e` and delete the line ending in `cron_snapshot.sh`, or run `crontab -l | grep -vF cron_snapshot.sh | crontab -` to remove it in one shot. Other entries in your crontab are preserved.
+
 ## Runs
 
 Four activities for operating and verifying the portfolio.
