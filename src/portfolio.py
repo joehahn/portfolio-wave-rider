@@ -2530,19 +2530,20 @@ def build_curator_dashboard(
     bnh_return = (bnh_final / bnh_initial) - 1.0
 
     fig = make_subplots(
-        rows=5, cols=1, vertical_spacing=0.08,
-        row_heights=[0.24, 0.30, 0.13, 0.13, 0.20],
+        rows=6, cols=1, vertical_spacing=0.07,
+        row_heights=[0.20, 0.26, 0.13, 0.12, 0.12, 0.17],
         subplot_titles=(
             "1. Realized portfolio value: curator vs baselines vs benchmark",
             "2. Watchlist composition over time (one row per ticker; color = wave bucket)",
-            "3. Actual portfolio $ by asset class over time",
-            "4. Actual portfolio $ by wave over time<br>"
+            "3. Cumulative $ gain per holding over the 5y window",
+            "4. Actual portfolio $ by asset class over time",
+            "5. Actual portfolio $ by wave over time<br>"
             "<span style='font-size:0.8em;color:#666;font-weight:400;'>"
             "general_markets = defensive equity ETFs (broad-market / dividend / "
             "utilities / staples); cashlike = bonds + cash-equivalents + precious "
             "metals (e.g., AGG, BIL, IAU)"
             "</span>",
-            "5. Expected vs realized annualized return per rebalance "
+            "6. Expected vs realized annualized return per rebalance "
             "(divergence is optimizer prediction error)",
         ),
     )
@@ -2621,7 +2622,32 @@ def build_curator_dashboard(
     )
     fig.update_xaxes(range=[start, end], row=2, col=1)
 
-    # Charts 3 and 4: actual portfolio $ by asset class and by wave over
+    # Chart 3: cumulative $ gain per ticker over the 5y window. Daily
+    # P&L = prior_day_shares × price_change, summed across the window.
+    # Mirrors the live dashboard's chart 5 attribution. Tickers ordered
+    # by gain descending, colored green (positive) or red (negative).
+    snaps_sorted = snaps.sort_values(["ticker", "date"])
+    _gain_by_ticker: dict[str, float] = {}
+    for _tk, _sub in snaps_sorted.groupby("ticker"):
+        _sub = _sub.sort_values("date").reset_index(drop=True)
+        _pc = _sub["price"].diff()
+        _ps = _sub["shares"].shift(1)
+        _gain_by_ticker[_tk] = float((_ps * _pc).fillna(0.0).sum())
+    _gain_items = sorted(_gain_by_ticker.items(), key=lambda kv: kv[1], reverse=True)
+    _gain_tickers = [t for t, _ in _gain_items]
+    _gain_values = [v for _, v in _gain_items]
+    _bar_colors = ["#2ca02c" if v >= 0 else "#d62728" for v in _gain_values]
+    fig.add_trace(
+        go.Bar(x=_gain_tickers, y=_gain_values, marker_color=_bar_colors,
+               name="$ gain", showlegend=False,
+               hovertemplate="%{x}<br>$%{y:,.0f}<extra></extra>"),
+        row=3, col=1,
+    )
+    fig.update_yaxes(title_text="$ gain", tickformat="$,.0f",
+                     zeroline=True, zerolinewidth=1, zerolinecolor="#888",
+                     row=3, col=1)
+
+    # Charts 4 and 5: actual portfolio $ by asset class and by wave over
     # time. Stacked area on linear y-axis: top edge = total portfolio
     # value; each band's thickness = that bucket's $ contribution.
     snaps_full = snaps.copy()
@@ -2649,7 +2675,7 @@ def build_curator_dashboard(
                        line={"color": ac_colors.get(bucket, "#444"), "width": 0.5},
                        hovertemplate=f"{bucket}<br>%{{x|%Y-%m-%d}}"
                                      "<br>$%{y:,.0f}<extra></extra>"),
-            row=3, col=1,
+            row=4, col=1,
         )
     # Split cash/bonds/precious-metals/crypto out of general_markets into
     # a separate "cashlike" band so general_markets shows only defensive
@@ -2672,14 +2698,14 @@ def build_curator_dashboard(
                        hovertemplate=f"{WAVE_DISPLAY_LABEL.get(wave, wave)}"
                                      "<br>%{x|%Y-%m-%d}"
                                      "<br>$%{y:,.0f}<extra></extra>"),
-            row=4, col=1,
+            row=5, col=1,
         )
-    fig.update_yaxes(title_text="$", tickformat="$,.0f", row=3, col=1)
     fig.update_yaxes(title_text="$", tickformat="$,.0f", row=4, col=1)
-    fig.update_xaxes(range=[start, end], row=3, col=1)
+    fig.update_yaxes(title_text="$", tickformat="$,.0f", row=5, col=1)
     fig.update_xaxes(range=[start, end], row=4, col=1)
+    fig.update_xaxes(range=[start, end], row=5, col=1)
 
-    # Chart 5: expected vs realized annualized return per rebalance.
+    # Chart 6: expected vs realized annualized return per rebalance.
     # Reads recommendations.csv (per-rebalance expected_return) plus
     # snapshots.csv total_value; realized = forward-1y annualized return
     # from each rebalance date. The last few rebalances will have NaN
@@ -2699,7 +2725,7 @@ def build_curator_dashboard(
                            mode="lines+markers", legend="legend2",
                            line={"color": "#3b82f6", "width": 2},
                            hovertemplate="%{x|%Y-%m-%d}<br>expected %{y:.1%}<extra></extra>"),
-                row=5, col=1,
+                row=6, col=1,
             )
             fig.add_trace(
                 go.Scatter(x=evr["date"], y=evr["realized"],
@@ -2707,15 +2733,15 @@ def build_curator_dashboard(
                            mode="lines+markers", legend="legend2",
                            line={"color": "#d97706", "width": 2},
                            hovertemplate="%{x|%Y-%m-%d}<br>realized %{y:.1%}<extra></extra>"),
-                row=5, col=1,
+                row=6, col=1,
             )
             fig.update_yaxes(title_text="annualized return", tickformat=".0%",
                              zeroline=True, zerolinewidth=1, zerolinecolor="#888",
-                             row=5, col=1)
-            fig.update_xaxes(range=[start, end], row=5, col=1)
+                             row=6, col=1)
+            fig.update_xaxes(range=[start, end], row=6, col=1)
 
     fig.update_layout(
-        height=1900, margin={"t": 90, "b": 60, "l": 80, "r": 30},
+        height=2200, margin={"t": 90, "b": 60, "l": 80, "r": 30},
         title={
             "text": (
                 f"<span style='font-size:14px;color:#555;'>"
@@ -2738,22 +2764,22 @@ def build_curator_dashboard(
         legend5=dict(
             title_text="Wave bucket",
             xref="paper", x=1.02,
-            yref="paper", y=0.655, yanchor="middle",
+            yref="paper", y=0.716, yanchor="middle",
         ),
         legend3=dict(
             title_text="Asset class",
             xref="paper", x=1.02,
-            yref="paper", y=0.473, yanchor="top",
+            yref="paper", y=0.407, yanchor="top",
         ),
         legend4=dict(
             title_text="Wave bucket",
             xref="paper", x=1.02,
-            yref="paper", y=0.305, yanchor="top",
+            yref="paper", y=0.259, yanchor="top",
         ),
         legend2=dict(
             title_text="Expected vs realized",
             xref="paper", x=1.02,
-            yref="paper", y=0.137, yanchor="top",
+            yref="paper", y=0.111, yanchor="top",
         ),
     )
 
