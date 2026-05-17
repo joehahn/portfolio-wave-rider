@@ -12,7 +12,7 @@ This Claude Code demo uses AI to manage and optimize a long-horizon investment p
 Two dashboards are served from GitHub Pages:
 
 - **[Live dashboard](https://joehahn.github.io/portfolio-wave-rider/)** — today's portfolio: realized value over time, latest recommended weights, asset-class and wave-bucket breakdowns.
-- **[5-year curator backtest](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html)** — tests whether the curator's quarterly add and remove decisions, replayed through the optimizer over a 5-year historical window, would have produced better realized returns than holding the starter watchlist unchanged. SPY is shown for market context.
+- **[5-year curator backtest](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html)** — tests whether the curator's quarterly watchlist decisions across a 5-year historical window yields better returns than the buy-and-hold investor.
 
 See [GLOSSARY.md](GLOSSARY.md) for finance and stats terms (`σ`, `μ`, `Σ`, Sharpe ratio, risk aversion `λ`, mean-variance optimization, etc.) and [REFERENCE.md](REFERENCE.md) for project details (repo layout, code, input and output files, architecture overview, and testing instructions).
 
