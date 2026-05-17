@@ -30,7 +30,10 @@ import plotly.graph_objects as go
 
 RISK_FREE_RATE = 0.04  # matches portfolio.py default
 
-from src.portfolio import curator_backtest, _fetch_benchmark_curves, _nav_strip
+from src.portfolio import (
+    curator_backtest, _fetch_benchmark_curves, _nav_strip,
+    _compute_expected_vs_realized,
+)
 
 DEFAULTS = {
     "risk_aversion": [0.0, 0.33, 0.5, 0.67, 1.0, 2.0, 3.0, 10.0],
@@ -45,9 +48,11 @@ PALETTE = [
 
 
 def run_one(param: str, value: float, runs_dir: str, tmp: Path,
-            base_max_weight: float, base_risk_aversion: float) -> pd.Series:
+            base_max_weight: float, base_risk_aversion: float
+            ) -> tuple[pd.Series, pd.DataFrame]:
     """Replay the curator runs with one parameter swapped to ``value``.
-    Returns a date-indexed Series of total portfolio value."""
+    Returns (date-indexed Series of total portfolio value, per-rebalance
+    expected-vs-realized DataFrame)."""
     out_dir = tmp / f"{param}_{value}"
     kw = {
         "runs_dir": runs_dir,
@@ -67,7 +72,13 @@ def run_one(param: str, value: float, runs_dir: str, tmp: Path,
     curator_backtest(**kw)
     snaps = pd.read_csv(out_dir / "snapshots.csv", parse_dates=["date"])
     totals = snaps.groupby("date")["total_value"].first().sort_index()
-    return totals
+    recs = pd.read_csv(out_dir / "recommendations.csv")
+    snaps_raw = pd.read_csv(out_dir / "snapshots.csv")
+    try:
+        evr = _compute_expected_vs_realized(recs, snaps_raw, window_days=365)
+    except Exception:
+        evr = pd.DataFrame(columns=["date", "expected", "realized"])
+    return totals, evr
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -90,10 +101,13 @@ def main(argv: list[str] | None = None) -> int:
     tmp = Path(tempfile.mkdtemp(prefix="sweep_"))
     try:
         curves: dict[float, pd.Series] = {}
+        evrs: dict[float, pd.DataFrame] = {}
         for v in values:
             print(f"  {args.param} = {v}", file=sys.stderr)
-            curves[v] = run_one(args.param, v, args.runs_dir, tmp,
-                                args.base_max_weight, args.base_risk_aversion)
+            totals, evr = run_one(args.param, v, args.runs_dir, tmp,
+                                  args.base_max_weight, args.base_risk_aversion)
+            curves[v] = totals
+            evrs[v] = evr
 
         # All curves share the same x-axis. Build summary first.
         first = next(iter(curves.values()))
@@ -121,6 +135,39 @@ def main(argv: list[str] | None = None) -> int:
                     x=curve.index, y=curve.values, name=f"{b} benchmark",
                     mode="lines", line={"color": "#10b981", "width": 1.5, "dash": "dot"},
                 ))
+        # Second figure: per-rebalance expected μᵀw vs forward-1y realized
+        # annualized return, one solid+dashed pair per variant. Same hue
+        # palette as the equity-curve chart so the reader can map across.
+        # The last few rebalances have NaN realized (1y forward window
+        # not complete within the backtest window).
+        fig_evr = go.Figure()
+        for i, (v, evr) in enumerate(evrs.items()):
+            if evr.empty:
+                continue
+            color = PALETTE[i % len(PALETTE)]
+            fig_evr.add_trace(go.Scatter(
+                x=evr["date"], y=evr["expected"],
+                name=f"{args.param}={v} expected",
+                mode="lines+markers", legendgroup=f"{v}",
+                line={"color": color, "width": 1.5, "dash": "dash"},
+            ))
+            fig_evr.add_trace(go.Scatter(
+                x=evr["date"], y=evr["realized"],
+                name=f"{args.param}={v} realized",
+                mode="lines+markers", legendgroup=f"{v}", showlegend=False,
+                line={"color": color, "width": 2},
+            ))
+        fig_evr.update_layout(
+            title="Expected vs realized annualized return per rebalance "
+                  "(solid = realized 1y forward; dashed = optimizer μᵀw)",
+            xaxis_title="rebalance date",
+            yaxis_title="annualized return",
+            yaxis_tickformat=".0%",
+            height=520,
+            plot_bgcolor="#fafafa",
+            margin={"t": 60, "b": 60, "l": 80, "r": 30},
+        )
+
         fig.update_layout(
             title=f"Curator backtest swept across {args.param} "
                   f"({start.date()} to {end.date()})",
@@ -184,6 +231,9 @@ def main(argv: list[str] | None = None) -> int:
             f'<code>{args.param}</code>.</p>'
             + fig.to_html(full_html=False, include_plotlyjs="cdn",
                           config={"displayModeBar": False})
+            + (fig_evr.to_html(full_html=False, include_plotlyjs=False,
+                               config={"displayModeBar": False})
+               if args.param == "risk_aversion" else "")
             + table
             + '</body></html>'
         )
