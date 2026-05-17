@@ -59,7 +59,7 @@ To uninstall this project's cron entry later: run `crontab -e` and delete the li
 
 ## Runs
 
-Four activities for operating and verifying the portfolio.
+Activities for operating and verifying the portfolio.
 
 ### 1. initialize (once)
 
