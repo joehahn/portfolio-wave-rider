@@ -126,7 +126,7 @@ This is the standard Markowitz mean-variance formulation (Markowitz 1952, *Portf
 
 **Setup:** 5y window (Mar 2021 → Mar 2026), starter watchlist `[AAPL, MSFT, GOOGL, SPY, AGG]`, 21 quarterly curator calls.
 
-The starter is a plausible portfolio for a tech-aware US investor in early 2021. The buy-and-hold baseline below is the mean-variance optimizer's day-0 weights across these five tickers held forever, **not** the thesis-driven "beliefs in dollar form" allocation that `/initialize-portfolio` produces in the live workflow.
+The starter is a plausible portfolio for a tech-aware US investor in early 2021. At the profile's current defaults (`λ=0.5, max_weight=0.5, lookback=3y`) the optimizer's day-0 weights on this watchlist come out to **50% AAPL, 50% MSFT, and 0% each on GOOGL, SPY, and AGG** — a 50/50 AAPL/MSFT bet held forever. (This is **not** the thesis-driven "beliefs in dollar form" allocation that `/initialize-portfolio` produces in the live workflow.)
 
 **Total realized return over the 5 years:**
 
