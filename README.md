@@ -5,16 +5,16 @@
 **Date:** 2026-May-14 <br>
 **branch:** main
 
-This Claude Code demo uses AI to manage and optimize a long-horizon investment portfolio. You declare your goals, constraints, and an investment thesis (namely what you think will drive future returns), then initialize a starter watchlist of tickers you already want exposure to. At each periodic rebalance the curator agent reads recent news against your thesis and proposes adds and removes against the current watchlist; the mean-variance optimizer then recommends portfolio weights for whatever watchlist results. The result accumulates into a static Plotly dashboard so you can watch the watchlist composition, the recommended weights, and the realized portfolio value evolve over time.
+This Claude Code demo uses AI to manage and optimize a long-horizon investment portfolio. You declare your goals, constraints, and an investment thesis (namely what you think will drive future returns), then initialize a starter watchlist of tickers you already want exposure to. At each periodic rebalance the curator agent reads recent news against your thesis and proposes adds and removes against the current watchlist; the mean-variance optimizer then recommends portfolio weights for all tickers on that watchlist. The result accumulates into a static Plotly dashboard so you can watch the watchlist composition, the recommended weights, and the realized portfolio value evolve over time.
 
-**Who this helps.** An investor who has a thesis about where markets are going but not enough time to track news ticker by ticker. This demo helps such an investor pivot from a less-optimal static buy-and-hold portfolio to one that's lightly managed by AI. In the 5-year backtest detailed below, the AI-managed portfolio lifted realized return by about **34 percentage points per year annualized** over a buy-and-hold of the starter watchlist (+511pp total over 5y, a 6.7× wealth multiple vs the buy-and-hold). Past performance is not predictive; the curator's job is to compound a thesis you already hold, not to replace one you don't have.
+**Who this helps.** An investor who has a thesis about where markets are going but not enough time to track market news, or who needs help optimizing their portfolio, or who merely needs a scheduled reminder to do either. This demo helps such an investor pivot from a less-optimal static buy-and-hold portfolio to one that's lightly but effectively managed by AI. In the 5-year backtest detailed below, the AI-managed portfolio lifted realized return by about **34 percentage points per year annualized** over a buy-and-hold of the starter watchlist. Past performance is not predictive; the curator's job is to compound a thesis you already hold, not to replace one you don't have.
 
 Two dashboards are served from GitHub Pages:
 
 - **[Live dashboard](https://joehahn.github.io/portfolio-wave-rider/)** — today's portfolio: realized value over time, latest recommended weights, asset-class and wave-bucket breakdowns. Regenerated daily by cron.
 - **[5-year curator backtest](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html)** — equity-curve race (curator vs buy-and-hold vs SPY).
 
-See [GLOSSARY.md](GLOSSARY.md) for finance and stats terms (`σ`, `μ`, `Σ`, Sharpe ratio, risk aversion `λ`, mean-variance optimization, etc.) and [REFERENCE.md](REFERENCE.md) for the CLI flags, repo layout, output files, architecture overview, and testing instructions.
+See [GLOSSARY.md](GLOSSARY.md) for finance and stats terms (`σ`, `μ`, `Σ`, Sharpe ratio, risk aversion `λ`, mean-variance optimization, etc.) and [REFERENCE.md](REFERENCE.md) for project details (repo layout, code, input and output files, architecture overview, and testing instructions).
 
 ## Setup
 
