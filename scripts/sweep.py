@@ -81,7 +81,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--out", default=None,
                    help="output HTML path (default: docs/sweep_<param>.html)")
     p.add_argument("--benchmarks", nargs="*", default=["SPY"])
-    p.add_argument("--base-max-weight", type=float, default=0.50)
+    p.add_argument("--base-max-weight", type=float, default=0.70)
     p.add_argument("--base-risk-aversion", type=float, default=0.5)
     args = p.parse_args(argv)
 

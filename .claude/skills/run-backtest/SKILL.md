@@ -113,7 +113,7 @@ PY
 .venv/bin/python -m src.cli backtest \
   --curator-runs-dir data/curator_runs/5y-sweep-cap08 \
   --out-dir data/backtest_curator_5y \
-  --max-weight 0.50 --risk-aversion 0.5 \
+  --max-weight 0.70 --risk-aversion 0.5 \
   --benchmarks SPY
 ```
 
