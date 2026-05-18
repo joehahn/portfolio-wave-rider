@@ -176,21 +176,21 @@ Headline experiment that justified the watchlist-curator design (over the previo
 
 - **Window**: 2021-09-30 → 2026-04-30 (4.6 years, 20 quarterly rebalances)
 - **Starter watchlist**: AAPL, MSFT, GOOGL, NVDA, SPY — a realistic 2021-Q1 tech-savvy investor's holding
-- **Optimizer**: mean_variance λ=1, lookback 1.3y, max_weight 0.25, cadence quarterly, max_watchlist_size 12
+- **Optimizer**: mean_variance λ=0.5, lookback 3y, max_weight 0.50, cadence quarterly, max_watchlist_size 8
 - **Curator**: 21 strict-as-of-date Sonnet calls, each with WebSearch `before:` filters, suppression list from `scripts/post_date_events.py`, and a self-critique pass. Total cost ~$3, total wall clock ~6 min (parallel batches).
 - **Output**: 25 distinct tickers entered the watchlist over the run (with adds and removes); final watchlist spans all six named wave buckets
 
 | Strategy | Final ($50K start) | Return | Active vs SPY |
 |---|---|---|---|
-| **Curator-driven** | **$318,124** | **+536.25%** | **+460.6pp** |
+| **Curator-driven** | **$361,017** | **+622.03%** | **+546.3pp** |
 | Buy-and-hold starter (equal-weight, then hold) | $214,360 | +328.72% | +253.0pp |
 | SPY benchmark (rebased) | $87,845 | +75.69% | — |
 
-Optimizer settings: `λ=0.5`, `lookback=3y`, `max_weight=0.50` (all from `investor_profile.md` defaults). The buy-and-hold baseline is an equal-weight allocation (20% in each of AAPL/MSFT/GOOGL/NVDA/SPY) bought on day 0 and held without rebalancing. NVDA is in the starter because excluding it would have stacked the comparison in the curator's favor (the curator adds NVDA at Q3 2021 — most of the 5y window's apparent lift comes from being early to NVDA). With NVDA already in the buy-and-hold, the curator's remaining lift is **+207pp** (≈11pp annualized) — coming from its other thematic adds (nuclear, robotics, rockets, quantum) plus the optimizer's quarterly re-weighting. Annualized return 44.8%, max drawdown −49.4%.
+Optimizer settings: `λ=0.5`, `lookback=3y`, `max_weight=0.50`, `max_watchlist_size=8` (all from `investor_profile.md` defaults). The buy-and-hold baseline is an equal-weight allocation (20% in each of AAPL/MSFT/GOOGL/NVDA/SPY) bought on day 0 and held without rebalancing. NVDA is in the starter because excluding it would have stacked the comparison in the curator's favor (the curator adds NVDA at Q3 2021 — most of the 5y window's apparent lift comes from being early to NVDA). With NVDA already in the buy-and-hold, the curator's remaining lift is **+293pp** (≈14.8pp annualized) — coming from its other thematic adds (nuclear, robotics, rockets, quantum) plus the optimizer's quarterly re-weighting. Annualized return 48.5%, max drawdown −44.7%, Sharpe 1.18.
 
 `baselines_totals.csv` also includes a `bnh_total` column for an ablation baseline (the mean-variance optimizer's day-0 weights on the same 5 tickers, held forever). At the current defaults this typically pegs at the concentration cap (Markowitz behavior at low λ + wide cap); kept for researchers who want a math-only static comparator.
 
-To reproduce: `python -m src.cli backtest --curator-runs-dir data/curator_runs/5y-quarterly --out-dir data/backtest_curator_5y --max-weight 0.25 --risk-aversion 1.0`. Replays the saved JSONs through the optimizer in a few seconds. Re-running the curator agents from scratch costs another ~$3.
+To reproduce: `python -m src.cli backtest --curator-runs-dir data/curator_runs/5y-sweep-cap08 --out-dir data/curator_runs/5y-sweep-cap08/_backtest --max-weight 0.50 --risk-aversion 0.5 --benchmarks SPY`. Replays the saved JSONs through the optimizer in a few seconds. Re-running the curator agents from scratch costs another ~$3. (The older `5y-quarterly/` run dir is the same experiment at the previous cap=12 default — kept as a historical reference.)
 
 ### Prior wave-stage tilt experiment (frozen on `5y-backtest` branch)
 

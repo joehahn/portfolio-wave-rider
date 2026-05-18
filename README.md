@@ -87,17 +87,17 @@ At each quarterly rebalance the curator reads news as of the rebalance date and 
 ./scripts/run_sweeps.sh
 ```
 
-Replays the same curator JSONs against a range of values for three optimizer knobs. Each sweep holds the curator's watchlist decisions fixed and varies one knob, so the spread between curves isolates the optimizer's sensitivity to that knob without confounding it with news-driven composition changes.
+Reruns the 5-year backtest under different settings for `risk_aversion` (`λ`), `lookback_period`, and `concentration_cap` to determine the optimal value of each.
 
 Three overlay pages are written and published to GitHub Pages:
 
-- **[Risk aversion `λ`](https://joehahn.github.io/portfolio-wave-rider/sweep_risk_aversion.html)** — values `[0, 0.33, 0.5, 0.67, 1, 2, 3, 10]`. Trades expected return against variance; default `λ = 0.5` tilts toward return.
-- **[Price-history lookback](https://joehahn.github.io/portfolio-wave-rider/sweep_lookback.html)** — values `[0.5, 1, 1.5, 2, 3, 5]` years. Length of the window used to estimate `μ` and `Σ`. Default 3y.
-- **[Concentration cap](https://joehahn.github.io/portfolio-wave-rider/sweep_max_weight.html)** — values `[0.10, 0.25, 0.33, 0.50, 0.75, 1.00]`. Maximum weight any single ticker can carry. Default 0.50.
+- **[Risk aversion `λ`](https://joehahn.github.io/portfolio-wave-rider/sweep_risk_aversion.html)** — small `λ` produces a portfolio concentrated in volatile but higher-reward equities; large `λ` shifts the portfolio toward cash and bonds.
+- **[Price-history lookback](https://joehahn.github.io/portfolio-wave-rider/sweep_lookback.html)** — the length of the price-history window used to estimate `μ` and `Σ`. Short lookbacks chase recent momentum and react quickly to regime changes but are noisy; long lookbacks average across more market conditions and produce steadier estimates but lag turning points.
+- **[Concentration cap](https://joehahn.github.io/portfolio-wave-rider/sweep_max_weight.html)** — the maximum weight any single ticker can carry. Small caps force diversification across the full watchlist, smoothing returns but diluting conviction; large caps let the optimizer pile into its top picks, raising both upside and drawdown risk.
 
 Each sweep page has a nav strip at the top for jumping between sweeps.
 
-A fourth sweep, **[max_watchlist_size](https://joehahn.github.io/portfolio-wave-rider/sweep_max_watchlist_size.html)** at values `[5, 8, 12, 16, 24]`, is fired separately via `/sweep-max-watchlist-size`. It can't be a pure replay because the cap shapes the curator's *decisions* (not just the optimizer's response), so each cap requires its own 21 fresh curator calls. Cost: ~$13 in LLM, ~15 min wall clock. cap=12 is the default and reuses the standard `/run-backtest` output.
+A fourth sweep, **[max_watchlist_size](https://joehahn.github.io/portfolio-wave-rider/sweep_max_watchlist_size.html)** at values `[5, 8, 12, 16, 24]`, is fired separately via `/sweep-max-watchlist-size`. It can't be a pure replay because the cap shapes the curator's *decisions* (not just the optimizer's response), so each cap requires its own 21 fresh curator calls. Cost: ~$13 in LLM, ~15 min wall clock. cap=8 is the project default (Sharpe 1.18, the best risk-adjusted result in the sweep) and the headline backtest below uses it.
 
 ## How `holdings.csv` shapes outcomes
 
@@ -136,19 +136,19 @@ The buy-and-hold baseline is the **equal-weight allocation** (20% in each of the
 
 | Strategy | Return | Annualized |
 |---|---|---|
-| Curator-driven | **+536.3%** | **+44.8%** |
+| Curator-driven | **+622.0%** | **+48.5%** |
 | Buy-and-hold (equal-weight starter, includes NVDA) | +328.7% | +33.7% |
 | SPY benchmark | +75.7% | +11.9% |
 
-Curator max drawdown over the window: **−49.4%**.
+Curator max drawdown over the window: **−44.7%**.
 
 **Curator's lift over buy-and-hold:**
 
 | Measure | Value |
 |---|---|
-| Absolute (curator − buy/hold), total | +207pp |
-| Absolute, annualized | +11pp/yr |
-| Relative (curator − buy/hold) / (buy/hold) | 0.63 |
+| Absolute (curator − buy/hold), total | +293pp |
+| Absolute, annualized | +14.8pp/yr |
+| Relative (curator − buy/hold) / (buy/hold) | 0.89 |
 
 See the [curator backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html) and the full report in `data/backtest_curator_5y/report.md`. Reproduce locally with the on-demand backtest from the Runs section above.
 
