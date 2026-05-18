@@ -1,0 +1,37 @@
+{
+  "as_of_date": "2021-06-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "URA",
+      "wave_bucket": "nuclear",
+      "rationale": "Adds nuclear-wave exposure (uranium miners + nuclear fuel cycle), a gap in the current watchlist. Profile explicitly names nuclear (SMRs + AI data-center PPAs) as a target next-wave. ETF, deeply liquid, US-listed since 2010.",
+      "news_evidence_urls": [
+        "https://www.kiplinger.com/investing/etfs/603434/3-uranium-etfs-that-pack-a-nuclear-punch",
+        "https://www.globalxetfs.com/funds/ura"
+      ]
+    },
+    {
+      "ticker": "LMT",
+      "wave_bucket": "geopolitical",
+      "rationale": "Adds defense/geopolitical exposure (hypersonics, missile defense) on the back of a 2021-05-27 successful live-fire hypersonic strike test with NOC for the U.S. Navy CPS and Army LRHW programs. Fills the geopolitical-energy thesis slot; large-cap liquid US-listed.",
+      "news_evidence_urls": [
+        "https://news.lockheedmartin.com/navy-cps-hypersonic-strike-test"
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "SPY",
+      "wave_bucket": "general_markets",
+      "rationale": "Broad-market index largely duplicates exposure already held via AAPL/MSFT/GOOGL/NVDA (top SPY weights). Profile prioritizes early-wave concentration over benchmark hugging; freeing the slot creates room for nuclear-wave entry."
+    },
+    {
+      "ticker": "TSM",
+      "wave_bucket": "AI",
+      "rationale": "Heavy AI-semi overlap with NVDA on the same chip-shortage / TSMC-capex tailwind, plus Taiwan single-country concentration risk that is not the geopolitical exposure the profile is trying to express. Trimming TSM keeps the AI wave covered via NVDA and frees a slot for a defense/geopolitical add."
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Watchlist is at cap=8 and currently overweight AI megacaps (AAPL/MSFT/GOOGL/NVDA/TSM) with zero nuclear or geopolitical-energy exposure, leaving two profile-named next-waves entirely unrepresented. Trim SPY (redundant with the AI megacaps that dominate it) and TSM (semi overlap with NVDA + Taiwan concentration) to open two slots. Add URA for the nuclear wave (uranium at decade-high pricing entering Q2 2021) and LMT for the geopolitical/defense wave (2021-05-27 hypersonic live-fire test). Quantum is intentionally left unfilled this quarter: IonQ has not yet completed its SPAC and no quantum pure-play is yet investable on a US exchange. AI wave (AAPL/MSFT/GOOGL/NVDA), robotics (ISRG), and rockets/space (ARKX) — the latter supported by the 2021-06-25 FAA license for Virgin Galactic passenger spaceflight — remain core."
+}

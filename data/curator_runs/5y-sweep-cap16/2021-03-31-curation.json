@@ -1,0 +1,36 @@
+{
+  "as_of_date": "2021-03-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "SMH",
+      "wave_bucket": "AI",
+      "rationale": "Deepens AI-wave exposure beyond a single mega-cap (NVDA) into the broader semiconductor supply chain (TSMC, ASML, AMAT) that the entire AI buildout depends on. TSMC's Q1-2021 results flagged >100% fab utilization, raised 2021 capex to ~$30B, and committed $100B over three years to expand capacity — a multi-year picks-and-shovels tailwind for SMH's top holdings.",
+      "news_evidence_urls": [
+        "https://www.tomshardware.com/news/tsmc-expects-chip-deficit-to-continue-into-2022",
+        "https://investor.tsmc.com/english/quarterly-results/2021/q1"
+      ]
+    },
+    {
+      "ticker": "ARKQ",
+      "wave_bucket": "robotics",
+      "rationale": "Cleanest US-listed liquid vehicle covering two next-wave thesis buckets simultaneously: robotics/autonomy (Tesla, Trimble, Kratos, industrial automation) and early rockets/spacecraft (Iridium, satellite-comms, aerospace primes). SpaceX Starship SN10 stuck its landing on 2021-03-03, validating the reusable-launch thesis at a moment when no pure-play public spacecraft ticker exists yet (RKLB is still private).",
+      "news_evidence_urls": [
+        "https://www.space.com/spacex-starship-sn10-test-launch-landing-explosion",
+        "https://spaceflightnow.com/2021/03/03/starship-sn10-test-flight/"
+      ]
+    },
+    {
+      "ticker": "URA",
+      "wave_bucket": "nuclear",
+      "rationale": "Captures the nuclear next-wave through uranium miners (Cameco, Kazatomprom, NexGen). Cameco's Q4-2020 release (Feb 9, 2021) flagged that ~two-thirds of utility uranium requirements will be uncovered by 2030, while the new US administration recommitted to maintaining the existing reactor fleet and supporting advanced reactor construction. Tight long-term supply plus net-zero policy alignment is a textbook 'invest early while cheap' setup.",
+      "news_evidence_urls": [
+        "https://www.world-nuclear-news.org/Articles/Cameco-remains-positive-about-long-term-uranium-ou",
+        "https://www.cameco.com/invest/financial-information/quarterly-reports/2020/q4"
+      ]
+    }
+  ],
+  "removes": [],
+  "no_changes": false,
+  "rationale_overall": "Watchlist is heavy AI/mega-cap-tech (AAPL, MSFT, GOOGL, NVDA) plus SPY. With 11 slots free under the 16-cap, this round deepens AI breadth via SMH (semiconductor supply chain) and seeds two next-wave thesis buckets while still cheap: ARKQ for robotics + early rockets/spacecraft exposure (SpaceX SN10 just landed; no pure-play public rocket ticker exists yet), and URA for the nuclear wave (uranium supply gap by 2030, supportive US policy). No removes — current watchlist members are all core AI-wave names that the thesis says to ride, not trim, in early 2021."
+}

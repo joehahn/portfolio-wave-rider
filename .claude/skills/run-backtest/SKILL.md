@@ -19,7 +19,7 @@ the math replay.
    (and the regenerated `data/backtest_curator_5y/` outputs +
    `docs/backtest_curator.html`) at the end of the run so the public
    demo always reflects the latest 5y window.
-2. The starter watchlist is fixed at `[AAPL, MSFT, GOOGL, SPY, NVDA]` —
+2. The starter watchlist is fixed at `[AAPL, MSFT, GOOGL, NVDA, SPY]` —
    a 2021-tech-savvy investor's portfolio before the AI surge. The
    fixed starter keeps the backtest's day-0 conditions stable across
    refreshes; only the trailing edge moves.
@@ -94,7 +94,7 @@ from pathlib import Path
 runs = Path("data/curator_runs/5y-quarterly")
 dates = sorted(pd.Timestamp(p.stem.replace("-curation","")) for p in runs.glob("*-curation.json"))
 starter = {
-    "starter_watchlist": ["AAPL", "MSFT", "GOOGL", "SPY", "NVDA"],
+    "starter_watchlist": ["AAPL", "MSFT", "GOOGL", "NVDA", "SPY"],
     "as_of_dates": [d.strftime("%Y-%m-%d") for d in dates],
     "rebalance_period": "quarterly",
     "initial_usd": 50000.0,
@@ -152,7 +152,7 @@ One short message:
 
 ## Rules
 
-- The starter watchlist is fixed at `[AAPL, MSFT, GOOGL, SPY, NVDA]`.
+- The starter watchlist is fixed at `[AAPL, MSFT, GOOGL, NVDA, SPY]`.
   Don't reinterpret it based on the current date; that would change
   day-0 conditions and make refreshes non-comparable to prior ones.
 - Strict as-of-date discipline applies to every fresh curator call,

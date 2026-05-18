@@ -1660,6 +1660,7 @@ _NAV_PAGES: list[tuple[str, str]] = [
     ("sweep_risk_aversion.html", "sweep: risk_aversion"),
     ("sweep_lookback.html", "sweep: lookback"),
     ("sweep_max_weight.html", "sweep: max_weight"),
+    ("sweep_max_watchlist_size.html", "sweep: max_watchlist_size"),
 ]
 
 
@@ -2868,7 +2869,7 @@ def build_curator_dashboard(
         'mean-variance on the revised watchlist. The buy-and-hold curve below is '
         'the value of the initial portfolio (which never gets rebalanced or '
         'optimized) over time. The buy-and-hold portfolio has equal amounts of '
-        '<code>[AAPL, MSFT, GOOGL, SPY, NVDA]</code> and is held without any '
+        '<code>[AAPL, MSFT, GOOGL, NVDA, SPY]</code> and is held without any '
         'rebalancing across the 5 year window.</p>'
         + chart_html
         + log_html

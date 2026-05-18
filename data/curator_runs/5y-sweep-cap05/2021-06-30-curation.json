@@ -1,0 +1,26 @@
+{
+  "as_of_date": "2021-06-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "ARKX",
+      "wave_bucket": "rockets_spacecraft",
+      "rationale": "Adds the missing rockets/spacecraft next-wave exposure called out in the profile. ARKX is a diversified, US-listed active ETF (39 holdings spanning orbital/suborbital aerospace, enabling tech, and aerospace beneficiaries) — preferable to a single pre-revenue name like SPCE at this stage. Launch catalyst is dated and in-window.",
+      "news_evidence_urls": [
+        "https://www.bloomberg.com/news/articles/2021-03-30/cathie-wood-tests-appetite-for-ark-with-launch-of-new-space-etf",
+        "https://www.cnbc.com/2021/06/25/virgin-galactic-receives-faa-license-to-fly-passengers-to-space.html",
+        "https://www.washingtonpost.com/business/2021/06/25/virgin-galactic-faa-approval/"
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "ARKQ",
+      "wave_bucket": "robotics",
+      "rationale": "Make room for ARKX while staying at cap=5. ARKQ's robotics/autonomy exposure overlaps heavily with the four AI mega-caps already held (NVDA/MSFT/GOOGL/AAPL all sit inside the autonomy supply chain), so removing it is the lowest-conviction trim. The freed slot funds a missing wave (rockets/spacecraft) rather than doubling-up on AI-adjacent autonomy.",
+      "news_evidence_urls": []
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Watchlist is at cap=5 with strong AI representation (AAPL, MSFT, GOOGL, NVDA) and one ARK thematic ETF (ARKQ). The thesis explicitly calls for early investment in rockets/spacecraft, nuclear, quantum, robotics. Quantum is not addable yet (IonQ doesn't IPO until 2021-10-01; pure-play quantum names are private/post-date). Nuclear via CCJ/URA lacks a clean dated Q2 2021 catalyst (Cameco's Q2 news is a wildfire and a loss). Rockets/spacecraft has both a structural and dated catalyst: ARKX launched 2021-03-30 with strong demand, and SPCE got FAA passenger approval 2021-06-25. Swapping ARKQ -> ARKX trades a wave already implicit in the AI mega-caps for a wave currently absent from the watchlist. AI trim is premature -- mid-2021 is still AI buildup phase (pre-ChatGPT, pre-NVDA data-center surge), so no AI removes are warranted. Honors exclusions (solar, wind, engineered_biology). One add, one remove, post-change size = 5."
+}

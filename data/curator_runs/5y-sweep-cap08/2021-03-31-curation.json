@@ -1,0 +1,36 @@
+{
+  "as_of_date": "2021-03-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "ARKX",
+      "wave_bucket": "rockets_spacecraft",
+      "rationale": "ARK Space Exploration & Innovation ETF launched March 30, 2021 (one day before as-of date) as a thematic vehicle for reusable rockets, satellites, drones, and orbital/sub-orbital aerospace exposure. With SpaceX still private and pure-play space names scarce, ARKX is the cleanest liquid public entry point for the rockets-and-spacecraft next wave the profile calls out. Debut day saw ~$294M traded (8th-best ETF debut on record), so liquidity is adequate.",
+      "news_evidence": [
+        "2021-03-29 ThinkAdvisor: Cathie Wood's Ark to Launch Space Exploration ETF Tuesday — https://www.thinkadvisor.com/2021/03/29/cathie-woods-ark-to-launch-space-exploration-etf-tuesday/",
+        "2021-03-30 Bloomberg: Cathie Wood's Space ETF Debut Sees $294 Million in Shares Traded — https://www.bloomberg.com/news/articles/2021-03-30/cathie-wood-tests-appetite-for-ark-with-launch-of-new-space-etf"
+      ]
+    },
+    {
+      "ticker": "TSM",
+      "wave_bucket": "AI",
+      "rationale": "Taiwan Semiconductor announced a record 2021 capex plan of $25-28B (up 45-62% YoY) on January 14, 2021, explicitly to expand leading-edge 5nm/3nm capacity for AI and HPC customers. TSMC is the sole-source foundry for Nvidia, AMD, and Apple silicon — every AI training and inference workload routes through its fabs. Q1 2021 reporting also showed industry-wide capacity exceeding demand, which is bullish for the foundry monopolist. Adds an AI-wave exposure that is upstream of NVDA (already in watchlist) and harder to disrupt.",
+      "news_evidence": [
+        "2021-01-15 CNBC: TSMC's massive capital spending plans for 2021 could pressure its earnings — https://www.cnbc.com/2021/01/15/tsmcs-2021-capital-spending-plans-could-pressure-earnings-analyst-says.html",
+        "2021-01-14 Seeking Alpha: TSMC may announce record high capex of $20B+ in 2021 — https://seekingalpha.com/news/3648384-tsmc-may-announce-record-high-capex-of-20b-in-2021"
+      ]
+    },
+    {
+      "ticker": "ISRG",
+      "wave_bucket": "robotics",
+      "rationale": "Intuitive Surgical is the dominant surgical-robotics franchise (da Vinci installed base ~5,989 systems at end-2020, recurring instruments/services revenue). Profile calls out robotics as a next wave and aging-population demographics as a non-tech wave — ISRG sits at the intersection. Q4 2020 earnings (released Jan 2021) showed procedure volumes recovering from COVID disruption. Provides liquid US-listed robotics exposure without taking on the operating risk of speculative humanoid or industrial-automation names that mostly aren't public yet.",
+      "news_evidence": [
+        "2021-01-21 Intuitive Surgical Q4 2020 earnings release: 5,989 da Vinci systems installed, procedures recovering — https://isrg.intuitive.com/news-releases/news-release-details/intuitive-announces-fourth-quarter-earnings-1/",
+        "2021-01-22 The Robot Report: Intuitive Surgical announces Q4 financial earnings — https://www.therobotreport.com/intuitive-surgical-announces-q4-financial-earnings/"
+      ]
+    }
+  ],
+  "removes": [],
+  "no_changes": false,
+  "rationale_overall": "Current watchlist (AAPL, MSFT, GOOGL, NVDA, SPY) is all AI-wave concentrated megacap-tech plus S&P broad-market beta — solid 'ride the current wave' positioning but zero exposure to the profile's stated next waves. With 3 slots open under the cap=8 budget, I'm using all three to plant flags in the named next-wave buckets: ARKX for rockets_spacecraft (just listed March 30, 2021 — first liquid public option), TSM for an upstream AI-foundry hedge that also captures the broader chip cycle, and ISRG for robotics + demographics double-exposure. No removes — the current five are all keepers at this stage of the AI wave and there's no crest signal yet. Skipping nuclear and quantum this round: pure-play SMR names (NuScale, Oklo) aren't public yet, URA/NLR exist but the uranium spot rally is still pre-Sprott-physical-trust (which launches July 2021 — post-date, so I can't reason from it); will revisit next quarter once more data accrues. No engineered_biology names per profile."
+}

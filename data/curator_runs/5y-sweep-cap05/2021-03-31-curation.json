@@ -1,0 +1,41 @@
+{
+  "as_of_date": "2021-03-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "ARKQ",
+      "wave_bucket": "robotics",
+      "rationale": "Watchlist is saturated with AI mega-caps (AAPL/MSFT/GOOGL/NVDA) plus broad-market SPY, with zero exposure to the profile's explicit next waves (robotics, rockets/spacecraft, nuclear). ARKQ (ARK Autonomous Technology & Robotics ETF) is the most direct, liquid way to advance the 'invest early in next waves while cheap' rule. Holdings span industrial robotics, autonomous vehicles, 3D printing, and space/aerospace names — covering two of the profile's next-wave buckets in one ticker. ADV well above the $5M liquidity floor.",
+      "news_evidence": [
+        {
+          "summary": "ARK Invest's autonomous tech and robotics ETF ARKQ has gathered roughly $3B in AUM amid a surge of investor interest in disruptive-innovation strategies through Q1 2021, with strong inflows into the robotics theme.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2021-02-19/cathie-wood-s-ark-funds-keep-luring-cash-despite-recent-pullback",
+          "date": "2021-02-19"
+        },
+        {
+          "summary": "Global semiconductor shortage is accelerating capital spending on factory automation and industrial robotics across autos and electronics manufacturers, with Reuters noting record order books at robotics suppliers.",
+          "source": "Reuters",
+          "url": "https://www.reuters.com/article/us-autos-semiconductors/global-chip-shortage-puts-the-brake-on-auto-recovery-idUSKBN2AS0L4",
+          "date": "2021-02-28"
+        }
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "SPY",
+      "rationale": "SPY's largest weights at this date are AAPL, MSFT, AMZN, FB, GOOGL, NVDA — the watchlist already holds the top mega-caps directly, so SPY is the most redundant slot. Removing it frees a slot for thematic next-wave exposure that the rest of the watchlist cannot provide. The optimizer can still allocate AAPL/MSFT/GOOGL/NVDA directly.",
+      "news_evidence": [
+        {
+          "summary": "S&P 500 closed Q1 2021 up 5.8% on the quarter, driven heavily by the same mega-cap tech names already in the watchlist; concentration in top-10 names remains near multi-decade highs per WSJ Markets coverage.",
+          "source": "WSJ",
+          "url": "https://www.wsj.com/articles/global-stocks-markets-dow-update-03-31-2021-11617178107",
+          "date": "2021-03-31"
+        }
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Watchlist is at the cap of 5 and already overweight current-wave AI mega-caps via direct AAPL/MSFT/GOOGL/NVDA positions. The single highest-value move is swapping SPY (redundant beta given the mega-cap holdings already cover SPY's top weights) for ARKQ, which adds robotics and adjacent-autonomy/space exposure — directly advancing the profile's rule (2) 'invest early in next waves while cheap.' Conservative single swap rather than churning multiple slots; AAPL/MSFT/GOOGL/NVDA remain to keep current-wave AI exposure intact per rule (1)."
+}

@@ -1,0 +1,37 @@
+{
+  "as_of_date": "2021-06-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "CCJ",
+      "wave_bucket": "nuclear",
+      "rationale": "Cameco is the largest Western uranium producer and a direct pure-play on the nuclear-fuel-cycle leg of the next-waves thesis (SMRs + AI-datacenter PPAs in the longer term, fuel-supply tightness now). Complements URA's basket exposure with operational leverage. Through Q2 2021 uranium spot was firming on Kazatomprom + Cameco production cuts and the run-up to the Sprott Physical Uranium Trust (launched mid-2021), all dated pre-2021-07-01.",
+      "news_evidence_urls": [
+        "https://www.cameco.com/invest/markets/uranium-price",
+        "https://investingnews.com/daily/resource-investing/energy-investing/uranium-investing/when-will-uranium-prices-go-up/"
+      ]
+    },
+    {
+      "ticker": "LMT",
+      "wave_bucket": "geopolitical",
+      "rationale": "Lockheed Martin sits at the intersection of geopolitical-energy/defense and the rockets_spacecraft adjacency (Orion, space systems, hypersonics). June 2021 SCIFiRE preliminary-design awards (Boeing/Lockheed/Raytheon, $15-month hypersonic cruise missile contracts under the U.S.-Australia bilateral, becoming HACM) confirm the multi-year hypersonics build cycle the profile flags as a next-wave driver. Profile exclusions (solar/wind) do not hit defense.",
+      "news_evidence_urls": [
+        "https://www.airandspaceforces.com/raytheon-wins-hypersonic-attack-cruise-missile-contract/",
+        "https://en.wikipedia.org/wiki/Hypersonic_Attack_Cruise_Missile"
+      ]
+    },
+    {
+      "ticker": "TSM",
+      "wave_bucket": "AI",
+      "rationale": "Taiwan Semiconductor ADR is the foundry picks-and-shovels complement to NVDA's designer exposure on the AI wave. Q1 2021 revenue hit $12.9B with TSMC capturing ~57% of global foundry revenue (CNBC, May/June 2021); Arizona Fab 21 construction broke ground April 2021 with $12B committed and 5nm process committed to the US site. All dated pre-2021-07-01. Sits on the 'ride AI now, trim before crest' side of the thesis as a lower-multiple supplier rather than a high-multiple model-layer name.",
+      "news_evidence_urls": [
+        "https://www.cnbc.com/2021/05/21/tsmc-says-2021-output-of-key-auto-chip-component-up-60percent-versus-last-year.html",
+        "https://www.cnbc.com/2021/06/01/chip-foundries-see-record-revenues-amid-semiconductor-shortage.html",
+        "https://www.cnn.com/2021/06/10/tech/taiwan-chip-shortage-covid-climate-crisis-intl-hnk"
+      ]
+    }
+  ],
+  "removes": [],
+  "no_changes": false,
+  "rationale_overall": "Wide cap (24) with 16 free slots; current watchlist of 8 is undersized for the multi-wave thesis. Three high-conviction adds, each landing on a distinct wave bucket the profile names but the current list under-covers: CCJ (nuclear fuel-cycle, complements URA basket with single-name leverage), LMT (geopolitical-defense + hypersonics, with dated June-2021 SCIFiRE awards), TSM (AI foundry layer, complements NVDA). No removes: AAPL/MSFT/GOOGL/NVDA are the AI core the profile says to ride (not yet crest); SPY is the broad-market anchor; ARKX/BOTZ/URA are the only existing next-wave exposures and earning their slots at Q2 2021. Quantum and rockets pure-plays (IonQ, RKLB) are post-date and excluded by listing-date guardrail; revisit at later quarters."
+}

@@ -1,0 +1,38 @@
+{
+  "as_of_date": "2021-03-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "ARKX",
+      "wave_bucket": "rockets_spacecraft",
+      "rationale": "Pure-play rockets & spacecraft ETF; opens the 'next wave' rockets bucket with a single liquid vehicle while individual launch-economy names remain private or post-date (SpaceX private; RKLB has not yet listed). Buy-and-hold-able diversified basket at inception.",
+      "news_evidence_urls": [
+        "https://www.bloomberg.com/news/articles/2021-03-30/cathie-wood-tests-appetite-for-ark-with-launch-of-new-space-etf",
+        "https://www.thinkadvisor.com/2021/03/29/cathie-woods-ark-to-launch-space-exploration-etf-tuesday/"
+      ],
+      "news_dates": ["2021-03-30", "2021-03-29"]
+    },
+    {
+      "ticker": "BOTZ",
+      "wave_bucket": "robotics",
+      "rationale": "Largest liquid robotics & AI ETF; opens the 'next wave' robotics bucket. Industrial automation and factory-robot demand are accelerating as the post-COVID reshoring push and global chip shortage push manufacturers toward higher automation intensity. Diversified across industrial robotics, automation components, and adjacent AI exposure.",
+      "news_evidence_urls": [
+        "https://www.gizmochina.com/2021/04/15/tsmc-q1-profit-growth-chip-shortage-last-till-2022/",
+        "https://www.globalxetfs.com/funds/botz"
+      ],
+      "news_dates": ["2021-03-31"]
+    },
+    {
+      "ticker": "URA",
+      "wave_bucket": "nuclear",
+      "rationale": "Largest uranium/nuclear-components ETF; opens the 'next wave' nuclear bucket cheaply. Uranium spot price has begun recovering off multi-year lows in early 2021 as utility long-term contracting picks up and SMR development pipelines (NuScale, X-energy, TerraPower) attract attention. Provides diversified exposure to the nuclear renaissance without single-name technology risk.",
+      "news_evidence_urls": [
+        "https://www.globalxetfs.com/funds/ura"
+      ],
+      "news_dates": ["2021-03-31"]
+    }
+  ],
+  "removes": [],
+  "no_changes": false,
+  "rationale_overall": "First rebalance after profile inception. Current watchlist (AAPL, MSFT, GOOGL, NVDA, SPY) cleanly covers the current AI wave and broad-market beta, so no removes are warranted. With a wide cap of 24 (19 slots free), this is the right moment to open three 'next wave' buckets cheaply via diversified ETFs: ARKX (rockets & spacecraft, just-launched 2021-03-30), BOTZ (robotics), and URA (nuclear). Each ETF opens a distinct wave bucket from the profile's prioritized list, avoids the engineered-biology and solar/wind exclusions, and lets us own the option on these next waves before single-name pure-plays exist publicly (RKLB, IonQ, NuScale are all still private as of today)."
+}

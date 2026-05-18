@@ -1,0 +1,36 @@
+{
+  "as_of_date": "2021-06-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "SPCE",
+      "wave_bucket": "rockets_spacecraft",
+      "rationale": "Virgin Galactic received FAA approval for full commercial launch license on 2021-06-25 following successful May test flight, becoming the first FAA-licensed spaceline for paying passengers; stock jumped ~39% on the news. Direct, dated catalyst aligned with the rockets/spacecraft next-wave thesis.",
+      "news_evidence_urls": [
+        "https://www.cnbc.com/2021/06/25/virgin-galactic-receives-faa-license-to-fly-passengers-to-space.html",
+        "https://investors.virgingalactic.com/news/news-details/2021/Virgin-Galactic-Receives-Approval-From-FAA-for-Full-Commercial-Launch-License-Following-Success-of-May-Test-Flight/default.aspx"
+      ]
+    },
+    {
+      "ticker": "ARKX",
+      "wave_bucket": "rockets_spacecraft",
+      "rationale": "ARK Space Exploration & Innovation ETF launched 2021-03-30; provides diversified basket exposure to space/satellite/launch names complementing the single-stock SPCE position. US-listed, liquid, active management aligned with the next-wave rockets thesis.",
+      "news_evidence_urls": [
+        "https://www.cnbc.com/2021/01/13/cathie-woods-ark-invest-plans-space-exploration-etf-arkx.html",
+        "https://www.ark-funds.com/funds/arkx"
+      ]
+    },
+    {
+      "ticker": "CCJ",
+      "wave_bucket": "nuclear",
+      "rationale": "Cameco's Q2 2021 reporting period showed continued long-term contract build-out (+7M lbs U3O8 added in Q2, 16M lbs YTD 2021) as utilities re-engage on uranium supply; pure-play uranium producer aligned with the SMR/nuclear next-wave thesis. US-listed (NYSE), liquid.",
+      "news_evidence_urls": [
+        "https://www.cameco.com/invest/financial-information/quarterly-reports/2021/q2",
+        "https://investingnews.com/cameco-q2-profits-rise/"
+      ]
+    }
+  ],
+  "removes": [],
+  "no_changes": false,
+  "rationale_overall": "Watchlist has 8/16 slots free at 2021-06-30. AI exposure (AAPL, MSFT, GOOGL, NVDA, SMH, ARKQ) is already strong, so this quarter we open the first beachhead in the next-wave names called out in the profile: rockets (SPCE + ARKX) and nuclear (CCJ). All three have dated catalysts/listings before 2021-07-01 and are US-listed and liquid. Quantum (IonQ) deferred because its SPAC didn't begin trading until October 2021. Robotics not added this round because no clean dated Q2 2021 catalyst surfaced beyond what NVDA/ARKQ already capture; will revisit. No removes: current names are core to the AI thesis and not yet at crest. Exclusions (solar, wind) honored."
+}
