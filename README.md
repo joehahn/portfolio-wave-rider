@@ -97,6 +97,8 @@ Three overlay pages are written and published to GitHub Pages:
 
 Each sweep page has a nav strip at the top for jumping between sweeps.
 
+A fourth sweep, **[max_watchlist_size](https://joehahn.github.io/portfolio-wave-rider/sweep_max_watchlist_size.html)** at values `[5, 8, 12, 16, 24]`, is fired separately via `/sweep-max-watchlist-size`. It can't be a pure replay because the cap shapes the curator's *decisions* (not just the optimizer's response), so each cap requires its own 21 fresh curator calls. Cost: ~$13 in LLM, ~15 min wall clock. cap=12 is the default and reuses the standard `/run-backtest` output.
+
 ## How `holdings.csv` shapes outcomes
 
 `holdings.csv` is the watchlist that the curator and the optimizer operate on.
