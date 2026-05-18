@@ -87,7 +87,7 @@ At each quarterly rebalance the curator reads news as of the rebalance date and 
 ./scripts/run_sweeps.sh
 ```
 
-Replays the same curator JSONs against a range of values for three optimizer knobs. Pure Python, no LLM calls, takes a few seconds. Each sweep holds the curator's watchlist decisions fixed and varies one knob, so the spread between curves isolates the optimizer's sensitivity to that knob without confounding it with news-driven composition changes.
+Replays the same curator JSONs against a range of values for three optimizer knobs. Each sweep holds the curator's watchlist decisions fixed and varies one knob, so the spread between curves isolates the optimizer's sensitivity to that knob without confounding it with news-driven composition changes.
 
 Three overlay pages are written and published to GitHub Pages:
 
