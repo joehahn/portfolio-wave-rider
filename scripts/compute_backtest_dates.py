@@ -25,7 +25,7 @@ from pathlib import Path
 import pandas as pd
 
 DEFAULT_RUNS_DIR = "data/curator_runs/5y-quarterly"
-STARTER_WATCHLIST = ["AAPL", "MSFT", "GOOGL", "SPY", "AGG"]
+STARTER_WATCHLIST = ["AAPL", "MSFT", "GOOGL", "SPY", "NVDA"]
 N_QUARTERS = 21  # rolling-5y window: 21 quarter-ends span 20 intervals = 5y
 
 

@@ -2868,7 +2868,7 @@ def build_curator_dashboard(
         'mean-variance on the revised watchlist. The buy-and-hold curve below is '
         'the value of the initial portfolio (which never gets rebalanced or '
         'optimized) over time. The starter watchlist is <code>[AAPL, MSFT, GOOGL, '
-        'SPY, AGG]</code>, a plausible portfolio for a tech-aware US investor in '
+        'SPY, NVDA]</code>, a plausible portfolio for a tech-aware US investor in '
         'early 2021. The buy-and-hold baseline is the equal-weight allocation '
         '(20% in each of the five tickers) bought on day 0 and held without '
         'rebalancing through the end of the window.</p>'

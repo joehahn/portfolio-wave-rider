@@ -2,12 +2,11 @@
   {
     "date": "2021-03-31",
     "adds": [
-      "NVDA",
       "ARKX",
       "BOTZ"
     ],
     "removes": [],
-    "rejections": 0
+    "rejections": 1
   },
   {
     "date": "2021-06-30",
@@ -36,10 +35,11 @@
   {
     "date": "2022-03-31",
     "adds": [
-      "CCJ"
+      "CCJ",
+      "ISRG"
     ],
     "removes": [],
-    "rejections": 2
+    "rejections": 1
   },
   {
     "date": "2022-06-30",
