@@ -1,0 +1,8 @@
+{
+  "as_of_date": "2022-12-31",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "Watchlist [NVDA, URA, RKLB, XLE, LNG] is at cap=5 and already covers four named profile waves: AI (NVDA), nuclear (URA), rockets/spacecraft (RKLB), and geopolitical-energy (XLE + LNG). Last quarter we executed the IONQ->LNG swap on the fresh Nord Stream catalyst (2022-09-26/27); no comparably dated, watchlist-displacing catalyst has emerged in Q4 2022. Q4's biggest macro events were FTX's collapse (2022-11-08, crypto-specific, no watchlist read-through), the Fed's continued tightening (Nov 2 +75bp, Dec 14 +50bp, fully discounted across all holdings), and ChatGPT's consumer launch (2022-11-30) which reinforces the NVDA AI thesis already held but does not pull a new ticker onto a 5-slot watchlist over current holdings. European winter gas storage filled successfully but Russia gas cuts persist into Q1 2023, so the XLE+LNG double-stack on the geopolitical-energy wave is still defensible (2 of 5 slots, within the 4-per-bucket guardrail). Re-adding a quantum name one quarter after removing IONQ would be pure churn (no fresh Q4 quantum commercial catalyst). Defense primes (LMT/ITA) remain off the table at cap=5 without a dated trigger fresher than the 10-month-old Ukraine invasion. Demographics has no dated Q4 catalyst. Holding the line is the higher-conviction call than forcing a marginal swap at the bear-market bottom. All considerations verified via WebSearch with before:2023-01-01; no post-date events (MSFT-OpenAI 2023-01, SVB 2023-03, GPT-4 2023-03, etc.) referenced."
+}

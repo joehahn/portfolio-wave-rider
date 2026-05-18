@@ -1,0 +1,48 @@
+{
+  "as_of_date": "2021-09-30",
+  "current_watchlist": ["AAPL", "MSFT", "GOOGL", "NVDA", "SPY", "ARKX", "BOTZ", "URA", "CCJ", "LMT", "TSM"],
+  "max_watchlist_size": 24,
+  "adds": [
+    {
+      "ticker": "RKLB",
+      "wave_bucket": "rockets",
+      "rationale": "Pure-play small-launch provider; newly public via SPAC merger closing Aug 25, 2021. Aligns with profile's 'invest early in next waves: rockets' mandate. Complements ARKX (broad space ETF) with a single-name early-stage bet.",
+      "news_evidence": [
+        {
+          "date": "2021-08-25",
+          "url": "https://www.cnbc.com/2021/08/25/rocket-lab-begins-trading-on-nasdaq-as-rklb-after-spac-merger.html",
+          "summary": "Rocket Lab begins trading on Nasdaq as RKLB after closing Vector Acquisition SPAC merger; ~$777M gross proceeds, $4.8B equity valuation."
+        }
+      ]
+    },
+    {
+      "ticker": "ISRG",
+      "wave_bucket": "robotics",
+      "rationale": "Dominant medical-robotics platform with widening installed base and procedure-volume tailwind from elective-surgery recovery. Profile names robotics as a next-wave bucket; ISRG diversifies BOTZ exposure into healthcare robotics.",
+      "news_evidence": [
+        {
+          "date": "2021-07-20",
+          "url": "https://www.sec.gov/Archives/edgar/data/0001035267/000103526721000115/a20210630ex-991.htm",
+          "summary": "Q2 2021 8-K: da Vinci procedures +68% YoY, installed base grew to 6,335 systems (+10% YoY), Q2 revenue $1.46B (+72% YoY), 328 systems shipped."
+        }
+      ]
+    },
+    {
+      "ticker": "LNG",
+      "wave_bucket": "geopolitical_energy",
+      "rationale": "Leading US LNG exporter; profile names geopolitical-energy as a non-tech wave. European gas tightness in 2H 2021 (pre-Russia curtailment) is already lifting Atlantic-basin LNG netbacks, structurally favoring US export capacity.",
+      "news_evidence": [
+        {
+          "date": "2021-09-30",
+          "url": "https://www.eia.gov/todayinenergy/detail.php?id=63804",
+          "summary": "EIA notes global natural gas market entering a tighter supply-demand balance heading into winter 2021-22; European hub prices rising sharply, lifting demand for US LNG cargoes."
+        }
+      ]
+    }
+  ],
+  "removes": [],
+  "post_action_watchlist": ["AAPL", "MSFT", "GOOGL", "NVDA", "SPY", "ARKX", "BOTZ", "URA", "CCJ", "LMT", "TSM", "RKLB", "ISRG", "LNG"],
+  "post_action_size": 14,
+  "slots_remaining": 10,
+  "notes": "Cap=24 with 13 slots free at as-of; using 3 of 3 add allowance. No removes: current 11 names span AI majors (AAPL/MSFT/GOOGL/NVDA/TSM), broad-beta (SPY), space (ARKX), robotics-AI (BOTZ), nuclear/uranium (URA/CCJ), and defense (LMT) - all consistent with stated waves. Excluded buckets respected (no engineered_biology; no solar/wind). All adds have dated evidence strictly before 2021-10-01; no post-date events cited (Omicron, Ukraine, Fed hikes, etc. suppressed)."
+}

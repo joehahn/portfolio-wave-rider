@@ -1,0 +1,53 @@
+{
+  "as_of_date": "2022-09-30",
+  "current_watchlist": ["NVDA", "URA", "RKLB", "IONQ", "XLE"],
+  "max_watchlist_size": 5,
+  "no_changes": false,
+  "adds": [
+    {
+      "ticker": "LNG",
+      "wave_bucket": "non-tech: geopolitical-energy",
+      "rationale": "Cheniere Energy is the largest US LNG exporter (Sabine Pass + Corpus Christi). Nord Stream 1 & 2 sabotage on 2022-09-26/27 severed Russia's primary gas link to Germany, making US LNG the structural replacement for European pipeline gas; Europe's 2022 LNG imports were on pace to grow ~60% YoY. On 2022-09-12 Cheniere raised its 2022 distributable cash flow midpoint to ~$11.3B (up from $10.1B), confirming the cash flow tailwind is already landing in results, not just narrative. Fits the profile's geopolitical-energy wave and is a cleaner pure-play on the Russia-gas-cut thesis than XLE (broad oil & gas).",
+      "news_evidence_urls": [
+        "https://www.bloomberg.com/news/articles/2022-09-12/cheniere-rises-as-lng-exporter-signals-more-cash-is-on-the-way",
+        "https://carnegieendowment.org/russia-eurasia/politika/2022/09/shutting-down-nord-stream-marks-the-point-of-no-return-for-russian-gas",
+        "https://www.bloomberg.com/news/articles/2022-09-27/europe-faces-an-energy-crisis-how-bad-could-things-get"
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "IONQ",
+      "wave_bucket": "tech: quantum",
+      "rationale": "IONQ is the lowest-conviction holding in the 90d lookback. Quantum remains the most distant of the named tech waves with no commercial-revenue catalyst in Q3 2022; IONQ posted a Q2 2022 (Aug 15) report with revenue still in the single-digit millions and a widening net loss. With the broader risk-off environment (Fed hiked 75bp on 2022-09-21, third consecutive 75bp move) hammering long-duration unprofitable tech the hardest, IONQ is the holding most exposed to multiple compression and the one I'd cycle out of to make room for a dated-catalyst non-tech name. Quantum thesis is paused, not abandoned, and IONQ can be re-added later when a commercial milestone lands.",
+      "news_evidence_urls": [
+        "https://investors.ionq.com/news/news-details/2022/IonQ-Reports-Second-Quarter-2022-Financial-Results/default.aspx"
+      ]
+    }
+  ],
+  "kept": [
+    {
+      "ticker": "NVDA",
+      "rationale": "Core AI-wave holding. Q2 FY23 (2022-08-24) was weak on gaming and US imposed export curbs on A100/H100 to China (2022-08-31), but Data Center still grew +61% YoY to $3.81B — the structural AI training-chip thesis is intact and the stock's drawdown reflects cyclical gaming/macro pain, not a broken franchise. Holding through the cycle."
+    },
+    {
+      "ticker": "URA",
+      "rationale": "Nuclear wave. Europe's gas crisis and the Nord Stream sabotage are accelerating the policy pivot back to nuclear (Germany delayed nuclear shutdowns, Japan restart announcements, UK new-build commitments through 2022). URA captures uranium miners broadly; no name-specific bad news in the 90d window."
+    },
+    {
+      "ticker": "RKLB",
+      "rationale": "Rockets/space wave. Rocket Lab continues Electron cadence and Neutron development; no negative 90d catalyst. Speculative but the only listed pure-play small-launch name fitting the profile's rockets bucket."
+    },
+    {
+      "ticker": "XLE",
+      "rationale": "Geopolitical-energy wave. Broad US energy ETF benefiting from the same European gas crisis tailwind; complements LNG (XLE is integrated oil-weighted, LNG is pure US export). Holding both gives the energy wave depth without doubling up on the same sub-segment."
+    }
+  ],
+  "wave_coverage_after": {
+    "AI / semis": ["NVDA"],
+    "nuclear": ["URA"],
+    "rockets / space": ["RKLB"],
+    "geopolitical-energy (non-tech)": ["XLE", "LNG"]
+  },
+  "self_critique": "Only one swap proposed because at cap=5 every add forces a remove and I want high-conviction trades. IONQ→LNG is the cleanest: IONQ has no Q3 catalyst and is most exposed to rate-driven multiple compression; LNG has a dated, fresh, profile-aligned catalyst (Nord Stream 2022-09-26/27, four days before as_of). Did not add defense (LMT/ITA) despite Ukraine counteroffensive — defense has been running since February and the catalyst is more priced-in than the LNG one; saved for a future quarter if a fresh dated trigger appears. All cited events are pre-2022-10-01 and confirmed via WebSearch with before:2022-10-01 filters; no post-date events (FTX, ChatGPT, etc.) referenced. All tickers are US-listed, liquid, listed well before 2022-09-30. Adheres to exclusions (no solar, wind, engineered_biology)."
+}

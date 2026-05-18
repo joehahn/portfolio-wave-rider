@@ -1,0 +1,8 @@
+{
+  "as_of_date": "2022-06-30",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "Watchlist sits at cap=16 with the post-invasion thematic shape already correctly set by last quarter's rotation (ITA + XLE + NLR in; SPCE + ARKX + ARKQ out). Bucket distribution is balanced: AI/general core 6 (AAPL/MSFT/GOOGL/NVDA/SPY/SMH), geopolitical-energy 3 (LNG/ITA/XLE), nuclear 3 (URA/CCJ/NLR), robotics 2 (BOTZ/ISRG), rockets 1 (RKLB), quantum 1 (IONQ). Q2 2022 reinforced rather than reshaped the Q1 thesis: Fed delivered a second 50 bp hike on 2022-05-04 and a 75 bp hike on 2022-06-15 (largest since 1994), S&P entered bear market on 2022-06-13, US CPI hit 8.6% YoY for May (reported 2022-06-10), and the EU's REPowerEU plan (announced 2022-05-18) plus the UK Energy Security Strategy (2022-04-07, up to 8 new reactors by 2050) and France's six-EPR2 commitment (Macron, 2022-02-10) keep both the geopolitical-energy and nuclear legs structurally valid. The growth/tech drawdown is severe but reflects rate-driven multiple compression, not a thesis break on AI; the profile's 'trim before crest' rule does not apply at mid-cycle drawdown. No Q2 2022 catalyst surfaced a high-conviction add for the empty demographics bucket, and at cap any forced swap would degrade rather than improve the thematic shape. Engineered-biology exclusion honored. No changes this quarter."
+}

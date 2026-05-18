@@ -1,0 +1,33 @@
+{
+  "as_of_date": "2022-06-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "LLY",
+      "wave_bucket": "demographics",
+      "rationale": "Eli Lilly fills the profile's named non-tech next wave (demographics / chronic-disease of aging populations) which the cap-8 basket currently does not cover. Mounjaro (tirzepatide) received FDA approval on 2022-05-13 for type-2 diabetes with a strong weight-loss readout already in the SURPASS trial program, opening a multi-decade obesity/metabolic franchise tied to aging demographics in the US, EU, and Japan. LLY is a large-cap US-listed liquid name with multi-decade trading history. Not engineered biology — tirzepatide is a peptide GLP-1/GIP dual agonist, classical pharma chemistry, not cell or genome engineering.",
+      "news_evidence": [
+        {
+          "date": "2022-05-13",
+          "headline": "FDA approves Eli Lilly's Mounjaro (tirzepatide) for type-2 diabetes",
+          "url": "https://www.fda.gov/news-events/press-announcements/fda-approves-novel-dual-targeted-treatment-type-2-diabetes"
+        },
+        {
+          "date": "2022-04-28",
+          "headline": "Lilly Q1 2022 earnings: Trulicity (GLP-1) revenue +18% YoY, reinforcing the metabolic franchise into the Mounjaro launch",
+          "url": "https://investor.lilly.com/news-releases/news-release-details/lilly-reports-strong-first-quarter-2022-financial-results-and"
+        }
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "LNG",
+      "wave_bucket": "geopolitical-energy",
+      "rationale": "Cheniere has done its job. After Russia invaded Ukraine on 2022-02-24, European utilities bid up US LNG cargoes and Cheniere is up sharply YTD into Q2-close — the closest thing to a 'trim before crest' signal in the cap-8 basket. Geopolitical-energy coverage is preserved via URA (Global X Uranium ETF), which also covers the nuclear next-wave through its Cameco / Kazatomprom / NextGen miner mix — higher information density per slot at cap=8 than holding both LNG and URA. Removing LNG frees the slot for demographics (LLY), the only named profile wave with zero current coverage."
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Stand at 2022-06-30 close. Macro regime since the last rebalance: 50bp Fed hike on 2022-05-04 and 75bp on 2022-06-15 — durable hawkishness, NASDAQ down roughly 22% in Q2 alone. This is buildup-phase pullback for the AI core (MSFT, GOOGL, NVDA), not a crest — the profile's 'trim before crest' rule does not fire on any AI name; hold all three. ISRG (robotics), RKLB (rockets; Capstone NASA cislunar launch success on 2022-06-28 reinforces thesis), and IONQ (quantum, only quantum name in the basket) each remain the sole representative of a named next-wave and are held. URA covers both geopolitical-energy (uranium spot lifted by the Russia/Kazakhstan supply concern) and partially the nuclear next-wave (Cameco/NextGen exposure inside the ETF) — held. The one swap this quarter: LNG out, LLY in. LNG has earned a peak-enthusiasm trim after the European LNG bidding war priced in through Q2; URA alone is sufficient for the geopolitical-energy slot. LLY brings the only coverage of the profile's named demographics non-tech wave, with Mounjaro FDA approval on 2022-05-13 anchoring a multi-decade metabolic/obesity franchise. Engineered_biology is excluded per profile and LLY is classical peptide pharma, not synbio — allowed. CCJ-replaces-URA was considered and rejected for the same reason as last quarter: URA's diversified miner basket beats single-name Cameco at this watchlist size. LMT/defense was considered as a Ukraine-driven add and rejected because the profile names rockets/robotics/quantum/nuclear as next waves, not defense primes. Post-change basket remains AT cap=8: MSFT, GOOGL, NVDA, ISRG, URA, RKLB, IONQ, LLY.",
+  "self_critique": "Stand at 2022-06-30 close. Pre-date events used: Russia invasion 2022-02-24, Fed 25bp 2022-03-16 / 50bp 2022-05-04 / 75bp 2022-06-15, Mounjaro FDA approval 2022-05-13, Lilly Q1 2022 earnings 2022-04-28, RKLB Capstone launch 2022-06-28, NASDAQ Q2 2022 drawdown context. Suppression list verified clean: no reference to Luna May-12 (pre-date but suppressed-region not invoked), UK gilt 2022-09-23, FTX 2022-11-08, ChatGPT 2022-11-30, MSFT-OpenAI 2023-01-23, SVB 2023-03-10, GPT-4 2023-03-14, NVDA Q2 2023-05-24, BTC ETF 2024-01-08, NUKZ launch 2024-01-24, GB200 2024-03-18, Apple Intelligence 2024-06-10, TMI PPA 2024-09-20, Trump 2024-11-05, DeepSeek 2025-01-20, robotaxi 2025-10-12, FY26 2025-12-01, AI agents 2026-02-15. No 2023/2024/2025/2026 event referenced. Inflation Reduction Act (signed 2022-08-16) is post-date and NOT used to justify URA/nuclear hold — only pre-date uranium-supply concerns. Constraints satisfied: 1 add + 1 remove (within 3/3 cap), adds-paired-with-removes, LLY not in current set, LLY US-listed (NYSE) with multi-decade history pre-2022-06-30, basket stays AT cap=8 post-change, no engineered_biology proposed (LLY is classical peptide pharma not synbio), each add has dated evidence bullets (2022-05-13 and 2022-04-28, both pre-date). WebSearch would be filtered before:2022-07-01 if invoked."
+}

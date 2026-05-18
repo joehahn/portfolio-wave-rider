@@ -1,0 +1,53 @@
+{
+  "as_of_date": "2022-03-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "ITA",
+      "wave_bucket": "geopolitical_energy",
+      "rationale": "Russia's invasion of Ukraine on 2022-02-24 has triggered a structural rerating of Western defense budgets (German chancellor Scholz pledged on 2022-02-27 to roughly double military spending and create a EUR 100B special fund; NATO members moving 2% of GDP from goal to floor). ITA is the most liquid, established (launched 2006-05) US-listed pure-play defense ETF (LMT, RTX, NOC, GD, BA top holdings) and rallied ~10% in the week after invasion. The profile names 'geopolitical-energy' as a non-tech next wave; defense is the geopolitical complement to the LNG/energy leg already in the watchlist and adds a distinct factor beyond oil-and-gas. ITA does not violate the engineered-biology exclusion.",
+      "news_evidence_urls": [
+        "https://www.nasdaq.com/articles/aerospace-and-defense-etfs-rallying-on-russia-ukraine-war",
+        "https://www.etftrends.com/defense-etfs-climb-following-russias-advance-into-ukraine/",
+        "https://etfdb.com/etf/ITA/"
+      ]
+    },
+    {
+      "ticker": "XLE",
+      "wave_bucket": "geopolitical_energy",
+      "rationale": "Brent crude crossed $100/bbl on 2022-02-28 after Russia's invasion of Ukraine and peaked near $127/bbl on 2022-03-08 as sanctions tightened, marking the most decisive geopolitical energy shock in a decade. XLE (Energy Select Sector SPDR, top holdings XOM, CVX, COP) gives diversified oil-major exposure that LNG (Cheniere, a US gas-export pure-play) does not capture, and complements the existing LNG geopolitical-energy leg. Established ETF (1998), deep liquidity, no exclusion conflicts.",
+      "news_evidence_urls": [
+        "https://www.eia.gov/todayinenergy/detail.php?id=55020",
+        "https://www.cnn.com/2022/02/23/business/brent-oil-ukraine-russia/index.html"
+      ]
+    },
+    {
+      "ticker": "NLR",
+      "wave_bucket": "nuclear",
+      "rationale": "The current nuclear leg (URA + CCJ) is essentially two correlated uranium-miner bets. NLR (VanEck Uranium+Nuclear Energy ETF, launched 2007) diversifies into nuclear utilities and downstream infrastructure-and-equipment names (BWX Technologies, Constellation-style operators, Korean and Japanese nuclear builders), which is where the post-invasion European reshoring of energy security plus the broader nuclear restart narrative will land. Profile explicitly names nuclear as a next wave; this add reduces single-commodity (U3O8 spot) concentration without touching the engineered-biology exclusion.",
+      "news_evidence_urls": [
+        "https://etfdb.com/etf/NLR/",
+        "https://www.sec.gov/Archives/edgar/data/0001137360/000113736022000412/vaneckuraniumnuclearenergy.htm"
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "SPCE",
+      "wave_bucket": "rockets_spacecraft",
+      "rationale": "Virgin Galactic announced on 2021-10-14 it was pushing commercial service from Q4 2022 (and after subsequent updates, into 2023), citing supply-chain and labor constraints; the stock has lost roughly two-thirds of its value from its 2021 high and the company is still pre-revenue with rising cash burn. RKLB (already in the watchlist since 2021-08-25 IPO, with a real Electron launch cadence and a Neutron roadmap) is the credible rockets pure-play; SPCE's space-tourism thesis is failing on its own milestones and no longer earns a cap-16 slot. Freeing this slot for a higher-conviction geopolitical-energy add."
+    },
+    {
+      "ticker": "ARKX",
+      "wave_bucket": "rockets_spacecraft",
+      "rationale": "ARK Space Exploration & Innovation ETF overlaps materially with the rockets bucket already covered by RKLB single-name and the broader AI/disruptive-tech bets in ARKQ/SMH; ARK funds were punished disproportionately in Q1 2022 as the Fed began hiking (first 25 bp on 2022-03-16) and long-duration growth re-rated lower. ARKX is also small and less liquid than the established defense/energy ETFs being added. Removing reduces redundancy and ARK-rate-beta concentration."
+    },
+    {
+      "ticker": "ARKQ",
+      "wave_bucket": "robotics",
+      "rationale": "ARK Autonomous Technology & Robotics ETF is largely redundant with BOTZ (diversified robotics ETF, already held) plus ISRG (robotic-surgery pure-play, already held). Same ARK-fund problem as ARKX: long-duration growth re-rated hard in Q1 2022 on Fed hiking and the holdings overlap with other watchlist names is material. Removing tightens the robotics leg to one ETF + one pure-play and frees a slot for nuclear diversification."
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Watchlist is at cap=16 so every add is paired with a remove. The quarter's macro pivot is decisive: Russia invaded Ukraine on 2022-02-24, Brent crossed $100 on 2022-02-28 and peaked near $127 on 2022-03-08, and the Fed delivered its first 25 bp hike on 2022-03-16. Three growth/space speculatives that were defensible at zero-rates are now stale (SPCE has slipped its own commercial-service milestones into 2023; ARKX and ARKQ are ARK rate-beta sleeves that overlap RKLB+BOTZ+ISRG already in the watchlist). Three replacements lean into the new regime: ITA captures the multi-decade rearmament cycle that just started in Europe, XLE captures the oil-major leg of geopolitical-energy that LNG (a gas-export pure-play) doesn't, and NLR diversifies the nuclear bucket beyond two correlated uranium miners. The AI core (AAPL/MSFT/GOOGL/NVDA/SPY/SMH) is untouched - we are nowhere near AI crest; the profile's 'trim before crest' rule does not apply yet. Engineered-biology exclusion honored throughout."
+}

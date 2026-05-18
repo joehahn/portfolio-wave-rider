@@ -1,0 +1,36 @@
+{
+  "as_of_date": "2021-09-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "RKLB",
+      "wave_bucket": "rockets_spacecraft",
+      "rationale": "Rocket Lab completed its SPAC merger with Vector Acquisition and began trading on Nasdaq under RKLB on 2021-08-25, raising ~$777M gross to fund Neutron, an 8-ton reusable medium-lift rocket announced 2021-03-01 with a 2024 maiden-flight target. Revenue-generating launch provider (Electron) with a credible reusable roadmap; better next-wave rockets play than the pre-revenue tourism names already held.",
+      "news_evidence_urls": [
+        "https://www.businesswire.com/news/home/20210825005365/en/Rocket-Lab-Completes-Merger-with-Vector-Acquisition-Corporation-to-Become-Publicly-Traded-End-to-End-Space-Company",
+        "https://spacenews.com/rocket-lab-to-go-public-through-spac-merger-and-develop-medium-lift-rocket/"
+      ]
+    },
+    {
+      "ticker": "BOTZ",
+      "wave_bucket": "robotics",
+      "rationale": "Global X Robotics & AI ETF gives diversified exposure to industrial-automation and robotics leaders (Keyence, Mitsubishi Electric, Fanuc-style names) that the current US-tech-heavy watchlist lacks. Trading since 2016, deep liquidity, ~49 holdings, ~77% US+Japan; opens the robotics next-wave beachhead the profile calls out without single-name concentration risk and only modest NVDA overlap.",
+      "news_evidence_urls": [
+        "https://www.globalxetfs.com/funds/botz",
+        "https://etfdb.com/etf/BOTZ/"
+      ]
+    },
+    {
+      "ticker": "LNG",
+      "wave_bucket": "geopolitical_energy",
+      "rationale": "European TTF natural-gas prices surged from ~$500/1000m3 in late July to ~$800/1000m3 by 2021-09-14 as Gazprom pipeline flows ran below long-term contractual ceilings and EU storage filled to a decade low. US LNG export terminals (Cheniere is the dominant US-listed pure-play) are the direct beneficiary of the spread between depressed Henry Hub and elevated TTF/JKM. Matches the profile's non-tech geopolitical-energy wave.",
+      "news_evidence_urls": [
+        "https://foreignpolicy.com/2021/09/24/energy-crisis-europe-gas-coal-renewable-prices-climate/",
+        "https://www.cgai.ca/lessons_from_the_2021_european_gas_crisis"
+      ]
+    }
+  ],
+  "removes": [],
+  "no_changes": false,
+  "rationale_overall": "Watchlist has 5/16 slots free at 2021-09-30; using 3 to open beachheads in the remaining profile-called next waves. RKLB is the highest-quality rockets add now that it has been trading since 2021-08-25 with cash and a Neutron roadmap; complements but does not replace SPCE/ARKX. BOTZ opens robotics with a diversified, liquid ETF rather than a single name. LNG opens the non-tech geopolitical-energy wave on the directly-dated European gas crisis (TTF doubling July to mid-September, Gazprom withholding supply). Quantum (IonQ) explicitly deferred: the SPAC business combination closed 2021-09-30 but stock did not begin trading on NYSE until 2021-10-01, so it is not yet eligible. SMR pure-plays (NuScale) also not yet public. No removes: AI core (AAPL/MSFT/GOOGL/NVDA/SMH/ARKQ/SPY) remains in build-up, not crest; uranium/space speculatives (URA/SPCE/ARKX/CCJ) still aligned with stated next-wave theses. Exclusions (solar, wind, engineered_biology) honored."
+}

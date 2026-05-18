@@ -1,0 +1,42 @@
+{
+  "as_of": "2022-12-31",
+  "current_watchlist": ["AAPL", "MSFT", "GOOGL", "NVDA", "SPY", "SMH", "URA", "CCJ", "RKLB", "BOTZ", "LNG", "IONQ", "ISRG", "ITA", "XLE", "NLR"],
+  "max_watchlist_size": 16,
+  "at_cap": true,
+  "no_changes": true,
+  "adds": [],
+  "removes": [],
+  "rationale": "Watchlist is at cap=16 and well-aligned with the investor profile thesis at year-end 2022. Coverage across all profile waves is balanced: AI/tech (AAPL, MSFT, GOOGL, NVDA, SPY, SMH) is well-positioned for the just-launched ChatGPT-era inflection (OpenAI's ChatGPT released 2022-11-30, already crossing one million users within one week, triggering a multi-fold increase in AI-positive corporate sentiment); nuclear (URA, CCJ, NLR) reflects the post-IRA (2022-08-22) nuclear renaissance and tight uranium supply (Cameco contracted a record 80 Mlb in 2022, uranium futures at ~$48/lb on 2022-12-07, +12% YTD); geopolitical energy (LNG, XLE) captures the Russia-Ukraine-driven European LNG demand (Cheniere produced ~11% of global LNG in 2022 with 70%+ flowing to Europe); rockets (RKLB) and robotics (BOTZ, ISRG) and quantum (IONQ) cover the named next-waves; defense/demographics has ITA coverage benefiting from record world military spending of $2.24T in 2022. No current ticker has a thesis-breaking stale catalyst at this date, and no candidate add would clearly outrank an existing name on the profile's wave logic. The starter watchlist is already thesis-coherent for 2022-12-31 conditions.",
+  "evidence": [
+    {
+      "ticker": "MSFT",
+      "wave": "ride-AI",
+      "bullet": "ChatGPT launched 2022-11-30 by OpenAI (Microsoft's largest investor and exclusive cloud partner); >1M users in first week kicks off corporate AI sentiment surge.",
+      "url": "https://finance.yahoo.com/news/chatgpt-was-unveiled-3-years-ago-kicking-off-the-ai-revolution-for-investors-it-did-even-more-110014912.html"
+    },
+    {
+      "ticker": "CCJ",
+      "wave": "nuclear",
+      "bullet": "Cameco reported record 80 Mlb uranium contracting in 2022 with 17 Mkg conversion services; uranium futures ~$48/lb on 2022-12-07, +12% YTD on tight supply.",
+      "url": "https://theoregongroup.com/commodities/uranium/uranium-prices-how-did-we-get-here-what-comes-next/"
+    },
+    {
+      "ticker": "LNG",
+      "wave": "geopolitical-energy",
+      "bullet": "Cheniere produced ~11% of global LNG in 2022 with >70% to Europe (~40 bcm regasified), roughly doubling 2021 European volumes and covering ~30% of the Russian shortfall.",
+      "url": "https://www.lng2023.org/news/cheniere-key-contributor-european-energy-security"
+    },
+    {
+      "ticker": "ITA",
+      "wave": "geopolitical-defense",
+      "bullet": "World military spending hit an all-time high of $2.24T in 2022 (+3.7% YoY, 8th consecutive yearly rise), driven by Russia-Ukraine war and Central/Western European rearmament.",
+      "url": "https://www.tandfonline.com/doi/full/10.1080/10242694.2023.2221877"
+    },
+    {
+      "ticker": "ISRG",
+      "wave": "robotics",
+      "bullet": "Q4 2022 da Vinci procedures grew ~18% YoY despite China COVID drag; full-year procedure growth approaching pre-pandemic levels with solid installed base growth.",
+      "url": "https://www.sec.gov/Archives/edgar/data/0001035267/000103526723000006/q422ex-991earningsrelease.htm"
+    }
+  ]
+}

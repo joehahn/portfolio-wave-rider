@@ -1,0 +1,55 @@
+{
+  "as_of_date": "2021-12-31",
+  "current_watchlist": ["AAPL", "MSFT", "GOOGL", "NVDA", "SPY", "ARKX", "BOTZ", "URA", "CCJ", "LMT", "TSM", "RKLB", "ISRG", "LNG"],
+  "max_watchlist_size": 24,
+  "adds": [
+    {
+      "ticker": "IONQ",
+      "wave_bucket": "quantum",
+      "rationale": "First publicly traded pure-play quantum-computing company; profile explicitly names quantum as a next-wave priority and prior to IONQ's Oct 1, 2021 listing there was no liquid US-listed pure-play. Trapped-ion approach is differentiated from superconducting peers and accessible via AWS Braket and Azure Quantum.",
+      "news_evidence": [
+        {
+          "date": "2021-10-01",
+          "url": "https://investors.ionq.com/news/news-details/2021/IonQ-Becomes-First-Public-Pure-Play-Quantum-Computing-Company-Following-Business-Combination-with-dMY-Technology-Group-III/default.aspx",
+          "summary": "IonQ closes business combination with dMY Technology Group III and begins trading on NYSE as IONQ; first publicly traded pure-play quantum-computing company."
+        }
+      ]
+    },
+    {
+      "ticker": "BWXT",
+      "wave_bucket": "nuclear",
+      "rationale": "Sole North American manufacturer of large naval nuclear reactors plus growing Canadian SMR supply-chain footprint via partnerships with NuScale and GE Hitachi. Hits both nuclear (next-wave) and defense exposure; complements URA/CCJ (uranium fuel cycle) with downstream reactor manufacturing.",
+      "news_evidence": [
+        {
+          "date": "2021-04-20",
+          "url": "https://www.bwxt.com/bwxt-awarded-1-billion-in-naval-nuclear-propulsion-program-options/",
+          "summary": "BWXT awarded ~$2.2B in US Naval Nuclear Propulsion Program contracts (including future-year options) for manufacture of naval nuclear reactor components and fuel."
+        },
+        {
+          "date": "2021-12-02",
+          "url": "https://www.ans.org/news/article-3261/nuscale-advances-work-with-bwxt-builds-out-canadas-smr-supply-chain/",
+          "summary": "NuScale advances SMR supply-chain work with BWXT Canada, expanding BWXT's role in the small modular reactor build-out."
+        }
+      ]
+    },
+    {
+      "ticker": "AMD",
+      "wave_bucket": "AI",
+      "rationale": "Data-center CPU and accelerator share gainer; pending Xilinx acquisition (announced Oct 2020, regulatory approvals progressing through 2021) brings FPGA and AI-inference IP that broadens AMD's AI silicon stack. Diversifies AI-compute exposure beyond NVDA/TSM concentration.",
+      "news_evidence": [
+        {
+          "date": "2021-10-26",
+          "url": "https://ir.amd.com/news-events/press-releases/detail/1024/amd-reports-third-quarter-2021-financial-results",
+          "summary": "AMD reports Q3 2021 revenue of $4.31B, +54% YoY, driven by EPYC data-center server CPU share gains; reiterates Xilinx deal on track to close."
+        }
+      ]
+    }
+  ],
+  "removes": [],
+  "post_action_watchlist": ["AAPL", "MSFT", "GOOGL", "NVDA", "SPY", "ARKX", "BOTZ", "URA", "CCJ", "LMT", "TSM", "RKLB", "ISRG", "LNG", "IONQ", "BWXT", "AMD"],
+  "post_action_size": 17,
+  "slots_remaining": 7,
+  "no_changes": false,
+  "rationale_overall": "Three adds advance the profile's next-wave thesis on distinct fronts: IONQ opens the first quantum pure-play slot, BWXT layers nuclear-reactor manufacturing on top of the URA/CCJ fuel-cycle exposure (and adds defense alongside LMT), and AMD broadens AI-silicon exposure beyond the NVDA/TSM concentration. No removes: at end of 2021 the AI majors and existing thematics are still in buildup/surge phase per the 'trim before crest' rule, and 10 free slots make defensive trimming unnecessary. All adds carry strictly pre-2022 dated evidence; engineered-biology, solar, and wind excluded.",
+  "notes": "Cap=24 with 10 slots free at as-of; using 3 of 3 add allowance, 0 removes. Wave buckets used: quantum (IONQ), nuclear (BWXT), AI (AMD) - all from valid spec list. IONQ confirmed pre-date listing (2021-10-01). No post-date events cited (Ukraine invasion, Fed hike cycle, ChatGPT, GPT-4, DeepSeek, etc. all suppressed). Self-critique pass: every evidence date is <= 2021-12-31 and the AMD bullet deliberately stops at Q3 2021 earnings rather than the Feb 2022 Xilinx deal close."
+}

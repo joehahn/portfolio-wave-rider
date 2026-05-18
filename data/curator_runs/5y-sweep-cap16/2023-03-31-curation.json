@@ -1,0 +1,42 @@
+{
+  "as_of": "2023-03-31",
+  "current_watchlist": ["AAPL", "MSFT", "GOOGL", "NVDA", "SPY", "SMH", "URA", "CCJ", "RKLB", "BOTZ", "LNG", "IONQ", "ISRG", "ITA", "XLE", "NLR"],
+  "max_watchlist_size": 16,
+  "at_cap": true,
+  "no_changes": true,
+  "adds": [],
+  "removes": [],
+  "rationale": "Watchlist is at cap=16 and the GPT-4 quarter has only strengthened (not invalidated) every existing thesis line. AI/tech (AAPL, MSFT, GOOGL, NVDA, SPY, SMH) is sitting on the most important AI catalyst of the cycle: GPT-4 launched 2023-03-14 with multimodal input and step-function reasoning gains; MSFT began billing Azure OpenAI service 2023-03-13 at $0.002/1K tokens and rolled out Copilot for Microsoft 365 on 2023-03-16; NVDA H100 / DGX Cloud announced at GTC 2023-03-21 anchors the AI-infrastructure picks-and-shovels trade (NVDA already +90% YTD vs MSFT +16.5% confirming SMH overweighting is correct). The mid-March SVB collapse (2023-03-10) and ensuing regional-bank stress passed through tech mega-caps as a flight-to-quality bid rather than damage, so no defensive rotation is warranted. Nuclear (URA, CCJ, NLR): uranium spot held in the high-$40s/lb through Q1 with Cameco's Westinghouse acquisition closing (announced Oct 2022, in regulatory review through Q1 2023) wiring CCJ into SMR fuel-cycle economics via AP300 and eVinci; the IRA's nuclear PTC ($15/MWh) is now operative for existing reactors. Geopolitical energy (LNG, XLE): Cheniere shipped a record 167 cargoes in Q1 2023 with US-to-Europe flows remaining strong despite TTF moderating from winter highs; OPEC+ discipline keeps XLE thesis intact. Next-waves (RKLB rockets, IONQ quantum, ISRG/BOTZ robotics, ITA defense) all have ongoing positive operational catalysts: IONQ hit its 29 algorithmic-qubit target on Forte seven months early; ISRG da Vinci procedure growth re-accelerating post-China-reopen; ITA continuing to benefit from Russia-Ukraine-driven European rearmament. No US-listed liquid candidate (e.g. PLTR, ARM not yet IPO'd, SMR not yet listed via spac at this date) outranks an existing name on the profile's wave logic strongly enough to justify a forced swap at full cap, and trimming a conviction name into the GPT-4 catalyst would be premature.",
+  "evidence": [
+    {
+      "ticker": "MSFT",
+      "wave": "ride-AI",
+      "bullet": "GPT-4 launched 2023-03-14 (multimodal, +precision); Microsoft began billing Azure OpenAI Service on 2023-03-13 at $0.002/1K tokens and announced Copilot for Microsoft 365 on 2023-03-16, monetizing the OpenAI stack across Office/Teams.",
+      "url": "https://www.fool.com/investing/2023/03/15/microsofts-new-ai-machines-and-openais-new-chatgpt/"
+    },
+    {
+      "ticker": "NVDA",
+      "wave": "ride-AI",
+      "bullet": "NVDA shares +90% YTD through Q1 2023 (vs MSFT +16.5%) on H100 / DGX Cloud / GTC announcements 2023-03-21; AI-infrastructure picks-and-shovels trade now the cleanest expression of the AI thesis.",
+      "url": "https://www.fool.com/investing/2023/03/24/better-ai-stock-microsoft-vs-nvidia/"
+    },
+    {
+      "ticker": "LNG",
+      "wave": "geopolitical-energy",
+      "bullet": "Cheniere exported a record 167 LNG cargoes (~603 TBtu) in Q1 2023 with US flows to Europe remaining strong; TTF moderating from winter highs but US export economics intact.",
+      "url": "https://www.hartenergy.com/exclusives/cheniere-exports-record-lng-cargos-q1-204976"
+    },
+    {
+      "ticker": "IONQ",
+      "wave": "quantum",
+      "bullet": "IonQ hit its 2023 technical milestone of 29 algorithmic qubits on IonQ Forte seven months ahead of schedule (announced Q1 2023); Aria 2 construction complete, raised 2023 revenue outlook to $18.8-19.2M.",
+      "url": "https://www.sec.gov/Archives/edgar/data/0001824920/000095017023041321/ionq-ex99_1.htm"
+    },
+    {
+      "ticker": "SPY",
+      "wave": "ride-AI",
+      "bullet": "SVB collapsed 2023-03-10 (largest US bank failure since 2008); FDIC backstop announced 2023-03-12; flight-to-quality bid into mega-cap tech names cushioned SPY through the regional-bank stress rather than triggering a broad risk-off.",
+      "url": "https://en.wikipedia.org/wiki/Collapse_of_Silicon_Valley_Bank"
+    }
+  ]
+}

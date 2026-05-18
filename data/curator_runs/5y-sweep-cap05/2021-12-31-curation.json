@@ -1,0 +1,41 @@
+{
+  "as_of_date": "2021-12-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "IONQ",
+      "wave_bucket": "quantum",
+      "rationale": "Profile names quantum as a target next wave and the watchlist has zero quantum exposure. IonQ became the first publicly traded, pure-play quantum computing company on Oct 1, 2021 (pre-as-of-date, eligible) via the dMY Technology Group III SPAC merger, raising $636M to fund commercialization of trapped-ion quantum systems. Three months of trading history make it US-listed and liquid. No competing pure-play exists in Q4 2021 (Rigetti/IBM-quantum/Honeywell-Quantinuum either pre-merger or buried inside conglomerates), and QTUM is a thematic ETF that dilutes pure-play exposure. This is the cleanest investable proxy for the quantum thesis the profile explicitly calls out.",
+      "news_evidence": [
+        {
+          "summary": "IonQ closed its business combination with dMY Technology Group III and began trading on NYSE under 'IONQ' on Oct 1, 2021; received $636M gross proceeds to fund growth and commercialization of its trapped-ion quantum systems. First publicly traded pure-play quantum computing company.",
+          "source": "IonQ press release / NYSE listing",
+          "url": "https://www.ionq.com/news/october-01-2021-ionq-listed-on-nyse",
+          "date": "2021-10-01"
+        },
+        {
+          "summary": "IonQ announced commercial and ecosystem partnerships with Goldman Sachs, Fidelity Center for Applied Technology, GE Research, and the University of Maryland around its public listing, signaling early enterprise traction beyond academic users.",
+          "source": "InvestorPlace",
+          "url": "https://investorplace.com/2021/10/ionq-is-the-first-publicly-traded-quantum-computing-firm/",
+          "date": "2021-10-21"
+        }
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "BOTZ",
+      "rationale": "Replaced by IONQ to open a quantum slot at the cap=5 ceiling. BOTZ is the lowest-conviction holding for two reasons: (1) the robotics wave is already partially captured by NVDA (which sits in BOTZ's top holdings and supplies the GPUs/Jetson modules underlying most modern autonomy stacks), so BOTZ overlap with NVDA is real; (2) BOTZ's industrial-automation tail (Keyence, Fanuc, Mitsubishi Electric) is mostly Japanese ADRs trading on a slower, deeper-cycle dynamic than the AI/quantum/space/nuclear catalysts the profile is built around. Trading a partially-redundant diversified ETF for the first liquid pure-play in a profile-named next wave is the higher-leverage move. Net effect: watchlist still has four next-wave bets (RKLB rockets, URA nuclear, IONQ quantum, plus NVDA covering robotics-via-AI-compute) and two AI anchors (MSFT, NVDA).",
+      "news_evidence": [
+        {
+          "summary": "Profile-driven rotation, not news-driven: at cap=5 the quantum-wave slot can only be opened by removing the lowest-conviction current name. BOTZ's largest single holding is NVDA itself, and the remaining industrial-automation names are not levered to the same Q4-2021 catalysts (Rocket Lab Neutron reveal Dec 2, uranium structural deficit, IonQ commercial ramp) that the rest of the watchlist is.",
+          "source": "investor_profile.md",
+          "url": "n/a",
+          "date": "2021-12-31"
+        }
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "One swap this quarter: BOTZ -> IONQ. The profile names four next waves (rockets, robotics, quantum, nuclear); the entering watchlist covered three of them (rockets via RKLB, nuclear via URA, robotics via BOTZ) but had zero quantum exposure. IonQ's Oct 1, 2021 NYSE debut as the first publicly-traded pure-play quantum company is the first time that gap is fillable with a US-listed liquid name. The remove is BOTZ rather than URA or RKLB because (a) BOTZ's robotics thesis partially overlaps with NVDA (which is both a top BOTZ holding and the AI-compute supplier underneath most modern robotics), while uranium (URA) and rockets (RKLB) have no remaining proxy in the watchlist if removed; (b) BOTZ's Japanese-industrial-automation tail trades on different catalysts than the AI/quantum/space/nuclear cluster the rest of the watchlist is built around. RKLB stays — the Dec 2, 2021 Neutron design reveal is a fresh dated catalyst. URA stays — Sprott Physical Uranium Trust's ongoing spot accumulation remains the structural-deficit driver. MSFT and NVDA stay as the two AI anchors. Resulting watchlist: MSFT, NVDA, URA, RKLB, IONQ — two AI anchors plus one bet in each of three named next waves (rockets, nuclear, quantum), with robotics implicitly covered via NVDA. No demographics or geopolitical-energy add this quarter — no time-sensitive Q4-2021 catalyst, and using the only available swap slot on the quantum gap is higher-leverage."
+}

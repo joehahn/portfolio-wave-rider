@@ -1,0 +1,28 @@
+{
+  "as_of_date": "2021-12-31",
+  "current_watchlist": ["AAPL", "MSFT", "GOOGL", "NVDA", "ISRG", "URA", "RKLB", "LNG"],
+  "max_watchlist_size": 8,
+  "adds": [
+    {
+      "ticker": "IONQ",
+      "wave_bucket": "quantum",
+      "rationale": "Pure-play trapped-ion quantum computing operator; only US-listed quantum pure-play available at this date. IPO'd via SPAC on NYSE October 2021 (listing date 2021-10-01 — pre-as-of, eligible), raised $636M. Fits the profile's named 'quantum' next-wave bucket where the universe of investable pure-plays is otherwise empty. Profile guidance is to invest early in next waves; quantum is pre-commercial today, so this is a small-position high-asymmetry slot, not a core allocation. Replaces AAPL to stay at cap.",
+      "news_evidence": [
+        {
+          "date": "2021-10-01",
+          "headline": "IonQ begins trading on NYSE after SPAC merger; raised $636M",
+          "url": "https://en.wikipedia.org/wiki/IonQ"
+        }
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "AAPL",
+      "rationale": "Trim to make room for a quantum pure-play (IONQ). Among the four AI-megacap names in the watchlist (AAPL, MSFT, GOOGL, NVDA), AAPL has the least direct exposure to the generative-AI / accelerated-compute build-out: MSFT carries Azure and enterprise AI distribution, GOOGL carries TPU/search/cloud, NVDA is the accelerator monopoly. AAPL is a mature consumer-hardware franchise — profile guidance 'ride AI wave, trim before crest' applies most cleanly to the megacap with the least incremental AI upside per dollar. Note: not a thesis-negative call on AAPL, just the lowest-marginal-AI name in a capped basket."
+    }
+  ],
+  "kept": ["MSFT", "GOOGL", "NVDA", "ISRG", "URA", "RKLB", "LNG"],
+  "post_change_watchlist": ["MSFT", "GOOGL", "NVDA", "ISRG", "URA", "RKLB", "LNG", "IONQ"],
+  "self_critique": "Considered TSLA (robotics, Aug 19 2021 Optimus reveal at AI Day) and LMT (rockets, Oct 21 2021 LRHW test) as additional adds. Rejected TSLA because at 2021-12-31 Optimus is concept-stage — Musk himself framed it as a 2022 prototype, so the robotics-wave evidence is weaker than IONQ's actual operating-company-on-NYSE evidence; ISRG already provides robotics exposure (surgical robots, a real revenue base). Rejected LMT because RKLB already covers the rockets bucket as a commercial-space pure-play; LMT would be defense-rockets duplicative without a stronger near-term catalyst than the failed October LRHW test. Considered CCJ (uranium operator) but URA ETF already covers the uranium-spot thesis. Considered CEG (Constellation Energy nuclear) but the Exelon spinoff doesn't complete until 2022-02-01 — post-as-of, not eligible. Held to one add / one remove to keep signal-to-noise high; cap-8 is a tight basket and a 3-add/3-remove churn at the first quarter is hard to justify on dated 2021 news alone. No post-date events cited (verified against suppression list: Ukraine invasion 2022-02-24, MSFT-OpenAI 2023-01-23, NUKZ launch 2024-01-24, etc. all excluded). All evidence dated pre-2022-01-01."
+}

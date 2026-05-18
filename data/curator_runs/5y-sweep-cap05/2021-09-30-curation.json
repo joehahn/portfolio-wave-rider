@@ -1,0 +1,91 @@
+{
+  "as_of_date": "2021-09-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "URA",
+      "wave_bucket": "nuclear",
+      "rationale": "Pure-play uranium/nuclear-fuel ETF (Global X, US-listed, liquid). The thesis names nuclear (SMRs + AI data-center PPAs) as a target next wave and the watchlist currently has zero nuclear exposure. Uranium just printed its strongest rally in years on tight supply (Kazatomprom holding 2022-2023 production flat, Cameco cutting McArthur River guidance) plus Sprott's new physical trust absorbing spot supply — a structural-deficit setup, not a meme spike. URA captures the miners and converters that benefit before any SMR developer is investable in public markets.",
+      "news_evidence": [
+        {
+          "summary": "Uranium ETFs went nuclear in August-September: URNM +91% and URA +61% from Aug 22 through Sep 15, driven by Sprott Physical Uranium Trust spot-market buying and tight producer supply.",
+          "source": "etf.com",
+          "url": "https://www.etf.com/sections/features-and-news/uranium-etfs-explode",
+          "date": "2021-09-17"
+        },
+        {
+          "summary": "Cameco gained 24.2% in the week ending Sep 3 as spot uranium broke $35 to a 6-year high; Kazatomprom announced 2022-2023 production held flat and plans to buy spot to meet commitments — a near-perfect setup for higher prices.",
+          "source": "The Motley Fool",
+          "url": "https://www.fool.com/investing/2021/09/03/why-shares-of-uranium-miner-cameco-rocketed-24-thi/",
+          "date": "2021-09-03"
+        }
+      ]
+    },
+    {
+      "ticker": "RKLB",
+      "wave_bucket": "rockets_spacecraft",
+      "rationale": "Pure-play small-launch and space-systems company; began trading on Nasdaq via Vector SPAC merger on Aug 25, 2021 (pre-as-of-date, eligible). The profile calls out rockets as a next wave and the only current rocket exposure is ARKX, whose largest holdings are GPS/construction-machinery names (Trimble, Komatsu) rather than launch providers. RKLB is the cleanest investable proxy for the launch-cadence thesis in late 2021 — Electron is the second-most-frequently-launched US rocket and Neutron has just been announced.",
+      "news_evidence": [
+        {
+          "summary": "Rocket Lab began trading on Nasdaq as RKLB after closing its Vector Acquisition SPAC merger; deal valued the company at $4.8B equity with $777M gross cash proceeds.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2021/08/25/rocket-lab-begins-trading-on-nasdaq-as-rklb-after-spac-merger.html",
+          "date": "2021-08-25"
+        }
+      ]
+    },
+    {
+      "ticker": "BOTZ",
+      "wave_bucket": "robotics",
+      "rationale": "Robotics & AI ETF (Global X, US-listed, liquid). Profile lists robotics as a next wave and the watchlist has no robotics-specific exposure. BOTZ's largest names beyond NVDA are industrial-automation pure-plays (Keyence, Fanuc, Mitsubishi Electric, ABB) that capture the falling-cost-of-industrial-robots trend at a portfolio level — cleaner than picking one Japanese ADR. NVDA overlap is acceptable: BOTZ adds the industrial-automation tail behind the AI-compute leader I already hold.",
+      "news_evidence": [
+        {
+          "summary": "BOTZ's investment strategy targets industrial robotics, non-industrial robots, autonomous vehicles, and AI; the average cost of an industrial robot has fallen from $46K (2010) to $27K (2017) and is forecast to reach ~$7K by 2030, underpinning a multi-year adoption ramp.",
+          "source": "Global X ETFs",
+          "url": "https://www.globalxetfs.com/funds/botz",
+          "date": "2021-09-30"
+        }
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "ARKX",
+      "rationale": "Replaced by a purer rocket play (RKLB). ARKX's largest holdings are Trimble (GPS, ~8.5%), Komatsu (construction machinery, ~5.3%), and the in-house PRNT 3D-printing ETF — only a fraction of NAV is genuine launch/spacecraft exposure. With cap=5 every slot must pull its weight on the next-wave thesis; ARKX dilutes rockets exposure rather than concentrating it.",
+      "news_evidence": [
+        {
+          "summary": "ARKX's largest position is Trimble (~8.5%), a GPS/positioning company, followed by Komatsu (~5.3%), a construction-machinery name; critics note many top holdings derive most revenue from terrestrial agriculture, construction, and GPS rather than space.",
+          "source": "Morningstar / Arkalicious",
+          "url": "https://www.morningstar.com/funds/what-did-arks-space-etf-blast-off-with",
+          "date": "2021-04-15"
+        }
+      ]
+    },
+    {
+      "ticker": "GOOGL",
+      "rationale": "Trimming one AI mega-cap to fund a nuclear slot. With cap=5 and four AI names (AAPL/MSFT/GOOGL/NVDA) crowding the book, GOOGL is the least levered to the specific wave-thesis catalysts (cloud-AI infra, AI compute, on-device AI); MSFT (Azure + early OpenAI partnership) and NVDA (training silicon) carry the AI thesis more directly. Consistent with the profile's 'ride AI wave, trim before crest' guidance — not exiting AI, just concentrating it.",
+      "news_evidence": [
+        {
+          "summary": "Profile-driven rebalance, not news-driven: at cap=5 with three next-wave adds (URA, RKLB, BOTZ), one of four AI mega-caps must yield. GOOGL has the lowest pure-AI-infrastructure beta of the four.",
+          "source": "investor_profile.md",
+          "url": "n/a",
+          "date": "2021-09-30"
+        }
+      ]
+    },
+    {
+      "ticker": "AAPL",
+      "rationale": "Trimming a second AI mega-cap to fund the robotics slot. AAPL is consumer-electronics-heavy and the least exposed to data-center AI compute, cloud AI services, and industrial automation. Keeping MSFT (cloud AI, productivity AI) and NVDA (the picks-and-shovels AI compute leader) preserves the AI-wave conviction while opening room for the rockets/robotics/nuclear early bets the profile explicitly calls for.",
+      "news_evidence": [
+        {
+          "summary": "Profile-driven rebalance at the cap=5 ceiling: three next-wave adds require three removes; AAPL is the AI mega-cap with the lowest exposure to the specific catalysts in the profile (data-center compute, cloud AI, industrial automation).",
+          "source": "investor_profile.md",
+          "url": "n/a",
+          "date": "2021-09-30"
+        }
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "At the cap=5 ceiling the watchlist is 80% AI mega-caps and 20% a diluted rocket proxy — too narrow for the profile's explicit goal of 'invest early in next waves: rockets, robotics, quantum, nuclear.' This rebalance keeps the two highest-conviction AI names (MSFT, NVDA), swaps ARKX for the purer RKLB, and uses the freed slots to open positions in nuclear (URA) and robotics (BOTZ). Nuclear is the timeliest of the three: Aug-Sep 2021 saw uranium ETFs deliver 60-90% returns on a structural-supply-deficit setup that the watchlist had zero exposure to. No quantum or demographics add this quarter — no eligible US-listed pure-play quantum stock exists in Sept 2021 (IonQ has not listed yet; QUBT is OTC microcap), and a demographics bet has no time-sensitive catalyst here. Resulting watchlist: MSFT, NVDA, URA, RKLB, BOTZ — two AI anchors and three next-wave bets."
+}

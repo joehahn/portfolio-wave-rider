@@ -1,0 +1,65 @@
+{
+  "as_of_date": "2022-03-31",
+  "current_watchlist": ["AAPL", "MSFT", "GOOGL", "NVDA", "SPY", "ARKX", "BOTZ", "URA", "CCJ", "LMT", "TSM", "RKLB", "ISRG", "LNG", "IONQ", "BWXT", "AMD"],
+  "max_watchlist_size": 24,
+  "adds": [
+    {
+      "ticker": "XLE",
+      "wave_bucket": "geopolitical-energy",
+      "rationale": "Russia's invasion of Ukraine (Feb 24, 2022) is reshaping global energy markets and reinforces the profile's geopolitical-energy thesis. LNG alone gives narrow nat-gas exposure; XLE (Energy Select Sector SPDR, launched 1998, deeply liquid) broadens to the full US large-cap oil & gas complex (XOM, CVX, COP, etc.) which benefits from sustained Brent/WTI price elevation and European demand re-routing away from Russian supply. Pairs cleanly with LNG as a barbell on the same wave.",
+      "news_evidence": [
+        {
+          "date": "2022-02-24",
+          "url": "https://www.reuters.com/world/europe/russia-attacks-ukraine-multiple-cities-officials-ukrainian-2022-02-24/",
+          "summary": "Russia launches full-scale invasion of Ukraine; Brent crude spikes above $100/bbl for first time since 2014, European gas prices surge, and Western sanctions begin targeting Russian energy exports."
+        },
+        {
+          "date": "2022-03-08",
+          "url": "https://www.whitehouse.gov/briefing-room/statements-releases/2022/03/08/fact-sheet-united-states-bans-imports-of-russian-oil-liquefied-natural-gas-and-coal/",
+          "summary": "Biden administration bans US imports of Russian oil, LNG, and coal; structural demand shock supports North American energy producers across the XLE basket."
+        }
+      ]
+    },
+    {
+      "ticker": "ITA",
+      "wave_bucket": "geopolitical-energy",
+      "rationale": "Diversifies the watchlist's single-name defense exposure (LMT) into a basket (RTX, BA, NOC, GD, LMT, etc.) at a moment when European NATO members are committing to large multi-year defense budget increases in response to Russia/Ukraine. ITA (iShares US Aerospace & Defense, launched 2006) is deeply liquid and captures the same geopolitical-energy/defense crossover the profile names, with less single-name idiosyncratic risk than LMT alone.",
+      "news_evidence": [
+        {
+          "date": "2022-02-27",
+          "url": "https://www.bundesregierung.de/breg-en/news/policy-statement-by-olaf-scholz-2008378",
+          "summary": "Chancellor Scholz announces Germany will raise defense spending above 2% of GDP and establish a EUR 100B special fund for the Bundeswehr; a structural break in European defense procurement that flows to the prime contractors held by ITA."
+        },
+        {
+          "date": "2022-03-28",
+          "url": "https://www.defense.gov/News/Releases/Release/Article/2980014/department-of-defense-releases-the-presidents-fiscal-year-2023-defense-budget/",
+          "summary": "DoD releases $773B FY23 defense budget request, +4% YoY, with elevated procurement and R&D lines favoring ITA's top weights."
+        }
+      ]
+    },
+    {
+      "ticker": "XLV",
+      "wave_bucket": "demographics",
+      "rationale": "The watchlist currently has zero direct demographics-aging exposure, yet the profile names demographics as a non-tech next wave. XLV (Health Care Select Sector SPDR, launched 1998, deeply liquid) is the cleanest US-listed broad healthcare vehicle: large-cap pharma (JNJ, PFE, LLY, MRK), insurers (UNH), and devicemakers, all of which earn revenue from aging US/EU/Japan populations. Also provides a defensive ballast against the tech-heavy AI sleeve during the ongoing rate-hike repricing.",
+      "news_evidence": [
+        {
+          "date": "2022-03-16",
+          "url": "https://www.federalreserve.gov/monetarypolicy/fomcpresconf20220316.htm",
+          "summary": "Fed raises target rate 25bp, first hike of the cycle, with median dot plot showing six additional hikes in 2022; long-duration tech multiples compress and defensive sectors like healthcare gain relative appeal."
+        },
+        {
+          "date": "2022-03-08",
+          "url": "https://www.census.gov/library/stories/2022/03/by-2030-all-baby-boomers-will-be-age-65-or-older.html",
+          "summary": "US Census Bureau reiterates that by 2030 all baby boomers will be 65+, driving structurally higher Medicare enrollment and pharmaceutical demand - the long-horizon thesis behind a healthcare overweight."
+        }
+      ]
+    }
+  ],
+  "removes": [],
+  "post_action_watchlist": ["AAPL", "MSFT", "GOOGL", "NVDA", "SPY", "ARKX", "BOTZ", "URA", "CCJ", "LMT", "TSM", "RKLB", "ISRG", "LNG", "IONQ", "BWXT", "AMD", "XLE", "ITA", "XLV"],
+  "post_action_size": 20,
+  "slots_remaining": 4,
+  "no_changes": false,
+  "rationale_overall": "Three adds extend the profile's non-tech next-waves into areas the watchlist currently under-covers, all anchored on pre-2022-04-01 catalysts. XLE broadens the geopolitical-energy thesis from a single LNG name to the full US oil & gas complex, riding the post-invasion price shock and the US ban on Russian energy imports. ITA diversifies single-name defense risk (LMT) into a basket benefiting from Germany's EUR 100B Bundeswehr fund and the FY23 US defense budget request. XLV opens the demographics wave the watchlist had been missing entirely, with Boomer aging as the long-horizon driver and a useful defensive ballast against the rate-hike repricing now underway. No removes: AI majors are mid-selloff after the Fed pivot, not at crest; thematics (rockets, robotics, quantum, nuclear) are still in buildup/surge phase per the 'trim before crest' rule; and 7 free slots make defensive trimming unnecessary.",
+  "notes": "Cap=24 with 7 slots free at as-of; using 3 of 3 add allowance, 0 removes. Wave buckets used: geopolitical-energy (XLE, ITA), demographics (XLV) - all on the profile's non-tech next-wave list, and engineered_biology explicitly avoided. All three ETFs predate 2006 with deep liquidity. Pre-date catalysts only: Russia invasion (2022-02-24), US Russian energy ban (2022-03-08), Scholz defense pivot (2022-02-27), FY23 DoD budget (2022-03-28), Fed first 25bp (2022-03-16), Census aging note (2022-03-08). Suppression list honored: no Luna, no Fed 75bp June hike, no UK gilt, no FTX, no ChatGPT, no GPT-4, no DeepSeek, etc. Self-critique pass: every evidence date is <= 2022-03-31; ITA defense rationale stops at the Mar 28 FY23 request and does not reference later enacted budgets or 2023+ NATO pledges; XLE rationale does not reference June 2022 OPEC+ decisions or later sanctions packages."
+}

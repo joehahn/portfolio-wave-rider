@@ -1,0 +1,14 @@
+{
+  "as_of": "2022-09-30",
+  "no_changes": true,
+  "adds": [],
+  "removes": [],
+  "rationale": "Stand 2022-09-30: watchlist is at cap=16 and already covers every wave in the profile with defensible pre-date theses. AI/mega-cap (AAPL, MSFT, GOOGL, NVDA, SPY, SMH) — NVDA's 2022-08-24 Q2 FY23 gaming miss is a known macro drag, but the 2022-09-07 BIS chip export controls reinforce the domestic-semi (SMH) and AI-leader thesis. Nuclear (URA, CCJ, NLR) — Aug 2022 IRA Section 45U nuclear PTC + Sep 2022 Nord Stream pipeline closure + Japan reactor restart announcements all pre-date; the three names cover miner ETF, single-name producer, and broader utility-inclusive ETF without redundant overlap. Rockets (RKLB) — 2022-09-15 'Owl Spreads Its Wings' SAR launch shows operational cadence. Robotics (BOTZ, ISRG) — Q2 2022 release already showed da Vinci procedures recovering. Quantum (IONQ) — single-conviction pick, no listed peer pre-date worth pairing. Geopolitical-energy (LNG, XLE) — Nord Stream sabotage + EU LNG imports +60% YoY directly underpin LNG; XLE covers integrated oil into pre-Oct OPEC+ cut speculation. Defense (ITA) — 2022-09-23 Trump UN/Zelensky meeting + ongoing Russia/Ukraine flow bullish; ETF gives diversified prime exposure. Candidates evaluated: PLTR (2022-09-18 UK MoD £750M AI contract) overlaps with existing AI-mega-cap exposure; LMT/NOC overlap with ITA; SMR (NuScale) too early-stage with 2022 cost-estimate concerns (IEEFA). No add justifies displacing any current name. Profile excludes solar/wind/engineered_biology — none in or proposed for watchlist. Holding stable; optimizer can work the current universe.",
+  "evidence_urls": [
+    "https://www.fool.com/investing/2022/08/29/why-uranium-energy-all-uranium-stocks-jumped-today/",
+    "https://www.energy.gov/ne/articles/inflation-reduction-act-keeps-momentum-building-nuclear-power",
+    "https://www.iea.org/reports/gas-market-lessons-from-the-2022-2023-energy-crisis/anatomy-of-a-natural-gas-crisis",
+    "https://www.csis.org/analysis/where-chips-fall-us-export-controls-under-biden-administration-2022-2024",
+    "https://en.wikipedia.org/wiki/Rocket_Lab"
+  ]
+}

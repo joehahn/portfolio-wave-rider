@@ -1,0 +1,53 @@
+{
+  "as_of_date": "2022-03-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "XLE",
+      "wave_bucket": "geopolitical",
+      "rationale": "The profile names 'geopolitical realignment driving energy prices' as an active non-tech wave to watch; Russia's Feb 24 invasion of Ukraine is the in-window trigger that turned this from a watch into a position, and the watchlist currently has zero direct fossil-energy exposure (URA captures only the uranium-via-Rosatom-sanctions leg). XLE is the cleanest, most liquid US-listed proxy: the Energy Select Sector SPDR ETF (launched 1998, ~$1B+ ADV) is market-cap-weighted into XOM and CVX (>40% combined), so one slot at cap=5 buys the integrated-oil-major reflex to $100+ Brent and the Biden Mar 8 executive order banning Russian oil/gas/coal imports. Not in profile exclusions (only solar/wind are excluded).",
+      "news_evidence": [
+        {
+          "summary": "WTI crude touched $133.46/bbl and Brent reached $139.13/bbl on Mar 7, 2022 — the highest oil price since July 2008 — after Russia's invasion of Ukraine and supply-disruption fears. WTI had started January 2022 around $76/bbl, so this is a ~75% repricing in roughly two months and a structural geopolitical premium, not a transient spike.",
+          "source": "U.S. Energy Information Administration / EIA Today in Energy",
+          "url": "https://www.eia.gov/todayinenergy/detail.php?id=55020",
+          "date": "2022-03-08"
+        },
+        {
+          "summary": "President Biden signed an Executive Order on Mar 8, 2022 banning U.S. imports of Russian oil, liquefied natural gas, and coal, formalizing the Western-energy decoupling from Russia and locking in a structural tailwind for non-Russian fossil producers — exactly the integrated-major exposure XLE concentrates into.",
+          "source": "Powermag / Department of Energy summary",
+          "url": "https://www.powermag.com/pressure-on-u-s-nuclear-power-could-mount-if-sanctions-imposed-on-russian-uranium/",
+          "date": "2022-03-08"
+        },
+        {
+          "summary": "Exxon Mobil (XLE's #1 holding) signaled a ~$2.9B Q1 2022 earnings bump on higher oil prices and announced a planned exit from the Sakhalin-1 Russia joint venture, confirming that the realized-price tailwind was already flowing through to integrated-major P&L within the quarter rather than as a future expectation.",
+          "source": "OilPrice.com / Reuters",
+          "url": "https://oilprice.com/Latest-Energy-News/World-News/Exxon-Mobil-Signals-29B-Q1-Earnings-Bump-On-Higher-Oil-Prices.html",
+          "date": "2022-03-31"
+        }
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "MSFT",
+      "rationale": "At cap=5 the geopolitical-energy slot can only be opened by removing one current name, and MSFT is the lowest-conviction holding relative to its thesis. The profile says ride AI but trim before crest, and at cap=5 the watchlist does not need two mega-cap AI anchors — NVDA is the more concentrated AI-compute pure-play (every hyperscaler's training cluster is its silicon), while MSFT's Q1-2022 narrative is dominated by the Jan 18 announcement of a $68.7B all-cash deal to acquire Activision Blizzard, a gaming-consolidation story carrying material FTC/CMA regulatory risk and a multi-year close window — not an AI catalyst. Keeping NVDA preserves the AI anchor; rotating MSFT into XLE adds the live geopolitical-energy wave the profile names verbatim. URA, RKLB, IONQ stay — each is the sole watchlist representative of a profile-named next wave (nuclear, rockets, quantum) with a fresh in-window catalyst (uranium Mar 10 spike to $60+/lb on Rosatom sanction fears; Neutron Wallops/MARS site announcement Feb 28; IONQ Forte ytterbium-system roadmap).",
+      "news_evidence": [
+        {
+          "summary": "Microsoft announced on Jan 18, 2022 a $95.00-per-share all-cash agreement to acquire Activision Blizzard for ~$68.7B, expected to close in MSFT's fiscal year ending June 30, 2023. The deal is a gaming/Xbox consolidation story, not an AI catalyst, and the long regulatory close window introduces deal-break risk that is not a tailwind to the AI thesis.",
+          "source": "SEC 8-K / Activision Blizzard / Microsoft press release",
+          "url": "https://www.sec.gov/Archives/edgar/data/0000718877/000162828022010059/atvi33122ex991prtables.htm",
+          "date": "2022-01-18"
+        },
+        {
+          "summary": "Profile-driven rotation: at cap=5 the live geopolitical-energy wave (named verbatim in investor_profile.md as a non-tech wave to watch) has no representative in the current watchlist, and Russia's Feb 24 invasion plus Biden's Mar 8 Russian-energy import ban make Q1 2022 the entry point. NVDA alone is sufficient AI-anchor exposure at this cap, so the swap is MSFT out, XLE in.",
+          "source": "investor_profile.md",
+          "url": "n/a",
+          "date": "2022-03-31"
+        }
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "One swap this quarter: MSFT out, XLE in. The profile names geopolitical realignment driving energy prices as an active non-tech wave; the current watchlist [MSFT, NVDA, URA, RKLB, IONQ] had zero direct fossil-energy exposure when Russia's Feb 24 invasion of Ukraine and Biden's Mar 8 Russian-oil/gas/coal import ban repriced Brent from ~$95 to a $139 intraday peak in five weeks. XLE is the cleanest one-slot proxy at cap=5: a 1998-listed, US-listed, deeply liquid ETF that is ~40% XOM+CVX and captures the integrated-major reflex to the $100+ regime that XOM itself was already signaling a $2.9B Q1 earnings bump from. The remove is MSFT, not URA/RKLB/IONQ, because (a) URA already has a fresh dated catalyst (uranium $60+/lb spike on Mar 10 over Rosatom sanction fears) and is the sole nuclear/uranium proxy; (b) RKLB has the Feb 28 Wallops/MARS Neutron site announcement and is the sole rocket proxy; (c) IONQ is the sole publicly-traded pure-play quantum name; while (d) at cap=5 the watchlist does not need two mega-cap AI anchors — NVDA is the more concentrated AI-compute pure-play, and MSFT's dominant Q1-2022 catalyst is the $68.7B Activision acquisition (gaming consolidation with regulatory risk, not AI). Resulting watchlist: NVDA, URA, RKLB, IONQ, XLE — one bet in each of four profile-named waves (AI, nuclear, rockets, quantum) plus the live geopolitical-energy non-tech wave. No engineered-biology add (profile excludes it). No defense add (LMT/RTX have a clean Russia/Ukraine story via the mid-Mar $13.6B supplemental and Javelin replenishment, but defense is not in the profile's named wave list, so the single available slot goes to the explicitly-named geopolitical-energy wave instead)."
+}

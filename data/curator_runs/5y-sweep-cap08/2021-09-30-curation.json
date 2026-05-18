@@ -1,0 +1,39 @@
+{
+  "as_of_date": "2021-09-30",
+  "current_watchlist": ["AAPL", "MSFT", "GOOGL", "NVDA", "ARKX", "ISRG", "URA", "LMT"],
+  "max_watchlist_size": 8,
+  "no_changes": false,
+  "adds": [
+    {
+      "ticker": "RKLB",
+      "wave_bucket": "rockets_spacecraft",
+      "rationale": "Pure-play small-launch rocket company, now publicly traded since 2021-08-25 after the Vector SPAC merger closed at a $4.8B equity valuation. Cleaner exposure to the rockets/spacecraft next-wave thesis than ARKX, whose holdings are diluted with defense primes and aerospace incumbents. Profile explicitly names rockets as a next-wave bet.",
+      "news_evidence_urls": [
+        "https://www.cnbc.com/2021/08/25/rocket-lab-begins-trading-on-nasdaq-as-rklb-after-spac-merger.html",
+        "https://spacenews.com/shareholders-approve-rocket-lab-spac-deal/"
+      ]
+    },
+    {
+      "ticker": "LNG",
+      "wave_bucket": "geopolitical",
+      "rationale": "Cheniere Energy is the largest US LNG exporter and the cleanest US-listed beneficiary of Europe's natural gas crisis. TTF gas hit a record 79 EUR/MWh in mid-September 2021 with EU storage at multi-decade lows (74.6%) heading into winter, structurally tightening seaborne LNG demand. Fits the profile's geopolitical-energy non-tech wave bucket.",
+      "news_evidence_urls": [
+        "https://www.cnbc.com/2021/09/16/europes-energy-crisis-is-making-the-market-nervous-ahead-of-winter.html",
+        "https://www.oxfordenergy.org/wpcms/wp-content/uploads/2022/01/Surging-2021-European-Gas-Prices-%E2%80%93-Why-and-How.pdf"
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "ARKX",
+      "wave_bucket": "rockets_spacecraft",
+      "rationale": "Diluted space-thesis vehicle: top holdings are split across defense primes, aerospace incumbents, and tangential infrastructure rather than pure-play launch/spacecraft names. Replacing with RKLB gives a cleaner read on the rockets next-wave bet without changing the slot's wave bucket."
+    },
+    {
+      "ticker": "LMT",
+      "wave_bucket": "general_markets",
+      "rationale": "Defense prime whose primary driver is the US defense budget, not the profile's named next-waves. The Aerojet Rocketdyne acquisition (announced Dec 2020, stockholder-approved Mar 2021) is still pending regulatory clearance with no closing date, so the rockets-adjacent upside is uncertain. Freeing the slot for a cleaner geopolitical-energy add (LNG) tightens wave alignment."
+    }
+  ],
+  "summary": "Two-for-two swap at cap: tighten the rockets slot by replacing the diluted ARKX ETF with pure-play RKLB (newly public 2021-08-25), and reallocate the LMT defense-prime slot to LNG to capture the dated European gas crunch as a geopolitical-energy non-tech wave bet. Keeps AAPL/MSFT/GOOGL/NVDA AI core and ISRG (robotics) + URA (nuclear/uranium, with Sprott-driven spot surge dated Sep 2021) intact."
+}

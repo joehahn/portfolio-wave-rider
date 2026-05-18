@@ -1,0 +1,47 @@
+{
+  "as_of_date": "2021-12-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "IONQ",
+      "wave_bucket": "quantum",
+      "rationale": "First and only US-listed pure-play quantum computing company; quantum is explicitly named in the profile as a next wave and the watchlist currently has zero quantum exposure.",
+      "news_evidence": [
+        {
+          "summary": "IonQ became the first publicly traded pure-play quantum computing company on October 1, 2021 after closing its business combination with dMY Technology Group III; began trading on NYSE under IONQ with ~$636M of gross proceeds.",
+          "source": "IonQ newsroom",
+          "url": "https://www.ionq.com/news/october-01-2021-ionq-listed-on-nyse",
+          "date": "2021-10-01"
+        },
+        {
+          "summary": "IonQ reported Q3 2021 results on November 15, 2021; year-to-date total contract value bookings of $15.1M and raised 2021 TCV guidance to $15.8M, evidence the commercial quantum-cloud business is producing early revenue.",
+          "source": "SEC Form 8-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/0001824920/000119312521329866/d260367dex991.htm",
+          "date": "2021-11-15"
+        }
+      ]
+    },
+    {
+      "ticker": "ISRG",
+      "wave_bucket": "robotics",
+      "rationale": "Established robotic-surgery franchise with a fresh 10-million-procedure milestone confirming structural adoption; adds a profitable robotics pure-play to complement the broader BOTZ and ARKQ thematic ETFs the watchlist already holds.",
+      "news_evidence": [
+        {
+          "summary": "Intuitive Surgical announced on December 14, 2021 that surgeons have now performed more than 10 million procedures worldwide using da Vinci systems, with 6,500+ systems installed in 67 countries and 55,000+ trained surgeons.",
+          "source": "GlobeNewswire / Intuitive Surgical",
+          "url": "https://www.globenewswire.com/news-release/2021/12/14/2351745/7637/en/Intuitive-reaches-10-million-procedures-performed-using-da-Vinci-Surgical-Systems.html",
+          "date": "2021-12-14"
+        },
+        {
+          "summary": "Q3 2021 worldwide da Vinci procedures grew ~20% year over year, with shipments and installed base both expanding into the post-pandemic recovery, indicating the robotic-surgery wave is in a healthy buildup phase.",
+          "source": "SEC Form 8-K (Q3 2021)",
+          "url": "https://www.sec.gov/Archives/edgar/data/0001035267/000103526721000174/a20210930ex-991.htm",
+          "date": "2021-10-21"
+        }
+      ]
+    }
+  ],
+  "removes": [],
+  "no_changes": false,
+  "rationale_overall": "Two adds fill the two open slots in a 16-cap watchlist with zero removes. IONQ opens the quantum bucket the profile named as a next wave but the current watchlist did not cover; ISRG adds a profitable robotics pure-play behind the BOTZ/ARKQ thematic ETF exposure. No removes because the AI core (AAPL/MSFT/GOOGL/NVDA/SPY/SMH) is still in clear buildup at this date and the rocket/uranium next-wave bets are too young to judge. Engineered biology is excluded per the profile."
+}
