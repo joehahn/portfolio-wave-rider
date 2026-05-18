@@ -7,7 +7,7 @@
 
 This Claude Code demo uses AI to manage and optimize a long-horizon investment portfolio. You declare your goals, constraints, and an investment thesis (namely what you think will drive future returns), then initialize a starter watchlist of tickers you already want exposure to. At each periodic rebalance the curator agent reads recent news against your thesis and proposes adds and removes against the current watchlist; the mean-variance optimizer then recommends portfolio weights for all tickers on that watchlist. The result accumulates into a static Plotly dashboard so you can watch the watchlist composition, the recommended weights, and the realized portfolio value evolve over time.
 
-**Who this helps.** An investor who has a thesis about where markets are going but not enough time to track market news, or who needs help optimizing their portfolio, or who merely needs a scheduled reminder to do either. This demo helps such an investor pivot from a less-optimal static buy-and-hold portfolio to one that's lightly but effectively managed by AI. In the 5-year backtest detailed below, the AI-managed portfolio lifted realized return by about **34 percentage points per year annualized** over a buy-and-hold of the starter watchlist. Past performance is not predictive; the curator's job is to compound a thesis you already hold, not to replace one you don't have.
+**Who this helps.** An investor who has a thesis about where markets are going but not enough time to track market news, or who needs help optimizing their portfolio, or who merely needs a scheduled reminder to do either. This demo helps such an investor pivot from a less-optimal static buy-and-hold portfolio to one that's lightly but effectively managed by AI. In the 5-year backtest detailed below, the AI-managed portfolio lifted realized return by about **11 percentage points per year annualized** over a buy-and-hold of the starter watchlist (which includes NVDA, so the curator does not get credit for picking the obvious 5y winner). Past performance is not predictive; the curator's job is to compound a thesis you already hold, not to replace one you don't have.
 
 Two dashboards are served from GitHub Pages:
 
@@ -79,7 +79,7 @@ Note that recommendations do not execute trades — they only append optimizer o
 
 Run `/run-backtest` in Claude Code. This skill collects any missing historical news, evolves the watchlist quarter-by-quarter against your wave thesis, optimizes the portfolio at each rebalance, measures the resulting lift relative to a buy-and-hold investment strategy, and regenerates the backtest dashboard at `docs/backtest_curator.html` (open it locally in a browser to see your run).
 
-At each quarterly rebalance the curator reads news as of the rebalance date and proposes adds and removes to the watchlist; the optimizer then recomputes portfolio weights for whatever watchlist results, repeated over 5 years. Then compare results of your backtest to ours at [our backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html), +34pp/yr annualized when compared to the buy-and-hold investor's gains.
+At each quarterly rebalance the curator reads news as of the rebalance date and proposes adds and removes to the watchlist; the optimizer then recomputes portfolio weights for whatever watchlist results, repeated over 5 years. Then compare results of your backtest to ours at [our backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html), +11pp/yr annualized when compared to the buy-and-hold investor's gains.
 
 ### 5. sweep optimizer parameters (anytime)
 
@@ -124,27 +124,29 @@ This is the standard Markowitz mean-variance formulation (Markowitz 1952, *Portf
 
 ## Headline result
 
-**Setup:** 5y window (Mar 2021 → Mar 2026), starter watchlist `[AAPL, MSFT, GOOGL, SPY, AGG]`, 21 quarterly curator calls.
+**Setup:** 5y window (Mar 2021 → Mar 2026), starter watchlist `[AAPL, MSFT, GOOGL, SPY, NVDA]`, 21 quarterly curator calls.
 
-The buy-and-hold baseline is the **equal-weight allocation** (20% in each of the five tickers) bought on day 0 and held without rebalancing through the end of the window. The starter is a plausible 2021 tech-aware investor's portfolio; equal-weight is the simplest "no-judgment-call" weighting — what someone with no optimizer would have built. (This is **not** the thesis-driven "beliefs in dollar form" allocation that `/initialize-portfolio` produces in the live workflow.)
+The starter is a plausible 2021 tech-aware investor's portfolio. NVDA is included because excluding it would have stacked the deck for the curator (NVDA was *the* big winner of the 5y window, and the curator adds it at the Q3 2021 rebalance). With NVDA already in the buy-and-hold, the comparison instead measures what the curator's *other* decisions contributed: thematic adds in nuclear, robotics, rockets, quantum, and the optimizer's quarterly re-weighting.
+
+The buy-and-hold baseline is the **equal-weight allocation** (20% in each of the five tickers) bought on day 0 and held without rebalancing through the end of the window. (This is **not** the thesis-driven "beliefs in dollar form" allocation that `/initialize-portfolio` produces in the live workflow.)
 
 **Total realized return over the 5 years:**
 
 | Strategy | Return | Annualized |
 |---|---|---|
-| Curator-driven | **+599.5%** | **+47.5%** |
-| Buy-and-hold (equal-weight starter) | +87.0% | +13.3% |
+| Curator-driven | **+536.3%** | **+44.8%** |
+| Buy-and-hold (equal-weight starter, includes NVDA) | +328.7% | +33.7% |
 | SPY benchmark | +75.7% | +11.9% |
 
-Curator max drawdown over the window: **−49.5%**.
+Curator max drawdown over the window: **−49.4%**.
 
 **Curator's lift over buy-and-hold:**
 
 | Measure | Value |
 |---|---|
-| Absolute (curator − buy/hold), total | +512pp |
-| Absolute, annualized | +34pp/yr |
-| Relative (curator − buy/hold) / (buy/hold) | 5.89 |
+| Absolute (curator − buy/hold), total | +207pp |
+| Absolute, annualized | +11pp/yr |
+| Relative (curator − buy/hold) / (buy/hold) | 0.63 |
 
 See the [curator backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html) and the full report in `data/backtest_curator_5y/report.md`. Reproduce locally with the on-demand backtest from the Runs section above.
 
