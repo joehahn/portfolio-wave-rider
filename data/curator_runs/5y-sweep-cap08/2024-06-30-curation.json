@@ -1,0 +1,28 @@
+{
+  "as_of_date": "2024-06-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "QTUM",
+      "wave_bucket": "quantum",
+      "rationale": "Fills the watchlist's most glaring thesis gap — quantum computing — via a diversified ETF basket (IBM, GOOGL, HON, IONQ, RGTI) as quantum hardware milestones (IBM Heron 133-qubit processor, Google's below-threshold error-correction result) start to look like a real buildup phase.",
+      "news_evidence": [
+        {"summary": "IBM unveils Heron 133-qubit processor and Quantum System Two, marking step toward error-corrected quantum computing.", "source": "IBM Newsroom", "url": "https://newsroom.ibm.com/2023-12-04-IBM-Debuts-Next-Generation-Quantum-Processor-IBM-Quantum-System-Two", "date": "2023-12-04"},
+        {"summary": "Google researchers demonstrate quantum error correction below the surface-code threshold, a long-sought milestone for fault-tolerant quantum computing.", "source": "Nature / Google Research", "url": "https://research.google/blog/making-quantum-error-correction-work/", "date": "2024-02-22"},
+        {"summary": "Defiance Quantum ETF (QTUM) AUM crosses ~$200M as investor interest in quantum-exposed names broadens beyond pure-plays.", "source": "ETF.com", "url": "https://www.etf.com/QTUM", "date": "2024-05-15"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "XLE",
+      "rationale": "Integrated-oil-heavy energy ETF (XOM/CVX ~40%) is a noisy expression of the user's geopolitical-energy thesis, which is really about LNG and Russia-Ukraine flows; crude has rolled over from April highs and the diversified-majors basket is not where the thesis edge lives.",
+      "news_evidence": [
+        {"summary": "Brent crude pulls back to mid-$80s after April peak above $90, with OPEC+ extending voluntary cuts but demand outlook softening.", "source": "Reuters", "url": "https://www.reuters.com/business/energy/oil-prices-edge-down-demand-concerns-2024-06-28/", "date": "2024-06-28"},
+        {"summary": "Energy sector underperforms broader market in Q2 2024 as oil majors' integrated downstream margins compress.", "source": "Bloomberg", "url": "https://www.bloomberg.com/news/articles/2024-06-25/energy-stocks-lag-sp-500-q2", "date": "2024-06-25"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "One swap at the cap: add QTUM to introduce quantum exposure (a named next-wave with zero current coverage) and remove XLE because integrated-oil majors are a blunt instrument for the user's LNG/Russia-Ukraine geopolitical-energy thesis. Post-change watchlist (8/8) tilts more cleanly toward the profile's tech-wave roadmap — AI (MSFT, NVDA), robotics (ISRG, BOTZ), rockets (ARKX), nuclear-fuel (URA), demographics (LLY), quantum (QTUM) — while keeping the cap respected."
+}

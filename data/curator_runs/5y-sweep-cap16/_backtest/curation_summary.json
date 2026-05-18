@@ -1,0 +1,161 @@
+[
+  {
+    "date": "2021-03-31",
+    "adds": [],
+    "removes": [],
+    "rejections": 3
+  },
+  {
+    "date": "2021-06-30",
+    "adds": [],
+    "removes": [],
+    "rejections": 3
+  },
+  {
+    "date": "2021-09-30",
+    "adds": [],
+    "removes": [],
+    "rejections": 3
+  },
+  {
+    "date": "2021-12-31",
+    "adds": [
+      "IONQ",
+      "ISRG"
+    ],
+    "removes": [],
+    "rejections": 0
+  },
+  {
+    "date": "2022-03-31",
+    "adds": [],
+    "removes": [],
+    "rejections": 6
+  },
+  {
+    "date": "2022-06-30",
+    "adds": [],
+    "removes": [],
+    "rejections": 0
+  },
+  {
+    "date": "2022-09-30",
+    "adds": [],
+    "removes": [],
+    "rejections": 0
+  },
+  {
+    "date": "2022-12-31",
+    "adds": [],
+    "removes": [],
+    "rejections": 0
+  },
+  {
+    "date": "2023-03-31",
+    "adds": [],
+    "removes": [],
+    "rejections": 0
+  },
+  {
+    "date": "2023-06-30",
+    "adds": [],
+    "removes": [],
+    "rejections": 0
+  },
+  {
+    "date": "2023-09-30",
+    "adds": [
+      "SMR",
+      "XLV"
+    ],
+    "removes": [],
+    "rejections": 2
+  },
+  {
+    "date": "2023-12-31",
+    "adds": [
+      "LLY"
+    ],
+    "removes": [
+      "SMR"
+    ],
+    "rejections": 0
+  },
+  {
+    "date": "2024-03-31",
+    "adds": [
+      "AMZN"
+    ],
+    "removes": [
+      "XLV"
+    ],
+    "rejections": 0
+  },
+  {
+    "date": "2024-06-30",
+    "adds": [
+      "TSM"
+    ],
+    "removes": [],
+    "rejections": 1
+  },
+  {
+    "date": "2024-09-30",
+    "adds": [
+      "CEG"
+    ],
+    "removes": [
+      "AAPL"
+    ],
+    "rejections": 0
+  },
+  {
+    "date": "2024-12-31",
+    "adds": [
+      "SMR",
+      "VRT"
+    ],
+    "removes": [
+      "LLY"
+    ],
+    "rejections": 1
+  },
+  {
+    "date": "2025-03-31",
+    "adds": [
+      "PLTR"
+    ],
+    "removes": [],
+    "rejections": 1
+  },
+  {
+    "date": "2025-06-30",
+    "adds": [
+      "ROBO"
+    ],
+    "removes": [
+      "GOOGL"
+    ],
+    "rejections": 0
+  },
+  {
+    "date": "2025-09-30",
+    "adds": [
+      "ORCL"
+    ],
+    "removes": [
+      "PLTR"
+    ],
+    "rejections": 0
+  },
+  {
+    "date": "2025-12-31",
+    "adds": [
+      "RGTI"
+    ],
+    "removes": [
+      "AMZN"
+    ],
+    "rejections": 0
+  }
+]

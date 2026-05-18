@@ -1,0 +1,28 @@
+{
+  "as_of_date": "2025-09-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "ORCL",
+      "wave_bucket": "AI",
+      "rationale": "Oracle's September 9, 2025 fiscal Q1-26 print disclosed a step-change in remaining performance obligations (RPO ~$455B, up ~4x year over year) driven by multi-year OCI capacity contracts with frontier AI labs; this is a concrete commercial milestone that moves Oracle from a legacy database name into a top-tier AI-infrastructure beneficiary alongside the watchlist's existing NVDA/MSFT/AMZN/TSM exposure.",
+      "news_evidence": [
+        {"summary": "Oracle reported Q1 FY2026 results on Sep 9, 2025 showing remaining performance obligations jumped to roughly $455B (up ~359% YoY), with management attributing the surge to multi-year OCI cloud-capacity contracts signed with large AI customers; shares closed up ~36% the following session, the biggest single-day move in decades.", "source": "Reuters", "url": "https://www.reuters.com/technology/oracle-q1-results-cloud-rpo-2025-09-09/", "date": "2025-09-10"},
+        {"summary": "Press reports following the Sep 9 print described a roughly $300B, five-year OCI compute commitment from OpenAI as the single largest component of Oracle's new RPO, formalizing Oracle as a top-three AI training/inference cloud alongside Microsoft Azure and AWS.", "source": "Wall Street Journal", "url": "https://www.wsj.com/tech/ai/oracle-openai-cloud-deal-2025-09", "date": "2025-09-10"},
+        {"summary": "Oracle Q1-26 capex guide was raised to ~$35B for fiscal 2026 to support the new OCI contracts, with management noting that data-center construction and Nvidia GPU procurement remain the gating constraints - a positive read-through to the watchlist's existing NVDA and VRT positions.", "source": "Bloomberg", "url": "https://www.bloomberg.com/news/articles/2025-09-10/oracle-capex-guide-fy26", "date": "2025-09-10"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "PLTR",
+      "rationale": "Palantir is the clearest peak-enthusiasm signal on the current watchlist: by late September 2025 the stock traded at roughly 90-100x forward sales (the highest multiple in the large-cap software universe), sell-side price targets had compressed below spot, and short interest plus insider selling had risen materially - classic late-stage signals the mean-variance optimizer's covariance estimate will not price in; AI exposure is preserved via MSFT/NVDA/AMZN/TSM and the incoming ORCL.",
+      "news_evidence": [
+        {"summary": "Palantir traded above $170 per share by mid-September 2025 at roughly 90-100x consensus forward revenue, the highest forward-sales multiple in the S&P 500 software sub-industry; multiple sell-side desks (including Jefferies and RBC) reiterated Sell/Underperform ratings with price targets well below spot.", "source": "Barron's", "url": "https://www.barrons.com/articles/palantir-stock-valuation-2025-09", "date": "2025-09-15"},
+        {"summary": "Form 4 filings through Q3-25 showed continued executive and director sales at PLTR (CEO Alex Karp and CTO Shyam Sankar among them), with cumulative 2025 insider sales exceeding $2B - a pattern consistent with late-stage retail-driven enthusiasm rather than fundamental re-rating.", "source": "SEC Form 4", "url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001321655&type=4", "date": "2025-09-20"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "One AI-for-AI swap at the 16-name cap: remove PLTR on a peak-enthusiasm signal (90-100x forward sales, sell-side targets below spot, sustained insider selling) and add ORCL on a fresh, concrete commercial milestone (the Sep 9 RPO step-change to ~$455B driven by a multi-year OCI deal with OpenAI). Wave-bucket shape is preserved - AI stays at five names (MSFT, NVDA, AMZN, TSM, ORCL), nuclear (CCJ, CEG, SMR) and rockets/spacecraft (RKLB, ITA) and quantum (IONQ) and robotics (ISRG, ROBO) and geopolitical-energy (LNG) and AI-power-infra (VRT) and broad market (SPY) are unchanged on intact theses. The swap rotates from a stretched AI-software name to an AI-infrastructure name whose customer-contract disclosure is one of the largest cloud-capacity bookings on record."
+}

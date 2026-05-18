@@ -1,0 +1,44 @@
+{
+  "as_of_date": "2023-06-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "LLY",
+      "wave_bucket": "demographics",
+      "rationale": "Eli Lilly's Mounjaro (tirzepatide) is the cleanest pure-play on the aging-population/obesity demographics wave; Q1 2023 sales of ~$570M plus the SURMOUNT-2 readout position it for an obesity-label FDA decision later this year, and the broad XLV ETF is the only demographics exposure in the current watchlist.",
+      "news_evidence": [
+        {"summary": "Lilly Q1 2023 earnings: Mounjaro sales nearly $570M; SURMOUNT-1 data plus rolling submission to FDA seeking obesity indication in the coming weeks.", "source": "BioSpace / Lilly 8-K", "url": "https://www.biospace.com/lilly-s-mounjaro-poised-to-challenge-novo-s-wegovy-in-obesity", "date": "2023-04-27"},
+        {"summary": "SURMOUNT-2 trial: >80% of patients on Mounjaro lost at least 5% body weight; results approaching SURMOUNT-1's ~21% weight-loss findings.", "source": "BioPharma Dive", "url": "https://www.biopharmadive.com/news/lilly-mounjaro-weight-loss-trial-results-glp-1-ozempic/648670/", "date": "2023-04-27"}
+      ]
+    },
+    {
+      "ticker": "SMR",
+      "wave_bucket": "nuclear",
+      "rationale": "NuScale Power is the only publicly-traded pure-play SMR developer; its 50 MWe design received final NRC certification in January 2023 and the company has since announced an MOU with Nucor for steel-mill baseload and a $275M public-private commitment for a Romania deployment, giving the watchlist a fission-SMR pure-play that URA/CCJ/BWXT/CEG do not provide.",
+      "news_evidence": [
+        {"summary": "NRC certifies NuScale's 50 MWe SMR design; rule published Jan 19, 2023, effective Feb 21, 2023 — first SMR design certified in the US.", "source": "Utility Dive", "url": "https://www.utilitydive.com/news/NuScale-small-modular-reactor-nuclear-NRC/641012/", "date": "2023-01-20"},
+        {"summary": "NuScale signs MOU with Nucor to explore deploying VOYGR SMRs to power Nucor's electric-arc-furnace steel mills.", "source": "NuScale 8-K", "url": "https://www.sec.gov/Archives/edgar/data/0001822966/000182296623000008/pressreleasenuscalereach.htm", "date": "2023-02-22"},
+        {"summary": "Biden administration and partners commit up to $275M to advance a NuScale VOYGR SMR plant in Romania; RoPower Nuclear named as first international customer.", "source": "DOE / NuScale 8-K", "url": "https://www.sec.gov/Archives/edgar/data/0001822966/000182296623000117/a2023-05x16xnuscalepower.htm", "date": "2023-05-16"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "URA",
+      "rationale": "URA (Global X Uranium ETF) overlaps heavily with CCJ — Cameco is its top holding — so dropping URA in favor of pure-play CCJ + the new SMR developer position gives the nuclear bucket cleaner, less correlated exposures without reducing the bucket's size.",
+      "news_evidence": [
+        {"summary": "URA's portfolio is dominated by Cameco (CCJ) and a handful of uranium miners; holding both URA and CCJ duplicates the uranium-miner exposure already in the watchlist.", "source": "Global X URA fund profile", "url": "https://www.globalxetfs.com/funds/ura/", "date": "2023-06-30"}
+      ]
+    },
+    {
+      "ticker": "CGNX",
+      "rationale": "Cognex's Q1 2023 results (May 4) flagged a step-down in factory-automation demand with e-commerce logistics customers pausing capex and consumer-electronics/semicap customers weakening — the fundamental robotics thesis is breaking, and BOTZ + ISRG continue to give the watchlist diversified robotics exposure.",
+      "news_evidence": [
+        {"summary": "Cognex Q1 2023 earnings: factory-automation customers cautious with capital investment; significant step-down from record Q1 2022.", "source": "Cognex 8-K", "url": "https://www.sec.gov/Archives/edgar/data/0000851205/000115752323000715/a53392890ex99_1.htm", "date": "2023-05-04"},
+        {"summary": "Several of Cognex's largest e-commerce customers paused most of their investments; broader factory-automation slowdown noted heading into 2023.", "source": "Cognex Feb 2023 8-K", "url": "https://www.sec.gov/Archives/edgar/data/0000851205/000115752323000296/a53329327ex99_1.htm", "date": "2023-02-16"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Two thematic adjustments at quarter-end without changing watchlist size (24/24): rotate within nuclear from the URA basket (which is mostly Cameco) into pure-play SMR developer NuScale to capture the post-NRC-certification commercialization phase, and add Eli Lilly as a pure-play GLP-1/obesity demographics exposure alongside the broad XLV healthcare ETF. Funded by removing CGNX, whose Q1 2023 print confirmed an industrial-automation downturn, leaving BOTZ and ISRG to carry the robotics thesis. Net effect: nuclear stays at 4 with sharper sub-bucket diversity (uranium miner, naval/nuclear components, nuclear utility, SMR developer); demographics doubles from 1 to 2 in line with the profile's named aging-population wave; robotics trims one weakening single-name."
+}

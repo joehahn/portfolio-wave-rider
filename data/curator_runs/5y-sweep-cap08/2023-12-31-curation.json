@@ -1,0 +1,28 @@
+{
+  "as_of_date": "2023-12-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "ARKX",
+      "wave_bucket": "rockets_spacecraft",
+      "rationale": "Re-fills the rockets/spacecraft gap that opened in Q3 when RKLB was removed after the Sept 19 Electron failure; SpaceX's two 2023 Starship integrated test flights (April 20 IFT-1, Nov 18 IFT-2) plus a growing commercial-launch backlog mark a clean buildup phase for the wave the profile explicitly names, and an ETF wrapper diversifies single-vehicle/launch-failure risk that single-stock RKLB carried.",
+      "news_evidence": [
+        {"summary": "SpaceX's first full Starship integrated test flight on April 20, 2023; analysts framed it as a milestone toward ultra-low-cost launch economics.", "source": "NPR", "url": "https://www.npr.org/2023/04/16/1169734535/spacex-prepares-to-launch-its-mammoth-rocket-starship", "date": "2023-04-16"},
+        {"summary": "Starship's second integrated test flight on Nov 18, 2023 cleared the launch pad, achieved hot-staging, and reached space before in-flight termination; SpaceX framed it as substantial progress over IFT-1.", "source": "SpaceNews", "url": "https://spacenews.com/spacex-launches-second-starship-integrated-flight-test/", "date": "2023-11-18"},
+        {"summary": "Trade-press analysis arguing the broader space economy is positioning around Starship-class launch capacity becoming available later in the decade.", "source": "Via Satellite", "url": "https://interactive.satellitetoday.com/via/september-2023/prepare-for-a-space-economy-that-can-leverage-spacexs-starship", "date": "2023-09-01"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "IONQ",
+      "rationale": "Pure-play quantum-computing equities remain pre-revenue speculation at year-end 2023 with fault-tolerant quantum advantage still many years out; IONQ specifically saw execution wobble in 2023 (the company replaced its CEO in May 2023 and the stock has been volatile on a still-untested commercial roadmap), so the quantum slot in a tight 8-cap watchlist is better redeployed into a wave with concrete 2023 milestones (rockets/spacecraft). Quantum exposure can be revisited when fault-tolerance milestones or a broader quantum-themed ETF make the wave less single-name speculative.",
+      "news_evidence": [
+        {"summary": "IonQ announced a CEO transition in May 2023, with co-founder and CTO Peter Chapman stepping down as CEO and Niccolo de Masi taking over; the transition came as the company continued to operate at significant losses with limited near-term commercial milestones.", "source": "IonQ press release / Reuters", "url": "https://www.reuters.com/technology/ionq-names-new-ceo-co-founder-chapman-steps-down-2023-05-04/", "date": "2023-05-04"},
+        {"summary": "Industry analysis through 2023 reiterated that fault-tolerant quantum advantage (the threshold at which quantum computers solve commercially valuable problems classical machines cannot) remains years away, and pre-revenue pure-play quantum stocks carry binary outcome risk.", "source": "MIT Technology Review", "url": "https://www.technologyreview.com/2023/01/06/1066317/whats-next-for-quantum-computing/", "date": "2023-01-06"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "One-for-one swap that re-fills the rockets/spacecraft gap opened in Q3 (RKLB removed after Sept 19 Electron failure) by adding ARKX, which the profile's wave thesis names explicitly and which Starship's two 2023 IFTs have moved into clear buildup phase; paired with stepping out of IONQ, where pure-play quantum remains pre-revenue speculation at year-end 2023 and a 2023 CEO transition added execution uncertainty. Net effect at cap=8: AI core (MSFT/GOOGL/NVDA) plus healthcare-robotics (ISRG), nuclear (URA), demographics (LLY), and geopolitical-energy (XLE) all stay intact; rockets/spacecraft returns to the watchlist via an ETF wrapper that diversifies single-launch-vehicle risk; quantum exposure paused pending a better entry vehicle or clearer commercial milestones."
+}

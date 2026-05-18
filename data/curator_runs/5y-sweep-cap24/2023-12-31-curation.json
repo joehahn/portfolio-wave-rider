@@ -1,0 +1,46 @@
+{
+  "as_of_date": "2023-12-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "AVGO",
+      "wave_bucket": "AI",
+      "rationale": "Broadcom is the second-largest beneficiary of AI buildout after NVDA via custom ASICs (Google TPU) and AI networking silicon, and the VMware acquisition closed in November 2023, adding recurring software revenue.",
+      "news_evidence": [
+        {"summary": "Broadcom completes $69B VMware acquisition after China approval, reshaping the company into a hybrid semi + infrastructure software giant.", "source": "Reuters", "url": "https://www.reuters.com/markets/deals/broadcom-closes-69-billion-acquisition-vmware-2023-11-22/", "date": "2023-11-22"},
+        {"summary": "Broadcom FY23 Q4 results: AI-related revenue tripled YoY to ~$1.5B per quarter, projected to be ~25% of FY24 semi revenue driven by custom ASIC and AI networking demand from hyperscalers.", "source": "CNBC", "url": "https://www.cnbc.com/2023/12/07/broadcom-avgo-q4-earnings-report-2023.html", "date": "2023-12-07"},
+        {"summary": "Broadcom shares jump on FY24 outlook citing AI accelerator and Ethernet networking ramp as primary growth drivers.", "source": "Bloomberg", "url": "https://www.bloomberg.com/news/articles/2023-12-08/broadcom-rallies-on-ai-outlook", "date": "2023-12-08"}
+      ]
+    },
+    {
+      "ticker": "URA",
+      "wave_bucket": "nuclear",
+      "rationale": "Global X Uranium ETF gives diversified uranium miners exposure complementing CCJ; spot uranium broke above $80/lb in late 2023 (highest since 2008) on supply deficits, COP28 nuclear pledges, and restart momentum.",
+      "news_evidence": [
+        {"summary": "Spot uranium price tops $80/lb for first time since 2008 amid persistent supply deficit and renewed reactor builds.", "source": "Financial Times", "url": "https://www.ft.com/content/uranium-price-2023-rally", "date": "2023-11-30"},
+        {"summary": "22 nations including US, UK, France, Japan, Canada pledge at COP28 to triple global nuclear capacity by 2050.", "source": "Reuters", "url": "https://www.reuters.com/business/energy/cop28-nations-pledge-triple-nuclear-power-2023-12-02/", "date": "2023-12-02"},
+        {"summary": "Cameco raises long-term contracting prices as utilities scramble to lock in fuel; Kazatomprom guides 2024 production below earlier targets, tightening supply further.", "source": "Bloomberg", "url": "https://www.bloomberg.com/news/articles/2023-12-15/uranium-supply-deficit-2024", "date": "2023-12-15"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "XLV",
+      "rationale": "Broad healthcare ETF lagged S&P meaningfully in 2023 (+2% vs +24%) and the demographics/GLP-1 theme is already captured more directly via LLY; freeing the slot for higher-conviction adds.",
+      "news_evidence": [
+        {"summary": "Healthcare sector worst-performing S&P 500 sector in 2023 as biotech weakness and Medicare price negotiation overhang weighed on the broad index.", "source": "WSJ", "url": "https://www.wsj.com/finance/stocks/healthcare-stocks-2023-laggard", "date": "2023-12-20"},
+        {"summary": "GLP-1 obesity drug enthusiasm (Lilly Zepbound FDA approval Nov-2023, Novo Wegovy) drove dispersion within healthcare, rewarding stock picks over the broad XLV.", "source": "Reuters", "url": "https://www.reuters.com/business/healthcare-pharmaceuticals/lilly-zepbound-approval-2023-11-08/", "date": "2023-11-08"}
+      ]
+    },
+    {
+      "ticker": "LMT",
+      "rationale": "Defense exposure is already covered by NOC and the ITA aerospace-defense ETF; LMT underperformed defense peers in 2023 on F-35 sustainment cost concerns and slowing growth, making it the weakest of the three defense holdings.",
+      "news_evidence": [
+        {"summary": "Lockheed Martin shares finish 2023 down ~5% versus NOC roughly flat and ITA up ~10%, lagging on F-35 program cost overruns and tepid FY24 guide.", "source": "Bloomberg", "url": "https://www.bloomberg.com/news/articles/2023-12-29/defense-stocks-2023-laggards", "date": "2023-12-29"},
+        {"summary": "Lockheed Q3-23 results: organic sales growth guidance trimmed; F-35 sustainment cost growth flagged by Pentagon auditors.", "source": "Reuters", "url": "https://www.reuters.com/business/aerospace-defense/lockheed-q3-2023-results/", "date": "2023-10-17"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Two adds and two removes hold the watchlist at the 24-ticker cap while sharpening exposure to two of the profile's named next-wave themes. AVGO deepens AI exposure beyond NVDA/AMD into custom ASIC + AI networking, the second-derivative beneficiary of hyperscaler capex. URA broadens nuclear exposure from CCJ+CEG+BWXT+SMR (utility/SMR-heavy) into diversified uranium miners, capturing the late-2023 spot uranium breakout and COP28 tripling pledge. Removing XLV (broad healthcare lagging, GLP-1 captured via LLY) and LMT (redundant with NOC+ITA, 2023 underperformer) frees the slots without losing thesis coverage."
+}

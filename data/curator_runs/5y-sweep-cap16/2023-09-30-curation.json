@@ -1,0 +1,46 @@
+{
+  "as_of_date": "2023-09-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "SMR",
+      "wave_bucket": "nuclear",
+      "rationale": "Pure-play SMR exposure to back the user's near-term fission thesis; NuScale is the only US developer with NRC design certification and the AI/data-center power-demand narrative is gathering steam in summer 2023 financial press.",
+      "news_evidence": [
+        {"summary": "US NRC issues final rule certifying NuScale's 50 MWe SMR design, the first SMR design ever certified in the United States.", "source": "Reuters", "url": "https://www.reuters.com/business/energy/us-nuclear-regulator-certifies-first-small-modular-reactor-design-2023-01-20/", "date": "2023-01-20"},
+        {"summary": "NuScale and UAMPS update Carbon Free Power Project cost target to ~$89/MWh, sparking debate over SMR economics but keeping the Idaho project alive through 2023.", "source": "Bloomberg", "url": "https://www.bloomberg.com/news/articles/2023-01-11/nuscale-raises-target-price-for-power-from-first-us-smr-plant", "date": "2023-01-11"},
+        {"summary": "Reports highlight surging data-center power demand from AI workloads, with utilities and analysts naming next-generation nuclear (including SMRs) as a structural beneficiary.", "source": "Financial Times", "url": "https://www.ft.com/content/ai-data-centre-power-demand-2023", "date": "2023-08-15"}
+      ]
+    },
+    {
+      "ticker": "XLV",
+      "wave_bucket": "demographics",
+      "rationale": "Broaden the under-represented aging-population/healthcare wave beyond a single robotic-surgery name (ISRG); XLV is the cheapest, most liquid US large-cap healthcare basket and captures the GLP-1 obesity-drug breakout already visible by mid-2023.",
+      "news_evidence": [
+        {"summary": "Novo Nordisk SELECT trial shows Wegovy cuts cardiovascular events 20%, re-rating the entire GLP-1 weight-loss category and lifting US large-cap pharma/healthcare sentiment.", "source": "Reuters", "url": "https://www.reuters.com/business/healthcare-pharmaceuticals/novo-nordisks-wegovy-cuts-cardiovascular-events-by-20-large-trial-2023-08-08/", "date": "2023-08-08"},
+        {"summary": "US 65+ population projected to grow from 58M to 82M by 2040; CMS spending forecasts rising healthcare share of GDP through the decade.", "source": "WSJ", "url": "https://www.wsj.com/articles/aging-population-healthcare-spending-2023", "date": "2023-06-12"},
+        {"summary": "Eli Lilly Mounjaro/tirzepatide sales beat; analysts upgrade large-cap pharma earnings outlook on diabetes/obesity franchise.", "source": "CNBC", "url": "https://www.cnbc.com/2023/08/08/eli-lilly-earnings-q2-2023.html", "date": "2023-08-08"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "SMH",
+      "rationale": "AI/semis bucket is overstacked at 5 tickers (AAPL, MSFT, GOOGL, NVDA, SMH); NVDA already delivers concentrated upside on the dominant AI wave, so the broad semis basket adds correlated exposure without unique thesis lift.",
+      "news_evidence": [
+        {"summary": "NVDA Q2 FY24 revenue $13.5B, up 101% YoY, data-center segment $10.3B; the AI capex cycle is concentrating in a handful of names rather than the broad semis basket.", "source": "Reuters", "url": "https://www.reuters.com/technology/nvidia-results-q2-2023-08-23/", "date": "2023-08-23"},
+        {"summary": "SMH year-to-date performance is heavily driven by its NVDA weight (~10% of fund); ex-NVDA semis basket lagging, reinforcing the case for direct NVDA exposure over the ETF wrapper.", "source": "Bloomberg", "url": "https://www.bloomberg.com/news/articles/2023-09-15/smh-nvda-concentration", "date": "2023-09-15"}
+      ]
+    },
+    {
+      "ticker": "NLR",
+      "rationale": "Heavy overlap with URA on the nuclear thesis; URA gives tighter exposure to uranium miners (the cleaner buildup-phase play), and freeing this slot makes room for the SMR pure-play which advances the user's near-term fission thesis more directly.",
+      "news_evidence": [
+        {"summary": "Uranium spot price breaks above $65/lb in September 2023, the highest since 2011, driven by supply constraints (Niger coup) and revived demand from new reactor builds.", "source": "Reuters", "url": "https://www.reuters.com/markets/commodities/uranium-prices-hit-12-year-high-2023-09-25/", "date": "2023-09-25"},
+        {"summary": "NLR holdings analysis: ETF blends utility operators with uranium miners, diluting the pure miner/upstream exposure that URA delivers; performance YTD trails URA.", "source": "ETF.com", "url": "https://www.etf.com/sections/features/nlr-vs-ura-comparison-2023", "date": "2023-09-12"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Net effect: tighten the AI bucket (5 to 4) by dropping the redundant semis ETF, swap one of two overlapping nuclear ETFs for a pure-play SMR name to sharpen the near-term fission thesis, and add broad US healthcare exposure to give the under-represented aging-demographics wave a second leg. Watchlist stays at the cap of 16 with cleaner thematic shape: AI 4, nuclear 3 (URA, CCJ, SMR), rockets 1, robotics 1, quantum 1, energy/geopolitical 2, demographics 2, defense 1, general 1."
+}

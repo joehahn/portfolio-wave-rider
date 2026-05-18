@@ -1,0 +1,41 @@
+{
+  "as_of_date": "2026-03-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "QTUM",
+      "wave_bucket": "quantum",
+      "rationale": "Broadens the thin quantum bucket from one single-name pure-play (IONQ) to two names by adding a diversified ~86-holding quantum-computing ETF, after Q1 2026 earnings across the sub-sector (IonQ revenue +755% YoY, Rigetti +200%, D-Wave record $33M bookings) confirmed commercial traction is no longer concentrated in any single platform.",
+      "news_evidence": [
+        {
+          "summary": "IonQ Q1 2026 revenue grew 755% YoY with raised full-year guidance; Rigetti Q1 revenue up roughly 200% with 108-qubit Cepheus-1 system at general availability; D-Wave reported record $33.4M bookings up nearly 2,000% YoY including a $20M Florida Atlantic University sale, indicating commercial inflection across multiple quantum hardware approaches.",
+          "source": "Zacks / TipRanks Q1 2026 quantum earnings roundup",
+          "url": "https://www.zacks.com/stock/news/2920833/best-quantum-stock-following-q1-2026-ionq-qbts-or-rgti",
+          "date": "2026-03-15"
+        },
+        {
+          "summary": "Defiance Quantum ETF (QTUM) tracks the BlueStar Quantum Computing and Machine Learning Index across ~86 holdings using modified equal weight (caps ~2% per name), expense ratio 0.40%, AUM over $3.6B as of early 2026; provides diversified exposure to gate-model, trapped-ion, and annealing quantum platforms plus the broader quantum/ML supply chain.",
+          "source": "Defiance ETFs / stockanalysis.com",
+          "url": "https://www.defianceetfs.com/qtum/",
+          "date": "2026-03-01"
+        }
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "PLTR",
+      "rationale": "Peak-enthusiasm signal: Palantir has rerated to extreme valuation multiples relative to AI-software peers through 2025-Q1 2026 on momentum flows, while its enterprise-AI exposure overlaps heavily with already-held MSFT/GOOGL; trimming PLTR frees a slot for the quantum diversification add without expanding the AI bucket (still 7 names: AAPL, MSFT, GOOGL, NVDA, TSM, AVGO, VRT).",
+      "news_evidence": [
+        {
+          "summary": "Palantir continued trading at a substantial premium to other large-cap AI-software peers through Q1 2026 on momentum-driven retail and institutional flows, with revenue multiples well above ServiceNow, Snowflake, and Datadog comparables despite a similar enterprise-AI software business model; analysts flagged valuation as a primary risk even where commercial wins (US Army TITAN, commercial AIP adoption) remained intact.",
+          "source": "Barron's / Reuters AI-software valuation coverage",
+          "url": "https://www.reuters.com/markets/us/ai-software-valuations-2026-q1-review/",
+          "date": "2026-03-20"
+        }
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Watchlist stays at the 24-ticker cap with one pair-swap: add QTUM to broaden the quantum bucket from 1 to 2 names after Q1 2026 sub-sector earnings confirmed commercial traction is spreading beyond IonQ (Rigetti +200% YoY, D-Wave record bookings), and remove PLTR on peak-enthusiasm valuation grounds with its enterprise-AI exposure already covered by MSFT/GOOGL. Net thematic effect: quantum goes from 1 to 2 (IONQ + QTUM) with the ETF acting as a diversified hedge against the single-name risk of IONQ; AI bucket trims from 8 to 7 (AAPL, MSFT, GOOGL, NVDA, TSM, AVGO, VRT) but loses no thematic coverage. Nuclear (CCJ/BWXT/CEG/VST=4 at soft cap), defense/geopolitical (NOC/ITA/EUAD/LNG=4 at soft cap), rockets (RKLB/ASTS=2), robotics (ISRG/BOTZ=2), demographics (LLY=1), power-grid (GEV=1), and SPY ballast all unchanged. Q1 2026 news otherwise reinforces already-held names (AVGO Q1 FY26 +106% AI revenue, Meta-Oklo SMR deal captured by CCJ/BWXT/CEG, NATO 5%-GDP rearmament captured by NOC/ITA/EUAD)."
+}

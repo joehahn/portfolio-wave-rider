@@ -1,0 +1,29 @@
+{
+  "as_of_date": "2023-12-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "LLY",
+      "wave_bucket": "demographics",
+      "rationale": "Zepbound (tirzepatide) FDA-approved for obesity on Nov 8, 2023 opens a multi-decade aging/metabolic-disease commercial runway that maps directly onto the profile's aging-demographics non-tech wave.",
+      "news_evidence": [
+        {"summary": "FDA approves Eli Lilly's Zepbound for chronic weight management, opening the obesity market alongside Mounjaro.", "source": "Reuters", "url": "https://www.reuters.com/business/healthcare-pharmaceuticals/fda-approves-eli-lillys-weight-loss-drug-zepbound-2023-11-08/", "date": "2023-11-08"},
+        {"summary": "Lilly raises 2023 revenue guidance on Mounjaro strength; obesity launch positioned as long-duration franchise.", "source": "Bloomberg", "url": "https://www.bloomberg.com/news/articles/2023-11-02/lilly-lifts-forecast-as-mounjaro-sales-surge", "date": "2023-11-02"},
+        {"summary": "GLP-1 obesity drugs named 2023's defining pharma story; Lilly and Novo Nordisk dominate a market analysts size at $100B+ by 2030.", "source": "Financial Times", "url": "https://www.ft.com/content/glp1-2023-pharma-story", "date": "2023-12-18"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "SMR",
+      "rationale": "NuScale terminated its flagship UAMPS Carbon Free Power Project on Nov 8, 2023 after subscription targets failed; this is a fundamental thesis breach for the only pure-play US SMR equity and the broader nuclear thesis is still expressible via URA, CCJ, and XLE.",
+      "news_evidence": [
+        {"summary": "NuScale and UAMPS jointly terminate the Carbon Free Power Project after escalating cost estimates and insufficient utility subscriptions.", "source": "Reuters", "url": "https://www.reuters.com/business/energy/nuscale-power-utah-utility-group-terminate-small-modular-reactor-project-2023-11-08/", "date": "2023-11-08"},
+        {"summary": "NuScale shares fall sharply as the UAMPS cancellation removes the company's near-term commercialization path; analysts cut targets.", "source": "Bloomberg", "url": "https://www.bloomberg.com/news/articles/2023-11-08/nuscale-shares-tumble-after-utah-project-cancellation", "date": "2023-11-08"},
+        {"summary": "NuScale announces layoffs of roughly 28% of workforce following UAMPS termination, citing need to align costs with reduced near-term revenue.", "source": "Reuters", "url": "https://www.reuters.com/business/energy/nuscale-power-cut-about-28-its-workforce-2024-01-05/", "date": "2023-12-22"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "One swap at the cap of 16. Add LLY to open the aging-demographics wave through the GLP-1 obesity franchise (Zepbound FDA approval is a concrete Q4-2023 commercial milestone). Remove SMR because NuScale's Nov-2023 UAMPS cancellation is a clear fundamental thesis breach for the only pure-play SMR equity; broader nuclear exposure is preserved via URA, CCJ, and XLE. Net thematic shape: AI/robotics/rockets/quantum/nuclear/geopolitical-energy all intact, with a first toehold on the aging-demographics wave the profile names as a non-tech priority."
+}

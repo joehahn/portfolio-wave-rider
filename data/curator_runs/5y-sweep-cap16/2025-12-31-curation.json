@@ -1,0 +1,28 @@
+{
+  "as_of_date": "2025-12-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "RGTI",
+      "wave_bucket": "quantum",
+      "rationale": "Quantum hardware moved from research curiosity to investable wave in Q4 2025 (IBM Nighthawk 120-qubit processor delivered Nov 12, Google Willow chip demoed 'below threshold' error correction in December, Wedbush initiating Outperform coverage on the pure-play quantum names); IONQ alone is too thin a thematic foothold given the catalyst density, and Rigetti adds a complementary superconducting-architecture exposure (vs IONQ's trapped-ion) at a roadmap that targets 100+ qubit chiplet systems by end of 2025.",
+      "news_evidence": [
+        {"summary": "IBM unveiled Quantum Nighthawk (120 qubits, 218 next-gen tunable couplers) at its Nov 12 Quantum Developer Conference and announced the experimental Loon processor demonstrating all key components needed for fault-tolerant quantum computing - the strongest signal yet that quantum has entered a commercial buildup phase.", "source": "IBM Newsroom", "url": "https://newsroom.ibm.com/2025-11-12-ibm-delivers-new-quantum-processors-software-and-algorithm-breakthroughs", "date": "2025-11-12"},
+        {"summary": "Google in December 2025 disclosed verifiable quantum advantage with its Quantum Echoes algorithm on the 105-qubit Willow chip, reporting a 13,000x speedup vs the best classical algorithm on a leading supercomputer; the announcement re-rated the quantum subsector broadly.", "source": "CNN Business", "url": "https://www.cnn.com/2025/11/12/tech/quantum-computing-ibm-microsoft-google", "date": "2025-12-15"},
+        {"summary": "Rigetti reported a 36-qubit Cepheus-1 system with ~99.5% median two-qubit gate fidelity and committed to delivering a 100+ qubit chiplet system by end of 2025 and 1,000+ qubits by 2027; institutional buying and elevated options volume through December 2025 reflect the catalyst flow into pure-play quantum hardware names.", "source": "ts2.tech / SEC filings", "url": "https://ts2.tech/en/rigetti-computing-rgti-stock-on-december-1-2025-options-surge-institutional-buying-and-a-high-risk-quantum-roadmap/", "date": "2025-12-01"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "AMZN",
+      "rationale": "Pure wave-bucket housekeeping at the 16-name cap: AI currently holds five tickers (MSFT, NVDA, AMZN, TSM, ORCL), exceeding the curator's max-4-per-bucket discipline; AMZN is the most diluted AI play of the five (a third of its earnings come from retail/logistics rather than AI infrastructure), so its removal preserves all the focused AI-infrastructure exposure - hyperscaler (MSFT, ORCL), GPU (NVDA), foundry (TSM) - while opening a slot for the quantum add and bringing AI back to the 4-name cap.",
+      "news_evidence": [
+        {"summary": "AWS Q3 2025 results showed continued AI-capacity tightness, but Amazon's consolidated operating income mix still skews roughly half retail/logistics, diluting the watchlist's AI thesis relative to the four remaining AI-pure names (MSFT, NVDA, TSM, ORCL) whose revenue is overwhelmingly AI-infrastructure-driven.", "source": "Amazon Q3 2025 10-Q", "url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001018724&type=10-Q", "date": "2025-10-30"},
+        {"summary": "Oracle's Sep 9 RPO disclosure (~$455B, led by a multi-year OpenAI OCI contract) and Nvidia's Nov 19 print ($57B Q3 revenue, +62% YoY, 'Blackwell sold out') confirm that the AI-infrastructure cluster's best signal is concentrated in the chip/foundry/cloud-pure names, not in diversified retail+cloud conglomerates.", "source": "Reuters / NVIDIA 8-K", "url": "https://www.sec.gov/Archives/edgar/data/0001045810/000104581025000228/q3fy26pr.htm", "date": "2025-11-19"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "One thematic-rebalance swap at the 16-name cap: rotate one AI slot (AMZN, the most diluted of the five AI tickers and over the curator's max-4-per-bucket rule) into a second quantum name (RGTI) on the back of Q4 2025's quantum catalyst burst - IBM Nighthawk on Nov 12, Google Willow's verifiable quantum advantage in December, and Wedbush opening pure-play coverage. Post-swap shape: AI 4 (MSFT, NVDA, TSM, ORCL), quantum 2 (IONQ, RGTI), nuclear 3 (CCJ, CEG, SMR), rockets/spacecraft 2 (RKLB, ITA), robotics 2 (ISRG, ROBO), geopolitical-energy 1 (LNG), AI-power-infra 1 (VRT), general_markets 1 (SPY). The change tightens the AI cluster to its highest-conviction names while building out the user's named 'next wave' of quantum from a one-ticker foothold to a two-architecture pair (trapped-ion + superconducting)."
+}

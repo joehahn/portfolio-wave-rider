@@ -1,0 +1,8 @@
+{
+  "as_of_date": "2025-12-31",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "Quiet rebalance at cap=5: every held thesis got reinforced inside the Q4 2025 lookback, and no single robotics or demographics candidate surfaced a Q4-dated commercial milestone strong enough to displace one of the five at this cap. NVDA's Q3 FY26 print on Nov 19, 2025 was a blowout - $57.0B revenue +62% YoY, Data Center $51.2B +66% YoY, Networking $8.2B +162% YoY - confirming the AI surge is still compounding through year-end. RKLB's Nov 10, 2025 Q3 call delivered the one mixed signal: Neutron first launch slipped to 2026 (development cost grew from $250-300M to $360M), but the small-launch and space-systems franchise added 30+ new contracts in 2025 including a 4-launch BlackSky agreement in Q4, and full-year backlog is on track for ~$1.85B (+73% YoY) - the slip dampens the upside catalyst but does not breach the thesis. IONQ closed its Vector Atomic acquisition on Oct 7, 2025, rounding out the quantum-sensing stack on top of the Sep 2025 Oxford Ionics close - the quantum buildup-phase signal stays intact. LNG continues to ride a record 125 MT European import year with Corpus Christi Stage 3 ramping. URA's hyperscaler-nuclear thesis is reinforced by NuScale's Nov 2025 ENTRA1-TVA agreement for up to 6 GW of SMR capacity, extending the Meta-Constellation and Microsoft-Three Mile Island cadence. Wave coverage unchanged: AI (NVDA), nuclear (URA), rockets/spacecraft (RKLB), geopolitical-energy (LNG), quantum (IONQ) - five distinct buckets, one ticker each. At cap=5 the bar to swap is high and no candidate cleared it this quarter."
+}

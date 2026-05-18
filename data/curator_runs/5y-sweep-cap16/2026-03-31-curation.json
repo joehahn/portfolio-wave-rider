@@ -1,0 +1,72 @@
+{
+  "as_of_date": "2026-03-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "AVGO",
+      "wave_bucket": "AI",
+      "rationale": "Adds the AI-custom-silicon and AI-networking leg of the hyperscaler buildout that the existing AI cluster does not fully capture, after Broadcom's Q1 FY26 print (March 4, 2026) showed AI revenue $8.4B up 106% YoY, a $73B AI backlog, OpenAI added as the sixth named custom-silicon customer, and management guiding Q2 AI revenue to $13.1B with a 'clear line of sight' to >$100B annual AI chip revenue by late 2027/early 2028.",
+      "news_evidence": [
+        {
+          "summary": "Broadcom Q1 FY26 reported March 4, 2026: total revenue $19.31B (+29% YoY); AI semiconductor revenue $8.4B (+106% YoY); $73B AI-specific order backlog; Q2 AI revenue guided to $13.1B.",
+          "source": "Broadcom investor relations / Motley Fool transcript",
+          "url": "https://investors.broadcom.com/news-releases/news-release-details/broadcom-inc-announces-first-quarter-fiscal-year-2026-financial",
+          "date": "2026-03-04"
+        },
+        {
+          "summary": "Broadcom expanded named custom-silicon customer list from 5 to 6 with OpenAI joining Google, Anthropic, Meta, and two unnamed hyperscalers; management cited Google Ironwood, Anthropic scaling 1GW to 3GW, and OpenAI's first XPU in 2027 as the demand drivers behind the $73B AI backlog.",
+          "source": "FinancialContent coverage of Q1 FY26 print",
+          "url": "https://markets.financialcontent.com/stocks/article/marketminute-2026-3-24-broadcoms-ai-revenue-rockets-106-to-84-billion-as-custom-silicon-dominates-the-infrastructure-build-out",
+          "date": "2026-03-24"
+        }
+      ]
+    },
+    {
+      "ticker": "LEU",
+      "wave_bucket": "nuclear",
+      "rationale": "Adds the HALEU fuel-cycle leg of the nuclear thesis that CCJ/CEG/SMR (uranium miner, AI-power utility, reactor designer) leave uncovered, after a $900M DOE task order to Centrus on Jan 5, 2026 to expand the Piketon, Ohio facility to commercial-scale HALEU production - the enriched uranium that next-generation SMRs and advanced reactors require and which the US has no commercial domestic supplier of today.",
+      "news_evidence": [
+        {
+          "summary": "On January 5, 2026, the DOE announced that American Centrifuge Operating (Centrus subsidiary) was selected for a $900M task order to expand the Piketon, Ohio uranium enrichment facility to include commercial-scale HALEU production; Centrus is planning ~12 metric tons of HALEU annual capacity for next-generation reactors.",
+          "source": "Centrus Energy 8-K / SEC filing",
+          "url": "https://www.sec.gov/Archives/edgar/data/0001065059/000162828026007110/ex991_centrusfluorreleas.htm",
+          "date": "2026-01-05"
+        },
+        {
+          "summary": "Centrus disclosed a $2.3B commercial LEU enrichment contingent backlog and in December 2025 launched centrifuge manufacturing to support the planned Piketon HALEU expansion, positioning LEU as the only US-listed pure-play on the HALEU fuel-supply bottleneck for the SMR buildout.",
+          "source": "Centrus Energy shareholder letter (DEFA14A)",
+          "url": "https://www.sec.gov/Archives/edgar/data/0001065059/000162828026027243/shareholderletter2026vf.htm",
+          "date": "2026-02-10"
+        }
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "TSM",
+      "rationale": "AI-bucket rotation at the 4-ticker per-bucket ceiling: with AVGO added, swap out TSM as the weakest direct AI exposure of the cluster (pure foundry rather than AI compute/software end-demand owner) and the one carrying the most geopolitical-tail risk; the cluster sharpens to hyperscaler-software (MSFT, ORCL), GPU (NVDA), and custom-silicon/networking (AVGO).",
+      "news_evidence": [
+        {
+          "summary": "Bank of America's 2026 AI-chip buy list names NVDA, AVGO, MRVL, AMD, AMAT, LRCX, CDNS, SNPS as the eight primary beneficiaries of the upgraded $1.3T 2026 semiconductor TAM; TSM appears in foundry rolls but is one step removed from AI-compute end-demand owners.",
+          "source": "Bank of America 2026 semiconductor outlook / Yahoo Finance summary",
+          "url": "https://finance.yahoo.com/news/top-semiconductor-stocks-2026-wall-120207279.html",
+          "date": "2026-03-10"
+        }
+      ]
+    },
+    {
+      "ticker": "VRT",
+      "rationale": "Frees a slot for the nuclear-fuel-cycle add (LEU): VRT's AI-power-infrastructure exposure is increasingly captured by the watchlist's other AI-power proxies (CEG as the AI-utility, SMR as reactor-side, the AI mega-caps directly), so the single-name power-equipment bet adds the least incremental thesis vs a focused HALEU pure-play that no other ticker in the watchlist covers.",
+      "news_evidence": [
+        {
+          "summary": "Q1 2026 hyperscaler-nuclear deal flow (Meta-Oklo 1.2 GW Ohio campus announced Jan 2026; Google-Kairos Hermes 2 ramp; NuScale-TVA program) is being captured directly by CEG (Constellation, the AI-utility) and SMR (NuScale, reactor designer); the AI-power thesis is well represented without VRT's equipment-vendor exposure.",
+          "source": "WWT / DatacenterDynamics SMR-for-data-center coverage",
+          "url": "https://www.wwt.com/blog/big-techs-nuclear-bet-key-small-modular-reactors-for-cloud-power",
+          "date": "2026-01-28"
+        }
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Two thesis-sharpening swaps at the 16-name cap. (1) AI rotation: TSM out, AVGO in - keeps AI at the 4-ticker bucket cap but rotates from pure foundry to custom-silicon/AI-networking, the leg of the Q1 FY26 hyperscaler-capex story (Broadcom $8.4B AI revenue +106% YoY, $73B backlog, OpenAI as sixth custom-silicon customer) that NVDA-plus-foundry does not fully capture. (2) Nuclear deepening: VRT out, LEU in - expands the nuclear bucket from 3 to 4 (CCJ, CEG, SMR, LEU) by adding the HALEU fuel-cycle pure-play after Centrus's Jan 5 $900M DOE task order, completing the nuclear thesis chain (uranium miner -> enrichment -> reactor designer -> AI utility); VRT's AI-power-equipment exposure is already proxied by CEG and the AI mega-caps. Post-swap shape: AI 4 (MSFT, NVDA, ORCL, AVGO), nuclear 4 (CCJ, CEG, SMR, LEU), quantum 2 (IONQ, RGTI), rockets/spacecraft 2 (RKLB, ITA), robotics 2 (ISRG, ROBO), geopolitical-energy 1 (LNG), general_markets 1 (SPY). All buckets at or under the 4-ticker diversity ceiling; watchlist remains at the 16-name cap."
+}

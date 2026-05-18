@@ -1,0 +1,27 @@
+{
+  "as_of_date": "2025-03-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "EUAD",
+      "wave_bucket": "geopolitical",
+      "rationale": "European Commission President von der Leyen unveiled an 800B euro ReArm Europe plan on March 4, 2025 after Trump paused Ukraine aid, marking a structural geopolitical wave inflection; EUAD is the cleanest US-listed pure-play European aerospace and defense ETF (launched Oct 22, 2024) and broadens the watchlist's geopolitical-defense exposure beyond US primes ITA and NOC.",
+      "news_evidence": [
+        {"summary": "Von der Leyen announces ReArm Europe plan to mobilize up to 800B euros in defense spending over four years; Europe enters an 'era of rearmament' after Trump pauses Ukraine aid.", "source": "Al Jazeera", "url": "https://www.aljazeera.com/economy/2025/3/5/as-trump-rattles-stock-markets-investors-bet-on-europes-defence", "date": "2025-03-05"},
+        {"summary": "Select STOXX Europe Aerospace & Defense ETF (EUAD) launched October 22, 2024 as the first US-listed pure-play European A&D ETF, capturing names like Rheinmetall, BAE, Leonardo, and Airbus.", "source": "Select Funds / SEC Form 497", "url": "https://www.sec.gov/Archives/edgar/data/0001484018/000148401824000217/r497e1024.htm", "date": "2024-10-22"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "AMD",
+      "rationale": "DeepSeek R1 (Jan 27, 2025) crystallized a 'cheap inference' narrative that hits second-tier AI-accelerator names hardest, and AMD's MI300 ramp has been visibly disappointing relative to NVDA share gains and Street expectations; the watchlist already has NVDA, AVGO, TSM, and ASML covering AI-semis, and the AI bucket is overstacked at 7 tickers versus the 4-per-bucket curator guideline.",
+      "news_evidence": [
+        {"summary": "Nvidia falls 17% on Jan 27, 2025 as DeepSeek's R1 model triggers a global tech selloff, with AMD and other AI-semi names dragged down on the same 'cheaper AI compute' fear.", "source": "CNBC", "url": "https://www.cnbc.com/2025/01/27/nvidia-falls-10percent-in-premarket-trading-as-chinas-deepseek-triggers-global-tech-sell-off.html", "date": "2025-01-27"},
+        {"summary": "AMD CEO flags data center sales slowdown and heightened NVIDIA competition; MI300 traction has disappointed and AI data-center revenue is showing pressure from export restrictions on MI308 to China.", "source": "ainvest / company commentary", "url": "https://www.ainvest.com/news/amd-2025-goals-met-due-mi300-disappointment-2508/", "date": "2025-02-15"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Watchlist stays at the 24-ticker cap with one pair: add EUAD to capture the March 4 ReArm Europe inflection (the largest geopolitical-defense policy shift since the Ukraine invasion), and remove AMD whose competitive position in AI accelerators weakened further after the DeepSeek shock while the watchlist already carries four AI-semi names. Net thematic effect: geopolitical-defense exposure broadens from US-only (ITA, NOC) to include European primes via EUAD, while the still-crowded AI bucket loses its weakest semi and rebalances slightly toward higher-conviction names. Nuclear (4), quantum (2), rockets (1), and robotics (1) buckets unchanged; AI infra (VRT, GEV) and nuclear (CEG, VST) continue to fit the Stargate $500B AI-power tailwind announced Jan 21."
+}

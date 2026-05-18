@@ -1,0 +1,27 @@
+{
+  "as_of_date": "2023-06-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "BOTZ",
+      "wave_bucket": "robotics",
+      "rationale": "Opens an explicit robotics-wave slot named in the profile thesis; BOTZ provides diversified exposure to industrial robotics, automation, and AI-adjacent names that complement single-stock NVDA without doubling the AI bucket.",
+      "news_evidence": [
+        {"summary": "Global X identifies four themes inside BOTZ as of Jan 31 2023: industrial robotics and automation, unmanned vehicles and drones, AI, and non-industrial robotics; over half of holdings outside the US with significant Japan weight.", "source": "Global X / SEC 497K filing", "url": "https://www.sec.gov/Archives/edgar/data/0001432353/000143235323000407/a497kroboticsartificialint.htm", "date": "2023-03-01"},
+        {"summary": "Industrial-automation and AI-linked equities rallied through H1 2023 as enterprise AI investment accelerated alongside NVDA's data-center surge, broadening the buildout beyond pure GPU names.", "source": "Global X ETFs fund page", "url": "https://www.globalxetfs.com/funds/botz", "date": "2023-06-30"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "XLE",
+      "rationale": "Energy bucket is overweighted (XLE + LNG + URA = 3 of 5 slots); XLE overlaps LNG inside the geopolitical-energy thesis while crude has pulled back sharply (Brent fell ~$16 to ~$73/b between mid-April and early May 2023), eroding the broad-oil tailwind. LNG remains the cleaner Russia-Ukraine LNG-export bet, so dropping XLE frees a slot for the uncovered robotics wave without abandoning the geopolitical-energy thesis.",
+      "news_evidence": [
+        {"summary": "EIA reports Brent crude fell $16/b to $73/b and WTI fell $15/b to $69/b between April 12 and May 4 2023; agency expects only modest H2 2023 recovery to ~$78-79/b as OPEC+ cuts offset weaker demand.", "source": "U.S. Energy Information Administration", "url": "https://www.eia.gov/todayinenergy/detail.php?id=56560", "date": "2023-05-09"},
+        {"summary": "Cheniere supplied ~70% of its LNG to Europe in 2022, covering ~30% of the Russian pipeline-gas shortfall; the Russia-Ukraine LNG-export thesis is concentrated in LNG, leaving XLE as a redundant broad-oil overlay.", "source": "LNG2023 / Cheniere", "url": "https://www.lng2023.org/news/cheniere-key-contributor-european-energy-security", "date": "2023-05-15"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "The watchlist was concentrated 3-of-5 in energy/commodities (XLE, LNG, URA) and had no slot for robotics, one of the profile's named next waves. Swapping XLE for BOTZ keeps the geopolitical-energy thesis intact through LNG (the cleaner Russia-Ukraine export play) and the nuclear thesis intact through URA, while opening a robotics-wave slot to complement NVDA's AI exposure and RKLB's rockets exposure. Post-change watchlist of 5 spans one ticker per wave bucket: AI (NVDA), nuclear (URA), rockets (RKLB), geopolitical-energy (LNG), robotics (BOTZ). Quantum remains uncovered but Q1 2023 revenues at IonQ (~$4M) and Rigetti ($2.2M) are too small to justify displacing an existing position this quarter."
+}

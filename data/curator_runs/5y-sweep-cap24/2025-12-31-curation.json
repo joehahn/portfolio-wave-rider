@@ -1,0 +1,8 @@
+{
+  "as_of_date": "2025-12-31",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "Watchlist stays at the 24-ticker cap with no changes this quarter. Q4 2025 news flow reinforces already-held names rather than calling for a pair-swap: BWXT's backlog hit $7.4B (up 119% YoY) with a Rolls-Royce SMR steam-generator contract signed, CEG/VST continued to lock in hyperscaler power deals (Constellation's December 17 PJM auction results, Vistra's co-location discussions), RKLB posted a record $602M FY revenue and an $816M SDA Tranche III award, ASTS picked up Golden Dome defense bid optimism, and LLY's Q3 print showed Mounjaro/Zepbound revenue up 110-123% YoY. Sentiment-shock candidates for removal don't clear the bar: EUAD sold off Dec 15 on Zelenskyy's NATO-membership concession but the structural NATO 5%-of-GDP rearmament thesis is intact; IONQ is down ~26% YTD but it's the lone quantum name and the wave thesis is multi-year. Plausible adds (SMR after the September TVA/ENTRA1 6GW deal and December DOE $800M SMR program) would push the nuclear bucket past the 4-ticker soft cap (CCJ/BWXT/CEG/VST already), so the add is declined absent a compelling remove. Forcing churn at the cap purely to act would degrade thematic coverage; standing pat is the right call this quarter."
+}

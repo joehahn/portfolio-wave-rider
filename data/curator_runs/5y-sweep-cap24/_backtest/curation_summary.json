@@ -1,0 +1,174 @@
+[
+  {
+    "date": "2021-03-31",
+    "adds": [],
+    "removes": [],
+    "rejections": 3
+  },
+  {
+    "date": "2021-06-30",
+    "adds": [],
+    "removes": [],
+    "rejections": 3
+  },
+  {
+    "date": "2021-09-30",
+    "adds": [
+      "ISRG"
+    ],
+    "removes": [],
+    "rejections": 2
+  },
+  {
+    "date": "2021-12-31",
+    "adds": [
+      "IONQ",
+      "BWXT",
+      "AMD"
+    ],
+    "removes": [],
+    "rejections": 0
+  },
+  {
+    "date": "2022-03-31",
+    "adds": [
+      "XLV"
+    ],
+    "removes": [],
+    "rejections": 2
+  },
+  {
+    "date": "2022-06-30",
+    "adds": [
+      "CEG",
+      "NOC",
+      "CGNX"
+    ],
+    "removes": [],
+    "rejections": 0
+  },
+  {
+    "date": "2022-09-30",
+    "adds": [],
+    "removes": [],
+    "rejections": 1
+  },
+  {
+    "date": "2022-12-31",
+    "adds": [],
+    "removes": [],
+    "rejections": 0
+  },
+  {
+    "date": "2023-03-31",
+    "adds": [],
+    "removes": [],
+    "rejections": 0
+  },
+  {
+    "date": "2023-06-30",
+    "adds": [
+      "LLY",
+      "SMR"
+    ],
+    "removes": [
+      "CGNX"
+    ],
+    "rejections": 1
+  },
+  {
+    "date": "2023-09-30",
+    "adds": [
+      "VRT"
+    ],
+    "removes": [],
+    "rejections": 1
+  },
+  {
+    "date": "2023-12-31",
+    "adds": [
+      "AVGO",
+      "URA"
+    ],
+    "removes": [
+      "XLV"
+    ],
+    "rejections": 1
+  },
+  {
+    "date": "2024-03-31",
+    "adds": [
+      "SYM",
+      "VST"
+    ],
+    "removes": [
+      "SMR"
+    ],
+    "rejections": 2
+  },
+  {
+    "date": "2024-06-30",
+    "adds": [
+      "ASML"
+    ],
+    "removes": [],
+    "rejections": 0
+  },
+  {
+    "date": "2024-09-30",
+    "adds": [
+      "GEV"
+    ],
+    "removes": [
+      "URA"
+    ],
+    "rejections": 0
+  },
+  {
+    "date": "2024-12-31",
+    "adds": [
+      "QBTS",
+      "PLTR"
+    ],
+    "removes": [
+      "SYM"
+    ],
+    "rejections": 1
+  },
+  {
+    "date": "2025-03-31",
+    "adds": [
+      "EUAD"
+    ],
+    "removes": [
+      "AMD"
+    ],
+    "rejections": 0
+  },
+  {
+    "date": "2025-06-30",
+    "adds": [
+      "BOTZ"
+    ],
+    "removes": [
+      "ASML"
+    ],
+    "rejections": 0
+  },
+  {
+    "date": "2025-09-30",
+    "adds": [
+      "ASTS"
+    ],
+    "removes": [
+      "QBTS"
+    ],
+    "rejections": 0
+  },
+  {
+    "date": "2025-12-31",
+    "adds": [],
+    "removes": [],
+    "rejections": 0
+  }
+]

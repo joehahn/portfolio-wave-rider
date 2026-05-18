@@ -1,0 +1,8 @@
+{
+  "as_of_date": "2025-09-30",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "Quiet quarter at the cap=8 ceiling: the watchlist remains thematically saturated across every named wave (AI via MSFT and NVDA, robotics via ISRG, demographics via LLY, quantum via QTUM, nuclear via NLR, geopolitical-energy via LNG, rockets via RKLB), and Q3 2025 produced no thesis breach for any holding nor a candidate strong enough to displace one. The tailwinds actually firmed: NVDA's Aug 27 Q2 FY26 print showed Blackwell data-center revenue up 17% sequentially with a fresh $60B buyback, ISRG's Q2 revenue grew 21% on 180 da Vinci 5 placements (vs 70 a year ago), LLY's Sep 16 ATTAIN-1 detailed readout in NEJM confirmed orforglipron's 11.2% mean weight loss as a foundational oral GLP-1, AWS-Talen's June 1.92 GW PPA and Pennsylvania SMR exploration deepened the NLR thesis, Cheniere posted +85% Q2 net income on sustained EU LNG bilateral deals, QTUM names hit roadmap milestones early (IonQ AQ 64 ahead of schedule, Rigetti 99.5% two-qubit fidelity on its 36-qubit chiplet Aug 15), and RKLB's Wallops Launch Complex 3 pad ceremony in September kept Neutron tracking to its public 2H 2025 debut window. With every holding earning its slot and the cap=8 forcing a strict pair-with-remove for any add, the right call is hold and let the optimizer re-weight."
+}

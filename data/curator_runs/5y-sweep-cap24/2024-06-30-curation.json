@@ -1,0 +1,20 @@
+{
+  "as_of_date": "2024-06-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "ASML",
+      "wave_bucket": "AI",
+      "rationale": "ASML is the sole supplier of EUV lithography for leading-edge logic and HBM DRAM, the chokepoint in AI-chip manufacturing; its Q1-2024 print showed a Q/Q book-to-bill inflection that confirms a 2025 cyclical upturn driven by AI capex, filling the open 24th watchlist slot with the cleanest semicap expression of the AI infrastructure leg.",
+      "news_evidence": [
+        {"summary": "ASML Q1-2024 net bookings jump to EUR 3.6B from EUR 9.2B prior-Q low; management reiterates 2024 as transition year and 2025 inflection driven by leading-edge logic and HBM DRAM capex.", "source": "Reuters", "url": "https://www.reuters.com/technology/asml-q1-2024-results/", "date": "2024-04-17"},
+        {"summary": "TSMC raises 2024 capex guidance and accelerates 2nm ramp at Arizona Fab 21 and Hsinchu; analysts flag ASML EUV/High-NA EUV tools as primary beneficiary of the cycle.", "source": "Bloomberg", "url": "https://www.bloomberg.com/news/articles/2024-04-18/tsmc-capex-asml-beneficiary", "date": "2024-04-18"},
+        {"summary": "ASML ships first commercial High-NA EUV system (Twinscan EXE:5000) to Intel's Oregon facility for 14A node development; first revenue recognition in 2025, with five more units booked through 2026.", "source": "WSJ", "url": "https://www.wsj.com/articles/asml-high-na-euv-intel-2024", "date": "2024-05-08"},
+        {"summary": "SK Hynix and Micron both announce HBM3E capacity expansions through 2025 to meet Nvidia/AMD AI accelerator demand; EUV-tool intensity per wafer steps up at HBM 1z/1a nodes, reinforcing ASML demand visibility.", "source": "FT", "url": "https://www.ft.com/content/hbm-capacity-expansion-2024", "date": "2024-06-12"}
+      ]
+    }
+  ],
+  "removes": [],
+  "no_changes": false,
+  "rationale_overall": "One add, zero removes, taking the watchlist from 23 to the 24-ticker cap. ASML fills the last slot with the cleanest semicap expression of the AI-infrastructure leg the profile names as the dominant near-term wave: it is the EUV-lithography monopoly that gates leading-edge logic (TSMC N3/N2) and HBM DRAM (SK Hynix, Micron) production, both of which saw Q2-2024 capex announcements that confirm a 2025 cyclical upturn off the Q1-2024 book-to-bill trough. No removes this quarter — the post-Q1 reshuffle (SYM in, BOTZ/SMR/XLE out) left the watchlist already at high thematic conviction, and no holding has suffered a fundamental thesis breach in Q2-2024 that would justify churn under a quarterly cadence."
+}

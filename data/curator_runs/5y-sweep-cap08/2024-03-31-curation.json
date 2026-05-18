@@ -1,0 +1,29 @@
+{
+  "as_of_date": "2024-03-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "BOTZ",
+      "wave_bucket": "robotics",
+      "rationale": "Adds dedicated robotics exposure to a watchlist whose only robotics name is medical-only (ISRG); NVIDIA's GR00T humanoid-foundation-model launch at GTC (Mar 18, 2024) is a credible buildup-phase catalyst for the broader humanoid/industrial robotics wave the profile names explicitly.",
+      "news_evidence": [
+        {"summary": "NVIDIA announces Project GR00T, a general-purpose foundation model for humanoid robots, plus Jetson Thor SoC and Isaac platform upgrades, partnering with 1X, Agility, Apptronik, Boston Dynamics, Figure AI, Sanctuary, Unitree, XPENG.", "source": "NVIDIA Newsroom", "url": "https://nvidianews.nvidia.com/news/foundation-model-isaac-robotics-platform", "date": "2024-03-18"},
+        {"summary": "ROBO Global Q1-2024 commentary: NVIDIA (11.8% of index weight in robotics benchmarks) cited as compressing humanoid-robot development timelines from years to months via Isaac/GR00T; Jensen Huang flags robotics and physical automation as a top opportunity at GTC.", "source": "ROBO Global ETFs", "url": "https://www.roboglobaletfs.com/posts/robo-index-1q24-commentary", "date": "2024-03-28"},
+        {"summary": "IEEE Spectrum technical writeup: GR00T positions NVIDIA as the de-facto compute and simulation supplier for humanoid robotics, broadening industry funding flows beyond pure-play robot companies into the diversified ETF basket.", "source": "IEEE Spectrum", "url": "https://spectrum.ieee.org/nvidia-gr00t-ros", "date": "2024-03-19"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "GOOGL",
+      "rationale": "Pairs the BOTZ add to keep |watchlist|=8; thesis breach signal — Gemini image-generation rollout was paused mid-quarter after a public backlash, ~$70-96B of market cap was shed in days, and Alphabet now visibly trails MSFT/OpenAI on consumer-AI execution while MSFT and NVDA remain in the watchlist to carry the AI buildup wave.",
+      "news_evidence": [
+        {"summary": "Google pauses Gemini's image-generation of people after historically inaccurate outputs, the rollout is publicly walked back by Pichai as 'unacceptable.'", "source": "CNN Business", "url": "https://www.cnn.com/2024/02/22/tech/google-gemini-ai-image-generator", "date": "2024-02-22"},
+        {"summary": "Alphabet shares fall ~4.4% to $137.57; the dip equates to ~$70B of market-cap erased and ~$96.9B as of Feb 26 on Gemini fallout.", "source": "Fox Business", "url": "https://www.foxbusiness.com/media/google-parent-company-value-plummets-losing-70-billion-after-gemini-ai-scandal", "date": "2024-02-27"},
+        {"summary": "Co-founder Sergey Brin publicly concedes 'we definitely messed up on the image generation,' signaling internal-execution issues at the AI lab through Q1.", "source": "Fortune", "url": "https://fortune.com/2024/03/04/sergey-brin-google-definitely-messed-up-gemini-image-generation/", "date": "2024-03-04"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Cap-8 watchlist is full, so this is a single-pair swap: rotate from the AI laggard (GOOGL, fresh Gemini thesis breach) into a dedicated robotics ETF (BOTZ) catalyzed by NVIDIA's GR00T humanoid-foundation-model launch at GTC. Net effect: AI exposure narrows to the two cleanest names (MSFT, NVDA), and the profile's named 'robotics' next wave finally has a non-medical expression alongside ISRG. Nuclear (URA), geopolitical-energy (XLE), demographics/pharma (LLY), rockets/spacecraft (ARKX) unchanged."
+}

@@ -1,0 +1,27 @@
+{
+  "as_of_date": "2024-06-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "TSM",
+      "wave_bucket": "AI",
+      "rationale": "TSMC is the sole-source fab behind every leading-edge AI accelerator; Q1 FY25 Nvidia data center revenue at $22.6B (+427% YoY) and reports that NVDA/AMD/AVGO have locked up TSMC's 3nm capacity make TSM the picks-and-shovels exposure missing from the current AI cluster.",
+      "news_evidence": [
+        {"summary": "Nvidia reports record Q1 FY25 data center revenue of $22.6B, +427% YoY; announces 10-for-1 split effective June 7, 2024 — direct read-through to TSMC fab demand.", "source": "SEC 8-K (NVDA Q1FY25 press release)", "url": "https://www.sec.gov/Archives/edgar/data/0001045810/000104581024000113/q1fy25pr.htm", "date": "2024-05-22"},
+        {"summary": "TSMC board approves ~$17.4B in additional capex appropriations for advanced node and packaging capacity to meet long-term demand forecasts.", "source": "SEC 6-K (TSMC board action)", "url": "https://www.sec.gov/Archives/edgar/data/0001046179/000104617924000072/tsm-boardx20240605x6k.htm", "date": "2024-06-05"},
+        {"summary": "TSMC June 2024 net revenue NT$207.87B, +32.9% YoY; H1 2024 revenue up 28% YoY — AI-driven advanced-node demand visible in monthly run-rate.", "source": "TSMC investor relations / press", "url": "https://technologymagazine.com/news/tsmc-surging-ai-chip-demand", "date": "2024-06-30"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "URA",
+      "rationale": "URA's top holding is CCJ (~22% weight), which we already hold directly; dropping the ETF de-duplicates uranium exposure without changing the bucket thesis and frees a slot for a higher-conviction AI-infrastructure name.",
+      "news_evidence": [
+        {"summary": "Global X URA top holdings disclosure shows Cameco as the single largest constituent, with significant overlap to a direct CCJ position; uranium thesis remains intact via CCJ alone.", "source": "Global X URA fund page (holdings as of 2024-Q2)", "url": "https://www.globalxetfs.com/funds/ura/", "date": "2024-06-30"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Single swap this quarter: add TSM (AI fab bottleneck — direct beneficiary of the Nvidia data-center surge visible in May 22 earnings and TSMC's June 5 capex bump), drop URA (uranium ETF whose largest holding is CCJ, which we already own — de-duplication). Net effect: sharpens AI-infrastructure depth from chip-designer (NVDA) to chip-fab (TSM) while keeping the nuclear bucket intact via CCJ. Watchlist size stays at 16, all other thematic buckets (rockets, robotics, quantum, geopolitical-energy, demographics, defense) unchanged."
+}

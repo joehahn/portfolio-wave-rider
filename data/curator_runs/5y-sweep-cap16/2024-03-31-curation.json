@@ -1,0 +1,26 @@
+{
+  "as_of_date": "2024-03-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "AMZN",
+      "wave_bucket": "AI",
+      "rationale": "Closes the obvious hyperscaler gap in the watchlist: AWS is the third pillar of the AI-infrastructure buildout alongside MSFT-Azure and GOOGL-GCP, and Amazon just completed its $4B Anthropic investment on March 27, 2024, locking Anthropic to AWS Trainium/Inferentia and Bedrock.",
+      "news_evidence": [
+        {"summary": "Amazon completes $4B Anthropic investment; Anthropic commits to AWS Trainium/Inferentia for training and Bedrock for distribution", "source": "About Amazon (company newsroom)", "url": "https://www.aboutamazon.com/news/company-news/amazon-anthropic-ai-investment", "date": "2024-03-27"},
+        {"summary": "Nvidia GTC keynote unveils Blackwell GB200; AWS named among cloud partners committing to Blackwell instances later in 2024, reinforcing AWS's AI-infra trajectory", "source": "NVIDIA Newsroom", "url": "https://nvidianews.nvidia.com/news/nvidia-blackwell-platform-arrives-to-power-a-new-era-of-computing", "date": "2024-03-18"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "XLV",
+      "rationale": "Most redundant healthcare exposure on the list now that LLY (GLP-1 leader, $2B Mounjaro+Zepbound in Q1 2024) carries the aging-demographics thesis and ISRG covers medical robotics; XLV is a broad sector ETF that dilutes both signals and frees a slot under the 16-cap for the missing AI hyperscaler.",
+      "news_evidence": [
+        {"summary": "Eli Lilly's Mounjaro and Zepbound combined for ~$2B in Q1 2024, anchoring the GLP-1 leg of the demographics thesis without needing XLV's broad-sector dilution", "source": "Yahoo Finance / Lilly Q1 2024 reporting", "url": "https://finance.yahoo.com/news/eli-lilly-reports-2-billion-from-mounjaro-zepbound-in-q1-2024-172330824.html", "date": "2024-03-15"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "One targeted swap at the 16-cap: add AMZN to plug the AWS-shaped hole in the AI mega-cap exposure (the Anthropic-on-AWS deal closed March 27 makes this concrete), and drop XLV since LLY and ISRG already carry the demographics and medical-robotics legs of the healthcare thesis more sharply than a broad sector ETF. Net thematic shape is unchanged on nuclear (URA, CCJ), rockets (RKLB), robotics (BOTZ), quantum (IONQ), defense (ITA), and energy/LNG (LNG, XLE); AI breadth improves from 4 to 5 mega-caps."
+}

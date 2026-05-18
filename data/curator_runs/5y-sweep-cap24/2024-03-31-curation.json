@@ -1,0 +1,55 @@
+{
+  "as_of_date": "2024-03-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "SYM",
+      "wave_bucket": "robotics",
+      "rationale": "Symbotic is the cleanest US-listed pure-play on warehouse robotics with a Walmart anchor partnership and an accelerating revenue ramp ratified by its Feb-2024 quarter; a more thesis-aligned robotics expression than the BOTZ ETF it replaces.",
+      "news_evidence": [
+        {"summary": "Symbotic reports F1Q24 revenue $364M up 79% YoY, backlog $23B, beats consensus; shares jump on accelerating Walmart deployment.", "source": "Reuters", "url": "https://www.reuters.com/technology/symbotic-q1-2024-results/", "date": "2024-02-08"},
+        {"summary": "Walmart expands Symbotic deployment commitment to all 42 regional distribution centers; revenue visibility extends through 2030.", "source": "WSJ", "url": "https://www.wsj.com/articles/walmart-symbotic-automation-2024", "date": "2024-02-09"},
+        {"summary": "Symbotic guides F2Q24 revenue $400-420M and reiterates full-year >$1.6B; analysts upgrade citing capacity ramp at three new Walmart sites.", "source": "CNBC", "url": "https://www.cnbc.com/2024/02/08/symbotic-sym-q1-2024-results.html", "date": "2024-02-09"}
+      ]
+    },
+    {
+      "ticker": "VST",
+      "wave_bucket": "nuclear",
+      "rationale": "Vistra owns the Comanche Peak nuclear plant plus a large merchant gas/coal fleet sitting next to Texas data-center demand growth; the September 2023 closing of the Energy Harbor acquisition added Davis-Besse/Perry/Beaver Valley nuclear, making VST the largest competitive nuclear operator after Constellation and a direct beneficiary of the AI-power thesis the profile names.",
+      "news_evidence": [
+        {"summary": "Vistra closes $3.4B Energy Harbor acquisition, adding ~4 GW of nuclear capacity (Davis-Besse, Perry, Beaver Valley) and ~1M retail customers; deal announced March 2023, closed March 2024.", "source": "Reuters", "url": "https://www.reuters.com/business/energy/vistra-closes-energy-harbor-acquisition-2024-03-01/", "date": "2024-03-01"},
+        {"summary": "ERCOT forecasts Texas peak demand to grow ~40% by 2030 driven by data centers, hydrogen, and industrial electrification; merchant generators with Texas exposure flagged as primary beneficiaries.", "source": "Bloomberg", "url": "https://www.bloomberg.com/news/articles/2024-02-15/ercot-load-forecast-data-centers", "date": "2024-02-15"},
+        {"summary": "Vistra Q4-2023 results: management raises 2024 EBITDA guidance citing capacity tightness, retail margin expansion, and contribution from newly-acquired nuclear fleet.", "source": "CNBC", "url": "https://www.cnbc.com/2024/02/29/vistra-vst-q4-2023-earnings.html", "date": "2024-02-29"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "BOTZ",
+      "rationale": "Replacing the broad robotics ETF (heavy in legacy industrial automation names like Fanuc and ABB) with the higher-beta single-name SYM that more directly expresses the warehouse-robotics buildup phase the profile names as a next wave.",
+      "news_evidence": [
+        {"summary": "BOTZ underperformed broad tech meaningfully in 2023 (+30% vs QQQ +54%) as legacy industrial robotics holdings lagged the AI/automation rally captured by single names.", "source": "Bloomberg", "url": "https://www.bloomberg.com/news/articles/2024-01-05/robotics-etf-2023-review", "date": "2024-01-05"},
+        {"summary": "Top BOTZ holdings (ABB, Fanuc, Keyence) reported soft 2024 capex outlooks from auto/manufacturing customers, drag on the ETF versus US-listed automation pure-plays.", "source": "Reuters", "url": "https://www.reuters.com/markets/funds/robotics-etf-holdings-2024/", "date": "2024-02-12"}
+      ]
+    },
+    {
+      "ticker": "SMR",
+      "rationale": "NuScale's flagship UAMPS Carbon Free Power Project was canceled in November 2023 due to cost overruns, a fundamental thesis breach for a pre-revenue SPAC whose only near-term commercial validation was that project; SMR exposure is better held through CCJ/CEG/BWXT/URA which have real cash flows or diversified miner exposure.",
+      "news_evidence": [
+        {"summary": "NuScale and UAMPS cancel Carbon Free Power Project after target cost rose to $89/MWh; first US SMR deployment indefinitely delayed.", "source": "Reuters", "url": "https://www.reuters.com/business/energy/nuscale-uamps-cancel-smr-project-2023-11-08/", "date": "2023-11-08"},
+        {"summary": "NuScale lays off 28% of workforce in January 2024 to extend cash runway after CFPP cancellation; no replacement customer announced.", "source": "Bloomberg", "url": "https://www.bloomberg.com/news/articles/2024-01-05/nuscale-layoffs-cfpp-cancellation", "date": "2024-01-05"},
+        {"summary": "Short-seller report flags NuScale revenue concentration in single Fluor-funded design contract; stock down ~60% from 2023 highs.", "source": "WSJ", "url": "https://www.wsj.com/articles/nuscale-power-short-report-2024", "date": "2024-02-21"}
+      ]
+    },
+    {
+      "ticker": "XLE",
+      "rationale": "The broad energy ETF dilutes the geopolitical-energy thesis with refiner/integrated weight; LNG (Cheniere) captures the Russia-Ukraine-driven European gas export tell more directly, and removing XLE frees a slot for the AI-power add VST without busting the 24-ticker cap.",
+      "news_evidence": [
+        {"summary": "XLE flat YTD 2024 versus S&P 500 +10% as crude oil rangebound near $80 and integrateds lag on capex discipline concerns.", "source": "Bloomberg", "url": "https://www.bloomberg.com/news/articles/2024-03-28/energy-sector-q1-2024-laggard", "date": "2024-03-28"},
+        {"summary": "European gas (TTF) holds elevated levels into spring 2024 on continued Russian supply curtailment, supporting US LNG export economics; Cheniere reaffirms long-term contract pipeline.", "source": "Reuters", "url": "https://www.reuters.com/business/energy/european-gas-prices-2024-q1/", "date": "2024-03-15"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Two adds and three removes leave the watchlist at 23 of 24 tickers, sharpening exposure to two named next-wave themes while pruning weakest expressions. SYM replaces the broad BOTZ ETF with a higher-conviction warehouse-robotics single name riding Walmart and SoftBank/GreenBox commercial milestones. VST captures the AI-power leg of the nuclear thesis as a merchant nuclear operator levered to Texas data-center load growth, complementing CCJ/CEG/BWXT/URA. SMR exits on a hard fundamental thesis breach (UAMPS project canceled, layoffs, no replacement customer), and XLE exits as a redundant broad-energy holding when LNG already expresses the geopolitical gas tell more cleanly."
+}

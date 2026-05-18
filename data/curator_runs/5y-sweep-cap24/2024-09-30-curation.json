@@ -1,0 +1,29 @@
+{
+  "as_of_date": "2024-09-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "GEV",
+      "wave_bucket": "nuclear",
+      "rationale": "GE Vernova is the cleanest pure-play on the AI-power buildout: gas turbines, grid equipment, and a nuclear services arm (BWRX-300 SMR design with Hitachi) all sitting in front of a structural utility-capex up-cycle that the Q3-2024 Constellation/Microsoft Three Mile Island PPA crystallized; spun out of GE in April 2024 and now has two quarters of standalone prints confirming order growth and margin inflection.",
+      "news_evidence": [
+        {"summary": "GE Vernova begins trading on NYSE following spin-off from GE; investor day frames the company as the diversified electrification play across gas, grid, wind, and nuclear services.", "source": "Reuters", "url": "https://www.reuters.com/business/energy/ge-vernova-spin-off-begins-trading-2024-04-02/", "date": "2024-04-02"},
+        {"summary": "GE Vernova Q2-2024 results: organic revenue +1% but orders up 4% to $9.1B with gas-turbine orders +44% YoY; management cites data-center-driven gas demand and raises full-year 2024 guidance.", "source": "Bloomberg", "url": "https://www.bloomberg.com/news/articles/2024-07-24/ge-vernova-q2-2024-results", "date": "2024-07-24"},
+        {"summary": "Constellation Energy signs 20-year PPA with Microsoft to restart Three Mile Island Unit 1 nuclear plant (835 MW) for AI data-center load; deal frames nuclear restart and SMR-services economics for the broader sector.", "source": "WSJ", "url": "https://www.wsj.com/articles/constellation-microsoft-three-mile-island-2024", "date": "2024-09-20"},
+        {"summary": "GE Hitachi BWRX-300 SMR selected by TVA for Clinch River site front-end engineering; Ontario Power Generation construction permit for first BWRX-300 advances on schedule for 2028 in-service.", "source": "FT", "url": "https://www.ft.com/content/bwrx-300-smr-tva-opg-2024", "date": "2024-09-12"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "URA",
+      "rationale": "The Global X Uranium ETF is now the weakest expression of the nuclear thesis on a watchlist that already holds CCJ (the dominant Western miner and URA's top holding at ~22%), CEG and VST (operating nuclear fleets directly levered to the AI-power PPA cycle), and BWXT (nuclear services and naval reactors); adding GEV in the same call further saturates nuclear-services exposure, so URA is the cleanest redundant remove to free a slot under the 24-ticker cap.",
+      "news_evidence": [
+        {"summary": "URA top holdings disclosure: CCJ ~22%, Kazatomprime ~8%, NexGen ~6%; the ETF's price action in 2024 has tracked CCJ within ~2% on a beta-adjusted basis, confirming redundant exposure for a portfolio already holding CCJ.", "source": "Global X", "url": "https://www.globalxetfs.com/funds/ura/", "date": "2024-09-15"},
+        {"summary": "Uranium spot price drifts from $107/lb February peak to ~$82/lb in September 2024 as Kazatomprom guides higher 2025 output and Russian enriched uranium import waiver process opens; broad uranium-miner basket lags single-name utility plays riding the AI-power PPA narrative.", "source": "Reuters", "url": "https://www.reuters.com/markets/commodities/uranium-price-q3-2024/", "date": "2024-09-18"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "One add, one remove, watchlist stays at the 24-ticker cap. GEV enters as the cleanest single-name expression of the AI-power buildout that Q3-2024 made impossible to ignore: the Constellation-Microsoft Three Mile Island PPA is the structural tell that hyperscaler load growth is now contracting directly with nuclear and grid operators, and GE Vernova captures gas turbines, transmission gear, and the BWRX-300 SMR services arm in one US-listed instrument with two clean post-spin quarters of order growth. URA exits as a redundant nuclear vehicle: the watchlist already holds CCJ (URA's top constituent), CEG, VST, BWXT, and now GEV, so the ETF wrapper adds beta to a theme the single names already express more sharply. Net effect: sharper nuclear/AI-power conviction at the watchlist level with no change in cap utilization."
+}

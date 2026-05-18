@@ -1,0 +1,161 @@
+[
+  {
+    "date": "2021-03-31",
+    "adds": [
+      "ARKQ"
+    ],
+    "removes": [
+      "SPY"
+    ],
+    "rejections": 0
+  },
+  {
+    "date": "2021-06-30",
+    "adds": [],
+    "removes": [
+      "ARKQ"
+    ],
+    "rejections": 1
+  },
+  {
+    "date": "2021-09-30",
+    "adds": [
+      "URA",
+      "RKLB",
+      "BOTZ"
+    ],
+    "removes": [
+      "GOOGL",
+      "AAPL"
+    ],
+    "rejections": 1
+  },
+  {
+    "date": "2021-12-31",
+    "adds": [
+      "IONQ"
+    ],
+    "removes": [
+      "BOTZ"
+    ],
+    "rejections": 0
+  },
+  {
+    "date": "2022-03-31",
+    "adds": [
+      "XLE"
+    ],
+    "removes": [
+      "MSFT"
+    ],
+    "rejections": 0
+  },
+  {
+    "date": "2022-06-30",
+    "adds": [],
+    "removes": [],
+    "rejections": 0
+  },
+  {
+    "date": "2022-09-30",
+    "adds": [],
+    "removes": [
+      "IONQ"
+    ],
+    "rejections": 1
+  },
+  {
+    "date": "2022-12-31",
+    "adds": [],
+    "removes": [],
+    "rejections": 0
+  },
+  {
+    "date": "2023-03-31",
+    "adds": [],
+    "removes": [],
+    "rejections": 0
+  },
+  {
+    "date": "2023-06-30",
+    "adds": [
+      "BOTZ"
+    ],
+    "removes": [
+      "XLE"
+    ],
+    "rejections": 0
+  },
+  {
+    "date": "2023-09-30",
+    "adds": [
+      "IONQ"
+    ],
+    "removes": [
+      "BOTZ"
+    ],
+    "rejections": 0
+  },
+  {
+    "date": "2023-12-31",
+    "adds": [],
+    "removes": [],
+    "rejections": 0
+  },
+  {
+    "date": "2024-03-31",
+    "adds": [
+      "BOTZ"
+    ],
+    "removes": [
+      "IONQ"
+    ],
+    "rejections": 0
+  },
+  {
+    "date": "2024-06-30",
+    "adds": [],
+    "removes": [],
+    "rejections": 0
+  },
+  {
+    "date": "2024-09-30",
+    "adds": [],
+    "removes": [],
+    "rejections": 0
+  },
+  {
+    "date": "2024-12-31",
+    "adds": [],
+    "removes": [],
+    "rejections": 0
+  },
+  {
+    "date": "2025-03-31",
+    "adds": [],
+    "removes": [],
+    "rejections": 0
+  },
+  {
+    "date": "2025-06-30",
+    "adds": [
+      "IONQ"
+    ],
+    "removes": [
+      "BOTZ"
+    ],
+    "rejections": 0
+  },
+  {
+    "date": "2025-09-30",
+    "adds": [],
+    "removes": [],
+    "rejections": 0
+  },
+  {
+    "date": "2025-12-31",
+    "adds": [],
+    "removes": [],
+    "rejections": 0
+  }
+]

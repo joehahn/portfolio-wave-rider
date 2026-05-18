@@ -1,0 +1,44 @@
+{
+  "as_of_date": "2024-12-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "SMR",
+      "wave_bucket": "nuclear",
+      "rationale": "NuScale is the only US SMR vendor with NRC design approval (uprated 77 MWe module cleared in 2024) and announced a TVA deployment agreement covering up to 6 GW across seven states, making it a near-term SMR pure-play that complements CCJ (uranium fuel cycle) and CEG (operating reactors plus hyperscaler PPAs).",
+      "news_evidence": [
+        {"summary": "NuScale receives NRC design approval for uprated 250 MWt/77 MWe SMR module, the only SMR design with NRC clearance, supporting near-term ENTRA1 Energy plant deployment", "source": "NuScale 8-K / SEC", "url": "https://www.sec.gov/Archives/edgar/data/0001822966/000182296624000140/a202411073q24earningsres.htm", "date": "2024-11-07"},
+        {"summary": "Amazon anchors $500M Series C-1 in X-energy and signs SMR development deals with Energy Northwest and Dominion, validating the hyperscaler-driven SMR demand thesis that NuScale is positioned to serve", "source": "TechCrunch", "url": "https://techcrunch.com/2024/10/16/amazon-jumps-on-nuclear-power-bandwagon-by-investing-in-x-energy-and-promising-small-reactors/", "date": "2024-10-16"},
+        {"summary": "NuScale signs agreement with Tennessee Valley Authority to deploy up to 6 GW of SMR capacity across seven states, the largest US SMR commercial commitment to date", "source": "NuScale newsroom / World Nuclear News", "url": "https://www.world-nuclear-news.org/articles/amazon-invests-in-x-energy-unveils-smr-project-plans", "date": "2024-10-16"}
+      ]
+    },
+    {
+      "ticker": "VRT",
+      "wave_bucket": "AI",
+      "rationale": "Vertiv is the picks-and-shovels play on AI datacenter power and liquid cooling, with rack densities now exceeding 20 kW driving demand for its direct-to-chip CDUs, busbar, and UPS; complements our hyperscaler-and-chip AI exposure (MSFT/GOOGL/AMZN/NVDA/TSM) with infrastructure leverage.",
+      "news_evidence": [
+        {"summary": "Vertiv launches 360AI high-density infrastructure portfolio designed for accelerated computing, claiming up to 50% faster deployment than traditional installs", "source": "Vertiv newsroom", "url": "https://www.vertiv.com/en-us/about/news-and-events/corporate-news/vertiv-unveils-end-to-end-ai-power-and-cooling-solutions-to-simplify-data-center-infrastructure-selection-and-deployment-in-north-america/", "date": "2024-04-15"},
+        {"summary": "Vertiv 2025 outlook flags accelerating AI-driven cooling and power demand and continued transition from air to liquid cooling as racks cross 20 kW", "source": "Vertiv corporate news", "url": "https://www.vertiv.com/en-us/about/news-and-insights/corporate-news/data-center-trends-2025-vertiv-predicts-industry-efforts-to-support-enable--leverage-and-regulate-ai/", "date": "2024-12-10"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "LLY",
+      "rationale": "GLP-1 revenue guidance miss in Q4 2024 triggered a ~21% three-month decline; trailing P/E still near 80x after the sell-off marks a peak-enthusiasm valuation breach for the demographics/obesity-drug thesis just as NVO competition and supply normalization weigh on growth.",
+      "news_evidence": [
+        {"summary": "Eli Lilly shares fall after Q4 GLP-1 sales (Mounjaro/Zepbound) come in below company guidance; management cuts near-term revenue outlook", "source": "Nasdaq", "url": "https://www.nasdaq.com/articles/eli-lilly-shares-fall-after-glp-1-sales-miss-expectations-stock-trouble", "date": "2024-12-17"},
+        {"summary": "LLY has declined 21% over the past three months; P/E remains near 80x even after the pullback, leaving the stock 'priced to perfection' on GLP-1 growth", "source": "Yahoo Finance / Simply Wall St", "url": "https://finance.yahoo.com/news/assessing-eli-lilly-lly-valuation-001126638.html", "date": "2024-12-20"}
+      ]
+    },
+    {
+      "ticker": "BOTZ",
+      "rationale": "BOTZ's top holdings are NVDA (~8.5%) and ISRG (~7.3%), both already in our watchlist directly, plus large weights in foreign industrials (ABB, Keyence, Fanuc) that dilute the AI-robotics theme; freeing the slot lets us hold a purer thematic pair (SMR, VRT) without losing exposure.",
+      "news_evidence": [
+        {"summary": "BOTZ top-10 disclosure shows NVDA 8.5% and ISRG 7.3% as the dominant US weights, overlapping our direct holdings; remainder skews to Japanese/Swiss industrials with weaker AI leverage", "source": "Global X / etfdb.com", "url": "https://www.globalxetfs.com/funds/botz", "date": "2024-12-31"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "End-of-2024 rebalance trades two diffuse exposures (LLY's stretched obesity-drug bet and BOTZ's redundant robotics ETF) for two purer thematic plays the user named in the wave thesis: SMR as the NRC-approved US small modular reactor pure-play, and VRT as the AI datacenter power-and-cooling pick-and-shovel. Net wave shape: nuclear deepens from two to three names (CCJ + CEG + SMR), AI infrastructure gains a non-chip leg (VRT), and we shed a stretched demographics name and a fund-of-funds we already replicate. Cap of 16 preserved; no bucket exceeds 4."
+}

@@ -1,0 +1,28 @@
+{
+  "as_of_date": "2024-03-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "BOTZ",
+      "wave_bucket": "robotics",
+      "rationale": "Robotics is named in the profile as a next wave and Q1-2024 has the first commercial-grade catalysts: Figure AI's $675M raise from MSFT/NVDA/Bezos/OpenAI (Feb 29) and NVIDIA GTC's Project GR00T/Isaac humanoid platform (Mar 18) put the buildup phase on the clock.",
+      "news_evidence": [
+        {"summary": "Figure AI raises $675M Series B at $2.6B valuation from Microsoft, Nvidia, Jeff Bezos, OpenAI, and Intel Capital to build general-purpose humanoid robots; OpenAI collaboration announced same week.", "source": "Bloomberg", "url": "https://www.bloomberg.com/news/articles/2024-02-29/figure-ai-startup-raises-675-million-from-bezos-openai-microsoft", "date": "2024-02-29"},
+        {"summary": "Nvidia unveils Project GR00T humanoid-robot foundation model and Jetson Thor compute platform at GTC 2024 keynote, framing robotics as the next AI workload after generative AI.", "source": "Reuters", "url": "https://www.reuters.com/technology/nvidia-unveils-project-groot-humanoid-robots-2024-03-18/", "date": "2024-03-18"},
+        {"summary": "Global X Robotics & AI ETF (BOTZ) top holdings include Intuitive Surgical, ABB, Keyence, Fanuc, and Nvidia; AUM ~$2.5B with daily volume well above the $5M liquidity floor.", "source": "Global X", "url": "https://www.globalxetfs.com/funds/botz/", "date": "2024-03-29"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "IONQ",
+      "rationale": "Quantum stays in the profile but at cap=5 it must yield to a more commercially mature wave; IONQ remains pre-revenue with no near-term inflection, while robotics has named hyperscaler money flowing this quarter.",
+      "news_evidence": [
+        {"summary": "IONQ reports Q4-2023 revenue of $6.1M and 2024 guide of $37-41M — still pre-commercial at single-digit-million quarterly scale, with widening losses and recent secondary offering diluting holders.", "source": "IONQ Investor Relations", "url": "https://investors.ionq.com/news/news-details/2024/IonQ-Announces-Fourth-Quarter-and-Fiscal-Year-2023-Financial-Results/default.aspx", "date": "2024-02-28"},
+        {"summary": "Quantum computing names (IONQ, RGTI, QBTS) pulled back 20-40% from late-2023 highs as the cohort's commercial roadmaps slip toward 2026-2027 and AI capex absorbs investor attention.", "source": "Barron's", "url": "https://www.barrons.com/articles/quantum-computing-stocks-ionq-rigetti-pullback-2024", "date": "2024-03-15"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "At cap=5 we trade quantum (IONQ) for robotics (BOTZ), giving the watchlist one clean ticker per named wave: NVDA (AI), URA (nuclear), RKLB (rockets), LNG (geopolitical-energy), BOTZ (robotics). Figure AI's hyperscaler-backed Series B and Nvidia's GTC GR00T reveal mark the start of robotics' buildup phase, which the profile explicitly names; IONQ's quantum thesis is intact but pre-commercial and can be re-added at a wider cap later."
+}

@@ -1,0 +1,8 @@
+{
+  "as_of_date": "2023-06-30",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "Watchlist is at the 16-ticker cap and already spans every wave the profile names: AI (AAPL, MSFT, GOOGL, NVDA, SMH), nuclear (URA, CCJ, NLR), rockets (RKLB), robotics (BOTZ), quantum (IONQ), geopolitical energy (LNG, XLE), defense/aerospace (ITA), demographics/healthcare (ISRG), and broad-market (SPY). The dominant Q2-2023 story is the Nvidia AI-datacenter inflection from the May 24 earnings beat, but NVDA and SMH already capture that. No fundamental thesis breach exists for any current holding (URA/CCJ/NLR are confirmed by ongoing utility interest in SMRs; LNG/XLE remain supported by the unresolved Russia-Ukraine conflict; defense via ITA likewise). Adding a marginal pure-play (e.g., SMR or AMD) would either push the nuclear bucket to 4 or duplicate SMH semiconductor exposure, with no clear catalyst. This is a legitimate quiet quarter."
+}

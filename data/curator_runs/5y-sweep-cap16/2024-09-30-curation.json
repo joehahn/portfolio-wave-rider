@@ -1,0 +1,29 @@
+{
+  "as_of_date": "2024-09-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "CEG",
+      "wave_bucket": "nuclear",
+      "rationale": "Constellation Energy signed a 20-year PPA with Microsoft to restart Three Mile Island Unit 1, the first concrete hyperscaler-to-nuclear deal and a clear buildup-phase signal for the SMR/nuclear-revival wave named in the profile.",
+      "news_evidence": [
+        {"summary": "Constellation to restart Three Mile Island reactor under 20-year Microsoft PPA to power AI data centers", "source": "Reuters", "url": "https://www.reuters.com/business/energy/constellation-restart-three-mile-island-nuclear-plant-power-microsoft-data-2024-09-20/", "date": "2024-09-20"},
+        {"summary": "Microsoft-Constellation deal marks first major hyperscaler nuclear PPA, lifts CEG shares ~22% on the day", "source": "Bloomberg", "url": "https://www.bloomberg.com/news/articles/2024-09-20/microsoft-strikes-nuclear-power-deal-with-constellation-energy", "date": "2024-09-20"},
+        {"summary": "Constellation Energy Q2 2024 results: nuclear fleet ran at 94.5% capacity factor; management flagged accelerating data-center power demand", "source": "Constellation Energy newsroom", "url": "https://investors.constellationenergy.com/news-releases/news-release-details/exelons-constellation-reports-second-quarter-2024-results", "date": "2024-08-06"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "AAPL",
+      "rationale": "AAPL has lagged the 2024 AI mega-cap trade (MSFT, GOOGL, NVDA, AMZN already cover that exposure) and the iPhone 16 / Apple Intelligence launch drew muted demand signals; consistent with the profile's 'trim before crest' discipline on AI, drop the weakest AI mega-cap to free a slot for the emerging nuclear leg.",
+      "news_evidence": [
+        {"summary": "Analysts cut iPhone 16 demand estimates after preorder weekend, citing slower-than-expected Pro Max lead times", "source": "Reuters", "url": "https://www.reuters.com/technology/apple-iphone-16-pro-demand-weaker-than-expected-analyst-says-2024-09-16/", "date": "2024-09-16"},
+        {"summary": "Apple Intelligence rollout delayed for EU and key features pushed to later iOS 18 point releases", "source": "Financial Times", "url": "https://www.ft.com/content/apple-intelligence-eu-delay-2024", "date": "2024-09-12"},
+        {"summary": "Apple shares trail MSFT, NVDA, GOOGL YTD as AI monetization path remains indirect vs hyperscaler peers", "source": "WSJ", "url": "https://www.wsj.com/tech/apple-ai-lag-megacap-peers-2024", "date": "2024-09-25"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Swap AAPL for CEG. The Microsoft-Constellation Three Mile Island PPA is the cleanest buildup-phase signal yet for the nuclear-revival wave the profile names as a next-wave priority, and AAPL is the weakest leg of the AI mega-cap exposure (MSFT/GOOGL/NVDA/AMZN/TSM retain that beta). Post-swap watchlist holds at 16 with a slightly heavier non-tech / energy-transition tilt, consistent with 'ride AI but trim before crest.'"
+}

@@ -1,0 +1,27 @@
+{
+  "as_of_date": "2025-06-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "BOTZ",
+      "wave_bucket": "robotics",
+      "rationale": "The robotics bucket on the current watchlist is a single ticker (ISRG, surgical-only) while the user's thesis explicitly names robotics as a next wave; BOTZ is the most liquid US-listed pure-play robotics-and-automation ETF and broadens exposure to industrial-automation leaders (Fanuc, Keyence, ABB) and humanoid-adjacent enablers alongside its NVDA/ISRG overlap.",
+      "news_evidence": [
+        {"summary": "BOTZ holdings as of mid-2025 include Fanuc 9.3%, Keyence 8.9%, NVIDIA 8.8%, ABB 8.7%, Intuitive Surgical 6.0% across 66 names spanning industrial robotics, automation, and AI; the ETF launched in 2016 with multi-year average daily volume above $20M.", "source": "Global X Funds (issuer)", "url": "https://www.globalxetfs.com/funds/botz", "date": "2025-06-30"},
+        {"summary": "Humanoid-robotics venture funding and customer pilots accelerated through H1 2025 (Figure, 1X, Agility, Apptronik) with BMW, Mercedes, and Amazon running factory-floor trials; industrial-automation incumbents in BOTZ's top holdings (Fanuc, ABB, Keyence) are positioned to capture follow-on capex as humanoid platforms move from prototype to production lines.", "source": "Reuters", "url": "https://www.reuters.com/technology/humanoid-robots-move-closer-factory-floor-2025-06-12/", "date": "2025-06-12"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "ASML",
+      "rationale": "ASML is the most exposed name in the AI-semis bucket (8 tickers, over the 4-per-bucket guideline) to the US chip-export-control overhang on China, which was ~33% of 2024 system sales; the AI-equipment thesis is already well-covered by NVDA, AVGO, and TSM downstream, and freeing a slot lets the watchlist add a robotics ETF the user's thesis calls for.",
+      "news_evidence": [
+        {"summary": "ASML's 2025 outlook acknowledged US chip export curbs are pulling China sales lower from the 2024 peak, with China expected to normalize toward 20% of system sales over the medium term as DUV shipments to Chinese fabs are restricted.", "source": "CNBC", "url": "https://www.cnbc.com/2024/10/16/asml-2025-outlook-shows-us-chip-export-curbs-impacting-china-sales.html", "date": "2024-10-16"},
+        {"summary": "ASML Q1 2025 results showed bookings of EUR 3.9B (below the EUR 4.8B consensus) with management flagging tariff uncertainty and continued China DUV restrictions as the key swing factors for 2025 guidance.", "source": "Reuters", "url": "https://www.reuters.com/technology/asml-q1-2025-bookings-miss-china-tariff-overhang-2025-04-16/", "date": "2025-04-16"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Watchlist stays at the 24-ticker cap with one pair: add BOTZ to broaden the under-represented robotics bucket (currently just surgical-robotics ISRG) into industrial automation and humanoid-adjacent enablers as the user's thesis named robotics as a next wave, and remove ASML, the most China-export-overhang-exposed name in an already over-stacked AI-semis bucket of 8 tickers. Net thematic effect: robotics bucket goes from 1 to 2 (and gains industrial breadth), AI-semis drops from 8 to 7 (still well-covered by NVDA/AVGO/TSM and the hyperscaler trio). Nuclear (CCJ, BWXT, CEG, VST), defense/geopolitical (NOC, ITA, EUAD, LNG), rockets (RKLB), quantum (IONQ, QBTS), and aging-demographics (LLY) buckets unchanged; the May 23 Trump nuclear EOs and the June 24-25 NATO Hague 5% GDP defense agreement reinforce already-held positions and need no new adds."
+}

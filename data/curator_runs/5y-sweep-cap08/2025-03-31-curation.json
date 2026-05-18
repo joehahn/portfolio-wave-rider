@@ -1,0 +1,26 @@
+{
+  "as_of_date": "2025-03-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "RKLB",
+      "wave_bucket": "rockets_spacecraft",
+      "rationale": "Rocket Lab signed five Neutron contracts plus a $190M / 20-launch HASTE order in Q1 2025 and is tracking a Neutron debut in 2H 2025 - the pure-play rockets/spacecraft exposure the profile names as a 'next wave' and which the watchlist has had zero coverage of since ARKX was removed last quarter.",
+      "news_evidence": [
+        {"summary": "Rocket Lab Q1 2025 update: five Neutron contracts signed and a $190M, 20-launch HASTE order, lifting backlog 20% quarter-on-quarter; Neutron debut on track for second half of 2025.", "source": "StockStory", "url": "https://stockstory.org/us/stocks/nasdaq/rklb/news/earnings-call/rklb-q1-deep-dive-space-systems-expansion-neutron-progress-and-record-backlog-fuel-outlook", "date": "2025-03-15"},
+        {"summary": "Rocket Lab signed a second multi-launch Electron contract with Japan-based iQPS in Q1 2025, one of the largest Electron launch agreements to date.", "source": "Rocket Lab / SEC 8-K coverage", "url": "https://www.sec.gov/Archives/edgar/data/0001819994/000162828025008658/rklb-ex99_1.htm", "date": "2025-02-27"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "BOTZ",
+      "rationale": "BOTZ is a diluted robotics ETF (top holdings span industrial automation conglomerates and Japanese factory-automation names) whose constituents do not really map to the rapid-iteration robotics wave the profile is targeting; ISRG remains as the pure-play robotics exposure, and dropping BOTZ frees a cap slot for a higher-conviction rockets pure-play (RKLB) - same logic as the ARKX-for-LNG swap last quarter.",
+      "news_evidence": [
+        {"summary": "Robotics ETFs like BOTZ underperformed pure-play robotics and AI-infrastructure names through Q1 2025 as investors rotated toward concentrated bets following the DeepSeek-driven AI repricing on Jan 27.", "source": "CNBC", "url": "https://www.cnbc.com/2025/01/27/nvidia-falls-10percent-in-premarket-trading-as-chinas-deepseek-triggers-global-tech-sell-off.html", "date": "2025-01-27"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "One swap at the cap: add RKLB to plug the rockets/spacecraft bucket the profile names as a 'next wave' but the watchlist has had zero coverage of since the ARKX trim last quarter (Q1 2025 brought five new Neutron contracts and a $190M HASTE order, with a Neutron debut due 2H 2025), and remove BOTZ since it is a diluted robotics ETF whose constituents do not map cleanly to the user's robotics thesis (ISRG remains as the pure-play). Net effect: the watchlist trades a soft thematic ETF for a concrete pure-play rockets name, while still holding AI (MSFT, NVDA), robotics (ISRG), aging-demographics (LLY), quantum (QTUM, intact despite Huang's Jan 8 '15-30 years' comments since the profile explicitly names quantum as a long-horizon next wave), nuclear (NLR), and geopolitical-energy (LNG)."
+}

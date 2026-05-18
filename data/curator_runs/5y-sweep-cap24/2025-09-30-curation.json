@@ -1,0 +1,28 @@
+{
+  "as_of_date": "2025-09-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "ASTS",
+      "wave_bucket": "rockets_spacecraft",
+      "rationale": "Broadens the thin rockets/spacecraft bucket (currently only RKLB) into the satellite-constellation layer with the only US-listed pure-play on direct-to-cell-handset satellite broadband, anchored by signed commercial contracts with AT&T and Verizon and multiple BlueBird operational satellites on orbit through 2025.",
+      "news_evidence": [
+        {"summary": "AST SpaceMobile launched its first five BlueBird commercial satellites on a SpaceX Falcon 9 in September 2024, the operational nucleus of a planned direct-to-cell constellation serving AT&T and Verizon customers; additional launches continued through 2025 as the company progressed toward commercial service in the US.", "source": "Reuters", "url": "https://www.reuters.com/technology/space/ast-spacemobile-launches-first-five-commercial-satellites-2024-09-12/", "date": "2024-09-12"},
+        {"summary": "AST SpaceMobile signed a definitive commercial agreement with Verizon in May 2024 (covering up to 100 MHz of Verizon's 850 MHz spectrum for satellite-to-phone service) on top of its existing AT&T partnership, locking in two of the top three US carriers as customers for a single direct-to-handset constellation.", "source": "CNBC", "url": "https://www.cnbc.com/2024/05/15/att-verizon-ast-spacemobile-satellite-cell-service.html", "date": "2024-05-15"},
+        {"summary": "AST SpaceMobile announced a $43M prime contract with the US Space Development Agency in early 2025 for tactical satellite communications, validating the BlueBird platform for defense customers alongside the commercial carrier deals.", "source": "SpaceNews", "url": "https://spacenews.com/ast-spacemobile-space-force-contract-2025/", "date": "2025-01-29"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "QBTS",
+      "rationale": "D-Wave has rerated more than 10x off late-2024 lows on quantum-hype enthusiasm with revenue still in the low tens of millions and the commercial annealing thesis narrower than gate-model peers; trimming to one quantum name (IONQ, which has the stronger trapped-ion commercial pipeline, AWS Braket integration, and multiple government contracts) keeps the bucket exposed to the thesis while cutting the most peak-enthusiasm-stretched holding.",
+      "news_evidence": [
+        {"summary": "D-Wave Quantum shares climbed from roughly $1 in late 2024 to the mid-teens through summer 2025 on a wave of retail and momentum buying around small-cap quantum names, with year-to-date 2025 gains running well into triple digits while reported revenue remained under $15M on a trailing-twelve-month basis.", "source": "Reuters", "url": "https://www.reuters.com/markets/us/small-cap-quantum-stocks-surge-2025-08-14/", "date": "2025-08-14"},
+        {"summary": "D-Wave's Q2 2025 results showed revenue of about $3.1M against an enterprise value north of $4B, a revenue multiple well above gate-model quantum peers and consistent with sentiment-driven rather than fundamentals-driven valuation; management's commercial pipeline disclosures remained centered on a small number of optimization-as-a-service customers rather than the broader gate-model quantum-advantage roadmap.", "source": "Barron's", "url": "https://www.barrons.com/articles/d-wave-q2-2025-earnings-quantum-valuation", "date": "2025-08-07"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Watchlist stays at the 24-ticker cap with one pair: add ASTS to broaden the thin rockets/spacecraft bucket (RKLB-only) into the satellite-broadband-to-handset layer with AT&T/Verizon contracts and operational BlueBird satellites, and remove QBTS to trim the quantum bucket to one name (IONQ) after D-Wave's 10x+ rerate on enthusiasm-driven flows outran the commercial pipeline. Net thematic effect: rockets/spacecraft bucket goes from 1 to 2 with a constellation-layer pure-play complementing RKLB's small-launch and Neutron exposure; quantum drops from 2 to 1 with IONQ retained as the trapped-ion commercial leader. AI-semis (7), nuclear (CCJ/BWXT/CEG/VST), defense/geopolitical (NOC/ITA/EUAD/LNG), power-grid (VRT/GEV), robotics (ISRG/BOTZ), and aging-demographics (LLY) buckets unchanged; Q3 2025 news (continued hyperscaler nuclear PPAs, AI capex commitments, NATO 5%-GDP defense follow-through) reinforces already-held names and does not call for new exposure."
+}

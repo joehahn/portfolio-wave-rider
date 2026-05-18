@@ -1,0 +1,43 @@
+{
+  "as_of_date": "2024-12-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "QBTS",
+      "wave_bucket": "quantum",
+      "rationale": "Google's Willow chip announcement on Dec 9, 2024 is a sector-level inflection for quantum computing; adding D-Wave (annealing architecture) diversifies the quantum bucket alongside trapped-ion incumbent IONQ.",
+      "news_evidence": [
+        {"summary": "Google announces Willow, the first quantum chip to achieve below-threshold error correction, completing an RCS benchmark in 5 minutes that would take supercomputers 10^25 years.", "source": "Google Blog / Nature", "url": "https://blog.google/innovation-and-ai/technology/research/google-willow-quantum-chip/", "date": "2024-12-09"},
+        {"summary": "HPCwire reports Willow's error-correction breakthrough and roadmap details, sparking sector-wide rally in pure-play quantum names including QBTS.", "source": "HPCwire", "url": "https://www.hpcwire.com/2024/12/09/google-debuts-new-quantum-chip-error-correction-breakthrough-and-roadmap-details/", "date": "2024-12-09"}
+      ]
+    },
+    {
+      "ticker": "PLTR",
+      "wave_bucket": "AI",
+      "rationale": "Palantir's Q3 2024 U.S. revenue grew 44% YoY on AIP demand and the company landed a 750M GBP UK defense agreement, fitting both the AI wave and the geopolitical/defense thesis with one ticker.",
+      "news_evidence": [
+        {"summary": "Palantir Q3 2024: revenue +30% YoY, U.S. revenue +44% YoY to $499M, management cites 'unrelenting AI demand'.", "source": "SEC 8-K (Q3 2024 earnings release)", "url": "https://www.sec.gov/Archives/edgar/data/0001321655/000132165524000207/a2024q3ex991earningsrelease.htm", "date": "2024-11-04"},
+        {"summary": "Palantir secures large international defense contracts including a 750M GBP UK agreement, deepening AIP penetration in NATO defense.", "source": "Alpha Spread", "url": "https://www.alphaspread.com/market-news/stock-movements/palantir-stock-surges-on-strong-ai-demand-and-major-contracts", "date": "2024-12-15"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "CIBR",
+      "rationale": "Cybersecurity ETF has corrected ~20% from its mid-November high and the user's wave thesis never named cybersecurity as a target wave; freeing the slot for higher-conviction thematic exposure.",
+      "news_evidence": [
+        {"summary": "CIBR down 20% from mid-November high; analysts describe a 'long digestion period' of sideways consolidation.", "source": "TheStreet Pro / StockCharts", "url": "https://pro.thestreet.com/portfolio/chart-of-the-day-a-cibr-glitch", "date": "2024-12-20"}
+      ]
+    },
+    {
+      "ticker": "SYM",
+      "rationale": "Symbotic disclosed it cannot file its 10-K on time (Nov 27, 2024), an accounting/governance flag that breaches the original clean-execution thesis; ISRG remains the robotics anchor.",
+      "news_evidence": [
+        {"summary": "Symbotic announces it will be unable to file its 10-K by the SEC deadline, citing accounting review work.", "source": "Stocktitan / SEC filing", "url": "https://www.stocktitan.net/news/SYM/", "date": "2024-11-27"},
+        {"summary": "Symbotic acquires OhmniLabs assets for $13M (Dec 3, 2024) and expands Walmart relationship into Mexico, but execution overhang from delayed 10-K dominates near-term thesis.", "source": "INO.com / Company release", "url": "https://www.ino.com/blog/2024/12/robotics-revolution-in-warehouses-why-symbotic-sym-could-be-a-hidden-gem/", "date": "2024-12-15"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Watchlist remains at the 24-ticker cap. Two adds lean into named wave-thesis themes (quantum diversification post-Willow announcement, AI/defense via PLTR) and two removes clear out a drifting cybersecurity ETF position and a robotics name with a fresh governance flag. Net thematic effect: quantum exposure broadens from 1 to 2 tickers, defense/AI deepens, cybersecurity exits, robotics consolidates to ISRG. Nuclear (4 tickers) stays at the wave-bucket ceiling; no further adds there."
+}

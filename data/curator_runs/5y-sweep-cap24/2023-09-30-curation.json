@@ -1,0 +1,25 @@
+{
+  "as_of_date": "2023-09-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "VRT",
+      "wave_bucket": "AI",
+      "rationale": "Vertiv is the cleanest AI-data-center picks-and-shovels play: its Q2 2023 print (Aug 2) showed 24% revenue growth, 25% organic, and a $200M raise to FY23 FCF guidance, with management explicitly attributing the acceleration to AI-driven hyperscaler infrastructure spend — adds industrial-side AI capex exposure that the semiconductor-heavy AI sub-bucket (NVDA/AMD/TSM) does not capture.",
+      "news_evidence": [
+        {"summary": "Vertiv Q2 2023: net sales $1,734M, +24% YoY (+25% organic); raised FY23 adjusted FCF guide by $200M to $550M midpoint; CEO Albertazzi cites AI compute demand as a growth-acceleration driver for data-center infrastructure.", "source": "Vertiv 8-K (Q2 2023 earnings release)", "url": "https://www.sec.gov/Archives/edgar/data/0001674101/000162828023026549/q22023exhibit991vrt8223.htm", "date": "2023-08-02"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "ARKX",
+      "rationale": "ARKX's largest holdings are RKLB (~10%), AMD (~7%), and L3Harris/Teradyne/Deere — RKLB and AMD are already in the watchlist as direct positions, so ARKX duplicates that exposure while diluting it with non-space industrials; freeing the slot for a higher-conviction direct name (VRT) makes the watchlist cleaner without losing the rockets/spacecraft thesis (RKLB stays).",
+      "news_evidence": [
+        {"summary": "ARKX top holdings as of mid-2023: Rocket Lab ~10%, AMD ~7%, L3Harris ~7%, Teradyne ~6%, Deere ~5% — heavy overlap with RKLB and AMD already held directly in the watchlist.", "source": "ARK Funds / ETF.com holdings disclosure", "url": "https://www.etf.com/ARKX", "date": "2023-09-01"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "One swap this quarter, holding watchlist size at 24/24. Rotate out of the ARKX space ETF (top holdings RKLB and AMD already held directly, diluting the rockets thesis with generic industrials) and into Vertiv (VRT), whose Q2 2023 print made it the cleanest non-semiconductor AI-data-center capex play — power, cooling, and rack infrastructure for the hyperscaler build-out the NVDA/AMD/TSM names are already exposed to on the chip side. Net effect: AI bucket gains an industrial-infrastructure leg; rockets/spacecraft stays anchored on RKLB without the ETF overlap; all other wave buckets unchanged."
+}

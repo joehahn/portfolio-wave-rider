@@ -1,0 +1,27 @@
+{
+  "as_of_date": "2023-09-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "XLE",
+      "wave_bucket": "geopolitical",
+      "rationale": "Fills the geopolitical-energy gap the profile names explicitly (Russia-Ukraine driving oil/gas/LNG); Saudi+Russia extending voluntary production cuts pushed WTI to ~$90 and XLE to a Sept-2023 peak of ~$92.95, a multi-quarter structural setup the current watchlist has zero exposure to.",
+      "news_evidence": [
+        {"summary": "Saudi Arabia extends voluntary 1 mb/d oil production cut through September, with analysts expecting extension into October; oil prices up ~15% on the month to ~$86/bbl.", "source": "CNN Business", "url": "https://www.cnn.com/2023/08/03/energy/oil-production-cut-saudi-arabia/index.html", "date": "2023-08-03"},
+        {"summary": "Energy ETFs in focus as Saudi cuts likely prolonged; XLE peaked at $92.95 in September, slightly above the $91.25 resistance from November 2022.", "source": "Nasdaq", "url": "https://www.nasdaq.com/articles/energy-etfs-in-focus-as-saudi-likely-to-prolong-output-cuts", "date": "2023-09-05"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "RKLB",
+      "rationale": "Electron suffered an in-flight anomaly on Sept 19 2023, losing a Capella radar-imaging satellite and grounding the only revenue-generating launch vehicle pending an FAA mishap investigation; the return-to-flight timeline is uncertain and this is a clean fundamental thesis breach pre-as-of, so step out and revisit after the cause is identified and Electron returns to cadence.",
+      "news_evidence": [
+        {"summary": "Rocket Lab's Electron suffered its first failure in over two years, losing a Capella radar-imaging satellite ~2.5 minutes into flight; FAA mishap investigation required before return-to-flight.", "source": "TechCrunch", "url": "https://techcrunch.com/2023/09/19/rocket-labs-electron-suffers-first-failure-in-over-two-years/", "date": "2023-09-19"},
+        {"summary": "Radar-imaging satellite lost as Rocket Lab Electron rocket suffers launch failure; Rocket Lab's first launch failure since May 2021 ends a 20-consecutive-success streak.", "source": "Spaceflight Now", "url": "https://spaceflightnow.com/2023/09/19/radar-imaging-satellite-lost-as-rocket-lab-electron-rocket-suffers-launch-failure/", "date": "2023-09-19"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "One-for-one swap that fills the profile's named geopolitical-energy gap (XLE captures the Saudi-cut/Russia-Ukraine oil-and-gas tailwind the current watchlist has zero exposure to) while stepping back from RKLB after its Sept 19 Electron failure grounded its only revenue-generating launch vehicle. Net effect: watchlist stays at cap (8), rockets/spacecraft exposure pauses pending RKLB's return-to-flight, geopolitical-commodities wave gets its first seat, and the AI core (MSFT/GOOGL/NVDA) plus nuclear (URA), quantum (IONQ), demographics (LLY), and robotics-via-healthcare (ISRG) all stay intact."
+}

@@ -1,0 +1,26 @@
+{
+  "as_of_date": "2023-09-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "IONQ",
+      "wave_bucket": "quantum",
+      "rationale": "Pure-play quantum-computing exposure at a commercial inflection: IonQ disclosed it had reached its three-year $100M cumulative-bookings target ahead of plan, the only watchlist gap against the profile's named next-waves (rockets covered by RKLB, nuclear by URA, robotics by BOTZ, AI by NVDA).",
+      "news_evidence": [
+        {"summary": "IonQ Q2 2023 results: company on track to exceed $100M cumulative bookings target by year-end 2023, with revenue growth above 100% year-over-year.", "source": "Inside Quantum Technology", "url": "https://www.insidequantumtechnology.com/news-archive/ionq-hits-100-million-in-bookings-rigetti-revenue-grows-as-commercial-quantum-market-revs-up/", "date": "2023-08-10"},
+        {"summary": "Quantum computing sector transitioning from proof-of-concept to deployed systems and real-world applications across IonQ, Rigetti, D-Wave.", "source": "Data Center Dynamics", "url": "https://www.datacenterdynamics.com/en/news/quantum-computing-q3-2023-results-ionq-rigetti-d-wave/", "date": "2023-08-15"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "BOTZ",
+      "rationale": "At a 5-name watchlist cap, a broad robotics ETF is the weakest slot to hold: the robotics wave is still slow-buildup, BOTZ's top holdings overlap NVDA exposure already in the list, and freeing the slot lets a pure-play next-wave name (quantum) enter without violating the cap.",
+      "news_evidence": [
+        {"summary": "BOTZ remains a diversified robotics/AI thematic ETF whose largest weights (NVDA, Intuitive Surgical, ABB, Keyence) duplicate AI exposure already held via NVDA directly, with no 2023 catalyst lifting it above pure-play alternatives.", "source": "Global X / fund profile", "url": "https://www.globalxetfs.com/funds/botz/", "date": "2023-09-29"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Single-swap rebalance against a hard 5-name cap: trade a broad robotics ETF (BOTZ) for a pure-play quantum name (IONQ) that fills the only thesis-named next-wave bucket currently unrepresented. Post-change watchlist preserves one ticker per major bucket — AI (NVDA), nuclear (URA), rockets (RKLB), geopolitical-energy (LNG), quantum (IONQ) — keeping the portfolio aligned with the profile's stated dominant wave (AI) plus four early-stage next-waves with no thematic stacking."
+}

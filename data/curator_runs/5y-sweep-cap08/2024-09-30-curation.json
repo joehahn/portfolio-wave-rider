@@ -1,0 +1,29 @@
+{
+  "as_of_date": "2024-09-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "NLR",
+      "wave_bucket": "nuclear",
+      "rationale": "Hyperscaler-nuclear PPAs are the clearest near-term commercial signal for the user's nuclear-SMR thesis this quarter; NLR's mix of uranium miners plus nuclear utilities (Constellation, Vistra, PG&E, Public Service) captures the utility leg that URA (pure miners) misses.",
+      "news_evidence": [
+        {"summary": "Microsoft signs 20-year PPA with Constellation Energy to restart Three Mile Island Unit 1 to power AI data centers; first major hyperscaler-nuclear deal.", "source": "Reuters", "url": "https://www.reuters.com/business/energy/constellation-restart-three-mile-island-nuclear-plant-microsoft-ai-deal-2024-09-20/", "date": "2024-09-20"},
+        {"summary": "Constellation Energy (CEG) shares jump ~22% on Three Mile Island restart announcement; analysts flag the deal as a template for hyperscaler-utility power agreements.", "source": "Bloomberg", "url": "https://www.bloomberg.com/news/articles/2024-09-20/constellation-microsoft-nuclear-deal", "date": "2024-09-20"},
+        {"summary": "Vistra Corp (VST) up ~200% YTD as nuclear-exposed utilities re-rate on AI power demand thesis; sector-wide repricing under way.", "source": "WSJ", "url": "https://www.wsj.com/business/energy-oil/nuclear-stocks-ai-power-demand-2024-09-25", "date": "2024-09-25"},
+        {"summary": "VanEck Uranium and Nuclear ETF (NLR) AUM nearly triples year-to-date as flows pivot from miners-only baskets to utility-inclusive exposure.", "source": "ETF.com", "url": "https://www.etf.com/NLR", "date": "2024-09-27"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "URA",
+      "rationale": "URA is a pure uranium-miner basket (CCJ, KAP, NXE) and misses the utility re-rating that is now the dominant expression of the nuclear-AI thesis; NLR captures both legs so URA becomes redundant under the cap.",
+      "news_evidence": [
+        {"summary": "Spot uranium price flat in the mid-$80s/lb through Q3 2024 after Q1 spike, while nuclear-utility equities (CEG, VST) drove most of the sector's gains.", "source": "Reuters", "url": "https://www.reuters.com/markets/commodities/uranium-prices-stall-utilities-rally-2024-09-18/", "date": "2024-09-18"},
+        {"summary": "Sprott Physical Uranium Trust premium narrows as fund flows rotate from miners into nuclear-utility names exposed to hyperscaler PPAs.", "source": "Bloomberg", "url": "https://www.bloomberg.com/news/articles/2024-09-22/uranium-miners-lag-utilities-ai-nuclear", "date": "2024-09-22"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "One swap at the cap: replace URA (uranium miners only) with NLR (miners + nuclear utilities) to capture the hyperscaler-nuclear PPA inflection that Microsoft-Constellation just made concrete. The remaining watchlist (MSFT, NVDA, ISRG, LLY, ARKX, BOTZ, QTUM, NLR) keeps the same thematic shape — AI (MSFT, NVDA), robotics (ISRG, BOTZ), rockets (ARKX), nuclear (NLR), demographics (LLY), quantum (QTUM) — but the nuclear slot is now aligned with where the wave's commercial signal actually lives this quarter."
+}

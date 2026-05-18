@@ -1,0 +1,26 @@
+{
+  "as_of_date": "2024-12-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "LNG",
+      "wave_bucket": "geopolitical",
+      "rationale": "Pure-play US LNG exporter Cheniere brought its Corpus Christi Stage 3 expansion online in December 2024, adding capacity right as Europe's reliance on US LNG deepened with the Ukraine-Russia gas transit agreement set to expire Jan 1, 2025 - filling the geopolitical-energy bucket the profile names but the watchlist currently does not cover.",
+      "news_evidence": [
+        {"summary": "Two new US LNG export terminals (Cheniere Corpus Christi Stage 3 and Venture Global Plaquemines) began operation in December 2024, adding 30 mtpa to total US export capacity.", "source": "OilPrice.com", "url": "https://oilprice.com/Latest-Energy-News/World-News/US-LNG-Exports-Surged-at-the-End-of-2024.html", "date": "2024-12-30"},
+        {"summary": "Front-month natural gas futures hit a 52-week high of $4.20/MMBtu by late December 2024, driven by cold weather demand and European reliance on US LNG as Ukraine-Russia gas transit deal nears expiry.", "source": "Nasdaq", "url": "https://www.nasdaq.com/articles/natural-gas-jumps-44-2024-will-it-climb-further-2025", "date": "2024-12-23"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "ARKX",
+      "rationale": "ARKX is a diluted rockets/spacecraft vehicle (top holdings include Trimble, Iridium, Kratos - more aero/comms than pure launch); we trim it now to make cap room for a higher-conviction geopolitical-energy add and can re-express rockets exposure via a pure-play (e.g., RKLB) in a later quarter when warranted.",
+      "news_evidence": [
+        {"summary": "Rocket Lab completed 16 Electron launches in 2024, becoming the pure-play rockets name the broader thesis is really about, while ARKX's diversified-aerospace basket has lagged.", "source": "Nasdaq / RKLB coverage", "url": "https://www.nasdaq.com/articles/better-space-stock-ast-spacemobile-asts-vs-rocket-lab-rklb", "date": "2024-12-20"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "One swap at the cap: add LNG (Cheniere) to plug the geopolitical-energy / LNG-exports bucket the profile names but the watchlist had zero coverage of, and remove ARKX since it is a diluted rockets vehicle whose constituents do not really map to the user's rockets/spacecraft thesis. Net effect: the watchlist trades a soft thematic ETF for a concrete pure-play on the Russia-Ukraine driven LNG demand shift, while still holding AI (MSFT, NVDA), robotics (ISRG, BOTZ), aging-demographics (LLY), quantum (QTUM), and nuclear (NLR)."
+}

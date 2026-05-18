@@ -1,0 +1,26 @@
+{
+  "as_of_date": "2025-06-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "IONQ",
+      "wave_bucket": "quantum",
+      "rationale": "Fills the long-open quantum gap with a concrete commercial milestone: IonQ announced a $1.075B definitive agreement to acquire Oxford Ionics on June 9, 2025, consolidating trapped-ion fidelity records and accelerating its hardware roadmap, while Q1 2025 revenue had already beat guidance.",
+      "news_evidence": [
+        {"summary": "IonQ to acquire Oxford Ionics in $1.075B all-stock-plus-cash deal, combining IonQ's compute/network stack with Oxford Ionics' record-fidelity ion-trap-on-silicon technology.", "source": "IonQ press release / HPCwire", "url": "https://www.hpcwire.com/off-the-wire/ionq-to-acquire-oxford-ionics-in-1-075b-deal/", "date": "2025-06-09"},
+        {"summary": "IonQ Form 8-K filing for the Oxford Ionics agreement, formalizing the largest M&A in pure-play quantum to date and a clear buildup-phase signal for the quantum wave the profile names.", "source": "SEC EDGAR (IonQ 8-K)", "url": "https://www.sec.gov/Archives/edgar/data/0001824920/000119312525205489/d41803dex991.htm", "date": "2025-06-09"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "BOTZ",
+      "rationale": "At cap=5, BOTZ is the weakest holding to free a slot: it is a broad robotics/AI ETF with material NVDA overlap (already expressed directly via NVDA), and no concrete Q2 2025 robotics catalyst surfaced inside the lookback to justify keeping it over a pure-play quantum entry that the profile explicitly flags as a named next wave.",
+      "news_evidence": [
+        {"summary": "BOTZ's top holdings remain dominated by NVDA and large diversified industrial automation names, making its incremental thematic contribution low when NVDA is already held directly.", "source": "Global X ETFs (BOTZ fund page)", "url": "https://www.globalxetfs.com/funds/botz", "date": "2025-06-30"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "One swap at cap=5: rotate the broad robotics ETF (BOTZ) into a pure-play quantum name (IONQ) on the back of IonQ's June 9, 2025 Oxford Ionics acquisition, which is the cleanest commercial-milestone signal yet that the quantum wave has entered a buildup phase the profile explicitly names. The four held theses are all intact this quarter: NVDA's May 28 Q1 FY26 print ($44.1B revenue +69% YoY, Data Center $39.1B +73% YoY) confirms the AI surge despite the $4.5B H20 China charge; LNG's geopolitical-energy thesis got reinforced by the mid-June 2025 Israel-Iran strikes pushing Brent to the low-$80s before the ceasefire; URA's SMR thesis is supported by NuScale's May NRC Standard Design Approval and the ongoing hyperscaler-utility PPA cadence; RKLB's rockets/spacecraft thesis remains in buildup with backlog growth even with Neutron's H2 2025 timeline. Net wave coverage after the swap: AI, nuclear, rockets, geopolitical-energy, quantum — five distinct buckets, no bucket over one ticker."
+}
