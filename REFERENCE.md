@@ -175,7 +175,7 @@ Two LLM specialists (blue) bracket three Python calls (yellow). The profile is t
 Headline experiment that justified the watchlist-curator design (over the previously-attempted wave-stage tilt approach). See [docs/backtest_curator.html](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html) for the rendered result; full setup in `data/backtest_curator_5y/report.md`.
 
 - **Window**: 2021-09-30 → 2026-04-30 (4.6 years, 20 quarterly rebalances)
-- **Starter watchlist**: AAPL, MSFT, GOOGL, SPY, NVDA — a realistic 2021-Q1 tech-savvy investor's holding
+- **Starter watchlist**: AAPL, MSFT, GOOGL, NVDA, SPY — a realistic 2021-Q1 tech-savvy investor's holding
 - **Optimizer**: mean_variance λ=1, lookback 1.3y, max_weight 0.25, cadence quarterly, max_watchlist_size 12
 - **Curator**: 21 strict-as-of-date Sonnet calls, each with WebSearch `before:` filters, suppression list from `scripts/post_date_events.py`, and a self-critique pass. Total cost ~$3, total wall clock ~6 min (parallel batches).
 - **Output**: 25 distinct tickers entered the watchlist over the run (with adds and removes); final watchlist spans all six named wave buckets
@@ -186,7 +186,7 @@ Headline experiment that justified the watchlist-curator design (over the previo
 | Buy-and-hold starter (equal-weight, then hold) | $214,360 | +328.72% | +253.0pp |
 | SPY benchmark (rebased) | $87,845 | +75.69% | — |
 
-Optimizer settings: `λ=0.5`, `lookback=3y`, `max_weight=0.50` (all from `investor_profile.md` defaults). The buy-and-hold baseline is an equal-weight allocation (20% in each of AAPL/MSFT/GOOGL/SPY/NVDA) bought on day 0 and held without rebalancing. NVDA is in the starter because excluding it would have stacked the comparison in the curator's favor (the curator adds NVDA at Q3 2021 — most of the 5y window's apparent lift comes from being early to NVDA). With NVDA already in the buy-and-hold, the curator's remaining lift is **+207pp** (≈11pp annualized) — coming from its other thematic adds (nuclear, robotics, rockets, quantum) plus the optimizer's quarterly re-weighting. Annualized return 44.8%, max drawdown −49.4%.
+Optimizer settings: `λ=0.5`, `lookback=3y`, `max_weight=0.50` (all from `investor_profile.md` defaults). The buy-and-hold baseline is an equal-weight allocation (20% in each of AAPL/MSFT/GOOGL/NVDA/SPY) bought on day 0 and held without rebalancing. NVDA is in the starter because excluding it would have stacked the comparison in the curator's favor (the curator adds NVDA at Q3 2021 — most of the 5y window's apparent lift comes from being early to NVDA). With NVDA already in the buy-and-hold, the curator's remaining lift is **+207pp** (≈11pp annualized) — coming from its other thematic adds (nuclear, robotics, rockets, quantum) plus the optimizer's quarterly re-weighting. Annualized return 44.8%, max drawdown −49.4%.
 
 `baselines_totals.csv` also includes a `bnh_total` column for an ablation baseline (the mean-variance optimizer's day-0 weights on the same 5 tickers, held forever). At the current defaults this typically pegs at the concentration cap (Markowitz behavior at low λ + wide cap); kept for researchers who want a math-only static comparator.
 

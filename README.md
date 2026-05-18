@@ -124,7 +124,7 @@ This is the standard Markowitz mean-variance formulation (Markowitz 1952, *Portf
 
 ## Headline result
 
-**Setup:** 5y window (Mar 2021 → Mar 2026), starter watchlist `[AAPL, MSFT, GOOGL, SPY, NVDA]`, 21 quarterly curator calls.
+**Setup:** 5y window (Mar 2021 → Mar 2026), starter watchlist `[AAPL, MSFT, GOOGL, NVDA, SPY]`, 21 quarterly curator calls.
 
 The starter is a plausible 2021 tech-aware investor's portfolio. NVDA is included because excluding it would have stacked the deck for the curator (NVDA was *the* big winner of the 5y window, and the curator adds it at the Q3 2021 rebalance). With NVDA already in the buy-and-hold, the comparison instead measures what the curator's *other* decisions contributed: thematic adds in nuclear, robotics, rockets, quantum, and the optimizer's quarterly re-weighting.
 
