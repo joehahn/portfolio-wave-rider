@@ -4,7 +4,7 @@ Prints a JSON object the orchestrating skill consumes:
 
     {
       "today":           "YYYY-MM-DD",
-      "runs_dir":        "data/curator_runs/5y-quarterly",
+      "runs_dir":        "data/curator_runs/5y-sweep-cap08",
       "starter":         ["AAPL", "MSFT", "GOOGL", "SPY", "AGG"],
       "target_dates":    ["YYYY-MM-DD", ...],   # 20 most recent quarter-ends
       "existing_dates":  ["YYYY-MM-DD", ...],   # already have <date>-curation.json
@@ -24,7 +24,7 @@ from pathlib import Path
 
 import pandas as pd
 
-DEFAULT_RUNS_DIR = "data/curator_runs/5y-quarterly"
+DEFAULT_RUNS_DIR = "data/curator_runs/5y-sweep-cap08"
 STARTER_WATCHLIST = ["AAPL", "MSFT", "GOOGL", "NVDA", "SPY"]
 N_QUARTERS = 21  # rolling-5y window: 21 quarter-ends span 20 intervals = 5y
 

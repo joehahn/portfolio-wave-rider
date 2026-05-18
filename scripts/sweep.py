@@ -11,7 +11,7 @@ Three params are supported. Each is a pure replay (no LLM calls):
 Usage:
   python scripts/sweep.py --param risk_aversion
   python scripts/sweep.py --param lookback --values 0.5,1,1.3,2,3
-  python scripts/sweep.py --param max_weight --runs-dir data/curator_runs/5y-quarterly
+  python scripts/sweep.py --param max_weight --runs-dir data/curator_runs/5y-sweep-cap08
 
 Output: docs/sweep_<param>.html, plus a one-row-per-variant summary table
 appended below the chart.
@@ -77,7 +77,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--param", required=True, choices=list(DEFAULTS.keys()))
     p.add_argument("--values", default=None,
                    help="comma-separated values to sweep (overrides defaults)")
-    p.add_argument("--runs-dir", default="data/curator_runs/5y-quarterly")
+    p.add_argument("--runs-dir", default="data/curator_runs/5y-sweep-cap08")
     p.add_argument("--out", default=None,
                    help="output HTML path (default: docs/sweep_<param>.html)")
     p.add_argument("--benchmarks", nargs="*", default=["SPY"])

@@ -10,7 +10,7 @@ The math here is identical to the curator backtest (`backtest --curator-runs-dir
 2. Read `holdings.csv` for the current watchlist. Every ticker in this file is passed to the curator as `current_watchlist` (including rows with `shares=0`).
 3. **Empty-holdings guard**: if every row in `holdings.csv` has `shares == 0`, stop and tell the user this is a fresh repo; they should run `/initialize-portfolio` first to set the thesis allocation. Do not proceed.
 4. Read `data/thesis_baseline.json` if it exists. Its contents (`date`, `allocations_usd`, `reasoning`, `holdings`) are passed to the report-writer so every review report can render the thesis-vs-recommended comparison.
-5. Load the profile's `financial_model` settings via `python -m src.cli` (the CLI does this automatically via `portfolio.load_financial_model`). Defaults: `rebalance_period: monthly`, `max_watchlist_size: 12`.
+5. Load the profile's `financial_model` settings via `python -m src.cli` (the CLI does this automatically via `portfolio.load_financial_model`). Defaults: `rebalance_period: monthly`, `max_watchlist_size: 8`.
 
 ## Orchestration
 

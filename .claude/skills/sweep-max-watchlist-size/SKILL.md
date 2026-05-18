@@ -1,9 +1,11 @@
 # /sweep-max-watchlist-size
 
 Sweeps the `max_watchlist_size` cap by firing fresh `watchlist-curator`
-calls at four cap values (5, 8, 16, 24) over the 21 quarter-end dates of
-the standard 5y backtest window. cap=12 is the project's default and
-reuses the existing `data/curator_runs/5y-quarterly/` run dir.
+calls at four cap values (5, 12, 16, 24) over the 21 quarter-end dates of
+the standard 5y backtest window. cap=8 is the project's default and
+feeds the canonical `data/curator_runs/5y-sweep-cap08/` run dir; the
+sweep also includes the older cap=12 dir (`data/curator_runs/5y-quarterly/`)
+as a historical reference at the previous default.
 
 Each cap shapes the curator's decisions (not just the optimizer), so
 unlike the other three sweeps (λ, lookback, max_weight) this one cannot
@@ -16,9 +18,10 @@ partial runs can be resumed cheaply.
 
 ## Before you start
 
-1. The cap=12 run dir is `data/curator_runs/5y-quarterly/` and is
-   already populated (21 JSONs from prior `/run-backtest` invocations).
-   Do not re-fire those.
+1. The cap=8 run dir is `data/curator_runs/5y-sweep-cap08/` (the new
+   default after the cap sweep showed Sharpe 1.18 there). The legacy
+   cap=12 dir at `data/curator_runs/5y-quarterly/` is also populated
+   (historical). Do not re-fire either.
 2. Per-cap dirs `data/curator_runs/5y-sweep-cap{05,08,16,24}/` already
    contain `_starter.json` files (starter `[AAPL, MSFT, GOOGL, NVDA,
    SPY]` with the cap-specific `max_watchlist_size`).
@@ -122,7 +125,7 @@ git push origin main
 
 ## Rules
 
-- Cap=12 reuses `data/curator_runs/5y-quarterly/`. Do not re-fire.
+- Cap=8 (the project default) lives at `data/curator_runs/5y-sweep-cap08/`; cap=12 lives at `data/curator_runs/5y-quarterly/` as a historical reference. Do not re-fire either.
 - Dates are processed in chronological order per cap; cross-cap calls
   for the same date can run in parallel (no dependency).
 - Skip (cap, date) pairs whose JSON already exists; the skill is

@@ -15,7 +15,7 @@ the math replay.
 
 ## Before you start
 
-1. The runs dir is `data/curator_runs/5y-quarterly/`. Commit this dir
+1. The runs dir is `data/curator_runs/5y-sweep-cap08/`. Commit this dir
    (and the regenerated `data/backtest_curator_5y/` outputs +
    `docs/backtest_curator.html`) at the end of the run so the public
    demo always reflects the latest 5y window.
@@ -55,7 +55,7 @@ from these inputs:
   payloads' `adds`/`removes` if not. Note that one missing date may be
   inside the existing range (a "gap fill") OR newer than any existing
   date (a "forward extension"); the replay logic handles both.
-- `max_watchlist_size`: 12.
+- `max_watchlist_size`: 8.
 - `rebalance_period`: quarterly.
 - `recent_news_lookback_days`: 90.
 - `profile_wave_thesis`: prose from `investor_profile.md`'s "Strategy &
@@ -69,16 +69,16 @@ rate-limit pattern from the original 5y experiment). Between batches,
 update the `current_watchlist` for subsequent batches by replaying the
 just-completed dates' applied adds/removes.
 
-Save each agent return to `data/curator_runs/5y-quarterly/<date>-curation.json`.
+Save each agent return to `data/curator_runs/5y-sweep-cap08/<date>-curation.json`.
 
 ### Step 3 — archive stale JSONs (Bash)
 
 For each date in `stale_dates`:
 
 ```bash
-mkdir -p data/curator_runs/5y-quarterly/_archive
-mv data/curator_runs/5y-quarterly/<date>-curation.json \
-   data/curator_runs/5y-quarterly/_archive/<date>-curation.json
+mkdir -p data/curator_runs/5y-sweep-cap08/_archive
+mv data/curator_runs/5y-sweep-cap08/<date>-curation.json \
+   data/curator_runs/5y-sweep-cap08/_archive/<date>-curation.json
 ```
 
 Archive rather than delete so the historical decisions stay
@@ -91,7 +91,7 @@ the replay picks up.
 .venv/bin/python - <<'PY'
 import json, pandas as pd, glob
 from pathlib import Path
-runs = Path("data/curator_runs/5y-quarterly")
+runs = Path("data/curator_runs/5y-sweep-cap08")
 dates = sorted(pd.Timestamp(p.stem.replace("-curation","")) for p in runs.glob("*-curation.json"))
 starter = {
     "starter_watchlist": ["AAPL", "MSFT", "GOOGL", "NVDA", "SPY"],
@@ -99,7 +99,7 @@ starter = {
     "rebalance_period": "quarterly",
     "initial_usd": 50000.0,
     "lookback_years": 1.3,
-    "max_watchlist_size": 12,
+    "max_watchlist_size": 8,
     "start_date": dates[0].strftime("%Y-%m-%d"),
     "end_date": dates[-1].strftime("%Y-%m-%d"),
 }
@@ -111,9 +111,9 @@ PY
 
 ```bash
 .venv/bin/python -m src.cli backtest \
-  --curator-runs-dir data/curator_runs/5y-quarterly \
+  --curator-runs-dir data/curator_runs/5y-sweep-cap08 \
   --out-dir data/backtest_curator_5y \
-  --max-weight 0.25 --risk-aversion 1.0 \
+  --max-weight 0.50 --risk-aversion 0.5 \
   --benchmarks SPY
 ```
 
@@ -122,21 +122,21 @@ PY
 ```bash
 .venv/bin/python -m src.cli dashboard \
   --curator-backtest-dir data/backtest_curator_5y \
-  --curator-runs-dir data/curator_runs/5y-quarterly \
+  --curator-runs-dir data/curator_runs/5y-sweep-cap08 \
   --benchmarks SPY
 ```
 
 ### Step 7 — commit and push (Bash)
 
 ```bash
-git add data/curator_runs/5y-quarterly/*.json \
+git add data/curator_runs/5y-sweep-cap08/*.json \
         data/backtest_curator_5y/ \
         docs/backtest_curator.html
 git commit -m "Refresh 5y curator backtest (rolling window ending $(date +%Y-%m-%d))"
 git push origin main
 ```
 
-If `data/curator_runs/5y-quarterly/_archive/` got new entries this run,
+If `data/curator_runs/5y-sweep-cap08/_archive/` got new entries this run,
 stage them too. Skip the commit if nothing changed (replay produced
 identical output and no JSONs were added/archived).
 
@@ -159,7 +159,7 @@ One short message:
   even for very recent quarter-ends. Pass the suppression list from
   `events_after(date)` even if it's empty for the most-recent date.
 - Don't delete stale JSONs; archive them. The committed
-  `data/curator_runs/5y-quarterly/_archive/` directory is the
+  `data/curator_runs/5y-sweep-cap08/_archive/` directory is the
   historical record of what the backtest used to include.
 - Commit + push is part of the skill, not a follow-up step the user
   has to remember. The public dashboard must always reflect the

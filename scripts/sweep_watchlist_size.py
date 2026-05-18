@@ -7,9 +7,12 @@ HTML page with the same nav strip and visual style as the other three
 sweep dashboards.
 
 Per-cap input layout:
-  cap=12: data/backtest_curator_5y/snapshots.csv (existing, from the
-          standard /run-backtest)
-  others: data/curator_runs/5y-sweep-cap{NN}/_backtest/snapshots.csv
+  cap=8 is the project default and feeds the canonical
+  data/backtest_curator_5y/ outputs via /run-backtest.
+  Per-cap inputs for this sweep:
+    cap=N: data/curator_runs/5y-sweep-capNN/_backtest/snapshots.csv
+    cap=12: data/curator_runs/5y-quarterly/_backtest/snapshots.csv
+            (historical reference at the previous default)
 
 If a cap's snapshots.csv is missing, that cap is silently skipped (so
 the page can render mid-build before all curator calls have completed).
@@ -30,7 +33,7 @@ RISK_FREE_RATE = 0.04
 CAPS: list[tuple[int, Path]] = [
     (5,  Path("data/curator_runs/5y-sweep-cap05/_backtest/snapshots.csv")),
     (8,  Path("data/curator_runs/5y-sweep-cap08/_backtest/snapshots.csv")),
-    (12, Path("data/backtest_curator_5y/snapshots.csv")),
+    (12, Path("data/curator_runs/5y-quarterly/_backtest/snapshots.csv")),
     (16, Path("data/curator_runs/5y-sweep-cap16/_backtest/snapshots.csv")),
     (24, Path("data/curator_runs/5y-sweep-cap24/_backtest/snapshots.csv")),
 ]
@@ -133,8 +136,8 @@ def main() -> int:
         'shapes the curator\'s decisions, not just the optimizer\'s response. '
         'Each curve is a separate curator-driven walk-forward through the 5y '
         'window, with starter watchlist <code>[AAPL, MSFT, GOOGL, NVDA, SPY]</code> '
-        'and only the <code>max_watchlist_size</code> input changing. cap=12 is '
-        'the project default.</p>'
+        'and only the <code>max_watchlist_size</code> input changing. cap=8 is '
+        'the project default (Sharpe 1.18, the best risk-adjusted result here).</p>'
         + fig.to_html(full_html=False, include_plotlyjs="cdn",
                       config={"displayModeBar": False})
         + table
