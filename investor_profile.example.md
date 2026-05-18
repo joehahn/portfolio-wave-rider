@@ -13,7 +13,7 @@ asset_class_targets:              # rough guide, not a hard constraint
 financial_model:                  # optimizer math
   risk_aversion: 1.0              # λ in mean_variance utility (μᵀw − λ·wᵀΣw)
   risk_free_rate: 0.04            # ≈ 1y Treasury yield; baseline subtracted from E[r] in Sharpe-ratio calc
-  lookback_period: 1.3y           # history window for estimating μ and Σ
+  lookback_period: 1.5y           # history window for estimating μ and Σ
   rebalance_period: monthly       # monthly | quarterly | semi_annual | annual; how often the watchlist-curator runs
   max_watchlist_size: 8           # hard cap on how many tickers the curator may consider simultaneously
 ---

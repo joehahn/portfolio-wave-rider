@@ -7,7 +7,7 @@
 
 This Claude Code demo uses AI to manage and optimize a long-horizon investment portfolio. You declare your goals, constraints, and an investment thesis (namely what you think will drive future returns), then initialize a starter watchlist of tickers you already want exposure to. At each periodic rebalance the curator agent reads recent news against your thesis and proposes adds and removes against the current watchlist; the mean-variance optimizer then recommends portfolio weights for all tickers on that watchlist. The result accumulates into a static Plotly dashboard so you can watch the watchlist composition, the recommended weights, and the realized portfolio value evolve over time.
 
-**Who this helps.** An investor who has a thesis about where markets are going but not enough time to track market news, or who needs help optimizing their portfolio, or who merely needs a scheduled reminder to do either. This demo helps such an investor pivot from a less-optimal static buy-and-hold portfolio to one that's lightly but effectively managed by AI. In the 5-year backtest detailed below, the AI-managed portfolio lifted realized return by about **14.8 percentage points per year annualized** over a buy-and-hold of the starter watchlist (which includes NVDA, so the curator does not get credit for picking the obvious 5y winner). Past performance is not predictive; the curator's job is to compound a thesis you already hold, not to replace one you don't have.
+**Who this helps.** An investor who has a thesis about where markets are going but not enough time to track market news, or who needs help optimizing their portfolio, or who merely needs a scheduled reminder to do either. This demo helps such an investor pivot from a less-optimal static buy-and-hold portfolio to one that's lightly but effectively managed by AI. In the 5-year backtest detailed below, the AI-managed portfolio lifted realized return by about **20.8 percentage points per year annualized** over a buy-and-hold of the starter watchlist (which includes NVDA, so the curator does not get credit for picking the obvious 5y winner). Past performance is not predictive; the curator's job is to compound a thesis you already hold, not to replace one you don't have.
 
 Two dashboards are served from GitHub Pages:
 
@@ -79,7 +79,7 @@ Note that recommendations do not execute trades — they only append optimizer o
 
 Run `/run-backtest` in Claude Code. This skill collects any missing historical news, evolves the watchlist quarter-by-quarter against your wave thesis, optimizes the portfolio at each rebalance, measures the resulting lift relative to a buy-and-hold investment strategy, and regenerates the backtest dashboard at `docs/backtest_curator.html` (open it locally in a browser to see your run).
 
-At each quarterly rebalance the curator reads news as of the rebalance date and proposes adds and removes to the watchlist; the optimizer then recomputes portfolio weights for whatever watchlist results, repeated over 5 years. Then compare results of your backtest to ours at [our backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html), +14.8pp/yr annualized when compared to the buy-and-hold investor's gains.
+At each quarterly rebalance the curator reads news as of the rebalance date and proposes adds and removes to the watchlist; the optimizer then recomputes portfolio weights for whatever watchlist results, repeated over 5 years. Then compare results of your backtest to ours at [our backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html), +20.8pp/yr annualized when compared to the buy-and-hold investor's gains.
 
 ### 5. sweep optimizer parameters (anytime)
 
@@ -116,7 +116,7 @@ The optimizer used here selects a portfolio that maximizes the mean-variance obj
 μᵀw − λ·wᵀΣw
 ```
 
-subject to ∑ᵢ wᵢ = 1 (weights sum to one) and 0 ≤ wᵢ ≤ concentration_cap. The first term `μᵀw` is the portfolio's expected return (the weighted average of per-ticker expected returns); the second term `wᵀΣw` is the portfolio's return variance, scaled by `λ` to act as a risk penalty. `μ` is the per-ticker expected-return vector, computed as the annualized mean of daily log returns over a 3y price-history lookback set in `investor_profile.md`. `Σ` is the ticker × ticker covariance matrix estimated over the same window. `w` is the weight vector the optimizer is solving for. `λ` (risk aversion) trades expected return against variance:
+subject to ∑ᵢ wᵢ = 1 (weights sum to one) and 0 ≤ wᵢ ≤ concentration_cap. The first term `μᵀw` is the portfolio's expected return (the weighted average of per-ticker expected returns); the second term `wᵀΣw` is the portfolio's return variance, scaled by `λ` to act as a risk penalty. `μ` is the per-ticker expected-return vector, computed as the annualized mean of daily log returns over a 1.5y price-history lookback set in `investor_profile.md`. `Σ` is the ticker × ticker covariance matrix estimated over the same window. `w` is the weight vector the optimizer is solving for. `λ` (risk aversion) trades expected return against variance:
 
 - `λ → 0`: the solution favors high-return tickers, which also tend to have greater variability.
 - `λ = 0.5`: a return-tilted middle ground that still puts some weight on safer tickers when the market gets noisy. This is this project's default setting.
@@ -136,19 +136,19 @@ The buy-and-hold baseline is the **equal-weight allocation** (20% in each of the
 
 | Strategy | Return | Annualized |
 |---|---|---|
-| Curator-driven | **+622.0%** | **+48.5%** |
+| Curator-driven | **+780.0%** | **+54.5%** |
 | Buy-and-hold (equal-weight starter, includes NVDA) | +328.7% | +33.7% |
 | SPY benchmark | +75.7% | +11.9% |
 
-Curator max drawdown over the window: **−44.7%**.
+Curator max drawdown over the window: **−47.6%**.
 
 **Curator's lift over buy-and-hold:**
 
 | Measure | Value |
 |---|---|
-| Absolute (curator − buy/hold), total | +293pp |
-| Absolute, annualized | +14.8pp/yr |
-| Relative (curator − buy/hold) / (buy/hold) | 0.89 |
+| Absolute (curator − buy/hold), total | +451pp |
+| Absolute, annualized | +20.8pp/yr |
+| Relative (curator − buy/hold) / (buy/hold) | 1.37 |
 
 See the [curator backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html) and the full report in `data/backtest_curator_5y/report.md`. Reproduce locally with the on-demand backtest from the Runs section above.
 

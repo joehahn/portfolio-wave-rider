@@ -3,7 +3,7 @@
 **Window:** 2021-03-31 to 2026-03-31 (1826 calendar days, 1256 trading days)
 **Starter watchlist:** AAPL, MSFT, GOOGL, NVDA, SPY
 **Cadence:** quarterly
-**Optimizer:** `mean_variance`, lookback 3.0y, max_weight 0.50
+**Optimizer:** `mean_variance`, lookback 1.5y, max_weight 0.50
 
 ## Curation activity
 
@@ -14,27 +14,27 @@
 | Removes executed | 7 |
 | Final watchlist size | 12 |
 | Rebalances (optimizer calls) | 21 |
-| Mean L1 weight distance rebalance-to-rebalance | 0.4034 |
+| Mean L1 weight distance rebalance-to-rebalance | 0.7407 |
 
 ## Realized performance vs baselines
 
 | Strategy | Ending value | Total return | Active vs curator |
 |---|---|---|---|
-| Curator-driven | $316,140.17 | +532.28% | — |
-| Buy-and-hold starter (equal-weight, then hold) | $214,360.62 | +328.72% | +203.56pp |
+| Curator-driven | $87,187.45 | +74.37% | — |
+| Buy-and-hold starter (equal-weight, then hold) | $214,360.64 | +328.72% | -254.35pp |
 
 ## Risk and benchmarks
 
 | Metric | Value |
 |---|---|
-| Annualized return (curator) | +44.58% |
-| Max drawdown (curator) | -49.46% |
+| Annualized return (curator) | +11.76% |
+| Max drawdown (curator) | -69.72% |
 
 ### Benchmarks (over the same window)
 
 | Benchmark | Return | Active vs curator |
 |---|---|---|
-| SPY | +75.69% | +456.59pp |
+| SPY | +75.69% | -1.31pp |
 
 ## Caveats
 

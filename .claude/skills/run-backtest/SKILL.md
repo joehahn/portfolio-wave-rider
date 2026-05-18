@@ -98,7 +98,7 @@ starter = {
     "as_of_dates": [d.strftime("%Y-%m-%d") for d in dates],
     "rebalance_period": "quarterly",
     "initial_usd": 50000.0,
-    "lookback_years": 1.3,
+    "lookback_years": 1.5,
     "max_watchlist_size": 8,
     "start_date": dates[0].strftime("%Y-%m-%d"),
     "end_date": dates[-1].strftime("%Y-%m-%d"),
