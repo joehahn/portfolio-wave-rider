@@ -108,6 +108,21 @@ A fourth sweep, **[max_watchlist_size](https://joehahn.github.io/portfolio-wave-
 - **Curator-driven adds and removes.** At each `/review-portfolio`, the curator can append new rows (always at `shares=0`) and delete rows for tickers it wants to drop. The validator blocks removes for tickers with `shares > 0` — you must liquidate the live position in your brokerage first and zero out the row, then a future `/review-portfolio` can complete the remove. The full audit trail of applied changes lives in `data/curation_history.csv`.
 - **Manual edits still work.** Append `<TICKER>,0` to add by hand; delete a row to remove by hand (subject to the same liquidate-first rule for live positions).
 
+## How the watchlist curator works
+
+The curator is the AI subagent that decides which tickers belong on the watchlist. It runs once per `/review-portfolio` and once per quarterly rebalance in the backtest. Its job is composition only: read the news, decide what to add and what to remove against the current watchlist, return a JSON object. It does not propose weights, does not see the optimizer, and does not output any numerical forecast.
+
+On each call the curator:
+
+1. Reads the wave thesis from `investor_profile.md` and the current watchlist from `holdings.csv`.
+2. Searches recent news against the named waves, preferring sources listed in `news_sources.md`.
+3. Proposes at most 3 adds and 3 removes, each cited with 2-4 dated news items.
+4. Returns one JSON payload.
+
+The Python harness then validates the payload: US-listed only, listing-date check via yfinance, post-change watchlist size within `max_watchlist_size`, no double-adds, no stale removes, no removes of tickers with live share counts. Only the changes that survive validation touch `holdings.csv`.
+
+The split is intentional. Mean-variance handles the math where it has a precise objective function, and the LLM handles the taste where there is no closed-form answer. The full agent spec, including the as-of-date discipline used in backtest mode, is in `.claude/agents/watchlist-curator.md`.
+
 ## How the optimizer works
 
 The optimizer used here selects a portfolio that maximizes the mean-variance objective function:
