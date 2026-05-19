@@ -2404,14 +2404,58 @@ def build_dashboard(
     o_path = Path(out_path)
     o_path.parent.mkdir(parents=True, exist_ok=True)
     chart_html = fig.to_html(full_html=False, include_plotlyjs="cdn")
+
+    # Append a small table summarizing the 5y backtest's curation log so
+    # readers of the live dashboard can see what the curator actually
+    # decided over a longer window than the live history typically holds.
+    backtest_curation = ""
+    bt_history = Path("data/curator_runs/5y-sweep-cap08/_backtest/sandbox/curation_history.csv")
+    if is_live and bt_history.exists():
+        try:
+            bt = pd.read_csv(bt_history, parse_dates=["date"])
+            bt = bt.sort_values(["date", "action", "ticker"])
+            tbl_rows = []
+            for d, sub in bt.groupby("date"):
+                adds = sub[sub["action"] == "add"]
+                rems = sub[sub["action"] == "remove"]
+                adds_s = ", ".join(
+                    f"{r.ticker} <span style='color:#888;'>({r.wave_bucket})</span>"
+                    for r in adds.itertuples()
+                ) or "—"
+                rems_s = ", ".join(r.ticker for r in rems.itertuples()) or "—"
+                tbl_rows.append(
+                    f"<tr><td style='padding:4px 12px;white-space:nowrap;'>{d.date()}</td>"
+                    f"<td style='padding:4px 12px;'>{adds_s}</td>"
+                    f"<td style='padding:4px 12px;'>{rems_s}</td></tr>"
+                )
+            backtest_curation = (
+                "<h2 style='margin-top:2em;'>5y backtest: curation log</h2>"
+                "<p style='font-size:14px;color:#555;max-width:780px;'>"
+                "Every add and remove the curator applied across the 21 quarterly "
+                "rebalances of the canonical 5y backtest (Mar 2021 → Mar 2026, "
+                "cap=8). Dates not listed are <code>no_changes</code> rebalances. "
+                "Full per-decision rationale and news evidence are in the JSONs "
+                "under <code>data/curator_runs/5y-sweep-cap08/</code>.</p>"
+                "<table style='border-collapse:collapse;font-size:14px;'>"
+                "<thead><tr style='border-bottom:2px solid #ccc;text-align:left;'>"
+                "<th style='padding:4px 12px;'>Date</th>"
+                "<th style='padding:4px 12px;'>Adds</th>"
+                "<th style='padding:4px 12px;'>Removes</th></tr></thead>"
+                f"<tbody>{''.join(tbl_rows)}</tbody></table>"
+            )
+        except Exception:
+            pass  # silently skip the section if the file is malformed
+
     page = (
         '<!doctype html><html><head><meta charset="utf-8">'
         '<title>Portfolio Wave Rider — live dashboard</title>'
         '<style>body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;'
-        'max-width:1280px;margin:0 auto;padding:1em 1.5em;color:#222;}</style>'
+        'max-width:1280px;margin:0 auto;padding:1em 1.5em;color:#222;}'
+        'th,td{border-bottom:1px solid #eee;}</style>'
         '</head><body>'
         + _nav_strip("index.html")
-        + chart_html +
+        + chart_html
+        + backtest_curation +
         '</body></html>'
     )
     o_path.write_text(page, encoding="utf-8")
