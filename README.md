@@ -130,8 +130,6 @@ This project builds an AI assistant that reads business news against a user's st
 
 The single biggest source of returns over the 5-year window was NVDA — a roughly 14× run from early 2021 to early 2026 as the AI buildout drove data-center GPU demand. NVDA was in the starter watchlist from day 0, so both the AI-managed portfolio and the buy-and-hold baseline rode it. Where the two diverge is in the curator's other decisions, and the biggest of those was riding the rockets/spacecraft wave: the curator added Rocket Lab (RKLB) early in the window and held it as Electron's launch cadence accelerated and the Neutron program advanced. In the second half of 2025 the optimizer concentrated roughly 70% of the portfolio in RKLB as the stock roughly doubled from $34 to $73 — and that single nine-month stretch appears to have roughly doubled the AI-managed portfolio's final value.
 
-The buy-and-hold baseline is the **equal-weight allocation** (20% in each of the five tickers) bought on day 0 and held without rebalancing through the end of the window.
-
 **Total realized return over the 5 years:**
 
 | Strategy | Return | Annualized |
@@ -140,9 +138,7 @@ The buy-and-hold baseline is the **equal-weight allocation** (20% in each of the
 | Buy-and-hold (equal-weight starter, includes NVDA) | +328.7% | +33.7% |
 | SPY benchmark | +75.7% | +11.9% |
 
-Curator max drawdown over the window: **−45.6%**.
-
-**Curator's lift over buy-and-hold:**
+**The AI Curator's lift over buy-and-hold:**
 
 | Measure | Value |
 |---|---|
