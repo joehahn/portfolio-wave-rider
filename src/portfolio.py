@@ -2405,17 +2405,20 @@ def build_dashboard(
     o_path.parent.mkdir(parents=True, exist_ok=True)
     chart_html = fig.to_html(full_html=False, include_plotlyjs="cdn")
 
-    # Append a small table summarizing the 5y backtest's curation log so
-    # readers of the live dashboard can see what the curator actually
-    # decided over a longer window than the live history typically holds.
-    backtest_curation = ""
-    bt_history = Path("data/curator_runs/5y-sweep-cap08/_backtest/sandbox/curation_history.csv")
-    if is_live and bt_history.exists():
+    # Append a small table showing the live curator's add/remove history
+    # since the thesis baseline date (the user's own /review-portfolio
+    # decisions, not the backtest replay).
+    live_curation = ""
+    live_history = Path("data/curation_history.csv")
+    if is_live and live_history.exists():
         try:
-            bt = pd.read_csv(bt_history, parse_dates=["date"])
-            bt = bt.sort_values(["date", "action", "ticker"])
+            hist = pd.read_csv(live_history, parse_dates=["date"])
+            # Scope to entries on or after the thesis baseline date so the
+            # table tracks live decisions, not pre-thesis bootstrapping.
+            cutoff = pd.Timestamp(json.loads(Path(thesis_baseline_path).read_text())["date"])
+            hist = hist[hist["date"] >= cutoff].sort_values(["date", "action", "ticker"])
             tbl_rows = []
-            for d, sub in bt.groupby("date"):
+            for d, sub in hist.groupby("date"):
                 adds = sub[sub["action"] == "add"]
                 rems = sub[sub["action"] == "remove"]
                 adds_s = ", ".join(
@@ -2428,21 +2431,23 @@ def build_dashboard(
                     f"<td style='padding:4px 12px;'>{adds_s}</td>"
                     f"<td style='padding:4px 12px;'>{rems_s}</td></tr>"
                 )
-            backtest_curation = (
-                "<h2 style='margin-top:2em;'>5y backtest: curation log</h2>"
-                "<p style='font-size:14px;color:#555;max-width:780px;'>"
-                "Every add and remove the curator applied across the 21 quarterly "
-                "rebalances of the canonical 5y backtest (Mar 2021 → Mar 2026, "
-                "cap=8). Dates not listed are <code>no_changes</code> rebalances. "
-                "Full per-decision rationale and news evidence are in the JSONs "
-                "under <code>data/curator_runs/5y-sweep-cap08/</code>.</p>"
-                "<table style='border-collapse:collapse;font-size:14px;'>"
-                "<thead><tr style='border-bottom:2px solid #ccc;text-align:left;'>"
-                "<th style='padding:4px 12px;'>Date</th>"
-                "<th style='padding:4px 12px;'>Adds</th>"
-                "<th style='padding:4px 12px;'>Removes</th></tr></thead>"
-                f"<tbody>{''.join(tbl_rows)}</tbody></table>"
-            )
+            if tbl_rows:
+                live_curation = (
+                    "<h2 style='margin-top:2em;'>Curation log</h2>"
+                    "<p style='font-size:14px;color:#555;max-width:780px;'>"
+                    f"Every add and remove the curator has applied since the "
+                    f"thesis baseline date ({cutoff.date()}). Each row is one "
+                    "<code>/review-portfolio</code> run that produced at least one "
+                    "watchlist change. Full per-decision rationale and news "
+                    "evidence are in <code>data/curation_history.csv</code> and the "
+                    "archived JSONs under <code>data/curator_runs/live/</code>.</p>"
+                    "<table style='border-collapse:collapse;font-size:14px;'>"
+                    "<thead><tr style='border-bottom:2px solid #ccc;text-align:left;'>"
+                    "<th style='padding:4px 12px;'>Date</th>"
+                    "<th style='padding:4px 12px;'>Adds</th>"
+                    "<th style='padding:4px 12px;'>Removes</th></tr></thead>"
+                    f"<tbody>{''.join(tbl_rows)}</tbody></table>"
+                )
         except Exception:
             pass  # silently skip the section if the file is malformed
 
@@ -2455,7 +2460,7 @@ def build_dashboard(
         '</head><body>'
         + _nav_strip("index.html")
         + chart_html
-        + backtest_curation +
+        + live_curation +
         '</body></html>'
     )
     o_path.write_text(page, encoding="utf-8")
