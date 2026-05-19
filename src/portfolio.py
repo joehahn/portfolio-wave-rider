@@ -1807,9 +1807,10 @@ def build_dashboard(
     R_TURNOVER        = 2
     R_REC_WAVE        = 3
     R_LATEST_WEIGHTS  = 4
-    R_GAIN_INIT       = 5
-    R_GAIN_REVIEW     = 6 if is_live else None
-    _after_gain       = 7 if is_live else 6
+    R_ACTUAL_WEIGHTS  = 5 if is_live else None
+    R_GAIN_INIT       = 6 if is_live else 5
+    R_GAIN_REVIEW     = 7 if is_live else None
+    _after_gain       = 8 if is_live else 6
     R_ASSET_USD       = _after_gain
     R_WAVE_USD        = _after_gain + 1
     R_EXP_VS_REAL     = R_WAVE_USD + 1
@@ -1841,6 +1842,11 @@ def build_dashboard(
         f"{R_LATEST_WEIGHTS}. Latest recommended portfolio %"
         "<br><sub><i>The most recent optimizer's target weight per ticker. Bars at the cap signal the optimizer wanted more than the concentration constraint allowed.</i></sub>"
     )
+    if R_ACTUAL_WEIGHTS is not None:
+        titles_list.append(
+            f"{R_ACTUAL_WEIGHTS}. Today's actual portfolio %"
+            "<br><sub><i>Per-ticker share of total portfolio value from today's snapshot. Compare against chart 4 to see how far the actual portfolio sits from the latest recommendation; the gap is recommendations you haven't acted on yet.</i></sub>"
+        )
     titles_list.append(
         f"{R_GAIN_INIT}. Cumulative $ gain per holding since {_chart5_anchor}"
         "<br><sub><i>Per-ticker P&L attribution from the day-zero snapshot through today: Σ(prior-day shares × price change)."
@@ -1858,7 +1864,7 @@ def build_dashboard(
     )
     titles_list.append(
         f"{R_WAVE_USD}. Actual portfolio $ by wave over time"
-        "<br><sub><i>Your real holdings (from holdings.csv × close prices), grouped by wave. This is what you own today — not the optimizer's recommendation. Compare to chart 4 (latest recommended %) to see how far the actual portfolio sits from the latest recommendation. Log y-axis.</i></sub>"
+        "<br><sub><i>Your real holdings (from holdings.csv × close prices), grouped by wave. This is what you own today — not the optimizer's recommendation. Log y-axis.</i></sub>"
     )
     titles_list.append(
         f"{R_EXP_VS_REAL}. Expected vs realized annualized return per rebalance"
@@ -2073,6 +2079,47 @@ def build_dashboard(
             tickangle=0,
             row=R_LATEST_WEIGHTS, col=1,
         )
+
+    # 5. Today's actual portfolio % — bar chart of value / total_value
+    # per ticker from the latest snapshot. Mirrors chart 4's per-wave
+    # coloring so the reader can compare recommendation against reality
+    # at a glance; the gap is recommendations the user has not yet acted
+    # on. Live dashboard only — for the backtest dashboard, "actual" and
+    # "recommended" are the same series.
+    if R_ACTUAL_WEIGHTS is not None and snap_path.exists():
+        _snaps_now = pd.read_csv(snap_path, parse_dates=["date"])
+        _latest_date_now = _snaps_now["date"].max()
+        _latest_now = _snaps_now[_snaps_now["date"] == _latest_date_now].copy()
+        _total_now = float(_latest_now["value"].sum())
+        if _total_now > 0 and not _latest_now.empty:
+            _latest_now["weight"] = _latest_now["value"] / _total_now
+            _latest_now = _latest_now.sort_values("weight", ascending=False)
+            _latest_now["wave_bucket"] = _latest_now["ticker"].map(
+                lambda t: TICKER_WAVE.get(t, "general_markets")
+            )
+            _tickers_in_chart5 = _latest_now["ticker"].tolist()
+            _ticktext_5 = [_ticker_label(t) for t in _tickers_in_chart5]
+            fig.update_xaxes(categoryorder="array", categoryarray=_tickers_in_chart5,
+                             row=R_ACTUAL_WEIGHTS, col=1)
+            _waves_in_chart5 = [w for w in _WAVE_DISPLAY_ORDER
+                                if w in _latest_now["wave_bucket"].values]
+            for wave in _waves_in_chart5:
+                sub = _latest_now[_latest_now["wave_bucket"] == wave]
+                fig.add_trace(
+                    go.Bar(x=sub["ticker"], y=sub["weight"],
+                           name=WAVE_DISPLAY_LABEL.get(wave, wave),
+                           marker_color=WAVE_COLORS.get(wave),
+                           showlegend=False,
+                           hovertemplate=f"%{{x}}<br>{wave}<br>%{{y:.2%}}<extra></extra>"),
+                    row=R_ACTUAL_WEIGHTS, col=1,
+                )
+            fig.update_xaxes(
+                tickmode="array",
+                tickvals=_tickers_in_chart5,
+                ticktext=_ticktext_5,
+                tickangle=0,
+                row=R_ACTUAL_WEIGHTS, col=1,
+            )
 
     # 4. Cumulative $ gain per holding over the snapshot window. For each
     # ticker, daily P&L = shares_t * (price_t - price_{t-1}); cumulative
@@ -2378,6 +2425,8 @@ def build_dashboard(
     fig.update_yaxes(title_text="$", row=R_PORTFOLIO, col=1)
     fig.update_yaxes(title_text="portfolio %", row=R_REC_WAVE, col=1, tickformat=".0%")
     fig.update_yaxes(title_text="portfolio %", row=R_LATEST_WEIGHTS, col=1, tickformat=".0%")
+    if R_ACTUAL_WEIGHTS is not None:
+        fig.update_yaxes(title_text="portfolio %", row=R_ACTUAL_WEIGHTS, col=1, tickformat=".0%")
     fig.update_yaxes(title_text="$ gain", row=R_GAIN_INIT, col=1, zeroline=True,
                      zerolinewidth=1, zerolinecolor="#888")
     if R_GAIN_REVIEW is not None:
