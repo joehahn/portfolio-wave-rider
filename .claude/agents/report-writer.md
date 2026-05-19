@@ -60,7 +60,7 @@ Example of a properly aligned table:
 | AGG    | iShares Core U.S. Aggregate Bond ETF  | general_markets    |  18.2% |  4.6% |  6.1% |
 ```
 
-Notice the pipes line up vertically and headers are wide enough to fit the longest row in each column. This rule applies to **all** tables you write — recommended allocation, thesis-vs-recommended, asset-class drift, watchlist changes, etc.
+Notice the pipes line up vertically and headers are wide enough to fit the longest row in each column. This rule applies to **all** tables you write — recommended allocation, thesis-vs-recommended, watchlist changes, etc.
 
 ## Report structure
 
@@ -142,8 +142,8 @@ scale convention as the weights chart. Example:
 Then a one-paragraph interpretation of the gap. Frame the thesis
 allocation as the user's beliefs in dollar form (no math, set on
 `thesis_baseline.date`) and the recommended allocation as the
-mean-variance optimizer's preferred weights with wave-stage tilts as
-of today. The gap measures the marginal contribution of the
+mean-variance optimizer's preferred weights against the curator's
+current watchlist. The gap measures the marginal contribution of the
 optimizer relative to the user's stated beliefs. Quote one or two
 lines from `thesis_baseline.reasoning` to ground the comparison.
 
@@ -152,38 +152,6 @@ If `thesis_baseline` is null or absent, OMIT this section entirely.>
 ## How this maps to the profile
 <bulleted list: each bullet cites a specific profile line and explains
 how the recommendation honors it>
-
-## Asset-class drift
-<If the profile declares `asset_class_targets`, classify each ticker
-in the recommended allocation into an asset class and compare the
-resulting breakdown to the targets. Render a table with columns:
-asset class | recommended % | target % | drift (pp). Flag any class
-off by more than ±5pp.
-
-Follow the table with a paired bar chart in a fenced code block:
-two bars per asset class (target above recommended) so the drift is
-visually obvious. Example:
-
-  ```
-  Asset-class drift: target vs recommended, in % of portfolio:
-
-    equities         target 70.0% ██████████████
-                     recom  31.8% ██████▍
-    precious metals  target 10.0% ██
-                     recom  25.0% █████
-    bonds            target 10.0% ██
-                     recom  18.2% ███▋
-    cash             target  5.0% █
-                     recom  25.0% █████
-    cryptocurrencies target  5.0% █
-                     recom   0.0%
-  ```
-
-If the universe looks like a single-sleeve run (e.g. only equities),
-frame drift as informational, not a conflict — "this run covers the
-equities sleeve; other asset classes are managed outside this
-portfolio." If `asset_class_targets` is absent, skip the section with
-one line: "Not declared in profile.">
 
 ## Profile conflicts
 <empty if none. Otherwise: for each conflict, state the constraint

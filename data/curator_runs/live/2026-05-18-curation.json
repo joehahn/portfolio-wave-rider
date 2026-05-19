@@ -1,0 +1,34 @@
+{
+  "as_of_date": "2026-05-18",
+  "rebalance_period": "monthly",
+  "adds": [],
+  "removes": [
+    {
+      "ticker": "ARKG",
+      "rationale": "Engineered biology is not a named target wave in the investor profile, and ARKG's structural deterioration (AUM down from $9B peak to $1.2B, since-inception annual return ~4.2% vs S&P ~14%, high 0.75% fee, and forced small-cap liquidations as AUM shrinks) make it the weakest-justified holding against any wave thesis.",
+      "news_evidence": [
+        {"summary": "ARKG's since-inception annual return of approximately 4.2% has significantly underperformed both the S&P 500 (~14%) and broader biotech indexes as of early 2026; AUM has fallen from ~$9B peak in 2021 to ~$1.2B, creating structural pressure to liquidate small-cap holdings.", "source": "ETFdb / InvestSnips", "url": "https://investsnips.com/arkg-stock/", "date": "2026-05-01"},
+        {"summary": "ARKG holds ~35 high-conviction genomics positions with a beta exceeding 2.5 relative to the S&P 500, making it one of the most volatile ETFs in the health-care space with manager-dependent risk concentrated in early-stage clinical names.", "source": "ETFdb", "url": "https://etfdb.com/etf/ARKG/", "date": "2026-05-01"}
+      ]
+    },
+    {
+      "ticker": "VIG",
+      "rationale": "VIG is a broad dividend-appreciation ETF with no alignment to any named wave in the investor profile, and its general-markets exposure duplicates the large-cap equity coverage already provided by MSFT, NVDA, and GOOGL without contributing a distinct thematic signal the optimizer can exploit.",
+      "news_evidence": [
+        {"summary": "VIG concentrates in technology (23%), financial services (20%), and healthcare (18%) across 338 stocks, making it a general large-cap quality screen rather than a thematic wave play; YTD return of 4.3% through May 2026.", "source": "U.S. News Money / ETFdb", "url": "https://money.usnews.com/funds/etfs/large-blend/vanguard-dividend-appreciation-etf/vig", "date": "2026-05-15"},
+        {"summary": "Motley Fool analysis (May 2026) notes VIG's main edge is dividend-quality screening and low costs, not thematic wave exposure; the fund behaves as a broad-market proxy that lags in non-dividend-driven bull markets.", "source": "Motley Fool", "url": "https://www.fool.com/investing/2026/05/05/is-the-vanguard-dividend-appreciation-etf-buy-now/", "date": "2026-05-05"}
+      ]
+    },
+    {
+      "ticker": "GOOGL",
+      "rationale": "With the watchlist shrinking to 8 slots, carrying both MSFT and GOOGL in the same AI wave bucket is redundant; GOOGL is the weaker-conviction duplicate given its compounding antitrust overhang (DOJ + 35-state appeal, EU DMA enforcement expected in 2026, choice-screen mandate estimated to cost 5-8% of search traffic) and $175-185B capex plan with uncertain returns, while MSFT's Azure +40% and OpenAI partnership represent a cleaner AI infrastructure thesis.",
+      "news_evidence": [
+        {"summary": "The DOJ and 35 states filed appeals in February 2026 against the September 2025 antitrust remedy; Morgan Stanley estimated mandatory choice screens could cost Google 5-8% of search traffic over three years.", "source": "PYMNTS / tech-insider", "url": "https://tech-insider.org/google-antitrust-appeal-doj-search-monopoly-2026/", "date": "2026-04-08"},
+        {"summary": "Alphabet faces an expected EU antitrust fine in 2026 for non-compliance with the Digital Markets Act; investors are also focused on the $175-185B capex plan and whether AI investment will produce proportional returns.", "source": "ts2.tech / phemex", "url": "https://phemex.com/academy/alphabet-googl-stock-2026", "date": "2026-05-01"},
+        {"summary": "MSFT Q1 FY2026: Azure grew 40% YoY, AI business hit $37B annual run-rate (+123% YoY), and commercial bookings surged 112% driven by OpenAI Azure commitments — representing a more concentrated and defensible AI infrastructure thesis than GOOGL.", "source": "CNBC / Nasdaq", "url": "https://www.nasdaq.com/articles/microsoft-q1-earnings-revenues-beat-cloud-ai-strength", "date": "2025-10-29"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "This rebalance is a cap-reduction pass: the watchlist shrank from a 12-ticker limit to 8, requiring a net reduction of 4 tickers over two rebalance periods. Three removes are proposed this month to reach 9. ARKG exits because engineered biology is absent from the investor's named wave thesis and the fund has compounding structural problems (AUM decay, forced small-cap liquidations, 4.2% since-inception return vs 14% for the S&P). VIG exits because dividend appreciation carries no thematic signal aligned to any named wave. GOOGL exits to resolve AI-bucket duplication: with only 8 slots, carrying both MSFT and GOOGL is a luxury the reduced cap cannot afford. After these removes the watchlist stands at 9 tickers (AGG, BIL, IAU, MSFT, NUKZ, NVDA, QTUM, RKLB, ROBO), one over the new cap; the next rebalance should remove one more to reach the 8-ticker target."
+}

@@ -98,7 +98,7 @@ for cap in 05 08 16 24; do
   .venv/bin/python -m src.cli backtest \
     --curator-runs-dir data/curator_runs/5y-sweep-cap${cap} \
     --out-dir data/curator_runs/5y-sweep-cap${cap}/_backtest \
-    --max-weight 0.50 --risk-aversion 0.5 --benchmarks SPY
+    --max-weight 0.70 --risk-aversion 0.5 --benchmarks SPY
 done
 ```
 

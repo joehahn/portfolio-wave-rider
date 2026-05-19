@@ -19,7 +19,6 @@ Produce a JSON object mapping each watchlist ticker to a dollar amount. Constrai
 
 - The dollar amounts must sum to `initial_investment_usd` exactly.
 - Honor the profile's `exclusions`: any ticker in an excluded sector gets $0.
-- If the profile declares `asset_class_targets`, honor it as a guideline: sum the dollar amounts within each asset class and try to roughly match the target percentages. Use the asset-class mapping in `.claude/agents/report-writer.md`. If `asset_class_targets` is absent, treat the watchlist as a single sleeve (no class-level constraint) and weight tickers directly using the wave thesis below.
 - Weight tickers using the wave thesis. For equities: lean into the current AI wave, then the named "next waves" listed in the profile (rockets/spacecraft, robotics, quantum computing, nuclear — fission and fusion). Non-equity tickers (bonds, cash, gold ETFs) get a smaller share unless the profile names a corresponding wave. Tickers tied to past or unrelated waves get smaller weights.
 - Respect `concentration_cap`: no single ticker gets more than that fraction of `initial_investment_usd`.
 - Do not optimize for Sharpe, volatility, or any other math metric. **This is the user's beliefs in dollar form.** No optimizer is involved at this step.
@@ -71,7 +70,7 @@ Pass:
 }
 ```
 
-The report-writer should produce only the **The ask**, **Thesis allocation**, **Caveats** sections — there's no optimizer output, no news, no recommended weights, no asset-class drift. Output: `data/reports/<date>-initialize-portfolio.md`.
+The report-writer should produce only the **The ask**, **Thesis allocation**, **Caveats** sections — there's no optimizer output, no news, and no recommended weights. Output: `data/reports/<date>-initialize-portfolio.md`.
 
 ## Step 6 — refresh the dashboard (Bash)
 

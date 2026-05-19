@@ -15,7 +15,7 @@ The orchestrating skill or backtest harness passes a dict with these fields:
 
 - `current_watchlist`: list of ticker symbols currently in `holdings.csv`. May be as few as 4 to 6 (typical for a freshly-initialized portfolio) or as many as `max_watchlist_size`.
 - `as_of_date`: `YYYY-MM-DD`. For live runs this is today. For backtest runs this is a historical date and you MUST treat it as the present (see "As-of-date discipline" below).
-- `max_watchlist_size`: hard cap on `|current_watchlist + adds − removes|`. The post-change watchlist must satisfy this. Typical value is 12.
+- `max_watchlist_size`: hard cap on `|current_watchlist + adds − removes|`. The post-change watchlist must satisfy this. Typical value is 8.
 - `rebalance_period`: one of `monthly | quarterly | semi_annual | annual`. Use this to scale the news lookback (e.g., for `quarterly`, look at the last 90 days of news, not just the last 30).
 - `profile_wave_thesis`: prose excerpt from `investor_profile.md` describing the user's view of past, current, and likely next waves. This is your taste anchor.
 - `recent_news_lookback_days`: integer; how far back to search for news. Default scales with `rebalance_period` (30 / 90 / 180 / 365). The orchestrator may override.
@@ -58,7 +58,7 @@ Apply these BEFORE proposing any add. Better to skip a marginal candidate than v
 
 ## Sizing the watchlist
 
-The watchlist should usually grow from a thin starter (4 to 6 tickers in 2021) toward `max_watchlist_size` (12) over the first 12 to 24 months, then drift around that ceiling as adds and removes net out. Two operating notes:
+The watchlist should usually grow from a thin starter (4 to 6 tickers in 2021) toward `max_watchlist_size` (8) over the first 12 to 24 months, then drift around that ceiling as adds and removes net out. Two operating notes:
 
 - Day 0 typically has only the user's starter set. Your first run is usually 1 to 3 adds (filling in obvious thematic gaps the user already named in the profile), zero removes.
 - Replacing a ticker is fine: propose the add and the remove in the same call. The harness applies adds first then removes.

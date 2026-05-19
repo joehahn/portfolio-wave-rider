@@ -22,7 +22,7 @@ Spawn the `watchlist-curator` subagent. Pass a self-contained prompt with these 
 {
   "as_of_date": "<today, YYYY-MM-DD>",
   "current_watchlist": [<ticker list from holdings.csv>],
-  "max_watchlist_size": <from profile, default 12>,
+  "max_watchlist_size": <from profile, default 8>,
   "rebalance_period": "<from profile, default monthly>",
   "recent_news_lookback_days": <30 for monthly, 90 for quarterly>,
   "profile_wave_thesis": "<prose extracted from the 'Strategy & beliefs' section of investor_profile.md>",

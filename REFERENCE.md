@@ -17,8 +17,8 @@ Seven subcommands. The daily cron calls `snapshot` and `dashboard`. The `/review
 # to ∑wᵢ=1, wᵢ≥0, and wᵢ≤max_weight. λ (`--risk-aversion`) is the only knob on
 # the return/variance tradeoff: small λ favors return (more equity-heavy), large
 # λ favors variance reduction (more bond/cash-heavy).
-.venv/bin/python -m src.cli analyze --tickers AAPL MSFT NVDA --period 1.3y --max-weight 0.25
-.venv/bin/python -m src.cli analyze --tickers AAPL MSFT NVDA --risk-aversion 1.0
+.venv/bin/python -m src.cli analyze --tickers AAPL MSFT NVDA --period 1.5y --max-weight 0.70
+.venv/bin/python -m src.cli analyze --tickers AAPL MSFT NVDA --risk-aversion 0.5
 
 # Apply a watchlist-curator JSON payload to holdings.csv and data/curation_history.csv.
 # Validates against the contract (listing date via yfinance, max_watchlist_size,
@@ -28,7 +28,7 @@ Seven subcommands. The daily cron calls `snapshot` and `dashboard`. The `/review
 
 # Time-series logging
 .venv/bin/python -m src.cli snapshot   [--date YYYY-MM-DD] [--force]
-.venv/bin/python -m src.cli recommend  [--max-weight 0.25] [--force]
+.venv/bin/python -m src.cli recommend  [--max-weight 0.70] [--force]
 
 # Math-only walk-forward backtest of a fixed watchlist. Default window is a rolling
 # 12 months ending today (yfinance silently clips to whatever trading day has data).
@@ -43,7 +43,7 @@ Seven subcommands. The daily cron calls `snapshot` and `dashboard`. The `/review
 # computes a buy-and-hold-of-starter baseline for comparison. Writes snapshots.csv,
 # recommendations.csv, baselines_totals.csv, curation_summary.json, and report.md
 # to the out_dir.
-.venv/bin/python -m src.cli backtest --curator-runs-dir data/curator_runs/5y-quarterly \
+.venv/bin/python -m src.cli backtest --curator-runs-dir data/curator_runs/5y-sweep-cap08 \
                                      --out-dir data/backtest_curator_5y
 
 # Static dashboard. Default writes docs/index.html (the live portfolio).
@@ -52,7 +52,7 @@ Seven subcommands. The daily cron calls `snapshot` and `dashboard`. The `/review
 # over time) plus a curation event log.
 .venv/bin/python -m src.cli dashboard [--benchmarks SPY] [--out docs/index.html]
 .venv/bin/python -m src.cli dashboard --curator-backtest-dir data/backtest_curator_5y \
-                                       --curator-runs-dir data/curator_runs/5y-quarterly
+                                       --curator-runs-dir data/curator_runs/5y-sweep-cap08
 ```
 
 To inspect a math-only backtest visually without auto-render, point the dashboard at the backtest CSVs:
@@ -101,7 +101,9 @@ portfolio-wave-rider/
 │   ├── thesis_baseline.json    # one-time artifact from /initialize-portfolio
 │   ├── curator_latest.json     # most recent /review-portfolio curator output
 │   ├── curator_runs/           # one subdir per curator backtest run + a live/ archive
-│   │   ├── 5y-quarterly/         # 20 quarterly JSONs from the 5y experiment (committed)
+│   │   ├── 5y-sweep-cap08/       # canonical 5y backtest JSONs (cap=8, committed)
+│   │   ├── 5y-quarterly/         # cap=12 historical record from before the default migration
+│   │   ├── 5y-sweep-cap{05,16,24}/  # /sweep-max-watchlist-size variants (committed)
 │   │   └── live/                 # one JSON per /review-portfolio run (committed)
 │   ├── backtest/               # output of math-only `cli backtest` runs (gitignored)
 │   ├── backtest_curator_5y/    # output of the curator-driven 5y backtest (committed)
@@ -161,9 +163,11 @@ flowchart TD
 
 Two LLM specialists (blue) bracket three Python calls (yellow). The profile is the source of truth; the curator decides composition; the optimizer decides weights.
 
-- Two skills at `.claude/skills/`:
+- Four skills at `.claude/skills/`:
   - `initialize-portfolio` (one-shot): reads the profile and an empty holdings.csv, produces a thesis-driven dollar allocation, persists it to `data/thesis_baseline.json`, and writes a thesis-only report. No optimizer, no news.
   - `review-portfolio` (recurring): fires one watchlist-curator call against today's date, applies adds/removes via `curate`, runs `analyze` and `recommend` on the post-change watchlist, calls report-writer for a profile-aware narrative, and refreshes the live dashboard.
+  - `run-backtest` (on-demand maintenance): refreshes the canonical 5-year curator backtest against a rolling 5-year window ending today, regenerates `docs/backtest_curator.html`, and commits the result.
+  - `sweep-max-watchlist-size` (on-demand experiment): fires the watchlist-curator at four `max_watchlist_size` values across the 21 quarter-end dates of the standard 5y backtest and renders `docs/sweep_max_watchlist_size.html`.
 - Two subagents at `.claude/agents/`:
   - `watchlist-curator` (Sonnet): reads recent news (and `news_sources.md` if present), proposes adds and removes against the current watchlist. Returns JSON; does not write files. Carries strict as-of-date discipline (persona reset, WebSearch `before:` filters, suppression list, self-critique pass) when the harness passes a historical as-of date — used by curator backtests to suppress lookahead bias.
   - `report-writer` (Sonnet): synthesizes the analyze output and curator output into the final markdown report.
