@@ -121,7 +121,7 @@ On each call the curator:
 
 Python code then validates the payload: US-listed only, listing-date check via yfinance, post-change watchlist size within `max_watchlist_size`, no double-adds, no stale removes, no removes of tickers with live share counts. Only the changes that survive validation touch `holdings.csv`.
 
-This splitting is intentional. The mean-variance solution finds the portfolio that optimizes the objective function (which is detailed further below), while the LLM handles tasks that require a judgement call. The full agent spec, including the as-of-date discipline used in backtest mode, is in [`.claude/agents/watchlist-curator.md`](.claude/agents/watchlist-curator.md).
+This splitting is intentional. The mean-variance solution finds the portfolio that optimizes the objective function (which is detailed further below), while the LLM handles tasks that require a judgement call. The curator agent is detailed in [`.claude/agents/watchlist-curator.md`](.claude/agents/watchlist-curator.md).
 
 ## How the optimizer works
 
