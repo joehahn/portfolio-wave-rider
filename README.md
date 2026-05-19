@@ -124,7 +124,9 @@ subject to ∑ᵢ wᵢ = 1 (weights sum to one) and 0 ≤ wᵢ ≤ concentration
 
 This is the standard Markowitz mean-variance formulation (Markowitz 1952, *Portfolio Selection*, Journal of Finance 7:77-91), which is the textbook starting point for portfolio construction because it captures the central return-vs-risk tradeoff in a single closed-form quadratic expression. See [GLOSSARY.md](GLOSSARY.md) for the full definitions.
 
-## Headline result
+## Main results
+
+This project builds an AI assistant that reads business news against a user's stated investment thesis, derives a curated watchlist of tickers from it, and then hands that watchlist to a standard mean-variance optimizer for weighting at each rebalance. The AI's job is watchlist composition only; the math that turns the watchlist into portfolio weights is the textbook Markowitz step, with no LLM tilts on expected returns. To measure the AI's lift, we compare its 5-year track record against a tech-minded investor who buys the same starter tickers on day 0 and is then too busy to monitor news or rebalance — a realistic counterfactual for the audience this demo is aimed at.
 
 **Setup:** 5y window (Mar 2021 → Mar 2026), starter watchlist `[AAPL, MSFT, GOOGL, NVDA, SPY]`, 21 quarterly curator calls.
 
