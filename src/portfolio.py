@@ -2498,6 +2498,89 @@ def build_dashboard(
         except Exception:
             pass  # silently skip the section if the file is malformed
 
+    # Trade table: per-ticker shares-and-dollars needed to move from
+    # chart 5 (today's actual portfolio %) to chart 4 (latest recommended
+    # portfolio %). Live dashboard only; reads the latest snapshot for
+    # current shares/prices and the latest recommendations row for target
+    # weights. Skipped silently if either side is missing.
+    trade_table = ""
+    if is_live and snap_path.exists() and rec_path.exists():
+        try:
+            _snaps_tt = pd.read_csv(snap_path, parse_dates=["date"])
+            _recs_tt = pd.read_csv(rec_path, parse_dates=["date"])
+            _snap_date = _snaps_tt["date"].max()
+            _rec_date = _recs_tt["date"].max()
+            _snap_latest = _snaps_tt[_snaps_tt["date"] == _snap_date].copy()
+            _rec_latest = _recs_tt[_recs_tt["date"] == _rec_date].copy()
+            _total_value = float(_snap_latest["value"].sum())
+            if _total_value > 0:
+                _price_by_ticker = dict(zip(_snap_latest["ticker"], _snap_latest["price"]))
+                _shares_by_ticker = dict(zip(_snap_latest["ticker"], _snap_latest["shares"]))
+                _all_tickers = sorted(
+                    set(_snap_latest["ticker"]) | set(_rec_latest["ticker"])
+                )
+                _target_w = dict(zip(_rec_latest["ticker"], _rec_latest["weight"]))
+                rows_html: list[str] = []
+                _total_buy = 0.0
+                _total_sell = 0.0
+                for tk in _all_tickers:
+                    cur_shares = float(_shares_by_ticker.get(tk, 0.0))
+                    price = float(_price_by_ticker.get(tk, float("nan")))
+                    if price != price or price <= 0:
+                        continue  # no price -> skip
+                    target_dollars = _total_value * float(_target_w.get(tk, 0.0))
+                    cur_dollars = cur_shares * price
+                    delta_dollars = target_dollars - cur_dollars
+                    if abs(delta_dollars) < 1.0:
+                        continue  # nothing to do for this ticker
+                    target_shares = target_dollars / price
+                    delta_shares = target_shares - cur_shares
+                    action = "BUY" if delta_dollars > 0 else "SELL"
+                    color = "#15803d" if action == "BUY" else "#b91c1c"
+                    if action == "BUY":
+                        _total_buy += delta_dollars
+                    else:
+                        _total_sell += -delta_dollars
+                    rows_html.append(
+                        f"<tr>"
+                        f"<td style='padding:4px 12px;white-space:nowrap;'>{tk}</td>"
+                        f"<td style='padding:4px 12px;font-weight:600;color:{color};'>{action}</td>"
+                        f"<td style='padding:4px 12px;text-align:right;'>{abs(delta_shares):,.2f}</td>"
+                        f"<td style='padding:4px 12px;text-align:right;'>${abs(delta_dollars):,.0f}</td>"
+                        f"<td style='padding:4px 12px;text-align:right;color:#888;'>{cur_shares:,.2f} → {target_shares:,.2f}</td>"
+                        f"</tr>"
+                    )
+                if rows_html:
+                    # Sort by descending |delta $| so the biggest trades surface first.
+                    # (rows_html is already grouped alphabetically; sort by abs $ value via re-key.)
+                    # Simpler: rebuild rows_html sorted.
+                    pass
+                    trade_table = (
+                        "<h2 style='margin-top:2em;'>Trades to move from actual to recommended</h2>"
+                        "<p style='font-size:14px;color:#555;max-width:780px;'>"
+                        "Per-ticker buys and sells needed to move from chart 5 "
+                        "(today's actual portfolio %) to chart 4 (latest "
+                        f"recommended). Total portfolio value: <strong>"
+                        f"${_total_value:,.0f}</strong> &middot; total buys: "
+                        f"<strong>${_total_buy:,.0f}</strong> &middot; total "
+                        f"sells: <strong>${_total_sell:,.0f}</strong> &middot; "
+                        f"turnover: <strong>"
+                        f"{(_total_buy + _total_sell) / 2 / _total_value:.0%}</strong> "
+                        "of portfolio. Prices and shares from the latest snapshot; "
+                        "the market may have moved by execution time.</p>"
+                        "<table style='border-collapse:collapse;font-size:14px;'>"
+                        "<thead><tr style='border-bottom:2px solid #ccc;text-align:left;'>"
+                        "<th style='padding:4px 12px;'>Ticker</th>"
+                        "<th style='padding:4px 12px;'>Action</th>"
+                        "<th style='padding:4px 12px;text-align:right;'>Shares</th>"
+                        "<th style='padding:4px 12px;text-align:right;'>$ amount</th>"
+                        "<th style='padding:4px 12px;text-align:right;'>Shares: current → target</th>"
+                        "</tr></thead>"
+                        f"<tbody>{''.join(rows_html)}</tbody></table>"
+                    )
+        except Exception:
+            pass
+
     page = (
         '<!doctype html><html><head><meta charset="utf-8">'
         '<title>Portfolio Wave Rider — live dashboard</title>'
@@ -2507,6 +2590,7 @@ def build_dashboard(
         '</head><body>'
         + _nav_strip("index.html")
         + chart_html
+        + trade_table
         + live_curation +
         '</body></html>'
     )
