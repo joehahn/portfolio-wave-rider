@@ -28,7 +28,7 @@ from src.portfolio import curator_backtest
 RISK_FREE_RATE = 0.04
 
 DEFAULTS = {
-    "risk_aversion": [0.0, 0.33, 0.5, 0.67, 1.0, 2.0, 3.0, 10.0],
+    "risk_aversion": [0.0, 0.33, 0.5, 0.67, 1.0, 1.5, 2.0, 3.0, 10.0],
     "lookback":      [0.5, 1.0, 1.5, 2.0, 3.0, 5.0],
     "max_weight":    [0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90, 1.00],
 }
