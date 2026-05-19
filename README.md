@@ -110,7 +110,7 @@ A fourth sweep, **[max_watchlist_size](https://joehahn.github.io/portfolio-wave-
 
 ## How the watchlist curator works
 
-The curator is the AI subagent that decides which tickers belong on the watchlist, and it executes when you call `/review-portfolio`. Its job is composition only: read the news, decide what to add and what to remove against the current watchlist. It does not propose weights, does not see the optimizer, and does not output any numerical forecast.
+The curator is the AI subagent that decides which tickers belong on the watchlist, and it executes when you call `/review-portfolio`. Its job is composition only: read the news, decide what to add and what to remove against the current watchlist. It does not propose weights or generate any forecasts. Instead it manages the list of tickers that the optimizer can choose from, doing so in a way that is informed by current news and aligned with your investing thesis.
 
 On each call the curator:
 
