@@ -119,9 +119,9 @@ On each call the curator:
 3. Proposes at most 3 adds and 3 removes, each cited with 2-4 dated news items.
 4. Returns one JSON payload.
 
-The Python harness then validates the payload: US-listed only, listing-date check via yfinance, post-change watchlist size within `max_watchlist_size`, no double-adds, no stale removes, no removes of tickers with live share counts. Only the changes that survive validation touch `holdings.csv`.
+Python code then validates the payload: US-listed only, listing-date check via yfinance, post-change watchlist size within `max_watchlist_size`, no double-adds, no stale removes, no removes of tickers with live share counts. Only the changes that survive validation touch `holdings.csv`.
 
-The split is intentional. The mean-variance math finds the portfolio that optimizes the objective function (detailed below), and the LLM handles the taste where there is no closed-form answer. The full agent spec, including the as-of-date discipline used in backtest mode, is in `.claude/agents/watchlist-curator.md`.
+This splitting is intentional. The mean-variance solution finds the portfolio that optimizes the objective function that is detailed further, below, while the LLM handles tasks that require a judgement call (i.e. there is no closed-form answer). The full agent spec, including the as-of-date discipline used in backtest mode, is in `.claude/agents/watchlist-curator.md`.
 
 ## How the optimizer works
 
