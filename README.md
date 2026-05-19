@@ -110,7 +110,7 @@ A fourth sweep, **[max_watchlist_size](https://joehahn.github.io/portfolio-wave-
 
 ## How the watchlist curator works
 
-The curator is the AI subagent that decides which tickers belong on the watchlist. It runs once per `/review-portfolio` and once per quarterly rebalance in the backtest. Its job is composition only: read the news, decide what to add and what to remove against the current watchlist, return a JSON object. It does not propose weights, does not see the optimizer, and does not output any numerical forecast.
+The curator is the AI subagent that decides which tickers belong on the watchlist. It runs once per `/review-portfolio` and once per quarterly rebalance in the backtest. Its job is composition only: read the news, decide what to add and what to remove against the current watchlist. It does not propose weights, does not see the optimizer, and does not output any numerical forecast.
 
 On each call the curator:
 
@@ -121,7 +121,7 @@ On each call the curator:
 
 The Python harness then validates the payload: US-listed only, listing-date check via yfinance, post-change watchlist size within `max_watchlist_size`, no double-adds, no stale removes, no removes of tickers with live share counts. Only the changes that survive validation touch `holdings.csv`.
 
-The split is intentional. Mean-variance handles the math where it has a precise objective function, and the LLM handles the taste where there is no closed-form answer. The full agent spec, including the as-of-date discipline used in backtest mode, is in `.claude/agents/watchlist-curator.md`.
+The split is intentional. The mean-variance math finds the portfolio that optimizes the objective function (detailed below), and the LLM handles the taste where there is no closed-form answer. The full agent spec, including the as-of-date discipline used in backtest mode, is in `.claude/agents/watchlist-curator.md`.
 
 ## How the optimizer works
 
