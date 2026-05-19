@@ -99,6 +99,17 @@ All three defaults are set in `investor_profile.md` and can be edited there.
 
 A fourth sweep, **[max_watchlist_size](https://joehahn.github.io/portfolio-wave-rider/sweep_max_watchlist_size.html)**, is fired separately via the `/sweep-max-watchlist-size` skill. The `max_watchlist_size` parameter caps how many tickers the curator may hold in the active watchlist at one time. Every add the curator proposes past the cap is rejected unless paired with a remove, so the cap directly shapes which themes the portfolio can pursue at each rebalance. Small values force the curator to pick a few high-conviction tickers per wave bucket and rotate aggressively (sharper but more concentrated bets); large values let the watchlist grow broad enough to cover every named wave with multiple tickers each (more diversified but slower to react, and the optimizer may dilute its top picks across redundant exposures). max_watchlist_size=8 is the project default. Unlike the earlier sweeps, this one must execute as a Claude skill because the cap shapes the curator's *decisions*, so each cap requires its own quarterly portfolio-curator calls. Runtime is dominated by curator latency rather than local compute, so the wall clock (~15 min at 4-parallel batching) is roughly the same on any modern laptop.
 
+## Acting on a recommendation
+
+The `/review-portfolio` report ends with recommended weights, not trades. The project never touches your brokerage. To act on a recommendation:
+
+1. Read the **Profile conflicts** and **Recommended allocation** sections of the report. The optimizer regularly produces concentrated calls (single-stock weights at the `concentration_cap`); decide which subset you actually want to execute.
+2. Execute the buys and sells in your brokerage.
+3. Edit `holdings.csv` with the new share counts. The validator blocks the curator from removing tickers with `shares > 0`, so liquidate before zeroing a row.
+4. The next daily cron snapshot picks up the new positions and the dashboard catches up.
+
+You can also do nothing and let the next `/review-portfolio` produce a fresh recommendation. The split between recommendation and execution is intentional so you can review, override, or ignore each call.
+
 ## How `holdings.csv` shapes outcomes
 
 `holdings.csv` is the watchlist that the curator and the optimizer operate on.
