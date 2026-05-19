@@ -1828,16 +1828,12 @@ def build_dashboard(
     titles_list: list[str] = []
     titles_list.append(
         f"{R_PORTFOLIO}. Portfolio value over time"
-        "<br><sub><i>Σ(actual shares × close price) per day.</i></sub>"
     )
     titles_list.append(
         f"{R_TURNOVER}. Rebalance turnover (% of portfolio dollars that changed holdings)"
-        "<br><sub><i>At each rebalance, ½·||Δw||₁ — half the L1 distance between consecutive weight vectors. Equals the fraction of portfolio value that moved between tickers."
-        "<br>Step-function: each value holds until the next rebalance.</i></sub>"
     )
     titles_list.append(
         f"{R_REC_WAVE}. Recommended portfolio % segregated by wave, versus time"
-        "<br><sub><i>Each optimizer run produces target weights per ticker; this chart sums them by wave bucket so each line is the wave's total target allocation.</i></sub>"
     )
     titles_list.append(
         f"{R_LATEST_WEIGHTS}. Latest recommended portfolio %"
