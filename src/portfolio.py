@@ -1807,10 +1807,11 @@ def build_dashboard(
     R_TURNOVER        = 2
     R_REC_WAVE        = 3
     R_LATEST_WEIGHTS  = 4
-    R_ACTUAL_WEIGHTS  = 5 if is_live else None
-    R_GAIN_INIT       = 6 if is_live else 5
-    R_GAIN_REVIEW     = 7 if is_live else None
-    _after_gain       = 8 if is_live else 6
+    R_TRADE_TABLE     = 5 if is_live else None
+    R_ACTUAL_WEIGHTS  = 6 if is_live else None
+    R_GAIN_INIT       = 7 if is_live else 5
+    R_GAIN_REVIEW     = 8 if is_live else None
+    _after_gain       = 9 if is_live else 6
     R_ASSET_USD       = _after_gain
     R_WAVE_USD        = _after_gain + 1
     R_EXP_VS_REAL     = R_WAVE_USD + 1
@@ -1842,10 +1843,15 @@ def build_dashboard(
         f"{R_LATEST_WEIGHTS}. Latest recommended portfolio %"
         "<br><sub><i>The most recent optimizer's target weight per ticker. Bars at the cap signal the optimizer wanted more than the concentration constraint allowed.</i></sub>"
     )
+    if R_TRADE_TABLE is not None:
+        titles_list.append(
+            f"{R_TRADE_TABLE}. Trades to move from actual to recommended"
+            "<br><sub><i>Per-ticker buys and sells needed to rebalance from today's actual portfolio (chart 6 below) to the latest recommendation (chart 4 above). Prices and shares from the latest snapshot; market may have moved by execution time.</i></sub>"
+        )
     if R_ACTUAL_WEIGHTS is not None:
         titles_list.append(
             f"{R_ACTUAL_WEIGHTS}. Today's actual portfolio %"
-            "<br><sub><i>Per-ticker share of total portfolio value from today's snapshot. Compare against chart 4 to see how far the actual portfolio sits from the latest recommendation; the gap is recommendations you haven't acted on yet.</i></sub>"
+            "<br><sub><i>Per-ticker share of total portfolio value from today's snapshot. Compare against chart 4 above to see how far the actual portfolio sits from the latest recommendation; the gap is recommendations you haven't acted on yet.</i></sub>"
         )
     titles_list.append(
         f"{R_GAIN_INIT}. Cumulative $ gain per holding since {_chart5_anchor}"
@@ -1872,10 +1878,21 @@ def build_dashboard(
     )
     titles_all = tuple(titles_list)
 
+    # Subplot specs: every row is an xy chart except the trade-table row
+    # (live dashboard only), which uses Plotly's table trace type. Row
+    # heights weight the table row at 0.5 so it doesn't gulp the same
+    # vertical real estate as a full chart.
+    _specs = [[{"type": "xy"}] for _ in range(n_rows)]
+    _row_h = [1.0] * n_rows
+    if R_TRADE_TABLE is not None:
+        _specs[R_TRADE_TABLE - 1] = [{"type": "table"}]
+        _row_h[R_TRADE_TABLE - 1] = 0.5
     fig = make_subplots(
         rows=n_rows, cols=1,
         subplot_titles=titles_all,
         vertical_spacing=0.06,
+        specs=_specs,
+        row_heights=_row_h,
     )
 
     # Compute a shared x-axis range from the daily-cadence data
@@ -2080,7 +2097,98 @@ def build_dashboard(
             row=R_LATEST_WEIGHTS, col=1,
         )
 
-    # 5. Today's actual portfolio % — bar chart of value / total_value
+    # 5. Trade table — per-ticker BUY/SELL needed to rebalance from
+    # today's actual (chart 6) to the latest recommendation (chart 4).
+    # Uses Plotly's table trace type so the table lives inside the
+    # subplot grid between the recommended-weights and actual-weights
+    # bar charts. Live dashboard only.
+    if R_TRADE_TABLE is not None and snap_path.exists() and rec_path.exists():
+        try:
+            _snaps_tt = pd.read_csv(snap_path, parse_dates=["date"])
+            _recs_tt = pd.read_csv(rec_path, parse_dates=["date"])
+            _snap_latest_tt = _snaps_tt[_snaps_tt["date"] == _snaps_tt["date"].max()].copy()
+            _rec_latest_tt = _recs_tt[_recs_tt["date"] == _recs_tt["date"].max()].copy()
+            _total_value_tt = float(_snap_latest_tt["value"].sum())
+            if _total_value_tt > 0:
+                _price_by = dict(zip(_snap_latest_tt["ticker"], _snap_latest_tt["price"]))
+                _shares_by = dict(zip(_snap_latest_tt["ticker"], _snap_latest_tt["shares"]))
+                _target_w = dict(zip(_rec_latest_tt["ticker"], _rec_latest_tt["weight"]))
+                _trades = []
+                _total_buy = 0.0
+                _total_sell = 0.0
+                for tk in sorted(set(_snap_latest_tt["ticker"]) | set(_rec_latest_tt["ticker"])):
+                    cur_shares = float(_shares_by.get(tk, 0.0))
+                    price = float(_price_by.get(tk, float("nan")))
+                    if price != price or price <= 0:
+                        continue
+                    target_dollars = _total_value_tt * float(_target_w.get(tk, 0.0))
+                    cur_dollars = cur_shares * price
+                    delta_dollars = target_dollars - cur_dollars
+                    if abs(delta_dollars) < 1.0:
+                        continue
+                    target_shares = target_dollars / price
+                    delta_shares = target_shares - cur_shares
+                    action = "BUY" if delta_dollars > 0 else "SELL"
+                    if action == "BUY":
+                        _total_buy += delta_dollars
+                    else:
+                        _total_sell += -delta_dollars
+                    _trades.append((tk, action, abs(delta_shares), abs(delta_dollars),
+                                    cur_shares, target_shares))
+                _trades.sort(key=lambda r: -r[3])  # biggest $ moves first
+                if _trades:
+                    tickers_col = [r[0] for r in _trades]
+                    action_col = [r[1] for r in _trades]
+                    shares_col = [f"{r[2]:,.2f}" for r in _trades]
+                    dollars_col = [f"${r[3]:,.0f}" for r in _trades]
+                    transition_col = [f"{r[4]:,.2f} → {r[5]:,.2f}" for r in _trades]
+                    action_colors = ["#15803d" if a == "BUY" else "#b91c1c"
+                                     for a in action_col]
+                    fig.add_trace(
+                        go.Table(
+                            columnwidth=[1, 1, 1.4, 1.4, 2.4],
+                            header=dict(
+                                values=["<b>Ticker</b>", "<b>Action</b>",
+                                        "<b>Shares</b>", "<b>$ amount</b>",
+                                        "<b>Shares: current → target</b>"],
+                                fill_color="#f3f4f6",
+                                align=["left", "left", "right", "right", "right"],
+                                font=dict(size=12, color="#222"),
+                                height=28,
+                            ),
+                            cells=dict(
+                                values=[tickers_col, action_col, shares_col,
+                                        dollars_col, transition_col],
+                                align=["left", "left", "right", "right", "right"],
+                                fill_color="white",
+                                font=dict(
+                                    color=["#222", action_colors, "#222", "#222", "#888"],
+                                    size=12,
+                                ),
+                                height=26,
+                            ),
+                        ),
+                        row=R_TRADE_TABLE, col=1,
+                    )
+                    # Inject the summary stats into the subplot title.
+                    _turnover_pct = (_total_buy + _total_sell) / 2 / _total_value_tt
+                    _summary = (
+                        f"Total portfolio ${_total_value_tt:,.0f} &middot; "
+                        f"buys ${_total_buy:,.0f} &middot; "
+                        f"sells ${_total_sell:,.0f} &middot; "
+                        f"turnover {_turnover_pct:.0%} of portfolio"
+                    )
+                    _trade_prefix = f"{R_TRADE_TABLE}. Trades to move from actual to recommended"
+                    fig.layout.annotations[R_TRADE_TABLE - 1].update(
+                        text=fig.layout.annotations[R_TRADE_TABLE - 1].text.replace(
+                            _trade_prefix,
+                            f"{_trade_prefix} ({_summary})",
+                        )
+                    )
+        except Exception:
+            pass  # silently skip the trade table on any error
+
+    # 6. Today's actual portfolio % — bar chart of value / total_value
     # per ticker from the latest snapshot. Mirrors chart 4's per-wave
     # coloring so the reader can compare recommendation against reality
     # at a glance; the gap is recommendations the user has not yet acted
@@ -2498,89 +2606,6 @@ def build_dashboard(
         except Exception:
             pass  # silently skip the section if the file is malformed
 
-    # Trade table: per-ticker shares-and-dollars needed to move from
-    # chart 5 (today's actual portfolio %) to chart 4 (latest recommended
-    # portfolio %). Live dashboard only; reads the latest snapshot for
-    # current shares/prices and the latest recommendations row for target
-    # weights. Skipped silently if either side is missing.
-    trade_table = ""
-    if is_live and snap_path.exists() and rec_path.exists():
-        try:
-            _snaps_tt = pd.read_csv(snap_path, parse_dates=["date"])
-            _recs_tt = pd.read_csv(rec_path, parse_dates=["date"])
-            _snap_date = _snaps_tt["date"].max()
-            _rec_date = _recs_tt["date"].max()
-            _snap_latest = _snaps_tt[_snaps_tt["date"] == _snap_date].copy()
-            _rec_latest = _recs_tt[_recs_tt["date"] == _rec_date].copy()
-            _total_value = float(_snap_latest["value"].sum())
-            if _total_value > 0:
-                _price_by_ticker = dict(zip(_snap_latest["ticker"], _snap_latest["price"]))
-                _shares_by_ticker = dict(zip(_snap_latest["ticker"], _snap_latest["shares"]))
-                _all_tickers = sorted(
-                    set(_snap_latest["ticker"]) | set(_rec_latest["ticker"])
-                )
-                _target_w = dict(zip(_rec_latest["ticker"], _rec_latest["weight"]))
-                rows_html: list[str] = []
-                _total_buy = 0.0
-                _total_sell = 0.0
-                for tk in _all_tickers:
-                    cur_shares = float(_shares_by_ticker.get(tk, 0.0))
-                    price = float(_price_by_ticker.get(tk, float("nan")))
-                    if price != price or price <= 0:
-                        continue  # no price -> skip
-                    target_dollars = _total_value * float(_target_w.get(tk, 0.0))
-                    cur_dollars = cur_shares * price
-                    delta_dollars = target_dollars - cur_dollars
-                    if abs(delta_dollars) < 1.0:
-                        continue  # nothing to do for this ticker
-                    target_shares = target_dollars / price
-                    delta_shares = target_shares - cur_shares
-                    action = "BUY" if delta_dollars > 0 else "SELL"
-                    color = "#15803d" if action == "BUY" else "#b91c1c"
-                    if action == "BUY":
-                        _total_buy += delta_dollars
-                    else:
-                        _total_sell += -delta_dollars
-                    rows_html.append(
-                        f"<tr>"
-                        f"<td style='padding:4px 12px;white-space:nowrap;'>{tk}</td>"
-                        f"<td style='padding:4px 12px;font-weight:600;color:{color};'>{action}</td>"
-                        f"<td style='padding:4px 12px;text-align:right;'>{abs(delta_shares):,.2f}</td>"
-                        f"<td style='padding:4px 12px;text-align:right;'>${abs(delta_dollars):,.0f}</td>"
-                        f"<td style='padding:4px 12px;text-align:right;color:#888;'>{cur_shares:,.2f} → {target_shares:,.2f}</td>"
-                        f"</tr>"
-                    )
-                if rows_html:
-                    # Sort by descending |delta $| so the biggest trades surface first.
-                    # (rows_html is already grouped alphabetically; sort by abs $ value via re-key.)
-                    # Simpler: rebuild rows_html sorted.
-                    pass
-                    trade_table = (
-                        "<h2 style='margin-top:2em;'>Trades to move from actual to recommended</h2>"
-                        "<p style='font-size:14px;color:#555;max-width:780px;'>"
-                        "Per-ticker buys and sells needed to move from chart 5 "
-                        "(today's actual portfolio %) to chart 4 (latest "
-                        f"recommended). Total portfolio value: <strong>"
-                        f"${_total_value:,.0f}</strong> &middot; total buys: "
-                        f"<strong>${_total_buy:,.0f}</strong> &middot; total "
-                        f"sells: <strong>${_total_sell:,.0f}</strong> &middot; "
-                        f"turnover: <strong>"
-                        f"{(_total_buy + _total_sell) / 2 / _total_value:.0%}</strong> "
-                        "of portfolio. Prices and shares from the latest snapshot; "
-                        "the market may have moved by execution time.</p>"
-                        "<table style='border-collapse:collapse;font-size:14px;'>"
-                        "<thead><tr style='border-bottom:2px solid #ccc;text-align:left;'>"
-                        "<th style='padding:4px 12px;'>Ticker</th>"
-                        "<th style='padding:4px 12px;'>Action</th>"
-                        "<th style='padding:4px 12px;text-align:right;'>Shares</th>"
-                        "<th style='padding:4px 12px;text-align:right;'>$ amount</th>"
-                        "<th style='padding:4px 12px;text-align:right;'>Shares: current → target</th>"
-                        "</tr></thead>"
-                        f"<tbody>{''.join(rows_html)}</tbody></table>"
-                    )
-        except Exception:
-            pass
-
     page = (
         '<!doctype html><html><head><meta charset="utf-8">'
         '<title>Portfolio Wave Rider — live dashboard</title>'
@@ -2590,7 +2615,6 @@ def build_dashboard(
         '</head><body>'
         + _nav_strip("index.html")
         + chart_html
-        + trade_table
         + live_curation +
         '</body></html>'
     )
