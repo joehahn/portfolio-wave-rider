@@ -166,17 +166,20 @@ def main(argv: list[str] | None = None) -> int:
         rows = "".join(_fmt_row(*r) for r in summary)
         WALK_FORWARD_NOTES = {
             "risk_aversion": (
-                "the default <code>risk_aversion=0.5</code> wins both halves by "
-                "both Sharpe and Calmar — stable across regimes."
+                "we find that <code>risk_aversion=0.5</code> wins both halves "
+                "by both Sharpe and Calmar, so this setting is stable across "
+                "regimes."
             ),
             "lookback": (
-                "the default <code>lookback=1.5y</code> wins both halves by "
-                "both Sharpe and Calmar — the strongest result of the four sweeps."
+                "we find that <code>lookback=1.5y</code> wins both halves by "
+                "both Sharpe and Calmar, so this setting is stable across "
+                "regimes."
             ),
             "max_weight": (
-                "the default <code>max_weight=0.7</code> wins H2 by both Sharpe "
-                "and Calmar; H1 prefers slightly higher (0.8 by Sharpe, 0.9 by "
-                "Calmar) but the gap is small (H1 Sharpe 0.90 vs 0.99)."
+                "we find that <code>max_weight=0.7</code> wins H2 by both "
+                "Sharpe and Calmar, while H1 prefers slightly higher (0.8 by "
+                "Sharpe, 0.9 by Calmar); the H1 gap is small (Sharpe 0.90 vs "
+                "0.99), so the 0.7 choice is reasonable."
             ),
         }
         wf_note = WALK_FORWARD_NOTES.get(args.param, "")
@@ -198,11 +201,10 @@ def main(argv: list[str] | None = None) -> int:
             f"<strong>Calmar</strong> = annualized return / |max drawdown|; "
             f"penalizes deep drawdowns the way Sharpe doesn't.</p>"
             f"<p style='font-size:13px;color:#666;'>"
-            f"A <strong>walk-forward check</strong> splits the 5y backtest at "
-            f"its midpoint and asks whether the same parameter value wins on each "
-            f"half independently. If yes, the choice is robust across regimes; "
-            f"if no, the full-window winner is at least partly fit to one half. "
-            f"For this sweep (split 2023-09-27): {wf_note}</p>"
+            f"We also did a <strong>walk-forward check</strong> that splits "
+            f"the 5y backtest at its midpoint (2023-09-27) to ask whether the "
+            f"same parameter value wins on each half independently, and "
+            f"{wf_note}</p>"
         )
 
         nav = _nav_strip(f"sweep_{args.param}.html")

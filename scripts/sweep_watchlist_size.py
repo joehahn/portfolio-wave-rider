@@ -131,15 +131,13 @@ def main() -> int:
         f"<strong>Calmar</strong> = annualized return / |max drawdown|; "
         f"penalizes deep drawdowns the way Sharpe doesn't.</p>"
         f"<p style='font-size:13px;color:#666;'>"
-        f"A <strong>walk-forward check</strong> splits the 5y backtest at its "
-        f"midpoint and asks whether the same parameter value wins on each half "
-        f"independently. If yes, the choice is robust across regimes; if no, "
-        f"the full-window winner is at least partly fit to one half. For this "
-        f"sweep (split 2023-09-27): cap=5 wins H1 by both Sharpe and Calmar "
-        f"(H1 Calmar 1.22 vs 0.77 for cap=8); cap=8 wins H2 decisively (H2 "
-        f"Sharpe 1.99 vs 1.32). The H1 result reflects the early-window "
-        f"watchlist's thematic narrowness; cap=8 carries the full 5y window "
-        f"cleanly.</p>"
+        f"We also did a <strong>walk-forward check</strong> that splits the "
+        f"5y backtest at its midpoint (2023-09-27) to ask whether the same "
+        f"parameter value wins on each half independently, and we find that "
+        f"cap=5 wins H1 by both Sharpe and Calmar (H1 Calmar 1.22 vs 0.77 for "
+        f"cap=8) while cap=8 wins H2 decisively (H2 Sharpe 1.99 vs 1.32); the "
+        f"H1 result reflects the early-window watchlist's thematic narrowness, "
+        f"and cap=8 carries the full 5y window cleanly.</p>"
     )
 
     nav = _nav_strip("sweep_max_watchlist_size.html")
