@@ -1846,7 +1846,7 @@ def build_dashboard(
     if R_TRADE_TABLE is not None:
         titles_list.append(
             f"{R_TRADE_TABLE}. Trades to move from actual to recommended"
-            "<br><sub><i>Per-ticker buys and sells needed to rebalance from today's actual portfolio (chart 6 below) to the latest recommendation (chart 4 above). Prices and shares from the latest snapshot; market may have moved by execution time.</i></sub>"
+            "<br><sub><i>Per-ticker buys and sells needed to rebalance from today's actual portfolio (chart 6 below) to the latest recommendation (chart 4 above).</i></sub>"
         )
     if R_ACTUAL_WEIGHTS is not None:
         titles_list.append(
@@ -2188,21 +2188,6 @@ def build_dashboard(
                 ),
             ),
             row=R_TRADE_TABLE, col=1,
-        )
-        # Inject summary stats into the subplot title.
-        _turnover_pct = (trade_total_buy + trade_total_sell) / 2 / trade_total_value
-        _summary = (
-            f"Total portfolio ${trade_total_value:,.0f} &middot; "
-            f"buys ${trade_total_buy:,.0f} &middot; "
-            f"sells ${trade_total_sell:,.0f} &middot; "
-            f"turnover {_turnover_pct:.0%} of portfolio"
-        )
-        _trade_prefix = f"{R_TRADE_TABLE}. Trades to move from actual to recommended"
-        fig.layout.annotations[R_TRADE_TABLE - 1].update(
-            text=fig.layout.annotations[R_TRADE_TABLE - 1].text.replace(
-                _trade_prefix,
-                f"{_trade_prefix} ({_summary})",
-            )
         )
 
     # 6. Today's actual portfolio % — bar chart of value / total_value
