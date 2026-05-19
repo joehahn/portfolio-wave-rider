@@ -1851,7 +1851,7 @@ def build_dashboard(
     if R_ACTUAL_WEIGHTS is not None:
         titles_list.append(
             f"{R_ACTUAL_WEIGHTS}. Today's actual portfolio %"
-            "<br><sub><i>Per-ticker share of total portfolio value from today's snapshot. Compare against chart 4 above to see how far the actual portfolio sits from the latest recommendation; the gap is recommendations you haven't acted on yet.</i></sub>"
+            "<br><sub><i>Per-ticker share of total portfolio value from today's snapshot. Compare against chart 4 above to see how far the actual portfolio sits from the latest recommendation.</i></sub>"
         )
     titles_list.append(
         f"{R_GAIN_INIT}. Cumulative $ gain per holding since {_chart5_anchor}"
