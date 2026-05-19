@@ -5,11 +5,6 @@ min_trade_size_usd: 1000          # don't propose trades smaller than this
 exclusions:                       # sector / theme exclusions
   - solar energy (companies and ETFs)
   - wind energy (companies and ETFs)
-asset_class_targets:              # rough guide, not a hard constraint
-  equities: 0.75
-  precious metals: 0.10
-  bonds: 0.10
-  cash: 0.05
 financial_model:                  # optimizer math
   risk_aversion: 1.0              # λ in mean_variance utility (μᵀw − λ·wᵀΣw)
   risk_free_rate: 0.04            # ≈ 1y Treasury yield; baseline subtracted from E[r] in Sharpe-ratio calc
