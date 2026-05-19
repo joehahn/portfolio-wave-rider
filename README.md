@@ -124,15 +124,15 @@ subject to ∑ᵢ wᵢ = 1 (weights sum to one) and 0 ≤ wᵢ ≤ concentration
 
 This is the standard Markowitz mean-variance formulation (Markowitz 1952, *Portfolio Selection*, Journal of Finance 7:77-91), which is the textbook starting point for portfolio construction because it captures the central return-vs-risk tradeoff in a single closed-form quadratic expression. See [GLOSSARY.md](GLOSSARY.md) for the full definitions.
 
-## Main results
+## Main findings
 
-This project builds an AI assistant that reads business news against a user's stated investment thesis, derives a curated watchlist of tickers from it, and then hands that watchlist to a standard mean-variance optimizer for weighting at each rebalance. The AI's job is watchlist composition only; the math that turns the watchlist into portfolio weights is the textbook Markowitz step, with no LLM tilts on expected returns. To measure the AI's lift, we compare its 5-year track record against a tech-minded investor who buys the same starter tickers on day 0 and is then too busy to monitor news or rebalance — a realistic counterfactual for the audience this demo is aimed at.
+This project builds an AI assistant that reads business news against a user's stated investment thesis, derives a curated watchlist of tickers from it, and then hands that watchlist to a standard mean-variance optimizer for weighting at each rebalance. The AI's job is watchlist composition only; a simple but effective financial model then turns the watchlist into portfolio weights. To measure the AI's lift, we compare its 5-year track record against a tech-minded investor who buys the same starter watchlist `[AAPL, MSFT, GOOGL, NVDA, SPY]` — probably representative of a tech-savvy investor in early 2021 — on day 0 and is then too busy to monitor news or rebalance.
 
 **Setup:** 5y window (Mar 2021 → Mar 2026), starter watchlist `[AAPL, MSFT, GOOGL, NVDA, SPY]`, 21 quarterly curator calls.
 
 The starter is a plausible 2021 tech-aware investor's portfolio. NVDA is included because excluding it would have stacked the deck for the curator (NVDA was *the* big winner of the 5y window, and the curator adds it at the Q3 2021 rebalance). With NVDA already in the buy-and-hold, the comparison instead measures what the curator's *other* decisions contributed: thematic adds in nuclear, robotics, rockets, quantum, and the optimizer's quarterly re-weighting.
 
-The buy-and-hold baseline is the **equal-weight allocation** (20% in each of the five tickers) bought on day 0 and held without rebalancing through the end of the window. (This is **not** the thesis-driven "beliefs in dollar form" allocation that `/initialize-portfolio` produces in the live workflow.)
+The buy-and-hold baseline is the **equal-weight allocation** (20% in each of the five tickers) bought on day 0 and held without rebalancing through the end of the window.
 
 **Total realized return over the 5 years:**
 
