@@ -1878,15 +1878,65 @@ def build_dashboard(
     )
     titles_all = tuple(titles_list)
 
+    # Pre-compute the trade list so the table row can be sized to fit
+    # all rows up front (plotly Tables don't expand within their subplot
+    # domain — extra rows get scroll-hidden if the domain is too small).
+    # Returns a list of (ticker, action, shares, $, cur_shares, target_shares)
+    # tuples plus running totals; empty list when there's no data.
+    trade_rows: list[tuple] = []
+    trade_total_buy = 0.0
+    trade_total_sell = 0.0
+    trade_total_value = 0.0
+    if R_TRADE_TABLE is not None and snap_path.exists() and rec_path.exists():
+        try:
+            _snaps_tt = pd.read_csv(snap_path, parse_dates=["date"])
+            _recs_tt = pd.read_csv(rec_path, parse_dates=["date"])
+            _snap_latest_tt = _snaps_tt[_snaps_tt["date"] == _snaps_tt["date"].max()].copy()
+            _rec_latest_tt = _recs_tt[_recs_tt["date"] == _recs_tt["date"].max()].copy()
+            trade_total_value = float(_snap_latest_tt["value"].sum())
+            if trade_total_value > 0:
+                _price_by = dict(zip(_snap_latest_tt["ticker"], _snap_latest_tt["price"]))
+                _shares_by = dict(zip(_snap_latest_tt["ticker"], _snap_latest_tt["shares"]))
+                _target_w = dict(zip(_rec_latest_tt["ticker"], _rec_latest_tt["weight"]))
+                for tk in sorted(set(_snap_latest_tt["ticker"]) | set(_rec_latest_tt["ticker"])):
+                    cur_shares = float(_shares_by.get(tk, 0.0))
+                    price = float(_price_by.get(tk, float("nan")))
+                    if price != price or price <= 0:
+                        continue
+                    target_dollars = trade_total_value * float(_target_w.get(tk, 0.0))
+                    cur_dollars = cur_shares * price
+                    delta_dollars = target_dollars - cur_dollars
+                    if abs(delta_dollars) < 1.0:
+                        continue
+                    target_shares = target_dollars / price
+                    delta_shares = target_shares - cur_shares
+                    action = "BUY" if delta_dollars > 0 else "SELL"
+                    if action == "BUY":
+                        trade_total_buy += delta_dollars
+                    else:
+                        trade_total_sell += -delta_dollars
+                    trade_rows.append((tk, action, abs(delta_shares), abs(delta_dollars),
+                                       cur_shares, target_shares))
+                trade_rows.sort(key=lambda r: -r[3])  # biggest $ moves first
+        except Exception:
+            trade_rows = []
+
     # Subplot specs: every row is an xy chart except the trade-table row
-    # (live dashboard only), which uses Plotly's table trace type. Row
-    # heights weight the table row at 0.5 so it doesn't gulp the same
-    # vertical real estate as a full chart.
+    # (live dashboard only), which uses Plotly's table trace type. The
+    # table row's relative height is sized to fit header + cells with a
+    # small buffer; chart rows weight 1.0 = 340px (see fig.update_layout
+    # below). Plotly Tables don't scroll within a too-small subplot
+    # domain — they just truncate — so the table row must be sized up
+    # front to fit every trade row.
     _specs = [[{"type": "xy"}] for _ in range(n_rows)]
     _row_h = [1.0] * n_rows
     if R_TRADE_TABLE is not None:
         _specs[R_TRADE_TABLE - 1] = [{"type": "table"}]
-        _row_h[R_TRADE_TABLE - 1] = 0.5
+        # Header 28px + N cells × 26px + 40px buffer / 340px per unit.
+        # Min 0.4 (so the row is never weirdly short); no max — table
+        # gets whatever space it needs.
+        _table_px = 28 + max(1, len(trade_rows)) * 26 + 40
+        _row_h[R_TRADE_TABLE - 1] = max(0.4, _table_px / 340.0)
     fig = make_subplots(
         rows=n_rows, cols=1,
         subplot_titles=titles_all,
@@ -2101,92 +2151,57 @@ def build_dashboard(
     # today's actual (chart 6) to the latest recommendation (chart 4).
     # Uses Plotly's table trace type so the table lives inside the
     # subplot grid between the recommended-weights and actual-weights
-    # bar charts. Live dashboard only.
-    if R_TRADE_TABLE is not None and snap_path.exists() and rec_path.exists():
-        try:
-            _snaps_tt = pd.read_csv(snap_path, parse_dates=["date"])
-            _recs_tt = pd.read_csv(rec_path, parse_dates=["date"])
-            _snap_latest_tt = _snaps_tt[_snaps_tt["date"] == _snaps_tt["date"].max()].copy()
-            _rec_latest_tt = _recs_tt[_recs_tt["date"] == _recs_tt["date"].max()].copy()
-            _total_value_tt = float(_snap_latest_tt["value"].sum())
-            if _total_value_tt > 0:
-                _price_by = dict(zip(_snap_latest_tt["ticker"], _snap_latest_tt["price"]))
-                _shares_by = dict(zip(_snap_latest_tt["ticker"], _snap_latest_tt["shares"]))
-                _target_w = dict(zip(_rec_latest_tt["ticker"], _rec_latest_tt["weight"]))
-                _trades = []
-                _total_buy = 0.0
-                _total_sell = 0.0
-                for tk in sorted(set(_snap_latest_tt["ticker"]) | set(_rec_latest_tt["ticker"])):
-                    cur_shares = float(_shares_by.get(tk, 0.0))
-                    price = float(_price_by.get(tk, float("nan")))
-                    if price != price or price <= 0:
-                        continue
-                    target_dollars = _total_value_tt * float(_target_w.get(tk, 0.0))
-                    cur_dollars = cur_shares * price
-                    delta_dollars = target_dollars - cur_dollars
-                    if abs(delta_dollars) < 1.0:
-                        continue
-                    target_shares = target_dollars / price
-                    delta_shares = target_shares - cur_shares
-                    action = "BUY" if delta_dollars > 0 else "SELL"
-                    if action == "BUY":
-                        _total_buy += delta_dollars
-                    else:
-                        _total_sell += -delta_dollars
-                    _trades.append((tk, action, abs(delta_shares), abs(delta_dollars),
-                                    cur_shares, target_shares))
-                _trades.sort(key=lambda r: -r[3])  # biggest $ moves first
-                if _trades:
-                    tickers_col = [r[0] for r in _trades]
-                    action_col = [r[1] for r in _trades]
-                    shares_col = [f"{r[2]:,.2f}" for r in _trades]
-                    dollars_col = [f"${r[3]:,.0f}" for r in _trades]
-                    transition_col = [f"{r[4]:,.2f} → {r[5]:,.2f}" for r in _trades]
-                    action_colors = ["#15803d" if a == "BUY" else "#b91c1c"
-                                     for a in action_col]
-                    fig.add_trace(
-                        go.Table(
-                            columnwidth=[1, 1, 1.4, 1.4, 2.4],
-                            header=dict(
-                                values=["<b>Ticker</b>", "<b>Action</b>",
-                                        "<b>Shares</b>", "<b>$ amount</b>",
-                                        "<b>Shares: current → target</b>"],
-                                fill_color="#f3f4f6",
-                                align=["left", "left", "right", "right", "right"],
-                                font=dict(size=12, color="#222"),
-                                height=28,
-                            ),
-                            cells=dict(
-                                values=[tickers_col, action_col, shares_col,
-                                        dollars_col, transition_col],
-                                align=["left", "left", "right", "right", "right"],
-                                fill_color="white",
-                                font=dict(
-                                    color=["#222", action_colors, "#222", "#222", "#888"],
-                                    size=12,
-                                ),
-                                height=26,
-                            ),
-                        ),
-                        row=R_TRADE_TABLE, col=1,
-                    )
-                    # Inject the summary stats into the subplot title.
-                    _turnover_pct = (_total_buy + _total_sell) / 2 / _total_value_tt
-                    _summary = (
-                        f"Total portfolio ${_total_value_tt:,.0f} &middot; "
-                        f"buys ${_total_buy:,.0f} &middot; "
-                        f"sells ${_total_sell:,.0f} &middot; "
-                        f"turnover {_turnover_pct:.0%} of portfolio"
-                    )
-                    _trade_prefix = f"{R_TRADE_TABLE}. Trades to move from actual to recommended"
-                    fig.layout.annotations[R_TRADE_TABLE - 1].update(
-                        text=fig.layout.annotations[R_TRADE_TABLE - 1].text.replace(
-                            _trade_prefix,
-                            f"{_trade_prefix} ({_summary})",
-                        )
-                    )
-        except Exception:
-            pass  # silently skip the trade table on any error
+    # bar charts. Trade data was computed before make_subplots so the
+    # subplot row could be sized to fit every row.
+    if R_TRADE_TABLE is not None and trade_rows:
+        tickers_col = [r[0] for r in trade_rows]
+        action_col = [r[1] for r in trade_rows]
+        shares_col = [f"{r[2]:,.2f}" for r in trade_rows]
+        dollars_col = [f"${r[3]:,.0f}" for r in trade_rows]
+        transition_col = [f"{r[4]:,.2f} → {r[5]:,.2f}" for r in trade_rows]
+        action_colors = ["#15803d" if a == "BUY" else "#b91c1c"
+                         for a in action_col]
+        fig.add_trace(
+            go.Table(
+                columnwidth=[1, 1, 1.4, 1.4, 2.4],
+                header=dict(
+                    values=["<b>Ticker</b>", "<b>Action</b>",
+                            "<b>Shares</b>", "<b>$ amount</b>",
+                            "<b>Shares: current → target</b>"],
+                    fill_color="#f3f4f6",
+                    align=["left", "left", "right", "right", "right"],
+                    font=dict(size=12, color="#222"),
+                    height=28,
+                ),
+                cells=dict(
+                    values=[tickers_col, action_col, shares_col,
+                            dollars_col, transition_col],
+                    align=["left", "left", "right", "right", "right"],
+                    fill_color="white",
+                    font=dict(
+                        color=["#222", action_colors, "#222", "#222", "#888"],
+                        size=12,
+                    ),
+                    height=26,
+                ),
+            ),
+            row=R_TRADE_TABLE, col=1,
+        )
+        # Inject summary stats into the subplot title.
+        _turnover_pct = (trade_total_buy + trade_total_sell) / 2 / trade_total_value
+        _summary = (
+            f"Total portfolio ${trade_total_value:,.0f} &middot; "
+            f"buys ${trade_total_buy:,.0f} &middot; "
+            f"sells ${trade_total_sell:,.0f} &middot; "
+            f"turnover {_turnover_pct:.0%} of portfolio"
+        )
+        _trade_prefix = f"{R_TRADE_TABLE}. Trades to move from actual to recommended"
+        fig.layout.annotations[R_TRADE_TABLE - 1].update(
+            text=fig.layout.annotations[R_TRADE_TABLE - 1].text.replace(
+                _trade_prefix,
+                f"{_trade_prefix} ({_summary})",
+            )
+        )
 
     # 6. Today's actual portfolio % — bar chart of value / total_value
     # per ticker from the latest snapshot. Mirrors chart 4's per-wave
