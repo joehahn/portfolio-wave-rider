@@ -109,7 +109,14 @@ def main(argv: list[str] | None = None) -> int:
             daily_ret = s.pct_change().dropna()
             ann_vol = float(daily_ret.std() * np.sqrt(252))
             sharpe = (ann - RISK_FREE_RATE) / ann_vol if ann_vol > 0 else float("nan")
-            summary.append((v, final, ret, ann, sharpe))
+            # Max drawdown: running peak minus current, normalized by running peak.
+            running_peak = s.cummax()
+            drawdown = (s / running_peak) - 1.0
+            mdd = float(drawdown.min())
+            # Calmar = annualized return / |MDD|; penalizes high-drawdown paths
+            # the way Sharpe doesn't (Sharpe penalizes upside vol equally).
+            calmar = ann / abs(mdd) if mdd < 0 else float("nan")
+            summary.append((v, final, ret, ann, mdd, sharpe, calmar))
 
         fig = go.Figure()
         for i, (v, s) in enumerate(curves.items()):
@@ -147,16 +154,16 @@ def main(argv: list[str] | None = None) -> int:
             _starter = _json.loads((Path(args.runs_dir) / "_starter.json").read_text())
             default_v = float(_starter.get("lookback_years", 1.3))
 
-        def _fmt_row(v, final, ret, ann, sharpe):
+        def _fmt_row(v, final, ret, ann, mdd, sharpe, calmar):
             tr = "<tr style='font-weight:bold;'>" if abs(v - default_v) < 1e-9 else "<tr>"
             return (
                 f"{tr}<td>{v}</td><td>${final:,.0f}</td>"
                 f"<td>{ret*100:+.1f}%</td><td>{ann*100:+.1f}%</td>"
-                f"<td>{sharpe:.2f}</td></tr>"
+                f"<td>{mdd*100:+.1f}%</td>"
+                f"<td>{sharpe:.2f}</td><td>{calmar:.2f}</td></tr>"
             )
 
-        rows = "".join(_fmt_row(v, final, ret, ann, sharpe)
-                       for v, final, ret, ann, sharpe in summary)
+        rows = "".join(_fmt_row(*r) for r in summary)
         table = (
             f"<h2>Summary</h2><table style='border-collapse:collapse;font-size:14px;'>"
             f"<thead><tr style='border-bottom:2px solid #ccc;text-align:left;'>"
@@ -164,10 +171,15 @@ def main(argv: list[str] | None = None) -> int:
             f"<th style='padding:4px 12px;'>Final value</th>"
             f"<th style='padding:4px 12px;'>Total return</th>"
             f"<th style='padding:4px 12px;'>Annualized</th>"
-            f"<th style='padding:4px 12px;'>Sharpe</th></tr></thead>"
+            f"<th style='padding:4px 12px;'>Max drawdown</th>"
+            f"<th style='padding:4px 12px;'>Sharpe</th>"
+            f"<th style='padding:4px 12px;'>Calmar</th></tr></thead>"
             f"<tbody>{rows}</tbody></table>"
-            f"<p style='font-size:13px;color:#666;'>Sharpe = (annualized return − "
-            f"{RISK_FREE_RATE * 100:.0f}% risk-free) / annualized daily-return σ × √252.</p>"
+            f"<p style='font-size:13px;color:#666;'>"
+            f"Sharpe = (annualized return − {RISK_FREE_RATE * 100:.0f}% risk-free) "
+            f"/ annualized daily-return σ × √252. "
+            f"Calmar = annualized return / |max drawdown|; penalizes deep drawdowns "
+            f"the way Sharpe doesn't.</p>"
         )
 
         nav = _nav_strip(f"sweep_{args.param}.html")

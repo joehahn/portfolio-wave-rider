@@ -65,7 +65,7 @@ def main() -> int:
     start, end = first.index[0], first.index[-1]
     initial = float(first.iloc[0])
 
-    summary: list[tuple[int, float, float, float, float]] = []
+    summary: list[tuple[int, float, float, float, float, float, float]] = []
     for cap, s in curves.items():
         final = float(s.iloc[-1])
         ret = (final / initial) - 1.0
@@ -73,7 +73,11 @@ def main() -> int:
         daily_ret = s.pct_change().dropna()
         ann_vol = float(daily_ret.std() * np.sqrt(252))
         sharpe = (ann - RISK_FREE_RATE) / ann_vol if ann_vol > 0 else float("nan")
-        summary.append((cap, final, ret, ann, sharpe))
+        running_peak = s.cummax()
+        drawdown = (s / running_peak) - 1.0
+        mdd = float(drawdown.min())
+        calmar = ann / abs(mdd) if mdd < 0 else float("nan")
+        summary.append((cap, final, ret, ann, mdd, sharpe, calmar))
 
     fig = go.Figure()
     for i, (cap, s) in enumerate(curves.items()):
@@ -97,14 +101,15 @@ def main() -> int:
         margin={"t": 60, "b": 60, "l": 80, "r": 30},
     )
 
-    default_cap = 12
+    default_cap = 8
 
-    def _fmt_row(cap, final, ret, ann, sharpe):
+    def _fmt_row(cap, final, ret, ann, mdd, sharpe, calmar):
         tr = "<tr style='font-weight:bold;'>" if cap == default_cap else "<tr>"
         return (
             f"{tr}<td>{cap}</td><td>${final:,.0f}</td>"
             f"<td>{ret*100:+.1f}%</td><td>{ann*100:+.1f}%</td>"
-            f"<td>{sharpe:.2f}</td></tr>"
+            f"<td>{mdd*100:+.1f}%</td>"
+            f"<td>{sharpe:.2f}</td><td>{calmar:.2f}</td></tr>"
         )
 
     rows = "".join(_fmt_row(*r) for r in summary)
@@ -115,10 +120,15 @@ def main() -> int:
         "<th style='padding:4px 12px;'>Final value</th>"
         "<th style='padding:4px 12px;'>Total return</th>"
         "<th style='padding:4px 12px;'>Annualized</th>"
-        "<th style='padding:4px 12px;'>Sharpe</th></tr></thead>"
+        "<th style='padding:4px 12px;'>Max drawdown</th>"
+        "<th style='padding:4px 12px;'>Sharpe</th>"
+        "<th style='padding:4px 12px;'>Calmar</th></tr></thead>"
         f"<tbody>{rows}</tbody></table>"
-        f"<p style='font-size:13px;color:#666;'>Sharpe = (annualized return − "
-        f"{RISK_FREE_RATE * 100:.0f}% risk-free) / annualized daily-return σ × √252.</p>"
+        f"<p style='font-size:13px;color:#666;'>"
+        f"Sharpe = (annualized return − {RISK_FREE_RATE * 100:.0f}% risk-free) "
+        f"/ annualized daily-return σ × √252. "
+        f"Calmar = annualized return / |max drawdown|; penalizes deep drawdowns "
+        f"the way Sharpe doesn't.</p>"
     )
 
     nav = _nav_strip("sweep_max_watchlist_size.html")
