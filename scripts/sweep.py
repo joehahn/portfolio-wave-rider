@@ -198,8 +198,11 @@ def main(argv: list[str] | None = None) -> int:
             f"<strong>Calmar</strong> = annualized return / |max drawdown|; "
             f"penalizes deep drawdowns the way Sharpe doesn't.</p>"
             f"<p style='font-size:13px;color:#666;'>"
-            f"<strong>Walk-forward check (window split 2023-09-27):</strong> "
-            f"{wf_note}</p>"
+            f"A <strong>walk-forward check</strong> splits the 5y backtest at "
+            f"its midpoint and asks whether the same parameter value wins on each "
+            f"half independently. If yes, the choice is robust across regimes; "
+            f"if no, the full-window winner is at least partly fit to one half. "
+            f"For this sweep (split 2023-09-27): {wf_note}</p>"
         )
 
         nav = _nav_strip(f"sweep_{args.param}.html")
