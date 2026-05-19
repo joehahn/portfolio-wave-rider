@@ -1932,11 +1932,13 @@ def build_dashboard(
     _row_h = [1.0] * n_rows
     if R_TRADE_TABLE is not None:
         _specs[R_TRADE_TABLE - 1] = [{"type": "table"}]
-        # Header 28px + N cells × 26px + 40px buffer / 340px per unit.
-        # Min 0.4 (so the row is never weirdly short); no max — table
-        # gets whatever space it needs.
-        _table_px = 28 + max(1, len(trade_rows)) * 26 + 40
-        _row_h[R_TRADE_TABLE - 1] = max(0.4, _table_px / 340.0)
+        # Plotly Tables truncate (no internal scroll) when their subplot
+        # domain isn't tall enough. The subplot title and vertical
+        # spacing eat 150-180px before the table itself gets any space,
+        # so the buffer has to be generous. Width units are 340px per
+        # chart row (see fig.update_layout height below).
+        _table_px = 32 + max(1, len(trade_rows)) * 34 + 180
+        _row_h[R_TRADE_TABLE - 1] = max(0.6, _table_px / 340.0)
     fig = make_subplots(
         rows=n_rows, cols=1,
         subplot_titles=titles_all,
@@ -2171,7 +2173,7 @@ def build_dashboard(
                     fill_color="#f3f4f6",
                     align=["left", "left", "right", "right", "right"],
                     font=dict(size=12, color="#222"),
-                    height=28,
+                    height=32,
                 ),
                 cells=dict(
                     values=[tickers_col, action_col, shares_col,
@@ -2182,7 +2184,7 @@ def build_dashboard(
                         color=["#222", action_colors, "#222", "#222", "#888"],
                         size=12,
                     ),
-                    height=26,
+                    height=34,
                 ),
             ),
             row=R_TRADE_TABLE, col=1,
