@@ -147,6 +147,27 @@ def main() -> int:
         h1_end = h1.index[-1].date()
         h2_start = h2.index[0].date()
 
+        # max_watchlist_size walk-forward uses pre-existing per-cap snapshots.
+        print(f"=== max_watchlist_size ===", file=sys.stderr)
+        CAP_PATHS = {
+            5:  Path("data/curator_runs/5y-sweep-cap05/_backtest/snapshots.csv"),
+            8:  Path("data/curator_runs/5y-sweep-cap08/_backtest/snapshots.csv"),
+            12: Path("data/curator_runs/5y-quarterly/_backtest/snapshots.csv"),
+            16: Path("data/curator_runs/5y-sweep-cap16/_backtest/snapshots.csv"),
+            24: Path("data/curator_runs/5y-sweep-cap24/_backtest/snapshots.csv"),
+        }
+        LIVE_DEFAULTS["max_watchlist_size"] = 8
+        cap_results: dict[float, dict] = {}
+        for cap, path in CAP_PATHS.items():
+            if not path.exists():
+                continue
+            print(f"  max_watchlist_size = {cap}", file=sys.stderr)
+            snaps = pd.read_csv(path, parse_dates=["date"])
+            s = snaps.groupby("date")["total_value"].first().sort_index()
+            h1, h2 = split_at_midpoint(s)
+            cap_results[float(cap)] = {"h1": metrics_for(h1), "h2": metrics_for(h2)}
+        sections.append(render_table("max_watchlist_size", cap_results))
+
     finally:
         # Clean up tempdir
         import shutil

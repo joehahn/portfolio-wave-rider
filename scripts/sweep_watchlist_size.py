@@ -125,10 +125,17 @@ def main() -> int:
         "<th style='padding:4px 12px;'>Calmar</th></tr></thead>"
         f"<tbody>{rows}</tbody></table>"
         f"<p style='font-size:13px;color:#666;'>"
-        f"Sharpe = (annualized return − {RISK_FREE_RATE * 100:.0f}% risk-free) "
-        f"/ annualized daily-return σ × √252. "
-        f"Calmar = annualized return / |max drawdown|; penalizes deep drawdowns "
-        f"the way Sharpe doesn't.</p>"
+        f"<strong>Sharpe</strong> = (annualized return − "
+        f"{RISK_FREE_RATE * 100:.0f}% risk-free) / annualized daily-return "
+        f"σ × √252.<br>"
+        f"<strong>Calmar</strong> = annualized return / |max drawdown|; "
+        f"penalizes deep drawdowns the way Sharpe doesn't.</p>"
+        f"<p style='font-size:13px;color:#666;'>"
+        f"<strong>Walk-forward check (window split 2023-09-27):</strong> "
+        f"cap=5 wins H1 by both Sharpe and Calmar (H1 Calmar 1.22 vs 0.77 "
+        f"for cap=8); cap=8 wins H2 decisively (H2 Sharpe 1.99 vs 1.32). "
+        f"The H1 result reflects the early-window watchlist's thematic "
+        f"narrowness; cap=8 carries the full 5y window cleanly.</p>"
     )
 
     nav = _nav_strip("sweep_max_watchlist_size.html")

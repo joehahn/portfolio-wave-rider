@@ -164,6 +164,22 @@ def main(argv: list[str] | None = None) -> int:
             )
 
         rows = "".join(_fmt_row(*r) for r in summary)
+        WALK_FORWARD_NOTES = {
+            "risk_aversion": (
+                "the default <code>risk_aversion=0.5</code> wins both halves by "
+                "both Sharpe and Calmar — stable across regimes."
+            ),
+            "lookback": (
+                "the default <code>lookback=1.5y</code> wins both halves by "
+                "both Sharpe and Calmar — the strongest result of the four sweeps."
+            ),
+            "max_weight": (
+                "the default <code>max_weight=0.7</code> wins H2 by both Sharpe "
+                "and Calmar; H1 prefers slightly higher (0.8 by Sharpe, 0.9 by "
+                "Calmar) but the gap is small (H1 Sharpe 0.90 vs 0.99)."
+            ),
+        }
+        wf_note = WALK_FORWARD_NOTES.get(args.param, "")
         table = (
             f"<h2>Summary</h2><table style='border-collapse:collapse;font-size:14px;'>"
             f"<thead><tr style='border-bottom:2px solid #ccc;text-align:left;'>"
@@ -176,10 +192,14 @@ def main(argv: list[str] | None = None) -> int:
             f"<th style='padding:4px 12px;'>Calmar</th></tr></thead>"
             f"<tbody>{rows}</tbody></table>"
             f"<p style='font-size:13px;color:#666;'>"
-            f"Sharpe = (annualized return − {RISK_FREE_RATE * 100:.0f}% risk-free) "
-            f"/ annualized daily-return σ × √252. "
-            f"Calmar = annualized return / |max drawdown|; penalizes deep drawdowns "
-            f"the way Sharpe doesn't.</p>"
+            f"<strong>Sharpe</strong> = (annualized return − "
+            f"{RISK_FREE_RATE * 100:.0f}% risk-free) / annualized daily-return "
+            f"σ × √252.<br>"
+            f"<strong>Calmar</strong> = annualized return / |max drawdown|; "
+            f"penalizes deep drawdowns the way Sharpe doesn't.</p>"
+            f"<p style='font-size:13px;color:#666;'>"
+            f"<strong>Walk-forward check (window split 2023-09-27):</strong> "
+            f"{wf_note}</p>"
         )
 
         nav = _nav_strip(f"sweep_{args.param}.html")
