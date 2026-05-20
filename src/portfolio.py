@@ -1863,8 +1863,10 @@ def build_dashboard(
     )
     titles_list.append(
         f"{R_EXP_VS_REAL}. Expected vs realized annualized return per rebalance"
-        "<br><sub><i>At each rebalance, the optimizer's forward-looking expected annual return (μᵀw) versus the actual annualized return realized over the next 365 days (computed from total_value in snapshots.csv)."
-        "<br>Divergence is prediction error: expected high but realized low means the optimizer was over-confident on noisy μ estimates; expected low but realized high means it was too risk-averse for the regime."
+        "<br><sub><i>At each rebalance, the optimizer's forward-looking expected annual return (μᵀw) versus the actual annualized return realized over the next 365 days"
+        "<br>(computed from total_value in snapshots.csv)."
+        "<br>Divergence is prediction error:"
+        "<br>expected high but realized low means the optimizer was over-confident on noisy μ estimates; expected low but realized high means it was too risk-averse for the regime."
         "<br>Recent rebalances show expected only — the 1-year forward window hasn't elapsed yet.</i></sub>"
     )
     titles_all = tuple(titles_list)
@@ -1926,10 +1928,10 @@ def build_dashboard(
         # Plotly Tables truncate (no internal scroll) when their subplot
         # domain isn't tall enough. The subplot title and vertical
         # spacing eat 150-180px before the table itself gets any space,
-        # so the buffer has to be generous. Width units are 340px per
+        # so the buffer has to be generous. Width units are 408px per
         # chart row (see fig.update_layout height below).
         _table_px = 32 + max(1, len(trade_rows)) * 34 + 180
-        _row_h[R_TRADE_TABLE - 1] = max(0.6, _table_px / 340.0)
+        _row_h[R_TRADE_TABLE - 1] = max(0.6, _table_px / 408.0)
     fig = make_subplots(
         rows=n_rows, cols=1,
         subplot_titles=titles_all,
@@ -2476,7 +2478,7 @@ def build_dashboard(
                       f"(executed {latest_snap_date.date()})")
 
     fig.update_layout(
-        height=340 * n_rows,
+        height=408 * n_rows,
         # Pin the page title above the plotting area and reserve top
         # margin space, so it doesn't overlap chart 1's multi-line
         # subplot title.
