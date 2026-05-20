@@ -1862,8 +1862,8 @@ def build_dashboard(
         f"{R_WAVE_USD}. Actual portfolio $ by wave over time"
     )
     titles_list.append(
-        f"{R_EXP_VS_REAL}. Expected vs realized annualized return per rebalance"
-        "<br><sub><i>At each rebalance, the optimizer's forward-looking expected annual return (μᵀw) versus the actual annualized return realized over the next 365 days.</i></sub>"
+        f"{R_EXP_VS_REAL}. Realized annualized return vs the prediction made one year earlier"
+        "<br><sub><i>At each x-date, orange is the annualized return realized over the year ending at x, and blue is the optimizer's prediction (μᵀw) made at the start of that year. Both are shifted forward by 365 days from the rebalance date, so the rightmost blue points sit in the future where no realization is possible yet.</i></sub>"
     )
     titles_all = tuple(titles_list)
 
@@ -2431,10 +2431,13 @@ def build_dashboard(
                     row=R_TURNOVER, col=1,
                 )
 
-    # Expected vs realized annualized return per rebalance. Two lines
-    # over time. Recent rebalances drop the realized line where the
-    # 1-year forward window isn't complete yet — Plotly draws NaN as
-    # a gap, so the realized series naturally cuts off at the right.
+    # Realized vs predicted annualized return, plotted against the
+    # realization date (rebalance + 365 days). At each x, orange is the
+    # return realized over the year ending at x, and blue is the
+    # prediction made at the start of that year. Recent rebalances'
+    # blue points land in the future (beyond today's snapshot date);
+    # their corresponding orange points appear as NaN, which plotly
+    # draws as a gap.
     if snap_path.exists() and rec_path.exists():
         try:
             _rec_evr = pd.read_csv(rec_path)
@@ -2443,23 +2446,25 @@ def build_dashboard(
         except (OSError, pd.errors.EmptyDataError):
             evr = pd.DataFrame()
         if not evr.empty:
+            evr = evr.copy()
+            evr["date"] = pd.to_datetime(evr["date"]) + pd.Timedelta(days=365)
             fig.add_trace(
                 go.Scatter(
                     x=evr["date"], y=evr["expected"],
-                    name="Expected (optimizer μᵀw)",
+                    name="Predicted (made 1y earlier)",
                     mode="lines+markers", legend="legend8",
                     line={"color": "#3b82f6", "width": 2},
-                    hovertemplate="%{x|%Y-%m-%d}<br>expected %{y:.1%}<extra></extra>",
+                    hovertemplate="year ending %{x|%Y-%m-%d}<br>predicted %{y:.1%}<extra></extra>",
                 ),
                 row=R_EXP_VS_REAL, col=1,
             )
             fig.add_trace(
                 go.Scatter(
                     x=evr["date"], y=evr["realized"],
-                    name="Realized (1y forward)",
+                    name="Realized (year ending at x)",
                     mode="lines+markers", legend="legend8",
                     line={"color": "#d97706", "width": 2},
-                    hovertemplate="%{x|%Y-%m-%d}<br>realized %{y:.1%}<extra></extra>",
+                    hovertemplate="year ending %{x|%Y-%m-%d}<br>realized %{y:.1%}<extra></extra>",
                 ),
                 row=R_EXP_VS_REAL, col=1,
             )
@@ -2548,9 +2553,14 @@ def build_dashboard(
     # x-axes so the range setter is a no-op there.
     if xrange is not None:
         xrange_rows = [R_PORTFOLIO, R_TURNOVER, R_REC_WAVE,
-                       R_ASSET_USD, R_WAVE_USD, R_EXP_VS_REAL]
+                       R_ASSET_USD, R_WAVE_USD]
         for r in xrange_rows:
             fig.update_xaxes(range=list(xrange), row=r, col=1)
+        # Chart 11's x-axis is shifted +365 days from the others (data
+        # is anchored at realization date, not rebalance date), so its
+        # range extends one year past the snapshot window.
+        _xr_end = pd.Timestamp(xrange[1]) + pd.Timedelta(days=365)
+        fig.update_xaxes(range=[xrange[0], _xr_end], row=R_EXP_VS_REAL, col=1)
 
     # CUSTOM SUBPLOT LAYOUT: override plotly's uniform vertical_spacing
     # so specific gaps between subplots can be widened or narrowed
