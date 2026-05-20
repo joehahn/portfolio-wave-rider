@@ -1837,7 +1837,6 @@ def build_dashboard(
     )
     titles_list.append(
         f"{R_LATEST_WEIGHTS}. Latest recommended portfolio %"
-        "<br><sub><i>The most recent optimizer's target weight per ticker. Bars at the cap signal the optimizer wanted more than the concentration constraint allowed.</i></sub>"
     )
     if R_TRADE_TABLE is not None:
         titles_list.append(
@@ -1870,7 +1869,8 @@ def build_dashboard(
     )
     titles_list.append(
         f"{R_EXP_VS_REAL}. Expected vs realized annualized return per rebalance"
-        "<br><sub><i>At each rebalance, the optimizer's forward-looking expected annual return (μᵀw) versus the actual annualized return realized over the next 365 days (computed from total_value in snapshots.csv). Divergence is prediction error: expected high but realized low means the optimizer was over-confident on noisy μ estimates; expected low but realized high means it was too risk-averse for the regime. Recent rebalances show expected only — the 1-year forward window hasn't elapsed yet.</i></sub>"
+        "<br><sub><i>At each rebalance, the optimizer's forward-looking expected annual return (μᵀw) versus the actual annualized return realized over the next 365 days (computed from total_value in snapshots.csv)."
+        "<br>Divergence is prediction error: expected high but realized low means the optimizer was over-confident on noisy μ estimates; expected low but realized high means it was too risk-averse for the regime. Recent rebalances show expected only — the 1-year forward window hasn't elapsed yet.</i></sub>"
     )
     titles_all = tuple(titles_list)
 
@@ -2013,14 +2013,14 @@ def build_dashboard(
                     row=1, col=1,
                 )
         # Constant-rate reference curves: dotted lines showing what the
-        # thesis baseline portfolio would be worth at 5% / 10% / 15%
+        # thesis baseline portfolio would be worth at 2% / 4% / 8%
         # per week from day zero. Live dashboard only — anchored at the
         # thesis-baseline date.
         if is_live and len(snaps) > 0:
             anchor_date = snaps["date"].min()
             anchor_value = float(totals.iloc[0])
             ref_dates = pd.to_datetime(totals.index)
-            ref_shades = {0.05: "#cccccc", 0.10: "#888888", 0.15: "#444444"}
+            ref_shades = {0.02: "#cccccc", 0.04: "#888888", 0.08: "#444444"}
             for rate, color in ref_shades.items():
                 days = (ref_dates - anchor_date).days
                 ref_vals = anchor_value * (1 + rate) ** (days / 7.0)
