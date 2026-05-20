@@ -2582,8 +2582,11 @@ def build_dashboard(
             cur_top = bot
             if i < n_rows - 1:
                 cur_top -= gap_sizes_px[i] / total_h_custom
-        # Apply
+        # Apply. Note: Table rows have no yaxis — only xy chart rows do —
+        # so the yaxis index advances independently of the row index,
+        # skipping any Table rows.
         title_offset_frac = 14 / total_h_custom
+        yaxis_counter = 0
         for i, (y_lo, y_hi) in enumerate(new_domains, start=1):
             if i == R_TRADE_TABLE:
                 for trace in fig.data:
@@ -2591,7 +2594,8 @@ def build_dashboard(
                         trace.domain.y = (y_lo, y_hi)
                         break
             else:
-                yaxis_key = f"yaxis{'' if i == 1 else i}"
+                yaxis_counter += 1
+                yaxis_key = f"yaxis{'' if yaxis_counter == 1 else yaxis_counter}"
                 fig.layout[yaxis_key].domain = (y_lo, y_hi)
             if i - 1 < len(fig.layout.annotations):
                 fig.layout.annotations[i - 1].update(y=y_hi + title_offset_frac)
