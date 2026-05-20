@@ -1863,11 +1863,7 @@ def build_dashboard(
     )
     titles_list.append(
         f"{R_EXP_VS_REAL}. Expected vs realized annualized return per rebalance"
-        "<br><sub><i>At each rebalance, the optimizer's forward-looking expected annual return (μᵀw) versus the actual annualized return realized over the next 365 days"
-        "<br>(computed from total_value in snapshots.csv)."
-        "<br>Divergence is prediction error:"
-        "<br>expected high but realized low means the optimizer was over-confident on noisy μ estimates; expected low but realized high means it was too risk-averse for the regime."
-        "<br>Recent rebalances show expected only — the 1-year forward window hasn't elapsed yet.</i></sub>"
+        "<br><sub><i>At each rebalance, the optimizer's forward-looking expected annual return (μᵀw) versus the actual annualized return realized over the next 365 days.</i></sub>"
     )
     titles_all = tuple(titles_list)
 
