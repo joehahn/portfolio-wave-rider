@@ -1863,7 +1863,8 @@ def build_dashboard(
     )
     titles_list.append(
         f"{R_EXP_VS_REAL}. Realized annualized return vs the prediction made one year earlier"
-        "<br><sub><i>At each x-date, orange is the annualized return realized over the year ending at x, and blue is the optimizer's prediction (μᵀw) made at the start of that year. Both are shifted forward by 365 days from the rebalance date, so the rightmost blue points sit in the future where no realization is possible yet.</i></sub>"
+        "<br><sub><i>At each x-date, orange is the annualized return realized over the year ending at x, and blue is the optimizer's prediction (μᵀw) made at the start of that year."
+        "<br>Both are shifted forward by 365 days from the rebalance date, so the rightmost blue points sit in the future where no realization is possible yet.</i></sub>"
     )
     titles_all = tuple(titles_list)
 
@@ -2556,11 +2557,11 @@ def build_dashboard(
                        R_ASSET_USD, R_WAVE_USD]
         for r in xrange_rows:
             fig.update_xaxes(range=list(xrange), row=r, col=1)
-        # Chart 11's x-axis is shifted +365 days from the others (data
-        # is anchored at realization date, not rebalance date), so its
-        # range extends one year past the snapshot window.
+        # Chart 11's x-axis is shifted +365 days from chart 10's (data
+        # is anchored at realization date, not rebalance date).
+        _xr_start = pd.Timestamp(xrange[0]) + pd.Timedelta(days=365)
         _xr_end = pd.Timestamp(xrange[1]) + pd.Timedelta(days=365)
-        fig.update_xaxes(range=[xrange[0], _xr_end], row=R_EXP_VS_REAL, col=1)
+        fig.update_xaxes(range=[_xr_start, _xr_end], row=R_EXP_VS_REAL, col=1)
 
     # CUSTOM SUBPLOT LAYOUT: override plotly's uniform vertical_spacing
     # so specific gaps between subplots can be widened or narrowed
