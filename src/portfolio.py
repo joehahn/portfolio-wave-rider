@@ -1534,6 +1534,7 @@ WAVE_COLORS: dict[str, str] = {
     "engineered_biology": "#d62728",  # red
     "quantum":            "#9467bd",  # purple
     "nuclear_fusion":     "#8c564b",  # brown
+    "geopolitical":       "#e377c2",  # pink
     "general_markets":    "#7f7f7f",  # gray
     "cashlike":           "#0d9488",  # deep teal — distinct from any wave hue
 }
@@ -1563,6 +1564,7 @@ TICKER_ASSET_CLASS: dict[str, str] = {
     "AIQ": "equity ETF",
     "QTUM": "equity ETF", "NUKZ": "equity ETF",
     "VIG": "equity ETF",
+    "BWET": "equity ETF",
 }
 
 # Map raw asset-class labels to the broader buckets shown on the
@@ -1600,6 +1602,8 @@ TICKER_WAVE: dict[str, str] = {
     # proxy until pure-play fusion firms like Commonwealth Fusion Systems
     # or Helion go public).
     "NUKZ": "nuclear_fusion",
+    # Geopolitical (energy / shipping / LNG, profile's non-tech wave).
+    "BWET": "geopolitical", "LNG": "geopolitical", "XLE": "geopolitical",
     # General markets (broad ETFs, bonds, cash, metals, crypto)
     "AGG": "general_markets", "BND": "general_markets", "TLT": "general_markets",
     "IEF": "general_markets", "SHY": "general_markets", "MUB": "general_markets",
@@ -1628,6 +1632,7 @@ WAVE_DISPLAY_LABEL: dict[str, str] = {
     "engineered_biology": "biology",
     "quantum": "quantum",
     "nuclear_fusion": "nuclear",
+    "geopolitical": "geopolitical",
     "general_markets": "general_markets",
     "cashlike": "cashlike",
 }
@@ -1863,8 +1868,7 @@ def build_dashboard(
     )
     titles_list.append(
         f"{R_EXP_VS_REAL}. Realized annualized return vs the prediction made one year earlier"
-        "<br><sub><i>At each x-date, orange is the annualized return realized over the year ending at x, and blue is the optimizer's prediction (μᵀw) made at the start of that year."
-        "<br>Both are shifted forward by 365 days from the rebalance date, so the rightmost blue points sit in the future where no realization is possible yet.</i></sub>"
+        "<br><sub><i>At each x-date, orange is the annualized return realized over the year ending at x, and blue is the optimizer's prediction (μᵀw) made at the start of that year.</i></sub>"
     )
     titles_all = tuple(titles_list)
 
@@ -2574,7 +2578,7 @@ def build_dashboard(
         ROW_PX = 308
         DEFAULT_GAP_PX = 92  # roughly matches plotly auto-spacing at vs ~0.030
         # Extra ex of space ABOVE each row (positive widens gap above).
-        gap_extras_ex: dict[int, int] = {5: 2, 6: -2, 8: 2, 9: 2, 11: 2}
+        gap_extras_ex: dict[int, int] = {5: 2, 6: -2, 8: 2, 9: 2, 11: 3}
         row_sizes_px = [
             _table_px if i == R_TRADE_TABLE else ROW_PX
             for i in range(1, n_rows + 1)
