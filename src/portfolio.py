@@ -1850,27 +1850,22 @@ def build_dashboard(
         )
     titles_list.append(
         f"{R_GAIN_INIT}. Cumulative $ gain per holding since {_chart5_anchor}"
-        "<br><sub><i>Per-ticker P&L attribution from the day-zero snapshot through today: Σ(prior-day shares × price change)."
-        f"<br>{_chart5_tail}</i></sub>"
     )
     if R_GAIN_REVIEW is not None:
         titles_list.append(
             f"{R_GAIN_REVIEW}. Cumulative $ gain per holding since the most recent /review-portfolio rebalance"
-            "<br><sub><i>Per-ticker P&L attribution from the most recent /review-portfolio rebalance date through today."
-            "<br>Shows how the current allocation has performed since the latest optimizer fire.</i></sub>"
         )
     titles_list.append(
         f"{R_ASSET_USD}. Actual portfolio $ by asset class over time"
-        "<br><sub><i>Your real holdings (from holdings.csv × close prices), grouped by asset class. Sums to total portfolio value (chart 1). Log y-axis keeps small allocations visible.</i></sub>"
     )
     titles_list.append(
         f"{R_WAVE_USD}. Actual portfolio $ by wave over time"
-        "<br><sub><i>Your real holdings (from holdings.csv × close prices), grouped by wave. This is what you own today — not the optimizer's recommendation. Log y-axis.</i></sub>"
     )
     titles_list.append(
         f"{R_EXP_VS_REAL}. Expected vs realized annualized return per rebalance"
         "<br><sub><i>At each rebalance, the optimizer's forward-looking expected annual return (μᵀw) versus the actual annualized return realized over the next 365 days (computed from total_value in snapshots.csv)."
-        "<br>Divergence is prediction error: expected high but realized low means the optimizer was over-confident on noisy μ estimates; expected low but realized high means it was too risk-averse for the regime. Recent rebalances show expected only — the 1-year forward window hasn't elapsed yet.</i></sub>"
+        "<br>Divergence is prediction error: expected high but realized low means the optimizer was over-confident on noisy μ estimates; expected low but realized high means it was too risk-averse for the regime."
+        "<br>Recent rebalances show expected only — the 1-year forward window hasn't elapsed yet.</i></sub>"
     )
     titles_all = tuple(titles_list)
 
@@ -2591,9 +2586,9 @@ def build_dashboard(
                     "<h2 style='margin-top:2em;'>Curation log</h2>"
                     "<p style='font-size:14px;color:#555;max-width:780px;'>"
                     f"Every add and remove the curator has applied since the "
-                    f"thesis baseline date ({cutoff.date()}). Each row is one "
-                    "<code>/review-portfolio</code> run that produced at least one "
-                    "watchlist change.</p>"
+                    f"thesis baseline date ({cutoff.date()}).<br>"
+                    f"Each row is one <code>/review-portfolio</code> run that "
+                    "produced at least one watchlist change.</p>"
                     "<table style='border-collapse:collapse;font-size:14px;'>"
                     "<thead><tr style='border-bottom:2px solid #ccc;text-align:left;'>"
                     "<th style='padding:4px 12px;'>Date</th>"
