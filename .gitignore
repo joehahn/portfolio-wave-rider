@@ -19,6 +19,7 @@ data/backtest/
 data/curator_latest.json
 data/curation_history.csv
 data/curator_runs/*/_sandbox_*
+data/curator_runs/*/_backtest/sandbox/
 data/backtest_curator_*/sandbox/
 # data/dashboard.html removed — docs/index.html is the single dashboard now (commit 53d4929)
 
