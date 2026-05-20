@@ -1924,15 +1924,15 @@ def build_dashboard(
         # Plotly Tables truncate (no internal scroll) when their subplot
         # domain isn't tall enough; conversely, oversizing the domain
         # leaves empty space below the table that pushes the next chart
-        # away. Buffer = 80px covers the subplot title plus a bit of
-        # padding above and below the rows. Width units are 308px per
-        # chart row (see fig.update_layout height below).
-        _table_px = 32 + max(1, len(trade_rows)) * 34 + 80
+        # away. Buffer = 50px covers the subplot title plus a small
+        # bottom padding. Width units are 308px per chart row (see
+        # fig.update_layout height below).
+        _table_px = 32 + max(1, len(trade_rows)) * 34 + 50
         _row_h[R_TRADE_TABLE - 1] = max(0.5, _table_px / 308.0)
     fig = make_subplots(
         rows=n_rows, cols=1,
         subplot_titles=titles_all,
-        vertical_spacing=0.025,
+        vertical_spacing=0.030,
         specs=_specs,
         row_heights=_row_h,
     )
