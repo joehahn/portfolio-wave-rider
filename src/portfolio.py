@@ -2563,7 +2563,7 @@ def build_dashboard(
         ROW_PX = 308
         DEFAULT_GAP_PX = 92  # roughly matches plotly auto-spacing at vs ~0.030
         # Extra ex of space ABOVE each row (positive widens gap above).
-        gap_extras_ex: dict[int, int] = {5: 3, 6: -3, 8: 2, 9: 2, 11: 2}
+        gap_extras_ex: dict[int, int] = {5: 2, 6: -2, 8: 2, 9: 2, 11: 2}
         row_sizes_px = [
             _table_px if i == R_TRADE_TABLE else ROW_PX
             for i in range(1, n_rows + 1)
