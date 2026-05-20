@@ -29,7 +29,7 @@ Finance and stats terms used in the README, reports, and dashboard.
 | **VaR_α** | Value-at-risk: the α-quantile of the daily return distribution. `VaR_0.05 = -0.02` means there's a 5% chance of losing more than 2% on a given day (under the empirical distribution). |
 | **CVaR_α** | Conditional VaR: the expected return conditioned on being below `VaR_α`. Tail-loss expectation. |
 | **Concentration cap** | Box constraint on the optimizer: `w_i ≤ max_weight` for every asset. Profile default 0.70. |
-| **Asset class** | Coarse bucket: equities, bonds, precious metals, cash. |
+| **Asset class** | Coarse bucket: equities, bonds, precious metals, cash, crypto. |
 | **Rebalance** | Execute trades to move current portfolio weights back toward target weights. This project produces recommendations; the user does the trading. |
 | **Wave thesis** | The user's belief that long, structurally-driven shifts ("waves") drive returns. Most named waves are technology-driven (the AI wave currently, and next ones like rockets/spacecraft, robotics, engineered biology, quantum computing, nuclear), but the framing also covers non-technology waves: geopolitical realignments (e.g., regional wars driving energy/shipping repricings), demographic shifts (aging populations driving healthcare/automation demand), commodity cycles, and regulatory inflections. The profile prose is where the user names whichever waves they want exposure to. |
 | **Thesis allocation** | The user's wave thesis expressed as concrete dollar amounts per ticker, with no math involved (no optimizer, no Sharpe). Set once by `/initialize-portfolio`, persisted to `data/thesis_baseline.json`. |
