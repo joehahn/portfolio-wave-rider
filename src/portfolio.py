@@ -1519,7 +1519,8 @@ def curator_backtest(
 # quantum > fusion), with the current AI wave first and general_markets last.
 _WAVE_DISPLAY_ORDER = [
     "AI", "rockets_spacecraft", "robotics", "engineered_biology",
-    "quantum", "nuclear_fusion", "general_markets", "cashlike",
+    "quantum", "nuclear_fusion", "geopolitical",
+    "general_markets", "cashlike",
 ]
 
 # Stable wave -> color mapping so the same wave shows in the same color
@@ -2617,6 +2618,22 @@ def build_dashboard(
             if i - 1 < len(fig.layout.annotations):
                 fig.layout.annotations[i - 1].update(y=y_hi + title_offset_frac)
         fig.update_layout(height=int(total_h_custom))
+        # Reposition per-chart legends using the new y_high values so
+        # each legend sits at the top of its own chart, not at the
+        # plotly auto-layout position that no longer matches.
+        _row_to_yhi = {i: new_domains[i - 1][1] for i in range(1, n_rows + 1)}
+        legend_updates: dict[str, dict] = {}
+        for legend_name, row_idx in [
+            ("legend", R_PORTFOLIO),
+            ("legend5", R_REC_WAVE),
+            ("legend7", R_LATEST_WEIGHTS),
+            ("legend2", R_ASSET_USD),
+            ("legend3", R_WAVE_USD),
+            ("legend8", R_EXP_VS_REAL),
+        ]:
+            if row_idx in _row_to_yhi:
+                legend_updates[legend_name] = dict(y=_row_to_yhi[row_idx])
+        fig.update_layout(**legend_updates)
 
     o_path = Path(out_path)
     o_path.parent.mkdir(parents=True, exist_ok=True)
