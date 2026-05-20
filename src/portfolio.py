@@ -2578,7 +2578,9 @@ def build_dashboard(
         new_domains: list[tuple[float, float]] = []
         for i in range(n_rows):
             bot = cur_top - row_sizes_px[i] / total_h_custom
-            new_domains.append((bot, cur_top))
+            # Clamp to [0, 1] to avoid sub-epsilon negative values from
+            # float roundoff on the bottom row.
+            new_domains.append((max(0.0, min(1.0, bot)), max(0.0, min(1.0, cur_top))))
             cur_top = bot
             if i < n_rows - 1:
                 cur_top -= gap_sizes_px[i] / total_h_custom
