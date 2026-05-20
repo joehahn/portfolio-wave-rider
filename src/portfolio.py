@@ -2552,6 +2552,51 @@ def build_dashboard(
         for r in xrange_rows:
             fig.update_xaxes(range=list(xrange), row=r, col=1)
 
+    # CUSTOM SUBPLOT LAYOUT: override plotly's uniform vertical_spacing
+    # so specific gaps between subplots can be widened or narrowed
+    # independently. Each row's domain is computed from absolute pixel
+    # sizes (row_heights + per-gap deltas) and converted to figure-
+    # fraction coords. Subplot title annotations are repositioned to
+    # sit just above each row's new top edge.
+    if is_live and R_TRADE_TABLE is not None:
+        EX_PX = 8
+        ROW_PX = 308
+        DEFAULT_GAP_PX = 92  # roughly matches plotly auto-spacing at vs ~0.030
+        # Extra ex of space ABOVE each row (positive widens gap above).
+        gap_extras_ex: dict[int, int] = {5: 3, 6: -3, 8: 2, 9: 2, 11: 2}
+        row_sizes_px = [
+            _table_px if i == R_TRADE_TABLE else ROW_PX
+            for i in range(1, n_rows + 1)
+        ]
+        gap_sizes_px = [
+            DEFAULT_GAP_PX + gap_extras_ex.get(i + 1, 0) * EX_PX
+            for i in range(1, n_rows)
+        ]
+        total_h_custom = sum(row_sizes_px) + sum(gap_sizes_px)
+        # Walk top-down to compute fractional [y_low, y_high] per row.
+        cur_top = 1.0
+        new_domains: list[tuple[float, float]] = []
+        for i in range(n_rows):
+            bot = cur_top - row_sizes_px[i] / total_h_custom
+            new_domains.append((bot, cur_top))
+            cur_top = bot
+            if i < n_rows - 1:
+                cur_top -= gap_sizes_px[i] / total_h_custom
+        # Apply
+        title_offset_frac = 14 / total_h_custom
+        for i, (y_lo, y_hi) in enumerate(new_domains, start=1):
+            if i == R_TRADE_TABLE:
+                for trace in fig.data:
+                    if isinstance(trace, go.Table):
+                        trace.domain.y = (y_lo, y_hi)
+                        break
+            else:
+                yaxis_key = f"yaxis{'' if i == 1 else i}"
+                fig.layout[yaxis_key].domain = (y_lo, y_hi)
+            if i - 1 < len(fig.layout.annotations):
+                fig.layout.annotations[i - 1].update(y=y_hi + title_offset_frac)
+        fig.update_layout(height=int(total_h_custom))
+
     o_path = Path(out_path)
     o_path.parent.mkdir(parents=True, exist_ok=True)
     chart_html = fig.to_html(full_html=False, include_plotlyjs="cdn")
