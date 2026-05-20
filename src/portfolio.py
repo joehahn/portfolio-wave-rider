@@ -1922,12 +1922,13 @@ def build_dashboard(
     if R_TRADE_TABLE is not None:
         _specs[R_TRADE_TABLE - 1] = [{"type": "table"}]
         # Plotly Tables truncate (no internal scroll) when their subplot
-        # domain isn't tall enough. The subplot title and vertical
-        # spacing eat 150-180px before the table itself gets any space,
-        # so the buffer has to be generous. Width units are 308px per
+        # domain isn't tall enough; conversely, oversizing the domain
+        # leaves empty space below the table that pushes the next chart
+        # away. Buffer = 80px covers the subplot title plus a bit of
+        # padding above and below the rows. Width units are 308px per
         # chart row (see fig.update_layout height below).
-        _table_px = 32 + max(1, len(trade_rows)) * 34 + 180
-        _row_h[R_TRADE_TABLE - 1] = max(0.6, _table_px / 308.0)
+        _table_px = 32 + max(1, len(trade_rows)) * 34 + 80
+        _row_h[R_TRADE_TABLE - 1] = max(0.5, _table_px / 308.0)
     fig = make_subplots(
         rows=n_rows, cols=1,
         subplot_titles=titles_all,
@@ -2127,7 +2128,9 @@ def build_dashboard(
             go.Scatter(x=tickers_in_chart, y=[_cap] * len(tickers_in_chart),
                        mode="lines",
                        line={"color": "#d62728", "width": 1.5, "dash": "dot"},
-                       hoverinfo="skip", showlegend=False),
+                       name="concentration_cap",
+                       legend="legend7",
+                       hoverinfo="skip", showlegend=True),
             row=R_LATEST_WEIGHTS, col=1,
         )
         fig.update_xaxes(
