@@ -2796,17 +2796,14 @@ def build_curator_dashboard(
     bnh_return = (bnh_final / bnh_initial) - 1.0
 
     fig = make_subplots(
-        rows=8, cols=1, vertical_spacing=0.06,
-        row_heights=[0.138, 0.078, 0.156, 0.087, 0.095, 0.113, 0.166, 0.166],
+        rows=5, cols=1, vertical_spacing=0.06,
+        row_heights=[0.242, 0.137, 0.273, 0.151, 0.197],
         subplot_titles=(
             "1. Realized portfolio value: curator vs baselines vs benchmark",
             "2. Rolling 90-day Sharpe ratio",
             "3. Watchlist composition over time (color = wave bucket)",
             "4. Cumulative $ gain per holding over the 5y window",
-            "5. Actual portfolio $ by asset class over time",
-            "6. Actual portfolio $ by wave over time",
-            "7. Top ticker trajectories in return vs Sharpe space",
-            "8. Ticker phase space: value (fraction of all-time peak) vs its rate of change",
+            "5. Actual portfolio $ by wave over time",
         ),
     )
 
@@ -2947,9 +2944,9 @@ def build_curator_dashboard(
                      zeroline=True, zerolinewidth=1, zerolinecolor="#888",
                      row=4, col=1)
 
-    # Charts 5 and 6: actual portfolio $ by asset class and by wave over
-    # time. Stacked area on linear y-axis: top edge = total portfolio
-    # value; each band's thickness = that bucket's $ contribution.
+    # Chart 5: actual portfolio $ by wave over time. Stacked area on
+    # linear y-axis: top edge = total portfolio value; each band's
+    # thickness = that wave bucket's $ contribution.
     snaps_full = snaps.copy()
     snaps_full["asset_bucket"] = snaps_full["ticker"].map(
         lambda t: ASSET_CLASS_BUCKET.get(TICKER_ASSET_CLASS.get(t, "equity"), "equities")
@@ -2957,26 +2954,6 @@ def build_curator_dashboard(
     snaps_full["wave_bucket"] = snaps_full["ticker"].map(
         lambda t: TICKER_WAVE.get(t, "general_markets")
     )
-    ac_colors = {
-        "equities":        "#1f77b4",
-        "bonds":           "#9467bd",
-        "cash":            "#7f7f7f",
-        "precious metals": "#bcbd22",
-        "crypto":          "#17becf",
-    }
-    ac = snaps_full.groupby(["date", "asset_bucket"])["value"].sum().unstack(fill_value=0)
-    ac_order = [c for c in ["equities", "bonds", "cash", "precious metals", "crypto"]
-                if c in ac.columns]
-    for bucket in ac_order:
-        fig.add_trace(
-            go.Scatter(x=ac.index, y=ac[bucket], mode="lines",
-                       name=bucket, legend="legend3",
-                       stackgroup="asset",
-                       line={"color": ac_colors.get(bucket, "#444"), "width": 0.5},
-                       hovertemplate=f"{bucket}<br>%{{x|%Y-%m-%d}}"
-                                     "<br>$%{y:,.0f}<extra></extra>"),
-            row=5, col=1,
-        )
     # Split cash/bonds/precious-metals/crypto out of general_markets into
     # a separate "cashlike" band so general_markets shows only defensive
     # equities (SPY/VIG/DVY/XLU/XLP), not ballast.
@@ -2998,128 +2975,10 @@ def build_curator_dashboard(
                        hovertemplate=f"{WAVE_DISPLAY_LABEL.get(wave, wave)}"
                                      "<br>%{x|%Y-%m-%d}"
                                      "<br>$%{y:,.0f}<extra></extra>"),
-            row=6, col=1,
+            row=5, col=1,
         )
     fig.update_yaxes(title_text="$", tickformat="$,.0f", row=5, col=1)
-    fig.update_yaxes(title_text="$", tickformat="$,.0f", row=6, col=1)
     fig.update_xaxes(range=[start, end], row=5, col=1)
-    fig.update_xaxes(range=[start, end], row=6, col=1)
-
-    # Chart 7: rolling-90-day (Sharpe on x, return on y) trajectories
-    # for the top three GAINERS plus the bottom two (worst-performing)
-    # tickers by total $ gain. Connected dots with semi-transparent
-    # lines so individual data points stay readable. Chart is
-    # constrained to a centered square via xaxis.domain.
-    _ROLL = 90
-    _RF_D = 0.04 / 252
-    _top3 = [t for t, _ in _gain_items[:3]]
-    _worst2 = [t for t, _ in _gain_items[-2:]]
-    _chart7_tickers = _top3 + _worst2
-    _distinct_colors = [
-        ("#d97706", "rgba(217,119,6,0.35)"),    # orange  (top 1)
-        ("#3b82f6", "rgba(59,130,246,0.35)"),   # blue    (top 2)
-        ("#a855f7", "rgba(168,85,247,0.35)"),   # purple  (top 3)
-        ("#dc2626", "rgba(220,38,38,0.35)"),    # red     (worst 1)
-        ("#14b8a6", "rgba(20,184,166,0.35)"),   # teal    (worst 2)
-    ]
-    for _i, _tk in enumerate(_chart7_tickers):
-        _grp = snaps_sorted[snaps_sorted["ticker"] == _tk].sort_values("date").reset_index(drop=True)
-        if len(_grp) < _ROLL + 2:
-            continue
-        _ret = _grp["price"].pct_change().dropna()
-        _rmean = _ret.rolling(_ROLL).mean()
-        _rstd = _ret.rolling(_ROLL).std()
-        _ann = (_rmean * 252).dropna()
-        _shp = (((_rmean - _RF_D) / _rstd) * (252 ** 0.5)).dropna()
-        _ann, _shp = _ann.align(_shp, join="inner")
-        if _ann.empty:
-            continue
-        _solid, _faded = _distinct_colors[_i % len(_distinct_colors)]
-        fig.add_trace(
-            go.Scatter(
-                x=_shp.values, y=_ann.values, mode="lines+markers",
-                name=_tk, legend="legend8", opacity=0.5,
-                line={"color": _solid, "width": 1.2},
-                marker={"color": _solid, "size": 3},
-                hovertemplate=(f"<b>{_tk}</b><br>"
-                               "Sharpe %{x:.2f}<br>"
-                               "ann ret %{y:.1%}<extra></extra>"),
-            ),
-            row=7, col=1,
-        )
-        # End-of-trajectory marker + label (axes flipped: Sharpe on x).
-        fig.add_trace(
-            go.Scatter(
-                x=[float(_shp.iloc[-1])], y=[float(_ann.iloc[-1])],
-                mode="markers+text", text=[_tk],
-                textposition="top right",
-                textfont={"size": 11, "color": _solid},
-                marker={"size": 8, "color": _solid},
-                showlegend=False, hoverinfo="skip",
-            ),
-            row=7, col=1,
-        )
-    fig.update_xaxes(title_text="rolling 90-day Sharpe", row=7, col=1,
-                     zeroline=True, zerolinewidth=1, zerolinecolor="#888",
-                     domain=[0.058, 0.942])
-    fig.update_yaxes(title_text="rolling 90-day annualized return",
-                     tickformat=".0%", row=7, col=1,
-                     zeroline=True, zerolinewidth=1, zerolinecolor="#888")
-
-    # Chart 8: phase-space view for the same five tickers as chart 7.
-    # x is the price normalized to each ticker's own ALL-TIME MAXIMUM
-    # over the window (so x ∈ [0, 1], reaching 1.0 at the peak). y is
-    # dx/dt in the same units. Both axes are 90-day rolling means so
-    # the trajectory reflects structural motion through phase space
-    # rather than daily noise. Reading the figure:
-    #   x = 1 ............... at all-time peak
-    #   x < 1 with y > 0 .... below peak, recovering
-    #   x < 1 with y < 0 .... below peak, still declining
-    #   tight loops near a fixed x .... mean-reverting consolidation
-    for _i, _tk in enumerate(_chart7_tickers):
-        _grp = snaps_sorted[snaps_sorted["ticker"] == _tk].sort_values("date").reset_index(drop=True)
-        if len(_grp) < _ROLL + 2:
-            continue
-        _p = _grp["price"].astype(float)
-        _pmax = float(_p.max())              # all-time max over window
-        _xn = _p / _pmax                     # x ∈ [0, 1]
-        _vn = _xn.diff()                     # dx/dt in same units
-        _xs = _xn.rolling(_ROLL).mean()
-        _ys = _vn.rolling(_ROLL).mean()
-        _xs, _ys = _xs.align(_ys, join="inner")
-        _xs, _ys = _xs.dropna(), _ys.dropna()
-        if _xs.empty:
-            continue
-        _solid, _ = _distinct_colors[_i % len(_distinct_colors)]
-        fig.add_trace(
-            go.Scatter(
-                x=_xs.values, y=_ys.values, mode="lines+markers",
-                name=_tk, legend="legend9", opacity=0.5,
-                line={"color": _solid, "width": 1.2},
-                marker={"color": _solid, "size": 3},
-                hovertemplate=(f"<b>{_tk}</b><br>"
-                               "value %{x:.1%} of peak<br>"
-                               "dv/dt %{y:.3%}/day<extra></extra>"),
-            ),
-            row=8, col=1,
-        )
-        fig.add_trace(
-            go.Scatter(
-                x=[float(_xs.iloc[-1])], y=[float(_ys.iloc[-1])],
-                mode="markers+text", text=[_tk],
-                textposition="top right",
-                textfont={"size": 11, "color": _solid},
-                marker={"size": 8, "color": _solid},
-                showlegend=False, hoverinfo="skip",
-            ),
-            row=8, col=1,
-        )
-    fig.update_xaxes(title_text="ticker value (fraction of all-time peak)",
-                     tickformat=".0%", row=8, col=1, domain=[0.058, 0.942],
-                     zeroline=True, zerolinewidth=1, zerolinecolor="#888")
-    fig.update_yaxes(title_text="d(value)/dt (fraction of peak / day)",
-                     tickformat=".2%", row=8, col=1,
-                     zeroline=True, zerolinewidth=1, zerolinecolor="#888")
 
 
     fig.update_layout(
@@ -3143,53 +3002,36 @@ def build_curator_dashboard(
             title_text="Portfolio value",
             xref="paper", x=1.02, yref="paper", y=0.98, yanchor="top",
         ),
-        # Per-row legends, anchored to the 7-row layout. Row tops in
-        # paper coords (with row_heights=[0.166, 0.094, 0.187, 0.104,
-        # 0.114, 0.135, 0.200] and vertical_spacing=0.06):
-        # row 2 top ≈ 0.834, row 3 mid ≈ 0.658, row 5 top ≈ 0.408,
-        # row 6 top ≈ 0.275, row 7 mid ≈ 0.064.
+        # Per-row legends. y values are overridden by the per-gap
+        # spacing block below so the placeholders here just need to
+        # be valid paper coords.
         legend6=dict(
             title_text="Rolling Sharpe",
             xref="paper", x=1.02,
-            yref="paper", y=0.834, yanchor="top",
+            yref="paper", y=0.0, yanchor="top",
         ),
         legend5=dict(
             title_text="Wave bucket",
             xref="paper", x=1.02,
-            yref="paper", y=0.658, yanchor="middle",
-        ),
-        legend3=dict(
-            title_text="Asset class",
-            xref="paper", x=1.02,
-            yref="paper", y=0.408, yanchor="top",
+            yref="paper", y=0.0, yanchor="middle",
         ),
         legend4=dict(
             title_text="Wave bucket",
             xref="paper", x=1.02,
-            yref="paper", y=0.275, yanchor="top",
-        ),
-        legend8=dict(
-            title_text="Best 3 + worst 2",
-            xref="paper", x=1.02,
-            yref="paper", y=0.064, yanchor="middle",
-        ),
-        legend9=dict(
-            title_text="Best 3 + worst 2",
-            xref="paper", x=1.02,
-            yref="paper", y=0.0, yanchor="middle",  # overridden below
+            yref="paper", y=0.0, yanchor="top",
         ),
     )
 
-    # --- Per-gap vertical spacing override (8-row layout) ---
+    # --- Per-gap vertical spacing override (5-row layout) ---
     # Plotly's make_subplots only supports a single uniform
-    # vertical_spacing. We want each chart-to-chart gap shrunk to 50%
-    # of plotly's default (0.06 * fig_h = 222 px -> 111 px) except
-    # gap(4,5) which is shrunk only 33% (-> 149 px). Override each
-    # yaxis's domain and size the figure in absolute pixels so
-    # individual subplot sizes are preserved across edits.
-    ROW_PX = [393, 223, 443, 246, 270, 320, 473, 473]   # charts 1..8
-    GAP_PX = [111, 111, 111, 149, 111, 111, 111]        # 7 gaps
-    _new_fig_h = sum(ROW_PX) + sum(GAP_PX)              # 3656
+    # vertical_spacing. Each chart-to-chart gap is shrunk to 50% of
+    # plotly's default (111 px) except gap(4,5) which is shrunk only
+    # 33% (149 px). Override each yaxis's domain and size the figure
+    # in absolute pixels so individual subplot sizes are preserved
+    # across edits.
+    ROW_PX = [393, 223, 443, 246, 320]   # charts 1..5
+    GAP_PX = [111, 111, 111, 149]        # 4 gaps; gap(4,5) wider
+    _new_fig_h = sum(ROW_PX) + sum(GAP_PX)
     _tops, _bots = [], []
     _y = 1.0
     for _i, _h_px in enumerate(ROW_PX):
@@ -3199,22 +3041,19 @@ def build_curator_dashboard(
         if _i < len(GAP_PX):
             _y -= GAP_PX[_i] / _new_fig_h
     # Apply yaxis domains.
-    for _i in range(8):
+    for _i in range(5):
         _key = "yaxis" if _i == 0 else f"yaxis{_i + 1}"
         fig.layout[_key].domain = (max(0.0, _bots[_i]), min(1.0, _tops[_i]))
     # Reposition subplot-title annotations (~14px above each row top).
     _title_offset = 14 / _new_fig_h
-    for _i in range(min(8, len(fig.layout.annotations))):
+    for _i in range(min(5, len(fig.layout.annotations))):
         fig.layout.annotations[_i].update(y=_tops[_i] + _title_offset)
     # Reposition per-row legends to the new geometry.
     fig.update_layout(
         height=_new_fig_h,
         legend6=dict(y=_tops[1], yanchor="top"),
         legend5=dict(y=(_tops[2] + _bots[2]) / 2, yanchor="middle"),
-        legend3=dict(y=_tops[4], yanchor="top"),
-        legend4=dict(y=_tops[5], yanchor="top"),
-        legend8=dict(y=(_tops[6] + _bots[6]) / 2, yanchor="middle"),
-        legend9=dict(y=(_tops[7] + _bots[7]) / 2, yanchor="middle"),
+        legend4=dict(y=_tops[4], yanchor="top"),
     )
 
     # Curation event log table at the bottom.
