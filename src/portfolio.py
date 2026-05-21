@@ -2785,8 +2785,8 @@ def build_curator_dashboard(
     bnh_return = (bnh_final / bnh_initial) - 1.0
 
     fig = make_subplots(
-        rows=6, cols=1, vertical_spacing=0.06,
-        row_heights=[0.20, 0.11, 0.24, 0.13, 0.14, 0.18],
+        rows=7, cols=1, vertical_spacing=0.06,
+        row_heights=[0.18, 0.10, 0.20, 0.11, 0.12, 0.15, 0.14],
         subplot_titles=(
             "1. Realized portfolio value: curator vs baselines vs benchmark",
             "2. Rolling 90-day Sharpe ratio",
@@ -2799,6 +2799,9 @@ def build_curator_dashboard(
             "utilities / staples); cashlike = bonds + cash-equivalents + precious "
             "metals (e.g., AGG, BIL, IAU)"
             "</span>",
+            "7. Each ticker's trajectory in (rolling 90-day return, Sharpe) space"
+            "<br><sub><i>One polyline per ticker; colored by wave bucket. "
+            "Hover for ticker name.</i></sub>",
         ),
     )
 
@@ -2997,10 +3000,63 @@ def build_curator_dashboard(
     fig.update_xaxes(range=[start, end], row=5, col=1)
     fig.update_xaxes(range=[start, end], row=6, col=1)
 
+    # Chart 7: per-ticker trajectory in (rolling 90-day annualized return,
+    # rolling 90-day Sharpe) space. One polyline per ticker that ever
+    # appeared in the watchlist; line color = wave bucket. Tickers that
+    # compounded steadily live in the upper-right; spike-and-crash names
+    # have wider excursions.
+    _ROLL = 90
+    _RF_D = 0.04 / 252
+    _ticker_curve_map: dict[str, str] = {}
+    for _tk, _grp in snaps_sorted.groupby("ticker"):
+        _grp = _grp.sort_values("date").reset_index(drop=True)
+        if len(_grp) < _ROLL + 2:
+            continue
+        _ret = _grp["price"].pct_change().dropna()
+        _rmean = _ret.rolling(_ROLL).mean()
+        _rstd = _ret.rolling(_ROLL).std()
+        _ann = (_rmean * 252).dropna()
+        _shp = (((_rmean - _RF_D) / _rstd) * (252 ** 0.5)).dropna()
+        _ann, _shp = _ann.align(_shp, join="inner")
+        if _ann.empty:
+            continue
+        _wb = TICKER_WAVE.get(_tk, "general_markets")
+        _color = WAVE_COLORS.get(_wb, "#888888")
+        _ticker_curve_map[_tk] = _wb
+        fig.add_trace(
+            go.Scatter(
+                x=_ann.values, y=_shp.values, mode="lines",
+                name=f"{_tk} ({_wb})",
+                line={"color": _color, "width": 1.2},
+                opacity=0.65, showlegend=False,
+                hovertemplate=(f"<b>{_tk}</b> ({_wb})<br>"
+                               "ann ret %{x:.1%}<br>"
+                               "Sharpe %{y:.2f}<extra></extra>"),
+            ),
+            row=7, col=1,
+        )
+        # End-of-trajectory marker + label
+        fig.add_trace(
+            go.Scatter(
+                x=[float(_ann.iloc[-1])], y=[float(_shp.iloc[-1])],
+                mode="markers+text", text=[_tk],
+                textposition="top right",
+                textfont={"size": 9, "color": _color},
+                marker={"size": 5, "color": _color},
+                showlegend=False, hoverinfo="skip",
+            ),
+            row=7, col=1,
+        )
+    fig.update_xaxes(title_text="rolling 90-day annualized return",
+                     tickformat=".0%", row=7, col=1,
+                     zeroline=True, zerolinewidth=1, zerolinecolor="#888")
+    fig.update_yaxes(title_text="rolling 90-day Sharpe", row=7, col=1,
+                     zeroline=True, zerolinewidth=1, zerolinecolor="#888")
+
 
     fig.update_layout(
         template="seaborn",
-        height=2400, margin={"t": 90, "b": 60, "l": 80, "r": 30},
+        height=2900, margin={"t": 90, "b": 60, "l": 80, "r": 30},
         title={
             "text": (
                 f"<span style='font-size:14px;color:#555;'>"
