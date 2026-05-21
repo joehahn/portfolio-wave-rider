@@ -2840,8 +2840,8 @@ def build_curator_dashboard(
     _curator_ret = totals.pct_change().dropna()
     fig.add_trace(
         go.Scatter(x=_curator_ret.index, y=_rolling_sharpe(_curator_ret).values,
-                   name="Curator", mode="lines",
-                   line={"color": "#d97706", "width": 2}, showlegend=False,
+                   name="Curator", mode="lines", legend="legend6",
+                   line={"color": "#d97706", "width": 2},
                    hovertemplate="%{x|%Y-%m-%d}<br>Sharpe %{y:.2f}<extra>Curator</extra>"),
         row=2, col=1,
     )
@@ -2850,8 +2850,8 @@ def build_curator_dashboard(
         _bnh_ret = _bnh.pct_change().dropna()
         fig.add_trace(
             go.Scatter(x=_bnh_ret.index, y=_rolling_sharpe(_bnh_ret).values,
-                       name="Buy-and-hold", mode="lines",
-                       line={"color": "#3b82f6", "width": 1.8}, showlegend=False,
+                       name="Buy-and-hold", mode="lines", legend="legend6",
+                       line={"color": "#3b82f6", "width": 1.8},
                        hovertemplate="%{x|%Y-%m-%d}<br>Sharpe %{y:.2f}<extra>Buy-and-hold</extra>"),
             row=2, col=1,
         )
@@ -2859,9 +2859,8 @@ def build_curator_dashboard(
         _bench_ret = _curve.pct_change().dropna()
         fig.add_trace(
             go.Scatter(x=_bench_ret.index, y=_rolling_sharpe(_bench_ret).values,
-                       name=f"{_b}", mode="lines",
+                       name=f"{_b}", mode="lines", legend="legend6",
                        line={"color": "#10b981", "width": 1.5, "dash": "dot"},
-                       showlegend=False,
                        hovertemplate=f"%{{x|%Y-%m-%d}}<br>Sharpe %{{y:.2f}}<extra>{_b}</extra>"),
             row=2, col=1,
         )
@@ -2877,8 +2876,8 @@ def build_curator_dashboard(
 
     fig.add_trace(
         go.Scatter(x=totals.index, y=_drawdown(totals).values,
-                   name="Curator", mode="lines",
-                   line={"color": "#d97706", "width": 2}, showlegend=False,
+                   name="Curator", mode="lines", legend="legend7",
+                   line={"color": "#d97706", "width": 2},
                    hovertemplate="%{x|%Y-%m-%d}<br>drawdown %{y:.1%}<extra>Curator</extra>"),
         row=3, col=1,
     )
@@ -2886,8 +2885,8 @@ def build_curator_dashboard(
         _bnh_val = baselines.dropna(subset=["eq_total"]).set_index("date")["eq_total"]
         fig.add_trace(
             go.Scatter(x=_bnh_val.index, y=_drawdown(_bnh_val).values,
-                       name="Buy-and-hold", mode="lines",
-                       line={"color": "#3b82f6", "width": 1.8}, showlegend=False,
+                       name="Buy-and-hold", mode="lines", legend="legend7",
+                       line={"color": "#3b82f6", "width": 1.8},
                        hovertemplate="%{x|%Y-%m-%d}<br>drawdown %{y:.1%}<extra>Buy-and-hold</extra>"),
             row=3, col=1,
         )
@@ -3062,8 +3061,18 @@ def build_curator_dashboard(
         ),
         # Per-row legends, anchored to the new 7-row layout. Row tops in
         # paper coords (with row_heights=[0.18, 0.10, 0.10, 0.22, 0.12,
-        # 0.13, 0.15] and vertical_spacing=0.06): row 4 ≈ 0.577,
-        # row 6 ≈ 0.239, row 7 ≈ 0.096.
+        # 0.13, 0.15] and vertical_spacing=0.06): row 2 ≈ 0.825,
+        # row 3 ≈ 0.701, row 4 ≈ 0.577, row 6 ≈ 0.239, row 7 ≈ 0.096.
+        legend6=dict(
+            title_text="Rolling Sharpe",
+            xref="paper", x=1.02,
+            yref="paper", y=0.825, yanchor="top",
+        ),
+        legend7=dict(
+            title_text="Drawdown",
+            xref="paper", x=1.02,
+            yref="paper", y=0.701, yanchor="top",
+        ),
         legend5=dict(
             title_text="Wave bucket",
             xref="paper", x=1.02,
