@@ -4,14 +4,16 @@ docs/sweep_<param>.html.
 
 Three params are supported. Each is a pure replay (no LLM calls):
 
-  risk_aversion : λ in the mean-variance utility μᵀw − λ·wᵀΣw
-  lookback      : years of price history used to estimate μ and Σ
-  max_weight    : per-ticker concentration cap
+  risk_aversion     : λ in the mean-variance utility μᵀw − λ·wᵀΣw
+  lookback          : years of price history used to estimate μ and Σ
+  concentration_cap : per-ticker upper bound on weight (the `max_weight`
+                      kwarg on portfolio.optimize_portfolio; the profile
+                      knob name is `concentration_cap`)
 
 Usage:
   python scripts/sweep.py --param risk_aversion
   python scripts/sweep.py --param lookback --values 0.5,1,1.3,2,3
-  python scripts/sweep.py --param max_weight --runs-dir data/curator_runs/5y-sweep-cap08
+  python scripts/sweep.py --param concentration_cap --runs-dir data/curator_runs/5y-sweep-cap08
 
 Output: docs/sweep_<param>.html, plus a one-row-per-variant summary table
 appended below the chart.
@@ -35,9 +37,9 @@ from src.portfolio import (
 )
 
 DEFAULTS = {
-    "risk_aversion": [0.0, 0.33, 0.5, 0.67, 1.0, 1.5, 2.0, 3.0, 10.0],
-    "lookback":      [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 3.0, 5.0],
-    "max_weight":    [0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90, 1.00],
+    "risk_aversion":     [0.0, 0.33, 0.5, 0.67, 1.0, 1.5, 2.0, 3.0, 10.0],
+    "lookback":          [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 3.0, 5.0],
+    "concentration_cap": [0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90, 1.00],
 }
 
 PALETTE = [
@@ -62,7 +64,7 @@ def run_one(param: str, value: float, runs_dir: str, tmp: Path,
         kw["risk_aversion"] = value
     elif param == "lookback":
         kw["lookback_years_override"] = value
-    elif param == "max_weight":
+    elif param == "concentration_cap":
         kw["max_weight"] = value
     else:
         raise ValueError(f"unknown param: {param}")
@@ -147,7 +149,7 @@ def main(argv: list[str] | None = None) -> int:
         # param so the corresponding table row can be rendered in bold.
         if args.param == "risk_aversion":
             default_v = args.base_risk_aversion
-        elif args.param == "max_weight":
+        elif args.param == "concentration_cap":
             default_v = args.base_max_weight
         else:  # lookback — read the live default from _starter.json
             import json as _json
@@ -175,8 +177,8 @@ def main(argv: list[str] | None = None) -> int:
                 "both Sharpe and Calmar, so this setting is stable across "
                 "regimes."
             ),
-            "max_weight": (
-                "we find that <code>max_weight=0.7</code> wins H2 by both "
+            "concentration_cap": (
+                "we find that <code>concentration_cap=0.7</code> wins H2 by both "
                 "Sharpe and Calmar, while H1 prefers slightly higher (0.8 by "
                 "Sharpe, 0.9 by Calmar); the H1 gap is small (Sharpe 0.90 vs "
                 "0.99), so the 0.7 choice is reasonable."

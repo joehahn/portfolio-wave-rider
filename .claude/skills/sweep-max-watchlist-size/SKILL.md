@@ -8,7 +8,7 @@ sweep also includes the older cap=12 dir (`data/curator_runs/5y-quarterly/`)
 as a historical reference at the previous default.
 
 Each cap shapes the curator's decisions (not just the optimizer), so
-unlike the other three sweeps (λ, lookback, max_weight) this one cannot
+unlike the other three sweeps (λ, lookback, concentration_cap) this one cannot
 be a pure replay — every (cap, date) pair needs its own curator call.
 
 **Cost / time:** 4 caps × 21 dates × ~$0.15 = ~$13 for a from-scratch

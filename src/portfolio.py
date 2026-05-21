@@ -1680,7 +1680,7 @@ _NAV_PAGES: list[tuple[str, str]] = [
     ("backtest_curator.html", "5y backtest"),
     ("sweep_risk_aversion.html", "sweep: risk_aversion"),
     ("sweep_lookback.html", "sweep: lookback"),
-    ("sweep_max_weight.html", "sweep: max_weight"),
+    ("sweep_concentration_cap.html", "sweep: concentration_cap"),
     ("sweep_max_watchlist_size.html", "sweep: max_watchlist_size"),
 ]
 

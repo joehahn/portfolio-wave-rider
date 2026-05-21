@@ -5,7 +5,7 @@
 set -e
 cd "$(dirname "$0")/.."
 
-for param in risk_aversion lookback max_weight; do
+for param in risk_aversion lookback concentration_cap; do
   echo "=== sweep: $param ==="
   .venv/bin/python scripts/sweep.py --param "$param"
 done
