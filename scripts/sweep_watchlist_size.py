@@ -91,13 +91,13 @@ def main() -> int:
             mode="lines", line={"color": "#10b981", "width": 1.5, "dash": "dot"},
         ))
     fig.update_layout(
+        template="seaborn",
         title=f"Curator backtest swept across max_watchlist_size "
               f"({start.date()} to {end.date()})",
         xaxis_title="date",
         yaxis_title="portfolio value ($)",
         yaxis_tickformat="$,.0f",
         height=600,
-        plot_bgcolor="#fafafa",
         margin={"t": 60, "b": 60, "l": 80, "r": 30},
     )
 

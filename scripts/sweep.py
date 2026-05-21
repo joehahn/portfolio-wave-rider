@@ -132,13 +132,13 @@ def main(argv: list[str] | None = None) -> int:
                 ))
 
         fig.update_layout(
+            template="seaborn",
             title=f"Curator backtest swept across {args.param} "
                   f"({start.date()} to {end.date()})",
             xaxis_title="date",
             yaxis_title="portfolio value ($)",
             yaxis_tickformat="$,.0f",
             height=600,
-            plot_bgcolor="#fafafa",
             margin={"t": 60, "b": 60, "l": 80, "r": 30},
         )
 
