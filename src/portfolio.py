@@ -1593,20 +1593,31 @@ TICKER_WAVE: dict[str, str] = {
     # AI
     "GOOGL": "AI", "NVDA": "AI", "MSFT": "AI",
     "AIQ": "AI", "ARKK": "AI", "QQQ": "AI",
+    "TSM": "AI", "AVGO": "AI", "AMZN": "AI", "AMD": "AI",
+    "ASML": "AI", "VRT": "AI", "PLTR": "AI", "ORCL": "AI",
     # Robotics
     "BOTZ": "robotics", "ROBO": "robotics",
+    "ISRG": "robotics", "SYM": "robotics",
     # Rockets / spacecraft
-    "RKLB": "rockets_spacecraft",
+    "RKLB": "rockets_spacecraft", "ARKX": "rockets_spacecraft",
+    "ASTS": "rockets_spacecraft",
     # Engineered biology
     "ARKG": "engineered_biology",
     # Quantum computing
-    "QTUM": "quantum",
-    # Nuclear fusion (NUKZ is a fission-heavy nuclear-energy ETF used as a
-    # proxy until pure-play fusion firms like Commonwealth Fusion Systems
-    # or Helion go public).
-    "NUKZ": "nuclear_fusion",
-    # Geopolitical (energy / shipping / LNG, profile's non-tech wave).
+    "QTUM": "quantum", "IONQ": "quantum", "QBTS": "quantum", "RGTI": "quantum",
+    # Nuclear (NUKZ is a fission-heavy nuclear-energy ETF; nuclear_fusion
+    # kept as an alias for forward compatibility with pure-play fusion
+    # firms like Commonwealth Fusion or Helion if they go public).
+    "NUKZ": "nuclear", "NLR": "nuclear", "URA": "nuclear", "CCJ": "nuclear",
+    "CEG": "nuclear", "VST": "nuclear", "BWXT": "nuclear", "SMR": "nuclear",
+    "GEV": "nuclear", "LEU": "nuclear",
+    # Demographics (aging-population thesis: GLP-1 leaders, healthcare,
+    # eldercare REITs, automation that backfills labor shortages).
+    "LLY": "demographics", "XLV": "demographics",
+    # Geopolitical (energy / shipping / LNG, defense, profile's non-tech wave).
     "BWET": "geopolitical", "LNG": "geopolitical", "XLE": "geopolitical",
+    "LMT": "geopolitical", "NOC": "geopolitical", "ITA": "geopolitical",
+    "EUAD": "geopolitical",
     # General markets (broad ETFs, bonds, cash, metals, crypto)
     "AGG": "general_markets", "BND": "general_markets", "TLT": "general_markets",
     "IEF": "general_markets", "SHY": "general_markets", "MUB": "general_markets",
@@ -2793,15 +2804,8 @@ def build_curator_dashboard(
             "3. Watchlist composition over time (color = wave bucket)",
             "4. Cumulative $ gain per holding over the 5y window",
             "5. Actual portfolio $ by asset class over time",
-            "6. Actual portfolio $ by wave over time<br>"
-            "<span style='font-size:0.8em;color:#666;font-weight:400;'>"
-            "general_markets = defensive equity ETFs (broad-market / dividend / "
-            "utilities / staples); cashlike = bonds + cash-equivalents + precious "
-            "metals (e.g., AGG, BIL, IAU)"
-            "</span>",
-            "7. Each ticker's trajectory in (rolling 90-day return, Sharpe) space"
-            "<br><sub><i>One polyline per ticker; colored by wave bucket. "
-            "Hover for ticker name.</i></sub>",
+            "6. Actual portfolio $ by wave over time",
+            "7. Top ticker trajectories in return vs Sharpe space",
         ),
     )
 
@@ -2935,7 +2939,7 @@ def build_curator_dashboard(
         tickmode="array",
         tickvals=_gain_tickers,
         ticktext=[_ticker_label(t) for t in _gain_tickers],
-        tickangle=0,
+        tickangle=-90,
         row=4, col=1,
     )
     fig.update_yaxes(title_text="$ gain", tickformat="$,.0f",
@@ -3052,7 +3056,7 @@ def build_curator_dashboard(
         )
     fig.update_xaxes(title_text="rolling 90-day Sharpe", row=7, col=1,
                      zeroline=True, zerolinewidth=1, zerolinecolor="#888",
-                     domain=[0.30, 0.70])
+                     domain=[0.25, 0.75])
     fig.update_yaxes(title_text="rolling 90-day annualized return",
                      tickformat=".0%", row=7, col=1,
                      zeroline=True, zerolinewidth=1, zerolinecolor="#888")
@@ -3060,7 +3064,7 @@ def build_curator_dashboard(
 
     fig.update_layout(
         template="seaborn",
-        height=3200, margin={"t": 90, "b": 60, "l": 80, "r": 30},
+        height=3200, margin={"t": 120, "b": 60, "l": 80, "r": 30},
         title={
             "text": (
                 f"<span style='font-size:14px;color:#555;'>"
@@ -3070,6 +3074,11 @@ def build_curator_dashboard(
                 f"·  (Curator - buy/hold)/(buy/hold): "
                 f"{(cur_return - bnh_return) / bnh_return:.2f}"
                 f"</span>"
+                "<br><span style='font-size:11px;color:#888;'>"
+                "general_markets = defensive equity ETFs (broad-market / dividend / "
+                "utilities / staples); cashlike = bonds + cash-equivalents + precious "
+                "metals (e.g., AGG, BIL, IAU)"
+                "</span>"
             ),
             "x": 0.5, "xanchor": "center",
         },
