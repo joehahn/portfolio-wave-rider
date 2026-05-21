@@ -2850,8 +2850,10 @@ def build_curator_dashboard(
             "utilities / staples); cashlike = bonds + cash-equivalents + precious "
             "metals (e.g., AGG, BIL, IAU)"
             "</span>",
-            "6. Expected vs realized annualized return per rebalance "
-            "(divergence is optimizer prediction error)",
+            "6. Realized annualized return vs the prediction made one year earlier"
+            "<br><sub>At each x-date, orange is the annualized return realized "
+            "over the year ending at x, and blue is the optimizer's prediction "
+            "(μᵀw) made at the start of that year.</sub>",
         ),
     )
 
@@ -3025,11 +3027,12 @@ def build_curator_dashboard(
     fig.update_xaxes(range=[start, end], row=4, col=1)
     fig.update_xaxes(range=[start, end], row=5, col=1)
 
-    # Chart 6: expected vs realized annualized return per rebalance.
-    # Reads recommendations.csv (per-rebalance expected_return) plus
-    # snapshots.csv total_value; realized = forward-1y annualized return
-    # from each rebalance date. The last few rebalances will have NaN
-    # realized (1y forward window not complete within the backtest window).
+    # Chart 6: realized vs predicted annualized return, plotted against
+    # the realization date (rebalance + 365 days). At each x, orange is
+    # the return realized over the year ending at x; blue is the
+    # prediction made at the start of that year. Recent rebalances'
+    # blue points land in the future (beyond the backtest window),
+    # past the right edge of the x-axis.
     rec_path = bd / "recommendations.csv"
     if rec_path.exists() and snaps_path.exists():
         try:
@@ -3039,26 +3042,30 @@ def build_curator_dashboard(
         except (OSError, pd.errors.EmptyDataError):
             evr = pd.DataFrame()
         if not evr.empty:
+            evr = evr.copy()
+            evr["date"] = pd.to_datetime(evr["date"]) + pd.Timedelta(days=365)
             fig.add_trace(
                 go.Scatter(x=evr["date"], y=evr["expected"],
-                           name="Expected (optimizer μᵀw)",
+                           name="Predicted (made 1y earlier)",
                            mode="lines+markers", legend="legend2",
                            line={"color": "#3b82f6", "width": 2},
-                           hovertemplate="%{x|%Y-%m-%d}<br>expected %{y:.1%}<extra></extra>"),
+                           hovertemplate="year ending %{x|%Y-%m-%d}<br>predicted %{y:.1%}<extra></extra>"),
                 row=6, col=1,
             )
             fig.add_trace(
                 go.Scatter(x=evr["date"], y=evr["realized"],
-                           name="Realized (1y forward)",
+                           name="Realized (year ending at x)",
                            mode="lines+markers", legend="legend2",
                            line={"color": "#d97706", "width": 2},
-                           hovertemplate="%{x|%Y-%m-%d}<br>realized %{y:.1%}<extra></extra>"),
+                           hovertemplate="year ending %{x|%Y-%m-%d}<br>realized %{y:.1%}<extra></extra>"),
                 row=6, col=1,
             )
             fig.update_yaxes(title_text="annualized return", tickformat=".0%",
                              zeroline=True, zerolinewidth=1, zerolinecolor="#888",
                              row=6, col=1)
-            fig.update_xaxes(range=[start, end], row=6, col=1)
+            # x-axis extends one year past the snapshot window so the
+            # future-dated blue points fit.
+            fig.update_xaxes(range=[start, end + pd.Timedelta(days=365)], row=6, col=1)
 
     fig.update_layout(
         template="seaborn",
