@@ -3066,19 +3066,23 @@ def build_curator_dashboard(
                      tickformat=".0%", row=7, col=1,
                      zeroline=True, zerolinewidth=1, zerolinecolor="#888")
 
-    # Chart 8: phase-space view (x = price normalized to its starting
-    # value, y = dx/dt in the same units) for the same five tickers as
-    # chart 7. Both axes are 90-day rolling means so the trajectories
-    # reflect structural motion through phase space rather than daily
-    # noise. Outward drift = compounding; tight loops near (x, 0) =
-    # mean-reverting; sustained y < 0 = decline.
+    # Chart 8: phase-space view for the same five tickers as chart 7.
+    # x is the price normalized to each ticker's own ALL-TIME MAXIMUM
+    # over the window (so x ∈ [0, 1], reaching 1.0 at the peak). y is
+    # dx/dt in the same units. Both axes are 90-day rolling means so
+    # the trajectory reflects structural motion through phase space
+    # rather than daily noise. Reading the figure:
+    #   x = 1 ............... at all-time peak
+    #   x < 1 with y > 0 .... below peak, recovering
+    #   x < 1 with y < 0 .... below peak, still declining
+    #   tight loops near a fixed x .... mean-reverting consolidation
     for _i, _tk in enumerate(_chart7_tickers):
         _grp = snaps_sorted[snaps_sorted["ticker"] == _tk].sort_values("date").reset_index(drop=True)
         if len(_grp) < _ROLL + 2:
             continue
         _p = _grp["price"].astype(float)
-        _p0 = float(_p.iloc[0])
-        _xn = _p / _p0                       # normalized price (×starting)
+        _pmax = float(_p.max())              # all-time max over window
+        _xn = _p / _pmax                     # x ∈ [0, 1]
         _vn = _xn.diff()                     # dx/dt in same units
         _xs = _xn.rolling(_ROLL).mean()
         _ys = _vn.rolling(_ROLL).mean()
@@ -3094,8 +3098,8 @@ def build_curator_dashboard(
                 line={"color": _solid, "width": 1.2},
                 marker={"color": _solid, "size": 3},
                 hovertemplate=(f"<b>{_tk}</b><br>"
-                               "value %{x:.2f}×<br>"
-                               "dv/dt %{y:.4f}×/day<extra></extra>"),
+                               "value %{x:.1%} of peak<br>"
+                               "dv/dt %{y:.3%}/day<extra></extra>"),
             ),
             row=8, col=1,
         )
@@ -3110,11 +3114,11 @@ def build_curator_dashboard(
             ),
             row=8, col=1,
         )
-    fig.update_xaxes(title_text="ticker value (× starting price)",
-                     row=8, col=1, domain=[0.058, 0.942],
+    fig.update_xaxes(title_text="ticker value (fraction of all-time peak)",
+                     tickformat=".0%", row=8, col=1, domain=[0.058, 0.942],
                      zeroline=True, zerolinewidth=1, zerolinecolor="#888")
-    fig.update_yaxes(title_text="d(value)/dt (× starting price / day)",
-                     row=8, col=1,
+    fig.update_yaxes(title_text="d(value)/dt (fraction of peak / day)",
+                     tickformat=".2%", row=8, col=1,
                      zeroline=True, zerolinewidth=1, zerolinecolor="#888")
 
 
