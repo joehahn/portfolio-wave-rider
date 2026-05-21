@@ -2535,7 +2535,7 @@ def build_dashboard(
             yref="paper", y=_row_top(R_EXP_VS_REAL), yanchor="top",
         ),
     )
-    fig.update_yaxes(title_text="$", row=R_PORTFOLIO, col=1)
+    fig.update_yaxes(title_text="$", row=R_PORTFOLIO, col=1, type="log")
     fig.update_yaxes(title_text="portfolio %", row=R_REC_WAVE, col=1, tickformat=".0%")
     fig.update_yaxes(title_text="portfolio %", row=R_LATEST_WEIGHTS, col=1, tickformat=".0%")
     if R_ACTUAL_WEIGHTS is not None:
