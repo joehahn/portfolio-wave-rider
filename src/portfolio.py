@@ -3071,7 +3071,6 @@ def build_curator_dashboard(
             ),
             "x": 0.5, "xanchor": "center",
         },
-        plot_bgcolor="#fafafa",
         # Per-row legends, each pinned to its chart's vertical position
         # in paper coords (1.0 = top, 0.0 = bottom).
         legend=dict(
