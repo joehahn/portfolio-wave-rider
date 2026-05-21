@@ -2488,6 +2488,7 @@ def build_dashboard(
                       f"(executed {latest_snap_date.date()})")
 
     fig.update_layout(
+        template="seaborn",
         height=308 * n_rows,
         # Pin the page title above the plotting area and reserve top
         # margin space, so it doesn't overlap chart 1's multi-line
@@ -3056,6 +3057,7 @@ def build_curator_dashboard(
             fig.update_xaxes(range=[start, end], row=6, col=1)
 
     fig.update_layout(
+        template="seaborn",
         height=2200, margin={"t": 90, "b": 60, "l": 80, "r": 30},
         title={
             "text": (
