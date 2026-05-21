@@ -2806,7 +2806,7 @@ def build_curator_dashboard(
             "5. Actual portfolio $ by asset class over time",
             "6. Actual portfolio $ by wave over time",
             "7. Top ticker trajectories in return vs Sharpe space",
-            "8. Ticker phase space: value vs its rate of change",
+            "8. Ticker phase space: value (fraction of all-time peak) vs its rate of change",
         ),
     )
 
