@@ -1896,7 +1896,7 @@ def build_dashboard(
     R_EXP_VS_REAL     = None
     n_rows            = R_WAVE_USD
 
-    _chart5_anchor = "/initialize-portfolio executed" if is_live else "backtest start"
+    _chart5_anchor = "portfolio as initialized" if is_live else "backtest start"
     _chart5_tail = (
         "Bars sum to total realized portfolio gain since the thesis was set. Green = winners, red = losers."
         if is_live else
@@ -1909,10 +1909,10 @@ def build_dashboard(
         f"{R_PORTFOLIO}. Portfolio value over time"
     )
     titles_list.append(
-        f"{R_TURNOVER}. Rebalance turnover (% of portfolio dollars that changed holdings)"
+        f"{R_TURNOVER}. Rebalance turnover"
     )
     titles_list.append(
-        f"{R_REC_WAVE}. Recommended portfolio % segregated by wave, versus time"
+        f"{R_REC_WAVE}. Recommended portfolio percentages"
     )
     titles_list.append(
         f"{R_LATEST_WEIGHTS}. Latest recommended portfolio %"
@@ -1928,11 +1928,11 @@ def build_dashboard(
             "<br><sub><i>Per-ticker share of total portfolio value from today's snapshot. Compare against chart 4 above to see how far the actual portfolio sits from the latest recommendation.</i></sub>"
         )
     titles_list.append(
-        f"{R_GAIN_INIT}. Cumulative $ gain per holding since {_chart5_anchor}"
+        f"{R_GAIN_INIT}. Cumulative $ gain since {_chart5_anchor}"
     )
     if R_GAIN_REVIEW is not None:
         titles_list.append(
-            f"{R_GAIN_REVIEW}. Cumulative $ gain per holding since the most recent /review-portfolio rebalance"
+            f"{R_GAIN_REVIEW}. Cumulative $ gain since last rebalance"
         )
     titles_list.append(
         f"{R_ASSET_USD}. Actual portfolio $ by asset class over time"
@@ -2039,14 +2039,14 @@ def build_dashboard(
                     row=1, col=1,
                 )
         # Constant-rate reference curves: dotted lines showing what the
-        # thesis baseline portfolio would be worth at 2% / 4% / 8%
+        # thesis baseline portfolio would be worth at 1% / 2% / 4%
         # per week from day zero. Live dashboard only — anchored at the
         # thesis-baseline date.
         if is_live and len(snaps) > 0:
             anchor_date = snaps["date"].min()
             anchor_value = float(totals.iloc[0])
             ref_dates = pd.to_datetime(totals.index)
-            ref_shades = {0.02: "#cccccc", 0.04: "#888888", 0.08: "#444444"}
+            ref_shades = {0.01: "#cccccc", 0.02: "#888888", 0.04: "#444444"}
             for rate, color in ref_shades.items():
                 days = (ref_dates - anchor_date).days
                 ref_vals = anchor_value * (1 + rate) ** (days / 7.0)
@@ -2300,7 +2300,7 @@ def build_dashboard(
         # position (R_GAIN_INIT - 1) — subplot titles map 1:1 to the
         # figure's annotations in row order.
         _total_init = sum(gain_values)
-        _chart5_prefix = f"{R_GAIN_INIT}. Cumulative $ gain per holding since {_chart5_anchor}"
+        _chart5_prefix = f"{R_GAIN_INIT}. Cumulative $ gain since {_chart5_anchor}"
         fig.layout.annotations[R_GAIN_INIT - 1].update(
             text=fig.layout.annotations[R_GAIN_INIT - 1].text.replace(
                 _chart5_prefix,
@@ -2346,7 +2346,7 @@ def build_dashboard(
             )
             # Inject total gain into the chart's title.
             _total_recent = sum(recent_values)
-            _chart6_prefix = f"{R_GAIN_REVIEW}. Cumulative $ gain per holding since the most recent /review-portfolio rebalance"
+            _chart6_prefix = f"{R_GAIN_REVIEW}. Cumulative $ gain since last rebalance"
             fig.layout.annotations[R_GAIN_REVIEW - 1].update(
                 text=fig.layout.annotations[R_GAIN_REVIEW - 1].text.replace(
                     _chart6_prefix,
