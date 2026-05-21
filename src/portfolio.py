@@ -2786,7 +2786,7 @@ def build_curator_dashboard(
 
     fig = make_subplots(
         rows=7, cols=1, vertical_spacing=0.06,
-        row_heights=[0.18, 0.10, 0.20, 0.11, 0.12, 0.15, 0.14],
+        row_heights=[0.16, 0.09, 0.18, 0.10, 0.11, 0.13, 0.23],
         subplot_titles=(
             "1. Realized portfolio value: curator vs baselines vs benchmark",
             "2. Rolling 90-day Sharpe ratio",
@@ -3000,14 +3000,19 @@ def build_curator_dashboard(
     fig.update_xaxes(range=[start, end], row=5, col=1)
     fig.update_xaxes(range=[start, end], row=6, col=1)
 
-    # Chart 7: rolling-90-day (return, Sharpe) trajectories for the top
-    # three tickers by total $ gain over the backtest window. Distinct
-    # colors per ticker (legend-driven), not wave-bucket colors. End-of-
-    # trajectory marker and ticker label at each line's final point.
+    # Chart 7: rolling-90-day (Sharpe on x, return on y) trajectories
+    # for the top three tickers by total $ gain. Connected dots with
+    # semi-transparent lines so individual data points stay readable.
+    # Chart is constrained to a centered square via xaxis.domain (the
+    # subplot row otherwise spans the full figure width).
     _ROLL = 90
     _RF_D = 0.04 / 252
     _top3 = [t for t, _ in _gain_items[:3]]
-    _distinct_colors = ["#d97706", "#3b82f6", "#a855f7"]  # orange / blue / purple
+    _distinct_colors = [
+        ("#d97706", "rgba(217,119,6,0.35)"),    # orange
+        ("#3b82f6", "rgba(59,130,246,0.35)"),   # blue
+        ("#a855f7", "rgba(168,85,247,0.35)"),   # purple
+    ]
     for _i, _tk in enumerate(_top3):
         _grp = snaps_sorted[snaps_sorted["ticker"] == _tk].sort_values("date").reset_index(drop=True)
         if len(_grp) < _ROLL + 2:
@@ -3020,40 +3025,42 @@ def build_curator_dashboard(
         _ann, _shp = _ann.align(_shp, join="inner")
         if _ann.empty:
             continue
-        _color = _distinct_colors[_i % len(_distinct_colors)]
+        _solid, _faded = _distinct_colors[_i % len(_distinct_colors)]
         fig.add_trace(
             go.Scatter(
-                x=_ann.values, y=_shp.values, mode="lines",
+                x=_shp.values, y=_ann.values, mode="lines+markers",
                 name=_tk, legend="legend8",
-                line={"color": _color, "width": 1.6},
+                line={"color": _faded, "width": 1.2},
+                marker={"color": _solid, "size": 3},
                 hovertemplate=(f"<b>{_tk}</b><br>"
-                               "ann ret %{x:.1%}<br>"
-                               "Sharpe %{y:.2f}<extra></extra>"),
+                               "Sharpe %{x:.2f}<br>"
+                               "ann ret %{y:.1%}<extra></extra>"),
             ),
             row=7, col=1,
         )
-        # End-of-trajectory marker + label
+        # End-of-trajectory marker + label (axes flipped: Sharpe on x).
         fig.add_trace(
             go.Scatter(
-                x=[float(_ann.iloc[-1])], y=[float(_shp.iloc[-1])],
+                x=[float(_shp.iloc[-1])], y=[float(_ann.iloc[-1])],
                 mode="markers+text", text=[_tk],
                 textposition="top right",
-                textfont={"size": 11, "color": _color},
-                marker={"size": 7, "color": _color},
+                textfont={"size": 11, "color": _solid},
+                marker={"size": 8, "color": _solid},
                 showlegend=False, hoverinfo="skip",
             ),
             row=7, col=1,
         )
-    fig.update_xaxes(title_text="rolling 90-day annualized return",
+    fig.update_xaxes(title_text="rolling 90-day Sharpe", row=7, col=1,
+                     zeroline=True, zerolinewidth=1, zerolinecolor="#888",
+                     domain=[0.30, 0.70])
+    fig.update_yaxes(title_text="rolling 90-day annualized return",
                      tickformat=".0%", row=7, col=1,
-                     zeroline=True, zerolinewidth=1, zerolinecolor="#888")
-    fig.update_yaxes(title_text="rolling 90-day Sharpe", row=7, col=1,
                      zeroline=True, zerolinewidth=1, zerolinecolor="#888")
 
 
     fig.update_layout(
         template="seaborn",
-        height=2900, margin={"t": 90, "b": 60, "l": 80, "r": 30},
+        height=3200, margin={"t": 90, "b": 60, "l": 80, "r": 30},
         title={
             "text": (
                 f"<span style='font-size:14px;color:#555;'>"
@@ -3072,35 +3079,35 @@ def build_curator_dashboard(
             title_text="Portfolio value",
             xref="paper", x=1.02, yref="paper", y=0.98, yanchor="top",
         ),
-        # Per-row legends, anchored to the new 6-row layout. Row tops in
-        # paper coords (with row_heights=[0.20, 0.11, 0.24, 0.13, 0.14,
-        # 0.18] and vertical_spacing=0.06): row 2 ≈ 0.800,
-        # row 3 ≈ 0.663 (mid 0.579), row 5 ≈ 0.284, row 6 ≈ 0.126.
+        # Per-row legends, anchored to the 7-row layout. Row tops in
+        # paper coords (with row_heights=[0.16, 0.09, 0.18, 0.10, 0.11,
+        # 0.13, 0.23] and vertical_spacing=0.06): row 2 ≈ 0.838,
+        # row 3 ≈ 0.720 (mid 0.662), row 5 ≈ 0.421, row 6 ≈ 0.290,
+        # row 7 ≈ 0.147 (mid 0.074).
         legend6=dict(
             title_text="Rolling Sharpe",
             xref="paper", x=1.02,
-            yref="paper", y=0.800, yanchor="top",
+            yref="paper", y=0.838, yanchor="top",
         ),
         legend5=dict(
             title_text="Wave bucket",
             xref="paper", x=1.02,
-            yref="paper", y=0.579, yanchor="middle",
+            yref="paper", y=0.662, yanchor="middle",
         ),
         legend3=dict(
             title_text="Asset class",
             xref="paper", x=1.02,
-            yref="paper", y=0.284, yanchor="top",
+            yref="paper", y=0.421, yanchor="top",
         ),
         legend4=dict(
             title_text="Wave bucket",
             xref="paper", x=1.02,
-            yref="paper", y=0.126, yanchor="top",
+            yref="paper", y=0.290, yanchor="top",
         ),
-        # Chart 7: row top ≈ 0.090, row bottom = 0, midpoint ≈ 0.045.
         legend8=dict(
             title_text="Top 3 gainers",
             xref="paper", x=1.02,
-            yref="paper", y=0.045, yanchor="middle",
+            yref="paper", y=0.074, yanchor="middle",
         ),
     )
 
