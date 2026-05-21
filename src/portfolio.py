@@ -1656,17 +1656,17 @@ WAVE_DISPLAY_LABEL: dict[str, str] = {
 
 def _ticker_label(t: str) -> str:
     """Two-line tick label: ticker on top, wave bucket (equities) or
-    asset class (non-equities) on a tighter second line. Using
-    <span style='font-size:0.6em;'> in place of <sub> drops the
-    subscript baseline shift, so the two lines sit ~quarter-ex closer."""
+    asset class (non-equities) on a tighter second line. <sup> shifts
+    the second-line baseline UP (superscript), so the wave/asset text
+    sits ~half-ex closer to the ticker than a plain second line would."""
     cls = TICKER_ASSET_CLASS.get(t, "equity")
     if cls == "equity":
         wave = WAVE_DISPLAY_LABEL.get(TICKER_WAVE.get(t, "general_markets"), "")
-        return f"{t}<br><span style='font-size:0.6em;'>{wave}</span>"
+        return f"{t}<br><sup>{wave}</sup>"
     if cls == "equity ETF":
         wave = WAVE_DISPLAY_LABEL.get(TICKER_WAVE.get(t, "general_markets"), "")
-        return f"{t}<br><span style='font-size:0.6em;'>{wave} ETF</span>"
-    return f"{t}<br><span style='font-size:0.6em;'>{cls}</span>"
+        return f"{t}<br><sup>{wave} ETF</sup>"
+    return f"{t}<br><sup>{cls}</sup>"
 
 
 
@@ -2797,7 +2797,7 @@ def build_curator_dashboard(
 
     fig = make_subplots(
         rows=7, cols=1, vertical_spacing=0.06,
-        row_heights=[0.145, 0.082, 0.164, 0.091, 0.100, 0.118, 0.300],
+        row_heights=[0.166, 0.094, 0.187, 0.104, 0.114, 0.135, 0.200],
         subplot_titles=(
             "1. Realized portfolio value: curator vs baselines vs benchmark",
             "2. Rolling 90-day Sharpe ratio",
@@ -3037,8 +3037,8 @@ def build_curator_dashboard(
         fig.add_trace(
             go.Scatter(
                 x=_shp.values, y=_ann.values, mode="lines+markers",
-                name=_tk, legend="legend8",
-                line={"color": _faded, "width": 1.2},
+                name=_tk, legend="legend8", opacity=0.5,
+                line={"color": _solid, "width": 1.2},
                 marker={"color": _solid, "size": 3},
                 hovertemplate=(f"<b>{_tk}</b><br>"
                                "Sharpe %{x:.2f}<br>"
@@ -3060,7 +3060,7 @@ def build_curator_dashboard(
         )
     fig.update_xaxes(title_text="rolling 90-day Sharpe", row=7, col=1,
                      zeroline=True, zerolinewidth=1, zerolinecolor="#888",
-                     domain=[0.1675, 0.8325])
+                     domain=[0.058, 0.942])
     fig.update_yaxes(title_text="rolling 90-day annualized return",
                      tickformat=".0%", row=7, col=1,
                      zeroline=True, zerolinewidth=1, zerolinecolor="#888")
@@ -3068,7 +3068,7 @@ def build_curator_dashboard(
 
     fig.update_layout(
         template="seaborn",
-        height=4000, margin={"t": 90, "b": 60, "l": 80, "r": 30},
+        height=3700, margin={"t": 90, "b": 60, "l": 80, "r": 30},
         title={
             "text": (
                 f"<span style='font-size:14px;color:#555;'>"
@@ -3076,10 +3076,7 @@ def build_curator_dashboard(
                 f"·  Buy/hold: {bnh_return * 100:+.0f}%  "
                 f"·  (Curator - buy/hold): {(cur_return - bnh_return) * 100:+.0f}%  "
                 f"·  (Curator - buy/hold)/(buy/hold): "
-                f"{(cur_return - bnh_return) / bnh_return:.2f}  ·  "
-                "general_markets = defensive equity ETFs (broad-market / dividend / "
-                "utilities / staples); cashlike = bonds + cash-equivalents + precious "
-                "metals (e.g., AGG, BIL, IAU)"
+                f"{(cur_return - bnh_return) / bnh_return:.2f}"
                 f"</span>"
             ),
             "x": 0.5, "xanchor": "center",
@@ -3091,34 +3088,34 @@ def build_curator_dashboard(
             xref="paper", x=1.02, yref="paper", y=0.98, yanchor="top",
         ),
         # Per-row legends, anchored to the 7-row layout. Row tops in
-        # paper coords (with row_heights=[0.145, 0.082, 0.164, 0.091,
-        # 0.100, 0.118, 0.300] and vertical_spacing=0.06):
-        # row 2 top ≈ 0.847, row 3 mid ≈ 0.682, row 5 top ≈ 0.452,
-        # row 6 top ≈ 0.328, row 7 mid ≈ 0.096.
+        # paper coords (with row_heights=[0.166, 0.094, 0.187, 0.104,
+        # 0.114, 0.135, 0.200] and vertical_spacing=0.06):
+        # row 2 top ≈ 0.834, row 3 mid ≈ 0.658, row 5 top ≈ 0.408,
+        # row 6 top ≈ 0.275, row 7 mid ≈ 0.064.
         legend6=dict(
             title_text="Rolling Sharpe",
             xref="paper", x=1.02,
-            yref="paper", y=0.847, yanchor="top",
+            yref="paper", y=0.834, yanchor="top",
         ),
         legend5=dict(
             title_text="Wave bucket",
             xref="paper", x=1.02,
-            yref="paper", y=0.682, yanchor="middle",
+            yref="paper", y=0.658, yanchor="middle",
         ),
         legend3=dict(
             title_text="Asset class",
             xref="paper", x=1.02,
-            yref="paper", y=0.452, yanchor="top",
+            yref="paper", y=0.408, yanchor="top",
         ),
         legend4=dict(
             title_text="Wave bucket",
             xref="paper", x=1.02,
-            yref="paper", y=0.328, yanchor="top",
+            yref="paper", y=0.275, yanchor="top",
         ),
         legend8=dict(
             title_text="Best 3 + worst 2",
             xref="paper", x=1.02,
-            yref="paper", y=0.096, yanchor="middle",
+            yref="paper", y=0.064, yanchor="middle",
         ),
     )
 
@@ -3176,7 +3173,11 @@ def build_curator_dashboard(
         'the value of the initial portfolio (which never gets rebalanced or '
         'optimized) over time. The buy-and-hold portfolio has equal amounts of '
         '<code>[AAPL, MSFT, GOOGL, NVDA, SPY]</code> and is held without any '
-        'rebalancing across the 5 year window.</p>'
+        'rebalancing across the 5 year window. '
+        'Throughout the charts below: <code>general_markets</code> = defensive '
+        'equity ETFs (broad-market / dividend / utilities / staples); '
+        '<code>cashlike</code> = bonds + cash-equivalents + precious metals '
+        '(e.g., AGG, BIL, IAU).</p>'
         + chart_html
         + log_html
         + '</body></html>'
