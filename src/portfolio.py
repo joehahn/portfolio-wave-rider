@@ -2796,8 +2796,8 @@ def build_curator_dashboard(
     bnh_return = (bnh_final / bnh_initial) - 1.0
 
     fig = make_subplots(
-        rows=7, cols=1, vertical_spacing=0.06,
-        row_heights=[0.166, 0.094, 0.187, 0.104, 0.114, 0.135, 0.200],
+        rows=8, cols=1, vertical_spacing=0.06,
+        row_heights=[0.138, 0.078, 0.156, 0.087, 0.095, 0.113, 0.166, 0.166],
         subplot_titles=(
             "1. Realized portfolio value: curator vs baselines vs benchmark",
             "2. Rolling 90-day Sharpe ratio",
@@ -2806,6 +2806,7 @@ def build_curator_dashboard(
             "5. Actual portfolio $ by asset class over time",
             "6. Actual portfolio $ by wave over time",
             "7. Top ticker trajectories in return vs Sharpe space",
+            "8. Ticker phase space: value vs its rate of change",
         ),
     )
 
@@ -3065,6 +3066,57 @@ def build_curator_dashboard(
                      tickformat=".0%", row=7, col=1,
                      zeroline=True, zerolinewidth=1, zerolinecolor="#888")
 
+    # Chart 8: phase-space view (x = price normalized to its starting
+    # value, y = dx/dt in the same units) for the same five tickers as
+    # chart 7. Both axes are 90-day rolling means so the trajectories
+    # reflect structural motion through phase space rather than daily
+    # noise. Outward drift = compounding; tight loops near (x, 0) =
+    # mean-reverting; sustained y < 0 = decline.
+    for _i, _tk in enumerate(_chart7_tickers):
+        _grp = snaps_sorted[snaps_sorted["ticker"] == _tk].sort_values("date").reset_index(drop=True)
+        if len(_grp) < _ROLL + 2:
+            continue
+        _p = _grp["price"].astype(float)
+        _p0 = float(_p.iloc[0])
+        _xn = _p / _p0                       # normalized price (×starting)
+        _vn = _xn.diff()                     # dx/dt in same units
+        _xs = _xn.rolling(_ROLL).mean()
+        _ys = _vn.rolling(_ROLL).mean()
+        _xs, _ys = _xs.align(_ys, join="inner")
+        _xs, _ys = _xs.dropna(), _ys.dropna()
+        if _xs.empty:
+            continue
+        _solid, _ = _distinct_colors[_i % len(_distinct_colors)]
+        fig.add_trace(
+            go.Scatter(
+                x=_xs.values, y=_ys.values, mode="lines+markers",
+                name=_tk, legend="legend9", opacity=0.5,
+                line={"color": _solid, "width": 1.2},
+                marker={"color": _solid, "size": 3},
+                hovertemplate=(f"<b>{_tk}</b><br>"
+                               "value %{x:.2f}×<br>"
+                               "dv/dt %{y:.4f}×/day<extra></extra>"),
+            ),
+            row=8, col=1,
+        )
+        fig.add_trace(
+            go.Scatter(
+                x=[float(_xs.iloc[-1])], y=[float(_ys.iloc[-1])],
+                mode="markers+text", text=[_tk],
+                textposition="top right",
+                textfont={"size": 11, "color": _solid},
+                marker={"size": 8, "color": _solid},
+                showlegend=False, hoverinfo="skip",
+            ),
+            row=8, col=1,
+        )
+    fig.update_xaxes(title_text="ticker value (× starting price)",
+                     row=8, col=1, domain=[0.058, 0.942],
+                     zeroline=True, zerolinewidth=1, zerolinecolor="#888")
+    fig.update_yaxes(title_text="d(value)/dt (× starting price / day)",
+                     row=8, col=1,
+                     zeroline=True, zerolinewidth=1, zerolinecolor="#888")
+
 
     fig.update_layout(
         template="seaborn",
@@ -3117,48 +3169,38 @@ def build_curator_dashboard(
             xref="paper", x=1.02,
             yref="paper", y=0.064, yanchor="middle",
         ),
+        legend9=dict(
+            title_text="Best 3 + worst 2",
+            xref="paper", x=1.02,
+            yref="paper", y=0.0, yanchor="middle",  # overridden below
+        ),
     )
 
-    # --- Per-gap vertical spacing override ---
+    # --- Per-gap vertical spacing override (8-row layout) ---
     # Plotly's make_subplots only supports a single uniform
-    # vertical_spacing. We want each gap shrunk to ~50% of plotly's
-    # default 0.06 (so gap fraction 0.030) except gap(4,5) which is
-    # shrunk only ~33% (0.040), without shrinking the subplots
-    # themselves. We do this by overriding each yaxis's domain and
-    # shortening the figure height so the absolute row pixel sizes are
-    # preserved.
-    _ORIG_H = 3700
-    _NORMAL_GAP_PX = (0.06 * _ORIG_H) * 0.50  # 50% of original gap
-    _GAP45_PX      = (0.06 * _ORIG_H) * 0.67  # 33% shrunk
-    _row_h_pct = [0.166, 0.094, 0.187, 0.104, 0.114, 0.135, 0.200]
-    _plot_px = (1 - 6 * 0.06) * _ORIG_H        # preserve row pixels
-    _total_gap_px = 5 * _NORMAL_GAP_PX + _GAP45_PX
-    _new_fig_h = int(_plot_px + _total_gap_px)
-    _gap_fracs = [
-        _NORMAL_GAP_PX / _new_fig_h,  # 1-2
-        _NORMAL_GAP_PX / _new_fig_h,  # 2-3
-        _NORMAL_GAP_PX / _new_fig_h,  # 3-4
-        _GAP45_PX      / _new_fig_h,  # 4-5
-        _NORMAL_GAP_PX / _new_fig_h,  # 5-6
-        _NORMAL_GAP_PX / _new_fig_h,  # 6-7
-    ]
-    _plot_frac = 1 - sum(_gap_fracs)
-    _row_pf = [r * _plot_frac for r in _row_h_pct]
+    # vertical_spacing. We want each chart-to-chart gap shrunk to 50%
+    # of plotly's default (0.06 * fig_h = 222 px -> 111 px) except
+    # gap(4,5) which is shrunk only 33% (-> 149 px). Override each
+    # yaxis's domain and size the figure in absolute pixels so
+    # individual subplot sizes are preserved across edits.
+    ROW_PX = [393, 223, 443, 246, 270, 320, 473, 473]   # charts 1..8
+    GAP_PX = [111, 111, 111, 149, 111, 111, 111]        # 7 gaps
+    _new_fig_h = sum(ROW_PX) + sum(GAP_PX)              # 3656
     _tops, _bots = [], []
     _y = 1.0
-    for _i, _h in enumerate(_row_pf):
+    for _i, _h_px in enumerate(ROW_PX):
         _tops.append(_y)
-        _y -= _h
+        _y -= _h_px / _new_fig_h
         _bots.append(_y)
-        if _i < 6:
-            _y -= _gap_fracs[_i]
+        if _i < len(GAP_PX):
+            _y -= GAP_PX[_i] / _new_fig_h
     # Apply yaxis domains.
-    for _i in range(7):
+    for _i in range(8):
         _key = "yaxis" if _i == 0 else f"yaxis{_i + 1}"
         fig.layout[_key].domain = (max(0.0, _bots[_i]), min(1.0, _tops[_i]))
     # Reposition subplot-title annotations (~14px above each row top).
     _title_offset = 14 / _new_fig_h
-    for _i in range(min(7, len(fig.layout.annotations))):
+    for _i in range(min(8, len(fig.layout.annotations))):
         fig.layout.annotations[_i].update(y=_tops[_i] + _title_offset)
     # Reposition per-row legends to the new geometry.
     fig.update_layout(
@@ -3168,6 +3210,7 @@ def build_curator_dashboard(
         legend3=dict(y=_tops[4], yanchor="top"),
         legend4=dict(y=_tops[5], yanchor="top"),
         legend8=dict(y=(_tops[6] + _bots[6]) / 2, yanchor="middle"),
+        legend9=dict(y=(_tops[7] + _bots[7]) / 2, yanchor="middle"),
     )
 
     # Curation event log table at the bottom.
