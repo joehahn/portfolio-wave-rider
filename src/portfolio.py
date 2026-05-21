@@ -2877,7 +2877,7 @@ def build_curator_dashboard(
         )
     fig.update_yaxes(
         title_text="portfolio value ($)", row=1, col=1,
-        type="log", range=[4, 6],
+        type="log",
         tickvals=[10000, 30000, 100000, 300000, 1000000],
         ticktext=["$10K", "$30K", "$100K", "$300K", "$1M"],
     )
