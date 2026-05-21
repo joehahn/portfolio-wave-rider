@@ -3119,6 +3119,57 @@ def build_curator_dashboard(
         ),
     )
 
+    # --- Per-gap vertical spacing override ---
+    # Plotly's make_subplots only supports a single uniform
+    # vertical_spacing. We want each gap shrunk to ~50% of plotly's
+    # default 0.06 (so gap fraction 0.030) except gap(4,5) which is
+    # shrunk only ~33% (0.040), without shrinking the subplots
+    # themselves. We do this by overriding each yaxis's domain and
+    # shortening the figure height so the absolute row pixel sizes are
+    # preserved.
+    _ORIG_H = 3700
+    _NORMAL_GAP_PX = (0.06 * _ORIG_H) * 0.50  # 50% of original gap
+    _GAP45_PX      = (0.06 * _ORIG_H) * 0.67  # 33% shrunk
+    _row_h_pct = [0.166, 0.094, 0.187, 0.104, 0.114, 0.135, 0.200]
+    _plot_px = (1 - 6 * 0.06) * _ORIG_H        # preserve row pixels
+    _total_gap_px = 5 * _NORMAL_GAP_PX + _GAP45_PX
+    _new_fig_h = int(_plot_px + _total_gap_px)
+    _gap_fracs = [
+        _NORMAL_GAP_PX / _new_fig_h,  # 1-2
+        _NORMAL_GAP_PX / _new_fig_h,  # 2-3
+        _NORMAL_GAP_PX / _new_fig_h,  # 3-4
+        _GAP45_PX      / _new_fig_h,  # 4-5
+        _NORMAL_GAP_PX / _new_fig_h,  # 5-6
+        _NORMAL_GAP_PX / _new_fig_h,  # 6-7
+    ]
+    _plot_frac = 1 - sum(_gap_fracs)
+    _row_pf = [r * _plot_frac for r in _row_h_pct]
+    _tops, _bots = [], []
+    _y = 1.0
+    for _i, _h in enumerate(_row_pf):
+        _tops.append(_y)
+        _y -= _h
+        _bots.append(_y)
+        if _i < 6:
+            _y -= _gap_fracs[_i]
+    # Apply yaxis domains.
+    for _i in range(7):
+        _key = "yaxis" if _i == 0 else f"yaxis{_i + 1}"
+        fig.layout[_key].domain = (max(0.0, _bots[_i]), min(1.0, _tops[_i]))
+    # Reposition subplot-title annotations (~14px above each row top).
+    _title_offset = 14 / _new_fig_h
+    for _i in range(min(7, len(fig.layout.annotations))):
+        fig.layout.annotations[_i].update(y=_tops[_i] + _title_offset)
+    # Reposition per-row legends to the new geometry.
+    fig.update_layout(
+        height=_new_fig_h,
+        legend6=dict(y=_tops[1], yanchor="top"),
+        legend5=dict(y=(_tops[2] + _bots[2]) / 2, yanchor="middle"),
+        legend3=dict(y=_tops[4], yanchor="top"),
+        legend4=dict(y=_tops[5], yanchor="top"),
+        legend8=dict(y=(_tops[6] + _bots[6]) / 2, yanchor="middle"),
+    )
+
     # Curation event log table at the bottom.
     log_html = ""
     if summary_path.exists():
