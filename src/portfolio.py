@@ -2875,30 +2875,13 @@ def build_curator_dashboard(
     seen.reverse()  # so top of chart is first-added
     y_index = {tk: i for i, tk in enumerate(seen)}
 
-    # Per-wave shade variation: each ticker within a wave bucket gets a
-    # distinct lightness step of the wave's base color, so adjacent rows
-    # in the Gantt that share a wave (e.g., 8 AI tickers) are visually
-    # distinguishable while still grouping as the same hue family.
-    import colorsys
-    wave_tickers: dict[str, list[str]] = {}
-    for tk, _, _, wb in periods:
-        if tk not in wave_tickers.setdefault(wb, []):
-            wave_tickers[wb].append(tk)
-
-    def _shade(base_hex: str, idx: int, n: int) -> str:
-        h = base_hex.lstrip("#")
-        r, g, b = (int(h[i:i+2], 16) / 255 for i in (0, 2, 4))
-        hh, ll, ss = colorsys.rgb_to_hls(r, g, b)
-        # Spread lightness across [0.30, 0.70] so all variants stay legible.
-        new_l = ll if n <= 1 else 0.30 + (idx / (n - 1)) * 0.40
-        nr, ng, nb = colorsys.hls_to_rgb(hh, new_l, ss)
-        return f"#{int(nr*255):02x}{int(ng*255):02x}{int(nb*255):02x}"
-
+    # Each ticker's Gantt bar uses its wave's base color exactly so the
+    # bar hue matches the legend swatch one-for-one. (Previous version
+    # spread lightness across each wave's tickers to disambiguate
+    # adjacent same-wave rows; that's traded for legend-color fidelity.)
     legend_seen: set[str] = set()
     for tk, p_start, p_end, wb in periods:
-        members = wave_tickers[wb]
-        idx = members.index(tk)
-        color = _shade(WAVE_COLORS.get(wb, "#888888"), idx, len(members))
+        color = WAVE_COLORS.get(wb, "#888888")
         show_legend = wb not in legend_seen
         legend_seen.add(wb)
         fig.add_trace(
