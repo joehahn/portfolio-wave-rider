@@ -2781,16 +2781,15 @@ def build_curator_dashboard(
     bnh_return = (bnh_final / bnh_initial) - 1.0
 
     fig = make_subplots(
-        rows=7, cols=1, vertical_spacing=0.06,
-        row_heights=[0.18, 0.10, 0.10, 0.22, 0.12, 0.13, 0.15],
+        rows=6, cols=1, vertical_spacing=0.06,
+        row_heights=[0.20, 0.11, 0.24, 0.13, 0.14, 0.18],
         subplot_titles=(
             "1. Realized portfolio value: curator vs baselines vs benchmark",
             "2. Rolling 90-day Sharpe ratio (curator vs buy-and-hold vs SPY)",
-            "3. Drawdown over time (curator vs buy-and-hold)",
-            "4. Watchlist composition over time (one row per ticker; color = wave bucket)",
-            "5. Cumulative $ gain per holding over the 5y window",
-            "6. Actual portfolio $ by asset class over time",
-            "7. Actual portfolio $ by wave over time<br>"
+            "3. Watchlist composition over time (one row per ticker; color = wave bucket)",
+            "4. Cumulative $ gain per holding over the 5y window",
+            "5. Actual portfolio $ by asset class over time",
+            "6. Actual portfolio $ by wave over time<br>"
             "<span style='font-size:0.8em;color:#666;font-weight:400;'>"
             "general_markets = defensive equity ETFs (broad-market / dividend / "
             "utilities / staples); cashlike = bonds + cash-equivalents + precious "
@@ -2868,33 +2867,7 @@ def build_curator_dashboard(
                      zeroline=True, zerolinewidth=1, zerolinecolor="#888")
     fig.update_xaxes(range=[start, end], row=2, col=1)
 
-    # Chart 3: drawdown over time. At each date, the % below the prior
-    # running-max value. Always ≤ 0; 0 means at-a-peak, more negative
-    # means deeper underwater. Two curves: curator and buy-and-hold.
-    def _drawdown(value: pd.Series) -> pd.Series:
-        return (value / value.cummax()) - 1.0
-
-    fig.add_trace(
-        go.Scatter(x=totals.index, y=_drawdown(totals).values,
-                   name="Curator", mode="lines", legend="legend7",
-                   line={"color": "#d97706", "width": 2},
-                   hovertemplate="%{x|%Y-%m-%d}<br>drawdown %{y:.1%}<extra>Curator</extra>"),
-        row=3, col=1,
-    )
-    if "eq_total" in baselines.columns:
-        _bnh_val = baselines.dropna(subset=["eq_total"]).set_index("date")["eq_total"]
-        fig.add_trace(
-            go.Scatter(x=_bnh_val.index, y=_drawdown(_bnh_val).values,
-                       name="Buy-and-hold", mode="lines", legend="legend7",
-                       line={"color": "#3b82f6", "width": 1.8},
-                       hovertemplate="%{x|%Y-%m-%d}<br>drawdown %{y:.1%}<extra>Buy-and-hold</extra>"),
-            row=3, col=1,
-        )
-    fig.update_yaxes(title_text="drawdown", row=3, col=1, tickformat=".0%",
-                     zeroline=True, zerolinewidth=1, zerolinecolor="#888")
-    fig.update_xaxes(range=[start, end], row=3, col=1)
-
-    # Chart 4: watchlist Gantt. One row per ticker, color = wave_bucket.
+    # Chart 3: watchlist Gantt. One row per ticker, color = wave_bucket.
     # Sort tickers so the first-added is at the top, latest at the bottom.
     seen: list[str] = []
     for tk, _s, _e, _wb in periods:
@@ -2938,16 +2911,16 @@ def build_curator_dashboard(
                 hovertemplate=f"<b>{tk}</b><br>{wb}<br>"
                               f"%{{x|%Y-%m-%d}}<extra></extra>",
             ),
-            row=4, col=1,
+            row=3, col=1,
         )
 
     fig.update_yaxes(
         tickmode="array", tickvals=list(range(len(seen))), ticktext=seen,
-        autorange="reversed", row=4, col=1,
+        autorange="reversed", row=3, col=1,
     )
-    fig.update_xaxes(range=[start, end], row=4, col=1)
+    fig.update_xaxes(range=[start, end], row=3, col=1)
 
-    # Chart 5: cumulative $ gain per ticker over the 5y window. Daily
+    # Chart 4: cumulative $ gain per ticker over the 5y window. Daily
     # P&L = prior_day_shares × price_change, summed across the window.
     # Mirrors the live dashboard's chart 5 attribution. Tickers ordered
     # by gain descending, colored green (positive) or red (negative).
@@ -2966,20 +2939,20 @@ def build_curator_dashboard(
         go.Bar(x=_gain_tickers, y=_gain_values, marker_color=_bar_colors,
                name="$ gain", showlegend=False,
                hovertemplate="%{x}<br>$%{y:,.0f}<extra></extra>"),
-        row=5, col=1,
+        row=4, col=1,
     )
     fig.update_xaxes(
         tickmode="array",
         tickvals=_gain_tickers,
         ticktext=[_ticker_label(t) for t in _gain_tickers],
         tickangle=0,
-        row=5, col=1,
+        row=4, col=1,
     )
     fig.update_yaxes(title_text="$ gain", tickformat="$,.0f",
                      zeroline=True, zerolinewidth=1, zerolinecolor="#888",
-                     row=5, col=1)
+                     row=4, col=1)
 
-    # Charts 6 and 7: actual portfolio $ by asset class and by wave over
+    # Charts 5 and 6: actual portfolio $ by asset class and by wave over
     # time. Stacked area on linear y-axis: top edge = total portfolio
     # value; each band's thickness = that bucket's $ contribution.
     snaps_full = snaps.copy()
@@ -3007,7 +2980,7 @@ def build_curator_dashboard(
                        line={"color": ac_colors.get(bucket, "#444"), "width": 0.5},
                        hovertemplate=f"{bucket}<br>%{{x|%Y-%m-%d}}"
                                      "<br>$%{y:,.0f}<extra></extra>"),
-            row=6, col=1,
+            row=5, col=1,
         )
     # Split cash/bonds/precious-metals/crypto out of general_markets into
     # a separate "cashlike" band so general_markets shows only defensive
@@ -3030,17 +3003,17 @@ def build_curator_dashboard(
                        hovertemplate=f"{WAVE_DISPLAY_LABEL.get(wave, wave)}"
                                      "<br>%{x|%Y-%m-%d}"
                                      "<br>$%{y:,.0f}<extra></extra>"),
-            row=7, col=1,
+            row=6, col=1,
         )
+    fig.update_yaxes(title_text="$", tickformat="$,.0f", row=5, col=1)
     fig.update_yaxes(title_text="$", tickformat="$,.0f", row=6, col=1)
-    fig.update_yaxes(title_text="$", tickformat="$,.0f", row=7, col=1)
+    fig.update_xaxes(range=[start, end], row=5, col=1)
     fig.update_xaxes(range=[start, end], row=6, col=1)
-    fig.update_xaxes(range=[start, end], row=7, col=1)
 
 
     fig.update_layout(
         template="seaborn",
-        height=2700, margin={"t": 90, "b": 60, "l": 80, "r": 30},
+        height=2400, margin={"t": 90, "b": 60, "l": 80, "r": 30},
         title={
             "text": (
                 f"<span style='font-size:14px;color:#555;'>"
@@ -3059,34 +3032,29 @@ def build_curator_dashboard(
             title_text="Portfolio value",
             xref="paper", x=1.02, yref="paper", y=0.98, yanchor="top",
         ),
-        # Per-row legends, anchored to the new 7-row layout. Row tops in
-        # paper coords (with row_heights=[0.18, 0.10, 0.10, 0.22, 0.12,
-        # 0.13, 0.15] and vertical_spacing=0.06): row 2 ≈ 0.825,
-        # row 3 ≈ 0.701, row 4 ≈ 0.577, row 6 ≈ 0.239, row 7 ≈ 0.096.
+        # Per-row legends, anchored to the new 6-row layout. Row tops in
+        # paper coords (with row_heights=[0.20, 0.11, 0.24, 0.13, 0.14,
+        # 0.18] and vertical_spacing=0.06): row 2 ≈ 0.800,
+        # row 3 ≈ 0.663 (mid 0.579), row 5 ≈ 0.284, row 6 ≈ 0.126.
         legend6=dict(
             title_text="Rolling Sharpe",
             xref="paper", x=1.02,
-            yref="paper", y=0.825, yanchor="top",
-        ),
-        legend7=dict(
-            title_text="Drawdown",
-            xref="paper", x=1.02,
-            yref="paper", y=0.701, yanchor="top",
+            yref="paper", y=0.800, yanchor="top",
         ),
         legend5=dict(
             title_text="Wave bucket",
             xref="paper", x=1.02,
-            yref="paper", y=0.50, yanchor="middle",
+            yref="paper", y=0.579, yanchor="middle",
         ),
         legend3=dict(
             title_text="Asset class",
             xref="paper", x=1.02,
-            yref="paper", y=0.239, yanchor="top",
+            yref="paper", y=0.284, yanchor="top",
         ),
         legend4=dict(
             title_text="Wave bucket",
             xref="paper", x=1.02,
-            yref="paper", y=0.096, yanchor="top",
+            yref="paper", y=0.126, yanchor="top",
         ),
     )
 
