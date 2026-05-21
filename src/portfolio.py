@@ -1656,17 +1656,17 @@ WAVE_DISPLAY_LABEL: dict[str, str] = {
 
 def _ticker_label(t: str) -> str:
     """Two-line tick label: ticker on top, wave bucket (equities) or
-    asset class (non-equities) on the line below.
-    Equities: 'TICKER<br><sub>wave</sub>'; equity ETFs: '... wave ETF';
-    non-equities: 'TICKER<br><sub>asset class</sub>'."""
+    asset class (non-equities) on a tighter second line. Using
+    <span style='font-size:0.6em;'> in place of <sub> drops the
+    subscript baseline shift, so the two lines sit ~quarter-ex closer."""
     cls = TICKER_ASSET_CLASS.get(t, "equity")
     if cls == "equity":
         wave = WAVE_DISPLAY_LABEL.get(TICKER_WAVE.get(t, "general_markets"), "")
-        return f"{t}<br><sub>{wave}</sub>"
+        return f"{t}<br><span style='font-size:0.6em;'>{wave}</span>"
     if cls == "equity ETF":
         wave = WAVE_DISPLAY_LABEL.get(TICKER_WAVE.get(t, "general_markets"), "")
-        return f"{t}<br><sub>{wave} ETF</sub>"
-    return f"{t}<br><sub>{cls}</sub>"
+        return f"{t}<br><span style='font-size:0.6em;'>{wave} ETF</span>"
+    return f"{t}<br><span style='font-size:0.6em;'>{cls}</span>"
 
 
 
@@ -2797,7 +2797,7 @@ def build_curator_dashboard(
 
     fig = make_subplots(
         rows=7, cols=1, vertical_spacing=0.06,
-        row_heights=[0.16, 0.09, 0.18, 0.10, 0.11, 0.13, 0.23],
+        row_heights=[0.145, 0.082, 0.164, 0.091, 0.100, 0.118, 0.300],
         subplot_titles=(
             "1. Realized portfolio value: curator vs baselines vs benchmark",
             "2. Rolling 90-day Sharpe ratio",
@@ -3005,19 +3005,23 @@ def build_curator_dashboard(
     fig.update_xaxes(range=[start, end], row=6, col=1)
 
     # Chart 7: rolling-90-day (Sharpe on x, return on y) trajectories
-    # for the top three tickers by total $ gain. Connected dots with
-    # semi-transparent lines so individual data points stay readable.
-    # Chart is constrained to a centered square via xaxis.domain (the
-    # subplot row otherwise spans the full figure width).
+    # for the top three GAINERS plus the bottom two (worst-performing)
+    # tickers by total $ gain. Connected dots with semi-transparent
+    # lines so individual data points stay readable. Chart is
+    # constrained to a centered square via xaxis.domain.
     _ROLL = 90
     _RF_D = 0.04 / 252
     _top3 = [t for t, _ in _gain_items[:3]]
+    _worst2 = [t for t, _ in _gain_items[-2:]]
+    _chart7_tickers = _top3 + _worst2
     _distinct_colors = [
-        ("#d97706", "rgba(217,119,6,0.35)"),    # orange
-        ("#3b82f6", "rgba(59,130,246,0.35)"),   # blue
-        ("#a855f7", "rgba(168,85,247,0.35)"),   # purple
+        ("#d97706", "rgba(217,119,6,0.35)"),    # orange  (top 1)
+        ("#3b82f6", "rgba(59,130,246,0.35)"),   # blue    (top 2)
+        ("#a855f7", "rgba(168,85,247,0.35)"),   # purple  (top 3)
+        ("#dc2626", "rgba(220,38,38,0.35)"),    # red     (worst 1)
+        ("#14b8a6", "rgba(20,184,166,0.35)"),   # teal    (worst 2)
     ]
-    for _i, _tk in enumerate(_top3):
+    for _i, _tk in enumerate(_chart7_tickers):
         _grp = snaps_sorted[snaps_sorted["ticker"] == _tk].sort_values("date").reset_index(drop=True)
         if len(_grp) < _ROLL + 2:
             continue
@@ -3056,7 +3060,7 @@ def build_curator_dashboard(
         )
     fig.update_xaxes(title_text="rolling 90-day Sharpe", row=7, col=1,
                      zeroline=True, zerolinewidth=1, zerolinecolor="#888",
-                     domain=[0.25, 0.75])
+                     domain=[0.1675, 0.8325])
     fig.update_yaxes(title_text="rolling 90-day annualized return",
                      tickformat=".0%", row=7, col=1,
                      zeroline=True, zerolinewidth=1, zerolinecolor="#888")
@@ -3064,7 +3068,7 @@ def build_curator_dashboard(
 
     fig.update_layout(
         template="seaborn",
-        height=3200, margin={"t": 120, "b": 60, "l": 80, "r": 30},
+        height=4000, margin={"t": 90, "b": 60, "l": 80, "r": 30},
         title={
             "text": (
                 f"<span style='font-size:14px;color:#555;'>"
@@ -3072,13 +3076,11 @@ def build_curator_dashboard(
                 f"·  Buy/hold: {bnh_return * 100:+.0f}%  "
                 f"·  (Curator - buy/hold): {(cur_return - bnh_return) * 100:+.0f}%  "
                 f"·  (Curator - buy/hold)/(buy/hold): "
-                f"{(cur_return - bnh_return) / bnh_return:.2f}"
-                f"</span>"
-                "<br><span style='font-size:11px;color:#888;'>"
+                f"{(cur_return - bnh_return) / bnh_return:.2f}  ·  "
                 "general_markets = defensive equity ETFs (broad-market / dividend / "
                 "utilities / staples); cashlike = bonds + cash-equivalents + precious "
                 "metals (e.g., AGG, BIL, IAU)"
-                "</span>"
+                f"</span>"
             ),
             "x": 0.5, "xanchor": "center",
         },
@@ -3089,34 +3091,34 @@ def build_curator_dashboard(
             xref="paper", x=1.02, yref="paper", y=0.98, yanchor="top",
         ),
         # Per-row legends, anchored to the 7-row layout. Row tops in
-        # paper coords (with row_heights=[0.16, 0.09, 0.18, 0.10, 0.11,
-        # 0.13, 0.23] and vertical_spacing=0.06): row 2 ≈ 0.838,
-        # row 3 ≈ 0.720 (mid 0.662), row 5 ≈ 0.421, row 6 ≈ 0.290,
-        # row 7 ≈ 0.147 (mid 0.074).
+        # paper coords (with row_heights=[0.145, 0.082, 0.164, 0.091,
+        # 0.100, 0.118, 0.300] and vertical_spacing=0.06):
+        # row 2 top ≈ 0.847, row 3 mid ≈ 0.682, row 5 top ≈ 0.452,
+        # row 6 top ≈ 0.328, row 7 mid ≈ 0.096.
         legend6=dict(
             title_text="Rolling Sharpe",
             xref="paper", x=1.02,
-            yref="paper", y=0.838, yanchor="top",
+            yref="paper", y=0.847, yanchor="top",
         ),
         legend5=dict(
             title_text="Wave bucket",
             xref="paper", x=1.02,
-            yref="paper", y=0.662, yanchor="middle",
+            yref="paper", y=0.682, yanchor="middle",
         ),
         legend3=dict(
             title_text="Asset class",
             xref="paper", x=1.02,
-            yref="paper", y=0.421, yanchor="top",
+            yref="paper", y=0.452, yanchor="top",
         ),
         legend4=dict(
             title_text="Wave bucket",
             xref="paper", x=1.02,
-            yref="paper", y=0.290, yanchor="top",
+            yref="paper", y=0.328, yanchor="top",
         ),
         legend8=dict(
-            title_text="Top 3 gainers",
+            title_text="Best 3 + worst 2",
             xref="paper", x=1.02,
-            yref="paper", y=0.074, yanchor="middle",
+            yref="paper", y=0.096, yanchor="middle",
         ),
     )
 
