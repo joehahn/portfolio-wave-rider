@@ -2785,7 +2785,7 @@ def build_curator_dashboard(
         row_heights=[0.20, 0.11, 0.24, 0.13, 0.14, 0.18],
         subplot_titles=(
             "1. Realized portfolio value: curator vs baselines vs benchmark",
-            "2. Rolling 90-day Sharpe ratio (curator vs buy-and-hold vs SPY)",
+            "2. Rolling 90-day Sharpe ratio",
             "3. Watchlist composition over time (one row per ticker; color = wave bucket)",
             "4. Cumulative $ gain per holding over the 5y window",
             "5. Actual portfolio $ by asset class over time",
