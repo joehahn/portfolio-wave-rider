@@ -2875,8 +2875,12 @@ def build_curator_dashboard(
                        mode="lines", line={"color": "#10b981", "width": 1.5, "dash": "dot"}),
             row=1, col=1,
         )
-    fig.update_yaxes(title_text="portfolio value ($)", tickformat="$,.0f", row=1, col=1,
-                     type="log", range=[4, 6], dtick=1)
+    fig.update_yaxes(
+        title_text="portfolio value ($)", row=1, col=1,
+        type="log", range=[4, 6],
+        tickvals=[10000, 30000, 100000, 300000, 1000000],
+        ticktext=["$10K", "$30K", "$100K", "$300K", "$1M"],
+    )
 
     # Chart 2: watchlist Gantt. One row per ticker, color = wave_bucket.
     # Sort tickers so the first-added is at the top, latest at the bottom.
