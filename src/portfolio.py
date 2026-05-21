@@ -1820,8 +1820,8 @@ def build_dashboard(
     _after_gain       = 9 if is_live else 6
     R_ASSET_USD       = _after_gain
     R_WAVE_USD        = _after_gain + 1
-    R_EXP_VS_REAL     = R_WAVE_USD + 1
-    n_rows            = R_EXP_VS_REAL
+    R_EXP_VS_REAL     = None
+    n_rows            = R_WAVE_USD
 
     _chart5_anchor = "/initialize-portfolio executed" if is_live else "backtest start"
     _chart5_tail = (
@@ -1866,10 +1866,6 @@ def build_dashboard(
     )
     titles_list.append(
         f"{R_WAVE_USD}. Actual portfolio $ by wave over time"
-    )
-    titles_list.append(
-        f"{R_EXP_VS_REAL}. Realized annualized return vs the prediction made one year earlier"
-        "<br><sub><i>At each x-date, orange is the annualized return realized over the year ending at x, and blue is the optimizer's prediction (μᵀw) made at the start of that year.</i></sub>"
     )
     titles_all = tuple(titles_list)
 
@@ -2437,44 +2433,6 @@ def build_dashboard(
                     row=R_TURNOVER, col=1,
                 )
 
-    # Realized vs predicted annualized return, plotted against the
-    # realization date (rebalance + 365 days). At each x, orange is the
-    # return realized over the year ending at x, and blue is the
-    # prediction made at the start of that year. Recent rebalances'
-    # blue points land in the future (beyond today's snapshot date);
-    # their corresponding orange points appear as NaN, which plotly
-    # draws as a gap.
-    if snap_path.exists() and rec_path.exists():
-        try:
-            _rec_evr = pd.read_csv(rec_path)
-            _snap_evr = pd.read_csv(snap_path)
-            evr = _compute_expected_vs_realized(_rec_evr, _snap_evr, window_days=365)
-        except (OSError, pd.errors.EmptyDataError):
-            evr = pd.DataFrame()
-        if not evr.empty:
-            evr = evr.copy()
-            evr["date"] = pd.to_datetime(evr["date"]) + pd.Timedelta(days=365)
-            fig.add_trace(
-                go.Scatter(
-                    x=evr["date"], y=evr["expected"],
-                    name="Predicted (made 1y earlier)",
-                    mode="lines+markers", legend="legend8",
-                    line={"color": "#3b82f6", "width": 2},
-                    hovertemplate="year ending %{x|%Y-%m-%d}<br>predicted %{y:.1%}<extra></extra>",
-                ),
-                row=R_EXP_VS_REAL, col=1,
-            )
-            fig.add_trace(
-                go.Scatter(
-                    x=evr["date"], y=evr["realized"],
-                    name="Realized (year ending at x)",
-                    mode="lines+markers", legend="legend8",
-                    line={"color": "#d97706", "width": 2},
-                    hovertemplate="year ending %{x|%Y-%m-%d}<br>realized %{y:.1%}<extra></extra>",
-                ),
-                row=R_EXP_VS_REAL, col=1,
-            )
-
     # Per-row top y in paper coords: row_top_k = 1 - (k-1) * (row_h + vsp)
     # where row_h = (1 - (n-1)*vsp) / n, vsp = 0.06.
     _vsp = 0.06
@@ -2530,11 +2488,6 @@ def build_dashboard(
             xref="paper", x=1.02,
             yref="paper", y=_row_top(R_WAVE_USD), yanchor="top",
         ),
-        legend8=dict(
-            title_text="Expected vs realized",
-            xref="paper", x=1.02,
-            yref="paper", y=_row_top(R_EXP_VS_REAL), yanchor="top",
-        ),
     )
     fig.update_yaxes(title_text="$", row=R_PORTFOLIO, col=1)
     fig.update_yaxes(title_text="portfolio %", row=R_REC_WAVE, col=1, tickformat=".0%")
@@ -2549,9 +2502,6 @@ def build_dashboard(
     fig.update_yaxes(title_text="$", row=R_ASSET_USD, col=1, tickformat="$,.0f")
     fig.update_yaxes(title_text="$", row=R_WAVE_USD, col=1, tickformat="$,.0f")
     fig.update_yaxes(title_text="turnover (%)", row=R_TURNOVER, col=1, rangemode="tozero")
-    fig.update_yaxes(title_text="annualized return", row=R_EXP_VS_REAL, col=1,
-                     tickformat=".0%", zeroline=True,
-                     zerolinewidth=1, zerolinecolor="#888")
 
     # Apply the padded snapshots-derived range to every time-series
     # subplot so data points don't sit flush against the axis edges
@@ -2563,11 +2513,6 @@ def build_dashboard(
                        R_ASSET_USD, R_WAVE_USD]
         for r in xrange_rows:
             fig.update_xaxes(range=list(xrange), row=r, col=1)
-        # Chart 11's x-axis is shifted +365 days from chart 10's (data
-        # is anchored at realization date, not rebalance date).
-        _xr_start = pd.Timestamp(xrange[0]) + pd.Timedelta(days=365)
-        _xr_end = pd.Timestamp(xrange[1]) + pd.Timedelta(days=365)
-        fig.update_xaxes(range=[_xr_start, _xr_end], row=R_EXP_VS_REAL, col=1)
 
     # CUSTOM SUBPLOT LAYOUT: override plotly's uniform vertical_spacing
     # so specific gaps between subplots can be widened or narrowed
@@ -2630,7 +2575,6 @@ def build_dashboard(
             ("legend7", R_LATEST_WEIGHTS),
             ("legend2", R_ASSET_USD),
             ("legend3", R_WAVE_USD),
-            ("legend8", R_EXP_VS_REAL),
         ]:
             if row_idx in _row_to_yhi:
                 legend_updates[legend_name] = dict(y=_row_to_yhi[row_idx])
@@ -2837,8 +2781,8 @@ def build_curator_dashboard(
     bnh_return = (bnh_final / bnh_initial) - 1.0
 
     fig = make_subplots(
-        rows=6, cols=1, vertical_spacing=0.07,
-        row_heights=[0.20, 0.26, 0.13, 0.12, 0.12, 0.17],
+        rows=5, cols=1, vertical_spacing=0.07,
+        row_heights=[0.22, 0.30, 0.15, 0.16, 0.17],
         subplot_titles=(
             "1. Realized portfolio value: curator vs baselines vs benchmark",
             "2. Watchlist composition over time (one row per ticker; color = wave bucket)",
@@ -2850,10 +2794,6 @@ def build_curator_dashboard(
             "utilities / staples); cashlike = bonds + cash-equivalents + precious "
             "metals (e.g., AGG, BIL, IAU)"
             "</span>",
-            "6. Realized annualized return vs the prediction made one year earlier"
-            "<br><sub>At each x-date, orange is the annualized return realized "
-            "over the year ending at x, and blue is the optimizer's prediction "
-            "(μᵀw) made at the start of that year.</sub>",
         ),
     )
 
@@ -3027,45 +2967,6 @@ def build_curator_dashboard(
     fig.update_xaxes(range=[start, end], row=4, col=1)
     fig.update_xaxes(range=[start, end], row=5, col=1)
 
-    # Chart 6: realized vs predicted annualized return, plotted against
-    # the realization date (rebalance + 365 days). At each x, orange is
-    # the return realized over the year ending at x; blue is the
-    # prediction made at the start of that year. Recent rebalances'
-    # blue points land in the future (beyond the backtest window),
-    # past the right edge of the x-axis.
-    rec_path = bd / "recommendations.csv"
-    if rec_path.exists() and snaps_path.exists():
-        try:
-            _rec = pd.read_csv(rec_path)
-            _snap = pd.read_csv(snaps_path)
-            evr = _compute_expected_vs_realized(_rec, _snap, window_days=365)
-        except (OSError, pd.errors.EmptyDataError):
-            evr = pd.DataFrame()
-        if not evr.empty:
-            evr = evr.copy()
-            evr["date"] = pd.to_datetime(evr["date"]) + pd.Timedelta(days=365)
-            fig.add_trace(
-                go.Scatter(x=evr["date"], y=evr["expected"],
-                           name="Predicted (made 1y earlier)",
-                           mode="lines+markers", legend="legend2",
-                           line={"color": "#3b82f6", "width": 2},
-                           hovertemplate="year ending %{x|%Y-%m-%d}<br>predicted %{y:.1%}<extra></extra>"),
-                row=6, col=1,
-            )
-            fig.add_trace(
-                go.Scatter(x=evr["date"], y=evr["realized"],
-                           name="Realized (year ending at x)",
-                           mode="lines+markers", legend="legend2",
-                           line={"color": "#d97706", "width": 2},
-                           hovertemplate="year ending %{x|%Y-%m-%d}<br>realized %{y:.1%}<extra></extra>"),
-                row=6, col=1,
-            )
-            fig.update_yaxes(title_text="annualized return", tickformat=".0%",
-                             zeroline=True, zerolinewidth=1, zerolinecolor="#888",
-                             row=6, col=1)
-            # x-axis extends one year past the snapshot window so the
-            # future-dated blue points fit.
-            fig.update_xaxes(range=[start, end + pd.Timedelta(days=365)], row=6, col=1)
 
     fig.update_layout(
         template="seaborn",
