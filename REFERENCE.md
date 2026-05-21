@@ -94,7 +94,7 @@ portfolio-wave-rider/
 │   ├── compute_backtest_dates.py  # rolling-5y date diff used by /run-backtest
 │   ├── post_date_events.py     # chronological event timeline; suppression list for as-of-date backtests
 │   ├── replay_watchlist.py     # replays curator JSONs to compute the watchlist at any as-of date
-│   ├── sweep.py                # parameter sweeps for risk_aversion / lookback / max_weight
+│   ├── sweep.py                # parameter sweeps for risk_aversion / lookback / concentration_cap
 │   ├── sweep_watchlist_size.py # aggregates per-cap _backtest dirs into the cap-sweep page
 │   ├── walk_forward.py         # robustness check: are sweep winners stable across halves of the window?
 │   ├── run_sweeps.sh           # convenience runner for the three replay sweeps
@@ -122,7 +122,7 @@ portfolio-wave-rider/
     ├── backtest_curator.html            # 5y curator-backtest dashboard
     ├── sweep_risk_aversion.html         # λ sweep
     ├── sweep_lookback.html              # lookback-period sweep
-    ├── sweep_max_weight.html            # concentration-cap sweep
+    ├── sweep_concentration_cap.html     # concentration-cap sweep
     └── sweep_max_watchlist_size.html    # max_watchlist_size sweep
 ```
 

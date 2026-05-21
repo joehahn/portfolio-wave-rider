@@ -93,7 +93,7 @@ Three overlay pages are written and published to GitHub Pages:
 
 - **[`risk_aversion` `λ`](https://joehahn.github.io/portfolio-wave-rider/sweep_risk_aversion.html)** — default `0.5`. Small `λ` produces a portfolio concentrated in volatile but higher-reward equities; large `λ` shifts the portfolio toward cash and bonds.
 - **[`lookback_period`](https://joehahn.github.io/portfolio-wave-rider/sweep_lookback.html)** — default `1.5y`. The length of the price-history window used to estimate `μ` and `Σ`. Short lookbacks chase recent momentum and react quickly to regime changes but are noisy; long lookbacks average across more market conditions and produce steadier estimates but lag turning points.
-- **[`concentration_cap`](https://joehahn.github.io/portfolio-wave-rider/sweep_max_weight.html)** — default `0.70`. The maximum weight any single ticker can carry. Small caps force diversification across the full watchlist, smoothing returns but diluting conviction; large caps let the optimizer pile into its top picks, raising both upside and drawdown risk.
+- **[`concentration_cap`](https://joehahn.github.io/portfolio-wave-rider/sweep_concentration_cap.html)** — default `0.70`. The maximum weight any single ticker can carry. Small caps force diversification across the full watchlist, smoothing returns but diluting conviction; large caps let the optimizer pile into its top picks, raising both upside and drawdown risk.
 
 All three defaults are set in `investor_profile.md` and can be edited there.
 
