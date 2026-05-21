@@ -3000,16 +3000,16 @@ def build_curator_dashboard(
     fig.update_xaxes(range=[start, end], row=5, col=1)
     fig.update_xaxes(range=[start, end], row=6, col=1)
 
-    # Chart 7: per-ticker trajectory in (rolling 90-day annualized return,
-    # rolling 90-day Sharpe) space. One polyline per ticker that ever
-    # appeared in the watchlist; line color = wave bucket. Tickers that
-    # compounded steadily live in the upper-right; spike-and-crash names
-    # have wider excursions.
+    # Chart 7: rolling-90-day (return, Sharpe) trajectories for the top
+    # three tickers by total $ gain over the backtest window. Distinct
+    # colors per ticker (legend-driven), not wave-bucket colors. End-of-
+    # trajectory marker and ticker label at each line's final point.
     _ROLL = 90
     _RF_D = 0.04 / 252
-    _ticker_curve_map: dict[str, str] = {}
-    for _tk, _grp in snaps_sorted.groupby("ticker"):
-        _grp = _grp.sort_values("date").reset_index(drop=True)
+    _top3 = [t for t, _ in _gain_items[:3]]
+    _distinct_colors = ["#d97706", "#3b82f6", "#a855f7"]  # orange / blue / purple
+    for _i, _tk in enumerate(_top3):
+        _grp = snaps_sorted[snaps_sorted["ticker"] == _tk].sort_values("date").reset_index(drop=True)
         if len(_grp) < _ROLL + 2:
             continue
         _ret = _grp["price"].pct_change().dropna()
@@ -3020,16 +3020,13 @@ def build_curator_dashboard(
         _ann, _shp = _ann.align(_shp, join="inner")
         if _ann.empty:
             continue
-        _wb = TICKER_WAVE.get(_tk, "general_markets")
-        _color = WAVE_COLORS.get(_wb, "#888888")
-        _ticker_curve_map[_tk] = _wb
+        _color = _distinct_colors[_i % len(_distinct_colors)]
         fig.add_trace(
             go.Scatter(
                 x=_ann.values, y=_shp.values, mode="lines",
-                name=f"{_tk} ({_wb})",
-                line={"color": _color, "width": 1.2},
-                opacity=0.65, showlegend=False,
-                hovertemplate=(f"<b>{_tk}</b> ({_wb})<br>"
+                name=_tk, legend="legend8",
+                line={"color": _color, "width": 1.6},
+                hovertemplate=(f"<b>{_tk}</b><br>"
                                "ann ret %{x:.1%}<br>"
                                "Sharpe %{y:.2f}<extra></extra>"),
             ),
@@ -3041,8 +3038,8 @@ def build_curator_dashboard(
                 x=[float(_ann.iloc[-1])], y=[float(_shp.iloc[-1])],
                 mode="markers+text", text=[_tk],
                 textposition="top right",
-                textfont={"size": 9, "color": _color},
-                marker={"size": 5, "color": _color},
+                textfont={"size": 11, "color": _color},
+                marker={"size": 7, "color": _color},
                 showlegend=False, hoverinfo="skip",
             ),
             row=7, col=1,
@@ -3098,6 +3095,12 @@ def build_curator_dashboard(
             title_text="Wave bucket",
             xref="paper", x=1.02,
             yref="paper", y=0.126, yanchor="top",
+        ),
+        # Chart 7: row top ≈ 0.090, row bottom = 0, midpoint ≈ 0.045.
+        legend8=dict(
+            title_text="Top 3 gainers",
+            xref="paper", x=1.02,
+            yref="paper", y=0.045, yanchor="middle",
         ),
     )
 
