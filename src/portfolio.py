@@ -1519,7 +1519,7 @@ def curator_backtest(
 # quantum > fusion), with the current AI wave first and general_markets last.
 _WAVE_DISPLAY_ORDER = [
     "AI", "rockets_spacecraft", "robotics", "engineered_biology",
-    "quantum", "nuclear_fusion", "geopolitical",
+    "quantum", "nuclear", "nuclear_fusion", "demographics", "geopolitical",
     "general_markets", "cashlike",
 ]
 
@@ -1534,7 +1534,9 @@ WAVE_COLORS: dict[str, str] = {
     "robotics":           "#2ca02c",  # green
     "engineered_biology": "#d62728",  # red
     "quantum":            "#9467bd",  # purple
-    "nuclear_fusion":     "#8c564b",  # brown
+    "nuclear":            "#eab308",  # gold (curator's bucket name)
+    "nuclear_fusion":     "#eab308",  # gold (alias used by TICKER_WAVE)
+    "demographics":       "#17becf",  # cyan
     "geopolitical":       "#e377c2",  # pink
     "general_markets":    "#7f7f7f",  # gray
     "cashlike":           "#0d9488",  # deep teal — distinct from any wave hue
@@ -1632,7 +1634,9 @@ WAVE_DISPLAY_LABEL: dict[str, str] = {
     "rockets_spacecraft": "rockets",
     "engineered_biology": "biology",
     "quantum": "quantum",
+    "nuclear": "nuclear",
     "nuclear_fusion": "nuclear",
+    "demographics": "demographics",
     "geopolitical": "geopolitical",
     "general_markets": "general_markets",
     "cashlike": "cashlike",
