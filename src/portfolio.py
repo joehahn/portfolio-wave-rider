@@ -1823,7 +1823,65 @@ def build_dashboard(
     # anchor in the live sense, so the chart is meaningless there.
     is_live = thesis_baseline_path is not None and Path(thesis_baseline_path).exists()
 
-    # Row layout.
+    # Pre-compute the trade list before the row layout: when every proposed
+    # trade falls below `min_trade_size_usd` from investor_profile.md the
+    # whole trade-table chart is omitted and subsequent charts shift up.
+    # Also up front so the table row can be sized to fit every trade row
+    # (Plotly Tables truncate instead of scrolling when their subplot
+    # domain is too small). Returns (ticker, action, shares, $, cur, target)
+    # tuples plus running totals; empty list when there's nothing to trade.
+    _min_trade_usd = 1.0
+    if is_live:
+        try:
+            import yaml as _yaml
+            import re as _re
+            _profile_text = Path("investor_profile.md").read_text()
+            _m = _re.match(r"^---\s*\n(.*?)\n---\s*\n", _profile_text, _re.DOTALL)
+            _min_trade_usd = float((_yaml.safe_load(_m.group(1)) or {}).get(
+                "min_trade_size_usd", 1.0)) if _m else 1.0
+        except (OSError, ValueError, AttributeError):
+            _min_trade_usd = 1.0
+    trade_rows: list[tuple] = []
+    trade_total_buy = 0.0
+    trade_total_sell = 0.0
+    trade_total_value = 0.0
+    if is_live and snap_path.exists() and rec_path.exists():
+        try:
+            _snaps_tt = pd.read_csv(snap_path, parse_dates=["date"])
+            _recs_tt = pd.read_csv(rec_path, parse_dates=["date"])
+            _snap_latest_tt = _snaps_tt[_snaps_tt["date"] == _snaps_tt["date"].max()].copy()
+            _rec_latest_tt = _recs_tt[_recs_tt["date"] == _recs_tt["date"].max()].copy()
+            trade_total_value = float(_snap_latest_tt["value"].sum())
+            if trade_total_value > 0:
+                _price_by = dict(zip(_snap_latest_tt["ticker"], _snap_latest_tt["price"]))
+                _shares_by = dict(zip(_snap_latest_tt["ticker"], _snap_latest_tt["shares"]))
+                _target_w = dict(zip(_rec_latest_tt["ticker"], _rec_latest_tt["weight"]))
+                for tk in sorted(set(_snap_latest_tt["ticker"]) | set(_rec_latest_tt["ticker"])):
+                    cur_shares = float(_shares_by.get(tk, 0.0))
+                    price = float(_price_by.get(tk, float("nan")))
+                    if price != price or price <= 0:
+                        continue
+                    target_dollars = trade_total_value * float(_target_w.get(tk, 0.0))
+                    cur_dollars = cur_shares * price
+                    delta_dollars = target_dollars - cur_dollars
+                    if abs(delta_dollars) < _min_trade_usd:
+                        continue
+                    target_shares = target_dollars / price
+                    delta_shares = target_shares - cur_shares
+                    action = "BUY" if delta_dollars > 0 else "SELL"
+                    if action == "BUY":
+                        trade_total_buy += delta_dollars
+                    else:
+                        trade_total_sell += -delta_dollars
+                    trade_rows.append((tk, action, abs(delta_shares), abs(delta_dollars),
+                                       cur_shares, target_shares))
+                trade_rows.sort(key=lambda r: -r[3])  # biggest $ moves first
+        except Exception:
+            trade_rows = []
+
+    # Row layout. Chart 5 (the trade table) is always present on the live
+    # dashboard; rows below min_trade_size_usd are filtered out above, and
+    # when that leaves the table empty only the header renders.
     R_PORTFOLIO       = 1
     R_TURNOVER        = 2
     R_REC_WAVE        = 3
@@ -1883,49 +1941,6 @@ def build_dashboard(
         f"{R_WAVE_USD}. Actual portfolio $ by wave over time"
     )
     titles_all = tuple(titles_list)
-
-    # Pre-compute the trade list so the table row can be sized to fit
-    # all rows up front (plotly Tables don't expand within their subplot
-    # domain — extra rows get scroll-hidden if the domain is too small).
-    # Returns a list of (ticker, action, shares, $, cur_shares, target_shares)
-    # tuples plus running totals; empty list when there's no data.
-    trade_rows: list[tuple] = []
-    trade_total_buy = 0.0
-    trade_total_sell = 0.0
-    trade_total_value = 0.0
-    if R_TRADE_TABLE is not None and snap_path.exists() and rec_path.exists():
-        try:
-            _snaps_tt = pd.read_csv(snap_path, parse_dates=["date"])
-            _recs_tt = pd.read_csv(rec_path, parse_dates=["date"])
-            _snap_latest_tt = _snaps_tt[_snaps_tt["date"] == _snaps_tt["date"].max()].copy()
-            _rec_latest_tt = _recs_tt[_recs_tt["date"] == _recs_tt["date"].max()].copy()
-            trade_total_value = float(_snap_latest_tt["value"].sum())
-            if trade_total_value > 0:
-                _price_by = dict(zip(_snap_latest_tt["ticker"], _snap_latest_tt["price"]))
-                _shares_by = dict(zip(_snap_latest_tt["ticker"], _snap_latest_tt["shares"]))
-                _target_w = dict(zip(_rec_latest_tt["ticker"], _rec_latest_tt["weight"]))
-                for tk in sorted(set(_snap_latest_tt["ticker"]) | set(_rec_latest_tt["ticker"])):
-                    cur_shares = float(_shares_by.get(tk, 0.0))
-                    price = float(_price_by.get(tk, float("nan")))
-                    if price != price or price <= 0:
-                        continue
-                    target_dollars = trade_total_value * float(_target_w.get(tk, 0.0))
-                    cur_dollars = cur_shares * price
-                    delta_dollars = target_dollars - cur_dollars
-                    if abs(delta_dollars) < 1.0:
-                        continue
-                    target_shares = target_dollars / price
-                    delta_shares = target_shares - cur_shares
-                    action = "BUY" if delta_dollars > 0 else "SELL"
-                    if action == "BUY":
-                        trade_total_buy += delta_dollars
-                    else:
-                        trade_total_sell += -delta_dollars
-                    trade_rows.append((tk, action, abs(delta_shares), abs(delta_dollars),
-                                       cur_shares, target_shares))
-                trade_rows.sort(key=lambda r: -r[3])  # biggest $ moves first
-        except Exception:
-            trade_rows = []
 
     # Subplot specs: every row is an xy chart except the trade-table row
     # (live dashboard only), which uses Plotly's table trace type. The
@@ -2164,7 +2179,7 @@ def build_dashboard(
     # subplot grid between the recommended-weights and actual-weights
     # bar charts. Trade data was computed before make_subplots so the
     # subplot row could be sized to fit every row.
-    if R_TRADE_TABLE is not None and trade_rows:
+    if R_TRADE_TABLE is not None:
         tickers_col = [r[0] for r in trade_rows]
         action_col = [r[1] for r in trade_rows]
         shares_col = [f"{r[2]:,.2f}" for r in trade_rows]
