@@ -2035,15 +2035,15 @@ def build_dashboard(
     if snap_path.exists():
         snaps = pd.read_csv(snap_path, parse_dates=["date"])
         totals = snaps.groupby("date")["total_value"].first().sort_index()
-        # Live plot 1 mirrors the backtest dashboard's plot 1: orange for
-        # the actual portfolio, blue for the buy-and-hold counterfactual,
-        # dotted green for SPY. Non-live (legacy backtest) keeps blue.
-        _port_color = "#d97706" if is_live else "#1f77b4"
+        # Live plot 1: blue for the actual portfolio, orange for the
+        # thesis buy-and-hold counterfactual, dotted green for SPY.
+        # Non-live (legacy backtest) keeps blue too.
+        _port_color = "#3b82f6" if is_live else "#1f77b4"
         _port_width = 2.5 if is_live else 2
         fig.add_trace(
             go.Scatter(x=totals.index, y=totals.values, mode=_ts_mode,
                        name="Portfolio $", line={"width": _port_width, "color": _port_color},
-                       legend="legend"),
+                       legend="legend", legendrank=7),
             row=1, col=1,
         )
         # Mark each rebalance date (where the optimizer fired) with a
@@ -2059,39 +2059,13 @@ def build_dashboard(
                                mode="markers", name="Rebalance",
                                marker={"size": 11, "symbol": "square-open",
                                        "color": "#ff7f0e", "line": {"width": 2}},
-                               legend="legend"),
+                               legend="legend", legendrank=6),
                     row=1, col=1,
                 )
-        # Thesis buy-and-hold counterfactual (live only): if the day-1
-        # /initialize-portfolio allocation had been bought and held with
-        # no further trading, what would it be worth on each subsequent
-        # date? Scaled so its day-1 value equals the live snapshots'
-        # day-1 total (which has been rescaled for capital events, so the
-        # comparison is apples-to-apples in dollar terms). Blue, matching
-        # the backtest dashboard's plot 1.
-        if is_live and len(totals) > 1 and thesis_baseline_path \
-                and Path(thesis_baseline_path).exists():
-            try:
-                _tb = json.loads(Path(thesis_baseline_path).read_text())
-                _holdings = {t: float(v.get("shares", 0.0))
-                             for t, v in _tb.get("holdings", {}).items()}
-                _bh = _thesis_buy_hold_curve(
-                    _holdings, totals.index[0], totals.index[-1], float(totals.iloc[0]),
-                )
-                if _bh is not None:
-                    fig.add_trace(
-                        go.Scatter(x=_bh.index, y=_bh.values, mode="lines",
-                                   name="Buy-and-hold (thesis day 1)",
-                                   line={"width": 1.8, "color": "#3b82f6"},
-                                   legend="legend"),
-                        row=1, col=1,
-                    )
-            except (OSError, ValueError):
-                pass
         # Benchmark overlays normalized to the portfolio's starting value.
         # SPY-style benchmarks are rendered green and dotted so they're
-        # visually distinct from the portfolio (orange on live, blue on
-        # legacy backtest) and the buy-and-hold counterfactual (blue).
+        # visually distinct from the portfolio (blue on live, blue on
+        # legacy backtest) and the buy-and-hold counterfactual (orange).
         if benchmarks and len(totals) > 1:
             benchmark_curves = _fetch_benchmark_curves(
                 benchmarks, totals.index[0], totals.index[-1], float(totals.iloc[0]),
@@ -2103,28 +2077,68 @@ def build_dashboard(
                     go.Scatter(x=curve.index, y=curve.values, mode=_ts_mode,
                                name=f"{b} (rescaled)",
                                line={"width": 1.5, "color": _bench_color, "dash": _bench_dash},
-                               legend="legend"),
+                               legend="legend", legendrank=5),
                     row=1, col=1,
                 )
         # Constant-rate reference curves: dotted lines showing what the
-        # thesis baseline portfolio would be worth at 1% / 3% / 9%
+        # thesis baseline portfolio would be worth at 1% / 3% / 6%
         # per week from day zero. Live dashboard only — anchored at the
         # thesis-baseline date.
         if is_live and len(snaps) > 0:
             anchor_date = snaps["date"].min()
             anchor_value = float(totals.iloc[0])
             ref_dates = pd.to_datetime(totals.index)
-            ref_shades = {0.01: "#cccccc", 0.03: "#888888", 0.09: "#444444"}
-            for rate, color in ref_shades.items():
+            ref_shades = {0.01: "#cccccc", 0.03: "#888888", 0.06: "#444444"}
+            for _ref_idx, (rate, color) in enumerate(ref_shades.items()):
                 days = (ref_dates - anchor_date).days
                 ref_vals = anchor_value * (1 + rate) ** (days / 7.0)
                 fig.add_trace(
                     go.Scatter(x=ref_dates, y=ref_vals, mode="lines",
                                name=f"{int(rate * 100)}%/wk",
                                line={"width": 1, "color": color, "dash": "dot"},
-                               legend="legend"),
+                               legend="legend", legendrank=4 - _ref_idx),
                     row=1, col=1,
                 )
+        # Thesis buy-and-hold counterfactual (live only): if the day-1
+        # /initialize-portfolio allocation had been bought and held with
+        # no further trading, what would it be worth on each subsequent
+        # date? Scaled so its day-1 value equals the live snapshots'
+        # day-1 total (which has been rescaled for capital events, so the
+        # comparison is apples-to-apples in dollar terms). Last in the
+        # add_trace order so it sits at the bottom of the legend column.
+        if is_live and len(totals) > 1 and thesis_baseline_path \
+                and Path(thesis_baseline_path).exists():
+            try:
+                _tb = json.loads(Path(thesis_baseline_path).read_text())
+                _holdings = {t: float(v.get("shares", 0.0))
+                             for t, v in _tb.get("holdings", {}).items()}
+                _bh = _thesis_buy_hold_curve(
+                    _holdings, totals.index[0], totals.index[-1], float(totals.iloc[0]),
+                )
+                if _bh is not None:
+                    # Legend label spells out the thesis day-1 composition
+                    # so a viewer can read the breakdown without opening
+                    # thesis_baseline.json.
+                    _alloc = _tb.get("allocations_usd", {}) or {}
+                    _total_alloc = sum(v for v in _alloc.values() if v) or 1.0
+                    _ranked = sorted(
+                        ((t, v) for t, v in _alloc.items() if v and v > 0),
+                        key=lambda kv: -kv[1],
+                    )
+                    _alloc_lines = "<br>".join(
+                        f"&nbsp;&nbsp;{t} {v / _total_alloc * 100:.0f}%"
+                        for t, v in _ranked
+                    )
+                    _bh_label = f"Buy-and-hold portfolio:<br>{_alloc_lines}"
+                    fig.add_trace(
+                        go.Scatter(x=_bh.index, y=_bh.values, mode="lines",
+                                   name=_bh_label,
+                                   line={"width": 1.8, "color": "#d97706"},
+                                   legend="legend", legendrank=1),
+                        row=1, col=1,
+                    )
+            except (OSError, ValueError):
+                pass
         # No-rebalance counterfactual: hold the first-snapshot share
         # counts for the entire window. Backtest only — in live mode the
         # snapshots span the post-/initialize-portfolio period during
@@ -2563,6 +2577,12 @@ def build_dashboard(
             title_text="Portfolio value",
             xref="paper", x=1.02,
             yref="paper", y=_row_top(R_PORTFOLIO), yanchor="top",
+            # Buy-and-hold's legend label spans 10 lines (header + 9
+            # tickers); with the default valign="middle" the swatch
+            # marker sits next to the midpoint of the ticker list.
+            # valign="top" anchors the marker to the first line so it
+            # reads as the label for "Buy-and-hold portfolio:".
+            valign="top",
         ),
         legend5=dict(
             title_text="Portfolio % by wave",
