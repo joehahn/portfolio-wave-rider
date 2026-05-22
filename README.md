@@ -121,11 +121,9 @@ You can also do nothing and let the next `/review-portfolio` produce a fresh rec
 
 ## How Claude Code skills and subagents fit in
 
-For Claude Code novices wondering why this repo is shaped the way it is.
+This project utilizes two kinds of Claude Code primitives:
 
-This project leans on two Claude Code primitives:
-
-- **Skills** are slash commands. Each one packages a workflow into a single invocation. Typing `/review-portfolio` runs the recipe in [`.claude/skills/review-portfolio/SKILL.md`](.claude/skills/review-portfolio/SKILL.md), which (in order) fires the curator subagent, applies the surviving adds and removes to `holdings.csv`, runs the optimizer, calls the report-writer, and refreshes the dashboard. Four skills live in this repo: [`/initialize-portfolio`](.claude/skills/initialize-portfolio/SKILL.md), [`/review-portfolio`](.claude/skills/review-portfolio/SKILL.md), [`/run-backtest`](.claude/skills/run-backtest/SKILL.md), and [`/sweep-max-watchlist-size`](.claude/skills/sweep-max-watchlist-size/SKILL.md).
+- **Skills** are slash commands. Each one packages a workflow into a single invocation. Typing `/review-portfolio` runs the recipe in [`.claude/skills/review-portfolio/SKILL.md`](.claude/skills/review-portfolio/SKILL.md), which (in order) fires the curator subagent, applies the surviving adds and removes to `holdings.csv`, runs the optimizer, calls the report-writer, and refreshes the dashboard. Four skills exist in this repo: [`/initialize-portfolio`](.claude/skills/initialize-portfolio/SKILL.md), [`/review-portfolio`](.claude/skills/review-portfolio/SKILL.md), [`/run-backtest`](.claude/skills/run-backtest/SKILL.md), and [`/sweep-max-watchlist-size`](.claude/skills/sweep-max-watchlist-size/SKILL.md).
 - **Subagents** are specialist LLMs with narrow tool allowlists. Each one runs in its own context so it doesn't crowd the main conversation. Two live here: [`watchlist-curator`](.claude/agents/watchlist-curator.md) reads news and proposes adds and removes; [`report-writer`](.claude/agents/report-writer.md) writes the monthly report by synthesizing the curator's output and the optimizer's numbers.
 
 The math (mean-variance optimization, price fetching, validation, dashboard rendering) is deterministic and lives in two short Python files. The judgment (which themes are still active, which news matters, what to write in the report) is what an LLM is good at and what's painful to encode as fixed logic. So Python does the math, an LLM does the judgment, and each piece stays small enough to read in one sitting and easy to audit.
