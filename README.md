@@ -119,6 +119,19 @@ You can also do nothing and let the next `/review-portfolio` produce a fresh rec
 - **Curator-driven adds and removes.** At each `/review-portfolio`, the curator can append new rows (always at `shares=0`) and delete rows for tickers it wants to drop. The validator blocks removes for tickers with `shares > 0` — you must liquidate the live position in your brokerage first and zero out the row, then a future `/review-portfolio` can complete the remove. The full audit trail of applied changes lives in `data/curation_history.csv`.
 - **Manual edits still work.** Append `<TICKER>,0` to add by hand; delete a row to remove by hand (subject to the same liquidate-first rule for live positions).
 
+## How Claude Code skills and subagents fit in
+
+For Claude Code novices wondering why this repo is shaped the way it is.
+
+This project leans on two Claude Code primitives:
+
+- **Skills** are slash commands. Each one packages a workflow into a single invocation. Typing `/review-portfolio` runs the recipe in [`.claude/skills/review-portfolio/SKILL.md`](.claude/skills/review-portfolio/SKILL.md), which (in order) fires the curator subagent, applies the surviving adds and removes to `holdings.csv`, runs the optimizer, calls the report-writer, and refreshes the dashboard. Four skills live in this repo: [`/initialize-portfolio`](.claude/skills/initialize-portfolio/SKILL.md), [`/review-portfolio`](.claude/skills/review-portfolio/SKILL.md), [`/run-backtest`](.claude/skills/run-backtest/SKILL.md), and [`/sweep-max-watchlist-size`](.claude/skills/sweep-max-watchlist-size/SKILL.md).
+- **Subagents** are specialist LLMs with narrow tool allowlists. Each one runs in its own context so it doesn't crowd the main conversation. Two live here: [`watchlist-curator`](.claude/agents/watchlist-curator.md) reads news and proposes adds and removes; [`report-writer`](.claude/agents/report-writer.md) writes the monthly report by synthesizing the curator's output and the optimizer's numbers.
+
+The math (mean-variance optimization, price fetching, validation, dashboard rendering) is deterministic and lives in two short Python files. The judgment (which themes are still active, which news matters, what to write in the report) is what an LLM is good at and what's painful to encode as fixed logic. So Python does the math, an LLM does the judgment, and each piece stays small enough to read in one sitting and easy to audit.
+
+A pure-code solution would need either hand-written thematic-news rules (brittle, go stale fast) or headline-scoring NLP (fragile, won't generalize). Letting an LLM do everything (including the optimizer) is slow, irreproducible, and likely worse than the textbook solver. The skill plus subagent plus Python split lets each tool do what it's best at.
+
 ## How the watchlist curator works
 
 The curator is the AI subagent that decides which tickers belong on the watchlist, and it executes when you call `/review-portfolio`. Its job is composition only: read the news, decide what to add and what to remove against the current watchlist. It does not propose weights or generate any forecasts. Instead it manages the list of tickers that the optimizer can choose from, doing so in a way that is informed by current news and aligned with your investing thesis.
