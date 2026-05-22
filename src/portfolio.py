@@ -1747,6 +1747,41 @@ def _fetch_benchmark_curves(
     return curves
 
 
+def _thesis_buy_hold_curve(
+    thesis_holdings: dict[str, float],
+    start: pd.Timestamp,
+    end: pd.Timestamp,
+    anchor: float,
+) -> "pd.Series | None":
+    """Daily portfolio value of the thesis-baseline holdings held without
+    rebalancing from ``start`` to ``end``, then uniformly rescaled so the
+    first value equals ``anchor``. Used by the live dashboard's plot 1 to
+    contrast the path actually taken (curator picks plus manual rebalances)
+    against the counterfactual of just holding the initial
+    /initialize-portfolio allocation."""
+    tickers = [t for t, s in thesis_holdings.items() if s > 0]
+    if not tickers:
+        return None
+    try:
+        raw = yf.download(tickers, start=start, end=end + pd.Timedelta(days=1),
+                          auto_adjust=True, progress=False, group_by="column")
+    except Exception:  # noqa: BLE001 — yfinance is permissively wrapped elsewhere too.
+        return None
+    if raw.empty:
+        return None
+    closes = raw["Close"] if isinstance(raw.columns, pd.MultiIndex) \
+        else raw[["Close"]].rename(columns={"Close": tickers[0]})
+    closes = closes.dropna(how="all").ffill().dropna(how="all")
+    common = [t for t in tickers if t in closes.columns]
+    if not common:
+        return None
+    shares = pd.Series({t: thesis_holdings[t] for t in common})
+    values = closes[common].mul(shares, axis=1).sum(axis=1).dropna()
+    if values.empty or float(values.iloc[0]) <= 0:
+        return None
+    return (values / float(values.iloc[0])) * anchor
+
+
 def _compute_expected_vs_realized(
     rec_df: pd.DataFrame, snap_df: pd.DataFrame, window_days: int = 365,
 ) -> pd.DataFrame:
@@ -2000,9 +2035,14 @@ def build_dashboard(
     if snap_path.exists():
         snaps = pd.read_csv(snap_path, parse_dates=["date"])
         totals = snaps.groupby("date")["total_value"].first().sort_index()
+        # Live plot 1 mirrors the backtest dashboard's plot 1: orange for
+        # the actual portfolio, blue for the buy-and-hold counterfactual,
+        # dotted green for SPY. Non-live (legacy backtest) keeps blue.
+        _port_color = "#d97706" if is_live else "#1f77b4"
+        _port_width = 2.5 if is_live else 2
         fig.add_trace(
             go.Scatter(x=totals.index, y=totals.values, mode=_ts_mode,
-                       name="Portfolio $", line={"width": 2, "color": "#1f77b4"},
+                       name="Portfolio $", line={"width": _port_width, "color": _port_color},
                        legend="legend"),
             row=1, col=1,
         )
@@ -2022,31 +2062,59 @@ def build_dashboard(
                                legend="legend"),
                     row=1, col=1,
                 )
+        # Thesis buy-and-hold counterfactual (live only): if the day-1
+        # /initialize-portfolio allocation had been bought and held with
+        # no further trading, what would it be worth on each subsequent
+        # date? Scaled so its day-1 value equals the live snapshots'
+        # day-1 total (which has been rescaled for capital events, so the
+        # comparison is apples-to-apples in dollar terms). Blue, matching
+        # the backtest dashboard's plot 1.
+        if is_live and len(totals) > 1 and thesis_baseline_path \
+                and Path(thesis_baseline_path).exists():
+            try:
+                _tb = json.loads(Path(thesis_baseline_path).read_text())
+                _holdings = {t: float(v.get("shares", 0.0))
+                             for t, v in _tb.get("holdings", {}).items()}
+                _bh = _thesis_buy_hold_curve(
+                    _holdings, totals.index[0], totals.index[-1], float(totals.iloc[0]),
+                )
+                if _bh is not None:
+                    fig.add_trace(
+                        go.Scatter(x=_bh.index, y=_bh.values, mode="lines",
+                                   name="Buy-and-hold (thesis day 1)",
+                                   line={"width": 1.8, "color": "#3b82f6"},
+                                   legend="legend"),
+                        row=1, col=1,
+                    )
+            except (OSError, ValueError):
+                pass
         # Benchmark overlays normalized to the portfolio's starting value.
-        # SPY-style benchmarks are rendered in light green and dashed so
-        # they're visually distinct from the portfolio (blue) and the
-        # no-rebalance counterfactual (brown, dash-dot, below).
+        # SPY-style benchmarks are rendered green and dotted so they're
+        # visually distinct from the portfolio (orange on live, blue on
+        # legacy backtest) and the buy-and-hold counterfactual (blue).
         if benchmarks and len(totals) > 1:
             benchmark_curves = _fetch_benchmark_curves(
                 benchmarks, totals.index[0], totals.index[-1], float(totals.iloc[0]),
             )
+            _bench_color = "#10b981" if is_live else "#66c266"
+            _bench_dash = "dot" if is_live else "dash"
             for b, curve in benchmark_curves.items():
                 fig.add_trace(
                     go.Scatter(x=curve.index, y=curve.values, mode=_ts_mode,
                                name=f"{b} (rescaled)",
-                               line={"width": 1.5, "color": "#66c266", "dash": "dash"},
+                               line={"width": 1.5, "color": _bench_color, "dash": _bench_dash},
                                legend="legend"),
                     row=1, col=1,
                 )
         # Constant-rate reference curves: dotted lines showing what the
-        # thesis baseline portfolio would be worth at 1% / 2% / 4%
+        # thesis baseline portfolio would be worth at 1% / 3% / 9%
         # per week from day zero. Live dashboard only — anchored at the
         # thesis-baseline date.
         if is_live and len(snaps) > 0:
             anchor_date = snaps["date"].min()
             anchor_value = float(totals.iloc[0])
             ref_dates = pd.to_datetime(totals.index)
-            ref_shades = {0.01: "#cccccc", 0.02: "#888888", 0.04: "#444444"}
+            ref_shades = {0.01: "#cccccc", 0.03: "#888888", 0.09: "#444444"}
             for rate, color in ref_shades.items():
                 days = (ref_dates - anchor_date).days
                 ref_vals = anchor_value * (1 + rate) ** (days / 7.0)
