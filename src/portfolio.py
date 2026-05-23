@@ -1858,6 +1858,12 @@ def build_dashboard(
     # anchor in the live sense, so the chart is meaningless there.
     is_live = thesis_baseline_path is not None and Path(thesis_baseline_path).exists()
 
+    # Composition text for the thesis buy-and-hold caption that appears
+    # below plot 1 in live mode. Populated when the buy-and-hold trace
+    # is successfully built; stays None when no thesis baseline exists or
+    # the yfinance fetch fails. Read later in fig.add_annotation.
+    _bh_alloc_html: "str | None" = None
+
     # Pre-compute the trade list before the row layout: when every proposed
     # trade falls below `min_trade_size_usd` from investor_profile.md the
     # whole trade-table chart is omitted and subsequent charts shift up.
@@ -2077,7 +2083,7 @@ def build_dashboard(
                     go.Scatter(x=curve.index, y=curve.values, mode=_ts_mode,
                                name=f"{b} (rescaled)",
                                line={"width": 1.5, "color": _bench_color, "dash": _bench_dash},
-                               legend="legend", legendrank=5),
+                               legend="legend", legendrank=4),
                     row=1, col=1,
                 )
         # Constant-rate reference curves: dotted lines showing what the
@@ -2096,7 +2102,7 @@ def build_dashboard(
                     go.Scatter(x=ref_dates, y=ref_vals, mode="lines",
                                name=f"{int(rate * 100)}%/wk",
                                line={"width": 1, "color": color, "dash": "dot"},
-                               legend="legend", legendrank=4 - _ref_idx),
+                               legend="legend", legendrank=3 - _ref_idx),
                     row=1, col=1,
                 )
         # Thesis buy-and-hold counterfactual (live only): if the day-1
@@ -2116,25 +2122,24 @@ def build_dashboard(
                     _holdings, totals.index[0], totals.index[-1], float(totals.iloc[0]),
                 )
                 if _bh is not None:
-                    # Legend label spells out the thesis day-1 composition
-                    # so a viewer can read the breakdown without opening
-                    # thesis_baseline.json.
+                    # Compose the thesis day-1 ticker breakdown as an
+                    # HTML fragment for the annotation that goes below
+                    # plot 1 (added after fig.update_layout below).
                     _alloc = _tb.get("allocations_usd", {}) or {}
                     _total_alloc = sum(v for v in _alloc.values() if v) or 1.0
                     _ranked = sorted(
                         ((t, v) for t, v in _alloc.items() if v and v > 0),
                         key=lambda kv: -kv[1],
                     )
-                    _alloc_lines = "<br>".join(
-                        f"&nbsp;&nbsp;{t} {v / _total_alloc * 100:.0f}%"
+                    _bh_alloc_html = ",  ".join(
+                        f"{t} {v / _total_alloc * 100:.0f}%"
                         for t, v in _ranked
                     )
-                    _bh_label = f"Buy-and-hold portfolio:<br>{_alloc_lines}"
                     fig.add_trace(
                         go.Scatter(x=_bh.index, y=_bh.values, mode="lines",
-                                   name=_bh_label,
+                                   name="Buy-and-hold",
                                    line={"width": 1.8, "color": "#d97706"},
-                                   legend="legend", legendrank=1),
+                                   legend="legend", legendrank=5),
                         row=1, col=1,
                     )
             except (OSError, ValueError):
@@ -2577,12 +2582,6 @@ def build_dashboard(
             title_text="Portfolio value",
             xref="paper", x=1.02,
             yref="paper", y=_row_top(R_PORTFOLIO), yanchor="top",
-            # Buy-and-hold's legend label spans 10 lines (header + 9
-            # tickers); with the default valign="middle" the swatch
-            # marker sits next to the midpoint of the ticker list.
-            # valign="top" anchors the marker to the first line so it
-            # reads as the label for "Buy-and-hold portfolio:".
-            valign="top",
         ),
         legend5=dict(
             title_text="Portfolio % by wave",
@@ -2632,18 +2631,45 @@ def build_dashboard(
         for r in xrange_rows:
             fig.update_xaxes(range=list(xrange), row=r, col=1)
 
+    # Thesis buy-and-hold caption: a small two-line text block placed
+    # in the gap just below plot 1, listing the day-1 thesis composition
+    # that the orange buy-and-hold curve is built from. Live mode only;
+    # the trace name itself reads just "Buy-and-hold" so the legend
+    # stays compact. The y position uses _row_top math for the default
+    # plotly layout; the custom-layout block below reaches in and
+    # repositions this annotation against the per-row pixel domains.
+    _bh_anno_idx: "int | None" = None
+    if is_live and _bh_alloc_html:
+        # Single-line caption: bold header followed by the inline ticker
+        # breakdown, nudged ~2ex below plot 1's bottom so it clears the
+        # x-axis tick labels.
+        fig.add_annotation(
+            name="bh_composition",
+            text=(f"<b>Buy-and-hold portfolio:</b>  "
+                  f"<span style='color:#555;'>{_bh_alloc_html}</span>"),
+            xref="paper", yref="paper",
+            x=0.0, xanchor="left", xshift=48,  # ~6ex right of the y-axis
+            y=_row_top(R_PORTFOLIO) - _row_h - 0.019, yanchor="top",
+            showarrow=False,
+            font=dict(size=12, color="#222"),
+            align="left",
+        )
+        _bh_anno_idx = len(fig.layout.annotations) - 1
+
     # CUSTOM SUBPLOT LAYOUT: override plotly's uniform vertical_spacing
     # so specific gaps between subplots can be widened or narrowed
     # independently. Each row's domain is computed from absolute pixel
     # sizes (row_heights + per-gap deltas) and converted to figure-
     # fraction coords. Subplot title annotations are repositioned to
     # sit just above each row's new top edge.
-    if is_live and R_TRADE_TABLE is not None:
+    if is_live:
         EX_PX = 8
         ROW_PX = 308
         DEFAULT_GAP_PX = 92  # roughly matches plotly auto-spacing at vs ~0.030
         # Extra ex of space ABOVE each row (positive widens gap above).
-        gap_extras_ex: dict[int, int] = {5: 2, 6: -2, 8: 2, 9: 2, 11: 3}
+        # Row 2 (turnover) gets +5ex so the buy-and-hold caption below
+        # plot 1 has room without crowding the next subplot's title.
+        gap_extras_ex: dict[int, int] = {2: 5, 5: 2, 6: -2, 8: 2, 9: 2, 11: 3}
         row_sizes_px = [
             _table_px if i == R_TRADE_TABLE else ROW_PX
             for i in range(1, n_rows + 1)
@@ -2697,6 +2723,14 @@ def build_dashboard(
             if row_idx in _row_to_yhi:
                 legend_updates[legend_name] = dict(y=_row_to_yhi[row_idx])
         fig.update_layout(**legend_updates)
+        # Reposition the buy-and-hold composition caption to sit at the
+        # bottom of plot 1's pixel-sized domain (default-layout math
+        # used at add_annotation time no longer matches the custom row
+        # heights set above).
+        if _bh_anno_idx is not None and _bh_anno_idx < len(fig.layout.annotations):
+            # 40px ≈ 5ex of clearance below plot 1's tick labels.
+            _bh_y = new_domains[R_PORTFOLIO - 1][0] - 40.0 / total_h_custom
+            fig.layout.annotations[_bh_anno_idx].update(y=_bh_y)
 
     o_path = Path(out_path)
     o_path.parent.mkdir(parents=True, exist_ok=True)
@@ -2920,7 +2954,7 @@ def build_curator_dashboard(
         eq = baselines.dropna(subset=["eq_total"])
         fig.add_trace(
             go.Scatter(x=eq["date"], y=eq["eq_total"],
-                       name="Buy-and-hold (20% each)",
+                       name="Buy-and-hold",
                        mode="lines", line={"color": "#3b82f6", "width": 1.8}),
             row=1, col=1,
         )
