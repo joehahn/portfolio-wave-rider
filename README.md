@@ -128,8 +128,6 @@ This project uses two kinds of Claude Code primitives:
 
 Other project tasks (portfolio optimization, price fetching, validation, dashboard rendering) are deterministic and handled by plain Python in [`src/portfolio.py`](src/portfolio.py) and [`src/cli.py`](src/cli.py). The judgment pieces (which investment waves are currently active, which news matters, what to write in the report) are what an LLM is good at and what's painful to encode as fixed logic. So Python does the deterministic work, an LLM does the judgment, and each piece stays small enough to read in one sitting and easy to audit.
 
-A pure-code solution would need either hand-written thematic-news rules (brittle, go stale fast) or headline-scoring NLP (fragile, won't generalize). Letting an LLM do everything (including the optimizer) is slow, irreproducible, and likely worse than the textbook solver. The skill plus subagent plus Python split lets each tool do what it's best at.
-
 ## How the watchlist curator works
 
 The curator is the AI subagent that decides which tickers belong on the watchlist, and it executes when you call `/review-portfolio`. Its job is composition only: read the news, decide what to add and what to remove against the current watchlist. It does not propose weights or generate any forecasts. Instead it manages the list of tickers that the optimizer can choose from, doing so in a way that is informed by current news and aligned with your investing thesis.
