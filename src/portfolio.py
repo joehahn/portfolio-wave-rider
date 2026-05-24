@@ -2953,28 +2953,29 @@ def build_curator_dashboard(
                    mode="lines", line={"color": "#d97706", "width": 2.5}),
         row=1, col=1,
     )
-    # Orange vertical rectangles marking each quarterly rebalance (one per
-    # curator call). Drawn below the lines so the equity curves stay on top.
-    # add_vrect shapes don't appear in the legend, so a dummy zero-data
-    # trace carries the legend swatch; placed immediately after
-    # "Curator-driven" so it sits just below it in the legend.
-    fig.add_trace(
-        go.Scatter(x=[None], y=[None], mode="markers", name="Rebalanced",
-                   marker={"symbol": "square", "size": 12,
-                           "color": "rgba(249,115,22,0.55)"},
-                   hoverinfo="skip"),
-        row=1, col=1,
-    )
-    _rebal_half = pd.Timedelta(days=4)  # ~8-day-wide band, visible but thin
+    # Orange box on the curator curve at each quarterly rebalance (one per
+    # curator call). y = curator portfolio value as of that date (asof picks
+    # the nearest snapshot at/before the quarter-end). This single trace both
+    # plots the markers and carries the legend swatch; placed immediately
+    # after "Curator-driven" so it sits just below it in the legend.
+    _rebal_x, _rebal_y = [], []
     for _d in rebalance_dates:
         _ts = pd.Timestamp(_d)
         if _ts < start or _ts > end:
             continue
-        fig.add_vrect(
-            x0=max(start, _ts - _rebal_half), x1=min(end, _ts + _rebal_half),
-            fillcolor="rgba(249,115,22,0.30)", line_width=0,
-            layer="below", row=1, col=1,
-        )
+        _val = totals.asof(_ts)
+        if pd.notna(_val):
+            _rebal_x.append(_ts)
+            _rebal_y.append(float(_val))
+    fig.add_trace(
+        go.Scatter(x=_rebal_x, y=_rebal_y, mode="markers", name="Rebalanced",
+                   marker={"symbol": "square", "size": 9,
+                           "color": "rgba(249,115,22,0.95)",
+                           "line": {"width": 1, "color": "#7c2d12"}},
+                   hovertemplate="Rebalanced %{x|%Y-%m-%d}"
+                                 "<br>$%{y:,.0f}<extra></extra>"),
+        row=1, col=1,
+    )
     if "eq_total" in baselines.columns:
         eq = baselines.dropna(subset=["eq_total"])
         fig.add_trace(
