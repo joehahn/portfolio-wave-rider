@@ -2914,9 +2914,12 @@ def build_curator_dashboard(
 
     # Watchlist periods for the Gantt chart.
     starter_tickers: list[str] = []
+    rebalance_dates: list[str] = []
     runs_starter = Path(runs_dir) / "_starter.json"
     if runs_starter.exists():
-        starter_tickers = json.loads(runs_starter.read_text()).get("starter_watchlist", [])
+        _starter = json.loads(runs_starter.read_text())
+        starter_tickers = _starter.get("starter_watchlist", [])
+        rebalance_dates = _starter.get("as_of_dates", [])
     periods, _ = _build_ticker_periods(runs_dir, starter_tickers, end)
 
     # Realized return numbers for the headline summary.
@@ -2950,6 +2953,28 @@ def build_curator_dashboard(
                    mode="lines", line={"color": "#d97706", "width": 2.5}),
         row=1, col=1,
     )
+    # Orange vertical rectangles marking each quarterly rebalance (one per
+    # curator call). Drawn below the lines so the equity curves stay on top.
+    # add_vrect shapes don't appear in the legend, so a dummy zero-data
+    # trace carries the legend swatch; placed immediately after
+    # "Curator-driven" so it sits just below it in the legend.
+    fig.add_trace(
+        go.Scatter(x=[None], y=[None], mode="markers", name="Rebalanced",
+                   marker={"symbol": "square", "size": 12,
+                           "color": "rgba(249,115,22,0.55)"},
+                   hoverinfo="skip"),
+        row=1, col=1,
+    )
+    _rebal_half = pd.Timedelta(days=4)  # ~8-day-wide band, visible but thin
+    for _d in rebalance_dates:
+        _ts = pd.Timestamp(_d)
+        if _ts < start or _ts > end:
+            continue
+        fig.add_vrect(
+            x0=max(start, _ts - _rebal_half), x1=min(end, _ts + _rebal_half),
+            fillcolor="rgba(249,115,22,0.30)", line_width=0,
+            layer="below", row=1, col=1,
+        )
     if "eq_total" in baselines.columns:
         eq = baselines.dropna(subset=["eq_total"])
         fig.add_trace(
