@@ -2890,7 +2890,7 @@ def build_curator_dashboard(
     """
     import plotly.graph_objects as go
     from plotly.subplots import make_subplots
-    import textwrap
+    import textwrap, re
 
     bd = Path(backtest_dir)
     snaps_path = bd / "snapshots.csv"
@@ -2961,13 +2961,36 @@ def build_curator_dashboard(
     # after "Curator-driven" so it sits just below it in the legend.
     # Per-square hover popup: what the curator changed (adds/removes) and
     # why (its rationale_overall), pulled from that quarter's curation JSON.
-    # Long rationales are collapsed to one line, truncated, then wrapped so
-    # the tooltip stays a readable few lines rather than one runaway string.
-    def _wrap(text: str, width: int = 66, max_chars: int = 320) -> str:
+    # To keep the tooltip short and avoid mid-string "…" truncation, the
+    # "why" is just the first complete sentence: drop the "Stand at <date>
+    # close." stage-direction preamble some outputs open with, then return
+    # the first sentence that clears a min length (so a short lead-in like
+    # "One swap at the cap:" doesn't end the quote prematurely), wrapped.
+    def _why_line(text: str, width: int = 64, min_len: int = 60,
+                  soft_cap: int = 220) -> str:
         text = " ".join((text or "").split())
-        if len(text) > max_chars:
-            text = text[:max_chars].rstrip() + "…"
-        return "<br>".join(textwrap.wrap(text, width=width))
+        text = re.sub(r"^Stand at[^.]*\.\s*", "", text)
+        if not text:
+            return ""
+        first = text
+        for m in re.finditer(r"[.!?](?:\s|$)", text):
+            if m.start() + 1 >= min_len:
+                first = text[: m.start() + 1]
+                break
+        # Run-on first sentences get capped to ~soft_cap chars: cut at the
+        # last clause break (or word) before the cap, then drop any now-
+        # unclosed parenthetical, and end with a period. No "…" — the result
+        # reads as a complete, if abbreviated, statement.
+        if len(first) > soft_cap:
+            head = first[:soft_cap]
+            cut = max(head.rfind(", "), head.rfind("; "), head.rfind(". "))
+            if cut < min_len:
+                cut = head.rfind(" ")
+            first = head[:cut]
+            if first.count("(") > first.count(")"):
+                first = first[: first.rfind("(")]
+            first = first.rstrip(" ,;.") + "."
+        return "<br>".join(textwrap.wrap(first, width=width))
 
     _rebal_x, _rebal_y, _rebal_text = [], [], []
     for _d in rebalance_dates:
@@ -2992,7 +3015,7 @@ def build_curator_dashboard(
                 _parts.append(f"<span style='color:#b91c1c;'>remove: {', '.join(_rems)}</span>")
             if not _adds and not _rems:
                 _parts.append("<i>no changes</i>")
-            _why = _wrap(_cj.get("rationale_overall", ""))
+            _why = _why_line(_cj.get("rationale_overall", ""))
             if _why:
                 _parts.append(f"<i>why:</i><br>{_why}")
         _rebal_text.append("<br>".join(_parts))
