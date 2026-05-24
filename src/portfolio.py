@@ -1827,6 +1827,60 @@ def _compute_expected_vs_realized(
     return pd.DataFrame(rows).sort_values("date").reset_index(drop=True)
 
 
+# Shared filled-square marker style for rebalance points on both dashboards'
+# plot 1. A solid orange fill with a thin white outline reads clearly as a
+# filled square sitting on the (also orange) curve, not a hollow outline.
+_REBALANCE_MARKER = {"symbol": "square", "size": 10, "color": "#ea580c",
+                     "line": {"width": 1.5, "color": "white"}}
+
+
+def _rebalance_popup(curation_json: Path) -> str:
+    """Tooltip body for one rebalance marker: what the curator changed
+    (adds/removes) and a one-sentence 'why', read from a single curation
+    JSON. Returns '' when the file is missing.
+
+    The 'why' is just the first complete sentence of rationale_overall so
+    the tooltip stays short and never ends in a "…": the "Stand at <date>
+    close." preamble is dropped, a min length keeps a short lead-in from
+    ending the quote early, run-on sentences are capped at ~220 chars at a
+    clause boundary, and any dangling open-paren is trimmed.
+    """
+    import textwrap, re
+    if not curation_json.exists():
+        return ""
+    cj = json.loads(curation_json.read_text())
+    parts: list[str] = []
+    adds = [a.get("ticker", "") for a in (cj.get("adds") or [])]
+    rems = [r.get("ticker", "") for r in (cj.get("removes") or [])]
+    if adds:
+        parts.append(f"<span style='color:#0a7a3a;'>add: {', '.join(adds)}</span>")
+    if rems:
+        parts.append(f"<span style='color:#b91c1c;'>remove: {', '.join(rems)}</span>")
+    if not adds and not rems:
+        parts.append("<i>no changes</i>")
+    text = " ".join((cj.get("rationale_overall") or "").split())
+    text = re.sub(r"^Stand at[^.]*\.\s*", "", text)
+    if text:
+        first = text
+        for m in re.finditer(r"[.!?](?:\s|$)", text):
+            if m.start() + 1 >= 60:
+                first = text[: m.start() + 1]
+                break
+        if len(first) > 220:
+            head = first[:220]
+            cut = max(head.rfind(", "), head.rfind("; "), head.rfind(". "))
+            if cut < 60:
+                cut = head.rfind(" ")
+            first = head[:cut]
+            if first.count("(") > first.count(")"):
+                first = first[: first.rfind("(")]
+            first = first.rstrip(" ,;.") + "."
+        wrapped = "<br>".join(textwrap.wrap(first, width=64))
+        if wrapped:
+            parts.append(f"<i>why:</i><br>{wrapped}")
+    return "<br>".join(parts)
+
+
 def build_dashboard(
     snapshots_path: str = "data/snapshots.csv",
     recommendations_path: str = "data/recommendations.csv",
@@ -1948,6 +2002,7 @@ def build_dashboard(
     titles_list: list[str] = []
     titles_list.append(
         f"{R_PORTFOLIO}. Portfolio value over time"
+        "<br><sub><i>Each orange square marks a /review-portfolio rebalance — hover one to see that review's adds, removes, and the curator's reason.</i></sub>"
     )
     titles_list.append(
         f"{R_TURNOVER}. Rebalance turnover"
@@ -2052,19 +2107,36 @@ def build_dashboard(
                        legend="legend", legendrank=7),
             row=1, col=1,
         )
-        # Mark each rebalance date (where the optimizer fired) with a
-        # large open-square symbol so the cadence is visually obvious.
-        # Rebalance dates come from recommendations.csv; the markers sit
-        # on top of the portfolio-value line at each fire date.
-        if rec_path.exists():
-            rec_dates = pd.read_csv(rec_path, parse_dates=["date"])["date"].unique()
-            rebalance_totals = totals[totals.index.isin(rec_dates)]
-            if not rebalance_totals.empty:
+        # Mark each curator-driven review with a filled orange square on
+        # the portfolio-value line. Dates come from one curation JSON per
+        # /review-portfolio run in data/curator_runs/live/; hovering a
+        # square shows that review's adds/removes and the curator's reason
+        # (same popup as the curator-backtest dashboard). asof() places the
+        # marker on the nearest snapshot at/before the review date.
+        _live_runs = Path("data/curator_runs/live")
+        if _live_runs.exists() and len(totals) > 0:
+            _rb_x, _rb_y, _rb_text = [], [], []
+            for _cj in sorted(_live_runs.glob("*-curation.json")):
+                _d = _cj.name[:10]  # YYYY-MM-DD prefix
+                _ts = pd.Timestamp(_d)
+                if _ts < totals.index[0] or _ts > totals.index[-1]:
+                    continue
+                _val = totals.asof(_ts)
+                if pd.isna(_val):
+                    continue
+                _rb_x.append(_ts)
+                _rb_y.append(float(_val))
+                _rb_text.append(_rebalance_popup(_cj))
+            if _rb_x:
                 fig.add_trace(
-                    go.Scatter(x=rebalance_totals.index, y=rebalance_totals.values,
-                               mode="markers", name="Rebalance",
-                               marker={"size": 11, "symbol": "square-open",
-                                       "color": "#ff7f0e", "line": {"width": 2}},
+                    go.Scatter(x=_rb_x, y=_rb_y, mode="markers", name="Rebalance",
+                               marker=_REBALANCE_MARKER,
+                               hovertext=_rb_text,
+                               hoverlabel={"align": "left", "bgcolor": "white",
+                                           "bordercolor": "#7c2d12"},
+                               hovertemplate="<b>Rebalanced %{x|%Y-%m-%d}</b>"
+                                             "<br>portfolio $%{y:,.0f}<br>%{hovertext}"
+                                             "<extra></extra>",
                                legend="legend", legendrank=6),
                     row=1, col=1,
                 )
@@ -2890,7 +2962,6 @@ def build_curator_dashboard(
     """
     import plotly.graph_objects as go
     from plotly.subplots import make_subplots
-    import textwrap, re
 
     bd = Path(backtest_dir)
     snaps_path = bd / "snapshots.csv"
@@ -2959,39 +3030,10 @@ def build_curator_dashboard(
     # the nearest snapshot at/before the quarter-end). This single trace both
     # plots the markers and carries the legend swatch; placed immediately
     # after "Curator-driven" so it sits just below it in the legend.
-    # Per-square hover popup: what the curator changed (adds/removes) and
-    # why (its rationale_overall), pulled from that quarter's curation JSON.
-    # To keep the tooltip short and avoid mid-string "…" truncation, the
-    # "why" is just the first complete sentence: drop the "Stand at <date>
-    # close." stage-direction preamble some outputs open with, then return
-    # the first sentence that clears a min length (so a short lead-in like
-    # "One swap at the cap:" doesn't end the quote prematurely), wrapped.
-    def _why_line(text: str, width: int = 64, min_len: int = 60,
-                  soft_cap: int = 220) -> str:
-        text = " ".join((text or "").split())
-        text = re.sub(r"^Stand at[^.]*\.\s*", "", text)
-        if not text:
-            return ""
-        first = text
-        for m in re.finditer(r"[.!?](?:\s|$)", text):
-            if m.start() + 1 >= min_len:
-                first = text[: m.start() + 1]
-                break
-        # Run-on first sentences get capped to ~soft_cap chars: cut at the
-        # last clause break (or word) before the cap, then drop any now-
-        # unclosed parenthetical, and end with a period. No "…" — the result
-        # reads as a complete, if abbreviated, statement.
-        if len(first) > soft_cap:
-            head = first[:soft_cap]
-            cut = max(head.rfind(", "), head.rfind("; "), head.rfind(". "))
-            if cut < min_len:
-                cut = head.rfind(" ")
-            first = head[:cut]
-            if first.count("(") > first.count(")"):
-                first = first[: first.rfind("(")]
-            first = first.rstrip(" ,;.") + "."
-        return "<br>".join(textwrap.wrap(first, width=width))
-
+    # Per-square hover popup (built by the shared _rebalance_popup helper):
+    # what the curator changed (adds/removes) and a one-sentence "why" from
+    # that quarter's curation JSON. asof() places each marker on the nearest
+    # snapshot at/before the quarter-end.
     _rebal_x, _rebal_y, _rebal_text = [], [], []
     for _d in rebalance_dates:
         _ts = pd.Timestamp(_d)
@@ -3002,28 +3044,10 @@ def build_curator_dashboard(
             continue
         _rebal_x.append(_ts)
         _rebal_y.append(float(_val))
-        # Build the popup body from the per-date curation JSON, if present.
-        _parts: list[str] = []
-        _cj_path = Path(runs_dir) / f"{_d}-curation.json"
-        if _cj_path.exists():
-            _cj = json.loads(_cj_path.read_text())
-            _adds = [a.get("ticker", "") for a in (_cj.get("adds") or [])]
-            _rems = [r.get("ticker", "") for r in (_cj.get("removes") or [])]
-            if _adds:
-                _parts.append(f"<span style='color:#0a7a3a;'>add: {', '.join(_adds)}</span>")
-            if _rems:
-                _parts.append(f"<span style='color:#b91c1c;'>remove: {', '.join(_rems)}</span>")
-            if not _adds and not _rems:
-                _parts.append("<i>no changes</i>")
-            _why = _why_line(_cj.get("rationale_overall", ""))
-            if _why:
-                _parts.append(f"<i>why:</i><br>{_why}")
-        _rebal_text.append("<br>".join(_parts))
+        _rebal_text.append(_rebalance_popup(Path(runs_dir) / f"{_d}-curation.json"))
     fig.add_trace(
         go.Scatter(x=_rebal_x, y=_rebal_y, mode="markers", name="Rebalanced",
-                   marker={"symbol": "square", "size": 9,
-                           "color": "rgba(249,115,22,0.95)",
-                           "line": {"width": 1, "color": "#7c2d12"}},
+                   marker=_REBALANCE_MARKER,
                    hovertext=_rebal_text,
                    hoverlabel={"align": "left", "bgcolor": "white",
                                "bordercolor": "#7c2d12"},
