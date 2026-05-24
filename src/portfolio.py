@@ -2890,6 +2890,7 @@ def build_curator_dashboard(
     """
     import plotly.graph_objects as go
     from plotly.subplots import make_subplots
+    import textwrap
 
     bd = Path(backtest_dir)
     snaps_path = bd / "snapshots.csv"
@@ -2958,22 +2959,54 @@ def build_curator_dashboard(
     # the nearest snapshot at/before the quarter-end). This single trace both
     # plots the markers and carries the legend swatch; placed immediately
     # after "Curator-driven" so it sits just below it in the legend.
-    _rebal_x, _rebal_y = [], []
+    # Per-square hover popup: what the curator changed (adds/removes) and
+    # why (its rationale_overall), pulled from that quarter's curation JSON.
+    # Long rationales are collapsed to one line, truncated, then wrapped so
+    # the tooltip stays a readable few lines rather than one runaway string.
+    def _wrap(text: str, width: int = 66, max_chars: int = 320) -> str:
+        text = " ".join((text or "").split())
+        if len(text) > max_chars:
+            text = text[:max_chars].rstrip() + "…"
+        return "<br>".join(textwrap.wrap(text, width=width))
+
+    _rebal_x, _rebal_y, _rebal_text = [], [], []
     for _d in rebalance_dates:
         _ts = pd.Timestamp(_d)
         if _ts < start or _ts > end:
             continue
         _val = totals.asof(_ts)
-        if pd.notna(_val):
-            _rebal_x.append(_ts)
-            _rebal_y.append(float(_val))
+        if pd.isna(_val):
+            continue
+        _rebal_x.append(_ts)
+        _rebal_y.append(float(_val))
+        # Build the popup body from the per-date curation JSON, if present.
+        _parts: list[str] = []
+        _cj_path = Path(runs_dir) / f"{_d}-curation.json"
+        if _cj_path.exists():
+            _cj = json.loads(_cj_path.read_text())
+            _adds = [a.get("ticker", "") for a in (_cj.get("adds") or [])]
+            _rems = [r.get("ticker", "") for r in (_cj.get("removes") or [])]
+            if _adds:
+                _parts.append(f"<span style='color:#0a7a3a;'>add: {', '.join(_adds)}</span>")
+            if _rems:
+                _parts.append(f"<span style='color:#b91c1c;'>remove: {', '.join(_rems)}</span>")
+            if not _adds and not _rems:
+                _parts.append("<i>no changes</i>")
+            _why = _wrap(_cj.get("rationale_overall", ""))
+            if _why:
+                _parts.append(f"<i>why:</i><br>{_why}")
+        _rebal_text.append("<br>".join(_parts))
     fig.add_trace(
         go.Scatter(x=_rebal_x, y=_rebal_y, mode="markers", name="Rebalanced",
                    marker={"symbol": "square", "size": 9,
                            "color": "rgba(249,115,22,0.95)",
                            "line": {"width": 1, "color": "#7c2d12"}},
-                   hovertemplate="Rebalanced %{x|%Y-%m-%d}"
-                                 "<br>$%{y:,.0f}<extra></extra>"),
+                   hovertext=_rebal_text,
+                   hoverlabel={"align": "left", "bgcolor": "white",
+                               "bordercolor": "#7c2d12"},
+                   hovertemplate="<b>Rebalanced %{x|%Y-%m-%d}</b>"
+                                 "<br>portfolio $%{y:,.0f}<br>%{hovertext}"
+                                 "<extra></extra>"),
         row=1, col=1,
     )
     if "eq_total" in baselines.columns:
@@ -3269,7 +3302,10 @@ def build_curator_dashboard(
         '<p style="color:#555;max-width:780px;">The watchlist-curator agent was called quarterly over a 5 year historical window. '
         'At each rebalance it read the news of the preceding quarter and proposed '
         'adds and removes against the active watchlist; the optimizer then ran '
-        'mean-variance on the revised watchlist. The buy-and-hold curve below is '
+        'mean-variance on the revised watchlist. Each rebalance is marked by an '
+        'orange square on the curator curve in chart 1 — hover over one to see '
+        'that quarter\'s adds, removes, and the curator\'s rationale. '
+        'The buy-and-hold curve below is '
         'the value of the initial portfolio (which never gets rebalanced or '
         'optimized) over time. The buy-and-hold portfolio has equal amounts of '
         '<code>[AAPL, MSFT, GOOGL, NVDA, SPY]</code> and is held without any '
