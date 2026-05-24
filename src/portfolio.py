@@ -2002,7 +2002,6 @@ def build_dashboard(
     titles_list: list[str] = []
     titles_list.append(
         f"{R_PORTFOLIO}. Portfolio value over time"
-        "<br><sub><i>Each orange square marks a curator-driven review — hover one to see that review's adds, removes, and the curator's reason. (Earlier reviews predate the curator and aren't marked.)</i></sub>"
     )
     titles_list.append(
         f"{R_TURNOVER}. Rebalance turnover"
