@@ -2004,7 +2004,7 @@ def build_dashboard(
         f"{R_PORTFOLIO}. Portfolio value over time"
     )
     titles_list.append(
-        f"{R_TURNOVER}. Rebalance turnover"
+        f"{R_TURNOVER}. Recommended rebalance turnover"
     )
     titles_list.append(
         f"{R_REC_WAVE}. Recommended portfolio percentages"
