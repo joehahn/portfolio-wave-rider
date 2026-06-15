@@ -51,7 +51,7 @@ def main(argv: list[str] | None = None) -> int:
     p_an = sub.add_parser("analyze", help="fetch + optimize + risk in one call")
     p_an.add_argument("--tickers", nargs="+", required=True)
     p_an.add_argument("--period", default=fm["lookback_period"])
-    p_an.add_argument("--max-weight", type=float, default=0.25)
+    p_an.add_argument("--max-weight", type=float, default=0.5)
     p_an.add_argument("--risk-free-rate", type=float, default=fm["risk_free_rate"])
     p_an.add_argument("--risk-aversion", type=float, default=fm["risk_aversion"],
                       help="lambda in the mean-variance utility μᵀw - λ·wᵀΣw; "
@@ -69,7 +69,7 @@ def main(argv: list[str] | None = None) -> int:
     p_rec.add_argument("--holdings", default="holdings.csv")
     p_rec.add_argument("--out", default="data/recommendations.csv")
     p_rec.add_argument("--period", default=fm["lookback_period"])
-    p_rec.add_argument("--max-weight", type=float, default=0.25)
+    p_rec.add_argument("--max-weight", type=float, default=0.5)
     p_rec.add_argument("--risk-free-rate", type=float, default=fm["risk_free_rate"])
     p_rec.add_argument("--risk-aversion", type=float, default=fm["risk_aversion"],
                        help="lambda in the mean-variance utility; see analyze --risk-aversion")
