@@ -97,8 +97,20 @@ def _period_to_start(period: str) -> pd.Timestamp | None:
     return pd.Timestamp.today().normalize() - pd.Timedelta(days=days)
 
 
-def fetch_prices(tickers: list[str], period: str = "3y", interval: str = "1d") -> pd.DataFrame:
-    """Download adjusted-close prices for the given tickers via yfinance."""
+def fetch_prices(tickers: list[str], period: str = "3y", interval: str = "1d",
+                 min_history: bool = False) -> pd.DataFrame:
+    """Download adjusted-close prices for the given tickers via yfinance.
+
+    With ``min_history=True``, drop any ticker whose own history does not span
+    ~the full lookback window before the final row-wise dropna. This matters
+    because that dropna intersects all tickers onto their shared dates: ffill
+    cannot backfill the leading NaNs of a recently-listed ticker, so a single
+    days-old IPO would otherwise truncate the *entire* panel back to its first
+    trading day (collapsing the covariance estimate — at the extreme to one row,
+    which makes the optimizer fail). Excluded tickers are reported on the
+    returned frame's ``.attrs['excluded_short_history']`` so callers can surface
+    them. The optimization path turns this on; init-holdings (which just needs
+    latest prices) leaves it off."""
     if not tickers:
         raise ValueError("tickers must be non-empty")
     clean = [t.upper().strip() for t in tickers]
@@ -118,7 +130,27 @@ def fetch_prices(tickers: list[str], period: str = "3y", interval: str = "1d") -
     # yfinance returns a MultiIndex when there are 2+ tickers, a flat index for 1.
     prices = data["Close"] if isinstance(data.columns, pd.MultiIndex) \
         else data[["Close"]].rename(columns={"Close": clean[0]})
-    return prices.dropna(how="all").ffill().dropna()
+    prices = prices.dropna(how="all").ffill()
+
+    excluded: list[str] = []
+    if min_history and start is not None and len(prices) > 0:
+        # Eligible = first trade no later than 5% into the lookback window.
+        # A ticker missing more than that would, after the join below, shrink
+        # every other ticker's estimation window down to its own start date.
+        window_days = (prices.index[-1] - start).days
+        cutoff = start + pd.Timedelta(days=round(0.05 * window_days))
+        eligible = [t for t in prices.columns
+                    if (fv := prices[t].first_valid_index()) is not None and fv <= cutoff]
+        excluded = [t for t in prices.columns if t not in eligible]
+        if not eligible:
+            raise RuntimeError(
+                f"no ticker has enough history to span the {period} lookback; "
+                f"excluded: {excluded}")
+        prices = prices[eligible]
+
+    prices = prices.dropna()
+    prices.attrs["excluded_short_history"] = excluded
+    return prices
 
 
 def compute_returns(prices: pd.DataFrame, frequency: str = "daily") -> dict[str, Any]:
@@ -275,7 +307,7 @@ def analyze(
     risk_aversion: float = 1.0,
 ) -> dict[str, Any]:
     """Run the full pipeline and return a single JSON-serializable dict."""
-    prices = fetch_prices(tickers, period=period)
+    prices = fetch_prices(tickers, period=period, min_history=True)
     returns = compute_returns(prices)
     opt = optimize_portfolio(
         returns, objective=objective, risk_free_rate=risk_free_rate,
@@ -286,6 +318,7 @@ def analyze(
 
     return {
         "tickers": list(prices.columns),
+        "excluded_short_history": prices.attrs.get("excluded_short_history", []),
         "period": {
             "start": str(prices.index[0].date()),
             "end": str(prices.index[-1].date()),
@@ -789,6 +822,7 @@ def recommend_portfolio(
     return {
         "date": str(rec_date),
         "tickers": tickers,
+        "excluded_short_history": result.get("excluded_short_history", []),
         "weights": opt["weights"],
         "expected_annual_return": opt["expected_annual_return"],
         "annual_volatility": opt["annual_volatility"],

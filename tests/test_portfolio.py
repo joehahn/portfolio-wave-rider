@@ -195,6 +195,37 @@ def test_fetch_benchmark_curves_returns_empty_on_yfinance_failure(monkeypatch) -
     assert curves == {}
 
 
+def test_fetch_prices_min_history_excludes_recent_ipo(monkeypatch) -> None:
+    """A days-old IPO must be dropped before the join so it can't truncate the
+    seasoned tickers' estimation window (the SPCX failure mode)."""
+    # ~2.4y of business days ending today, so a 1.5y lookback lands inside.
+    dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=600)
+    seasoned = pd.DataFrame(
+        {"AAA": np.linspace(100, 160, 600), "BBB": np.linspace(50, 90, 600)},
+        index=dates,
+    )
+    ipo = pd.Series(np.nan, index=dates)
+    ipo.iloc[-3:] = [200.0, 205.0, 210.0]  # first trade only 3 days ago
+    full = seasoned.assign(ZZZ=ipo)
+
+    def fake_download(tickers, start, end, **kwargs):
+        df = full.copy()
+        df.columns = pd.MultiIndex.from_product([["Close"], df.columns])
+        return df.loc[start:end]
+    monkeypatch.setattr(portfolio.yf, "download", fake_download)
+
+    prices = portfolio.fetch_prices(["AAA", "BBB", "ZZZ"], period="1.5y", min_history=True)
+    # ZZZ excluded; seasoned tickers keep the full ~1.5y window (not truncated to 3 rows).
+    assert list(prices.columns) == ["AAA", "BBB"]
+    assert prices.attrs["excluded_short_history"] == ["ZZZ"]
+    assert len(prices) > 100
+
+    # Without the filter, the leading-NaN join collapses the panel to ZZZ's 3 rows.
+    unfiltered = portfolio.fetch_prices(["AAA", "BBB", "ZZZ"], period="1.5y")
+    assert list(unfiltered.columns) == ["AAA", "BBB", "ZZZ"]
+    assert len(unfiltered) == 3
+
+
 
 
 
