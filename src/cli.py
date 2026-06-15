@@ -9,10 +9,10 @@ walk-forward variant lands in stage C2.
 
 Usage:
     python -m src.cli init-holdings      --allocations '{"AAPL": 5000, ...}' --out holdings.csv
-    python -m src.cli analyze            --tickers AAPL MSFT NVDA --period 3y --max-weight 0.25
+    python -m src.cli analyze            --tickers AAPL MSFT NVDA --period 3y [--max-weight 0.35]
     python -m src.cli curate             --input curator_payload.json [--as-of-date YYYY-MM-DD]
     python -m src.cli snapshot           [--date YYYY-MM-DD] [--force]
-    python -m src.cli recommend          [--max-weight 0.25] [--force]
+    python -m src.cli recommend          [--max-weight 0.35] [--force]
     python -m src.cli backtest           [--start-date YYYY-MM-DD] [--end-date YYYY-MM-DD] [--initial-usd 50000]
     python -m src.cli dashboard
 """
@@ -51,7 +51,9 @@ def main(argv: list[str] | None = None) -> int:
     p_an = sub.add_parser("analyze", help="fetch + optimize + risk in one call")
     p_an.add_argument("--tickers", nargs="+", required=True)
     p_an.add_argument("--period", default=fm["lookback_period"])
-    p_an.add_argument("--max-weight", type=float, default=0.5)
+    p_an.add_argument("--max-weight", type=float, default=fm["concentration_cap"],
+                      help="optimizer per-position max weight; defaults to the profile's "
+                           "concentration_cap")
     p_an.add_argument("--risk-free-rate", type=float, default=fm["risk_free_rate"])
     p_an.add_argument("--risk-aversion", type=float, default=fm["risk_aversion"],
                       help="lambda in the mean-variance utility μᵀw - λ·wᵀΣw; "
@@ -69,7 +71,9 @@ def main(argv: list[str] | None = None) -> int:
     p_rec.add_argument("--holdings", default="holdings.csv")
     p_rec.add_argument("--out", default="data/recommendations.csv")
     p_rec.add_argument("--period", default=fm["lookback_period"])
-    p_rec.add_argument("--max-weight", type=float, default=0.5)
+    p_rec.add_argument("--max-weight", type=float, default=fm["concentration_cap"],
+                       help="optimizer per-position max weight; defaults to the profile's "
+                            "concentration_cap")
     p_rec.add_argument("--risk-free-rate", type=float, default=fm["risk_free_rate"])
     p_rec.add_argument("--risk-aversion", type=float, default=fm["risk_aversion"],
                        help="lambda in the mean-variance utility; see analyze --risk-aversion")

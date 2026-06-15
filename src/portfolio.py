@@ -43,16 +43,22 @@ _FINANCIAL_MODEL_DEFAULTS: dict[str, Any] = {
     "lookback_period": "3y",
     "rebalance_period": "monthly",
     "max_watchlist_size": 12,
+    # concentration_cap is the optimizer's per-position max weight (the
+    # --max-weight default). Unlike the others it lives at the profile's top
+    # level, not inside the financial_model block; load_financial_model reads
+    # it from there so the cap has a single source of truth (investor_profile).
+    "concentration_cap": 0.25,
 }
 
 
 def load_financial_model(profile_path: str = "investor_profile.md") -> dict[str, Any]:
     """Read `financial_model` from investor_profile.md's YAML front matter.
 
-    Returns a dict with five fields (`risk_aversion`, `risk_free_rate`,
-    `lookback_period`, `rebalance_period`, `max_watchlist_size`); any missing
-    field falls back to the hard-coded default. If the profile file doesn't
-    exist or has no front matter, all defaults are returned.
+    Returns a dict with six fields (`risk_aversion`, `risk_free_rate`,
+    `lookback_period`, `rebalance_period`, `max_watchlist_size`, and the
+    top-level `concentration_cap`); any missing field falls back to the
+    hard-coded default. If the profile file doesn't exist or has no front
+    matter, all defaults are returned.
 
     The optimizer objective is intentionally not configurable here: this
     project commits to mean-variance maximization with ``risk_aversion`` (λ)
@@ -74,6 +80,9 @@ def load_financial_model(profile_path: str = "investor_profile.md") -> dict[str,
     fm = data.get("financial_model") or {}
     out = dict(_FINANCIAL_MODEL_DEFAULTS)
     out.update(fm)
+    # concentration_cap is a top-level profile key, not part of financial_model.
+    if "concentration_cap" in data:
+        out["concentration_cap"] = data["concentration_cap"]
     return out
 
 
