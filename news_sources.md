@@ -80,6 +80,17 @@ Covers fission (uranium, utilities, small modular reactors, the AI-data-center e
 - **Fusion Industry Association** — https://www.fusionindustryassociation.org — trade-body briefings and state-of-industry reports.
 - **Nature — Fusion** — https://www.nature.com/subjects/nuclear-fusion-and-fission — peer-reviewed milestones.
 
+## Defense / rearmament
+
+Military procurement, defense budgets, the primes, and defense ETFs. Covers the geopolitical "defense and rearmament" expression in `investor_profile.md`: US budget growth, NATO and European rearmament, and Gulf procurement (where the investable exposure is the US and EU exporters, not the buyer states).
+
+- **Breaking Defense** — https://breakingdefense.com — US procurement, budget, and program reporting.
+- **Defense News** — https://www.defensenews.com — global defense-industry trade press; contracts and budgets.
+- **Janes** — https://www.janes.com — defense-intelligence reference on programs, orders, and order-of-battle.
+- **War on the Rocks** — https://warontherocks.com — strategy and policy analysis; useful for reading where budgets are heading.
+- **Reuters — Aerospace & Defense** — https://www.reuters.com/business/aerospace-defense/ — wire-service coverage of primes' earnings and contract awards.
+- **Project On Government Oversight (POGO)** — https://www.pogo.org — *skeptic.* Defense-spending watchdog; rigorous on cost overruns, failed programs, and procurement waste. The credibility-weighted foil to the trade press above, useful for spotting when a re-rated prime is priced for execution it may not deliver.
+
 ## General markets
 
 For tickers that don't map cleanly to a single wave, or for macro context.
