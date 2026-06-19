@@ -90,13 +90,16 @@ Spawn the `report-writer` subagent. Pass:
 
 The report is written to `data/reports/YYYY-MM-DD-review-portfolio.md`.
 
-### Step 6 — refresh dashboard (Bash)
+### Step 6 — refresh snapshot, then dashboard (Bash)
 
 ```bash
+.venv/bin/python -m src.cli snapshot --force
 .venv/bin/python -m src.cli dashboard
 ```
 
-Regenerates `docs/index.html`. Time-series charts are scoped to dates >= `thesis_baseline.date` if the file exists.
+`snapshot --force` must run first. `curate` (Step 2) mutates `holdings.csv` (adds at `shares=0`, removes deleted), but the price snapshot is otherwise only refreshed by the daily cron. Without this step, any ticker added or removed this run is stale in `data/snapshots.csv` until the next cron fire, and the dashboard's trade table (chart 5, "Trades to move from actual to recommended") joins the latest recommendation to the latest snapshot by price: a freshly-added ticker has a target weight but no price row, so the NaN-price guard silently drops it and the BUY never appears. Re-snapshotting `--force` gives every current-watchlist ticker (including new `shares=0` adds) a price row for today, so the trade table is complete. `--force` overwrites today's rows only.
+
+`dashboard` regenerates `docs/index.html`. Time-series charts are scoped to dates >= `thesis_baseline.date` if the file exists.
 
 The curator's per-add news evidence is rendered inline in the report's "News evidence" section (step 5), so there is no separate news HTML page to refresh.
 
