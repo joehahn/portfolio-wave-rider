@@ -7,23 +7,69 @@
       "wave_bucket": "quantum",
       "rationale": "Quantum is a named 'likely next wave' with thin watchlist representation; IBM's 1,121-qubit Condor milestone at the December 2023 Quantum Summit and IonQ's $25.5M AFRL contract in September 2023 signal the wave transitioning from buildup to early-surge commercial/government visibility, making QTUM (launched September 2018, diversified across the quantum supply chain) an appropriate broad-exposure vehicle.",
       "news_evidence": [
-        {"summary": "IBM unveils Condor, a 1,121-qubit quantum processor, at the Dec 4, 2023 Quantum Summit — the first chip past the 1,000-qubit threshold — plus the Heron r1 133-qubit processor.", "source": "The Quantum Insider", "url": "https://thequantuminsider.com/2023/12/04/ibm-says-new-1000-plus-processors-to-advance-toward-quantum-utility/", "date": "2023-12-04"},
-        {"summary": "Scientific American reports IBM Condor as the first-ever 1,000-qubit quantum chip, a step toward near-term quantum advantage.", "source": "Scientific American", "url": "https://www.scientificamerican.com/article/ibm-releases-first-ever-1-000-qubit-quantum-chip/", "date": "2023-12-04"},
-        {"summary": "IonQ announces a $25.5M quantum networking system sale to the US Air Force Research Laboratory — its largest single government contract to that point.", "source": "The Quantum Insider", "url": "https://thequantuminsider.com/2023/09/28/ionq-announces-new-25-5-million-quantum-deal-with-united-states-air-force-research-lab/", "date": "2023-09-28"}
+        {
+          "summary": "IBM unveils Condor, a 1,121-qubit quantum processor, at the Dec 4, 2023 Quantum Summit \u2014 the first chip past the 1,000-qubit threshold \u2014 plus the Heron r1 133-qubit processor.",
+          "source": "The Quantum Insider",
+          "url": "https://thequantuminsider.com/2023/12/04/ibm-says-new-1000-plus-processors-to-advance-toward-quantum-utility/",
+          "date": "2023-12-04"
+        },
+        {
+          "summary": "Scientific American reports IBM Condor as the first-ever 1,000-qubit quantum chip, a step toward near-term quantum advantage.",
+          "source": "Scientific American",
+          "url": "https://www.scientificamerican.com/article/ibm-releases-first-ever-1-000-qubit-quantum-chip/",
+          "date": "2023-12-04"
+        },
+        {
+          "summary": "IonQ announces a $25.5M quantum networking system sale to the US Air Force Research Laboratory \u2014 its largest single government contract to that point.",
+          "source": "The Quantum Insider",
+          "url": "https://thequantuminsider.com/2023/09/28/ionq-announces-new-25-5-million-quantum-deal-with-united-states-air-force-research-lab/",
+          "date": "2023-09-28"
+        }
       ]
     }
   ],
   "removes": [
     {
       "ticker": "AAPL",
-      "rationale": "Apple is the weakest AI-thesis holder in the maxed AI bucket: Ming-Chi Kuo flagged Apple as 'significantly behind competitors' on generative AI with no 2024 roadmap, and CNBC confirmed Apple's measured AI pace lags Microsoft and Google — removing AAPL consolidates the AI bucket to three high-conviction names and frees the slot for quantum.",
+      "rationale": "Apple is the weakest AI-thesis holder in the maxed AI bucket: Ming-Chi Kuo flagged Apple as 'significantly behind competitors' on generative AI with no 2024 roadmap, and CNBC confirmed Apple's measured AI pace lags Microsoft and Google \u2014 removing AAPL consolidates the AI bucket to three high-conviction names and frees the slot for quantum.",
       "news_evidence": [
-        {"summary": "Ming-Chi Kuo: 'no sign' Apple plans generative-AI products in 2024; Apple 'significantly behind competitors' including OpenAI, Google, Microsoft.", "source": "MacRumors", "url": "https://www.macrumors.com/2023/08/02/no-sign-of-apple-generative-ai-coming-2024/", "date": "2023-08-02"},
-        {"summary": "CNBC: Apple's AI spending/deployment 'differs from Big Tech rivals,' forgoing the aggressive generative-AI rollouts Microsoft (Copilot) and Google (Bard) executed in 2023.", "source": "CNBC", "url": "https://www.cnbc.com/2023/11/01/how-apples-ai-spending-and-deployment-differ-from-big-tech-rivals.html", "date": "2023-11-01"},
-        {"summary": "Motley Fool comparison concludes Alphabet holds a materially stronger near-term AI position than Apple, which was absent from the 2023 consumer generative-AI race.", "source": "The Motley Fool", "url": "https://www.fool.com/investing/2023/12/22/better-ai-stock-alphabet-vs-apple/", "date": "2023-12-22"}
+        {
+          "summary": "Ming-Chi Kuo: 'no sign' Apple plans generative-AI products in 2024; Apple 'significantly behind competitors' including OpenAI, Google, Microsoft.",
+          "source": "MacRumors",
+          "url": "https://www.macrumors.com/2023/08/02/no-sign-of-apple-generative-ai-coming-2024/",
+          "date": "2023-08-02"
+        },
+        {
+          "summary": "CNBC: Apple's AI spending/deployment 'differs from Big Tech rivals,' forgoing the aggressive generative-AI rollouts Microsoft (Copilot) and Google (Bard) executed in 2023.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2023/11/01/how-apples-ai-spending-and-deployment-differ-from-big-tech-rivals.html",
+          "date": "2023-11-01"
+        },
+        {
+          "summary": "Motley Fool comparison concludes Alphabet holds a materially stronger near-term AI position than Apple, which was absent from the 2023 consumer generative-AI race.",
+          "source": "The Motley Fool",
+          "url": "https://www.fool.com/investing/2023/12/22/better-ai-stock-alphabet-vs-apple/",
+          "date": "2023-12-22"
+        }
       ]
     }
   ],
   "no_changes": false,
-  "rationale_overall": "One swap — AAPL out, QTUM in — to deepen the quantum wave (a named next wave) as the IBM Condor milestone and IonQ's government backlog show it crossing from research into early commercial visibility. AAPL is the natural exit: it held one of the maxed AI slots but had no generative-AI product in 2023 and no 2024 roadmap, so the AI thesis is carried more credibly by MSFT, GOOGL, NVDA. Other holdings stay in-thesis: RKLB closed 2023 with a record $515M Space Development Agency prime contract; URA's uranium spot rose ~76% in 2023 with COP28's pledge to triple nuclear capacity."
+  "rationale_overall": "One swap \u2014 AAPL out, QTUM in \u2014 to deepen the quantum wave (a named next wave) as the IBM Condor milestone and IonQ's government backlog show it crossing from research into early commercial visibility. AAPL is the natural exit: it held one of the maxed AI slots but had no generative-AI product in 2023 and no 2024 roadmap, so the AI thesis is carried more credibly by MSFT, GOOGL, NVDA. Other holdings stay in-thesis: RKLB closed 2023 with a record $515M Space Development Agency prime contract; URA's uranium spot rose ~76% in 2023 with COP28's pledge to triple nuclear capacity.",
+  "search_terms": [
+    "quantum computing ETF QTUM IonQ 2023 milestone before:2024-01-01",
+    "AAPL Apple AI artificial intelligence Q4 2023 competitive position before:2024-01-01",
+    "SPY S&P 500 ETF 2023 year-end watchlist thematic portfolio before:2024-01-01",
+    "quantum computing IBM Google milestone 2023 Q4 before:2024-01-01",
+    "IONQ quantum computing 2023 news revenue contract before:2024-01-01",
+    "QTUM Defiance Quantum ETF 2023 performance holdings before:2024-01-01",
+    "URA uranium ETF nuclear energy 2023 Q4 before:2024-01-01",
+    "RKLB Rocket Lab Q4 2023 launch news contract before:2024-01-01",
+    "Apple AI strategy 2023 behind competitors generative AI before:2024-01-01",
+    "IonQ AFRL quantum networking contract 2023 before:2024-01-01",
+    "IBM Quantum Summit December 2023 Condor 1000 qubit processor before:2024-01-01",
+    "Apple generative AI behind competitors 2023 Ming-Chi Kuo before:2024-01-01",
+    "QTUM Defiance Quantum ETF launch date inception 2018 before:2024-01-01",
+    "uranium price nuclear energy 2023 Q4 COP28 SMR demand before:2024-01-01"
+  ]
 }

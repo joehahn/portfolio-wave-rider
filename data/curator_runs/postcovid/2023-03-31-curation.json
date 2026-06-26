@@ -7,8 +7,18 @@
       "wave_bucket": "quantum",
       "rationale": "IonQ is the only NYSE-listed pure-play quantum computing hardware company with price history predating this rebalance; it fills the only named thesis wave (quantum) currently absent from the watchlist, supported by a January 2023 US manufacturing capacity announcement and March 30, 2023 Q4 2022 earnings showing ~100% YoY revenue growth and a 2023 revenue guide of $18.4-18.8M.",
       "news_evidence": [
-        {"summary": "IonQ announces first US dedicated quantum computing manufacturing facility in Bothell, WA, backed by a $1B planned Pacific Northwest investment; facility to house a second quantum data center.", "source": "BusinessWire / IonQ IR", "url": "https://www.businesswire.com/news/home/20230120005073/en", "date": "2023-01-20"},
-        {"summary": "IonQ FY2022 results: revenue $11.1M (up ~100% YoY), bookings $24.5M, cash $537.8M; 2023 revenue guidance $18.4-18.8M and bookings $38-42M.", "source": "IonQ Investor Relations", "url": "https://investors.ionq.com/news/news-details/2023/IonQ-Announces-Fourth-Quarter-and-Full-Year-2022-Financial-Results-and-Provides-Business-Update/default.aspx", "date": "2023-03-30"}
+        {
+          "summary": "IonQ announces first US dedicated quantum computing manufacturing facility in Bothell, WA, backed by a $1B planned Pacific Northwest investment; facility to house a second quantum data center.",
+          "source": "BusinessWire / IonQ IR",
+          "url": "https://www.businesswire.com/news/home/20230120005073/en",
+          "date": "2023-01-20"
+        },
+        {
+          "summary": "IonQ FY2022 results: revenue $11.1M (up ~100% YoY), bookings $24.5M, cash $537.8M; 2023 revenue guidance $18.4-18.8M and bookings $38-42M.",
+          "source": "IonQ Investor Relations",
+          "url": "https://investors.ionq.com/news/news-details/2023/IonQ-Announces-Fourth-Quarter-and-Full-Year-2022-Financial-Results-and-Provides-Business-Update/default.aspx",
+          "date": "2023-03-30"
+        }
       ]
     }
   ],
@@ -17,10 +27,31 @@
       "ticker": "SPY",
       "rationale": "SPY is the only non-thematic ticker in the watchlist (general_markets), contributing only broad market beta with no exposure to any named wave; at the 8/8 hard cap, the non-thematic slot is the natural candidate for displacement by the quantum wave, which has zero representation.",
       "news_evidence": [
-        {"summary": "SVB collapse triggers a Senate Banking Committee hearing on March 28; broad S&P 500 (SPY) absorbed contagion without adding wave-specific return — generic beta provides no thematic alpha.", "source": "CNBC", "url": "https://www.cnbc.com/amp/2023/03/28/silicon-valley-bank-hearing-live-updates-fdic-treasury-and-fed-officials-testify-before-senate-panel.html", "date": "2023-03-28"}
+        {
+          "summary": "SVB collapse triggers a Senate Banking Committee hearing on March 28; broad S&P 500 (SPY) absorbed contagion without adding wave-specific return \u2014 generic beta provides no thematic alpha.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/amp/2023/03/28/silicon-valley-bank-hearing-live-updates-fdic-treasury-and-fed-officials-testify-before-senate-panel.html",
+          "date": "2023-03-28"
+        }
       ]
     }
   ],
   "no_changes": false,
-  "rationale_overall": "The watchlist is full at 8/8 and covers AI (4), rockets, robotics, and nuclear — but has zero quantum exposure, which the investor names as a likely next wave to enter while cheap. IONQ is the only NYSE-listed pure-play quantum hardware company with sufficient history and, as of March 2023, shows ~100% revenue growth plus a US manufacturing buildout. The only slot to free without sacrificing a thematic holding is SPY, whose general-market beta serves no wave-specific purpose. Post-change the watchlist maps cleanly to all five named waves with no bucket exceeding the 4-ticker cap."
+  "rationale_overall": "The watchlist is full at 8/8 and covers AI (4), rockets, robotics, and nuclear \u2014 but has zero quantum exposure, which the investor names as a likely next wave to enter while cheap. IONQ is the only NYSE-listed pure-play quantum hardware company with sufficient history and, as of March 2023, shows ~100% revenue growth plus a US manufacturing buildout. The only slot to free without sacrificing a thematic holding is SPY, whose general-market beta serves no wave-specific purpose. Post-change the watchlist maps cleanly to all five named waves with no bucket exceeding the 4-ticker cap.",
+  "search_terms": [
+    "nuclear energy small modular reactor SMR commercial news before:2023-04-01",
+    "quantum computing stocks IONQ IonQ 2023 before:2023-04-01",
+    "defense rearmament ETF XAR ITA NATO spending 2023 before:2023-04-01",
+    "IonQ IONQ quantum computing revenue 2022 2023 milestones site:ionq.com OR site:sec.gov before:2023-04-01",
+    "NuScale Power SMR ticker IPO listing date 2022 before:2023-04-01",
+    "Rocket Lab RKLB launch 2023 contract news before:2023-04-01",
+    "QTUM ETF Defiance quantum computing launch date 2021 before:2023-04-01",
+    "URA uranium ETF thesis nuclear energy 2023 Q1 before:2023-04-01",
+    "IonQ IONQ quantum computing 2023 Q1 January February March announcement before:2023-04-01",
+    "Rocket Lab RKLB 2023 Q1 earnings launch backlog before:2023-04-01",
+    "SPY S&P 500 ETF banking crisis March 2023 SVB Silicon Valley Bank before:2023-04-01",
+    "IonQ IONQ manufacturing facility Washington quantum computing January 2023 before:2023-04-01",
+    "Rocket Lab RKLB Q4 2022 earnings revenue backlog February March 2023 before:2023-04-01",
+    "quantum computing investment wave early 2023 sector growth before:2023-04-01"
+  ]
 }

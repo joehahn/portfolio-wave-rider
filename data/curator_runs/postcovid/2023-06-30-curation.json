@@ -5,11 +5,26 @@
     {
       "ticker": "IONQ",
       "wave_bucket": "quantum",
-      "rationale": "IonQ is the only US-listed pure-play trapped-ion quantum computer company; Q1 2023 revenue of $4.3M beat guidance and doubled YoY, the full-year outlook was raised, and IonQ Forte hit the firm's primary 2023 technical target (29 algorithmic qubits) seven months early — a concrete commercial milestone in a named priority wave (quantum) that currently holds zero watchlist slots.",
+      "rationale": "IonQ is the only US-listed pure-play trapped-ion quantum computer company; Q1 2023 revenue of $4.3M beat guidance and doubled YoY, the full-year outlook was raised, and IonQ Forte hit the firm's primary 2023 technical target (29 algorithmic qubits) seven months early \u2014 a concrete commercial milestone in a named priority wave (quantum) that currently holds zero watchlist slots.",
       "news_evidence": [
-        {"summary": "IonQ Q1 2023 revenue of $4.3M exceeded guidance and more than doubled YoY; full-year 2023 outlook raised to $18.8-19.2M; new UAE Quantum Research Center contract.", "source": "IonQ Investor Relations", "url": "https://investors.ionq.com/news/news-details/2023/IonQ-Announces-First-Quarter-2023-Financial-Results/", "date": "2023-05-11"},
-        {"summary": "IonQ Forte achieved 29 algorithmic qubits (#AQ29), meeting its primary 2023 technical milestone seven months early; IonQ Aria 2 construction completed.", "source": "IonQ Investor Relations", "url": "https://investors.ionq.com/news/news-details/2023/IonQ-Announces-First-Quarter-2023-Financial-Results/", "date": "2023-05-11"},
-        {"summary": "IonQ scheduled to report Q1 2023 results on May 11, 2023, confirming commercial cadence ahead of the rebalance.", "source": "IonQ Newsroom", "url": "https://ionq.com/news/ionq-to-report-first-quarter-2023-financial-results-on-may-11-2023", "date": "2023-04-27"}
+        {
+          "summary": "IonQ Q1 2023 revenue of $4.3M exceeded guidance and more than doubled YoY; full-year 2023 outlook raised to $18.8-19.2M; new UAE Quantum Research Center contract.",
+          "source": "IonQ Investor Relations",
+          "url": "https://investors.ionq.com/news/news-details/2023/IonQ-Announces-First-Quarter-2023-Financial-Results/",
+          "date": "2023-05-11"
+        },
+        {
+          "summary": "IonQ Forte achieved 29 algorithmic qubits (#AQ29), meeting its primary 2023 technical milestone seven months early; IonQ Aria 2 construction completed.",
+          "source": "IonQ Investor Relations",
+          "url": "https://investors.ionq.com/news/news-details/2023/IonQ-Announces-First-Quarter-2023-Financial-Results/",
+          "date": "2023-05-11"
+        },
+        {
+          "summary": "IonQ scheduled to report Q1 2023 results on May 11, 2023, confirming commercial cadence ahead of the rebalance.",
+          "source": "IonQ Newsroom",
+          "url": "https://ionq.com/news/ionq-to-report-first-quarter-2023-financial-results-on-may-11-2023",
+          "date": "2023-04-27"
+        }
       ]
     }
   ],
@@ -18,11 +33,36 @@
       "ticker": "SPY",
       "rationale": "SPY maps to no named wave (general_markets) and occupies one of eight slots at the hard cap; with quantum explicitly named as a priority next wave and holding zero slots, SPY is the least-thesis-aligned position to release.",
       "news_evidence": [
-        {"summary": "NVIDIA Q1 FY2024: record data-center revenue $4.28B and Q2 guidance of ~$11B confirm the AI wave in full adoption-surge; the four AI slots are well-covered, so a broad-market catch-all adds no incremental wave value.", "source": "CNBC", "url": "https://www.cnbc.com/2023/05/24/nvidia-nvda-earnings-report-q1-2024.html", "date": "2023-05-24"},
-        {"summary": "Apple WWDC 2023 confirmed a 'deliberate' AI stance with no generative-AI product, underscoring the AI bucket's pure-plays are captured and SPY's slot is better used for quantum entry.", "source": "CNBC", "url": "https://www.cnbc.com/2023/06/05/apple-practical-approach-to-ai-no-bragging-just-features.html", "date": "2023-06-05"}
+        {
+          "summary": "NVIDIA Q1 FY2024: record data-center revenue $4.28B and Q2 guidance of ~$11B confirm the AI wave in full adoption-surge; the four AI slots are well-covered, so a broad-market catch-all adds no incremental wave value.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2023/05/24/nvidia-nvda-earnings-report-q1-2024.html",
+          "date": "2023-05-24"
+        },
+        {
+          "summary": "Apple WWDC 2023 confirmed a 'deliberate' AI stance with no generative-AI product, underscoring the AI bucket's pure-plays are captured and SPY's slot is better used for quantum entry.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2023/06/05/apple-practical-approach-to-ai-no-bragging-just-features.html",
+          "date": "2023-06-05"
+        }
       ]
     }
   ],
   "no_changes": false,
-  "rationale_overall": "The watchlist enters Q2 2023 full (8/8) with a clear quantum gap. The surgical fix swaps out SPY (a broad-market catch-all with no wave alignment) for IONQ, the only US-listed pure-play trapped-ion quantum computer company, which beat Q1 2023 guidance, raised its outlook, and hit its primary technical milestone early. Post-change covers AI, rockets, robotics, nuclear, and quantum with no catch-all consuming capacity and no bucket exceeding the four-ticker limit."
+  "rationale_overall": "The watchlist enters Q2 2023 full (8/8) with a clear quantum gap. The surgical fix swaps out SPY (a broad-market catch-all with no wave alignment) for IONQ, the only US-listed pure-play trapped-ion quantum computer company, which beat Q1 2023 guidance, raised its outlook, and hit its primary technical milestone early. Post-change covers AI, rockets, robotics, nuclear, and quantum with no catch-all consuming capacity and no bucket exceeding the four-ticker limit.",
+  "search_terms": [
+    "NVDA Nvidia AI earnings 2023 Q1 data center before:2023-07-01",
+    "RKLB Rocket Lab launch contract news 2023 before:2023-07-01",
+    "URA uranium ETF nuclear SMR news Q2 2023 before:2023-07-01",
+    "IONQ quantum computing stock news 2023 Q2 before:2023-07-01",
+    "BOTZ robotics ETF global X 2023 Q2 performance holdings before:2023-07-01",
+    "AI generative wave peak enthusiasm bubble 2023 Q2 before:2023-07-01",
+    "IONQ IonQ earnings Q1 2023 revenue bookings results before:2023-07-01",
+    "AAPL Apple AI machine learning 2023 Q2 news before:2023-07-01",
+    "SPY S&P 500 ETF portfolio watchlist role rebalance 2023 before:2023-07-01",
+    "IONQ IonQ Q1 2023 financial results revenue May 2023 before:2023-07-01",
+    "Nvidia NVDA generative AI data center May 2023 earnings revenue beat before:2023-07-01",
+    "quantum computing IONQ IonQ government contract AWS Azure 2023 before:2023-07-01",
+    "Rocket Lab RKLB Q1 2023 results contract backlog launch 2023 before:2023-07-01"
+  ]
 }

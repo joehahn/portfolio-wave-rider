@@ -7,32 +7,96 @@
       "wave_bucket": "rockets_spacecraft",
       "rationale": "Rocket Lab is the clearest US-listed pure-play on the profile's #1 priority next wave: commercial small-sat launch entered its revenue-generating phase in 2021, a second launch pad (LC-1B) opened with a successful February 28 mission, and a multi-mission Synspective contract demonstrates repeatable commercial cadence.",
       "news_evidence": [
-        {"summary": "Rocket Lab executes 'The Owl's Night Continues' Electron mission from the new Launch Complex 1B at Mahia, delivering Synspective's StriX-β SAR satellite on the pad's first flight.", "source": "NASASpaceFlight", "url": "https://www.nasaspaceflight.com/2022/02/the-owls-night-continues/", "date": "2022-02-28"},
-        {"summary": "Mission is first of three dedicated Electron launches contracted for Synspective's SAR constellation in 2022-2023, a booked commercial backlog across multiple customers.", "source": "Rocket Lab corporate", "url": "https://www.rocketlabusa.com/updates/rocket-lab-brings-forward-launch-for-earth-imaging-company-synspective/", "date": "2022-02-28"},
-        {"summary": "Orbital Today reports the successful inaugural LC-1B flight; RKLB now operates two active pads and is building a US launch site in Virginia.", "source": "OrbitalToday", "url": "https://orbitaltoday.com/2022/02/28/excitement-grows-as-rocket-lab-announces-the-launch-of-the-owls-night-continues-mission/", "date": "2022-02-28"}
+        {
+          "summary": "Rocket Lab executes 'The Owl's Night Continues' Electron mission from the new Launch Complex 1B at Mahia, delivering Synspective's StriX-\u03b2 SAR satellite on the pad's first flight.",
+          "source": "NASASpaceFlight",
+          "url": "https://www.nasaspaceflight.com/2022/02/the-owls-night-continues/",
+          "date": "2022-02-28"
+        },
+        {
+          "summary": "Mission is first of three dedicated Electron launches contracted for Synspective's SAR constellation in 2022-2023, a booked commercial backlog across multiple customers.",
+          "source": "Rocket Lab corporate",
+          "url": "https://www.rocketlabusa.com/updates/rocket-lab-brings-forward-launch-for-earth-imaging-company-synspective/",
+          "date": "2022-02-28"
+        },
+        {
+          "summary": "Orbital Today reports the successful inaugural LC-1B flight; RKLB now operates two active pads and is building a US launch site in Virginia.",
+          "source": "OrbitalToday",
+          "url": "https://orbitaltoday.com/2022/02/28/excitement-grows-as-rocket-lab-announces-the-launch-of-the-owls-night-continues-mission/",
+          "date": "2022-02-28"
+        }
       ]
     },
     {
       "ticker": "BOTZ",
       "wave_bucket": "robotics",
-      "rationale": "The Global X Robotics and AI ETF captures the profile's #2 priority next wave at the moment the structural demand driver — a persistent multi-year manufacturing labor shortage — is accelerating capital expenditure on industrial automation across US and European manufacturers.",
+      "rationale": "The Global X Robotics and AI ETF captures the profile's #2 priority next wave at the moment the structural demand driver \u2014 a persistent multi-year manufacturing labor shortage \u2014 is accelerating capital expenditure on industrial automation across US and European manufacturers.",
       "news_evidence": [
-        {"summary": "RoboticsTomorrow notes a projected 6-million-worker manufacturing shortage by 2030 and accelerating deployment of collaborative robots.", "source": "RoboticsTomorrow", "url": "https://www.roboticstomorrow.com/article/2022/02/using-technology-to-combat-the-skilled-labor-shortage/18183", "date": "2022-02-17"},
-        {"summary": "ABB Q4 2021 results: orders across Robotics and Discrete Automation grew 18% YoY with broad-based strength across regions and segments.", "source": "ABB investor relations", "url": "https://new.abb.com/news/detail/87387/q4-2021-results", "date": "2022-02-03"}
+        {
+          "summary": "RoboticsTomorrow notes a projected 6-million-worker manufacturing shortage by 2030 and accelerating deployment of collaborative robots.",
+          "source": "RoboticsTomorrow",
+          "url": "https://www.roboticstomorrow.com/article/2022/02/using-technology-to-combat-the-skilled-labor-shortage/18183",
+          "date": "2022-02-17"
+        },
+        {
+          "summary": "ABB Q4 2021 results: orders across Robotics and Discrete Automation grew 18% YoY with broad-based strength across regions and segments.",
+          "source": "ABB investor relations",
+          "url": "https://new.abb.com/news/detail/87387/q4-2021-results",
+          "date": "2022-02-03"
+        }
       ]
     },
     {
       "ticker": "URA",
       "wave_bucket": "nuclear",
-      "rationale": "Russia's invasion of Ukraine shattered the assumption that Russian-sourced uranium enrichment (42% of global capacity) is reliable; utilities are bidding spot uranium to a 10-year high to lock in Western-origin supply — the early commercial inflection the profile identifies as the entry signal for the nuclear fission wave.",
+      "rationale": "Russia's invasion of Ukraine shattered the assumption that Russian-sourced uranium enrichment (42% of global capacity) is reliable; utilities are bidding spot uranium to a 10-year high to lock in Western-origin supply \u2014 the early commercial inflection the profile identifies as the entry signal for the nuclear fission wave.",
       "news_evidence": [
-        {"summary": "S&P Global: U3O8 spot hits $50.75/lb — highest since June 2012 — as utilities replace Russian-origin supply; Sprott made its largest single-day purchase Feb 25.", "source": "S&P Global Market Intelligence", "url": "https://www.spglobal.com/marketintelligence/en/news-insights/latest-news-headlines/uranium-buyers-ukraine-conflict-drive-spot-price-to-10-year-high-69251651", "date": "2022-03-03"},
-        {"summary": "Bloomberg: 'Uranium Surges to Highest Since Fukushima on Russian War' — Ux U3O8 reaches $59.75/lb; US weighing sanctions on Rosatom (42% of global enrichment).", "source": "Bloomberg", "url": "https://www.bloomberg.com/news/articles/2022-03-11/uranium-soars-to-highest-since-fukushima-disaster-on-russian-war", "date": "2022-03-11"},
-        {"summary": "Bloomberg: investors flood into uranium following the invasion, citing Rosatom's JVs with Kazatomprom (45% of global primary uranium) as a dual supply chokepoint.", "source": "Bloomberg", "url": "https://www.bloomberg.com/news/articles/2022-03-09/retail-and-meme-traders-are-buying-uranium-after-russia-invaded-ukraine", "date": "2022-03-09"}
+        {
+          "summary": "S&P Global: U3O8 spot hits $50.75/lb \u2014 highest since June 2012 \u2014 as utilities replace Russian-origin supply; Sprott made its largest single-day purchase Feb 25.",
+          "source": "S&P Global Market Intelligence",
+          "url": "https://www.spglobal.com/marketintelligence/en/news-insights/latest-news-headlines/uranium-buyers-ukraine-conflict-drive-spot-price-to-10-year-high-69251651",
+          "date": "2022-03-03"
+        },
+        {
+          "summary": "Bloomberg: 'Uranium Surges to Highest Since Fukushima on Russian War' \u2014 Ux U3O8 reaches $59.75/lb; US weighing sanctions on Rosatom (42% of global enrichment).",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2022-03-11/uranium-soars-to-highest-since-fukushima-disaster-on-russian-war",
+          "date": "2022-03-11"
+        },
+        {
+          "summary": "Bloomberg: investors flood into uranium following the invasion, citing Rosatom's JVs with Kazatomprom (45% of global primary uranium) as a dual supply chokepoint.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2022-03-09/retail-and-meme-traders-are-buying-uranium-after-russia-invaded-ukraine",
+          "date": "2022-03-09"
+        }
       ]
     }
   ],
   "removes": [],
   "no_changes": false,
-  "rationale_overall": "The AI bucket (AAPL, MSFT, GOOGL, NVDA) is already at the four-ticker cap, so all three adds open exposure to the profile's priority next-wave categories. RKLB fills rockets/spacecraft on its Feb 28 LC-1B commercial pad expansion. BOTZ fills robotics as the labor-shortage driver pulls forward automation capex (ABB record Q4 2021 orders). URA fills nuclear on the Ukraine supply shock driving uranium spot to a 10-year high. The watchlist reaches its hard cap of 8 with zero removes. Defense/rearmament (Germany's Zeitenwende) is noted but deferred since US primes already partially re-rated within weeks."
+  "rationale_overall": "The AI bucket (AAPL, MSFT, GOOGL, NVDA) is already at the four-ticker cap, so all three adds open exposure to the profile's priority next-wave categories. RKLB fills rockets/spacecraft on its Feb 28 LC-1B commercial pad expansion. BOTZ fills robotics as the labor-shortage driver pulls forward automation capex (ABB record Q4 2021 orders). URA fills nuclear on the Ukraine supply shock driving uranium spot to a 10-year high. The watchlist reaches its hard cap of 8 with zero removes. Defense/rearmament (Germany's Zeitenwende) is noted but deferred since US primes already partially re-rated within weeks.",
+  "search_terms": [
+    "RKLB Rocket Lab commercial launch contract milestone before:2022-04-01",
+    "BOTZ Global X Robotics ETF robotics industry outlook 2022 before:2022-04-01",
+    "URA uranium nuclear ETF price surge 2022 before:2022-04-01",
+    "Rocket Lab RKLB 2022 Q1 launch revenue news site:spacenews.com OR site:rocketlabusa.com OR site:reuters.com",
+    "uranium nuclear energy price 2022 Russia Ukraine war supply before:2022-04-01",
+    "defense spending NATO Europe increase 2022 rearmament budget before:2022-04-01",
+    "Rocket Lab RKLB SPAC merger listing date 2021 site:sec.gov OR site:spacenews.com",
+    "ITA iShares aerospace defense ETF Germany NATO rearmament Q1 2022 budget increase site:reuters.com OR site:cnbc.com OR site:ft.com",
+    "robotics industry automation 2022 labor shortage spending increase site:reuters.com OR site:wsj.com OR site:ft.com",
+    "Germany Scholz Zeitenwende 100 billion defense fund February 2022 NATO rearmament",
+    "uranium spot price 10 year high March 2022 Russia Ukraine nuclear supply site:spglobal.com OR site:reuters.com OR site:bloomberg.com",
+    "Rocket Lab launch 2022 Q1 January February March Electron satellite",
+    "BOTZ robotics ETF manufacturing automation spending February March 2022 site:therobotreport.com OR site:reuters.com",
+    "ITA XAR defense ETF Germany 100 billion Zeitenwende rearmament February March 2022 stocks",
+    "International Federation Robotics IFR 2022 industrial robot installations record growth January February",
+    "Rocket Lab \"February 28\" OR \"March 2022\" launch Electron Synspective satellite success 2022",
+    "IFR World Robotics 2021 record installations 517000 report released 2021 site:ifr.org",
+    "\"Rocket Lab\" \"Owl's Night Continues\" February 2022 launch success Synspective site:spacenews.com OR site:space.com",
+    "robotics automation investment labor shortage January 2022 manufacturers spending site:reuters.com OR site:wsj.com OR site:cnbc.com",
+    "URA uranium ETF February March 2022 Russia Ukraine supply Russia Kazatomprom price spike site:bloomberg.com OR site:reuters.com",
+    "Amazon ABB Fanuc robots manufacturing automation orders Q1 2022 January February March before:2022-04-01",
+    "ABB robotics order intake record 2021 Q4 earnings 2022 automation demand growth"
+  ]
 }

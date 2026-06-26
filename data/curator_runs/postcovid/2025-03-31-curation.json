@@ -4,5 +4,30 @@
   "adds": [],
   "removes": [],
   "no_changes": true,
-  "rationale_overall": "The watchlist is full at 8/8 and all positions maintain intact theses as of March 31, 2025. The January 27 DeepSeek shock (NVDA -17% intraday) was the quarter's main AI stress test; it resolved without thesis damage — NVDA Q4 FY2025 (Feb 26) showed data-center revenue $35.6B up 93% YoY and confirmed the Blackwell ramp, MSFT FY2025 Q2 (Jan 29) showed its AI business at a $13B+ run rate growing 175% YoY, and GOOGL Q4 2024 (Feb 4-5) confirmed 30% Google Cloud growth with Gemini 2.0 integrated. Quantum: IONQ beat FY2024 with $43.1M revenue (+95% YoY), $95.6M bookings, a $21.1M AFRL contract, and a definitive agreement to acquire ID Quantique (Feb 26). Rockets: RKLB reported Q4 2024 record revenue $132.4M, FY2024 $436.2M (Feb 27). Nuclear: CEG holds the Microsoft TMI-restart PPA as its anchor; NUKZ provides diversified nuclear-basket coverage distinct from CEG. Robotics: BOTZ supported by a broad wave of humanoid/industrial-robotics venture funding in early 2025. The defense/rearmament wave would be the natural next add, but the profile warns defense primes have already re-rated sharply and no pre-April 2025 catalyst justifies displacing an intact holding. No changes."
+  "rationale_overall": "The watchlist is full at 8/8 and all positions maintain intact theses as of March 31, 2025. The January 27 DeepSeek shock (NVDA -17% intraday) was the quarter's main AI stress test; it resolved without thesis damage \u2014 NVDA Q4 FY2025 (Feb 26) showed data-center revenue $35.6B up 93% YoY and confirmed the Blackwell ramp, MSFT FY2025 Q2 (Jan 29) showed its AI business at a $13B+ run rate growing 175% YoY, and GOOGL Q4 2024 (Feb 4-5) confirmed 30% Google Cloud growth with Gemini 2.0 integrated. Quantum: IONQ beat FY2024 with $43.1M revenue (+95% YoY), $95.6M bookings, a $21.1M AFRL contract, and a definitive agreement to acquire ID Quantique (Feb 26). Rockets: RKLB reported Q4 2024 record revenue $132.4M, FY2024 $436.2M (Feb 27). Nuclear: CEG holds the Microsoft TMI-restart PPA as its anchor; NUKZ provides diversified nuclear-basket coverage distinct from CEG. Robotics: BOTZ supported by a broad wave of humanoid/industrial-robotics venture funding in early 2025. The defense/rearmament wave would be the natural next add, but the profile warns defense primes have already re-rated sharply and no pre-April 2025 catalyst justifies displacing an intact holding. No changes.",
+  "search_terms": [
+    "IONQ quantum computing news Q1 2025 before:2025-04-01",
+    "CEG Constellation Energy nuclear news Q1 2025 before:2025-04-01",
+    "NUKZ nuclear ETF news Q1 2025 before:2025-04-01",
+    "IONQ IonQ news January February March 2025 before:2025-04-01",
+    "RKLB Rocket Lab news Q1 2025 before:2025-04-01",
+    "BOTZ robotics ETF news Q1 2025 before:2025-04-01",
+    "Rocket Lab RKLB Neutron rocket update 2025 before:2025-04-01",
+    "NVDA Nvidia AI chips news January March 2025 before:2025-04-01",
+    "nuclear energy PPA AI data center utility deals 2025 before:2025-04-01",
+    "IonQ IONQ Q4 2024 earnings results February 2025 before:2025-04-01",
+    "Rocket Lab RKLB Q4 2024 earnings launch 2025 before:2025-04-01",
+    "humanoid robot robotics investment news Q1 2025 before:2025-04-01",
+    "DeepSeek AI market impact NVDA selloff January 2025 before:2025-04-01",
+    "Constellation Energy CEG Microsoft Three Mile Island PPA nuclear 2025 before:2025-04-01",
+    "SPCX space exploration ETF launch date listing 2025 before:2025-04-01",
+    "European defense rearmament ETF US-listed ITA XAR DFEN news Q1 2025 before:2025-04-01",
+    "MSFT Microsoft AI revenue cloud Q1 2025 earnings before:2025-04-01",
+    "GOOGL Google AI Gemini revenue Q4 2024 earnings before:2025-04-01",
+    "Constellation Energy DOE loan Three Mile Island date announced 2025 before:2025-04-01",
+    "BOTZ Global X robotics AI ETF holdings performance Q1 2025 before:2025-04-01",
+    "Figure AI robotics funding round humanoid 2025 date before:2025-04-01",
+    "NVDA Nvidia earnings Q4 FY2025 results February 2025 before:2025-04-01",
+    "IonQ IONQ Air Force Research Lab contract DARPA quantum 2025 date before:2025-04-01"
+  ]
 }

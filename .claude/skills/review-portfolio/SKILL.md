@@ -38,6 +38,15 @@ Save the agent's JSON return to:
 - `data/curator_latest.json` (overwritten each run; the dashboard reads this for the "Latest curation" panel)
 - `data/curator_runs/live/<today>-curation.json` (archived; accumulates a history of every live run)
 
+Then record the curator's **real** WebSearch queries (ground truth, not the agent's self-report). The `Task` result for the curator call includes an `output_file:` path (the agent transcript); run:
+
+```bash
+.venv/bin/python scripts/extract_search_terms.py <curator output_file> \
+  --into data/curator_latest.json
+```
+
+This parses the actual `WebSearch` tool calls out of the transcript and writes them into `search_terms`, so the dashboard's "Curator search terms" panel shows what the curator truly searched. If the transcript can't be parsed it leaves the agent's self-reported `search_terms` in place (graceful fallback). Copy the updated `curator_latest.json` over `data/curator_runs/live/<today>-curation.json` so the archive matches.
+
 ### Step 2 — apply curate (Bash)
 
 ```bash

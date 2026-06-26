@@ -81,6 +81,15 @@ just-completed dates' applied adds/removes.
 
 Save each agent return to `data/curator_runs/postcovid/<date>-curation.json`.
 
+Then preserve that agent's **real** WebSearch queries. Each `Task` result includes an `output_file:` path (the agent transcript); per-agent attribution works even though the agents run in parallel, because each has its own transcript. For each completed date run:
+
+```bash
+.venv/bin/python scripts/extract_search_terms.py <that agent's output_file> \
+  --into data/curator_runs/postcovid/<date>-curation.json
+```
+
+This writes the actual `WebSearch` tool calls (verbatim, including the `before:` filters) into that date's `search_terms`, falling back to the agent's self-reported `search_terms` if the transcript can't be parsed. This is how the backtest preserves its query terms per rebalance date.
+
 ### Step 3 — archive stale JSONs (Bash)
 
 For each date in `stale_dates`:

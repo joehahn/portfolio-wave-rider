@@ -4,5 +4,23 @@
   "adds": [],
   "removes": [],
   "no_changes": true,
-  "rationale_overall": "As of 2024-06-30, all eight tickers hold intact theses. RKLB confirmed strong Q1 2024 momentum (69% YoY revenue growth, $1B+ backlog, $515M SDA contract, Archimedes engine-build completion May 7, 2024). URA's nuclear thesis was reinforced by the AWS-Talen 10-year 960 MW nuclear PPA (March 2024), the first hyperscaler baseload-nuclear deal of the cycle. IONQ beat Q1 2024 guidance ($7.6M, +77% YoY), raised full-year bookings to $75-95M, and launched a record AQ36 system in Europe. BOTZ is supported by a deepening humanoid-robotics venture wave (Figure AI $675M Series B, Feb 2024). MSFT/GOOGL/NVDA remain the AI ride with capex still accelerating. Two potential entrants were rejected for thin history: OKLO (NYSE-listed May 2024, ~7 weeks) and NUKZ (launched Jan 2024, ~5 months) — URA already covers nuclear and the optimizer's 1.5y lookback would be data-starved. No defense-ETF add was supported by sufficient pre-date evidence. Watchlist left unchanged."
+  "rationale_overall": "As of 2024-06-30, all eight tickers hold intact theses. RKLB confirmed strong Q1 2024 momentum (69% YoY revenue growth, $1B+ backlog, $515M SDA contract, Archimedes engine-build completion May 7, 2024). URA's nuclear thesis was reinforced by the AWS-Talen 10-year 960 MW nuclear PPA (March 2024), the first hyperscaler baseload-nuclear deal of the cycle. IONQ beat Q1 2024 guidance ($7.6M, +77% YoY), raised full-year bookings to $75-95M, and launched a record AQ36 system in Europe. BOTZ is supported by a deepening humanoid-robotics venture wave (Figure AI $675M Series B, Feb 2024). MSFT/GOOGL/NVDA remain the AI ride with capex still accelerating. Two potential entrants were rejected for thin history: OKLO (NYSE-listed May 2024, ~7 weeks) and NUKZ (launched Jan 2024, ~5 months) \u2014 URA already covers nuclear and the optimizer's 1.5y lookback would be data-starved. No defense-ETF add was supported by sufficient pre-date evidence. Watchlist left unchanged.",
+  "search_terms": [
+    "IONQ quantum computing news 2024 before:2024-07-01",
+    "URA uranium ETF nuclear energy news Q2 2024 before:2024-07-01",
+    "RKLB Rocket Lab news milestones 2024 before:2024-07-01",
+    "BOTZ robotics ETF news 2024 before:2024-07-01",
+    "nuclear SMR fission utility data center PPA news Q2 2024 before:2024-07-01",
+    "IonQ USAF Air Force Research Lab contract 2024 date before:2024-07-01",
+    "humanoid robotics investment funding milestone 2024 before:2024-07-01",
+    "defense spending rearmament ETF ITA XAR news 2024 before:2024-07-01",
+    "OKLO nuclear IPO SPAC listing date 2024 before:2024-07-01",
+    "Rocket Lab RKLB Neutron Archimedes engine milestone June 2024 before:2024-07-01",
+    "QTUM quantum ETF Defiance news performance 2024 before:2024-07-01",
+    "uranium price spot nuclear utility PPA demand Q2 2024 before:2024-07-01",
+    "NUKZ nuclear ETF launch date listing 2024 before:2024-07-01",
+    "NVDA Nvidia AI market cap peak June 2024 stock news before:2024-07-01",
+    "NATO defense spending rearmament milestone news June 2024 before:2024-07-01",
+    "IonQ quantum computing Q1 2024 results revenue earnings before:2024-07-01"
+  ]
 }
