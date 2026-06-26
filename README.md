@@ -181,8 +181,6 @@ NVDA is in the starter from day 0, so both the AI-managed portfolio and the buy-
 | Absolute, annualized | +11.5pp/yr |
 | Relative (curator − buy/hold) / (buy/hold) | 0.53 |
 
-**Execution lag.** The figures above assume a realistic one-session delay between a rebalance decision and the trade (a real user reviews the recommendation, then places the order later) — not an instant same-close fill. On this window that delay is material: the no-lag run would be +334.2% (~48pp higher), so the published headline is the conservative, normally-paced figure. The mechanism, the `t_update_days` knob, and why timing matters more here than over a longer window are detailed in [REFERENCE.md](REFERENCE.md#the-curator-backtest-post-covid-window).
-
 See the [curator backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html) and the full report in `data/backtest_curator_postcovid/report.md`. Reproduce locally with the on-demand backtest from the Runs section above.
 
 ## Notes
