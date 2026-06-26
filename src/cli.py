@@ -120,12 +120,13 @@ def main(argv: list[str] | None = None) -> int:
     p_bt.add_argument("--benchmarks", nargs="*", default=["SPY"],
                       help="benchmark tickers compared against the backtest's realized return "
                            "(default: SPY). Pass an empty list to skip the benchmark section.")
-    p_bt.add_argument("--t-update-days", type=int, default=1,
+    p_bt.add_argument("--t-update-days", type=int, default=fm["t_update_days"],
                       help="curator mode only: trading-day lag between a rebalance "
                            "signal (decided on the rebalance date's close) and the "
                            "trade actually landing. Models the gap between running a "
-                           "review and placing the order. Default 1 (next session); "
-                           "0 reproduces the optimistic same-close 'smart money' run.")
+                           "review and placing the order. Defaults to t_update_days "
+                           "in investor_profile.md (1 = next session); 0 reproduces "
+                           "the optimistic same-close 'smart money' run.")
     p_bt.add_argument("--curator-runs-dir", default=None,
                       help="path to a directory of curator JSON payloads "
                            "(<dir>/_starter.json + <date>-curation.json files). "

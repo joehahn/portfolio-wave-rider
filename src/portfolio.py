@@ -43,6 +43,12 @@ _FINANCIAL_MODEL_DEFAULTS: dict[str, Any] = {
     "lookback_period": "3y",
     "rebalance_period": "monthly",
     "max_watchlist_size": 12,
+    # t_update_days: backtest realism only. Trading-day lag between a rebalance
+    # signal (decided on the rebalance date's close) and the trade actually
+    # executing, modeling the gap between running a review and placing the
+    # order. The live analyze/recommend path does not use it (real fills happen
+    # whenever you trade); it shapes only the curator backtest replay.
+    "t_update_days": 1,
     # concentration_cap is the optimizer's per-position max weight (the
     # --max-weight default). Unlike the others it lives at the profile's top
     # level, not inside the financial_model block; load_financial_model reads
@@ -54,11 +60,11 @@ _FINANCIAL_MODEL_DEFAULTS: dict[str, Any] = {
 def load_financial_model(profile_path: str = "investor_profile.md") -> dict[str, Any]:
     """Read `financial_model` from investor_profile.md's YAML front matter.
 
-    Returns a dict with six fields (`risk_aversion`, `risk_free_rate`,
-    `lookback_period`, `rebalance_period`, `max_watchlist_size`, and the
-    top-level `concentration_cap`); any missing field falls back to the
-    hard-coded default. If the profile file doesn't exist or has no front
-    matter, all defaults are returned.
+    Returns a dict with seven fields (`risk_aversion`, `risk_free_rate`,
+    `lookback_period`, `rebalance_period`, `max_watchlist_size`,
+    `t_update_days`, and the top-level `concentration_cap`); any missing field
+    falls back to the hard-coded default. If the profile file doesn't exist or
+    has no front matter, all defaults are returned.
 
     The optimizer objective is intentionally not configurable here: this
     project commits to mean-variance maximization with ``risk_aversion`` (λ)
