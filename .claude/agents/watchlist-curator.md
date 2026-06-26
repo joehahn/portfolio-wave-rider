@@ -33,7 +33,15 @@ For live runs (`as_of_date` is today), ignore the as-of-date discipline; you can
 
 ## What to search for
 
-For each ticker you are considering adding or removing, gather 2 to 4 dated bullets from major financial news outlets (Bloomberg, Reuters, WSJ, FT, CNBC, the company's own newsroom, SEC filings). Prefer these over speculative blog posts. The user maintains a `news_sources.md` file with curated sources grouped by wave bucket; consult it if present.
+Reading beats reasoning: discover what the press is naming as movers before you reason about your own holdings. Run your searches in two passes, and record every query you run verbatim (see `search_terms` in the output schema).
+
+**Pass 1 — gem-agnostic discovery (drives ADDs).** Do NOT search any ticker symbol in this pass; the point is to surface names you do not already hold, from the news rather than from your priors.
+
+- *Profile-wave beats.* For each wave named in `investor_profile.md`'s "Strategy & beliefs" section, derive one or two plain discovery queries and run them. The profile's waves are the source of truth here, so these terms evolve automatically as the user edits their thesis. Examples: a "rockets & spacecraft" wave → `space stocks`, `rocket launch stocks`; "nuclear" → `nuclear stocks`, `SMR stocks`; "robotics" → `robotics stocks`, `humanoid robot stocks`; "quantum computing" → `quantum computing stocks`; an energy/geopolitical wave → `geopolitics`, `shipping stocks`, `tanker stocks`. Also consult `news_sources.md`, whose sources are grouped by these same waves.
+- *Fixed generic beats.* A small ticker-agnostic set, run every time regardless of thesis: `best performing etf this month`, `biggest stock gainers`, plus macro context (`interest rates`, `tariffs`) when the profile names a non-tech or geopolitical wave.
+- Read the headline + snippet of each result and collect the tickers the press explicitly names. These become your ADD candidates.
+
+**Pass 2 — ticker-keyed due-diligence (drives KEEPs and REMOVEs).** For each current-watchlist ticker and each candidate surfaced in Pass 1, search the ticker by name and gather 2 to 4 dated bullets from major financial news outlets (Bloomberg, Reuters, WSJ, FT, CNBC, the company's own newsroom, SEC filings). Prefer these over speculative blog posts. (In backtest mode both passes obey the as-of-date discipline: `before:` filters and the suppression list apply to discovery beats too.)
 
 A good add suggestion is supported by at least one of:
 
@@ -93,11 +101,14 @@ Emit one JSON object as your final message. No surrounding prose, no markdown co
     }
   ],
   "no_changes": false,
-  "rationale_overall": "One short paragraph summarizing the net effect on the watchlist's thematic shape and how it reflects the profile's wave thesis."
+  "rationale_overall": "One short paragraph summarizing the net effect on the watchlist's thematic shape and how it reflects the profile's wave thesis.",
+  "search_terms": ["space stocks", "nuclear stocks", "robotics stocks", "quantum computing stocks", "biggest stock gainers", "best performing etf this month", "RKLB recent news", "NUKZ recent news"]
 }
 ```
 
 `no_changes: true` is a legitimate output for a quiet rebalance period (nothing material happened). When `no_changes` is true, `adds` and `removes` must both be empty lists.
+
+`search_terms` is the flat list of every query you actually ran this rebalance, verbatim and in run order: the Pass-1 discovery beats (profile-wave + fixed generic) followed by the Pass-2 ticker searches. The live dashboard renders this so the user can see what the curator looked at, including for tickers it kept; the set evolves over time as the profile's waves and the current holdings change. Emit it on every run, including `no_changes` runs.
 
 `wave_bucket` on adds must be one of: `AI | robotics | rockets_spacecraft | nuclear | quantum | engineered_biology | geopolitical | demographics | commodities | regulatory | general_markets`. The first six are technology waves; the next four are non-technology waves (geopolitical realignments, demographic shifts, commodity cycles, regulatory inflections); `general_markets` is the catch-all for tickers not tied to any specific thesis.
 
