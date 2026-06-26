@@ -10,8 +10,8 @@ financial_model:                  # optimizer math
   risk_free_rate: 0.04            # ≈ 1y Treasury yield; baseline subtracted from E[r] in Sharpe-ratio calc
   lookback_period: 1.5y           # history window for estimating μ and Σ
   rebalance_period: monthly       # monthly | quarterly | semi_annual | annual; how often the watchlist-curator runs
-  max_watchlist_size: 8           # hard cap on how many tickers the curator may consider simultaneously
-  t_update_days: 1                # backtest only: trading-day lag from rebalance signal to trade (1 = next session, 0 = same-close)
+  max_watchlist_size: 8           # hard cap on number of tickers the curator may consider
+  t_update_days: 1                # trading-day lag from rebalance signal to trade (1 = next session, 0 = same-close)
 ---
 
 # Goals
