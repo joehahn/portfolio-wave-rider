@@ -117,6 +117,8 @@ PY
   --benchmarks SPY
 ```
 
+Execution lag defaults to `--t-update-days 1` (each rebalance is decided on the rebalance date's close but the trade lands the next session — the realistic case for a live user who reviews and then trades later). Pass `--t-update-days 0` to reproduce the optimistic same-close run; the result is insensitive to the lag (within noise across 0-3 sessions).
+
 ### Step 6 — render the public dashboard (Bash)
 
 ```bash

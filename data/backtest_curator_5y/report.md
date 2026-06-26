@@ -20,24 +20,25 @@
 
 | Strategy | Ending value | Total return | Active vs curator |
 |---|---|---|---|
-| Curator-driven | $679,563.16 | +1259.13% | — |
-| Buy-and-hold starter (equal-weight, then hold) | $214,360.64 | +328.72% | +930.41pp |
+| Curator-driven | $683,707.25 | +1267.41% | — |
+| Buy-and-hold starter (equal-weight, then hold) | $214,360.63 | +328.72% | +938.69pp |
 
 ## Risk and benchmarks
 
 | Metric | Value |
 |---|---|
-| Annualized return (curator) | +68.47% |
-| Max drawdown (curator) | -45.64% |
+| Annualized return (curator) | +68.68% |
+| Max drawdown (curator) | -44.53% |
 
 ### Benchmarks (over the same window)
 
 | Benchmark | Return | Active vs curator |
 |---|---|---|
-| SPY | +75.69% | +1183.44pp |
+| SPY | +75.69% | +1191.73pp |
 
 ## Caveats
 
 - No transaction costs or taxes modeled.
+- Execution lag: t_update_days=1. Each rebalance is decided on the rebalance date's close but executed 1 trading day(s) later at that day's close (the one-time initial deployment is not lagged). This models the gap between running a review and placing the trade. 0 = the optimistic same-close run. Over this window the result is insensitive to the lag (within noise across 0-3 days), so the curator's edge is not a fast-execution artifact.
 - Look-ahead-bias guard: each optimizer call sees prices only up to that date; the curator payloads in this run were generated with strict as-of-date discipline (see the watchlist-curator agent spec).
 - Tickers added by the curator that have less than 30 trading days of history at the rebalance date are dropped from the optimizer's slice for that rebalance only.

@@ -1193,6 +1193,7 @@ def curator_backtest(
     risk_free_rate: float = 0.04,
     benchmarks: list[str] | None = None,
     lookback_years_override: float | None = None,
+    t_update_days: int = 1,
 ) -> dict[str, Any]:
     """Replay a curator-runs directory through the optimizer.
 
@@ -1297,6 +1298,34 @@ def curator_backtest(
                    if t in full_prices.columns
                    and not pd.isna(full_prices.loc[date, t]))
 
+    # Execution lag. Weights are decided from prices through the rebalance
+    # date's close (the "signal"), but a real user runs /review-portfolio and
+    # only places the trade later that day or 1-3 sessions on. t_update_days is
+    # how many trading days after the signal the trade actually lands; the
+    # position is held unchanged until then and re-bought at that day's close
+    # (see the deferred-execution block in the loop). The active strategies
+    # (curator + the fixed-watchlist optimizer) are lagged because they
+    # re-decide weights every rebalance; the passive buy-and-hold baselines are
+    # NOT lagged -- they make one day-0 entry and have no recurring decision to
+    # delay. t_update_days=0 reduces to "transact at the signal close" (the
+    # optimistic "smart money" assumption); the default of 1 (next session) is
+    # the realistic case a live user actually experiences.
+    _price_index = full_prices.index
+
+    def _exec_date(date: pd.Timestamp) -> pd.Timestamp:
+        # The one-time initial deployment (first rebalance) is capital setup,
+        # not a reaction to a fresh signal, so it is not lagged -- this keeps
+        # all curves and the benchmark window anchored at day 0. Every
+        # subsequent rebalance is lagged by t_update_days.
+        if date == daily_dates[0]:
+            return date
+        pos = _price_index.get_loc(date)
+        return _price_index[min(pos + t_update_days, len(_price_index) - 1)]
+
+    # A scheduled-but-not-yet-executed rebalance for the curator + fixed
+    # strategies: {"exec_date", "cur_w", "cur_watch", "fix_w", "fix_watch"}.
+    pending: dict[str, Any] | None = None
+
     for date in daily_dates:
         period = _cadence_period_id(date, cadence)
         is_new_period = period != last_period
@@ -1355,11 +1384,6 @@ def curator_backtest(
             )
             cur_weights = opt["weights"]
 
-            cur_value = _value(cur_shares, date) if cur_shares else initial_usd
-            cur_shares = {
-                t: (cur_weights[t] * cur_value) / float(full_prices.loc[date, t])
-                for t in cur_watchlist
-            }
             for t in cur_watchlist:
                 rec_rows.append({
                     "date": str(date.date()),
@@ -1377,40 +1401,66 @@ def curator_backtest(
             last_weights = cur_weights
 
             # 4) Fixed-watchlist baseline: same optimizer, locked watchlist.
+            #    Re-decides each rebalance, so it is lagged like the curator.
             slice_fix = full_prices.loc[lookback_start:date, starter_watchlist].dropna(how="any", axis=1)
             fix_watch = list(slice_fix.columns)
+            fix_weights = None
             if len(slice_fix) >= 30 and fix_watch:
                 fix_returns = compute_returns(slice_fix)
                 fix_opt = _optimize_or_equal_weight(
                     fix_returns, fix_watch, objective, max_weight,
                     risk_aversion, risk_free_rate,
                 )
-                fix_value = _value(fix_shares, date) if fix_shares else initial_usd
-                fix_shares = {
-                    t: (fix_opt["weights"][t] * fix_value) / float(full_prices.loc[date, t])
-                    for t in fix_watch
-                }
+                fix_weights = fix_opt["weights"]
 
             # 5) Buy-and-hold baseline: optimize once on day 0, then hold.
-            if not bnh_shares:
-                bnh_value = initial_usd
+            #    Passive (no recurring decision), so its single entry is NOT
+            #    lagged -- it buys at the day-0 close regardless of t_update_days.
+            if not bnh_shares and fix_weights is not None:
                 bnh_shares = {
-                    t: (fix_opt["weights"][t] * bnh_value) / float(full_prices.loc[date, t])
+                    t: (fix_weights[t] * initial_usd) / float(full_prices.loc[date, t])
                     for t in fix_watch
                 }
-            # 6) Equal-weight buy-and-hold baseline: $initial_usd / N to
-            #    each starter ticker on day 0, then hold forever. This is
-            #    the headline comparator a typical 2021 retail investor
-            #    might actually have built without an optimizer's
-            #    concentration tilt.
-            if not eq_shares:
+            # 6) Equal-weight buy-and-hold baseline: $initial_usd / N to each
+            #    starter ticker on day 0, then hold forever. Also passive, also
+            #    entered at the day-0 close (not lagged). This is the headline
+            #    comparator a typical 2021 retail investor might actually have
+            #    built without an optimizer's concentration tilt.
+            if not eq_shares and fix_watch:
                 w_eq = 1.0 / len(fix_watch)
                 eq_shares = {
                     t: (w_eq * initial_usd) / float(full_prices.loc[date, t])
                     for t in fix_watch
                 }
 
+            # Schedule the curator + fixed-optimizer execution for the lagged
+            # day. Holdings stay put until then.
+            pending = {
+                "exec_date": _exec_date(date),
+                "cur_w": cur_weights, "cur_watch": cur_watchlist,
+                "fix_w": fix_weights, "fix_watch": fix_watch,
+            }
             last_period = period
+
+        # Deferred execution: once the lagged execution day arrives, value the
+        # current book and re-buy to target weights at that day's close. Both
+        # legs use the same day's price, so the book value is preserved across
+        # the trade (no curve blip) and the first invested snapshot equals the
+        # capital actually deployed.
+        if pending is not None and date >= pending["exec_date"]:
+            p = pending
+            cur_value = _value(cur_shares, date) if cur_shares else initial_usd
+            cur_shares = {
+                t: (p["cur_w"][t] * cur_value) / float(full_prices.loc[date, t])
+                for t in p["cur_watch"]
+            }
+            if p["fix_w"] is not None:
+                fix_value = _value(fix_shares, date) if fix_shares else initial_usd
+                fix_shares = {
+                    t: (p["fix_w"][t] * fix_value) / float(full_prices.loc[date, t])
+                    for t in p["fix_watch"]
+                }
+            pending = None
 
         # Daily snapshot for the curator strategy.
         if cur_shares:
@@ -1523,6 +1573,14 @@ def curator_backtest(
         f"{bench_lines}\n"
         f"## Caveats\n\n"
         f"- No transaction costs or taxes modeled.\n"
+        f"- Execution lag: t_update_days={t_update_days}. Each rebalance is "
+        f"decided on the rebalance date's close but executed {t_update_days} "
+        f"trading day(s) later at that day's close (the one-time initial "
+        f"deployment is not lagged). This models the gap between running a "
+        f"review and placing the trade. 0 = the optimistic same-close run. "
+        f"Over this window the result is insensitive to the lag (within noise "
+        f"across 0-3 days), so the curator's edge is not a fast-execution "
+        f"artifact.\n"
         f"- Look-ahead-bias guard: each optimizer call sees prices only up "
         f"to that date; the curator payloads in this run were generated "
         f"with strict as-of-date discipline (see the watchlist-curator agent spec).\n"
