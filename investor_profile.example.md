@@ -11,6 +11,9 @@ financial_model:                  # optimizer math
   lookback_period: 1.5y           # history window for estimating μ and Σ
   rebalance_period: monthly       # monthly | quarterly | semi_annual | annual; how often the watchlist-curator runs
   max_watchlist_size: 8           # hard cap on number of tickers the curator may consider
+backtest:                         # only affects /run-backtest and sweeps, not live recommendations
+  start_date: 2022-03-31          # window start (a quarter-end; first rebalance lands here). Post-COVID/post-stimulus normal regime
+  end_date: 2025-10-31            # window end (just before the late-2025 Iran-war runup; a month past the last quarter-end so it holds)
   t_update_days: 1                # trading-day lag from rebalance signal to trade (1 = next session, 0 = same-close)
 ---
 
