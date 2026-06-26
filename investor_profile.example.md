@@ -11,7 +11,7 @@ financial_model:                  # optimizer math
   lookback_period: 1.5y           # history window for estimating μ and Σ
   rebalance_period: monthly       # monthly | quarterly | semi_annual | annual; how often the watchlist-curator runs
   max_watchlist_size: 8           # hard cap on how many tickers the curator may consider simultaneously
-  t_update_days: 1                # backtest realism only: trading-day lag from a rebalance signal to the trade landing (1 = next session; models reviewing today, trading tomorrow). 0 = optimistic same-close fill. The live path's lag is just your real fill timing.
+  t_update_days: 1                # backtest only: trading-day lag from rebalance signal to trade (1 = next session, 0 = same-close)
 ---
 
 # Goals
