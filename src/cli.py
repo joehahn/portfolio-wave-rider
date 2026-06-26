@@ -38,6 +38,7 @@ def main(argv: list[str] | None = None) -> int:
     # profile / missing financial_model section -> hard-coded defaults so
     # nothing breaks. CLI flags still override the profile values explicitly.
     fm = portfolio.load_financial_model()
+    bc = portfolio.load_backtest_config()
 
     parser = argparse.ArgumentParser(prog="src.cli", description="Portfolio CLI.")
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -120,7 +121,7 @@ def main(argv: list[str] | None = None) -> int:
     p_bt.add_argument("--benchmarks", nargs="*", default=["SPY"],
                       help="benchmark tickers compared against the backtest's realized return "
                            "(default: SPY). Pass an empty list to skip the benchmark section.")
-    p_bt.add_argument("--t-update-days", type=int, default=fm["t_update_days"],
+    p_bt.add_argument("--t-update-days", type=int, default=bc["t_update_days"],
                       help="curator mode only: trading-day lag between a rebalance "
                            "signal (decided on the rebalance date's close) and the "
                            "trade actually landing. Models the gap between running a "

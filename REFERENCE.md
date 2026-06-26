@@ -191,29 +191,31 @@ Two LLM specialists (blue) bracket four Python calls (yellow). The profile is th
 - All Python in two files: `src/portfolio.py` (math) and `src/cli.py` (one entry point with seven subcommands).
 - The user-authored `investor_profile.md` is the source of truth. Every recommendation cites lines from it. When the optimal numerical answer violates a profile constraint, the report flags the conflict in a dedicated section; it does not silently clamp.
 
-## The 5-year curator backtest
+## The curator backtest (post-COVID window)
 
-Headline experiment that justified the watchlist-curator design (over the previously-attempted wave-stage tilt approach). See [docs/backtest_curator.html](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html) for the rendered result; full setup in `data/backtest_curator_5y/report.md`.
+Headline experiment that justified the watchlist-curator design (over the previously-attempted wave-stage tilt approach). See [docs/backtest_curator.html](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html) for the rendered result; full setup in `data/backtest_curator_postcovid/report.md`.
 
-- **Window**: 2021-03-31 → 2026-03-31 (5 years, 21 quarterly rebalances)
-- **Starter watchlist**: AAPL, MSFT, GOOGL, NVDA, SPY — a realistic 2021-Q1 tech-savvy investor's holding
+The published window is deliberately **post-COVID, normal-regime**: it starts after the 2020–2021 stimulus melt-up (which inflated the earlier 2021-start run) and ends just before the late-2025 Iran-war runup, so it reads as a credible "what a normally-paced investor would have gotten" test rather than a best-case headline.
+
+- **Window**: 2022-03-31 → 2025-10-31 (~3.6 years, 15 quarterly rebalances). Set in `investor_profile.md`'s `backtest` section (`start_date` / `end_date`).
+- **Starter watchlist**: AAPL, MSFT, GOOGL, NVDA, SPY — a realistic tech-savvy investor's holding
 - **Optimizer**: mean_variance λ=0.5, lookback 1.5y, concentration_cap 0.70, cadence quarterly, max_watchlist_size 8
-- **Curator**: 21 strict-as-of-date Sonnet calls, each with WebSearch `before:` filters, suppression list from `scripts/post_date_events.py`, and a self-critique pass. Total cost ~$3, total wall clock ~6 min (parallel batches).
-- **Output**: 25 distinct tickers entered the watchlist over the run (with adds and removes); final watchlist spans all six named wave buckets
+- **Curator**: 15 strict-as-of-date Sonnet calls, each with WebSearch `before:` filters, suppression list from `scripts/post_date_events.py`, and a self-critique pass. Total cost ~$3, fired in parallel batches.
+- **Output**: 12 distinct tickers passed through the watchlist (adds: RKLB, BOTZ, URA, IONQ, QTUM, CEG, NUKZ); final watchlist `[MSFT, GOOGL, NVDA, RKLB, BOTZ, IONQ, CEG, NUKZ]` spans five wave buckets (AI, rockets, robotics, quantum, nuclear).
 
 | Strategy | Final ($50K start) | Return | Active vs SPY |
 |---|---|---|---|
-| **Curator-driven** | **$683,707** | **+1267.41%** | **+1191.7pp** |
-| Buy-and-hold starter (equal-weight, then hold) | $214,360 | +328.72% | +253.0pp |
-| SPY benchmark (rebased) | $87,845 | +75.69% | — |
+| **Curator-driven** | **$193,128** | **+286.26%** | **+227.6pp** |
+| Buy-and-hold starter (equal-weight, then hold) | $143,628 | +187.26% | +128.6pp |
+| SPY benchmark (rebased) | $79,345 | +58.69% | — |
 
-Optimizer settings: `λ=0.5`, `lookback=1.5y`, `concentration_cap=0.70`, `max_watchlist_size=8` (all from `investor_profile.md` defaults). The buy-and-hold baseline is an equal-weight allocation (20% in each of AAPL/MSFT/GOOGL/NVDA/SPY) bought on day 0 and held without rebalancing. NVDA is in the starter because excluding it would have stacked the comparison in the curator's favor (the curator adds NVDA at Q3 2021 — most of the 5y window's apparent lift comes from being early to NVDA). With NVDA already in the buy-and-hold, the curator's remaining lift is **+939pp** (≈34.9pp annualized) — coming from its other thematic adds (nuclear, robotics, rockets, quantum) plus the optimizer's quarterly re-weighting. Annualized return 68.7%, max drawdown −44.5%, Sharpe 1.44.
+Optimizer settings: `λ=0.5`, `lookback=1.5y`, `concentration_cap=0.70`, `max_watchlist_size=8` (all from `investor_profile.md` defaults). The buy-and-hold baseline is an equal-weight allocation (20% in each of AAPL/MSFT/GOOGL/NVDA/SPY) bought on day 0 and held without rebalancing. NVDA is in the starter so the curator gets no credit for the obvious AI winner. With NVDA already in the buy-and-hold, the curator's remaining lift is **+99pp** (≈11.5pp annualized) — coming from its thematic adds (rockets, robotics, quantum, nuclear) plus the optimizer's quarterly re-weighting. Annualized return 45.7%, max drawdown −43.0%.
 
-**Execution lag.** The replay models the gap between a rebalance *signal* (decided on the rebalance date's close) and the *trade* (placed later, since a live user runs a review and only acts afterward). The CLI flag `--t-update-days` (default **1**, i.e. next session) sets this lag in trading days; the one-time initial capital deployment is not lagged. The headline above is at the default t=1. The strategy is essentially insensitive to the lag — sweeping it 0→3 sessions moves the curator return only within noise and slightly *upward* on this path (+1259.1% at t=0, +1267.4% at t=1, +1269.8% at t=2, +1292.4% at t=3), because the curator holds long-horizon thematic positions rather than chasing same-day news pops. In other words the edge is not a fast-execution artifact a real user (who trades a session late) would fail to capture. Set `--t-update-days 0` to reproduce the optimistic same-close run.
+**Execution lag.** The replay models the gap between a rebalance *signal* (decided on the rebalance date's close) and the *trade* (placed later, since a live user runs a review and only acts afterward). The CLI flag `--t-update-days` (default **1**, i.e. next session; also set in `investor_profile.md`'s `backtest` section) sets this lag in trading days; the one-time initial capital deployment is not lagged. The published headline is at t=1. **On this shorter window the lag is material**: the optimistic same-close run (`t_update_days=0`) returns +334.2%, so a one-session execution delay trims the curator's edge by ~48pp (the lift over buy-and-hold shrinks from ~147pp to +99pp). That is the honest case for publishing the t=1 number — it is what a normally-paced human actually captures, not a fast-execution upper bound. (On the longer 2021–2026 run the lag was near-noise; here the smaller rebalance count and sharper thematic entries make timing matter more.) Set `--t-update-days 0` to reproduce the optimistic same-close run.
 
 `baselines_totals.csv` also includes a `bnh_total` column for an ablation baseline (the mean-variance optimizer's day-0 weights on the same 5 tickers, held forever). At the current defaults this typically pegs at the concentration cap (Markowitz behavior at low λ + wide cap); kept for researchers who want a math-only static comparator.
 
-To reproduce the canonical numbers and refresh `docs/backtest_curator.html`: `python -m src.cli backtest --curator-runs-dir data/curator_runs/5y-sweep-cap08 --out-dir data/backtest_curator_5y --max-weight 0.70 --risk-aversion 0.5 --benchmarks SPY`. Replays the saved JSONs through the optimizer in a few seconds. Re-running the curator agents from scratch costs another ~$3. (The older `5y-quarterly/` run dir is the same experiment at the previous cap=12 default — kept as a historical reference.)
+To reproduce the published numbers and refresh `docs/backtest_curator.html`: `python -m src.cli backtest --curator-runs-dir data/curator_runs/postcovid --out-dir data/backtest_curator_postcovid --max-weight 0.70 --risk-aversion 0.5 --benchmarks SPY`. Replays the saved JSONs through the optimizer in a few seconds. Re-running the curator agents from scratch costs another ~$3. The longer **2021–2026 run** (+1267% over its full 5y window, including the 2021 melt-up) is preserved in `data/curator_runs/5y-sweep-cap08/` + `data/backtest_curator_5y/` for reference.
 
 ### Prior wave-stage tilt experiment (frozen on `5y-backtest` branch)
 

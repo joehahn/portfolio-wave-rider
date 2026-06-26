@@ -1,0 +1,39 @@
+{
+  "as_of_date": "2022-06-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "RKLB",
+      "wave_bucket": "rockets_spacecraft",
+      "rationale": "Rocket Lab achieved the first mid-air helicopter catch of a returning orbital booster in May 2022, posted Q1 revenue of $40.7M (+124% YoY), and signed a multi-launch HawkEye 360 contract in April 2022 — concrete early-surge commercial milestones for the rockets wave with no comparable US-listed pure-play available.",
+      "news_evidence": [
+        {"summary": "Rocket Lab secures multi-launch contract with HawkEye 360 for three Electron missions including the inaugural Wallops Island launch.", "source": "SpaceNews", "url": "https://spacenews.com/rocket-lab-to-launch-hawkeye-360-satellites-on-first-wallops-electron-mission/", "date": "2022-04-19"},
+        {"summary": "Rocket Lab 'There And Back Again' deploys 34 satellites and achieves first-ever mid-air helicopter catch of a returning booster.", "source": "TechCrunch", "url": "https://techcrunch.com/2022/05/02/watch-rocket-lab-attempt-to-catch-a-falling-booster-with-a-helicopter-today/", "date": "2022-05-02"},
+        {"summary": "Rocket Lab Q1 2022: $40.7M revenue (+124% YoY); Space Systems +1,873% YoY post-SolAero; Q2 guidance $51-54M.", "source": "BusinessWire", "url": "https://www.businesswire.com/news/home/20220516005897/en/Rocket-Lab-Announces-First-Quarter-2022-Financial-Results-and-Guidance-for-Second-Quarter-2022", "date": "2022-05-16"}
+      ]
+    },
+    {
+      "ticker": "NLR",
+      "wave_bucket": "nuclear",
+      "rationale": "Russia's invasion triggered a structural inflection in European nuclear policy (EU taxonomy inclusion Feb 2022, REPowerEU May 2022) and drove uranium spot to an 11-year high of $64.61 in April 2022, marking early-surge conditions for the fission renaissance; NLR is the broadest liquid vehicle for the theme.",
+      "news_evidence": [
+        {"summary": "European Commission adopts draft delegated act classifying nuclear as sustainable under EU taxonomy, reversing a major headwind.", "source": "OMFIF", "url": "https://www.omfif.org/2022/02/european-commission-adds-nuclear-power-to-taxonomy/", "date": "2022-02-02"},
+        {"summary": "Uranium spot surges from $43.94 in late Feb to $64.61 in mid-April 2022, an 11-year high, as Western utilities scramble for non-Russian sources.", "source": "Investing News Network", "url": "https://investingnews.com/daily/resource-investing/energy-investing/uranium-investing/highest-price-for-uranium/", "date": "2022-04-15"},
+        {"summary": "European Commission launches REPowerEU to end dependence on Russian fossil fuels by 2030; recognizes nuclear baseload as a key energy-security pillar.", "source": "European Commission", "url": "https://commission.europa.eu/topics/energy/repowereu_en", "date": "2022-05-18"}
+      ]
+    },
+    {
+      "ticker": "BOTZ",
+      "wave_bucket": "robotics",
+      "rationale": "North American robot orders hit an all-time quarterly record in Q1 2022 (+28% YoY) with labor shortage cited as the primary driver, and a Deloitte survey projected a 2.1M-worker manufacturing gap by 2030; BOTZ adds early-wave robotics exposure diversifying away from the starter's software/semiconductor AI concentration.",
+      "news_evidence": [
+        {"summary": "A3 reports North American robot sales hit an all-time quarterly record in Q1 2022: 11,595 units at $646M, +28% YoY, labor shortages the primary driver.", "source": "A3 / Automate.org", "url": "https://www.automate.org/news/robot-sales-in-us-north-america-continue-record-surge-into-2022", "date": "2022-06-06"},
+        {"summary": "Deloitte/Manufacturing Institute project a 2.1M US manufacturing-worker shortage by 2030, accelerating automation over hiring.", "source": "Deloitte / Manufacturing Institute", "url": "https://www2.deloitte.com/us/en/pages/consumer-business/articles/future-of-manufacturing-skills.html", "date": "2022-03-31"},
+        {"summary": "Global X BOTZ AUM exceeds $2B, holding industrial-automation leaders Fanuc, Yaskawa, Keyence — a broad liquid robotics basket.", "source": "Global X ETFs", "url": "https://www.globalxetfs.com/funds/botz", "date": "2022-06-01"}
+      ]
+    }
+  ],
+  "removes": [],
+  "no_changes": false,
+  "rationale_overall": "The starter is a concentrated current-wave bet (AAPL, MSFT, GOOGL, NVDA in AI, plus SPY) with zero coverage of the thesis's named next waves. This rebalance fills the three remaining slots to reach max_watchlist_size of 8: RKLB (rockets, first booster helicopter catch in Q2 2022), NLR (nuclear, EU policy reversal plus uranium at an 11-year high), and BOTZ (robotics, record North American robot orders). No removes — the starter retains full thesis validity and SPY cushions the 2022 bear."
+}

@@ -7,12 +7,12 @@
 
 This Claude Code project uses AI to manage a curated watchlist of tickers. You declare your goals, constraints, and an investment thesis (namely what you think will drive future returns), then initialize a starter watchlist of tickers that you want exposure to. At each periodic rebalance the curator agent reads recent news against your thesis and evolves the watchlist by proposing adds and removes. A standard mean-variance optimizer then recommends portfolio weights across the resulting watchlist. The result accumulates into a static Plotly dashboard so you can watch the watchlist composition, the recommended weights, and the realized portfolio value evolve over time. In our experiments, this coupling of AI-driven watchlist curation with standard portfolio optimization significantly outperforms the optimizer on its own.
 
-**Who this helps.** An investor who has a thesis about where markets are going but not enough time to track market news, or who needs help optimizing their portfolio. This demo helps such an investor pivot from a less-optimal static buy-and-hold portfolio to one that's lightly but effectively managed by AI. In the 5-year backtest detailed below, the AI-managed portfolio lifted realized return by about **34.9 percentage points per year annualized** over a buy-and-hold of the starter watchlist. The curator's job is to compound a thesis you already hold, not to replace one you don't have.
+**Who this helps.** An investor who has a thesis about where markets are going but not enough time to track market news, or who needs help optimizing their portfolio. This demo helps such an investor pivot from a less-optimal static buy-and-hold portfolio to one that's lightly but effectively managed by AI. In the post-COVID backtest detailed below (2022–2025), the AI-managed portfolio lifted realized return by about **11.5 percentage points per year annualized** over a buy-and-hold of the starter watchlist. The curator's job is to compound a thesis you already hold, not to replace one you don't have.
 
 Two dashboards are served from GitHub Pages:
 
 - **[Live dashboard](https://joehahn.github.io/portfolio-wave-rider/)** — today's portfolio: realized value over time, latest recommended weights, asset-class and wave-bucket breakdowns.
-- **[5-year curator backtest](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html)** — tests whether the curator's quarterly watchlist decisions across a 5-year historical window yields better returns than the buy-and-hold investor.
+- **[Curator backtest](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html)** — tests whether the curator's quarterly watchlist decisions across a post-COVID historical window (2022–2025) yield better returns than the buy-and-hold investor.
 
 See [GLOSSARY.md](GLOSSARY.md) for the meanings of the finance terms used below (`σ`, `μ`, `Σ`, Sharpe ratio, risk aversion `λ`, mean-variance optimization, etc.) and [REFERENCE.md](REFERENCE.md) for project details (repo layout, code, input and output files, architecture overview, and testing instructions).
 
@@ -75,11 +75,11 @@ Run `/review-portfolio` in Claude Code. The cadence is declared in `investor_pro
 
 Note that recommendations do not execute trades — they only append optimizer output to `data/recommendations.csv`. To act on a recommendation, execute trades in your brokerage and then edit `holdings.csv` so the next daily snapshot picks up the new share counts.
 
-### 4. run 5-year backtest (anytime)
+### 4. run the curator backtest (anytime)
 
 Run `/run-backtest` in Claude Code. This skill collects any missing historical news, evolves the watchlist quarter-by-quarter against your wave thesis, optimizes the portfolio at each rebalance, measures the resulting lift relative to a buy-and-hold investment strategy, and regenerates the backtest dashboard at `docs/backtest_curator.html` (open it locally in a browser to see your run).
 
-At each quarterly rebalance the curator reads news as of the rebalance date and proposes adds and removes to the watchlist; the optimizer then recomputes portfolio weights for whatever watchlist results, repeated over 5 years. Then compare results of your backtest to ours at [our backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html), +34.9pp/yr annualized when compared to the buy-and-hold investor's gains.
+At each quarterly rebalance the curator reads news as of the rebalance date and proposes adds and removes to the watchlist; the optimizer then recomputes portfolio weights for whatever watchlist results, repeated across the window. Then compare results of your backtest to ours at [our backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html), +11.5pp/yr annualized when compared to the buy-and-hold investor's gains.
 
 ### 5. sweep optimizer parameters (anytime)
 
@@ -87,7 +87,7 @@ At each quarterly rebalance the curator reads news as of the rebalance date and 
 ./scripts/run_sweeps.sh
 ```
 
-Reruns the 5-year backtest under different settings for `risk_aversion`, `lookback_period`, and `concentration_cap` to determine the optimal value of each.
+Reruns the backtest under different settings for `risk_aversion`, `lookback_period`, and `concentration_cap` to determine the optimal value of each.
 
 Three overlay pages are written and published to GitHub Pages:
 
@@ -161,29 +161,29 @@ This is the standard Markowitz mean-variance formulation (Markowitz 1952, *Portf
 
 ## Main findings
 
-This project builds an AI assistant that reads business news against a user's stated investment thesis, derives a curated watchlist of tickers from it, and then hands that watchlist to a standard mean-variance optimizer for weighting at each rebalance. The AI's job is watchlist composition only, while a simple but effective financial model then turns the watchlist into portfolio weights. To measure the AI's lift, we also compare the AI's 5-year track record against a tech-minded investor whose initial portfolio is equal amounts of `[AAPL, MSFT, GOOGL, NVDA, SPY]` (probably representative of such an investor in early 2021), and we refer to that investor as a buy-and-hold investor since it's assumed that person is too busy to monitor business news and revise their portfolio. We know such investors exist because the author of this project is one.
+This project builds an AI assistant that reads business news against a user's stated investment thesis, derives a curated watchlist of tickers from it, and then hands that watchlist to a standard mean-variance optimizer for weighting at each rebalance. The AI's job is watchlist composition only, while a simple but effective financial model then turns the watchlist into portfolio weights. The published backtest covers a **post-COVID, normal-regime window (2022-03-31 → 2025-10-31, ~3.6 years)** — it deliberately drops the distorted 2020–2021 stimulus melt-up and ends just before the late-2025 Iran-war runup, so it reads as a credible "normal markets" test rather than a best-case headline. To measure the AI's lift, we compare its track record against a tech-minded investor whose initial portfolio is equal amounts of `[AAPL, MSFT, GOOGL, NVDA, SPY]`, a buy-and-hold investor too busy to monitor news and revise their portfolio. We know such investors exist because the author of this project is one.
 
-The single biggest source of returns over the 5-year window was NVDA — a roughly 14× run from early 2021 to early 2026 as the AI buildout drove data-center GPU demand. NVDA was in the starter watchlist from day 0, so both the AI-managed portfolio and the buy-and-hold baseline rode it. Where the two diverge is in the curator's other decisions, and the biggest of those was riding the rockets/spacecraft wave: the curator added Rocket Lab (RKLB) early in the window and held it as Electron's launch cadence accelerated and the Neutron program advanced. In the second half of 2025 the optimizer concentrated roughly 70% of the portfolio in RKLB as the stock roughly doubled from $34 to $73 — and that single nine-month stretch appears to have roughly doubled the AI-managed portfolio's final value.
+NVDA is in the starter from day 0, so both the AI-managed portfolio and the buy-and-hold baseline ride it and the curator earns no credit there. The divergence comes from the curator's thematic adds and the optimizer's quarterly re-weighting. The clearest example is the rockets/spacecraft wave: the curator added Rocket Lab (RKLB) at the window's start in 2022 and held it through a multi-year, several-fold run as Electron's launch cadence accelerated and the Neutron program advanced; by the final 2025 rebalance the optimizer had concentrated the portfolio at its 70% cap in RKLB. The curator also rotated the watchlist as theses matured — swapping the broad-market SPY and a lagging Apple out for quantum (IONQ), and shifting nuclear from uranium-miners (URA) to operators and SMR developers (CEG, NUKZ) once the AI-data-center power thesis produced concrete hyperscaler PPAs.
 
-**Total realized return over the 5 years:**
+**Total realized return over the window (2022–2025, ~3.6 years):**
 
 | Strategy | Return | Annualized |
 |---|---|---|
-| Curator-driven | **+1267.4%** | **+68.7%** |
-| Buy-and-hold (equal-weight starter, includes NVDA) | +328.7% | +33.7% |
-| SPY benchmark | +75.7% | +11.9% |
+| Curator-driven | **+286.3%** | **+45.7%** |
+| Buy-and-hold (equal-weight starter, includes NVDA) | +187.3% | +34.2% |
+| SPY benchmark | +58.7% | +13.7% |
 
 **The AI Curator's lift over buy-and-hold:**
 
 | Measure | Value |
 |---|---|
-| Absolute (curator − buy/hold), total | +939pp |
-| Absolute, annualized | +34.9pp/yr |
-| Relative (curator − buy/hold) / (buy/hold) | 2.86 |
+| Absolute (curator − buy/hold), total | +99pp |
+| Absolute, annualized | +11.5pp/yr |
+| Relative (curator − buy/hold) / (buy/hold) | 0.53 |
 
-**Execution lag.** A real user does not trade at the instant a rebalance is decided — they run a review and place the order later that day or the next session. The backtest models this with a one-trading-day execution lag (`t_update_days` in `investor_profile.md`, default 1; CLI override `--t-update-days`): each rebalance is decided on the rebalance date's close but the trade lands the next session. The result barely moves — sweeping the lag from 0 to 3 sessions keeps the curator return within noise and slightly higher (+1259.1% at no lag, +1267.4% at one session) — because the curator holds long-horizon thematic positions rather than chasing same-day news pops. So the edge above is not a fast-execution mirage; it is what a normally-paced human should expect to capture.
+**Execution lag.** A real user does not trade at the instant a rebalance is decided — they run a review and place the order later that day or the next session. The backtest models this with a one-trading-day execution lag (`t_update_days` in `investor_profile.md`, default 1; CLI override `--t-update-days`): each rebalance is decided on the rebalance date's close but the trade lands the next session. On this shorter window the lag is **material**: the optimistic same-close run (no lag) returns +334.2%, so a one-session delay trims the curator's edge by ~48pp. That is exactly why the published figure is the realistic next-session number (+286.3%) and not the same-close upper bound — it is what a normally-paced human should actually expect to capture. (Over a longer 2021–2026 window the lag was near-noise; here the smaller rebalance count and sharp thematic entries make timing matter more.)
 
-See the [curator backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html) and the full report in `data/backtest_curator_5y/report.md`. Reproduce locally with the on-demand backtest from the Runs section above.
+See the [curator backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html) and the full report in `data/backtest_curator_postcovid/report.md`. Reproduce locally with the on-demand backtest from the Runs section above.
 
 ## Notes
 

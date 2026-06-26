@@ -1,24 +1,32 @@
 # /run-backtest
 
-Refreshes the 5-year curator backtest against a rolling 5-year window
-ending today. Diffs the target quarter-end dates against the committed
-curator JSONs, fires fresh `watchlist-curator` agent calls for any
-missing quarter-ends (with strict as-of-date discipline), archives
-JSONs that have rolled out of the window, regenerates the backtest
-output and the public dashboard, and pushes the result to GitHub.
+Refreshes the curator backtest over the window declared in
+`investor_profile.md`'s `backtest` section (`start_date` / `end_date`).
+Diffs the target quarter-end dates against the committed curator JSONs,
+fires fresh `watchlist-curator` agent calls for any missing quarter-ends
+(with strict as-of-date discipline), archives JSONs that fall outside
+the window, regenerates the backtest output and the public dashboard,
+and pushes the result to GitHub.
 
-First-time invocation by a fresh clone: ~$3 in LLM calls (20 fresh
-quarter-ends). Subsequent invocations once new quarters have elapsed:
-~$0.15 per new quarter. If nothing new is needed (helper reports
-missing=[] and stale=[]), the skill skips the LLM step and just re-runs
-the math replay.
+The published window is post-COVID, normal-regime (2022-03-31 →
+2025-10-31, 15 quarter-ends). First-time / from-scratch run: ~$3 in LLM
+calls. If the profile window is unchanged and all JSONs already exist
+(helper reports missing=[] and stale=[]), the skill skips the LLM step
+and just re-runs the math replay.
+
+IMPORTANT: changing the window's *start* date invalidates every saved
+JSON, because the curator's add/remove decisions are path-dependent on
+the watchlist state that has accumulated since the start. A start-date
+change means re-firing all quarter-ends from scratch (use a fresh run
+dir or archive the old JSONs first). Changing only the *end* date later
+is a cheap forward-extension / truncation.
 
 ## Before you start
 
-1. The runs dir is `data/curator_runs/5y-sweep-cap08/`. Commit this dir
-   (and the regenerated `data/backtest_curator_5y/` outputs +
+1. The runs dir is `data/curator_runs/postcovid/`. Commit this dir
+   (and the regenerated `data/backtest_curator_postcovid/` outputs +
    `docs/backtest_curator.html`) at the end of the run so the public
-   demo always reflects the latest 5y window.
+   demo always reflects the profile-defined window.
 2. The starter watchlist is fixed at `[AAPL, MSFT, GOOGL, NVDA, SPY]` —
    a 2021-tech-savvy investor's portfolio before the AI surge. The
    fixed starter keeps the backtest's day-0 conditions stable across
@@ -30,14 +38,16 @@ the math replay.
 
 ## Orchestration
 
-### Step 1 — diff the rolling window against committed JSONs (Bash)
+### Step 1 — diff the profile window against committed JSONs (Bash)
 
 ```bash
 .venv/bin/python scripts/compute_backtest_dates.py
 ```
 
-Returns JSON with `target_dates` (the 20 most recent quarter-ends),
+Reads `start_date` / `end_date` from `investor_profile.md`'s `backtest`
+section and returns JSON with `target_dates` (quarter-ends in the window),
 `existing_dates`, `missing_dates`, `stale_dates`. Capture this output.
+(If the profile pins no window, it falls back to a rolling window.)
 
 If `missing_dates` is empty, skip to step 4.
 
@@ -69,16 +79,16 @@ rate-limit pattern from the original 5y experiment). Between batches,
 update the `current_watchlist` for subsequent batches by replaying the
 just-completed dates' applied adds/removes.
 
-Save each agent return to `data/curator_runs/5y-sweep-cap08/<date>-curation.json`.
+Save each agent return to `data/curator_runs/postcovid/<date>-curation.json`.
 
 ### Step 3 — archive stale JSONs (Bash)
 
 For each date in `stale_dates`:
 
 ```bash
-mkdir -p data/curator_runs/5y-sweep-cap08/_archive
-mv data/curator_runs/5y-sweep-cap08/<date>-curation.json \
-   data/curator_runs/5y-sweep-cap08/_archive/<date>-curation.json
+mkdir -p data/curator_runs/postcovid/_archive
+mv data/curator_runs/postcovid/<date>-curation.json \
+   data/curator_runs/postcovid/_archive/<date>-curation.json
 ```
 
 Archive rather than delete so the historical decisions stay
@@ -89,9 +99,11 @@ the replay picks up.
 
 ```bash
 .venv/bin/python - <<'PY'
-import json, pandas as pd, glob
+import json, pandas as pd
 from pathlib import Path
-runs = Path("data/curator_runs/5y-sweep-cap08")
+from src.portfolio import load_backtest_config
+bc = load_backtest_config()                     # window from investor_profile.md
+runs = Path("data/curator_runs/postcovid")
 dates = sorted(pd.Timestamp(p.stem.replace("-curation","")) for p in runs.glob("*-curation.json"))
 starter = {
     "starter_watchlist": ["AAPL", "MSFT", "GOOGL", "NVDA", "SPY"],
@@ -100,8 +112,10 @@ starter = {
     "initial_usd": 50000.0,
     "lookback_years": 1.5,
     "max_watchlist_size": 8,
-    "start_date": dates[0].strftime("%Y-%m-%d"),
-    "end_date": dates[-1].strftime("%Y-%m-%d"),
+    # Window edges come from the profile, not the JSON glob: end_date is
+    # typically a month past the last quarter-end so the final rebalance holds.
+    "start_date": bc["start_date"] or dates[0].strftime("%Y-%m-%d"),
+    "end_date": bc["end_date"] or dates[-1].strftime("%Y-%m-%d"),
 }
 (runs / "_starter.json").write_text(json.dumps(starter, indent=2))
 PY
@@ -111,8 +125,8 @@ PY
 
 ```bash
 .venv/bin/python -m src.cli backtest \
-  --curator-runs-dir data/curator_runs/5y-sweep-cap08 \
-  --out-dir data/backtest_curator_5y \
+  --curator-runs-dir data/curator_runs/postcovid \
+  --out-dir data/backtest_curator_postcovid \
   --max-weight 0.70 --risk-aversion 0.5 \
   --benchmarks SPY
 ```
@@ -123,22 +137,22 @@ Execution lag defaults to `--t-update-days 1` (each rebalance is decided on the 
 
 ```bash
 .venv/bin/python -m src.cli dashboard \
-  --curator-backtest-dir data/backtest_curator_5y \
-  --curator-runs-dir data/curator_runs/5y-sweep-cap08 \
+  --curator-backtest-dir data/backtest_curator_postcovid \
+  --curator-runs-dir data/curator_runs/postcovid \
   --benchmarks SPY
 ```
 
 ### Step 7 — commit and push (Bash)
 
 ```bash
-git add data/curator_runs/5y-sweep-cap08/*.json \
-        data/backtest_curator_5y/ \
+git add data/curator_runs/postcovid/*.json \
+        data/backtest_curator_postcovid/ \
         docs/backtest_curator.html
-git commit -m "Refresh 5y curator backtest (rolling window ending $(date +%Y-%m-%d))"
+git commit -m "Refresh curator backtest (profile window, regenerated $(date +%Y-%m-%d))"
 git push origin main
 ```
 
-If `data/curator_runs/5y-sweep-cap08/_archive/` got new entries this run,
+If `data/curator_runs/postcovid/_archive/` got new entries this run,
 stage them too. Skip the commit if nothing changed (replay produced
 identical output and no JSONs were added/archived).
 
@@ -161,7 +175,7 @@ One short message:
   even for very recent quarter-ends. Pass the suppression list from
   `events_after(date)` even if it's empty for the most-recent date.
 - Don't delete stale JSONs; archive them. The committed
-  `data/curator_runs/5y-sweep-cap08/_archive/` directory is the
+  `data/curator_runs/postcovid/_archive/` directory is the
   historical record of what the backtest used to include.
 - Commit + push is part of the skill, not a follow-up step the user
   has to remember. The public dashboard must always reflect the

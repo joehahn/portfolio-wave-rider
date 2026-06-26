@@ -1,0 +1,38 @@
+{
+  "as_of_date": "2022-12-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "RKLB",
+      "wave_bucket": "rockets_spacecraft",
+      "rationale": "Rocket Lab delivered a record launch cadence in 2022 including two classified NRO national-security missions and has imminent US launch capability from Wallops Island, establishing it as the leading small-sat launch provider at the onset of the commercial space buildup phase named in the investor thesis.",
+      "news_evidence": [
+        {"summary": "Rocket Lab successfully launched NROL-162 on July 13, 2022, delivering NRO's national security payload under the RASR responsive-space contract.", "source": "BusinessWire", "url": "https://www.businesswire.com/news/home/20220713005416/en/Rocket-Lab-Successfully-Launches-First-of-Two-Responsive-Space-Missions-for-the-National-Reconnaissance-Office", "date": "2022-07-13"},
+        {"summary": "Rocket Lab hit a cadence record with the NROL-199 Electron launch on August 4, 2022, completing three launches in just over five weeks.", "source": "Via Satellite", "url": "https://www.satellitetoday.com/launch/2022/08/04/rocket-lab-hits-cadence-record-with-successful-nrol-199-launch/", "date": "2022-08-04"},
+        {"summary": "Rocket Lab reschedules its first Electron launch from Wallops Island to January 2023; the US launch site is operationally ready.", "source": "SpaceNews", "url": "https://spacenews.com/rocket-lab-reschedules-first-u-s-launch-for-january-2023-provides-update-on-effect-to-prior-q4-guidance/", "date": "2022-12-12"}
+      ]
+    },
+    {
+      "ticker": "BOTZ",
+      "wave_bucket": "robotics",
+      "rationale": "The IFR World Robotics Report released October 2022 showed global industrial robot installations exceeding 500,000 units for the second consecutive record year, confirming structural demand; the 2022 tech-sector selloff has compressed BOTZ's price, creating a buildup-phase entry point consistent with the investor thesis's 'invest early while cheap' rule.",
+      "news_evidence": [
+        {"summary": "IFR World Robotics Report 2022: global industrial robot installations exceeded 500,000 units for the second consecutive year; global robotics market valued at over $80 billion.", "source": "IFR / Automation.com", "url": "https://www.automation.com/en-us/articles/october-2022/ifr-presents-world-robotics-report-2022", "date": "2022-10-01"},
+        {"summary": "IFR 'Top 5 Robot Trends 2022': accelerating adoption of collaborative robots, AI-guided automation, and service robots across manufacturing and logistics.", "source": "International Federation of Robotics", "url": "https://ifr.org/ifr-press-releases/news/top-5-robot-trends-2022", "date": "2022-01-27"}
+      ]
+    },
+    {
+      "ticker": "CCJ",
+      "wave_bucket": "nuclear",
+      "rationale": "Cameco, the world's second-largest uranium producer, raised its 2022 revenue guidance 14% on post-Ukraine uranium price recovery, and the Inflation Reduction Act signed in August 2022 created new production and investment tax credits for nuclear that materially improve SMR and existing-plant economics — marking early-surge conditions in the fission renaissance wave.",
+      "news_evidence": [
+        {"summary": "Cameco raised its 2022 revenue guidance ~14% to a $1.9B high-end after Q1 2022 earnings, citing stronger uranium prices.", "source": "Seeking Alpha", "url": "https://seekingalpha.com/article/4507251-cameco-q1-earnings-increases-2022-revenue-guidance-interesting-nuclear-opportunity", "date": "2022-05-04"},
+        {"summary": "The Inflation Reduction Act, signed August 2022, creates a nuclear production tax credit for existing plants and a 30% investment tax credit for new nuclear construction.", "source": "CNBC", "url": "https://www.cnbc.com/2022/08/22/what-the-climate-bill-does-for-the-nuclear-industry.html", "date": "2022-08-22"},
+        {"summary": "NuScale Power commenced trading on NYSE under 'SMR' on May 3, 2022, becoming the world's first publicly traded pure-play SMR company.", "source": "NuScale Power press release", "url": "https://www.nuscalepower.com/press-releases/2022/nuscale-completes-merger-with-spring-valley", "date": "2022-05-03"}
+      ]
+    }
+  ],
+  "removes": [],
+  "no_changes": false,
+  "rationale_overall": "This rebalance fills the watchlist from 5 to the maximum of 8 by adding one ticker each in the three highest-priority next-wave buckets named in the investor profile: rockets and spacecraft (RKLB), robotics (BOTZ), and nuclear (CCJ). The four existing AI-wave tickers are retained as the current dominant wave; the AI bucket is now at its 4-ticker diversity cap. RKLB enters on a 2022 cadence record and operationally ready Wallops US launch site; BOTZ as the most liquid established robotics ETF with the 2022 bear providing a cheaper entry; CCJ as the direct uranium-price beneficiary of the post-Ukraine squeeze and the IRA's new nuclear incentives at early-surge pricing."
+}

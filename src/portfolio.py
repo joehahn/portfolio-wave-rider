@@ -43,12 +43,6 @@ _FINANCIAL_MODEL_DEFAULTS: dict[str, Any] = {
     "lookback_period": "3y",
     "rebalance_period": "monthly",
     "max_watchlist_size": 12,
-    # t_update_days: backtest realism only. Trading-day lag between a rebalance
-    # signal (decided on the rebalance date's close) and the trade actually
-    # executing, modeling the gap between running a review and placing the
-    # order. The live analyze/recommend path does not use it (real fills happen
-    # whenever you trade); it shapes only the curator backtest replay.
-    "t_update_days": 1,
     # concentration_cap is the optimizer's per-position max weight (the
     # --max-weight default). Unlike the others it lives at the profile's top
     # level, not inside the financial_model block; load_financial_model reads
@@ -60,11 +54,15 @@ _FINANCIAL_MODEL_DEFAULTS: dict[str, Any] = {
 def load_financial_model(profile_path: str = "investor_profile.md") -> dict[str, Any]:
     """Read `financial_model` from investor_profile.md's YAML front matter.
 
-    Returns a dict with seven fields (`risk_aversion`, `risk_free_rate`,
-    `lookback_period`, `rebalance_period`, `max_watchlist_size`,
-    `t_update_days`, and the top-level `concentration_cap`); any missing field
-    falls back to the hard-coded default. If the profile file doesn't exist or
-    has no front matter, all defaults are returned.
+    Returns a dict with six fields (`risk_aversion`, `risk_free_rate`,
+    `lookback_period`, `rebalance_period`, `max_watchlist_size`, and the
+    top-level `concentration_cap`); any missing field falls back to the
+    hard-coded default. If the profile file doesn't exist or has no front
+    matter, all defaults are returned.
+
+    Backtest-only knobs (window dates, execution lag) live in a separate
+    `backtest` section and are read by ``load_backtest_config`` instead, since
+    they never affect the live analyze/recommend path.
 
     The optimizer objective is intentionally not configurable here: this
     project commits to mean-variance maximization with ``risk_aversion`` (λ)
@@ -89,6 +87,47 @@ def load_financial_model(profile_path: str = "investor_profile.md") -> dict[str,
     # concentration_cap is a top-level profile key, not part of financial_model.
     if "concentration_cap" in data:
         out["concentration_cap"] = data["concentration_cap"]
+    return out
+
+
+_BACKTEST_DEFAULTS: dict[str, Any] = {
+    # Window for /run-backtest and the parameter sweeps. None => fall back to
+    # the run dir's _starter.json window (or a rolling default in the helper).
+    "start_date": None,
+    "end_date": None,
+    # Trading-day lag from a rebalance signal (decided on the rebalance date's
+    # close) to the trade actually landing. 1 = next session. Backtest-only.
+    "t_update_days": 1,
+}
+
+
+def load_backtest_config(profile_path: str = "investor_profile.md") -> dict[str, Any]:
+    """Read the `backtest` section from investor_profile.md's YAML front matter.
+
+    These knobs (`start_date`, `end_date`, `t_update_days`) only shape
+    /run-backtest and the parameter sweeps -- never the live analyze/recommend
+    path. Any missing field falls back to the hard-coded default; `start_date`
+    / `end_date` of None mean "use the run dir's own window". Dates are
+    normalized to ``YYYY-MM-DD`` strings (PyYAML parses bare dates to
+    ``datetime.date``).
+    """
+    import re
+    import yaml
+
+    out = dict(_BACKTEST_DEFAULTS)
+    p = Path(profile_path)
+    if not p.exists():
+        return out
+    text = p.read_text()
+    m = re.match(r"^---\s*\n(.*?)\n---\s*\n", text, re.DOTALL)
+    if not m:
+        return out
+    data = yaml.safe_load(m.group(1)) or {}
+    bt = data.get("backtest") or {}
+    out.update({k: bt[k] for k in _BACKTEST_DEFAULTS if k in bt})
+    for k in ("start_date", "end_date"):
+        if out[k] is not None:
+            out[k] = str(out[k])
     return out
 
 

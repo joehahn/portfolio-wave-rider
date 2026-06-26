@@ -24,9 +24,15 @@ from pathlib import Path
 
 import pandas as pd
 
-DEFAULT_RUNS_DIR = "data/curator_runs/5y-sweep-cap08"
+DEFAULT_RUNS_DIR = "data/curator_runs/postcovid"
 STARTER_WATCHLIST = ["AAPL", "MSFT", "GOOGL", "NVDA", "SPY"]
-N_QUARTERS = 21  # rolling-5y window: 21 quarter-ends span 20 intervals = 5y
+N_QUARTERS = 21  # rolling-window fallback: 21 quarter-ends span 20 intervals = 5y
+
+
+def quarter_ends_between(start: pd.Timestamp, end: pd.Timestamp) -> list[pd.Timestamp]:
+    """Calendar-quarter-end dates within [start, end] (inclusive of a start
+    that is itself a quarter-end). Used when the profile pins a fixed window."""
+    return list(pd.date_range(start=start, end=end, freq="QE"))
 
 
 def quarter_ends_through(today: pd.Timestamp, n: int = N_QUARTERS) -> list[pd.Timestamp]:
@@ -66,7 +72,17 @@ def main(argv: list[str] | None = None) -> int:
 
     today = pd.Timestamp(args.today) if args.today else pd.Timestamp.today().normalize()
     runs_dir = Path(args.runs_dir)
-    target = quarter_ends_through(today, args.n_quarters)
+
+    # Window source of truth: investor_profile.md's `backtest` section. If it
+    # pins both start_date and end_date, use that fixed window; otherwise fall
+    # back to a rolling window of the most recent quarter-ends through today.
+    from src.portfolio import load_backtest_config
+    bc = load_backtest_config()
+    if bc["start_date"] and bc["end_date"]:
+        target = quarter_ends_between(pd.Timestamp(bc["start_date"]),
+                                      pd.Timestamp(bc["end_date"]))
+    else:
+        target = quarter_ends_through(today, args.n_quarters)
     existing = existing_curation_dates(runs_dir)
     target_set = {d.strftime("%Y-%m-%d") for d in target}
     existing_set = {d.strftime("%Y-%m-%d") for d in existing}

@@ -1,0 +1,28 @@
+{
+  "as_of_date": "2023-09-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "QTUM",
+      "wave_bucket": "quantum",
+      "rationale": "Quantum is the only named next-wave with zero watchlist representation; three concrete Q3 2023 milestones — Google's surface-code error-correction scaling in Nature, IBM's qLDPC codes needing ~10x fewer physical qubits, and IonQ's $25.5M Air Force Research Lab contract — confirm credible early buildup, and QTUM (launched September 2018) provides diversified ETF exposure with five years of history.",
+      "news_evidence": [
+        {"summary": "Google Quantum AI published 'Suppressing quantum errors by scaling a surface code logical qubit' in Nature, showing more physical qubits reduce logical error rates — the scaling premise for fault tolerance.", "source": "Nature", "url": "https://www.nature.com/articles/s41586-022-05434-1", "date": "2023-02-22"},
+        {"summary": "IBM researchers posted qLDPC fault-tolerant memory codes requiring ~one-tenth the physical qubits of current surface codes, lowering the overhead threshold to fault tolerance.", "source": "phys.org", "url": "https://phys.org/news/2023-08-ibm-major-quantum-error-detection.html", "date": "2023-08-29"},
+        {"summary": "IonQ announced a $25.5M AFRL contract to deploy two trapped-ion systems for quantum networking — its largest government contract to date and first DoD-installation deployment.", "source": "IonQ Investor Relations", "url": "https://investors.ionq.com/news/news-details/2023/IonQ-Announces-New-25.5M-Quantum-Deal-with-United-States-Air-Force-Research-Lab/default.aspx", "date": "2023-09-28"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "SPY",
+      "rationale": "SPY provides only passive broad-market beta with no wave-thesis alignment; with four AI large-caps already supplying market exposure, SPY is the one non-thematic slot in a full 8/8 watchlist, and displacing it for QTUM closes the last named next-wave gap.",
+      "news_evidence": [
+        {"summary": "The Fed held the funds rate at 5.25-5.50% on Sep 20, 2023 and signaled higher-for-longer, compressing the premium on broad passive index exposure relative to early-stage thematic holds.", "source": "Federal Reserve", "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20230920a.htm", "date": "2023-09-20"},
+        {"summary": "Fortune reported the S&P 500 'suffered a rough September' as rising yields erased the summer rally; SPY's Q3 underperformance vs thematic holds reduces its marginal contribution.", "source": "Fortune", "url": "https://fortune.com/2023/09/29/september-sp-500-market-falling/", "date": "2023-09-29"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "One thematically targeted swap: SPY out, QTUM in. The thesis names quantum as a likely next wave, but the watchlist had zero quantum exposure. Three Q3 2023 milestones (Google's Nature error-correction result, IBM's qLDPC paper, IonQ's $25.5M AFRL contract) confirm active buildup with government/research validation — entry-before-surge timing. SPY is displaced as the only non-thematic slot. Post-change, all four named next-waves have a representative — RKLB, BOTZ, QTUM, URA — keeping the AI bucket intact."
+}

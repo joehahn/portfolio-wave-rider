@@ -1,0 +1,30 @@
+{
+  "as_of_date": "2024-09-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "CEG",
+      "wave_bucket": "nuclear",
+      "rationale": "The Microsoft-Constellation 20-year PPA to restart Three Mile Island (September 20, 2024) is the quarter's clearest nuclear-wave commercial milestone; CEG directly owns and operates the nuclear fleet, complementing URA's uranium-supply exposure with a nuclear-utility position benefiting from AI-data-center baseload demand.",
+      "news_evidence": [
+        {"summary": "Constellation announces a 20-year, 835 MW PPA with Microsoft to restart Three Mile Island Unit 1 — the first US nuclear restart; CEG surged ~8% pre-market.", "source": "CNBC", "url": "https://www.cnbc.com/2024/09/20/constellation-energy-to-restart-three-mile-island-and-sell-the-power-to-microsoft.html", "date": "2024-09-20"},
+        {"summary": "TMI Unit 1 to return as Microsoft signs a 20-year 835 MW AI data-center PPA; reactor expected online 2028, 100% of output to Microsoft.", "source": "Data Centre Dynamics", "url": "https://www.datacenterdynamics.com/en/news/three-mile-island-nuclear-power-plant-to-return-as-microsoft-signs-20-year-835mw-ai-data-center-ppa/", "date": "2024-09-20"},
+        {"summary": "Constellation Q2 2024 8-K: the carbon-free nuclear fleet performed at industry-leading levels during a record-hot summer, demonstrating reliability ahead of the new PPA.", "source": "SEC EDGAR", "url": "https://www.sec.gov/Archives/edgar/data/0001868275/000186827524000051/ceg-20240806991.htm", "date": "2024-08-06"},
+        {"summary": "CEG began regular-way Nasdaq trading on February 2, 2022 after the Exelon spinoff — a large-cap utility listed >2.5 years before this rebalance.", "source": "Nasdaq Trader", "url": "https://nasdaqtrader.com/TraderNews.aspx?id=eca2022-5", "date": "2022-02-01"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "QTUM",
+      "rationale": "QTUM's top holdings are broad semiconductors (Micron, Intel, ARM, STMicro) that duplicate AI-bucket exposure in MSFT/GOOGL/NVDA; the pure-play quantum thesis is more cleanly expressed by IONQ, which just secured its largest government contract ever ($54.5M AFRL, Sept 25, 2024), making the diluted ETF redundant in an 8-ticker watchlist.",
+      "news_evidence": [
+        {"summary": "IonQ announces a $54.5M AFRL contract — the largest US quantum contract of 2024 — to deliver quantum hardware over four years; QTUM weights IONQ far down its list behind broad semis.", "source": "The Quantum Insider", "url": "https://thequantuminsider.com/2024/09/27/ionq-announces-54-5-million-contract-with-united-states-air-force-research-lab/", "date": "2024-09-27"},
+        {"summary": "Defiance QTUM top holdings are Micron, Marvell, Intel, ARM, STMicro — broad semiconductors overlapping the existing AI-bucket positions.", "source": "Defiance ETFs", "url": "https://www.defianceetfs.com/qtum/", "date": "2024-09-30"},
+        {"summary": "QTUM is an 87-stock basket overlapping broad tech ETFs; pure quantum names like IonQ and D-Wave sit far down, diluting the quantum thesis.", "source": "StockAnalysis", "url": "https://stockanalysis.com/etf/qtum/holdings/", "date": "2024-09-30"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "The quarter's dominant event was the Microsoft-Constellation Three Mile Island PPA (Sept 20, 2024), converting nuclear's quiet-buildup narrative into a concrete 20-year hyperscaler offtake contract. URA covers uranium supply but misses the utility/generation side; CEG owns the nuclear fleet and receives guaranteed offtake, so adding it deepens nuclear (URA + CEG) without duplication. To stay at the 8-cap, QTUM is removed: its top holdings (Micron, Intel, ARM) shadow the AI bucket, while the pure-play quantum exposure the profile seeks is now anchored by IONQ after its $54.5M AFRL win. Net: nuclear upgrades from uranium-only to uranium-plus-utility; quantum tightens to the pure-play."
+}
