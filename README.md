@@ -181,6 +181,8 @@ NVDA is in the starter from day 0, so both the AI-managed portfolio and the buy-
 | Absolute, annualized | +11.5pp/yr |
 | Relative (curator − buy/hold) / (buy/hold) | 0.53 |
 
+**A caveat on robustness.** This lift is not a steady, broad-based edge. The curator actually trailed the buy-and-hold portfolio for most of this window (it was ahead on only about 15% of trading days) and pulled clear only in 2025, when the optimizer concentrated roughly 70% of the portfolio in Rocket Lab and RKLB ran hard. The outperformance therefore rests largely on a single late position rather than a repeatable advantage. Read it as one favorable wave the curator caught and held, not proof of a durable edge; a single winning bet (n=1) cannot separate skill from luck.
+
 See the [curator backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html) and the full report in `data/backtest_curator_postcovid/report.md`. Reproduce locally with the on-demand backtest from the Runs section above.
 
 ## Notes
