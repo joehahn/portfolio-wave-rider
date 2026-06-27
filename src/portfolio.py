@@ -3153,9 +3153,11 @@ def build_dashboard(
             )
 
     # Funded-ticker quick links: each real holding (shares > 0 in today's
-    # snapshot) links to its live Google Finance card — the interactive
-    # 1D/1M/.../1Y/Max price chart — by way of a "<TICKER> ticker" Google
-    # search, which avoids hardcoding each ticker's exchange suffix.
+    # snapshot) links to its live Google Finance chart opened at the 1-year
+    # window. Google Finance's quote URL honors ?window=1Y but needs the
+    # exchange suffix (e.g. RKLB:NASDAQ, ITA:BATS), so map yfinance's exchange
+    # code to Google's suffix; unknown codes fall back to a "<TICKER> ticker"
+    # Google search (whose card can't be forced off its 1D default).
     ticker_links = ""
     if is_live and snap_path.exists():
         try:
@@ -3163,8 +3165,22 @@ def build_dashboard(
             _sl_tl = _s_tl[_s_tl["date"] == _s_tl["date"].max()]
             _funded = sorted(_sl_tl[_sl_tl["shares"] > 0]["ticker"].unique())
             if _funded:
+                _gx = {"NMS": "NASDAQ", "NGM": "NASDAQ", "NCM": "NASDAQ",
+                       "NAS": "NASDAQ", "NYQ": "NYSE", "PCX": "NYSEARCA",
+                       "ASE": "NYSEAMERICAN", "BTS": "BATS"}
+                import yfinance as _yf
+
+                def _chart_url(t: str) -> str:
+                    try:
+                        suffix = _gx.get(_yf.Ticker(t).info.get("exchange"))
+                    except Exception:  # noqa: BLE001 - network/info failure
+                        suffix = None
+                    if suffix:
+                        return f"https://www.google.com/finance/quote/{t}:{suffix}?window=1Y"
+                    return f"https://www.google.com/search?q={t}+ticker"
+
                 _chips = "".join(
-                    f"<a href='https://www.google.com/search?q={_html.escape(t)}+ticker' "
+                    f"<a href='{_html.escape(_chart_url(t))}' "
                     "target='_blank' rel='noopener' "
                     "style='display:inline-block;background:#f0f7f0;border:1px solid #cde0cd;"
                     "border-radius:12px;padding:3px 12px;margin:3px 6px 3px 0;font-size:14px;"
@@ -3175,9 +3191,9 @@ def build_dashboard(
                 ticker_links = (
                     "<h2 style='margin-top:2em;'>Live ticker charts</h2>"
                     "<p style='font-size:14px;color:#555;max-width:780px;'>"
-                    "Each funded holding links to its live Google Finance card "
-                    "(interactive 1D / 1M / 1Y / Max price chart) — the same view a "
-                    "&ldquo;TICKER ticker&rdquo; Google search returns. Opens in a new tab.</p>"
+                    "Each funded holding links to its live Google Finance chart, opened "
+                    "at the 1-year window (toggle 1D / 1M / 1Y / Max there). Opens in a "
+                    "new tab.</p>"
                     f"<div style='margin:6px 0 12px;'>{_chips}</div>"
                 )
         except Exception:  # noqa: BLE001 - skip if snapshot is malformed
