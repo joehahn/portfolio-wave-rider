@@ -3005,34 +3005,55 @@ def build_dashboard(
         except Exception:
             pass  # silently skip the section if the file is malformed
 
-    # Panel: the news queries the curator ran on its most recent review, so the
-    # user can see what the curator actually looked at (the news-visibility
-    # gap). These evolve over time: the gem-agnostic discovery beats track the
-    # profile's waves and the ticker-keyed searches track the current holdings.
+    # Section: the curator's actual WebSearch queries at each review, newest
+    # first, as collapsible <details> blocks (latest open) — the news-visibility
+    # record. Reads every archived live run from data/curator_runs/live/; runs
+    # that predate query-capture (no search_terms) are skipped. Native <details>
+    # gives the click-to-expand behavior with no JavaScript.
     live_search = ""
-    latest_curation = Path("data/curator_latest.json")
-    if is_live and latest_curation.exists():
-        try:
-            cj = json.loads(latest_curation.read_text())
-            terms = [str(t) for t in (cj.get("search_terms") or []) if str(t).strip()]
-            if terms:
-                asof = cj.get("as_of_date", "")
+    if is_live:
+        live_dir = Path("data/curator_runs/live")
+        by_date: dict[str, list[str]] = {}
+        if live_dir.exists():
+            for f in sorted(live_dir.glob("*.json")):
+                try:
+                    cj = json.loads(f.read_text())
+                except Exception:  # noqa: BLE001 - skip malformed archive files
+                    continue
+                terms = [str(t) for t in (cj.get("search_terms") or []) if str(t).strip()]
+                if not terms:
+                    continue
+                d = str(cj.get("as_of_date") or f.stem)
+                # If a date has more than one archived file, keep the richest.
+                if d not in by_date or len(terms) > len(by_date[d]):
+                    by_date[d] = terms
+        runs = sorted(by_date.items(), key=lambda kv: kv[0], reverse=True)
+        if runs:
+            blocks = []
+            for i, (d, terms) in enumerate(runs):
                 chips = "".join(
                     "<span style='display:inline-block;background:#f0f3f7;"
                     "border:1px solid #dde;border-radius:12px;padding:2px 10px;"
                     f"margin:3px 4px 3px 0;font-size:13px;'>{_html.escape(t)}</span>"
                     for t in terms
                 )
-                live_search = (
-                    "<h2 style='margin-top:2em;'>Curator search terms</h2>"
-                    "<p style='font-size:14px;color:#555;max-width:780px;'>"
-                    f"All {len(terms)} news queries the curator ran on its most "
-                    f"recent review ({_html.escape(str(asof))}), captured verbatim "
-                    "from the agent's actual WebSearch tool calls.</p>"
-                    f"<div style='max-width:900px;'>{chips}</div>"
+                open_attr = " open" if i == 0 else ""
+                blocks.append(
+                    f"<details{open_attr} style='margin:6px 0;max-width:900px;'>"
+                    "<summary style='cursor:pointer;font-size:14px;font-weight:600;"
+                    f"padding:4px 0;'>{_html.escape(d)} &mdash; {len(terms)} queries"
+                    "</summary>"
+                    f"<div style='margin:6px 0 12px;'>{chips}</div></details>"
                 )
-        except Exception:
-            pass
+            live_search = (
+                "<h2 style='margin-top:2em;'>Curator search terms</h2>"
+                "<p style='font-size:14px;color:#555;max-width:780px;'>"
+                "Every news query the curator ran at each review, captured verbatim "
+                "from the agent's actual WebSearch tool calls. Click a review to "
+                "expand; the most recent is open by default. (Reviews before "
+                "query-capture was added are omitted.)</p>"
+                + "".join(blocks)
+            )
 
     page = (
         '<!doctype html><html><head><meta charset="utf-8">'
