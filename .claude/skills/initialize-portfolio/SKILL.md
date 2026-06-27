@@ -70,7 +70,7 @@ Pass:
 }
 ```
 
-The report-writer should produce only the **The ask**, **Thesis allocation**, **Caveats** sections — there's no optimizer output, no news, and no recommended weights. Output: `data/reports/<date>-initialize-portfolio.md`.
+Write this report yourself, in the main loop, with the Write tool, to `data/reports/<date>-initialize-portfolio.md`. **Do not delegate to the `report-writer` subagent** (background subagents both fail to propagate file writes to the real repo and stall on the heavy read-then-generate step; the report is authored inline). Produce only the **The ask**, **Thesis allocation**, and **Caveats** sections (there is no optimizer output, no news, and no recommended weights), following `.claude/agents/report-writer.md`'s "Report structure" and "Table formatting" for those sections. After writing, grep the file for narrative em dashes (`grep -n "—" data/reports/<date>-initialize-portfolio.md`) and replace any in-sentence em dashes, leaving only the `# <Skill> — <date>` title and any table empty-cell placeholders.
 
 ## Step 6 — refresh the dashboard (Bash)
 

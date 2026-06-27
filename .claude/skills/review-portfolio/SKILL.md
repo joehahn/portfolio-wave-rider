@@ -82,46 +82,21 @@ Returns a JSON blob with `optimization` (weights, Sharpe, expected return, vol) 
 
 Appends today's optimizer output to `data/recommendations.csv` so the dashboard's weight-history chart picks up the new row block. `--force` is required because re-running on the same day should overwrite, not duplicate.
 
-### Step 5 — write the report (Task, with watchdog + inline fallback)
+### Step 5 — write the report (inline, in the main loop)
 
-Spawn the `report-writer` subagent. Pass:
+Write the report yourself, in the main loop, with the Write tool, to `data/reports/<today>-review-portfolio.md`. **Do not delegate this to the `report-writer` subagent.** Background subagents fail at this task two independent ways, both verified: (a) a subagent's file `Write` does not propagate to the real repo (it reports "File created successfully" but the file never appears, because background subagents run in an isolated filesystem), and (b) the heavy "read a large context, then generate a long document in one shot" generation reliably hangs in a background subagent (every input read succeeds, then no output, indefinitely). The main loop does this task reliably; the `watchlist-curator` works only because it returns small results incrementally rather than one big generation. So the report is authored inline.
 
-```json
-{
-  "user_request": "<original prompt>",
-  "analysis": <step 3 JSON>,
-  "curator": <step 1 JSON, the watchlist-curator's full return>,
-  "curate_result": <step 2 JSON, with applied_adds/applied_removes/rejections>,
-  "profile_conflicts": <merged from steps 2-4>,
-  "thesis_baseline": <contents of data/thesis_baseline.json if it exists, else null>
-}
-```
+Inputs to read: the analyze JSON (step 3), `data/curator_latest.json` (step 1), the curate result (step 2), `holdings.csv`, `data/thesis_baseline.json` (if present), and `investor_profile.md`.
 
-The report is written to `data/reports/YYYY-MM-DD-review-portfolio.md`.
+Follow `.claude/agents/report-writer.md`'s "Report structure" and "Table formatting" sections exactly. That file is the canonical report spec; only its *agent role* is retired (it is no longer spawned), its format is not. All sections, in order: `The ask`, `Recommended allocation` (Asset-name column + per-ticker trades/tilts), `Thesis allocation` (thesis vs recommended %, omit only if `thesis_baseline` is null), `How this maps to the profile`, `Profile conflicts` (always present; cite the `investor_profile.md` line for any conflict; flag single-name concentration at the cap; never silently clamp), `Risk picture` (Sharpe, vol, max drawdown, VaR, CVaR from the analyze JSON), `Watchlist changes this period` ("Quiet period: curator proposed no changes." on a no-change run), `News evidence` (omit when there are no adds), `Caveats` (the report ends here). A no-change run still gets the full structure; numbers come only from the `src.cli` outputs, never the model.
 
-**Watchdog (required).** The `report-writer` subagent has stalled in practice: it reads all its inputs successfully and then the background generation step hangs, so it never emits the `Write` and never sends a completion notification, which would otherwise block the run forever. The cause is not the inputs or tools (every tool call returns) but a flaky background-inference generation; the main loop's own generation has not shown this. So do NOT wait indefinitely on the subagent. Right after spawning it, launch a background watchdog that polls for the report file with a timeout, e.g.:
+**Em-dash self-check (required).** After writing, grep the file and fix any narrative em dashes:
 
 ```bash
-f="data/reports/$(date +%F)-review-portfolio.md"
-for i in $(seq 1 16); do [ -f "$f" ] && { echo "REPORT_WRITTEN after $((i*15))s"; exit 0; }; sleep 15; done
-echo "TIMEOUT: report-writer stalled — falling back to inline"
+grep -n "—" data/reports/$(date +%F)-review-portfolio.md
 ```
 
-Run it with `run_in_background: true` so whichever finishes first (the subagent's completion notification or the watchdog) wakes you. If the report file exists, continue. If the watchdog times out with no file:
-
-1. Stop the stalled subagent with `TaskStop` (so a late zombie can't overwrite the file).
-2. Tell the user the report-writer stalled and you are writing the report inline.
-3. **Write the report yourself** with the Write tool, directly to `data/reports/<today>-review-portfolio.md`, from the same inputs (the analyze JSON, `data/curator_latest.json`, the curate result, `holdings.csv`, `data/thesis_baseline.json`, `investor_profile.md`). To match the subagent's output, **read `.claude/agents/report-writer.md` and follow its "Report structure" and "Table formatting" sections exactly** — do not improvise an abbreviated set. That means all of its sections, in order: `The ask`, `Recommended allocation` (with the Asset-name column and per-ticker trades/tilts), `Thesis allocation` (thesis vs recommended %, omit only if `thesis_baseline` is null), `How this maps to the profile`, `Profile conflicts` (always present, even if empty; cite the `investor_profile.md` line for any conflict; flag single-name concentration at the cap; never silently clamp), `Risk picture` (Sharpe, vol, max drawdown, VaR, CVaR from the analyze JSON), `Watchlist changes this period` (on a no-change run write "Quiet period — curator proposed no changes."), `News evidence` (omit entirely when there are no adds), and `Caveats` (the report ends here). Follow the repo prose rules (no em dashes in narrative; numbers only from the `src.cli` outputs). A no-change run still gets the full structure; it is not an excuse for a short report.
-
-   **Em-dash self-check (required after the inline write).** The inline path is the main loop writing prose directly, which has repeatedly slipped em dashes into the narrative against the no-em-dash rule. After writing the file, grep it and fix any narrative em dashes before finishing:
-
-   ```bash
-   grep -n "—" data/reports/$(date +%F)-review-portfolio.md
-   ```
-
-   Replace every em dash that sits in a sentence (clause separators, asides) with a comma, colon, semicolon, parentheses, or a new sentence. Two are allowed to remain and should NOT be changed: the report's `# <Skill> — <date>` title (the report-writer spec's header format) and `—` used as an empty-cell placeholder inside tables. Anything else is a violation; re-grep after fixing to confirm only the title and table placeholders remain. This check applies only to the inline fallback; the `report-writer` subagent handles its own prose.
-
-The inline fallback is not a cure for the flaky generation; it removes the silent-stall failure mode (no completion notification → infinite wait) and makes the step retryable in the main loop, which has been reliable.
+Replace every em dash inside a sentence (clause separators, asides) with a comma, colon, semicolon, parentheses, or a new sentence. Leave only the two legitimate uses: the `# <Skill> — <date>` title and `—` empty-cell placeholders inside tables. Re-grep to confirm only those remain.
 
 ### Step 6 — refresh snapshot, then dashboard (Bash)
 

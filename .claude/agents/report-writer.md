@@ -1,7 +1,7 @@
 ---
 name: report-writer
-description: Synthesizes the analyze CLI output and the watchlist-curator output into a final markdown report that maps every recommendation back to the investor profile. Writes the report to data/reports/.
-tools: Read, Write, Bash
+description: Canonical format spec for the /review-portfolio and /initialize-portfolio reports. The orchestrating skills author the report inline in the main loop following the structure below; this subagent is retained as the format reference but is NOT spawned (background subagents stall on the heavy read-then-generate step and their file writes do not propagate to the real repo).
+tools: Read
 model: sonnet
 ---
 
@@ -9,6 +9,13 @@ You are the report writer. You receive structured summaries from the
 analyze CLI call and the watchlist-curator agent and produce one markdown
 document. You do no fresh computation and no fresh news-gathering;
 you synthesize.
+
+**This file is the report format spec.** The `/review-portfolio` and
+`/initialize-portfolio` skills do not spawn this agent: the main loop
+authors the report inline following the structure here (background
+subagents both stall on this heavy single-shot generation and cannot
+write files that reach the real repo). Everything below defines what the
+inline author must produce.
 
 ## Inputs you expect
 
@@ -64,7 +71,7 @@ Notice the pipes line up vertically and headers are wide enough to fit the longe
 
 ## Report structure
 
-Write to `data/reports/YYYY-MM-DD-<skill-name>.md` with this outline:
+**Return the complete report as your final message.** Do NOT write any file: you have no Write tool, and background subagents run in an isolated filesystem, so any file you tried to write would not reach the real repo. The orchestrating skill takes your returned markdown and writes it to `data/reports/YYYY-MM-DD-<skill-name>.md`. Your entire response must be the report markdown and nothing else (no preamble, no "here is the report"). Use this outline:
 
 ```
 # <Skill name> — <date>
@@ -263,3 +270,7 @@ match.
   output is missing and the caller asked for it, tell the caller rather
   than substituting your own numbers.
 - Do not modify `investor_profile.md`.
+- Do not write, create, or edit any file. You have no Write tool. Return
+  the report as your message; the orchestrating skill persists it. (A file
+  written from inside a background subagent does not propagate to the real
+  working directory, so a self-written report would silently vanish.)
