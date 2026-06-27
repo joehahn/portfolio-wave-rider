@@ -3020,17 +3020,19 @@ def build_dashboard(
                 chips = "".join(
                     "<span style='display:inline-block;background:#f0f3f7;"
                     "border:1px solid #dde;border-radius:12px;padding:2px 10px;"
-                    f"margin:3px 4px 3px 0;font-size:13px;'>{t}</span>"
+                    f"margin:3px 4px 3px 0;font-size:13px;'>{_html.escape(t)}</span>"
                     for t in terms
                 )
                 live_search = (
                     "<h2 style='margin-top:2em;'>Curator search terms</h2>"
                     "<p style='font-size:14px;color:#555;max-width:780px;'>"
-                    f"The {len(terms)} news queries the curator ran on its most "
-                    f"recent review ({asof}): gem-agnostic discovery beats derived "
-                    "from the profile's waves plus a few fixed generic beats, then "
-                    "ticker-keyed due-diligence on the current holdings. This set "
-                    "evolves as the profile's thesis and the watchlist change.</p>"
+                    f"All {len(terms)} news queries the curator ran on its most "
+                    f"recent review ({_html.escape(str(asof))}), captured verbatim "
+                    "from the agent's actual WebSearch tool calls. The curator's "
+                    "protocol mixes gem-agnostic discovery beats (derived from the "
+                    "profile's waves) with ticker-keyed due-diligence on the "
+                    "holdings, so the set evolves as the profile and watchlist "
+                    "change.</p>"
                     f"<div style='max-width:900px;'>{chips}</div>"
                 )
         except Exception:
