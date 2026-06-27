@@ -3536,6 +3536,45 @@ def build_curator_dashboard(
             f"<tbody>{''.join(rows)}</tbody></table>"
         )
 
+    # Search-terms history: the actual WebSearch queries the curator ran at each
+    # rebalance, as collapsible blocks in chronological order. Mirrors the live
+    # dashboard's panel; data comes from each <date>-curation.json's search_terms
+    # (preserved from the agent transcripts).
+    search_html = ""
+    _st_blocks = []
+    _runs = Path(runs_dir)
+    if _runs.exists():
+        for f in sorted(_runs.glob("*-curation.json")):
+            try:
+                cj = json.loads(f.read_text())
+            except Exception:  # noqa: BLE001 - skip malformed files
+                continue
+            terms = [str(t) for t in (cj.get("search_terms") or []) if str(t).strip()]
+            if not terms:
+                continue
+            d = str(cj.get("as_of_date") or f.stem.replace("-curation", ""))
+            chips = "".join(
+                "<span style='display:inline-block;background:#f0f3f7;"
+                "border:1px solid #dde;border-radius:12px;padding:2px 10px;"
+                f"margin:3px 4px 3px 0;font-size:13px;'>{_html.escape(t)}</span>"
+                for t in terms
+            )
+            _st_blocks.append(
+                "<details style='margin:6px 0;max-width:900px;'>"
+                "<summary style='cursor:pointer;font-size:14px;font-weight:600;"
+                f"padding:4px 0;'>{_html.escape(d)} &mdash; {len(terms)} queries</summary>"
+                f"<div style='margin:6px 0 12px;'>{chips}</div></details>"
+            )
+    if _st_blocks:
+        search_html = (
+            "<h2 style='margin-top:2em;'>Curator search terms</h2>"
+            "<p style='color:#555;max-width:780px;'>Every news query the curator "
+            "ran at each quarterly rebalance, captured verbatim from the agent's "
+            "WebSearch tool calls (the <code>before:</code> filters confirm the "
+            "as-of-date discipline). Click a rebalance to expand.</p>"
+            + "".join(_st_blocks)
+        )
+
     chart_html = fig.to_html(full_html=False, include_plotlyjs="cdn", config={"displayModeBar": False})
     page = (
         '<!doctype html><html><head><meta charset="utf-8">'
@@ -3567,6 +3606,7 @@ def build_curator_dashboard(
         '(e.g., AGG, BIL, IAU).</p>'
         + chart_html
         + log_html
+        + search_html
         + '</body></html>'
     )
     o = Path(out_path)

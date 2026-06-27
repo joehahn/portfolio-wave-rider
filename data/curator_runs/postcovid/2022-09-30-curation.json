@@ -5,103 +5,101 @@
     {
       "ticker": "RKLB",
       "wave_bucket": "rockets_spacecraft",
-      "rationale": "Rocket Lab has demonstrated early-surge commercial momentum \u2014 first mid-air booster capture in May 2022 and record Q2 revenue of $55.5M (+392% YoY) confirm the company is in the buildup-to-surge phase of the rockets wave the investor profile names as the next wave after AI.",
+      "rationale": "Rocket Lab is the only US-listed pure-play small-satellite launch and spacecraft manufacturer, with a $143M MDA/Globalstar manufacturing contract signed in February 2022 and accelerating space-systems revenue through Q2 2022 \u2014 concrete commercial-milestone evidence of buildup-phase entry into the rockets/spacecraft wave the profile names as its first next tech wave.",
       "news_evidence": [
         {
-          "summary": "Rocket Lab's 'There And Back Again' mission on May 2, 2022 captured the returning Electron booster with a helicopter \u2014 first mid-air booster recovery attempt.",
-          "source": "TechCrunch",
-          "url": "https://techcrunch.com/2022/05/02/watch-rocket-lab-attempt-to-catch-a-falling-booster-with-a-helicopter-today/",
-          "date": "2022-05-02"
+          "summary": "Rocket Lab awarded $143M contract by MDA to manufacture 17 spacecraft for the Globalstar LEO constellation \u2014 largest space-systems contract to date.",
+          "source": "SEC EDGAR (RKLB 8-K FY2022)",
+          "url": "https://www.sec.gov/Archives/edgar/data/0001819994/000119312522083895/d336996dex991.htm",
+          "date": "2022-02-01"
         },
         {
-          "summary": "Rocket Lab Q2 2022 revenue of $55.5M, +392% YoY and +36% sequential, with Q3 guidance of $60-63M; backlog $545M.",
-          "source": "BusinessWire",
-          "url": "https://www.businesswire.com/news/home/20220811005658/en/Rocket-Lab-Announces-Second-Quarter-2022-Financial-Results-and-Guidance-for-Third-Quarter-2022",
-          "date": "2022-08-11"
+          "summary": "Rocket Lab Q2 2022 earnings: launch services revenue growing toward $19M with space-systems contracts diversifying the revenue base.",
+          "source": "SEC EDGAR (RKLB 8-K FY2022)",
+          "url": "https://www.sec.gov/Archives/edgar/data/0001819994/000119312522218581/d297956dex991.htm",
+          "date": "2022-08-10"
         },
         {
-          "summary": "RKLB commenced trading on Nasdaq on August 25, 2021, confirming >1yr of public price history as of this rebalance.",
-          "source": "BusinessWire / SEC 8-K",
-          "url": "https://www.businesswire.com/news/home/20210820005293/en/Vector-Acquisition-Corporation-Shareholders-Approve-Proposed-Merger-With-Rocket-Lab",
-          "date": "2021-08-25"
-        }
-      ]
-    },
-    {
-      "ticker": "NLR",
-      "wave_bucket": "nuclear",
-      "rationale": "Two independent structural catalysts landed before this rebalance \u2014 the EU Parliament's July 2022 endorsement of nuclear as a 'green' sustainable activity and the August 2022 Inflation Reduction Act's nuclear tax credits \u2014 marking the start of a policy-driven fission renaissance; NLR (VanEck Uranium and Nuclear ETF) provides diversified exposure across uranium miners, utilities, and reactor builders.",
-      "news_evidence": [
-        {
-          "summary": "EU included nuclear as a 'transitional' sustainable activity in its taxonomy; the EU Parliament rejected a motion opposing this classification in July 2022.",
-          "source": "World Nuclear News",
-          "url": "https://www.world-nuclear-news.org/Articles/A-guide-to-the-EUs-green-taxonomy-and-nuclears-pla",
-          "date": "2022-02-10"
-        },
-        {
-          "summary": "The Inflation Reduction Act, signed August 16, 2022, introduced a nuclear production tax credit up to $15/MWh for existing plants and a 30% ITC for new nuclear.",
-          "source": "Morgan Lewis",
-          "url": "https://www.morganlewis.com/pubs/2022/08/inflation-reduction-act-of-2022-boosts-nuclear-power-with-tax-credits-and-funding",
-          "date": "2022-08-16"
-        },
-        {
-          "summary": "The IRA earmarked $700M for domestic HALEU production, addressing fuel-supply security after Russia's invasion of Ukraine.",
-          "source": "US Department of Energy",
-          "url": "https://www.energy.gov/ne/articles/inflation-reduction-act-keeps-momentum-building-nuclear-power",
-          "date": "2022-08-16"
+          "summary": "Rocket Lab wins two contracts totaling $14M for separation systems for US Space Development Agency satellites, adding US government contract cadence.",
+          "source": "SEC EDGAR (RKLB 8-K FY2022)",
+          "url": "https://www.sec.gov/Archives/edgar/data/0001819994/000119312522151833/d342077dex991.htm",
+          "date": "2022-06-01"
         }
       ]
     },
     {
       "ticker": "BOTZ",
       "wave_bucket": "robotics",
-      "rationale": "North American robot orders hit consecutive quarterly records in early 2022 as manufacturers deployed automation to offset labor shortages, confirming the robotics wave is in its early-surge phase; BOTZ (Global X Robotics & AI ETF) is the most liquid single-ticker way to ride this theme.",
+      "rationale": "The Global X Robotics and AI ETF (BOTZ, launched September 2016) provides diversified liquid exposure to the robotics wave; August 2022 manufacturing earnings confirm a structural labor-shortage-driven automation demand surge matching the early-buildup entry point the profile targets.",
       "news_evidence": [
         {
-          "summary": "A3 reported Q1 2022 North American robot sales hit a record 11,595 units ($646M), up 28% in units and 43% in dollars YoY.",
-          "source": "The Robot Report",
-          "url": "https://www.therobotreport.com/robot-sales-hit-record-high-in-first-quarter-of-2022/",
-          "date": "2022-05-01"
+          "summary": "BOTZ launched September 12, 2016 by Global X; tracks global robotics and AI automation companies \u2014 established ETF with six years of history and adequate volume.",
+          "source": "Global X ETFs",
+          "url": "https://www.globalxetfs.com/funds/botz",
+          "date": "2016-09-12"
         },
         {
-          "summary": "A3 data published May 31, 2022 confirmed North American robot sales continued the record surge into 2022, driven by labor shortages.",
-          "source": "BusinessWire",
-          "url": "https://www.businesswire.com/news/home/20220531005299/en/Robot-Sales-in-North-America-Continue-Record-Surge-into-2022",
-          "date": "2022-05-31"
+          "summary": "Emerson reports ~47% boost to Q3 2022 profits, attributing the rise to growing manufacturing demand for industrial robots offsetting a labor shortage.",
+          "source": "Automate.org / The Bot Brief",
+          "url": "https://www.automate.org/robotics/news/the-bot-brief-181",
+          "date": "2022-08-01"
+        }
+      ]
+    },
+    {
+      "ticker": "SMR",
+      "wave_bucket": "nuclear",
+      "rationale": "NuScale Power (NYSE: SMR, listed May 2022) is the first and only US-listed pure-play small modular reactor company; the September 7, 2022 Task Order with Poland's KGHM to begin formal SMR deployment \u2014 backed by $351M cash and no debt \u2014 is the inaugural international commercial-deployment milestone marking SMR's entry into the buildup phase of the nuclear wave.",
+      "news_evidence": [
+        {
+          "summary": "NuScale completes SPAC merger and begins NYSE trading as 'SMR' on May 3, 2022, raising ~$380M including $235M PIPE.",
+          "source": "SEC EDGAR (NuScale 8-K FY2022)",
+          "url": "https://www.sec.gov/Archives/edgar/data/0001822966/000110465922056493/tm2213736d7_ex99-1.htm",
+          "date": "2022-05-03"
         },
         {
-          "summary": "Bloomberg reported US robot orders jumped 28% in 2021 to an all-time high; robot-leasing models accelerating adoption among mid-size manufacturers.",
-          "source": "Bloomberg",
-          "url": "https://www.bloomberg.com/news/articles/2022-03-31/automation-comes-to-more-factories-with-robot-leasing",
-          "date": "2022-03-31"
+          "summary": "NuScale Q2 2022 earnings: balance sheet of $350.8M cash and no debt; reaffirms outlook after $381M SPAC/PIPE proceeds.",
+          "source": "SEC EDGAR (NuScale 8-K FY2022)",
+          "url": "https://www.sec.gov/Archives/edgar/data/0001822966/000182296622000048/a2q22earningsrelease8.htm",
+          "date": "2022-08-10"
+        },
+        {
+          "summary": "NuScale and Poland's KGHM sign first Task Order (Sept 7, 2022) to initiate SMR deployment work \u2014 the company's first international deployment milestone post-IPO.",
+          "source": "SEC EDGAR (NuScale 8-K FY2022)",
+          "url": "https://www.sec.gov/Archives/edgar/data/0001822966/000182296622000068/kghmpressrelease.htm",
+          "date": "2022-09-07"
         }
       ]
     }
   ],
   "removes": [],
   "no_changes": false,
-  "rationale_overall": "The watchlist grows from 5 to its maximum of 8 by adding one ticker per underrepresented next-wave bucket. RKLB fills rockets/spacecraft on its first reusable-booster capture and near-400% Q2 revenue growth. NLR fills nuclear at a strong policy-catalyst moment (EU green-taxonomy endorsement + IRA nuclear tax credits + European energy crisis). BOTZ fills robotics on consecutive record North American robot-order quarters. No removes: the five holdings are in a broad-market bear phase but none has suffered a thesis breach.",
+  "rationale_overall": "The starter watchlist of five big-tech/AI tickers carries zero exposure to the profile's named next waves. This rebalance closes that gap: RKLB for rockets/spacecraft (pure-play small-sat launch/manufacture with revenue inflecting), BOTZ for robotics (diversified ETF capturing the labor-shortage automation buildup), and SMR for nuclear (the only US-listed pure-play SMR company, first international deployment Task Order signed 23 days before this rebalance). Quantum remains uncovered: IONQ, the only liquid pure-play, faces a May 2022 Scorpion Capital fraud allegation and securities class action, unsuitable until resolved. Defense (ITA/PPA) deferred since the Ukraine-war rearmament trade already drew ~$2B of inflows in early 2022, reducing the early-buildup advantage. Post-change watchlist hits the 8-cap with four wave buckets (AI, rockets, robotics, nuclear) plus SPY.",
   "search_terms": [
-    "RKLB Rocket Lab news milestones launches 2022 before:2022-10-01",
-    "nuclear energy SMR uranium ETF NLR CCJ 2022 before:2022-10-01",
-    "BOTZ robotics ETF automation 2022 before:2022-10-01",
-    "Rocket Lab RKLB electron launch contracts backlog 2022 site:spacenews.com OR site:rocketlabusa.com before:2022-10-01",
-    "QTUM quantum computing ETF 2022 before:2022-10-01",
-    "nuclear energy renaissance Europe 2022 uranium demand SMR before:2022-10-01",
-    "NLR nuclear ETF uranium Europe energy crisis 2022 August September before:2022-10-01",
-    "IONQ IonQ quantum computing revenue 2022 before:2022-10-01",
-    "Rocket Lab RKLB revenue backlog Q2 2022 earnings August before:2022-10-01",
-    "robotics labor shortage automation manufacturing 2022 BOTZ ROBO ETF before:2022-10-01",
-    "nuclear energy Europe 2022 EU taxonomy uranium price CCJ NLR VanEck before:2022-10-01 site:reuters.com OR site:bloomberg.com OR site:world-nuclear-news.org",
-    "Inflation Reduction Act nuclear energy incentives August 2022 before:2022-10-01",
-    "Rocket Lab \"There and Back Again\" booster catch helicopter 2022 before:2022-10-01",
-    "BOTZ \"Global X Robotics\" 2022 manufacturing automation labor shortage before:2022-10-01",
-    "robot orders installations record 2022 IFR International Federation Robotics before:2022-10-01",
-    "Rocket Lab RKLB \"Q2 2022\" OR \"second quarter 2022\" revenue results before:2022-10-01",
-    "NLR VanEck nuclear ETF Cameco uranium 2022 \"Inflation Reduction Act\" before:2022-10-01",
-    "industrial robots record installations 2022 labor shortage automation site:reuters.com OR site:bloomberg.com before:2022-10-01",
-    "Rocket Lab RKLB SPAC merger listing date 2021 before:2022-10-01",
-    "\"robot orders\" OR \"robotics demand\" 2022 record \"labor shortage\" site:therobotreport.com OR site:reuters.com before:2022-10-01",
-    "A3 robot orders 2022 record first quarter OR \"Q1 2022\" manufacturing before:2022-10-01"
+    "space stocks rocket launch 2022 before:2022-10-01",
+    "robotics stocks automation 2022 before:2022-10-01",
+    "quantum computing stocks 2022 before:2022-10-01",
+    "nuclear energy stocks SMR small modular reactor 2022 before:2022-10-01",
+    "artificial intelligence stocks 2022 before:2022-10-01",
+    "energy stocks tanker stocks geopolitics 2022 before:2022-10-01",
+    "defense stocks rearmament ETF 2022 before:2022-10-01",
+    "healthcare stocks aging population eldercare REIT 2022 before:2022-10-01",
+    "best performing ETF September 2022 before:2022-10-01",
+    "biggest stock gainers September 2022 before:2022-10-01",
+    "AAPL Apple stock news Q3 2022 before:2022-10-01",
+    "MSFT Microsoft stock news Q3 2022 before:2022-10-01",
+    "GOOGL Alphabet stock news Q3 2022 before:2022-10-01",
+    "NVDA Nvidia stock news Q3 2022 before:2022-10-01",
+    "SPY S&P 500 ETF September 2022 before:2022-10-01",
+    "Rocket Lab RKLB news 2022 before:2022-10-01",
+    "BOTZ Global X Robotics ETF news 2022 before:2022-10-01",
+    "IonQ IONQ quantum computing stock news 2022 before:2022-10-01",
+    "NuScale Power SMR stock news 2022 before:2022-10-01",
+    "PPA Invesco Aerospace Defense ETF news 2022 before:2022-10-01",
+    "Rocket Lab Electron launch contract revenue 2022 site:spacenews.com OR site:arstechnica.com before:2022-10-01",
+    "IonQ securities fraud lawsuit 2022 before:2022-10-01",
+    "NuScale Power SMR KGHM Poland contract 2022 before:2022-10-01",
+    "BOTZ robotics ETF launch date inception 2016 before:2022-10-01",
+    "defense ETF ITA PPA performance Ukraine war 2022 before:2022-10-01"
   ]
 }

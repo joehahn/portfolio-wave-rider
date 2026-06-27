@@ -5,31 +5,25 @@
     {
       "ticker": "NUKZ",
       "wave_bucket": "nuclear",
-      "rationale": "Replace the narrow uranium-mining ETF (URA) with the Range Nuclear Renaissance ETF, which directly holds the nuclear power operators and SMR developers \u2014 Talen Energy, GE Vernova, Rolls-Royce \u2014 that are the commercial beneficiaries of the three AI-data-center nuclear PPAs signed in Q4 2024, aligning the nuclear slot with the profile's explicit 'SMRs and utility PPAs to AI data centers' thesis.",
+      "rationale": "NUKZ (Range Nuclear Renaissance ETF, launched January 24, 2024) gained ~70% in its first year vs URA's flat -0.53%, and its holdings span nuclear power operators and utilities \u2014 exactly the entities signing AI-datacenter PPAs \u2014 rather than uranium miners that did not benefit from the TMI and Susquehanna PPA announcements.",
       "news_evidence": [
         {
-          "summary": "Microsoft signs a 20-year PPA with Constellation to restart Three Mile Island Unit 1 (835 MW) as baseload for PJM data centers; Constellation projects higher EPS growth through 2030.",
-          "source": "Utility Dive",
-          "url": "https://www.utilitydive.com/news/constellation-three-mile-island-nuclear-power-plant-microsoft-data-center-ppa/727652/",
-          "date": "2024-09-20"
+          "summary": "NUKZ named one of 2024's hottest ETFs (~+70% since its Jan 2024 launch); tracks the VettaFi Nuclear Renaissance index of utilities, fuel providers, advanced-reactor developers, and construction firms.",
+          "source": "Nasdaq / Yahoo Finance",
+          "url": "https://www.nasdaq.com/articles/nukz-brand-new-nuclear-energy-etf-one-2024s-hottest-etfs",
+          "date": "2024-12-01"
         },
         {
-          "summary": "Google and Kairos Power sign the first US corporate Master Plant Development Agreement for 500 MW of SMR capacity by 2035 \u2014 the first multi-plant SMR PPA in US history.",
-          "source": "World Nuclear News",
-          "url": "https://www.world-nuclear-news.org/articles/google-and-kairos-power-team-up-for-smr-deployments-in-us-first",
-          "date": "2024-10-14"
+          "summary": "Microsoft-Constellation 20-year TMI PPA exemplifies the thesis migrating from uranium supply to power-operator/utility PPAs, which NUKZ captures via utility holdings URA lacks.",
+          "source": "The Globe and Mail",
+          "url": "https://www.theglobeandmail.com/investing/markets/stocks/SMR-N/pressreleases/32987534/3-stocks-to-profit-from-the-upcoming-nuclear-power-boom/",
+          "date": "2024-09-01"
         },
         {
-          "summary": "NUKZ launched January 23, 2024 and gained ~70% through year-end; top holdings include Cameco (supply), Talen Energy (operator), GE Vernova, and Rolls-Royce (SMR) \u2014 full-stack nuclear renaissance exposure vs URA's mining-only coverage.",
-          "source": "AAII / Range ETFs",
-          "url": "https://www.aaii.com/etf/ticker/NUKZ",
-          "date": "2024-12-31"
-        },
-        {
-          "summary": "Google Willow 105-qubit chip achieves below-threshold error correction (Dec 9), validating the quantum thesis behind IONQ and underscoring simultaneous hyperscaler capex across AI, quantum, and nuclear.",
-          "source": "HPCwire",
-          "url": "https://www.hpcwire.com/2024/12/09/google-debuts-new-quantum-chip-error-correction-breakthrough-and-roadmap-details/",
-          "date": "2024-12-09"
+          "summary": "NUKZ launched Jan 24, 2024 on NYSE Arca by Range ETFs; spans nuclear fuel, utility generation, and advanced-reactor segments \u2014 direct operator-side exposure to the big-tech PPA wave.",
+          "source": "Range ETFs",
+          "url": "https://rangeetfs.com/nukz",
+          "date": "2024-01-24"
         }
       ]
     }
@@ -37,46 +31,49 @@
   "removes": [
     {
       "ticker": "URA",
-      "rationale": "URA's holdings are uranium miners (Cameco, Kazatomprom) capturing the fuel supply chain, not the nuclear operators and SMR developers that are the direct counterparties in the Q4 2024 hyperscaler PPAs; NUKZ supersedes URA with Cameco as its largest holding plus the operators and reactor designers URA lacks.",
+      "rationale": "URA returned -0.53% for full-year 2024 because it concentrates in uranium miners whose revenues lag the PPA-driven operator thesis; with both the Microsoft-TMI and AWS-Talen PPAs signed in Q3-Q4 2024, the nuclear thesis now rewards power operators and diversified renaissance funds rather than uranium-mining companies.",
       "news_evidence": [
         {
-          "summary": "AWS acquired Talen's Cumulus Data campus for $650M and secured a carbon-free PPA from Talen's Susquehanna nuclear plant \u2014 value flows to operator Talen (in NUKZ, absent from URA).",
-          "source": "Data Centre Magazine",
-          "url": "https://datacentremagazine.com/critical-environments/amazon-nuclear-energy-deal",
-          "date": "2024-03-31"
+          "summary": "URA delivered -0.53% for full-year 2024 (flat) while the broader nuclear thesis accelerated; uranium spot peaked >$106/lb in Jan 2024 and retreated through the year even as operators surged on PPA news.",
+          "source": "Global X / Yahoo Finance",
+          "url": "https://finance.yahoo.com/quote/URA/performance/",
+          "date": "2024-12-31"
         },
         {
-          "summary": "FERC rejected the Talen-PJM interconnection amendment 2-1, blocking expansion of co-located nuclear load \u2014 regulatory action landed on operators (Talen, PJM), not uranium miners.",
-          "source": "SEC EDGAR / Talen 8-K",
-          "url": "https://www.sec.gov/Archives/edgar/data/0001622536/000162828024044828/a20241103pressreleaseferco.htm",
-          "date": "2024-11-03"
-        },
-        {
-          "summary": "Uranium spot retreated from a ~$107/lb early-2024 peak to ~$80/lb by year-end while nuclear operator stocks surged on PPA news \u2014 the fuel cycle and the operator PPA cycle have de-coupled, making URA the wrong instrument for the active thesis.",
-          "source": "Investing News Network",
-          "url": "https://investingnews.com/uranium-forecast/",
-          "date": "2024-12-01"
+          "summary": "AWS-Talen Susquehanna PPA (Oct 2024) was the second major big-tech nuclear deal within 45 days; both reward generation/operator capacity, a segment URA barely captures.",
+          "source": "Q4 2024 industry reporting",
+          "url": "https://stockanalysis.com/etf/nukz/",
+          "date": "2024-10-01"
         }
       ]
     }
   ],
   "no_changes": false,
-  "rationale_overall": "Q4 2024 produced three landmark hyperscaler-nuclear PPAs \u2014 Microsoft/Constellation TMI (Sept), AWS/Talen Susquehanna (Mar deal, Oct expansion attempt), and Google/Kairos SMR fleet (Oct) \u2014 establishing nuclear operators and SMR developers as the commercial center of gravity in the nuclear wave, not uranium mining. URA is the mining layer only; NUKZ holds both the mining layer (Cameco) and the operator/reactor layer (Talen, GE Vernova, Rolls-Royce). Swapping URA for NUKZ keeps the watchlist at 8/8 and upgrades the nuclear slot from fuel-supply-only to full-stack renaissance exposure. The other holdings stay thesis-intact: Google's Willow chip reinforces quantum (IONQ); Nvidia Blackwell shipments validate AI capex (MSFT, GOOGL, NVDA); RKLB's expanding launch cadence sustains the rockets thesis.",
+  "rationale_overall": "One instrument substitution: URA exits and NUKZ enters, keeping nuclear filled but shifting from uranium mining (flat in 2024 as spot retreated from January highs) to the broader nuclear-renaissance basket of utilities and operators directly monetizing the Microsoft-TMI and AWS-Talen PPAs. Every other position is retained: NVDA (Blackwell ramp) and GOOGL (Willow chip) validated their AI leads in Q4, RKLB sustained record launch cadence, QTUM surged ~50% on quantum enthusiasm from Willow, ITA reflects the continued global-defense cycle, and BOTZ holds robotics despite ~10pp category underperformance. Aging-demographics and energy/tanker remain uncovered; Welltower (WELL) is the leading demographics candidate for a future rebalance.",
   "search_terms": [
-    "CEG Constellation Energy nuclear PPA Microsoft Three Mile Island Q4 2024 before:2025-01-01",
-    "NUKZ ETF launch date nuclear energy before:2025-01-01",
-    "URA uranium ETF nuclear energy news Q4 2024 before:2025-01-01",
-    "IONQ quantum computing news Q4 2024 before:2025-01-01",
-    "Google Willow quantum chip breakthrough December 2024 before:2025-01-01",
-    "nuclear energy AI data center PPA hyperscaler deals Q4 2024 before:2025-01-01",
-    "NUKZ \"Range Nuclear Renaissance\" ETF AUM holdings 2024 before:2025-01-01",
-    "BOTZ robotics ETF alternatives \"Global X\" robotics 2024 thesis before:2025-01-01",
-    "RKLB \"Rocket Lab\" news Q4 2024 contract launch before:2025-01-01",
-    "NUKZ nuclear renaissance ETF performance holdings 2024 Constellation Talen before:2025-01-01",
-    "Trump nuclear energy policy executive order 2024 fission SMR deregulation before:2025-01-01",
-    "uranium spot price URA Q4 2024 sentiment outlook before:2025-01-01",
-    "Google Kairos Power SMR nuclear deal October 2024 before:2025-01-01",
-    "AWS Amazon Talen Energy nuclear Susquehanna PPA October 2024 before:2025-01-01",
-    "Constellation Energy CEG stock Q4 2024 nuclear PPA data center before:2025-01-01"
+    "space stocks rocket launch stocks 2024 before:2025-01-01",
+    "robotics stocks humanoid robot stocks 2024 before:2025-01-01",
+    "quantum computing stocks 2024 before:2025-01-01",
+    "nuclear energy stocks SMR utility PPA 2024 before:2025-01-01",
+    "AI stocks artificial intelligence best performers 2024 before:2025-01-01",
+    "defense stocks rearmament ETF 2024 before:2025-01-01",
+    "geopolitical energy stocks tanker shipping stocks 2024 before:2025-01-01",
+    "aging population demographics healthcare eldercare REIT stocks 2024 before:2025-01-01",
+    "best performing ETF December 2024 before:2025-01-01",
+    "biggest stock gainers Q4 2024 before:2025-01-01",
+    "nuclear energy ETF uranium stocks 2024 fourth quarter before:2025-01-01",
+    "MSFT Microsoft news Q4 2024 before:2025-01-01",
+    "GOOGL Google news Q4 2024 Willow quantum chip before:2025-01-01",
+    "NVDA Nvidia Blackwell news Q4 2024 before:2025-01-01",
+    "RKLB Rocket Lab news Q4 2024 before:2025-01-01",
+    "QTUM quantum ETF news performance 2024 before:2025-01-01",
+    "URA uranium ETF news 2024 Q4 before:2025-01-01",
+    "ITA defense ETF news performance 2024 Q4 before:2025-01-01",
+    "BOTZ robotics ETF news performance 2024 before:2025-01-01",
+    "Welltower WELL healthcare REIT news 2024 Q4 before:2025-01-01",
+    "NUKZ nuclear ETF launch date listing 2024 before:2025-01-01",
+    "Vistra VST Constellation Energy CEG nuclear operator news Q4 2024 before:2025-01-01",
+    "NUKZ nuclear renaissance ETF performance 2024 returns before:2025-01-01",
+    "Welltower WELL seniors housing REIT acquisition 2024 before:2025-01-01"
   ]
 }

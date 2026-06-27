@@ -3,75 +3,71 @@
   "rebalance_period": "quarterly",
   "adds": [
     {
-      "ticker": "QTUM",
-      "wave_bucket": "quantum",
-      "rationale": "Quantum is the only named next-wave with zero watchlist representation; three concrete Q3 2023 milestones \u2014 Google's surface-code error-correction scaling in Nature, IBM's qLDPC codes needing ~10x fewer physical qubits, and IonQ's $25.5M Air Force Research Lab contract \u2014 confirm credible early buildup, and QTUM (launched September 2018) provides diversified ETF exposure with five years of history.",
+      "ticker": "BOTZ",
+      "wave_bucket": "robotics",
+      "rationale": "Global X Robotics & AI ETF fills the profile's only unrepresented technology next-wave (robotics) as the 2023 AI surge accelerates demand for industrial automation; BOTZ has traded since September 2016 and its January 2023 prospectus confirms four robotics-plus-AI sub-themes \u2014 a clean, liquid on-ramp.",
       "news_evidence": [
         {
-          "summary": "Google Quantum AI published 'Suppressing quantum errors by scaling a surface code logical qubit' in Nature, showing more physical qubits reduce logical error rates \u2014 the scaling premise for fault tolerance.",
-          "source": "Nature",
-          "url": "https://www.nature.com/articles/s41586-022-05434-1",
-          "date": "2023-02-22"
+          "summary": "Global X 497K (Jan 31, 2023) identifies four BOTZ themes: Industrial Robotics & Automation, Drones, AI, and Non-Industrial Robotics; >=80% in the Indxx Global Robotics & AI index.",
+          "source": "SEC EDGAR / Global X 497K",
+          "url": "https://www.sec.gov/Archives/edgar/data/0001432353/000143235323000407/a497kroboticsartificialint.htm",
+          "date": "2023-01-31"
         },
         {
-          "summary": "IBM researchers posted qLDPC fault-tolerant memory codes requiring ~one-tenth the physical qubits of current surface codes, lowering the overhead threshold to fault tolerance.",
-          "source": "phys.org",
-          "url": "https://phys.org/news/2023-08-ibm-major-quantum-error-detection.html",
-          "date": "2023-08-29"
-        },
-        {
-          "summary": "IonQ announced a $25.5M AFRL contract to deploy two trapped-ion systems for quantum networking \u2014 its largest government contract to date and first DoD-installation deployment.",
-          "source": "IonQ Investor Relations",
-          "url": "https://investors.ionq.com/news/news-details/2023/IonQ-Announces-New-25.5M-Quantum-Deal-with-United-States-Air-Force-Research-Lab/default.aspx",
-          "date": "2023-09-28"
+          "summary": "Defense One (Sep 12, 2023): European defense spending growth is 'sluggish' despite Ukraine, bottlenecked by production \u2014 defense ETFs lack a near-term catalyst, reinforcing robotics over defense as the gap to fill.",
+          "source": "Defense One",
+          "url": "https://www.defenseone.com/policy/2023/09/europes-defense-spending-sluggish-despite-ukraine-war/390236/",
+          "date": "2023-09-12"
         }
       ]
     }
   ],
   "removes": [
     {
-      "ticker": "SPY",
-      "rationale": "SPY provides only passive broad-market beta with no wave-thesis alignment; with four AI large-caps already supplying market exposure, SPY is the one non-thematic slot in a full 8/8 watchlist, and displacing it for QTUM closes the last named next-wave gap.",
+      "ticker": "AAPL",
+      "rationale": "Apple is the weakest AI-thesis holder: China's September 2023 government iPhone ban \u2014 expanding from central agencies to state-owned enterprises \u2014 threatens ~one-fifth of revenue, while Huawei's Mate 60 5G launch adds structural competition in the same market, making AAPL the poorest near-term risk/reward of the four AI mega-caps.",
       "news_evidence": [
         {
-          "summary": "The Fed held the funds rate at 5.25-5.50% on Sep 20, 2023 and signaled higher-for-longer, compressing the premium on broad passive index exposure relative to early-stage thematic holds.",
-          "source": "Federal Reserve",
-          "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20230920a.htm",
-          "date": "2023-09-20"
+          "summary": "Apple fell 2.8% then 3.6% after China barred iPhones from central government agencies and signaled extension to state-backed entities; Huawei launched a made-in-China 5G phone at the same time.",
+          "source": "Al Jazeera",
+          "url": "https://www.aljazeera.com/economy/2023/9/7/apple-shares-fall-amid-reports-of-chinas-increasing-iphone-restrictions",
+          "date": "2023-09-07"
         },
         {
-          "summary": "Fortune reported the S&P 500 'suffered a rough September' as rising yields erased the summer rally; SPY's Q3 underperformance vs thematic holds reduces its marginal contribution.",
-          "source": "Fortune",
-          "url": "https://fortune.com/2023/09/29/september-sp-500-market-falling/",
-          "date": "2023-09-29"
+          "summary": "Apple poised to shed $194B in market value as China broadens the iPhone ban; Huawei Mate 60 adds competitive pressure in Apple's second-largest market.",
+          "source": "Bloomberg",
+          "url": "https://www.bloomberg.com/news/articles/2023-09-07/apple-poised-to-shed-194-billion-as-china-broadens-iphone-ban",
+          "date": "2023-09-07"
         }
       ]
     }
   ],
   "no_changes": false,
-  "rationale_overall": "One thematically targeted swap: SPY out, QTUM in. The thesis names quantum as a likely next wave, but the watchlist had zero quantum exposure. Three Q3 2023 milestones (Google's Nature error-correction result, IBM's qLDPC paper, IonQ's $25.5M AFRL contract) confirm active buildup with government/research validation \u2014 entry-before-surge timing. SPY is displaced as the only non-thematic slot. Post-change, all four named next-waves have a representative \u2014 RKLB, BOTZ, QTUM, URA \u2014 keeping the AI bucket intact.",
+  "rationale_overall": "One swap: AAPL exits, BOTZ enters, keeping the watchlist at 8. Apple's China iPhone ban \u2014 a concrete dated headwind that wiped ~$200B of market cap in two days \u2014 makes it the weakest risk/reward among the four AI mega-caps; MSFT/GOOGL/NVDA retain the cleaner AI thesis. BOTZ gives the portfolio its first robotics-wave position. The macro backdrop reinforces conservatism (10-yr Treasury 4.57%, S&P 500 -4.77% in September), biasing toward highest-conviction names. URA, RKLB, QTUM, SPY survive on thesis support (uranium term pricing >$60/lb on utility re-contracting; RKLB growing bookings + a May 2023 NASA contract; QTUM the quantum anchor). Post-change: AI (MSFT/GOOGL/NVDA), robotics (BOTZ), rockets (RKLB), quantum (QTUM), nuclear (URA), general markets (SPY).",
   "search_terms": [
-    "RKLB Rocket Lab news 2023 Q3 before:2023-10-01",
-    "URA uranium ETF nuclear energy 2023 Q3 before:2023-10-01",
-    "Rocket Lab RKLB launch contract 2023 site:spacenews.com before:2023-10-01",
-    "quantum computing ETF QTUM IonQ news 2023 before:2023-10-01",
-    "Rocket Lab $515 million satellite contract date 2023 site:spacenews.com",
-    "QTUM Defiance quantum ETF launch date performance 2023 before:2023-10-01",
-    "Rocket Lab Electron launch mission Q3 2023 August September site:spacenews.com before:2023-10-01",
-    "quantum computing milestone IBM Google 2023 Q3 before:2023-10-01",
-    "BOTZ robotics ETF news 2023 Q3 performance before:2023-10-01",
-    "uranium nuclear energy demand 2023 Q3 AI data centers electricity before:2023-10-01",
-    "QTUM quantum ETF IonQ 2023 performance investment thesis before:2023-10-01",
-    "uranium price rally 2023 summer nuclear renaissance site:world-nuclear-news.org before:2023-10-01",
-    "IonQ quantum computing revenue contract 2023 Q3 before:2023-10-01",
-    "IonQ Air Force contract September 2023 Quantum World Congress before:2023-10-01",
-    "Google quantum 70 qubit breakthrough July 2023 site:blog.google OR site:quantumai.google before:2023-10-01",
-    "QTUM ETF annual report performance 2023 half year before:2023-10-01",
-    "Google quantum computing error correction Nature paper July 2023 before:2023-10-01",
-    "IBM quantum error correction codes August 2023 breakthrough before:2023-10-01",
-    "S&P 500 SPY performance Q3 2023 July September returns before:2023-10-01",
-    "Federal Reserve FOMC September 2023 interest rates hold before:2023-10-01",
-    "\"Suppressing quantum errors by scaling a surface code logical qubit\" Google 2023 Nature before:2023-10-01",
-    "S&P 500 September 2023 selloff stock market decline rising rates before:2023-10-01"
+    "space stocks rockets spacecraft stocks 2023 before:2023-10-01",
+    "robotics stocks 2023 before:2023-10-01",
+    "quantum computing stocks 2023 before:2023-10-01",
+    "nuclear energy SMR stocks 2023 before:2023-10-01",
+    "AI stocks artificial intelligence 2023 before:2023-10-01",
+    "defense stocks rearmament 2023 before:2023-10-01",
+    "geopolitics energy tanker stocks oil shipping 2023 before:2023-10-01",
+    "healthcare eldercare aging population demographics stocks 2023 before:2023-10-01",
+    "best performing ETF September 2023 before:2023-10-01",
+    "biggest stock gainers Q3 2023 before:2023-10-01",
+    "uranium stocks nuclear ETF URA 2023 before:2023-10-01",
+    "interest rates stock market September 2023 before:2023-10-01",
+    "BOTZ robotics ETF Global X 2023 before:2023-10-01",
+    "ITA defense ETF aerospace 2023 before:2023-10-01",
+    "AAPL Apple stock China news September 2023 before:2023-10-01",
+    "NVDA Nvidia stock news Q3 2023 before:2023-10-01",
+    "RKLB Rocket Lab news 2023 before:2023-10-01",
+    "URA uranium ETF nuclear demand 2023 before:2023-10-01",
+    "MSFT Microsoft stock Azure AI Copilot news September 2023 before:2023-10-01",
+    "QTUM quantum ETF news performance 2023 before:2023-10-01",
+    "robotics automation AI wave investment themes Q3 2023 before:2023-10-01",
+    "Ukraine war defense spending Europe stocks September 2023 before:2023-10-01",
+    "BOTZ Global X robotics ETF performance July August September 2023 before:2023-10-01",
+    "\"BOTZ\" robotics artificial intelligence ETF returns 2023 before:2023-10-01"
   ]
 }

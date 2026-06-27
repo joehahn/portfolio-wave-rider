@@ -3,7 +3,7 @@
     "date": "2022-03-31",
     "adds": [
       "RKLB",
-      "BOTZ",
+      "QTUM",
       "URA"
     ],
     "removes": [],
@@ -30,18 +30,22 @@
   {
     "date": "2023-03-31",
     "adds": [
-      "IONQ"
+      "ITA"
     ],
     "removes": [
-      "SPY"
+      "AAPL"
     ],
     "rejections": 0
   },
   {
     "date": "2023-06-30",
-    "adds": [],
-    "removes": [],
-    "rejections": 2
+    "adds": [
+      "BOTZ"
+    ],
+    "removes": [
+      "SPY"
+    ],
+    "rejections": 0
   },
   {
     "date": "2023-09-30",
@@ -51,62 +55,64 @@
   },
   {
     "date": "2023-12-31",
-    "adds": [
-      "QTUM"
-    ],
-    "removes": [
-      "AAPL"
-    ],
-    "rejections": 0
+    "adds": [],
+    "removes": [],
+    "rejections": 2
   },
   {
     "date": "2024-03-31",
-    "adds": [],
-    "removes": [],
+    "adds": [
+      "NUKZ",
+      "STNG"
+    ],
+    "removes": [
+      "BOTZ",
+      "GOOGL"
+    ],
     "rejections": 0
   },
   {
     "date": "2024-06-30",
     "adds": [],
-    "removes": [],
-    "rejections": 0
+    "removes": [
+      "URA"
+    ],
+    "rejections": 1
   },
   {
     "date": "2024-09-30",
     "adds": [
       "CEG"
     ],
-    "removes": [
-      "QTUM"
-    ],
-    "rejections": 0
+    "removes": [],
+    "rejections": 1
   },
   {
     "date": "2024-12-31",
-    "adds": [
-      "NUKZ"
-    ],
-    "removes": [
-      "URA"
-    ],
-    "rejections": 0
+    "adds": [],
+    "removes": [],
+    "rejections": 2
   },
   {
     "date": "2025-03-31",
-    "adds": [],
-    "removes": [],
+    "adds": [
+      "BOTZ"
+    ],
+    "removes": [
+      "STNG"
+    ],
     "rejections": 0
   },
   {
     "date": "2025-06-30",
     "adds": [],
     "removes": [],
-    "rejections": 0
+    "rejections": 2
   },
   {
     "date": "2025-09-30",
     "adds": [],
     "removes": [],
-    "rejections": 0
+    "rejections": 2
   }
 ]

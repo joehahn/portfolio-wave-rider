@@ -5,92 +5,94 @@
     {
       "ticker": "RKLB",
       "wave_bucket": "rockets_spacecraft",
-      "rationale": "Rocket Lab delivered a record launch cadence in 2022 including two classified NRO national-security missions and has imminent US launch capability from Wallops Island, establishing it as the leading small-sat launch provider at the onset of the commercial space buildup phase named in the investor thesis.",
+      "rationale": "Rocket Lab reported record Q3 2022 revenue of $63.1M (+1,093% YoY, +14% QoQ) with three successful Electron missions and $333M cash, a genuine revenue inflection for the rockets/spacecraft wave.",
       "news_evidence": [
         {
-          "summary": "Rocket Lab successfully launched NROL-162 on July 13, 2022, delivering NRO's national security payload under the RASR responsive-space contract.",
-          "source": "BusinessWire",
-          "url": "https://www.businesswire.com/news/home/20220713005416/en/Rocket-Lab-Successfully-Launches-First-of-Two-Responsive-Space-Missions-for-the-National-Reconnaissance-Office",
-          "date": "2022-07-13"
+          "summary": "Rocket Lab Q3 2022: record revenue $63.1M (+1,093% YoY); Q4 guidance $51-54M; three successful Electron missions.",
+          "source": "Business Wire",
+          "url": "https://www.businesswire.com/news/home/20221109005991/en/Rocket-Lab-Announces-Third-Quarter-2022-Results-and-Guidance-for-Fourth-Quarter-2022",
+          "date": "2022-11-09"
         },
         {
-          "summary": "Rocket Lab hit a cadence record with the NROL-199 Electron launch on August 4, 2022, completing three launches in just over five weeks.",
-          "source": "Via Satellite",
-          "url": "https://www.satellitetoday.com/launch/2022/08/04/rocket-lab-hits-cadence-record-with-successful-nrol-199-launch/",
-          "date": "2022-08-04"
-        },
-        {
-          "summary": "Rocket Lab reschedules its first Electron launch from Wallops Island to January 2023; the US launch site is operationally ready.",
-          "source": "SpaceNews",
-          "url": "https://spacenews.com/rocket-lab-reschedules-first-u-s-launch-for-january-2023-provides-update-on-effect-to-prior-q4-guidance/",
-          "date": "2022-12-12"
-        }
-      ]
-    },
-    {
-      "ticker": "BOTZ",
-      "wave_bucket": "robotics",
-      "rationale": "The IFR World Robotics Report released October 2022 showed global industrial robot installations exceeding 500,000 units for the second consecutive record year, confirming structural demand; the 2022 tech-sector selloff has compressed BOTZ's price, creating a buildup-phase entry point consistent with the investor thesis's 'invest early while cheap' rule.",
-      "news_evidence": [
-        {
-          "summary": "IFR World Robotics Report 2022: global industrial robot installations exceeded 500,000 units for the second consecutive year; global robotics market valued at over $80 billion.",
-          "source": "IFR / Automation.com",
-          "url": "https://www.automation.com/en-us/articles/october-2022/ifr-presents-world-robotics-report-2022",
-          "date": "2022-10-01"
-        },
-        {
-          "summary": "IFR 'Top 5 Robot Trends 2022': accelerating adoption of collaborative robots, AI-guided automation, and service robots across manufacturing and logistics.",
-          "source": "International Federation of Robotics",
-          "url": "https://ifr.org/ifr-press-releases/news/top-5-robot-trends-2022",
-          "date": "2022-01-27"
-        }
-      ]
-    },
-    {
-      "ticker": "CCJ",
-      "wave_bucket": "nuclear",
-      "rationale": "Cameco, the world's second-largest uranium producer, raised its 2022 revenue guidance 14% on post-Ukraine uranium price recovery, and the Inflation Reduction Act signed in August 2022 created new production and investment tax credits for nuclear that materially improve SMR and existing-plant economics \u2014 marking early-surge conditions in the fission renaissance wave.",
-      "news_evidence": [
-        {
-          "summary": "Cameco raised its 2022 revenue guidance ~14% to a $1.9B high-end after Q1 2022 earnings, citing stronger uranium prices.",
-          "source": "Seeking Alpha",
-          "url": "https://seekingalpha.com/article/4507251-cameco-q1-earnings-increases-2022-revenue-guidance-interesting-nuclear-opportunity",
-          "date": "2022-05-04"
-        },
-        {
-          "summary": "The Inflation Reduction Act, signed August 2022, creates a nuclear production tax credit for existing plants and a 30% investment tax credit for new nuclear construction.",
+          "summary": "CNBC: Rocket Lab record revenue + contract wins; adjusted EBITDA loss improved 62% YoY; Space Systems $40.1M of the $63.1M.",
           "source": "CNBC",
-          "url": "https://www.cnbc.com/2022/08/22/what-the-climate-bill-does-for-the-nuclear-industry.html",
-          "date": "2022-08-22"
+          "url": "https://www.cnbc.com/2022/11/09/rocket-lab-q3-results-record-revenue-added-contract-wins.html",
+          "date": "2022-11-09"
+        }
+      ]
+    },
+    {
+      "ticker": "ITA",
+      "wave_bucket": "geopolitical",
+      "rationale": "Russia's 2022 invasion triggered a structural multi-year NATO rearmament cycle; ITA gained ~+10% in CY2022 while the S&P 500 fell ~18%, and the spending uplift is ongoing \u2014 opening the watchlist to the profile's geopolitical wave via a liquid established instrument.",
+      "news_evidence": [
+        {
+          "summary": "Aerospace/defense ETFs surged on the Feb 24, 2022 invasion; ITA/PPA delivered ~+13% vs an S&P 500 decline; Maxar +40% post-invasion.",
+          "source": "Nasdaq / ETFdb",
+          "url": "https://www.nasdaq.com/articles/aerospace-defense-etfs-take-flight-on-russias-invasion-of-ukraine",
+          "date": "2022-03-01"
         },
         {
-          "summary": "NuScale Power commenced trading on NYSE under 'SMR' on May 3, 2022, becoming the world's first publicly traded pure-play SMR company.",
-          "source": "NuScale Power press release",
-          "url": "https://www.nuscalepower.com/press-releases/2022/nuscale-completes-merger-with-spring-valley",
-          "date": "2022-05-03"
+          "summary": "Defense ETFs (ITA, PPA, XAR) at a one-year high on rising NATO budgets and order backlogs; ITA ~+10% in CY2022, outpacing broad benchmarks.",
+          "source": "Nasdaq",
+          "url": "https://www.nasdaq.com/articles/aerospace-defense-etfs-one-year-high-heres-why",
+          "date": "2022-12-15"
+        }
+      ]
+    },
+    {
+      "ticker": "URNM",
+      "wave_bucket": "nuclear",
+      "rationale": "The Russia-Ukraine energy shock reversed European nuclear phase-outs and created a structural uranium supply deficit (2022 production ~58,200 MT vs ~60,000 MT demand); URNM, reorganized as a pure-play uranium-miners ETF under Sprott in April 2022, is the cleanest US-listed vehicle for the nuclear wave.",
+      "news_evidence": [
+        {
+          "summary": "WEF (Feb 2022): nuclear-fuel supply concern spiked as Russia's enrichment control created vulnerability; countries signaled reversal of phase-out policies.",
+          "source": "World Economic Forum",
+          "url": "https://www.weforum.org/stories/2022/02/nuclear-energy-fuel-supply-crunch/",
+          "date": "2022-02-01"
+        },
+        {
+          "summary": "Sprott reorganized the North Shore uranium ETF as the Sprott Uranium Miners ETF (URNM) on April 25, 2022 \u2014 companies with >=50% assets in uranium mining.",
+          "source": "Sprott ETFs",
+          "url": "https://sprottetfs.com/urnm-sprott-uranium-miners-etf/",
+          "date": "2022-04-25"
         }
       ]
     }
   ],
   "removes": [],
   "no_changes": false,
-  "rationale_overall": "This rebalance fills the watchlist from 5 to the maximum of 8 by adding one ticker each in the three highest-priority next-wave buckets named in the investor profile: rockets and spacecraft (RKLB), robotics (BOTZ), and nuclear (CCJ). The four existing AI-wave tickers are retained as the current dominant wave; the AI bucket is now at its 4-ticker diversity cap. RKLB enters on a 2022 cadence record and operationally ready Wallops US launch site; BOTZ as the most liquid established robotics ETF with the 2022 bear providing a cheaper entry; CCJ as the direct uranium-price beneficiary of the post-Ukraine squeeze and the IRA's new nuclear incentives at early-surge pricing.",
+  "rationale_overall": "The Q4 2022 rebalance opens the portfolio to three non-AI waves with active 2022 structural catalysts: RKLB (rockets, Q3 2022 revenue +1,093% YoY), ITA (geopolitical rearmament, ~28pp of 2022 outperformance vs the S&P 500), and URNM (nuclear, uranium supply-deficit and energy-security narrative set off by the same geopolitical shock). The AI bucket (AAPL, MSFT, GOOGL, NVDA) stays at its four-ticker max and SPY remains the broad-market anchor; the three adds bring the watchlist to its 8-ticker ceiling spanning five declared waves.",
   "search_terms": [
-    "RKLB Rocket Lab stock news commercial launches 2022 before:2023-01-01",
-    "BOTZ robotics ETF Global X automation industrial 2022 before:2023-01-01",
-    "QTUM quantum computing ETF Defiance news 2022 before:2023-01-01",
-    "uranium nuclear energy SMR small modular reactor 2022 investment before:2023-01-01",
-    "Rocket Lab RKLB launch 2022 Electron site:spacenews.com OR site:arstechnica.com before:2023-01-01",
-    "CCJ Cameco uranium price rally 2022 nuclear energy before:2023-01-01",
-    "nuclear energy renaissance SMR investment 2022 site:reuters.com OR site:bloomberg.com before:2023-01-01",
-    "robotics automation industry growth 2022 BOTZ ROBO ETF before:2023-01-01",
-    "NuScale Power SMR IPO SPAC 2022 nuclear energy before:2023-01-01",
-    "uranium price 2022 annual increase nuclear energy investment before:2023-01-01",
-    "Rocket Lab 2022 launches NRO National Reconnaissance Office Electron record before:2023-01-01",
-    "Cameco CCJ uranium 2022 revenue earnings nuclear renaissance before:2023-01-01",
-    "BOTZ Global X Robotics ETF AUM holdings 2022 automation demand before:2023-01-01",
-    "Rocket Lab RKLB IPO SPAC listing date August 2021 before:2023-01-01",
-    "inflation reduction act 2022 nuclear energy tax credit clean energy IRA signed before:2023-01-01",
-    "industrial robots orders 2022 record IFR International Federation Robotics before:2023-01-01"
+    "rockets spacecraft stocks 2022 before:2023-01-01",
+    "robotics stocks 2022 before:2023-01-01",
+    "quantum computing stocks 2022 before:2023-01-01",
+    "nuclear energy stocks SMR 2022 before:2023-01-01",
+    "artificial intelligence stocks 2022 before:2023-01-01",
+    "energy tanker shipping geopolitical stocks 2022 before:2023-01-01",
+    "defense rearmament stocks ETF 2022 before:2023-01-01",
+    "aging population demographics healthcare eldercare REIT stocks 2022 before:2023-01-01",
+    "best performing ETF this month December 2022 before:2023-01-01",
+    "biggest stock gainers December 2022 before:2023-01-01",
+    "AAPL Apple stock news December 2022 before:2023-01-01",
+    "MSFT Microsoft stock news December 2022 before:2023-01-01",
+    "GOOGL Alphabet stock news December 2022 before:2023-01-01",
+    "NVDA Nvidia stock news December 2022 before:2023-01-01",
+    "Rocket Lab RKLB news 2022 before:2023-01-01",
+    "BOTZ Global X Robotics AI ETF 2022 before:2023-01-01",
+    "ITA iShares aerospace defense ETF 2022 performance before:2023-01-01",
+    "NuScale Power SMR nuclear stock 2022 before:2023-01-01",
+    "Rocket Lab RKLB launches milestones Q3 2022 before:2023-01-01",
+    "XAR SPDR aerospace defense ETF 2022 annual return performance before:2023-01-01",
+    "QTUM Defiance Quantum ETF 2022 before:2023-01-01",
+    "uranium mining ETF URNM URA 2022 nuclear energy before:2023-01-01",
+    "defense ETF outperform 2022 NATO rearmament Russia Ukraine before:2023-01-01",
+    "BOTZ robotics ETF performance 2022 industrial automation before:2023-01-01",
+    "Rocket Lab Electron launch 2022 backlog contracts before:2023-01-01",
+    "nuclear energy renaissance 2022 uranium demand energy crisis before:2023-01-01",
+    "Rocket Lab Q3 2022 earnings revenue November 2022 before:2023-01-01",
+    "ITA defense ETF 2022 return Russia Ukraine rearmament before:2023-01-01",
+    "\"aerospace defense ETF\" outperformed 2022 annual \"Russia Ukraine\" before:2023-01-01",
+    "URNM Sprott uranium miners ETF launch April 2022 nuclear energy before:2023-01-01"
   ]
 }

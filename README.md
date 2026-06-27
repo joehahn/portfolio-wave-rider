@@ -7,7 +7,7 @@
 
 This Claude Code project uses AI to manage a curated watchlist of tickers. You declare your goals, constraints, and an investment thesis (namely what you think will drive future returns), then initialize a starter watchlist of tickers that you want exposure to. At each periodic rebalance the curator agent reads recent news against your thesis and evolves the watchlist by proposing adds and removes. A standard mean-variance optimizer then recommends portfolio weights across the resulting watchlist. The result accumulates into a static Plotly dashboard so you can watch the watchlist composition, the recommended weights, and the realized portfolio value evolve over time. In our experiments, this coupling of AI-driven watchlist curation with standard portfolio optimization significantly outperforms the optimizer on its own.
 
-**Who this helps.** An investor who has a thesis about where markets are going but not enough time to track market news, or who needs help optimizing their portfolio. This demo helps such an investor pivot from a less-optimal static buy-and-hold portfolio to one that's lightly but effectively managed by AI. In the post-COVID backtest detailed below (2022–2025), the AI-managed portfolio lifted realized return by about **11.5 percentage points per year annualized** over a buy-and-hold of the starter watchlist. The curator's job is to compound a thesis you already hold, not to replace one you don't have.
+**Who this helps.** An investor who has a thesis about where markets are going but not enough time to track market news, or who needs help optimizing their portfolio. This demo helps such an investor pivot from a less-optimal static buy-and-hold portfolio to one that's lightly but effectively managed by AI. In the post-COVID backtest detailed below (2022–2025), the AI-managed portfolio lifted realized return by about **14.3 percentage points per year annualized** over a buy-and-hold of the starter watchlist. The curator's job is to compound a thesis you already hold, not to replace one you don't have.
 
 Two dashboards are served from GitHub Pages:
 
@@ -79,7 +79,7 @@ Note that recommendations do not execute trades — they only append optimizer o
 
 Run `/run-backtest` in Claude Code. This skill collects any missing historical news, evolves the watchlist quarter-by-quarter against your wave thesis, optimizes the portfolio at each rebalance, measures the resulting lift relative to a buy-and-hold investment strategy, and regenerates the backtest dashboard at `docs/backtest_curator.html` (open it locally in a browser to see your run).
 
-At each quarterly rebalance the curator reads news as of the rebalance date and proposes adds and removes to the watchlist; the optimizer then recomputes portfolio weights for whatever watchlist results, repeated across the window. Then compare results of your backtest to ours at [our backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html), +11.5pp/yr annualized when compared to the buy-and-hold investor's gains.
+At each quarterly rebalance the curator reads news as of the rebalance date and proposes adds and removes to the watchlist; the optimizer then recomputes portfolio weights for whatever watchlist results, repeated across the window. Then compare results of your backtest to ours at [our backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html), +14.3pp/yr annualized when compared to the buy-and-hold investor's gains.
 
 ### 5. sweep optimizer parameters (anytime)
 
@@ -169,7 +169,7 @@ NVDA is in the starter from day 0, so both the AI-managed portfolio and the buy-
 
 | Strategy | Return | Annualized |
 |---|---|---|
-| Curator-driven | **+286.3%** | **+45.7%** |
+| Curator-driven | **+313.6%** | **+48.5%** |
 | Buy-and-hold (equal-weight starter, includes NVDA) | +187.3% | +34.2% |
 | SPY benchmark | +58.7% | +13.7% |
 
@@ -177,11 +177,11 @@ NVDA is in the starter from day 0, so both the AI-managed portfolio and the buy-
 
 | Measure | Value |
 |---|---|
-| Absolute (curator − buy/hold), total | +99pp |
-| Absolute, annualized | +11.5pp/yr |
-| Relative (curator − buy/hold) / (buy/hold) | 0.53 |
+| Absolute (curator − buy/hold), total | +126pp |
+| Absolute, annualized | +14.3pp/yr |
+| Relative (curator − buy/hold) / (buy/hold) | 0.67 |
 
-**A caveat on robustness.** This lift is not a steady, broad-based edge. The curator actually trailed the buy-and-hold portfolio for most of this window (it was ahead on only about 15% of trading days) and pulled clear only in 2025, when the optimizer concentrated roughly 70% of the portfolio in Rocket Lab and RKLB ran hard. The outperformance therefore rests largely on a single late position rather than a repeatable advantage. Read it as one favorable wave the curator caught and held, not proof of a durable edge; a single winning bet (n=1) cannot separate skill from luck. There is also a look-ahead-bias / data-leakage caveat: the curator is an LLM whose training postdates the window, and live WebSearch ranks results by present-day fame, so the backtest is a hindsight-tinted upper bound, not a clean out-of-sample result. See [REFERENCE.md](REFERENCE.md#the-curator-backtest-post-covid-window) for the full bias accounting.
+**A caveat on robustness.** This lift is not a steady, broad-based edge. The curator actually trailed the buy-and-hold portfolio for most of this window (it was ahead on only about 16% of trading days) and pulled clear only in 2025, when the optimizer concentrated roughly 70% of the portfolio in Rocket Lab and RKLB ran hard. The outperformance therefore rests largely on a single late position rather than a repeatable advantage. Read it as one favorable wave the curator caught and held, not proof of a durable edge; a single winning bet (n=1) cannot separate skill from luck. There is also a look-ahead-bias / data-leakage caveat: the curator is an LLM whose training postdates the window, and live WebSearch ranks results by present-day fame, so the backtest is a hindsight-tinted upper bound, not a clean out-of-sample result. See [REFERENCE.md](REFERENCE.md#the-curator-backtest-post-covid-window) for the full bias accounting.
 
 See the [curator backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html) and the full report in `data/backtest_curator_postcovid/report.md`. Reproduce locally with the on-demand backtest from the Runs section above.
 

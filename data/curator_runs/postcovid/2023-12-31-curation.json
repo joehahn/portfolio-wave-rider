@@ -3,27 +3,15 @@
   "rebalance_period": "quarterly",
   "adds": [
     {
-      "ticker": "QTUM",
-      "wave_bucket": "quantum",
-      "rationale": "Quantum is a named 'likely next wave' with thin watchlist representation; IBM's 1,121-qubit Condor milestone at the December 2023 Quantum Summit and IonQ's $25.5M AFRL contract in September 2023 signal the wave transitioning from buildup to early-surge commercial/government visibility, making QTUM (launched September 2018, diversified across the quantum supply chain) an appropriate broad-exposure vehicle.",
+      "ticker": "BOTZ",
+      "wave_bucket": "robotics",
+      "rationale": "Robotics is the first-named next tech wave in the profile and has zero watchlist coverage; BOTZ gained 16% in November 2023 and 29% YTD \u2014 an early-surge signal \u2014 while NVDA/MSFT/GOOGL give the optimizer enough AI exposure to absorb AAPL's removal.",
       "news_evidence": [
         {
-          "summary": "IBM unveils Condor, a 1,121-qubit quantum processor, at the Dec 4, 2023 Quantum Summit \u2014 the first chip past the 1,000-qubit threshold \u2014 plus the Heron r1 133-qubit processor.",
-          "source": "The Quantum Insider",
-          "url": "https://thequantuminsider.com/2023/12/04/ibm-says-new-1000-plus-processors-to-advance-toward-quantum-utility/",
-          "date": "2023-12-04"
-        },
-        {
-          "summary": "Scientific American reports IBM Condor as the first-ever 1,000-qubit quantum chip, a step toward near-term quantum advantage.",
-          "source": "Scientific American",
-          "url": "https://www.scientificamerican.com/article/ibm-releases-first-ever-1-000-qubit-quantum-chip/",
-          "date": "2023-12-04"
-        },
-        {
-          "summary": "IonQ announces a $25.5M quantum networking system sale to the US Air Force Research Laboratory \u2014 its largest single government contract to that point.",
-          "source": "The Quantum Insider",
-          "url": "https://thequantuminsider.com/2023/09/28/ionq-announces-new-25-5-million-quantum-deal-with-united-states-air-force-research-lab/",
-          "date": "2023-09-28"
+          "summary": "Global X Robotics & AI ETF (BOTZ) surged 16% in November 2023 (vs S&P 500 +9%), up 29% YTD, on Nvidia's AI tailwind and rate-cut expectations.",
+          "source": "The Motley Fool",
+          "url": "https://www.fool.com/investing/2023/12/05/why-the-global-x-robotics-artificial-intelligence/",
+          "date": "2023-12-05"
         }
       ]
     }
@@ -31,45 +19,50 @@
   "removes": [
     {
       "ticker": "AAPL",
-      "rationale": "Apple is the weakest AI-thesis holder in the maxed AI bucket: Ming-Chi Kuo flagged Apple as 'significantly behind competitors' on generative AI with no 2024 roadmap, and CNBC confirmed Apple's measured AI pace lags Microsoft and Google \u2014 removing AAPL consolidates the AI bucket to three high-conviction names and frees the slot for quantum.",
+      "rationale": "Apple posted its fourth consecutive quarter of declining revenue \u2014 its longest slump in 22 years \u2014 with Mac sales down ~34% YoY and flat holiday guidance; MSFT, GOOGL, NVDA already cover the AI wave, making AAPL the weakest-thesis slot and the natural pair for a robotics add.",
       "news_evidence": [
         {
-          "summary": "Ming-Chi Kuo: 'no sign' Apple plans generative-AI products in 2024; Apple 'significantly behind competitors' including OpenAI, Google, Microsoft.",
-          "source": "MacRumors",
-          "url": "https://www.macrumors.com/2023/08/02/no-sign-of-apple-generative-ai-coming-2024/",
-          "date": "2023-08-02"
+          "summary": "Apple Q4 FY2023 revenue fell for the fourth straight quarter (longest slump in 22 years), Mac -34% YoY, Greater China flat amid Huawei competition; no growth expected in the holiday quarter.",
+          "source": "Fortune",
+          "url": "https://fortune.com/2023/11/02/apple-earnings-q4-2023-china-revenue-mac-sales-miss-estimates/",
+          "date": "2023-11-02"
         },
         {
-          "summary": "CNBC: Apple's AI spending/deployment 'differs from Big Tech rivals,' forgoing the aggressive generative-AI rollouts Microsoft (Copilot) and Google (Bard) executed in 2023.",
+          "summary": "Apple Q4 2023: revenue $89.5B (-1% YoY), every hardware line outside iPhone declined, Mac -34%; shares fell 3%+ after-hours on weak holiday guidance.",
           "source": "CNBC",
-          "url": "https://www.cnbc.com/2023/11/01/how-apples-ai-spending-and-deployment-differ-from-big-tech-rivals.html",
-          "date": "2023-11-01"
-        },
-        {
-          "summary": "Motley Fool comparison concludes Alphabet holds a materially stronger near-term AI position than Apple, which was absent from the 2023 consumer generative-AI race.",
-          "source": "The Motley Fool",
-          "url": "https://www.fool.com/investing/2023/12/22/better-ai-stock-alphabet-vs-apple/",
-          "date": "2023-12-22"
+          "url": "https://www.cnbc.com/2023/11/02/apple-aapl-earnings-report-q4-2023.html",
+          "date": "2023-11-02"
         }
       ]
     }
   ],
   "no_changes": false,
-  "rationale_overall": "One swap \u2014 AAPL out, QTUM in \u2014 to deepen the quantum wave (a named next wave) as the IBM Condor milestone and IonQ's government backlog show it crossing from research into early commercial visibility. AAPL is the natural exit: it held one of the maxed AI slots but had no generative-AI product in 2023 and no 2024 roadmap, so the AI thesis is carried more credibly by MSFT, GOOGL, NVDA. Other holdings stay in-thesis: RKLB closed 2023 with a record $515M Space Development Agency prime contract; URA's uranium spot rose ~76% in 2023 with COP28's pledge to triple nuclear capacity.",
+  "rationale_overall": "The watchlist entered Q4 2023 full at 8/8 with four AI names and zero robotics coverage \u2014 an obvious thematic gap. Swapping AAPL (four straight quarterly revenue declines, Mac in freefall, no AI thesis distinct from MSFT/GOOGL/NVDA) for BOTZ opens the robotics bucket while keeping AI represented by three anchors. Remaining holdings confirmed: RKLB won a $515M US Space Force satellite contract (SEC filing Dec 21, 2023) and flew a successful return-to-flight Electron Dec 14; URA reinforced by COP28's Dec 2, 2023 pledge by 22 nations to triple nuclear capacity by 2050 (uranium spot up ~88% YTD); QTUM validated by quantum momentum (IONQ ~+290% in 2023). Defense and demographics remain unrepresented, to be revisited when a remove creates room.",
   "search_terms": [
-    "quantum computing ETF QTUM IonQ 2023 milestone before:2024-01-01",
-    "AAPL Apple AI artificial intelligence Q4 2023 competitive position before:2024-01-01",
-    "SPY S&P 500 ETF 2023 year-end watchlist thematic portfolio before:2024-01-01",
-    "quantum computing IBM Google milestone 2023 Q4 before:2024-01-01",
-    "IONQ quantum computing 2023 news revenue contract before:2024-01-01",
-    "QTUM Defiance Quantum ETF 2023 performance holdings before:2024-01-01",
-    "URA uranium ETF nuclear energy 2023 Q4 before:2024-01-01",
-    "RKLB Rocket Lab Q4 2023 launch news contract before:2024-01-01",
-    "Apple AI strategy 2023 behind competitors generative AI before:2024-01-01",
-    "IonQ AFRL quantum networking contract 2023 before:2024-01-01",
-    "IBM Quantum Summit December 2023 Condor 1000 qubit processor before:2024-01-01",
-    "Apple generative AI behind competitors 2023 Ming-Chi Kuo before:2024-01-01",
-    "QTUM Defiance Quantum ETF launch date inception 2018 before:2024-01-01",
-    "uranium price nuclear energy 2023 Q4 COP28 SMR demand before:2024-01-01"
+    "space stocks rocket launch stocks 2023 before:2024-01-01",
+    "robotics stocks humanoid robot stocks 2023 before:2024-01-01",
+    "quantum computing stocks 2023 before:2024-01-01",
+    "nuclear stocks SMR uranium stocks 2023 before:2024-01-01",
+    "AI stocks artificial intelligence best performers 2023 before:2024-01-01",
+    "defense stocks defense ETF rearmament 2023 before:2024-01-01",
+    "tanker stocks shipping stocks geopolitics energy 2023 before:2024-01-01",
+    "healthcare stocks eldercare aging population demographics 2023 before:2024-01-01",
+    "best performing ETF 2023 before:2024-01-01",
+    "biggest stock gainers Q4 2023 before:2024-01-01",
+    "AAPL Apple stock news Q4 2023 before:2024-01-01",
+    "SPY S&P 500 ETF outlook December 2023 before:2024-01-01",
+    "RKLB Rocket Lab news 2023 before:2024-01-01",
+    "QTUM Defiance Quantum ETF news 2023 before:2024-01-01",
+    "URA Global X Uranium ETF news 2023 before:2024-01-01",
+    "BOTZ Global X Robotics AI ETF news 2023 before:2024-01-01",
+    "ITA iShares aerospace defense ETF 2023 performance before:2024-01-01",
+    "IONQ quantum computing stock 2023 before:2024-01-01",
+    "BOTZ robotics ETF November December 2023 performance before:2024-01-01",
+    "Apple AAPL revenue decline hardware Q4 2023 China headwinds before:2024-01-01",
+    "uranium nuclear energy stocks 2023 performance COP28 before:2024-01-01",
+    "Rocket Lab RKLB launches contracts 2023 before:2024-01-01",
+    "NVDA MSFT GOOGL AI fourth quarter 2023 before:2024-01-01",
+    "Rocket Lab Space Force satellite contract December 2023 before:2024-01-01",
+    "COP28 nuclear tripling pledge 20 nations December 2023 before:2024-01-01"
   ]
 }
