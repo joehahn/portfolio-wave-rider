@@ -6,7 +6,7 @@ exclusions:                       # sector / theme exclusions
   - solar energy (companies and ETFs)
   - wind energy (companies and ETFs)
 financial_model:                  # optimizer math
-  risk_aversion: 0.33             # λ in mean_variance utility (μᵀw − λ·wᵀΣw)
+  risk_aversion: 0.67             # λ in mean_variance utility (μᵀw − λ·wᵀΣw)
   risk_free_rate: 0.04            # ≈ 1y Treasury yield; baseline subtracted from E[r] in Sharpe-ratio calc
   lookback_period: 0.5y           # history window for estimating μ and Σ
   rebalance_period: monthly       # monthly | quarterly | semi_annual | annual; how often the watchlist-curator runs
