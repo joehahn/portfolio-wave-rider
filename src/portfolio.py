@@ -3137,9 +3137,7 @@ def build_dashboard(
                 ticker_links = (
                     "<h2 style='margin-top:2em;'>Live ticker charts</h2>"
                     "<p style='font-size:14px;color:#555;max-width:780px;'>"
-                    "Each funded holding links to its live Google Finance chart, opened "
-                    "at the 1-year window (toggle 1D / 1M / 1Y / Max there). Opens in a "
-                    "new tab.</p>"
+                    "Each funded holding links to its live Google Finance chart.</p>"
                     f"<div style='margin:6px 0 12px;'>{_chips}</div>"
                 )
         except Exception:  # noqa: BLE001 - skip if snapshot is malformed
