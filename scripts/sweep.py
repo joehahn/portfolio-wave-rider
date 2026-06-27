@@ -33,7 +33,8 @@ import plotly.graph_objects as go
 RISK_FREE_RATE = 0.04  # matches portfolio.py default
 
 from src.portfolio import (
-    curator_backtest, _fetch_benchmark_curves, _nav_strip, load_financial_model,
+    curator_backtest, _fetch_benchmark_curves, _nav_strip,
+    load_financial_model, load_backtest_config,
 )
 
 # Live optimizer defaults, used as the held-constant base for each sweep so the
@@ -47,7 +48,7 @@ _BASE_LOOKBACK = float(_m.group(1)) if _m else 1.5
 
 DEFAULTS = {
     "risk_aversion":     [0.0, 0.33, 0.5, 0.67, 1.0, 1.5, 2.0, 3.0, 10.0],
-    "lookback":          [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 3.0, 5.0],
+    "lookback":          [0.2, 0.33, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 3.0],
     "concentration_cap": [0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90, 1.00],
 }
 
@@ -59,7 +60,7 @@ PALETTE = [
 
 def run_one(param: str, value: float, runs_dir: str, tmp: Path,
             base_max_weight: float, base_risk_aversion: float,
-            base_lookback: float) -> pd.Series:
+            base_lookback: float, base_t_update: int) -> pd.Series:
     """Replay the curator runs with one parameter swapped to ``value``.
     Returns a date-indexed Series of total portfolio value. The two
     parameters not being swept are held at the live-config base."""
@@ -70,6 +71,7 @@ def run_one(param: str, value: float, runs_dir: str, tmp: Path,
         "max_weight": base_max_weight,
         "risk_aversion": base_risk_aversion,
         "lookback_years_override": base_lookback,
+        "t_update_days": base_t_update,
         "benchmarks": [],
     }
     if param == "risk_aversion":
@@ -100,6 +102,9 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--base-lookback", type=float, default=_BASE_LOOKBACK)
     args = p.parse_args(argv)
 
+    _bc = load_backtest_config()
+    base_t_update = int(_bc["t_update_days"])
+
     values = ([float(v) for v in args.values.split(",")]
               if args.values else DEFAULTS[args.param])
     out_path = Path(args.out) if args.out else Path(f"docs/sweep_{args.param}.html")
@@ -111,7 +116,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"  {args.param} = {v}", file=sys.stderr)
             curves[v] = run_one(args.param, v, args.runs_dir, tmp,
                                 args.base_max_weight, args.base_risk_aversion,
-                                args.base_lookback)
+                                args.base_lookback, base_t_update)
 
         # All curves share the same x-axis. Build summary first.
         first = next(iter(curves.values()))
@@ -232,6 +237,58 @@ def main(argv: list[str] | None = None) -> int:
             f"{wf_note}</p>"
         )
 
+        # Parameter-settings table (mirrors the backtest dashboard): the knobs
+        # held constant across this sweep, plus the swept parameter and its values.
+        import json as _json2
+        _starter = _json2.loads((Path(args.runs_dir) / "_starter.json").read_text())
+        _fm2 = load_financial_model()
+        _g = lambda x: f"{x:g}"
+        _lbf = lambda x: f"{x:g}y"
+        _pctf = lambda x: f"{x:.0%}"
+
+        def _knob(label, base_val, fmt, swept):
+            return ((label, "swept &darr;", "this sweep's variable") if swept
+                    else (label, fmt(base_val), ""))
+
+        _swept_fmt = _lbf if args.param == "lookback" else _g
+        _param_rows = [
+            ("Backtest window", f"{start.date()} &rarr; {end.date()}", ""),
+            ("Rebalance cadence",
+             f"{_starter.get('rebalance_period', 'quarterly')} "
+             f"({len(_starter.get('as_of_dates', []))} curator calls)", ""),
+            ("Starter watchlist", ", ".join(_starter.get("starter_watchlist", [])) or "—", ""),
+            ("Initial capital", f"${initial:,.0f}", ""),
+            _knob("Risk aversion (&lambda;)", args.base_risk_aversion, _g,
+                  args.param == "risk_aversion"),
+            _knob("Lookback (&mu;/&Sigma; estimation)", args.base_lookback, _lbf,
+                  args.param == "lookback"),
+            _knob("Concentration cap (max weight)", args.base_max_weight, _pctf,
+                  args.param == "concentration_cap"),
+            ("Max watchlist size", f"{_fm2['max_watchlist_size']}", ""),
+            ("Risk-free rate", f"{RISK_FREE_RATE:.0%}", ""),
+            ("Execution lag", f"{base_t_update} trading day(s)", ""),
+            ("Swept parameter", f"<code>{args.param}</code>",
+             "varied across the values below"),
+            ("Swept values", ", ".join(_swept_fmt(v) for v in values), ""),
+        ]
+        _ptr = "".join(
+            f"<tr><td style='padding:5px 14px 5px 0;color:#555;white-space:nowrap;'>{k}</td>"
+            f"<td style='padding:5px 14px 5px 0;font-weight:600;'>{v}</td>"
+            f"<td style='padding:5px 0;color:#b45309;font-size:13px;'>{note}</td></tr>"
+            for k, v, note in _param_rows
+        )
+        params_table = (
+            "<h2 style='margin:1.2em 0 0.3em;'>Parameter settings</h2>"
+            "<p style='color:#555;max-width:780px;margin:0 0 0.6em;'>The "
+            "optimizer/backtest knobs held constant across this sweep, read from "
+            "<code>investor_profile.md</code> (the same config "
+            "<code>/review-portfolio</code> uses with real money). Only "
+            f"<code>{args.param}</code> is varied — across the values listed in the "
+            "last row.</p>"
+            "<table style='border-collapse:collapse;font-size:14px;margin-bottom:1.2em;'>"
+            f"<tbody>{_ptr}</tbody></table>"
+        )
+
         nav = _nav_strip(f"sweep_{args.param}.html")
 
         page = (
@@ -247,6 +304,7 @@ def main(argv: list[str] | None = None) -> int:
             f'All other knobs held at their <code>investor_profile.md</code> defaults. '
             f'Differences across curves isolate the optimizer\'s sensitivity to '
             f'<code>{args.param}</code>.</p>'
+            + params_table
             + fig.to_html(full_html=False, include_plotlyjs="cdn",
                           config={"displayModeBar": False})
             + table
