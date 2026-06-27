@@ -3583,6 +3583,57 @@ def build_curator_dashboard(
             + "".join(_st_blocks)
         )
 
+    # Parameter-settings table, rendered just above chart 1 so a reader can
+    # see exactly which optimizer / backtest knobs produced the curves below.
+    # Values are the *effective* ones used by the replay: a backtest-only
+    # override from investor_profile.md's `backtest` section wins if set,
+    # otherwise the live financial_model / top-level value is used (this
+    # mirrors the precedence in src/cli.py). When an override differs from the
+    # live value we say so, so it's clear the published curve is the aggressive
+    # config and not what /review-portfolio runs with real money.
+    _fm = load_financial_model()
+    _bc = load_backtest_config()
+    def _eff(override, live):
+        return (override, True) if override is not None else (live, False)
+    _ra, _ra_ov = _eff(_bc.get("risk_aversion"), _fm["risk_aversion"])
+    _lb, _lb_ov = _eff(_bc.get("lookback_years"),
+                       float(str(_fm["lookback_period"]).rstrip("y")))
+    _cap, _cap_ov = _eff(_bc.get("concentration_cap"), _fm["concentration_cap"])
+    _n_reb = sum(1 for _d in rebalance_dates
+                 if start <= pd.Timestamp(_d) <= end)
+    _param_rows = [
+        ("Backtest window", f"{start.date()} → {end.date()}", ""),
+        ("Rebalance cadence", f"quarterly ({_n_reb} curator calls)", ""),
+        ("Starter watchlist", ", ".join(starter_tickers) or "—", ""),
+        ("Initial capital", f"${initial:,.0f}", ""),
+        ("Risk aversion (λ)", f"{_ra:g}",
+         f"aggressive — live recommend path uses {_fm['risk_aversion']:g}" if _ra_ov else "same as live"),
+        ("Lookback (μ/Σ estimation)", f"{_lb:g}y",
+         f"aggressive — live uses {str(_fm['lookback_period'])}" if _lb_ov else "same as live"),
+        ("Concentration cap (max weight)", f"{_cap:.0%}",
+         f"aggressive — live uses {_fm['concentration_cap']:.0%}" if _cap_ov else "same as live"),
+        ("Max watchlist size", f"{_fm['max_watchlist_size']}", ""),
+        ("Risk-free rate", f"{_fm['risk_free_rate']:.0%}", ""),
+        ("Execution lag", f"{_bc['t_update_days']} trading day(s) after each rebalance signal", ""),
+    ]
+    _param_tr = "".join(
+        f"<tr><td style='padding:5px 14px 5px 0;color:#555;white-space:nowrap;'>{_html.escape(k)}</td>"
+        f"<td style='padding:5px 14px 5px 0;font-weight:600;'>{_html.escape(str(v))}</td>"
+        f"<td style='padding:5px 0;color:#b45309;font-size:13px;'>{_html.escape(note)}</td></tr>"
+        for k, v, note in _param_rows
+    )
+    params_html = (
+        "<h2 style='margin:1.4em 0 0.3em;'>Parameter settings</h2>"
+        "<p style='color:#555;max-width:780px;margin:0 0 0.6em;'>The exact "
+        "optimizer and backtest knobs behind the charts below. The published "
+        "run uses the sweep-optimal but <b>aggressive</b> overrides from "
+        "<code>investor_profile.md</code>'s <code>backtest</code> section; rows "
+        "flagged in amber differ from the robust config that "
+        "<code>/review-portfolio</code> uses with real money.</p>"
+        "<table style='border-collapse:collapse;font-size:14px;margin-bottom:1.2em;'>"
+        f"<tbody>{_param_tr}</tbody></table>"
+    )
+
     chart_html = fig.to_html(full_html=False, include_plotlyjs="cdn", config={"displayModeBar": False})
     page = (
         '<!doctype html><html><head><meta charset="utf-8">'
@@ -3612,6 +3663,7 @@ def build_curator_dashboard(
         'equity ETFs (broad-market / dividend / utilities / staples); '
         '<code>cashlike</code> = bonds + cash-equivalents + precious metals '
         '(e.g., AGG, BIL, IAU).</p>'
+        + params_html
         + chart_html
         + log_html
         + search_html
