@@ -3028,11 +3028,7 @@ def build_dashboard(
                     "<p style='font-size:14px;color:#555;max-width:780px;'>"
                     f"All {len(terms)} news queries the curator ran on its most "
                     f"recent review ({_html.escape(str(asof))}), captured verbatim "
-                    "from the agent's actual WebSearch tool calls. The curator's "
-                    "protocol mixes gem-agnostic discovery beats (derived from the "
-                    "profile's waves) with ticker-keyed due-diligence on the "
-                    "holdings, so the set evolves as the profile and watchlist "
-                    "change.</p>"
+                    "from the agent's actual WebSearch tool calls.</p>"
                     f"<div style='max-width:900px;'>{chips}</div>"
                 )
         except Exception:
