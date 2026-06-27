@@ -47,7 +47,7 @@ _m = _re.match(r"(\d+(?:\.\d+)?)", str(_FM["lookback_period"]))
 _BASE_LOOKBACK = float(_m.group(1)) if _m else 1.5
 
 DEFAULTS = {
-    "risk_aversion":     [0.0, 0.33, 0.5, 0.67, 1.0, 1.5, 2.0, 3.0, 10.0],
+    "risk_aversion":     [0.0, 0.1, 0.2, 0.33, 0.5, 0.67, 1.0, 1.5, 2.0, 3.0],
     "lookback":          [0.2, 0.33, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 3.0],
     "concentration_cap": [0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90, 1.00],
 }
