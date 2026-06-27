@@ -170,10 +170,8 @@ def main(argv: list[str] | None = None) -> int:
             default_v = args.base_risk_aversion
         elif args.param == "concentration_cap":
             default_v = args.base_max_weight
-        else:  # lookback — read the live default from _starter.json
-            import json as _json
-            _starter = _json.loads((Path(args.runs_dir) / "_starter.json").read_text())
-            default_v = float(_starter.get("lookback_years", 1.3))
+        else:  # lookback — the live default from investor_profile.md
+            default_v = args.base_lookback
 
         def _fmt_row(v, final, ret, ann, mdd, sharpe, calmar):
             tr = "<tr style='font-weight:bold;'>" if abs(v - default_v) < 1e-9 else "<tr>"
