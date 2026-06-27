@@ -113,6 +113,14 @@ Run it with `run_in_background: true` so whichever finishes first (the subagent'
 2. Tell the user the report-writer stalled and you are writing the report inline.
 3. **Write the report yourself** with the Write tool, directly to `data/reports/<today>-review-portfolio.md`, from the same inputs (the analyze JSON, `data/curator_latest.json`, the curate result, `holdings.csv`, `data/thesis_baseline.json`, `investor_profile.md`). To match the subagent's output, **read `.claude/agents/report-writer.md` and follow its "Report structure" and "Table formatting" sections exactly** — do not improvise an abbreviated set. That means all of its sections, in order: `The ask`, `Recommended allocation` (with the Asset-name column and per-ticker trades/tilts), `Thesis allocation` (thesis vs recommended %, omit only if `thesis_baseline` is null), `How this maps to the profile`, `Profile conflicts` (always present, even if empty; cite the `investor_profile.md` line for any conflict; flag single-name concentration at the cap; never silently clamp), `Risk picture` (Sharpe, vol, max drawdown, VaR, CVaR from the analyze JSON), `Watchlist changes this period` (on a no-change run write "Quiet period — curator proposed no changes."), `News evidence` (omit entirely when there are no adds), and `Caveats` (the report ends here). Follow the repo prose rules (no em dashes in narrative; numbers only from the `src.cli` outputs). A no-change run still gets the full structure; it is not an excuse for a short report.
 
+   **Em-dash self-check (required after the inline write).** The inline path is the main loop writing prose directly, which has repeatedly slipped em dashes into the narrative against the no-em-dash rule. After writing the file, grep it and fix any narrative em dashes before finishing:
+
+   ```bash
+   grep -n "—" data/reports/$(date +%F)-review-portfolio.md
+   ```
+
+   Replace every em dash that sits in a sentence (clause separators, asides) with a comma, colon, semicolon, parentheses, or a new sentence. Two are allowed to remain and should NOT be changed: the report's `# <Skill> — <date>` title (the report-writer spec's header format) and `—` used as an empty-cell placeholder inside tables. Anything else is a violation; re-grep after fixing to confirm only the title and table placeholders remain. This check applies only to the inline fallback; the `report-writer` subagent handles its own prose.
+
 The inline fallback is not a cure for the flaky generation; it removes the silent-stall failure mode (no completion notification → infinite wait) and makes the step retryable in the main loop, which has been reliable.
 
 ### Step 6 — refresh snapshot, then dashboard (Bash)
