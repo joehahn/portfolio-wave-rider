@@ -33,8 +33,17 @@ import plotly.graph_objects as go
 RISK_FREE_RATE = 0.04  # matches portfolio.py default
 
 from src.portfolio import (
-    curator_backtest, _fetch_benchmark_curves, _nav_strip,
+    curator_backtest, _fetch_benchmark_curves, _nav_strip, load_financial_model,
 )
+
+# Live optimizer defaults, used as the held-constant base for each sweep so the
+# swept parameter is varied around the config /review-portfolio actually uses.
+_FM = load_financial_model()
+_BASE_MAX_WEIGHT = float(_FM["concentration_cap"])
+_BASE_RISK_AVERSION = float(_FM["risk_aversion"])
+import re as _re
+_m = _re.match(r"(\d+(?:\.\d+)?)", str(_FM["lookback_period"]))
+_BASE_LOOKBACK = float(_m.group(1)) if _m else 1.5
 
 DEFAULTS = {
     "risk_aversion":     [0.0, 0.33, 0.5, 0.67, 1.0, 1.5, 2.0, 3.0, 10.0],
@@ -49,15 +58,18 @@ PALETTE = [
 
 
 def run_one(param: str, value: float, runs_dir: str, tmp: Path,
-            base_max_weight: float, base_risk_aversion: float) -> pd.Series:
+            base_max_weight: float, base_risk_aversion: float,
+            base_lookback: float) -> pd.Series:
     """Replay the curator runs with one parameter swapped to ``value``.
-    Returns a date-indexed Series of total portfolio value."""
+    Returns a date-indexed Series of total portfolio value. The two
+    parameters not being swept are held at the live-config base."""
     out_dir = tmp / f"{param}_{value}"
     kw = {
         "runs_dir": runs_dir,
         "out_dir": str(out_dir),
         "max_weight": base_max_weight,
         "risk_aversion": base_risk_aversion,
+        "lookback_years_override": base_lookback,
         "benchmarks": [],
     }
     if param == "risk_aversion":
@@ -83,8 +95,9 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--out", default=None,
                    help="output HTML path (default: docs/sweep_<param>.html)")
     p.add_argument("--benchmarks", nargs="*", default=["SPY"])
-    p.add_argument("--base-max-weight", type=float, default=0.70)
-    p.add_argument("--base-risk-aversion", type=float, default=0.5)
+    p.add_argument("--base-max-weight", type=float, default=_BASE_MAX_WEIGHT)
+    p.add_argument("--base-risk-aversion", type=float, default=_BASE_RISK_AVERSION)
+    p.add_argument("--base-lookback", type=float, default=_BASE_LOOKBACK)
     args = p.parse_args(argv)
 
     values = ([float(v) for v in args.values.split(",")]
@@ -97,7 +110,8 @@ def main(argv: list[str] | None = None) -> int:
         for v in values:
             print(f"  {args.param} = {v}", file=sys.stderr)
             curves[v] = run_one(args.param, v, args.runs_dir, tmp,
-                                args.base_max_weight, args.base_risk_aversion)
+                                args.base_max_weight, args.base_risk_aversion,
+                                args.base_lookback)
 
         # All curves share the same x-axis. Build summary first.
         first = next(iter(curves.values()))
@@ -168,28 +182,29 @@ def main(argv: list[str] | None = None) -> int:
         rows = "".join(_fmt_row(*r) for r in summary)
         WALK_FORWARD_NOTES = {
             "risk_aversion": (
-                "the highest total return on this window comes from "
-                "<code>risk_aversion=0.0</code> (pure return-max, +342.7% vs "
-                "+313.6% at 0.5) because a lower λ concentrates harder into the "
-                "single winner (RKLB) — overfitting to one outcome, not a robust "
-                "edge. The profile keeps <code>risk_aversion=0.5</code>, the value "
-                "chosen for stability across both halves of the longer 2021–2026 "
-                "window."
+                "total return on this window keeps rising as λ falls toward 0, "
+                "because a smaller variance penalty lets the optimizer concentrate "
+                "harder into the single 2025 winner (RKLB). That is the in-sample "
+                "tail, not proof of a durable edge. The profile sets "
+                "<code>risk_aversion=0.33</code> — return-tilted but still penalizing "
+                "variance; whether an even lower λ is genuinely better is a question "
+                "for <b>forward testing</b> on out-of-sample quarters, not this "
+                "in-sample curve."
             ),
             "lookback": (
-                "the highest total return comes from <code>lookback=0.5y</code> "
-                "(+519.2% vs +313.6% at 1.5y) because a shorter memory chases the "
-                "recent run-up (RKLB) harder — overfitting to this single window's "
-                "momentum. The profile keeps <code>lookback=1.5y</code>, chosen for "
-                "robustness on the longer 2021–2026 window."
+                "shorter lookbacks tend to score higher here because a shorter memory "
+                "chases this window's recent run-up (RKLB) harder — an in-sample "
+                "momentum artifact. The profile sets <code>lookback=1.5y</code>, a "
+                "steadier μ/Σ estimate; <b>forward testing</b> on out-of-sample "
+                "quarters is the real check on whether a shorter window helps."
             ),
             "concentration_cap": (
-                "the highest total return comes from <code>concentration_cap=1.0</code> "
-                "(+410.7% vs +313.6% at 0.7) because a higher cap lets the optimizer "
-                "pile more into the single winner (RKLB) — overfitting, and a clear "
-                "single-name risk. The profile keeps <code>concentration_cap=0.7</code>, "
-                "which bounds per-position risk and was chosen for robustness on the "
-                "longer 2021–2026 window."
+                "total return rises with the cap because a higher cap lets the "
+                "optimizer pile more into the single winner (RKLB) — higher "
+                "single-name risk, and an in-sample artifact. The profile sets "
+                "<code>concentration_cap=0.80</code>, which still allows high "
+                "conviction while bounding any one position; <b>forward testing</b> "
+                "is the arbiter of whether a higher cap is worth the concentration."
             ),
         }
         wf_note = WALK_FORWARD_NOTES.get(args.param, "")

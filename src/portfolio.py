@@ -3565,8 +3565,8 @@ def build_curator_dashboard(
             "<h2 style='margin-top:2em;'>Curator search terms</h2>"
             "<p style='color:#555;max-width:780px;'>Every news query the curator "
             "ran at each quarterly rebalance, captured verbatim from the agent's "
-            "WebSearch tool calls (the <code>before:</code> filters confirm the "
-            "as-of-date discipline). Click a rebalance to expand.</p>"
+            "WebSearch tool calls (the trailing-window <code>after:…before:…</code> "
+            "filters confirm the as-of-date discipline). Click a rebalance to expand.</p>"
             + "".join(_st_blocks)
         )
 
@@ -3575,9 +3575,10 @@ def build_curator_dashboard(
     # Values are the *effective* ones used by the replay: a backtest-only
     # override from investor_profile.md's `backtest` section wins if set,
     # otherwise the live financial_model / top-level value is used (this
-    # mirrors the precedence in src/cli.py). When an override differs from the
-    # live value we say so, so it's clear the published curve is the aggressive
-    # config and not what /review-portfolio runs with real money.
+    # mirrors the precedence in src/cli.py). By default no overrides are set,
+    # so the backtest uses the same config /review-portfolio runs live; an
+    # override (used to test a candidate config) is flagged so the reader can
+    # see the published curve no longer matches the live config.
     _fm = load_financial_model()
     _bc = load_backtest_config()
     def _eff(override, live):
@@ -3594,11 +3595,11 @@ def build_curator_dashboard(
         ("Starter watchlist", ", ".join(starter_tickers) or "—", ""),
         ("Initial capital", f"${initial:,.0f}", ""),
         ("Risk aversion (λ)", f"{_ra:g}",
-         f"aggressive — live recommend path uses {_fm['risk_aversion']:g}" if _ra_ov else "same as live"),
+         f"backtest-only override — live uses {_fm['risk_aversion']:g}" if _ra_ov else ""),
         ("Lookback (μ/Σ estimation)", f"{_lb:g}y",
-         f"aggressive — live uses {str(_fm['lookback_period'])}" if _lb_ov else "same as live"),
+         f"backtest-only override — live uses {str(_fm['lookback_period'])}" if _lb_ov else ""),
         ("Concentration cap (max weight)", f"{_cap:.0%}",
-         f"aggressive — live uses {_fm['concentration_cap']:.0%}" if _cap_ov else "same as live"),
+         f"backtest-only override — live uses {_fm['concentration_cap']:.0%}" if _cap_ov else ""),
         ("Max watchlist size", f"{_fm['max_watchlist_size']}", ""),
         ("Risk-free rate", f"{_fm['risk_free_rate']:.0%}", ""),
         ("Execution lag", f"{_bc['t_update_days']} trading day(s) after each rebalance signal", ""),
@@ -3612,11 +3613,11 @@ def build_curator_dashboard(
     params_html = (
         "<h2 style='margin:1.4em 0 0.3em;'>Parameter settings</h2>"
         "<p style='color:#555;max-width:780px;margin:0 0 0.6em;'>The exact "
-        "optimizer and backtest knobs behind the charts below. The published "
-        "run uses the sweep-optimal but <b>aggressive</b> overrides from "
-        "<code>investor_profile.md</code>'s <code>backtest</code> section; rows "
-        "flagged in amber differ from the robust config that "
-        "<code>/review-portfolio</code> uses with real money.</p>"
+        "optimizer and backtest knobs behind the charts below, read from "
+        "<code>investor_profile.md</code>. This is the same config "
+        "<code>/review-portfolio</code> uses with real money; any row flagged "
+        "in amber is a backtest-only override (used to test a candidate config) "
+        "and would not match the live path.</p>"
         "<table style='border-collapse:collapse;font-size:14px;margin-bottom:1.2em;'>"
         f"<tbody>{_param_tr}</tbody></table>"
     )

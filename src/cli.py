@@ -114,7 +114,8 @@ def main(argv: list[str] | None = None) -> int:
     _default_lookback_years = float(_m.group(1)) if _m else 1.3
     p_bt.add_argument("--lookback-years", type=float, default=_default_lookback_years,
                       help="optimizer lookback window in years (default from investor_profile)")
-    p_bt.add_argument("--max-weight", type=float, default=0.25)
+    p_bt.add_argument("--max-weight", type=float, default=fm["concentration_cap"],
+                      help="per-position cap (default from investor_profile's concentration_cap)")
     p_bt.add_argument("--risk-aversion", type=float, default=fm["risk_aversion"],
                       help="lambda in the mean-variance utility; see analyze --risk-aversion")
     p_bt.add_argument("--risk-free-rate", type=float, default=fm["risk_free_rate"])
@@ -168,10 +169,13 @@ def main(argv: list[str] | None = None) -> int:
         elif args.cmd == "backtest":
             if args.curator_runs_dir:
                 # Backtest-only optimizer overrides from investor_profile.md's
-                # `backtest` section take precedence over the live values, so the
-                # backtest can run more aggressive knobs than live recommends.
+                # `backtest` section take precedence over the live values when set,
+                # so a candidate config can be tested on the backtest before going live.
+                # When unset (None), the live financial_model / concentration_cap values
+                # (already the argparse defaults) are used, so backtest == live by default.
                 ra = bc["risk_aversion"] if bc["risk_aversion"] is not None else args.risk_aversion
                 mw = bc["concentration_cap"] if bc["concentration_cap"] is not None else args.max_weight
+                lb = bc["lookback_years"] if bc["lookback_years"] is not None else args.lookback_years
                 result = portfolio.curator_backtest(
                     runs_dir=args.curator_runs_dir,
                     out_dir=args.out_dir,
@@ -181,7 +185,7 @@ def main(argv: list[str] | None = None) -> int:
                     risk_free_rate=args.risk_free_rate,
                     benchmarks=args.benchmarks,
                     t_update_days=args.t_update_days,
-                    lookback_years_override=bc["lookback_years"],
+                    lookback_years_override=lb,
                 )
             else:
                 result = portfolio.backtest(

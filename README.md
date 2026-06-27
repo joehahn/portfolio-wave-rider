@@ -91,9 +91,9 @@ Reruns the backtest under different settings for `risk_aversion`, `lookback_peri
 
 Three overlay pages are written and published to GitHub Pages:
 
-- **[`risk_aversion` `λ`](https://joehahn.github.io/portfolio-wave-rider/sweep_risk_aversion.html)** — default `0.5`. Small `λ` produces a portfolio concentrated in volatile but higher-reward equities; large `λ` shifts the portfolio toward cash and bonds.
+- **[`risk_aversion` `λ`](https://joehahn.github.io/portfolio-wave-rider/sweep_risk_aversion.html)** — default `0.33`. Small `λ` produces a portfolio concentrated in volatile but higher-reward equities; large `λ` shifts the portfolio toward cash and bonds.
 - **[`lookback_period`](https://joehahn.github.io/portfolio-wave-rider/sweep_lookback.html)** — default `1.5y`. The length of the price-history window used to estimate `μ` and `Σ`. Short lookbacks chase recent momentum and react quickly to regime changes but are noisy; long lookbacks average across more market conditions and produce steadier estimates but lag turning points.
-- **[`concentration_cap`](https://joehahn.github.io/portfolio-wave-rider/sweep_concentration_cap.html)** — default `0.70`. The maximum weight any single ticker can carry. Small caps force diversification across the full watchlist, smoothing returns but diluting conviction; large caps let the optimizer pile into its top picks, raising both upside and drawdown risk.
+- **[`concentration_cap`](https://joehahn.github.io/portfolio-wave-rider/sweep_concentration_cap.html)** — default `0.80`. The maximum weight any single ticker can carry. Small caps force diversification across the full watchlist, smoothing returns but diluting conviction; large caps let the optimizer pile into its top picks, raising both upside and drawdown risk.
 
 All three defaults are set in `investor_profile.md` and can be edited there.
 
@@ -154,37 +154,36 @@ The optimizer used here selects a portfolio that maximizes the mean-variance obj
 subject to ∑ᵢ wᵢ = 1 (weights sum to one) and 0 ≤ wᵢ ≤ concentration_cap. The first term `μᵀw` is the portfolio's expected return (the weighted average of per-ticker expected returns); the second term `wᵀΣw` is the portfolio's return variance, scaled by `λ` to act as a risk penalty. `μ` is the per-ticker expected-return vector, computed as the annualized mean of daily log returns over a 1.5y price-history lookback set in `investor_profile.md`. `Σ` is the ticker × ticker covariance matrix estimated over the same window. `w` is the weight vector the optimizer is solving for. `λ` (risk aversion) trades expected return against variance:
 
 - `λ → 0`: the solution favors high-return tickers, which also tend to have greater variability.
-- `λ = 0.5`: a return-tilted middle ground that still puts some weight on safer tickers when the market gets noisy. This is this project's default setting.
+- `λ = 0.33`: a return-tilted setting that leans into higher-reward tickers while still penalizing variance. This is this project's default.
 - `λ ≫ 1`: the variance penalty dominates, so the solution tends toward a low-variance portfolio that is heavy in cash and bonds.
 
 This is the standard Markowitz mean-variance formulation (Markowitz 1952, *Portfolio Selection*, Journal of Finance 7:77-91), which is the textbook starting point for portfolio construction because it captures the central return-vs-risk tradeoff in a single closed-form quadratic expression. See [GLOSSARY.md](GLOSSARY.md) for the full definitions.
 
 ## Main findings
 
-This project builds an AI assistant that reads business news against a user's stated investment thesis, derives a curated watchlist of tickers from it, and then hands that watchlist to a standard mean-variance optimizer for weighting at each rebalance. The AI's job is watchlist composition only, while a simple but effective financial model then turns the watchlist into portfolio weights. The published backtest covers a **post-COVID, normal-regime window (2022-03-31 → 2025-10-31, ~3.6 years)** — it deliberately drops the distorted 2020–2021 stimulus melt-up and ends just before the late-2025 Iran-war runup, so it reads as a credible "normal markets" window. (The dashboard renders an aggressive sweep-optimal configuration; the robust configuration the live portfolio actually uses is shown alongside below.) To measure the AI's lift, we compare its track record against a tech-minded investor whose initial portfolio is equal amounts of `[AAPL, MSFT, GOOGL, NVDA, SPY]`, a buy-and-hold investor too busy to monitor news and revise their portfolio. We know such investors exist because the author of this project is one.
+This project builds an AI assistant that reads business news against a user's stated investment thesis, derives a curated watchlist of tickers from it, and then hands that watchlist to a standard mean-variance optimizer for weighting at each rebalance. The AI's job is watchlist composition only, while a simple but effective financial model then turns the watchlist into portfolio weights. The published backtest covers a **post-COVID, normal-regime window (2022-03-31 → 2025-10-31, ~3.6 years)** — it deliberately drops the distorted 2020–2021 stimulus melt-up and ends just before the late-2025 Iran-war runup, so it reads as a credible "normal markets" window. The dashboard renders the same single optimizer config the live portfolio uses (λ=0.33, lookback 1.5y, cap=0.80). To measure the AI's lift, we compare its track record against a tech-minded investor whose initial portfolio is equal amounts of `[AAPL, MSFT, GOOGL, NVDA, SPY]`, a buy-and-hold investor too busy to monitor news and revise their portfolio. We know such investors exist because the author of this project is one.
 
-NVDA is in the starter from day 0, so both the AI-managed portfolio and the buy-and-hold baseline ride it and the curator earns no credit there. The divergence comes from the curator's thematic adds and the optimizer's quarterly re-weighting. The clearest example is the rockets/spacecraft wave: the curator added Rocket Lab (RKLB) at the window's start in 2022 and held it through a multi-year, several-fold run; by 2025 the optimizer had concentrated heavily in RKLB — to the 70% cap in the live/robust config, and a full 100% in the aggressive published config. The curator also rotated the watchlist as theses matured: it added defense (ITA) and robotics (BOTZ) early, opened the nuclear slot with single-name NuScale (SMR) and then swapped it for the diversified nuclear ETF (NUKZ) once NuScale's flagship project collapsed, played quantum first via IonQ (IONQ) and then trimmed it "before the crest" after the late-2024 run-up, and dropped the broad AAPL/MSFT/GOOGL/SPY names on dated catalysts (Apple's revenue slump, Microsoft's AI-margin compression) — finally opening the demographics slot with the senior-housing REIT Welltower (WELL). Final watchlist: BOTZ, GOOGL, ITA, NUKZ, NVDA, RKLB, WELL.
+NVDA is in the starter from day 0, so both the AI-managed portfolio and the buy-and-hold baseline ride it and the curator earns no credit there. The divergence comes from the curator's thematic adds and the optimizer's quarterly re-weighting. The clearest example is the rockets/spacecraft wave: the curator added Rocket Lab (RKLB) at the window's start in 2022 and held it through a multi-year, several-fold run; by 2025 the optimizer had concentrated heavily in RKLB, up to its 80% cap. The curator also rotated the watchlist as theses matured: it added defense (ITA) and robotics (BOTZ) early, opened the nuclear slot with single-name NuScale (SMR) and then swapped it for the diversified nuclear ETF (NUKZ) once NuScale's flagship project collapsed, played quantum first via IonQ (IONQ) and then trimmed it "before the crest" after the late-2024 run-up, and dropped the broad AAPL/MSFT/GOOGL/SPY names on dated catalysts (Apple's revenue slump, Microsoft's AI-margin compression) — finally opening the demographics slot with the senior-housing REIT Welltower (WELL). Final watchlist: BOTZ, GOOGL, ITA, NUKZ, NVDA, RKLB, WELL.
 
 **Total realized return over the window (2022–2025, ~3.6 years):**
 
 | Strategy | Return | Annualized |
 |---|---|---|
-| Curator — published/aggressive (λ=0.33, lookback 0.5y, cap=1.0) | **+816.6%** | **+85.4%** |
-| Curator — live/robust (λ=0.5, lookback 1.5y, cap=0.70) | +437.6% | +59.8% |
+| Curator (λ=0.33, lookback 1.5y, cap=0.80) | **+525.1%** | **+66.6%** |
 | Buy-and-hold (equal-weight starter, includes NVDA) | +187.3% | +34.2% |
 | SPY benchmark | +58.7% | +13.7% |
 
-The dashboard renders the **aggressive** row, but it ends ~100% in a single name (RKLB) — the sweep-optimal ceiling, not the honest expectation. The **live/robust** row is what `/review-portfolio` recommends with real money; the lift figures below use it.
+This is the single config the live portfolio uses; the dashboard renders the same one. It ends ~80% RKLB / 20% WELL, so most of the lift rests on the one RKLB position (see the robustness caveat below).
 
 **The AI Curator's lift over buy-and-hold:**
 
 | Measure | Value |
 |---|---|
-| Absolute (curator − buy/hold), total | +250pp |
-| Absolute, annualized | +25.6pp/yr |
-| Relative (curator − buy/hold) / (buy/hold) | 1.34 |
+| Absolute (curator − buy/hold), total | +338pp |
+| Absolute, annualized | +32.4pp/yr |
+| Relative (curator − buy/hold) / (buy/hold) | 1.80 |
 
-**A caveat on robustness.** This lift is not a steady, broad-based edge. The curator actually trailed the buy-and-hold portfolio for most of this window (it was ahead on only about 16% of trading days) and pulled clear only in 2025, when the optimizer concentrated heavily in Rocket Lab and RKLB ran hard — 70% under the live cap, a full 100% under the aggressive published cap. The outperformance therefore rests largely on a single late position rather than a repeatable advantage. Read it as one favorable wave the curator caught and held, not proof of a durable edge; a single winning bet (n=1) cannot separate skill from luck. There is also a look-ahead-bias / data-leakage caveat: the curator is an LLM whose training postdates the window, and live WebSearch ranks results by present-day fame, so the backtest is a hindsight-tinted upper bound, not a clean out-of-sample result. See [REFERENCE.md](REFERENCE.md#the-curator-backtest-post-covid-window) for the full bias accounting.
+**A caveat on robustness.** This lift is not a steady, broad-based edge. The curator actually trailed the buy-and-hold portfolio for most of this window and pulled clear only in 2025, when the optimizer concentrated near the cap in Rocket Lab (ends ~80% RKLB) and RKLB ran hard. The outperformance therefore rests largely on a single late position rather than a repeatable advantage. Read it as one favorable wave the curator caught and held, not proof of a durable edge; a single winning bet (n=1) cannot separate skill from luck. There is also a look-ahead-bias / data-leakage caveat: the curator is an LLM whose training postdates the window, and live WebSearch ranks results by present-day fame, so the backtest is a **hindsight-tinted upper bound, not a clean out-of-sample result**. The way to test for overfitting is **forward testing** — hold this config fixed and measure realized performance on quarters that postdate the model's training cutoff. See [REFERENCE.md](REFERENCE.md#the-curator-backtest-post-covid-window) for the full bias accounting and the forward-testing plan.
 
 See the [curator backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html) and the full report in `data/backtest_curator_postcovid/report.md`. Reproduce locally with the on-demand backtest from the Runs section above.
 

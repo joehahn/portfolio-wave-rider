@@ -1,12 +1,12 @@
 ---
 initial_investment_usd: 50000     # total dollars to allocate on day 0
-concentration_cap: 0.70           # no single position > 70% of portfolio
+concentration_cap: 0.80           # no single position > 80% of portfolio
 min_trade_size_usd: 1000          # don't propose trades smaller than this
 exclusions:                       # sector / theme exclusions
   - solar energy (companies and ETFs)
   - wind energy (companies and ETFs)
 financial_model:                  # optimizer math
-  risk_aversion: 0.5              # λ in mean_variance utility (μᵀw − λ·wᵀΣw)
+  risk_aversion: 0.33             # λ in mean_variance utility (μᵀw − λ·wᵀΣw)
   risk_free_rate: 0.04            # ≈ 1y Treasury yield; baseline subtracted from E[r] in Sharpe-ratio calc
   lookback_period: 1.5y           # history window for estimating μ and Σ
   rebalance_period: monthly       # monthly | quarterly | semi_annual | annual; how often the watchlist-curator runs
@@ -16,11 +16,11 @@ backtest:                         # only affects /run-backtest and sweeps, not l
   end_date: 2025-10-31            # window end (just before the late-2025 Iran-war runup)
   t_update_days: 1                # trading-day lag from rebalance signal to trade (1 = next session, 0 = same-close)
   # Optional backtest-only optimizer overrides (omit to use the live values from
-  # financial_model + the top-level concentration_cap). Lets the backtest run more
-  # aggressive knobs than the live recommend path. Example:
-  #   risk_aversion: 0.33
-  #   lookback_years: 0.5
-  #   concentration_cap: 1.0
+  # financial_model + the top-level concentration_cap). Use these to test a candidate
+  # config on the backtest before adopting it live. Example:
+  #   risk_aversion: 0.5
+  #   lookback_years: 1.0
+  #   concentration_cap: 0.5
 ---
 
 # Goals
