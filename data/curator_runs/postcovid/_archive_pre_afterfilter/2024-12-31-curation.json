@@ -1,0 +1,79 @@
+{
+  "as_of_date": "2024-12-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "NUKZ",
+      "wave_bucket": "nuclear",
+      "rationale": "NUKZ (Range Nuclear Renaissance ETF, launched January 24, 2024) gained ~70% in its first year vs URA's flat -0.53%, and its holdings span nuclear power operators and utilities \u2014 exactly the entities signing AI-datacenter PPAs \u2014 rather than uranium miners that did not benefit from the TMI and Susquehanna PPA announcements.",
+      "news_evidence": [
+        {
+          "summary": "NUKZ named one of 2024's hottest ETFs (~+70% since its Jan 2024 launch); tracks the VettaFi Nuclear Renaissance index of utilities, fuel providers, advanced-reactor developers, and construction firms.",
+          "source": "Nasdaq / Yahoo Finance",
+          "url": "https://www.nasdaq.com/articles/nukz-brand-new-nuclear-energy-etf-one-2024s-hottest-etfs",
+          "date": "2024-12-01"
+        },
+        {
+          "summary": "Microsoft-Constellation 20-year TMI PPA exemplifies the thesis migrating from uranium supply to power-operator/utility PPAs, which NUKZ captures via utility holdings URA lacks.",
+          "source": "The Globe and Mail",
+          "url": "https://www.theglobeandmail.com/investing/markets/stocks/SMR-N/pressreleases/32987534/3-stocks-to-profit-from-the-upcoming-nuclear-power-boom/",
+          "date": "2024-09-01"
+        },
+        {
+          "summary": "NUKZ launched Jan 24, 2024 on NYSE Arca by Range ETFs; spans nuclear fuel, utility generation, and advanced-reactor segments \u2014 direct operator-side exposure to the big-tech PPA wave.",
+          "source": "Range ETFs",
+          "url": "https://rangeetfs.com/nukz",
+          "date": "2024-01-24"
+        }
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "URA",
+      "rationale": "URA returned -0.53% for full-year 2024 because it concentrates in uranium miners whose revenues lag the PPA-driven operator thesis; with both the Microsoft-TMI and AWS-Talen PPAs signed in Q3-Q4 2024, the nuclear thesis now rewards power operators and diversified renaissance funds rather than uranium-mining companies.",
+      "news_evidence": [
+        {
+          "summary": "URA delivered -0.53% for full-year 2024 (flat) while the broader nuclear thesis accelerated; uranium spot peaked >$106/lb in Jan 2024 and retreated through the year even as operators surged on PPA news.",
+          "source": "Global X / Yahoo Finance",
+          "url": "https://finance.yahoo.com/quote/URA/performance/",
+          "date": "2024-12-31"
+        },
+        {
+          "summary": "AWS-Talen Susquehanna PPA (Oct 2024) was the second major big-tech nuclear deal within 45 days; both reward generation/operator capacity, a segment URA barely captures.",
+          "source": "Q4 2024 industry reporting",
+          "url": "https://stockanalysis.com/etf/nukz/",
+          "date": "2024-10-01"
+        }
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "One instrument substitution: URA exits and NUKZ enters, keeping nuclear filled but shifting from uranium mining (flat in 2024 as spot retreated from January highs) to the broader nuclear-renaissance basket of utilities and operators directly monetizing the Microsoft-TMI and AWS-Talen PPAs. Every other position is retained: NVDA (Blackwell ramp) and GOOGL (Willow chip) validated their AI leads in Q4, RKLB sustained record launch cadence, QTUM surged ~50% on quantum enthusiasm from Willow, ITA reflects the continued global-defense cycle, and BOTZ holds robotics despite ~10pp category underperformance. Aging-demographics and energy/tanker remain uncovered; Welltower (WELL) is the leading demographics candidate for a future rebalance.",
+  "search_terms": [
+    "space stocks rocket launch stocks 2024 before:2025-01-01",
+    "robotics stocks humanoid robot stocks 2024 before:2025-01-01",
+    "quantum computing stocks 2024 before:2025-01-01",
+    "nuclear energy stocks SMR utility PPA 2024 before:2025-01-01",
+    "AI stocks artificial intelligence best performers 2024 before:2025-01-01",
+    "defense stocks rearmament ETF 2024 before:2025-01-01",
+    "geopolitical energy stocks tanker shipping stocks 2024 before:2025-01-01",
+    "aging population demographics healthcare eldercare REIT stocks 2024 before:2025-01-01",
+    "best performing ETF December 2024 before:2025-01-01",
+    "biggest stock gainers Q4 2024 before:2025-01-01",
+    "nuclear energy ETF uranium stocks 2024 fourth quarter before:2025-01-01",
+    "MSFT Microsoft news Q4 2024 before:2025-01-01",
+    "GOOGL Google news Q4 2024 Willow quantum chip before:2025-01-01",
+    "NVDA Nvidia Blackwell news Q4 2024 before:2025-01-01",
+    "RKLB Rocket Lab news Q4 2024 before:2025-01-01",
+    "QTUM quantum ETF news performance 2024 before:2025-01-01",
+    "URA uranium ETF news 2024 Q4 before:2025-01-01",
+    "ITA defense ETF news performance 2024 Q4 before:2025-01-01",
+    "BOTZ robotics ETF news performance 2024 before:2025-01-01",
+    "Welltower WELL healthcare REIT news 2024 Q4 before:2025-01-01",
+    "NUKZ nuclear ETF launch date listing 2024 before:2025-01-01",
+    "Vistra VST Constellation Energy CEG nuclear operator news Q4 2024 before:2025-01-01",
+    "NUKZ nuclear renaissance ETF performance 2024 returns before:2025-01-01",
+    "Welltower WELL seniors housing REIT acquisition 2024 before:2025-01-01"
+  ]
+}

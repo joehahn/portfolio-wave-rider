@@ -3,8 +3,8 @@
     "date": "2022-03-31",
     "adds": [
       "RKLB",
-      "QTUM",
-      "URA"
+      "BOTZ",
+      "ITA"
     ],
     "removes": [],
     "rejections": 0
@@ -30,17 +30,7 @@
   {
     "date": "2023-03-31",
     "adds": [
-      "ITA"
-    ],
-    "removes": [
-      "AAPL"
-    ],
-    "rejections": 0
-  },
-  {
-    "date": "2023-06-30",
-    "adds": [
-      "BOTZ"
+      "SMR"
     ],
     "removes": [
       "SPY"
@@ -48,10 +38,20 @@
     "rejections": 0
   },
   {
-    "date": "2023-09-30",
+    "date": "2023-06-30",
     "adds": [],
     "removes": [],
     "rejections": 2
+  },
+  {
+    "date": "2023-09-30",
+    "adds": [
+      "IONQ"
+    ],
+    "removes": [
+      "AAPL"
+    ],
+    "rejections": 0
   },
   {
     "date": "2023-12-31",
@@ -62,30 +62,24 @@
   {
     "date": "2024-03-31",
     "adds": [
-      "NUKZ",
-      "STNG"
+      "NUKZ"
     ],
     "removes": [
-      "BOTZ",
-      "GOOGL"
+      "SMR"
     ],
     "rejections": 0
   },
   {
     "date": "2024-06-30",
     "adds": [],
-    "removes": [
-      "URA"
-    ],
-    "rejections": 1
+    "removes": [],
+    "rejections": 2
   },
   {
     "date": "2024-09-30",
-    "adds": [
-      "CEG"
-    ],
+    "adds": [],
     "removes": [],
-    "rejections": 1
+    "rejections": 2
   },
   {
     "date": "2024-12-31",
@@ -96,10 +90,10 @@
   {
     "date": "2025-03-31",
     "adds": [
-      "BOTZ"
+      "WELL"
     ],
     "removes": [
-      "STNG"
+      "IONQ"
     ],
     "rejections": 0
   },
@@ -107,12 +101,14 @@
     "date": "2025-06-30",
     "adds": [],
     "removes": [],
-    "rejections": 2
+    "rejections": 0
   },
   {
     "date": "2025-09-30",
     "adds": [],
-    "removes": [],
-    "rejections": 2
+    "removes": [
+      "MSFT"
+    ],
+    "rejections": 1
   }
 ]

@@ -1,0 +1,88 @@
+{
+  "as_of_date": "2024-06-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "NUKZ",
+      "wave_bucket": "nuclear",
+      "rationale": "Replace URA's pure uranium-miner exposure with NUKZ's broader nuclear-renaissance coverage \u2014 advanced-reactor developers, utilities, construction/services, and fuel \u2014 to capture the AI-data-center baseload demand narrative that moved from speculation to Goldman Sachs institutional consensus by Q2 2024.",
+      "news_evidence": [
+        {
+          "summary": "NUKZ launched Jan 24, 2024 on NYSE Arca tracking the VettaFi Nuclear Renaissance Index; >=80% in nuclear companies spanning reactor developers, utilities, construction, and fuel \u2014 broader than URA's uranium-miner focus and aligned to the SMR/PPA thesis.",
+          "source": "Range ETFs / ETFdb",
+          "url": "https://etfdb.com/etf/NUKZ/",
+          "date": "2024-01-24"
+        },
+        {
+          "summary": "Goldman Sachs (May 2024) projected AI driving a 160% increase in US data-center power demand by 2030, naming nuclear a must-have baseload \u2014 the thesis NUKZ's utility/SMR holdings target and URA's miners structurally cannot.",
+          "source": "Goldman Sachs",
+          "url": "https://www.goldmansachs.com/insights/articles/accelerating-power-demand-from-data-centers-poised-to-boost-new-energy-technologies",
+          "date": "2024-05-01"
+        },
+        {
+          "summary": "Oklo went public May 2024 via SPAC (~$850M); its Aurora fast-fission reactor targets commercial customers \u2014 the forward SMR pipeline NUKZ holds and URA misses.",
+          "source": "IPOs.fyi / SEC 8-K",
+          "url": "https://ipos.fyi/tracker/oklo-ipo",
+          "date": "2024-05-14"
+        }
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "URA",
+      "rationale": "URA's two primary catalysts \u2014 uranium spot at a 15-year high in Feb 2024 and the Russian uranium import ban signed May 13, 2024 \u2014 are now enacted and priced into miner valuations; NUKZ replaces URA with a more forward-looking renaissance basket aligned to the AI-data-center electricity thesis.",
+      "news_evidence": [
+        {
+          "summary": "Uranium spot peaked ~$106/lb in Feb 2024 (15-year high) then pulled back as near-term supply improved, removing the sharp commodity tailwind behind URA's miner-heavy portfolio.",
+          "source": "Investing News / WNN",
+          "url": "https://www.world-nuclear-news.org/articles/google-and-kairos-power-team-up-for-smr-deployments-in-us-first",
+          "date": "2024-02-01"
+        },
+        {
+          "summary": "Biden signed the Prohibiting Russian Uranium Imports Act on May 13, 2024, banning Russian LEU imports and unlocking $2.72B for domestic enrichment \u2014 the primary policy catalyst behind early-2024 miner outperformance, now fully enacted.",
+          "source": "US DOE",
+          "url": "https://www.energy.gov/articles/biden-harris-administration-enacts-law-banning-importation-russian-uranium",
+          "date": "2024-05-13"
+        }
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Single swap \u2014 URA out, NUKZ in \u2014 upgrades the nuclear bucket from a commodity-mining expression to a full renaissance basket matching the profile's 'fission renaissance via SMRs and long-term PPAs to AI data centers' thesis. URA's key catalysts (Feb uranium peak, May Russian ban) are priced in; NUKZ adds the reactor-developer and utility layer for the next leg. Goldman's May 2024 data-center power report and Oklo's SPAC debut confirm the AI-nuclear narrative crossed into institutional consensus. Seven positions kept: AI (NVDA $26B Q1 FY25 on May 22 + 10:1 split June 10, MSFT, GOOGL), RKLB (Neutron buildout, intact Electron cadence), BOTZ and QTUM (early-buildup robotics and quantum), ITA (defense thesis intact amid Ukraine and rising NATO spending).",
+  "search_terms": [
+    "space stocks rockets spacecraft 2024 before:2024-07-01",
+    "robotics stocks humanoid robot 2024 before:2024-07-01",
+    "quantum computing stocks 2024 before:2024-07-01",
+    "nuclear stocks SMR fission energy 2024 before:2024-07-01",
+    "artificial intelligence stocks 2024 before:2024-07-01",
+    "geopolitical energy tanker stocks freight rates 2024 before:2024-07-01",
+    "defense rearmament stocks ETF NATO 2024 before:2024-07-01",
+    "aging population demographics healthcare eldercare REIT stocks 2024 before:2024-07-01",
+    "best performing ETF this month June 2024 before:2024-07-01",
+    "biggest stock gainers June 2024 before:2024-07-01",
+    "NVDA Nvidia news Q2 2024 before:2024-07-01",
+    "MSFT Microsoft AI news Q2 2024 before:2024-07-01",
+    "GOOGL Alphabet Google AI news Q2 2024 before:2024-07-01",
+    "RKLB Rocket Lab news 2024 before:2024-07-01",
+    "QTUM quantum ETF news 2024 before:2024-07-01",
+    "URA uranium ETF nuclear energy news June 2024 before:2024-07-01",
+    "ITA aerospace defense ETF performance news 2024 before:2024-07-01",
+    "BOTZ robotics ETF news performance 2024 before:2024-07-01",
+    "NUKZ nuclear ETF launched 2024 before:2024-07-01",
+    "Oklo OKLO nuclear small modular reactor IPO 2024 before:2024-07-01",
+    "Frontline FRO tanker stock Red Sea Houthi 2024 before:2024-07-01",
+    "Intuitive Machines LUNR lunar landing news 2024 before:2024-07-01",
+    "Welltower WELL Ventas VTR healthcare REIT 2024 before:2024-07-01",
+    "uranium price nuclear energy stocks performance H1 2024 before:2024-07-01",
+    "Nvidia NVDA stock split earnings May 2024 before:2024-07-01",
+    "nuclear power AI data center electricity demand 2024 before:2024-07-01",
+    "Rocket Lab 2024 launch manifest Neutron neutron rocket news before:2024-07-01",
+    "NUKZ Range nuclear renaissance ETF performance 2024 before:2024-07-01",
+    "Goldman Sachs nuclear energy AI data centers power demand report 2024 before:2024-07-01",
+    "nuclear power AI data centers electricity hyperscalers Microsoft Google Amazon before:2024-07-01",
+    "\"Goldman Sachs\" \"data centers\" \"power demand\" report date May June 2024 before:2024-07-01",
+    "Google Kairos Power small modular reactor SMR agreement 2023 before:2024-07-01",
+    "Prohibiting Russian Uranium Imports Act signed law Biden 2024 before:2024-07-01"
+  ]
+}

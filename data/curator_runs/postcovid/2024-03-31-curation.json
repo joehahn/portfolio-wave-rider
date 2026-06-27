@@ -5,113 +5,86 @@
     {
       "ticker": "NUKZ",
       "wave_bucket": "nuclear",
-      "rationale": "NUKZ launched January 23, 2024 and provides nuclear-renaissance exposure URA does not \u2014 utilities running reactors, reactor developers, and construction/services alongside uranium fuel \u2014 entering as uranium spot hit a 16-year high and AI-data-center baseload demand begins lifting the nuclear thesis.",
+      "rationale": "Replace failed single-name SMR (NuScale) with the Range Nuclear Renaissance ETF, which launched January 23 2024 and diversifies across uranium producers, nuclear utilities, advanced reactor developers, and construction services — maintaining the profile's nuclear-fission-for-AI-baseload thesis without the execution risk of one pre-revenue company whose only announced project just collapsed.",
       "news_evidence": [
         {
-          "summary": "NUKZ launched Jan 23, 2024, tracking the VettaFi Nuclear Renaissance Index (53 holdings across reactors, utilities, construction/services, fuel) \u2014 broader than URA's uranium-mining-only focus.",
-          "source": "stockanalysis.com / Range ETFs",
+          "summary": "Range Nuclear Renaissance ETF (NUKZ) begins trading on NYSE Arca on January 23, 2024, tracking the VettaFi Nuclear Renaissance index across four sub-segments: advanced reactors, utilities, construction and services, and fuel; provides diversified nuclear sector exposure vs. single-name risk.",
+          "source": "Range ETFs / AAII",
+          "url": "https://rangeetfs.com/nukz",
+          "date": "2024-01-23"
+        },
+        {
+          "summary": "NUKZ ETF overview confirms launch date of January 23, 2024 and index composition spanning uranium producers, nuclear utilities, SMR developers, and reactor services companies.",
+          "source": "Stock Analysis",
           "url": "https://stockanalysis.com/etf/nukz/",
           "date": "2024-01-23"
         },
         {
-          "summary": "Uranium spot hit a 16-year high of $106/lb in late January 2024 on Kazatomprom production-miss news; held near $85/lb through late March.",
-          "source": "ANS Nuclear Newswire / Nasdaq",
-          "url": "https://www.nasdaq.com/articles/what-was-the-highest-price-for-uranium-updated-2024",
-          "date": "2024-01-28"
-        }
-      ]
-    },
-    {
-      "ticker": "STNG",
-      "wave_bucket": "geopolitical",
-      "rationale": "Scorpio Tankers is the cleanest US-listed product-tanker pure-play for the Red Sea disruption trade: Houthi attacks since November 2023 rerouted ships via the Cape of Good Hope, shrinking effective tanker supply and lifting freight rates, while STNG's Q4 2023 earnings (Feb 14) beat on revenue and EPS.",
-      "news_evidence": [
-        {
-          "summary": "S&P Global: tighter fleet capacity, Red Sea disruptions, and Cape rerouting expected to boost 2024 tanker freight; net product-tanker fleet growth just 1.4% in 2024.",
-          "source": "S&P Global Commodity Insights",
-          "url": "https://www.spglobal.com/commodity-insights/en/news-research/latest-news/shipping/010824-tighter-fleet-capacity-geopolitical-issues-longer-voyages-to-boost-2024-tanker-freight",
-          "date": "2024-01-08"
-        },
-        {
-          "summary": "Scorpio Tankers Q4 2023 (Feb 14, 2024): revenue $334.07M, net income $120.9M ($2.43 EPS), beating estimates; owns/leases 110 tankers.",
-          "source": "Yahoo Finance / SEC 6-K",
-          "url": "https://finance.yahoo.com/news/scorpio-tankers-stng-beats-q4-125503840.html",
-          "date": "2024-02-14"
+          "summary": "IAEA bulletin notes that data centres, AI workloads, and cryptocurrency operations are actively evaluating advanced nuclear power to meet growing always-on power needs — the structural driver behind nuclear-focused ETF demand in early 2024.",
+          "source": "International Atomic Energy Agency",
+          "url": "https://www.iaea.org/bulletin/data-centres-artificial-intelligence-and-cryptocurrencies-eye-advanced-nuclear-to-meet-growing-power-needs",
+          "date": "2024-01-01"
         }
       ]
     }
   ],
   "removes": [
     {
-      "ticker": "BOTZ",
-      "rationale": "BOTZ's tilt toward Japanese industrial-automation incumbents (FANUC, Keyence, ABB) provides negligible exposure to the humanoid-robot buildup the profile names; the Q1 2024 AI rally is driven by pure semiconductor/software names, and no new milestone re-anchored BOTZ to the thesis.",
+      "ticker": "SMR",
+      "rationale": "Fundamental thesis breach: NuScale Power's only announced SMR project (the UAMPS Carbon Free Power Project in Idaho) was mutually terminated in November 2023 after per-kW costs more than doubled from initial estimates, leaving the company with no active deployment pipeline and zero near-term revenue path as of Q1 2024.",
       "news_evidence": [
         {
-          "summary": "Global X BOTZ concentrates in Japan-listed industrial-automation incumbents (FANUC, Keyence dominant); top five ~40% of the fund \u2014 limited humanoid exposure.",
-          "source": "Global X ETFs / SEC 497K",
-          "url": "https://www.globalxetfs.com/funds/botz",
-          "date": "2024-03-01"
+          "summary": "UAMPS and NuScale Power mutually agree to terminate the Carbon Free Power Project; project could not advance due to insufficient subscriber commitments and costs that had risen from $9,964/kW in 2015 to $21,561/kW — higher than the actual cost of Vogtle Unit 3 and 4.",
+          "source": "NuScale Power (press release)",
+          "url": "https://www.nuscalepower.com/press-releases/2023/utah-associated-municipal-power-systems-and-nuscale-power-agree-to-terminate-the-carbon-free-power-project",
+          "date": "2023-11-08"
         },
         {
-          "summary": "Q1 2024 best-performing ETFs were semiconductor/AI-infrastructure funds, confirming the rally favored pure AI/semis over the industrial automation that dominates BOTZ.",
-          "source": "ETF Stream / Morningstar",
-          "url": "https://www.etfstream.com/articles/etfs-in-review-q1-2024",
-          "date": "2024-04-01"
-        }
-      ]
-    },
-    {
-      "ticker": "GOOGL",
-      "rationale": "GOOGL's AI execution stumbled in February 2024 when Google paused Gemini image generation after racially inaccurate outputs, with Pichai calling the results 'completely unacceptable'; with MSFT and NVDA already covering AI strongly, a third AI name adds diminishing diversification and the slot is better redeployed.",
-      "news_evidence": [
-        {
-          "summary": "Google paused Gemini's AI image generation on Feb 22, 2024 after historically inaccurate racial depictions.",
-          "source": "CNBC",
-          "url": "https://www.cnbc.com/2024/02/22/google-pauses-gemini-ai-image-generator-after-inaccuracies.html",
-          "date": "2024-02-22"
+          "summary": "E&E News coverage of NuScale CFPP cancellation details the cost-surge dynamic: SMR economics did not scale as projected and the $1.4B DOE cost-share deal was insufficient to attract enough municipal utility subscribers at the revised price.",
+          "source": "E&E News by POLITICO",
+          "url": "https://www.eenews.net/articles/nuscale-cancels-first-of-a-kind-nuclear-project-as-costs-surge/",
+          "date": "2023-11-08"
         },
         {
-          "summary": "Pichai (Feb 28, 2024): Gemini's responses 'offended our users and showed bias... completely unacceptable and we got it wrong.'",
-          "source": "NPR",
-          "url": "https://www.npr.org/2024/02/28/1234532775/google-gemini-offended-users-images-race",
-          "date": "2024-02-28"
+          "summary": "NuScale Power 8-K filed February 15, 2024 announces Q4 and full-year 2023 earnings call for March 14, 2024; as of the filing date the company has no active commercial project following the November 2023 CFPP termination.",
+          "source": "SEC EDGAR",
+          "url": "https://www.sec.gov/Archives/edgar/data/0001822966/000182296624000008/a2024-02x15x8xkxprq4full.htm",
+          "date": "2024-02-15"
         }
       ]
     }
   ],
   "no_changes": false,
-  "rationale_overall": "The Q1 2024 rebalance narrows AI from three names to two (keeping MSFT and NVDA, the strongest execution stories) while rotating the freed slot plus the BOTZ slot into two uncovered thesis gaps: geopolitical/tanker (STNG, on the active Red Sea disruption) and a broader nuclear-renaissance play (NUKZ, capturing utilities and reactor developers URA misses). Post-change spans AI (MSFT, NVDA), rockets (RKLB), quantum (QTUM), nuclear (URA, NUKZ), defense (ITA), geopolitical (STNG) \u2014 holding the current AI wave while seeding the next waves early.",
+  "rationale_overall": "The single swap — SMR out, NUKZ in — is the only change warranted this quarter. NuScale Power lost its only announced SMR project to a cost collapse in November 2023; holding a pre-revenue single-name company with no active deployment path conflicts directly with the profile's 'enter during buildup, trim before the crest' rule when what has happened is not a crest but an outright execution failure. NUKZ, which launched on January 23 2024, replaces that exposure with a diversified nuclear-sector ETF (uranium producers, utilities, advanced reactor developers, construction services) that keeps the profile's nuclear-fission-for-AI-baseload thesis intact without concentrating on one company's broken pipeline. All other holdings are kept: NVDA is the dominant beneficiary of AI capex in Q1 2024 (revenue +262% YoY); RKLB closed Q1 with $1B+ backlog and 69% YoY revenue growth; IONQ reported 77% YoY revenue growth and extended its AWS access contract; GOOGL launched Gemini and beat Q1 revenue estimates; MSFT continues to monetize its OpenAI partnership through Azure; BOTZ maintains the profile's robotics-wave exposure; and ITA covers the defense/rearmament non-tech wave whose underlying holdings (GE Aerospace, ITT) reported strong Q1 results. The post-swap watchlist covers six distinct wave buckets (AI x3, nuclear, rockets/spacecraft, robotics, quantum, geopolitical/defense) within the eight-ticker cap.",
   "search_terms": [
-    "AI stocks artificial intelligence best performers Q1 2024 before:2024-04-01",
-    "space stocks rockets spacecraft launch 2024 before:2024-04-01",
-    "robotics stocks humanoid robot 2024 before:2024-04-01",
-    "quantum computing stocks 2024 before:2024-04-01",
-    "nuclear stocks SMR small modular reactor 2024 before:2024-04-01",
-    "tanker stocks energy geopolitical shipping freight 2024 before:2024-04-01",
-    "defense stocks rearmament ETF 2024 before:2024-04-01",
-    "aging population demographics healthcare eldercare REIT stocks 2024 before:2024-04-01",
-    "best performing ETF Q1 2024 before:2024-04-01",
-    "biggest stock gainers Q1 2024 before:2024-04-01",
-    "MSFT Microsoft stock news Q1 2024 before:2024-04-01",
-    "GOOGL Google Alphabet stock news Q1 2024 before:2024-04-01",
-    "NVDA Nvidia stock news Q1 2024 before:2024-04-01",
-    "RKLB Rocket Lab stock news Q1 2024 before:2024-04-01",
-    "QTUM Defiance quantum ETF performance 2024 before:2024-04-01",
-    "URA uranium ETF Global X nuclear energy 2024 before:2024-04-01",
-    "ITA iShares aerospace defense ETF performance 2024 before:2024-04-01",
-    "BOTZ Global X robotics AI ETF 2024 before:2024-04-01",
-    "NUKZ nuclear ETF launch January 2024 holdings performance before:2024-04-01",
-    "tanker stocks FRO STNG Frontline Scorpio Red Sea shipping rates 2024 before:2024-04-01",
-    "Welltower WELL Ventas VTR healthcare REIT 2024 before:2024-04-01",
-    "Nvidia NVDA earnings February 2024 Q4 results record before:2024-04-01",
-    "BOTZ robotics ETF underperforms 2024 thesis case before:2024-04-01",
-    "Red Sea Houthi attacks shipping freight rates tanker stocks surging 2024 before:2024-04-01",
-    "Google Gemini image generation controversy February 2024 before:2024-04-01",
-    "STNG Scorpio Tankers earnings Q4 2023 fleet revenue before:2024-04-01",
-    "NUKZ Range nuclear renaissance ETF nuclear energy 2024 data center power before:2024-04-01",
-    "ITA aerospace defense ETF Q1 2024 performance Ukraine NATO spending before:2024-04-01",
-    "Scorpio Tankers STNG Q4 2023 earnings release date revenue February 2024 before:2024-04-01",
-    "nuclear energy AI data center electricity demand Q1 2024 power consumption before:2024-04-01",
-    "uranium price 16 year high February 2024 nuclear energy before:2024-04-01"
+    "AI stocks artificial intelligence best performers after:2024-01-01 before:2024-04-01",
+    "space stocks rocket launch stocks after:2024-01-01 before:2024-04-01",
+    "robotics stocks humanoid robot stocks after:2024-01-01 before:2024-04-01",
+    "quantum computing stocks after:2024-01-01 before:2024-04-01",
+    "nuclear stocks SMR small modular reactor stocks after:2024-01-01 before:2024-04-01",
+    "defense stocks rearmament NATO defense ETF after:2024-01-01 before:2024-04-01",
+    "aging population demographics healthcare stocks eldercare REIT after:2024-01-01 before:2024-04-01",
+    "geopolitics energy stocks tanker stocks LNG shipping after:2024-01-01 before:2024-04-01",
+    "best performing ETF Q1 2024 after:2024-01-01 before:2024-04-01",
+    "biggest stock gainers Q1 2024 after:2024-01-01 before:2024-04-01",
+    "interest rates Federal Reserve 2024 outlook after:2024-01-01 before:2024-04-01",
+    "tariffs trade policy 2024 stocks after:2024-01-01 before:2024-04-01",
+    "SMR NuScale Power news 2024 after:2024-01-01 before:2024-04-01",
+    "IONQ IonQ quantum computing news after:2024-01-01 before:2024-04-01",
+    "LUNR Intuitive Machines news moon landing after:2024-01-01 before:2024-04-01",
+    "GLNG Golar LNG news stock after:2024-01-01 before:2024-04-01",
+    "NuScale UAMPS project cancelled SMR news before:2024-04-01",
+    "RKLB Rocket Lab news Q1 2024 after:2024-01-01 before:2024-04-01",
+    "NVDA Nvidia Q1 2024 earnings revenue after:2024-01-01 before:2024-04-01",
+    "LUNR Intuitive Machines IPO date listing SPAC before:2024-04-01",
+    "NUKZ ETF nuclear renaissance launch date listing before:2024-04-01",
+    "BOTZ robotics ETF performance news after:2024-01-01 before:2024-04-01",
+    "ITA defense aerospace ETF news after:2024-01-01 before:2024-04-01",
+    "GOOGL Google AI news Q1 2024 after:2024-01-01 before:2024-04-01",
+    "NUKZ Range Nuclear Renaissance ETF launch January 2024 nuclear after:2024-01-01 before:2024-04-01",
+    "nuclear energy AI data center power demand 2024 after:2024-01-01 before:2024-04-01",
+    "MSFT Microsoft AI news Q1 2024 after:2024-01-01 before:2024-04-01",
+    "NuScale Power Q4 2023 earnings results March 2024 after:2024-01-01 before:2024-04-01",
+    "nuclear power AI data center electricity demand Q1 2024 after:2024-01-01 before:2024-04-01"
   ]
 }

@@ -79,7 +79,7 @@ Note that recommendations do not execute trades — they only append optimizer o
 
 Run `/run-backtest` in Claude Code. This skill collects any missing historical news, evolves the watchlist quarter-by-quarter against your wave thesis, optimizes the portfolio at each rebalance, measures the resulting lift relative to a buy-and-hold investment strategy, and regenerates the backtest dashboard at `docs/backtest_curator.html` (open it locally in a browser to see your run).
 
-At each quarterly rebalance the curator reads news as of the rebalance date and proposes adds and removes to the watchlist; the optimizer then recomputes portfolio weights for whatever watchlist results, repeated across the window. Then compare results of your backtest to ours at [our backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html), +14.3pp/yr annualized when compared to the buy-and-hold investor's gains.
+At each quarterly rebalance the curator reads news as of the rebalance date and proposes adds and removes to the watchlist; the optimizer then recomputes portfolio weights for whatever watchlist results, repeated across the window. Then compare results of your backtest to ours at [our backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html), +25.6pp/yr annualized when compared to the buy-and-hold investor's gains.
 
 ### 5. sweep optimizer parameters (anytime)
 
@@ -163,14 +163,14 @@ This is the standard Markowitz mean-variance formulation (Markowitz 1952, *Portf
 
 This project builds an AI assistant that reads business news against a user's stated investment thesis, derives a curated watchlist of tickers from it, and then hands that watchlist to a standard mean-variance optimizer for weighting at each rebalance. The AI's job is watchlist composition only, while a simple but effective financial model then turns the watchlist into portfolio weights. The published backtest covers a **post-COVID, normal-regime window (2022-03-31 → 2025-10-31, ~3.6 years)** — it deliberately drops the distorted 2020–2021 stimulus melt-up and ends just before the late-2025 Iran-war runup, so it reads as a credible "normal markets" window. (The dashboard renders an aggressive sweep-optimal configuration; the robust configuration the live portfolio actually uses is shown alongside below.) To measure the AI's lift, we compare its track record against a tech-minded investor whose initial portfolio is equal amounts of `[AAPL, MSFT, GOOGL, NVDA, SPY]`, a buy-and-hold investor too busy to monitor news and revise their portfolio. We know such investors exist because the author of this project is one.
 
-NVDA is in the starter from day 0, so both the AI-managed portfolio and the buy-and-hold baseline ride it and the curator earns no credit there. The divergence comes from the curator's thematic adds and the optimizer's quarterly re-weighting. The clearest example is the rockets/spacecraft wave: the curator added Rocket Lab (RKLB) at the window's start in 2022 and held it through a multi-year, several-fold run; by 2025 the optimizer had concentrated heavily in RKLB — to the 70% cap in the live/robust config, and a full 100% in the aggressive published config. The curator also rotated the watchlist as theses matured: it added defense (ITA), kept quantum (QTUM), shifted nuclear from uranium-miners (URA) to operators and SMR developers (CEG, NUKZ) once hyperscaler PPAs landed, and dropped the broad AAPL/GOOGL/SPY names on dated catalysts (Apple's revenue slump, Google's antitrust ruling). Final watchlist: MSFT, NVDA, RKLB, QTUM, ITA, NUKZ, CEG, BOTZ.
+NVDA is in the starter from day 0, so both the AI-managed portfolio and the buy-and-hold baseline ride it and the curator earns no credit there. The divergence comes from the curator's thematic adds and the optimizer's quarterly re-weighting. The clearest example is the rockets/spacecraft wave: the curator added Rocket Lab (RKLB) at the window's start in 2022 and held it through a multi-year, several-fold run; by 2025 the optimizer had concentrated heavily in RKLB — to the 70% cap in the live/robust config, and a full 100% in the aggressive published config. The curator also rotated the watchlist as theses matured: it added defense (ITA) and robotics (BOTZ) early, opened the nuclear slot with single-name NuScale (SMR) and then swapped it for the diversified nuclear ETF (NUKZ) once NuScale's flagship project collapsed, played quantum first via IonQ (IONQ) and then trimmed it "before the crest" after the late-2024 run-up, and dropped the broad AAPL/MSFT/GOOGL/SPY names on dated catalysts (Apple's revenue slump, Microsoft's AI-margin compression) — finally opening the demographics slot with the senior-housing REIT Welltower (WELL). Final watchlist: BOTZ, GOOGL, ITA, NUKZ, NVDA, RKLB, WELL.
 
 **Total realized return over the window (2022–2025, ~3.6 years):**
 
 | Strategy | Return | Annualized |
 |---|---|---|
-| Curator — published/aggressive (λ=0.33, lookback 0.5y, cap=1.0) | **+910.2%** | **+90.5%** |
-| Curator — live/robust (λ=0.5, lookback 1.5y, cap=0.70) | +313.6% | +48.5% |
+| Curator — published/aggressive (λ=0.33, lookback 0.5y, cap=1.0) | **+816.6%** | **+85.4%** |
+| Curator — live/robust (λ=0.5, lookback 1.5y, cap=0.70) | +437.6% | +59.8% |
 | Buy-and-hold (equal-weight starter, includes NVDA) | +187.3% | +34.2% |
 | SPY benchmark | +58.7% | +13.7% |
 
@@ -180,9 +180,9 @@ The dashboard renders the **aggressive** row, but it ends ~100% in a single name
 
 | Measure | Value |
 |---|---|
-| Absolute (curator − buy/hold), total | +126pp |
-| Absolute, annualized | +14.3pp/yr |
-| Relative (curator − buy/hold) / (buy/hold) | 0.67 |
+| Absolute (curator − buy/hold), total | +250pp |
+| Absolute, annualized | +25.6pp/yr |
+| Relative (curator − buy/hold) / (buy/hold) | 1.34 |
 
 **A caveat on robustness.** This lift is not a steady, broad-based edge. The curator actually trailed the buy-and-hold portfolio for most of this window (it was ahead on only about 16% of trading days) and pulled clear only in 2025, when the optimizer concentrated heavily in Rocket Lab and RKLB ran hard — 70% under the live cap, a full 100% under the aggressive published cap. The outperformance therefore rests largely on a single late position rather than a repeatable advantage. Read it as one favorable wave the curator caught and held, not proof of a durable edge; a single winning bet (n=1) cannot separate skill from luck. There is also a look-ahead-bias / data-leakage caveat: the curator is an LLM whose training postdates the window, and live WebSearch ranks results by present-day fame, so the backtest is a hindsight-tinted upper bound, not a clean out-of-sample result. See [REFERENCE.md](REFERENCE.md#the-curator-backtest-post-covid-window) for the full bias accounting.
 

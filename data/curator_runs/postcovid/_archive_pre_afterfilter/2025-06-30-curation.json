@@ -1,0 +1,91 @@
+{
+  "as_of_date": "2025-06-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "BOTZ",
+      "wave_bucket": "robotics",
+      "rationale": "NVIDIA's GTC 2025 (March 18, 2025) commercially launched Isaac GR00T N1 humanoid-robot foundation models and the Newton physics engine with Fanuc, ABB, Agility, and Unitree, marking robotics' transition from concept to deployable platform; two first-of-kind robotics ETFs (KOID June 4, HUMN June 26) confirm forming institutional demand; BOTZ fills the only named wave with zero coverage and has $3.4B AUM and eight years of history.",
+      "news_evidence": [
+        {
+          "summary": "NVIDIA announces Isaac GR00T N1, the first open foundation model for generalized humanoid reasoning, plus Cosmos world models and Isaac simulation, at the GTC 2025 keynote March 18.",
+          "source": "NVIDIA Newsroom",
+          "url": "https://nvidianews.nvidia.com/news/nvidia-isaac-gr00t-n1-open-humanoid-robot-foundation-model-simulation-frameworks",
+          "date": "2025-03-18"
+        },
+        {
+          "summary": "NVIDIA and global robotics leaders (Agility, Boston Dynamics, Fanuc, Unitree) announce GTC 2025 partnerships to deploy physical-AI platforms commercially.",
+          "source": "NVIDIA Newsroom",
+          "url": "https://nvidianews.nvidia.com/news/nvidia-and-global-robotics-leaders-take-physical-ai-to-the-real-world",
+          "date": "2025-03-18"
+        },
+        {
+          "summary": "Roundhill HUMN begins trading June 26, 2025 (second pure-play robotics ETF after KraneShares KOID June 4); both too new for the 1.5y lookback, making the established BOTZ the clean vehicle.",
+          "source": "Roundhill Investments",
+          "url": "https://www.roundhillinvestments.com/etf/humn/",
+          "date": "2025-06-26"
+        }
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "STNG",
+      "rationale": "The product-tanker rate cycle has likely peaked: BIMCO and Drewry both forecast 2025 softening as fleet expansion outpaces demand, Q1 2025 LR2/MR TCE rates are well below 2024 highs, and Red Sea normalization would collapse the long-haul ton-mile thesis \u2014 a cyclical trade past its crest, not a structural position.",
+      "news_evidence": [
+        {
+          "summary": "BIMCO 2025 outlook: crude tankers tighten only slightly while product-tanker rates soften, with fleet expansion outpacing 2.5-3.5% cargo growth.",
+          "source": "Hellenic Shipping News / BIMCO",
+          "url": "https://www.hellenicshippingnews.com/bimco-crude-tanker-shipping-market-to-tighten-slightly-in-2025-products-to-soften/",
+          "date": "2025-01-15"
+        },
+        {
+          "summary": "Drewry warns product tankers 'battle fleet expansion in 2025' as new deliveries accelerate; any earlier Red Sea normalization adds downside.",
+          "source": "Drewry",
+          "url": "https://www.drewry.co.uk/maritime-research-opinion-browser/maritime-research-opinions/product-tanker-to-battle-fleet-expansion-in-2025",
+          "date": "2025-02-15"
+        },
+        {
+          "summary": "Scorpio Tankers Q1 2025: LR2 TCE $29k/day and MR $22k/day \u2014 materially below 2024 peaks; Q2 charter extensions at $31k/day cap near-term upside, confirming a rate ceiling.",
+          "source": "Yahoo Finance / Scorpio IR",
+          "url": "https://finance.yahoo.com/news/scorpio-tankers-inc-stng-q1-070956074.html",
+          "date": "2025-05-08"
+        }
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Single swap \u2014 STNG out, BOTZ in \u2014 rotates from a cyclical product-tanker trade whose rate thesis has eroded since the 2024 peak (BIMCO and Drewry forecasting further 2025 softening) into NVIDIA's robotics-platform buildout (Isaac GR00T N1 / Cosmos / Newton announced at GTC March 2025), filling the only named wave with zero coverage. Other holdings intact: NUKZ and CEG reinforced by the June 3 Constellation-Meta 20-year nuclear PPA; RKLB executing on cadence; ITA captures the multi-year defense buildup; MSFT and NVDA anchor AI despite MSFT's June EU/Italy regulatory headwinds. Post-swap covers six named waves \u2014 AI, rockets, quantum, nuclear, defense, robotics \u2014 with demographics open for a future quarter.",
+  "search_terms": [
+    "space stocks rocket launch 2025 before:2025-07-01",
+    "robotics stocks humanoid robot 2025 before:2025-07-01",
+    "quantum computing stocks 2025 before:2025-07-01",
+    "nuclear stocks SMR fission 2025 before:2025-07-01",
+    "AI artificial intelligence stocks 2025 before:2025-07-01",
+    "energy geopolitics tanker stocks oil 2025 before:2025-07-01",
+    "defense stocks rearmament military spending 2025 before:2025-07-01",
+    "aging population demographics healthcare eldercare stocks 2025 before:2025-07-01",
+    "best performing ETF this month June 2025 before:2025-07-01",
+    "biggest stock gainers June 2025 before:2025-07-01",
+    "MSFT Microsoft news June 2025 before:2025-07-01",
+    "NVDA Nvidia news June 2025 before:2025-07-01",
+    "RKLB Rocket Lab news June 2025 before:2025-07-01",
+    "QTUM Defiance Quantum ETF news 2025 before:2025-07-01",
+    "ITA iShares defense ETF news 2025 before:2025-07-01",
+    "NUKZ nuclear ETF news 2025 before:2025-07-01",
+    "STNG Scorpio Tankers news 2025 before:2025-07-01",
+    "CEG Constellation Energy news 2025 before:2025-07-01",
+    "BOTZ robotics ETF iShares news 2025 before:2025-07-01",
+    "AGNG Global X aging population ETF 2025 before:2025-07-01",
+    "Nvidia NVDA stock news May June 2025 before:2025-07-01",
+    "Rocket Lab RKLB Q2 2025 news quarterly before:2025-07-01",
+    "tanker rates product tanker market June 2025 before:2025-07-01",
+    "BOTZ Global X robotics ETF 2025 performance holdings before:2025-07-01",
+    "Scorpio Tankers STNG Q1 2025 earnings product tanker rates before:2025-07-01",
+    "robotics humanoid robot stocks momentum NVDA Jensen Huang June 2025 before:2025-07-01",
+    "defense rearmament ITA XAR aerospace defense stocks Q2 2025 before:2025-07-01",
+    "Nvidia GTC 2025 robotics physical AI announcement March before:2025-07-01",
+    "product tanker market outlook Red Sea 2025 H2 before:2025-07-01",
+    "Constellation Energy CEG nuclear PPA data center deal 2025 before:2025-07-01"
+  ]
+}

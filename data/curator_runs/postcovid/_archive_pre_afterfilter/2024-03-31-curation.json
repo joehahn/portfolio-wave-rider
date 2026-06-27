@@ -1,0 +1,117 @@
+{
+  "as_of_date": "2024-03-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "NUKZ",
+      "wave_bucket": "nuclear",
+      "rationale": "NUKZ launched January 23, 2024 and provides nuclear-renaissance exposure URA does not \u2014 utilities running reactors, reactor developers, and construction/services alongside uranium fuel \u2014 entering as uranium spot hit a 16-year high and AI-data-center baseload demand begins lifting the nuclear thesis.",
+      "news_evidence": [
+        {
+          "summary": "NUKZ launched Jan 23, 2024, tracking the VettaFi Nuclear Renaissance Index (53 holdings across reactors, utilities, construction/services, fuel) \u2014 broader than URA's uranium-mining-only focus.",
+          "source": "stockanalysis.com / Range ETFs",
+          "url": "https://stockanalysis.com/etf/nukz/",
+          "date": "2024-01-23"
+        },
+        {
+          "summary": "Uranium spot hit a 16-year high of $106/lb in late January 2024 on Kazatomprom production-miss news; held near $85/lb through late March.",
+          "source": "ANS Nuclear Newswire / Nasdaq",
+          "url": "https://www.nasdaq.com/articles/what-was-the-highest-price-for-uranium-updated-2024",
+          "date": "2024-01-28"
+        }
+      ]
+    },
+    {
+      "ticker": "STNG",
+      "wave_bucket": "geopolitical",
+      "rationale": "Scorpio Tankers is the cleanest US-listed product-tanker pure-play for the Red Sea disruption trade: Houthi attacks since November 2023 rerouted ships via the Cape of Good Hope, shrinking effective tanker supply and lifting freight rates, while STNG's Q4 2023 earnings (Feb 14) beat on revenue and EPS.",
+      "news_evidence": [
+        {
+          "summary": "S&P Global: tighter fleet capacity, Red Sea disruptions, and Cape rerouting expected to boost 2024 tanker freight; net product-tanker fleet growth just 1.4% in 2024.",
+          "source": "S&P Global Commodity Insights",
+          "url": "https://www.spglobal.com/commodity-insights/en/news-research/latest-news/shipping/010824-tighter-fleet-capacity-geopolitical-issues-longer-voyages-to-boost-2024-tanker-freight",
+          "date": "2024-01-08"
+        },
+        {
+          "summary": "Scorpio Tankers Q4 2023 (Feb 14, 2024): revenue $334.07M, net income $120.9M ($2.43 EPS), beating estimates; owns/leases 110 tankers.",
+          "source": "Yahoo Finance / SEC 6-K",
+          "url": "https://finance.yahoo.com/news/scorpio-tankers-stng-beats-q4-125503840.html",
+          "date": "2024-02-14"
+        }
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "BOTZ",
+      "rationale": "BOTZ's tilt toward Japanese industrial-automation incumbents (FANUC, Keyence, ABB) provides negligible exposure to the humanoid-robot buildup the profile names; the Q1 2024 AI rally is driven by pure semiconductor/software names, and no new milestone re-anchored BOTZ to the thesis.",
+      "news_evidence": [
+        {
+          "summary": "Global X BOTZ concentrates in Japan-listed industrial-automation incumbents (FANUC, Keyence dominant); top five ~40% of the fund \u2014 limited humanoid exposure.",
+          "source": "Global X ETFs / SEC 497K",
+          "url": "https://www.globalxetfs.com/funds/botz",
+          "date": "2024-03-01"
+        },
+        {
+          "summary": "Q1 2024 best-performing ETFs were semiconductor/AI-infrastructure funds, confirming the rally favored pure AI/semis over the industrial automation that dominates BOTZ.",
+          "source": "ETF Stream / Morningstar",
+          "url": "https://www.etfstream.com/articles/etfs-in-review-q1-2024",
+          "date": "2024-04-01"
+        }
+      ]
+    },
+    {
+      "ticker": "GOOGL",
+      "rationale": "GOOGL's AI execution stumbled in February 2024 when Google paused Gemini image generation after racially inaccurate outputs, with Pichai calling the results 'completely unacceptable'; with MSFT and NVDA already covering AI strongly, a third AI name adds diminishing diversification and the slot is better redeployed.",
+      "news_evidence": [
+        {
+          "summary": "Google paused Gemini's AI image generation on Feb 22, 2024 after historically inaccurate racial depictions.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2024/02/22/google-pauses-gemini-ai-image-generator-after-inaccuracies.html",
+          "date": "2024-02-22"
+        },
+        {
+          "summary": "Pichai (Feb 28, 2024): Gemini's responses 'offended our users and showed bias... completely unacceptable and we got it wrong.'",
+          "source": "NPR",
+          "url": "https://www.npr.org/2024/02/28/1234532775/google-gemini-offended-users-images-race",
+          "date": "2024-02-28"
+        }
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "The Q1 2024 rebalance narrows AI from three names to two (keeping MSFT and NVDA, the strongest execution stories) while rotating the freed slot plus the BOTZ slot into two uncovered thesis gaps: geopolitical/tanker (STNG, on the active Red Sea disruption) and a broader nuclear-renaissance play (NUKZ, capturing utilities and reactor developers URA misses). Post-change spans AI (MSFT, NVDA), rockets (RKLB), quantum (QTUM), nuclear (URA, NUKZ), defense (ITA), geopolitical (STNG) \u2014 holding the current AI wave while seeding the next waves early.",
+  "search_terms": [
+    "AI stocks artificial intelligence best performers Q1 2024 before:2024-04-01",
+    "space stocks rockets spacecraft launch 2024 before:2024-04-01",
+    "robotics stocks humanoid robot 2024 before:2024-04-01",
+    "quantum computing stocks 2024 before:2024-04-01",
+    "nuclear stocks SMR small modular reactor 2024 before:2024-04-01",
+    "tanker stocks energy geopolitical shipping freight 2024 before:2024-04-01",
+    "defense stocks rearmament ETF 2024 before:2024-04-01",
+    "aging population demographics healthcare eldercare REIT stocks 2024 before:2024-04-01",
+    "best performing ETF Q1 2024 before:2024-04-01",
+    "biggest stock gainers Q1 2024 before:2024-04-01",
+    "MSFT Microsoft stock news Q1 2024 before:2024-04-01",
+    "GOOGL Google Alphabet stock news Q1 2024 before:2024-04-01",
+    "NVDA Nvidia stock news Q1 2024 before:2024-04-01",
+    "RKLB Rocket Lab stock news Q1 2024 before:2024-04-01",
+    "QTUM Defiance quantum ETF performance 2024 before:2024-04-01",
+    "URA uranium ETF Global X nuclear energy 2024 before:2024-04-01",
+    "ITA iShares aerospace defense ETF performance 2024 before:2024-04-01",
+    "BOTZ Global X robotics AI ETF 2024 before:2024-04-01",
+    "NUKZ nuclear ETF launch January 2024 holdings performance before:2024-04-01",
+    "tanker stocks FRO STNG Frontline Scorpio Red Sea shipping rates 2024 before:2024-04-01",
+    "Welltower WELL Ventas VTR healthcare REIT 2024 before:2024-04-01",
+    "Nvidia NVDA earnings February 2024 Q4 results record before:2024-04-01",
+    "BOTZ robotics ETF underperforms 2024 thesis case before:2024-04-01",
+    "Red Sea Houthi attacks shipping freight rates tanker stocks surging 2024 before:2024-04-01",
+    "Google Gemini image generation controversy February 2024 before:2024-04-01",
+    "STNG Scorpio Tankers earnings Q4 2023 fleet revenue before:2024-04-01",
+    "NUKZ Range nuclear renaissance ETF nuclear energy 2024 data center power before:2024-04-01",
+    "ITA aerospace defense ETF Q1 2024 performance Ukraine NATO spending before:2024-04-01",
+    "Scorpio Tankers STNG Q4 2023 earnings release date revenue February 2024 before:2024-04-01",
+    "nuclear energy AI data center electricity demand Q1 2024 power consumption before:2024-04-01",
+    "uranium price 16 year high February 2024 nuclear energy before:2024-04-01"
+  ]
+}

@@ -3,78 +3,89 @@
   "rebalance_period": "quarterly",
   "adds": [
     {
-      "ticker": "BOTZ",
-      "wave_bucket": "robotics",
-      "rationale": "BOTZ fills the robotics wave \u2014 named in the profile as a likely next wave and the only declared wave with zero watchlist representation \u2014 as the sector transitions from science-project to buildout, per Morgan Stanley's April 2025 $5T long-run forecast and a ~39% CAGR projected through 2030.",
+      "ticker": "WELL",
+      "wave_bucket": "demographics",
+      "rationale": "Welltower enters to fill the demographics slot, which has zero representation in the current watchlist; Q2 2025 earnings (July 28) showed +21.9% FFO growth, a 4% revenue beat, and +23.4% Seniors Housing Operating NOI, while $9.2B in year-to-date acquisitions signals an active buildup phase against a structural US 80+ population growth tailwind and a supply pipeline constrained to 2% or less per year.",
       "news_evidence": [
         {
-          "summary": "Morgan Stanley's 'A $5 Trillion Global Market' report projects ~1B humanoid units by 2050, with labor-cost substitution across physical industries as the structural driver \u2014 the mechanism in the profile's robotics thesis.",
-          "source": "Morgan Stanley Insights",
-          "url": "https://www.morganstanley.com/insights/articles/humanoid-robot-market-5-trillion-by-2050",
-          "date": "2025-04-29"
+          "summary": "Welltower Q2 2025 results: normalized FFO $1.28/share (+21.9% YoY); total portfolio same-store NOI +13.8%; Seniors Housing Operating same-store NOI +23.4%; $9.2 billion in year-to-date transaction volume; full-year 2025 FFO guidance raised.",
+          "source": "PR Newswire",
+          "url": "https://www.prnewswire.com/news-releases/welltower-reports-second-quarter-2025-results-302515201.html",
+          "date": "2025-07-28"
         },
         {
-          "summary": "MarketsandMarkets sizes humanoid robots at $2.92B in 2025 growing to $15.26B by 2030 (39.2% CAGR) on falling AI compute costs, reshoring, and aging-population automation \u2014 buildup-phase entry timing.",
-          "source": "MarketsandMarkets",
-          "url": "https://www.marketsandmarkets.com/Market-Reports/humanoid-robot-market-99567653.html",
-          "date": "2025-01-01"
+          "summary": "Welltower Q2 2025 earnings call transcript: revenue $2.55B vs $2.45B expected (4.08% beat); Seniors Housing Operating revenue +10.1% driven by 420 bps occupancy growth and Revenue Per Occupied Room +4.9%; WELL stock rose 3.47% to $160.52 on the day.",
+          "source": "Investing.com",
+          "url": "https://www.investing.com/news/transcripts/earnings-call-transcript-welltower-q2-2025-results-show-strong-revenue-growth-93CH-4157934",
+          "date": "2025-07-28"
+        },
+        {
+          "summary": "US population aged 80 and above projected to grow 28% in the next five years while senior housing supply additions are expected to remain at 2% or less per year, creating a durable structural supply-demand imbalance that underpins healthcare REIT NOI growth.",
+          "source": "Nasdaq / Longevity Shift",
+          "url": "https://www.nasdaq.com/articles/longevity-shift-healthcare-reits-benefit-global-aging",
+          "date": "2025-09-01"
         }
       ]
     }
   ],
   "removes": [
     {
-      "ticker": "STNG",
-      "rationale": "STNG's rerouting-premium thesis has breached: Q2 2025 net income fell 68% YoY to $73.5M and average daily TCE dropped from $38,813 (2024) to $25,569, and management's September 4 filing locks a vessel into a 5-year charter at $28,350/day rather than riding spot \u2014 a classic 'exit before the crest' signal.",
+      "ticker": "MSFT",
+      "rationale": "Removing MSFT to trim AI-bucket concentration from three names to two: FY25 Q4 results showed cloud gross margin compressed to 69% as AI infrastructure capital spend scales, AI-service gross margins running approximately 60% versus traditional software's 80%, and capex guided above $40B for the next quarter — the stock declined on strong headline numbers, a classic peak-enthusiasm signal — and with GOOGL covering search/AI platforms and NVDA covering AI infrastructure hardware, MSFT provides the weakest incremental differentiation of the three AI names.",
       "news_evidence": [
         {
-          "summary": "Scorpio Tankers Q2 2025: net income $73.5M vs $227.3M YoY (-68%); average TCE fell to $25,569 from $38,813; dividend cut to $0.40/share \u2014 sustained freight-rate normalization.",
-          "source": "TipRanks / Scorpio IR",
-          "url": "https://www.tipranks.com/news/company-announcements/scorpio-tankers-reports-q2-2025-earnings-and-dividend",
+          "summary": "Microsoft FY25 Q4 (quarter ended June 30, 2025): Cloud gross margin percentage decreased to 69%, driven by the impact of scaling AI infrastructure; CapEx expected to increase to over $40B in Q1 FY26 as capacity comes online, including approximately $5B from higher component pricing.",
+          "source": "Microsoft Investor Relations",
+          "url": "https://www.microsoft.com/en-us/investor/earnings/fy-2025-q4/performance",
           "date": "2025-07-30"
         },
         {
-          "summary": "Scorpio 6-K (Sep 4, 2025): locks the LR2 STI Orchard into a 5-year charter at $28,350/day while Q3 LR2 spot TCE of $32,700 remains ~16% below the 2024 peak \u2014 a signal spot rates are near/past their ceiling.",
-          "source": "GlobeNewswire / SEC 6-K",
-          "url": "https://www.globenewswire.com/news-release/2025/09/04/3144270/0/en/Scorpio-Tankers-Inc-Announces-a-Time-Charter-Out-Agreement-and-an-Update-on-Daily-TCE-Rates.html",
-          "date": "2025-09-04"
+          "summary": "MSFT Q4 deep dive: AI services gross margin approximately 60% versus approximately 80% for traditional software; CFO Amy Hood acknowledged data center depreciation would compress gross margins for several more quarters; analysts questioned the timeline to recover returns on massive AI capex.",
+          "source": "StockStory",
+          "url": "https://stockstory.org/us/stocks/nasdaq/msft/news/earnings-call/msft-q4-deep-dive-ai-investment-drives-cloud-growth-capex-concerns-emerge",
+          "date": "2025-07-30"
+        },
+        {
+          "summary": "Hyperscaler enterprise AI adoption broad (80-90% of firms) but shallow (fewer than 40% have scaled beyond pilot programs), widening the gap between hyperscaler capex commitments and near-term monetization; bond spreads increased and median equity prices declined even as Q2 2025 results printed, signaling investor skepticism on capex payback timelines.",
+          "source": "Allianz Economic Research",
+          "url": "https://www.allianz.com/content/dam/onemarketing/azcom/Allianz_com/economic-research/publications/specials/en/2026/march/2026_03_25_AI.pdf",
+          "date": "2025-07-30"
         }
       ]
     }
   ],
   "no_changes": false,
-  "rationale_overall": "Sole swap \u2014 STNG out, BOTZ in \u2014 tightens alignment with the profile's wave map. STNG exits on Q2-Q3 2025 fundamentals: freight rates 16-34% below 2024 peaks and management de-risking into long-term charters, signaling the rerouting premium has crested (the profile's guidance is to trim tankers as rates normalize). BOTZ closes the robotics gap \u2014 the only named tech wave with zero representation \u2014 as the April 2025 Morgan Stanley $5T forecast plus an accelerating ETF-launch cycle mark the transition from quiet buildup to early surge. Post-change spans AI (MSFT, NVDA), rockets (RKLB), quantum (QTUM), nuclear (NUKZ, CEG), defense (ITA), robotics (BOTZ), with defense the sole geopolitical expression after STNG's exit.",
+  "rationale_overall": "This rebalance makes one swap — MSFT out, WELL in — that serves two simultaneous goals from the investor profile. First, it reduces AI-bucket concentration: holding GOOGL, MSFT, and NVDA in an eight-name watchlist dedicates 37.5% of watchlist slots to one wave; with FY25 Q4 signaling margin compression ahead for the AI infrastructure buildout and the market already pricing perfection into the megacaps, removing the most redundant AI name (MSFT) before the crest is consistent with operating rule one. GOOGL and NVDA stay because each holds a distinct role: GOOGL has the antitrust-relief catalyst and search-AI monetization, NVDA has the Blackwell hardware ramp and the purest AI infrastructure moat. Second, it fills the demographics slot, which the profile explicitly names as a watched non-technology wave but the portfolio has never held; Welltower's Q2 2025 results show the wave is already in active buildup — $9.2B in year-to-date acquisitions, +21.9% FFO growth, a 4% revenue beat — while the US 80-plus population growth and constrained housing supply provide the structural tailwind. All other holdings are kept: RKLB posted record Q2 2025 revenue of $144.5M (+36% YoY); IONQ completed the Oxford Ionics acquisition on September 17 and achieved AQ-64 ahead of schedule; NVDA guided Q3 FY26 to $54B; NUKZ benefits from the ongoing AI data center power-purchase-agreement thesis; BOTZ and ITA remain well-supported by the robotics and defense-rearmament waves respectively.",
   "search_terms": [
-    "AI stocks technology 2025 before:2025-10-01",
-    "space stocks rockets spacecraft 2025 before:2025-10-01",
-    "robotics stocks humanoid robot 2025 before:2025-10-01",
-    "quantum computing stocks 2025 before:2025-10-01",
-    "nuclear SMR stocks utility PPA AI data center 2025 before:2025-10-01",
-    "tanker stocks shipping freight geopolitical energy 2025 before:2025-10-01",
-    "defense stocks rearmament NATO European 2025 before:2025-10-01",
-    "aging population demographics healthcare eldercare REIT stocks 2025 before:2025-10-01",
-    "best performing ETF September 2025 before:2025-10-01",
-    "biggest stock gainers Q3 2025 before:2025-10-01",
-    "robotics ETF BOTZ ROBO 2025 performance before:2025-10-01",
-    "Welltower WELL healthcare REIT 2025 before:2025-10-01",
-    "MSFT Microsoft stock news Q3 2025 before:2025-10-01",
-    "NVDA Nvidia stock news Q3 2025 before:2025-10-01",
-    "RKLB Rocket Lab news 2025 before:2025-10-01",
-    "QTUM quantum computing ETF news 2025 before:2025-10-01",
-    "ITA iShares defense ETF news 2025 before:2025-10-01",
-    "NUKZ nuclear energy ETF news 2025 before:2025-10-01",
-    "STNG Scorpio Tankers stock news 2025 before:2025-10-01",
-    "CEG Constellation Energy stock news 2025 before:2025-10-01",
-    "BOTZ Global X robotics ETF 2025 performance news before:2025-10-01",
-    "Constellation Energy CEG Calpine acquisition nuclear PPA 2025 before:2025-10-01",
-    "Scorpio Tankers STNG Q2 2025 earnings freight rates before:2025-10-01",
-    "KRMN Karman Holdings spacecraft stock IPO 2025 before:2025-10-01",
-    "BOTZ robotics ETF news August September 2025 before:2025-10-01",
-    "Rocket Lab RKLB Synspective Mars launch September 2025 before:2025-10-01",
-    "\"robotics\" \"ETF\" 2025 quarterly performance humanoid industrial automation before:2025-10-01",
-    "Microsoft MSFT Azure AI cloud revenue growth 2025 Q2 before:2025-10-01",
-    "Morgan Stanley humanoid robot report 2025 date \"Humanoid Tech 25\" before:2025-10-01",
-    "STNG Scorpio Tankers TCE rates freight normalization 2025 before:2025-10-01",
-    "NUKZ nuclear ETF \"energy demand\" \"data center\" August 2025 before:2025-10-01"
+    "AI stocks artificial intelligence stocks momentum after:2025-07-01 before:2025-10-01",
+    "space stocks rocket launch stocks after:2025-07-01 before:2025-10-01",
+    "robotics stocks humanoid robot stocks after:2025-07-01 before:2025-10-01",
+    "quantum computing stocks after:2025-07-01 before:2025-10-01",
+    "nuclear stocks SMR stocks fission fusion after:2025-07-01 before:2025-10-01",
+    "geopolitical energy stocks tanker stocks LNG shipping after:2025-07-01 before:2025-10-01",
+    "defense stocks defense ETF rearmament after:2025-07-01 before:2025-10-01",
+    "aging population demographics healthcare stocks eldercare REIT after:2025-07-01 before:2025-10-01",
+    "best performing ETF biggest stock gainers after:2025-07-01 before:2025-10-01",
+    "interest rates tariffs macro market outlook after:2025-07-01 before:2025-10-01",
+    "BOTZ robotics ETF news after:2025-07-01 before:2025-10-01",
+    "IONQ IonQ news quantum computing after:2025-07-01 before:2025-10-01",
+    "ITA iShares aerospace defense ETF news after:2025-07-01 before:2025-10-01",
+    "RKLB Rocket Lab news after:2025-07-01 before:2025-10-01",
+    "NUKZ nuclear ETF news after:2025-07-01 before:2025-10-01",
+    "NVDA Nvidia news earnings after:2025-07-01 before:2025-10-01",
+    "MSFT Microsoft news AI cloud after:2025-07-01 before:2025-10-01",
+    "GOOGL Alphabet news antitrust AI after:2025-07-01 before:2025-10-01",
+    "hyperscaler AI capex overbuilding risk Q2 2025 after:2025-07-01 before:2025-10-01",
+    "Welltower WELL Ventas VTR healthcare REIT aging demographics news after:2025-07-01 before:2025-10-01",
+    "Welltower WELL senior housing acquisition earnings Q3 2025 after:2025-07-01 before:2025-10-01",
+    "KOID humanoid robotics ETF KraneShares launch AUM after:2025-06-01 before:2025-10-01",
+    "MSFT Microsoft Azure AI revenue growth concerns Q2 2025 fiscal year after:2025-07-01 before:2025-10-01",
+    "ITA defense ETF aerospace performance Q3 2025 after:2025-07-01 before:2025-10-01",
+    "Welltower Q2 2025 earnings results July 2025 after:2025-07-01 before:2025-10-01",
+    "KOID ETF KraneShares IPO launch date June 2025 listing before:2025-10-01",
+    "BOTZ Global X robotics AI ETF humanoid robot stocks Q3 2025 after:2025-07-01 before:2025-10-01",
+    "Rocket Lab RKLB contract award NASA SDA 2025 before:2025-10-01",
+    "Microsoft MSFT FY25 Q4 earnings capex AI margins concerns July 30 2025 after:2025-07-01 before:2025-10-01",
+    "Rocket Lab Q2 2025 earnings revenue backlog results August 2025 after:2025-07-01 before:2025-10-01"
   ]
 }

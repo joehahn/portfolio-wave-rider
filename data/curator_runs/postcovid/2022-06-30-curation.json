@@ -3,89 +3,97 @@
   "rebalance_period": "quarterly",
   "adds": [
     {
-      "ticker": "BOTZ",
-      "wave_bucket": "robotics",
-      "rationale": "BOTZ is the most liquid US-listed robotics ETF and gives clean exposure to the profile's robotics next-wave at a time when H1 2022 growth-stock weakness has compressed its price \u2014 an attractive early-accumulation entry.",
+      "ticker": "RKLB",
+      "wave_bucket": "rockets_spacecraft",
+      "rationale": "Rocket Lab is the only publicly-traded pure-play small-launch company with an active and growing orbital cadence — two successful Electron missions in Q2 2022 alone — making it the most direct early-buildup entry into the rockets-and-spacecraft wave the profile explicitly names as a likely next wave.",
       "news_evidence": [
         {
-          "summary": "Global X 497K confirms BOTZ tracks the Indxx Global Robotics & AI Thematic Index across industrial robotics/automation, drones, AI, and non-industrial robotics (Jan 31, 2022 reconstitution).",
-          "source": "SEC EDGAR",
-          "url": "https://www.sec.gov/Archives/edgar/data/0001432353/000143235322000255/a497kroboticsartificialint.htm",
-          "date": "2022-01-31"
+          "summary": "Rocket Lab's 26th Electron mission 'There And Back Again' on May 2, 2022 delivers 34 payloads to sun-synchronous orbit and makes history with the first-ever helicopter mid-air booster-capture attempt, demonstrating growing launch cadence and early reusability progress.",
+          "source": "CNN Business",
+          "url": "https://www.cnn.com/2022/05/02/tech/rocket-lab-helicopter-booster/index.html",
+          "date": "2022-05-02"
+        },
+        {
+          "summary": "Rocket Lab's 25th Electron mission carries two BlackSky Earth-observation satellites to orbit in April 2022, the company's first of two successful commercial missions in the quarter, continuing a multi-year track record of reliable small-satellite delivery.",
+          "source": "NASASpaceFlight.com",
+          "url": "https://www.nasaspaceflight.com/2022/04/electron-blacksky-25th-mission/",
+          "date": "2022-04-02"
         }
       ]
     },
     {
-      "ticker": "RKLB",
-      "wave_bucket": "rockets_spacecraft",
-      "rationale": "Rocket Lab is the only liquid US-listed pure-play small-launch provider, showing concrete H1 2022 momentum via the $143M MDA/Globalstar spacecraft contract and 124% YoY Q1 revenue growth \u2014 firmly in the buildup phase of the rockets/spacecraft wave.",
+      "ticker": "BOTZ",
+      "wave_bucket": "robotics",
+      "rationale": "The Global X Robotics and AI ETF (launched 2016, highly liquid) provides diversified exposure to the robotics wave the profile names as a next wave, and Amazon's June 22, 2022 unveiling of its first fully autonomous mobile warehouse robot confirms the wave has entered a clear commercial-deployment buildup phase driven by persistent labor shortages.",
       "news_evidence": [
         {
-          "summary": "Rocket Lab selected by MDA to build 17 spacecraft buses for Globalstar's LEO constellation; initial contract $143M with options for nine more.",
-          "source": "Business Wire / Nasdaq",
-          "url": "https://www.nasdaq.com/press-release/rocket-lab-selected-by-mda-to-design-and-build-spacecraft-for-globalstar-2022-02-24",
-          "date": "2022-02-24"
+          "summary": "Amazon unveils 'Proteus,' its first fully autonomous mobile warehouse robot, at the Re:Mars conference on June 22, 2022, designed to navigate freely around workers and automate GoCart transport, signaling mainstream commercial adoption of autonomous robotics to offset labor shortages.",
+          "source": "TechCrunch",
+          "url": "https://techcrunch.com/2022/06/22/amazon-debuts-a-fully-autonomous-warehouse-robot/",
+          "date": "2022-06-22"
         },
         {
-          "summary": "Rocket Lab Q1 FY2022: revenue $40.7M (+124% YoY); Space Systems +1,873% YoY; Q2 guidance $51-54M.",
-          "source": "SEC EDGAR (8-K)",
-          "url": "https://www.sec.gov/Archives/edgar/data/0001819994/000119312522151833/d342077dex991.htm",
-          "date": "2022-05-16"
+          "summary": "Amazon simultaneously reveals Cardinal, an AI-powered robotic arm for package sorting, alongside Proteus at Re:Mars, reinforcing the breadth of its 2022 warehouse-automation push and reflecting industrywide investment in robotics to address the ongoing U.S. labor shortage.",
+          "source": "Supply Chain Dive",
+          "url": "https://www.supplychaindive.com/news/amazon-unveils-first-fully-autonomous-mobile-robot-proteus-warehouse/626164/",
+          "date": "2022-06-22"
         }
       ]
     },
     {
       "ticker": "ITA",
       "wave_bucket": "geopolitical",
-      "rationale": "The 2022 NATO Madrid Summit (June 29-30, on the rebalance date) locked in a structural multi-year increase in allied defense budgets \u2014 the clearest near-term catalyst for the profile's geopolitical-rearmament wave; ITA is the most liquid broad US defense ETF to capture it.",
+      "rationale": "Russia's ongoing invasion of Ukraine has triggered a structural, multi-year NATO rearmament cycle cemented at the June 2022 Madrid summit, making the iShares U.S. Aerospace and Defense ETF a direct and liquid way to capture the geopolitical-realignment wave the profile watches, without single-stock concentration risk.",
       "news_evidence": [
         {
-          "summary": "White House Madrid Summit fact sheet: 2022 is the eighth straight year of rising non-US allied defense spending; new US force posture in Poland, UK, Italy, Germany \u2014 cementing multi-year rearmament.",
-          "source": "The White House",
-          "url": "https://bidenwhitehouse.archives.gov/briefing-room/statements-releases/2022/06/29/fact-sheet-the-2022-nato-summit-in-madrid/",
-          "date": "2022-06-29"
+          "summary": "Foreign Policy reports on June 30, 2022 that Putin's Ukraine invasion has 'turbocharged' NATO defense spending, with alliance members at the Madrid summit committing to new strategic concepts, higher force posture targets, and multi-year budget increases well above the 2-percent GDP floor.",
+          "source": "Foreign Policy",
+          "url": "https://foreignpolicy.com/2022/06/30/nato-defense-spending-putin-ukraine-war/",
+          "date": "2022-06-30"
         },
         {
-          "summary": "NATO 2022 Strategic Concept adopted at Madrid; allies submit updated spending plans under the 2% GDP pledge, a durable demand signal for ITA's defense holdings (LMT, NOC, RTX).",
-          "source": "NATO / EPRS",
-          "url": "https://www.europarl.europa.eu/RegData/etudes/ATAG/2022/733604/EPRS_ATA(2022)733604_EN.pdf",
-          "date": "2022-06-30"
+          "summary": "PBS NewsHour reports NATO Secretary-General Stoltenberg calling for larger defense budgets and a harder spending target as the Madrid summit formalizes that the Ukraine war has permanently reshaped the alliance's defense posture.",
+          "source": "PBS NewsHour",
+          "url": "https://www.pbs.org/newshour/world/nato-chief-eyes-bigger-defense-budgets-hard-spending-target-amid-war-in-ukraine",
+          "date": "2022-06-29"
         }
       ]
     }
   ],
   "removes": [],
   "no_changes": false,
-  "rationale_overall": "The starter watchlist is heavily concentrated in the current AI wave. This rebalance fills three next-wave slots: BOTZ for robotics (early-accumulation after H1 2022 growth-stock compression), RKLB for rockets/spacecraft (clear revenue ramp and the landmark MDA/Globalstar contract), and ITA for geopolitical-rearmament (the NATO Madrid Summit on the rebalance date locked in multi-year allied defense-budget expansion). Quantum (IONQ/RGTI) and nuclear (SMR, only ~58 days of price history) are deferred to Q3 2022 when the optimizer will have more data. Post-change watchlist reaches the 8-cap with no removals.",
+  "rationale_overall": "The existing five-ticker watchlist (AAPL, MSFT, GOOGL, NVDA, SPY) is concentrated entirely in the AI and broad-market buckets with zero coverage of the next-wave themes the profile identifies as buildup-stage targets. This first rebalance fills all three open slots to reach the 8-ticker cap: RKLB captures the rockets-and-spacecraft wave via the only publicly-traded pure-play small-launch operator, which is actively executing commercial missions in Q2 2022; BOTZ adds diversified robotics exposure as Amazon's Proteus announcement confirms the wave has entered commercial deployment; and ITA captures the structural defense-rearmament wave that the NATO Madrid summit has made explicit as a multi-decade commitment. All five existing tickers are retained — their shared drawdown in the 2022 rate-hike bear market is a multiple compression story, not a thesis breach — and the watchlist now spans five distinct wave buckets rather than one.",
   "search_terms": [
-    "space stocks rockets spacecraft 2022 before:2022-07-01",
-    "robotics stocks 2022 before:2022-07-01",
-    "quantum computing stocks 2022 before:2022-07-01",
-    "nuclear energy stocks SMR small modular reactor 2022 before:2022-07-01",
-    "AI artificial intelligence stocks ETF 2022 before:2022-07-01",
-    "defense stocks rearmament ETF 2022 before:2022-07-01",
-    "energy stocks oil tanker geopolitical 2022 Russia Ukraine before:2022-07-01",
-    "aging population demographics healthcare stocks eldercare 2022 before:2022-07-01",
-    "best performing ETF 2022 Q2 before:2022-07-01",
-    "biggest stock gainers June 2022 before:2022-07-01",
-    "NVDA Nvidia stock news Q2 2022 before:2022-07-01",
-    "AAPL Apple stock news Q2 2022 before:2022-07-01",
-    "BOTZ robotics ETF Global X 2022 before:2022-07-01",
-    "Rocket Lab RKLB stock news 2022 before:2022-07-01",
-    "Rocket Lab launch 2022 Electron rocket contract before:2022-07-01",
-    "NuScale Power SMR stock IPO SPAC 2022 before:2022-07-01",
-    "ITA aerospace defense ETF iShares 2022 performance before:2022-07-01",
-    "IonQ IONQ quantum computing stock 2022 before:2022-07-01",
-    "IonQ 2022 Q1 earnings quantum computing milestones before:2022-07-01",
-    "defense spending NATO Ukraine war stocks 2022 before:2022-07-01",
-    "IONQ IonQ quantum computing contract 2022 milestones SEC filing before:2022-07-01",
-    "MSFT Microsoft GOOGL Alphabet stock news Q2 2022 before:2022-07-01",
-    "IonQ Q4 2021 annual results quantum computing 2022 before:2022-07-01",
-    "Rocket Lab RKLB 2022 first quarter earnings revenue contracts before:2022-07-01",
-    "BOTZ ETF SEC filing 2022 index composition robotics before:2022-07-01",
-    "ITA iShares defense ETF Russia Ukraine NATO 2022 performance before:2022-07-01",
-    "\"Global X\" BOTZ robotics ETF 2022 SEC 497K filing January before:2022-07-01",
-    "NATO summit 2022 Madrid defense ETF ITA before:2022-07-01",
-    "Rocket Lab MDA Globalstar 2022 contract spacecraft bus before:2022-07-01"
+    "AI artificial intelligence stocks 2022 after:2022-04-01 before:2022-07-01",
+    "space stocks rocket launch spacecraft 2022 after:2022-04-01 before:2022-07-01",
+    "robotics stocks 2022 after:2022-04-01 before:2022-07-01",
+    "quantum computing stocks news Q2 2022 before:2022-07-01",
+    "nuclear energy SMR stocks 2022 before:2022-07-01",
+    "defense stocks rearmament 2022 before:2022-07-01",
+    "oil gas energy stocks geopolitical 2022 Q2 before:2022-07-01",
+    "healthcare aging population demographics stocks 2022 before:2022-07-01",
+    "best performing ETF Q2 2022 before:2022-07-01",
+    "biggest stock gainers Q2 2022 before:2022-07-01",
+    "interest rates Fed inflation tech stocks 2022 before:2022-07-01 after:2022-04-01",
+    "Rocket Lab RKLB news 2022 before:2022-07-01",
+    "NuScale Power SMR IPO listing 2022 before:2022-07-01",
+    "NVDA Nvidia news Q2 2022 before:2022-07-01 after:2022-04-01",
+    "AAPL Apple MSFT Microsoft GOOGL Google stock Q2 2022 before:2022-07-01",
+    "BOTZ robotics ETF news 2022 before:2022-07-01",
+    "defense ETF XAR ITA aerospace 2022 before:2022-07-01",
+    "IonQ IONQ quantum computing 2022 before:2022-07-01",
+    "Rocket Lab RKLB launches contracts 2022 after:2022-04-01 before:2022-07-01",
+    "BOTZ Global X Robotics ETF 2022 robotics automation industrial after:2022-04-01 before:2022-07-01",
+    "ITA defense ETF Ukraine war spending 2022 after:2022-04-01 before:2022-07-01",
+    "Rocket Lab Electron launch mission 2022 spring before:2022-07-01",
+    "Rocket Lab Capella Space contract 2022 before:2022-07-01",
+    "robotics automation labor shortage demand 2022 industrial robots before:2022-07-01 after:2022-04-01",
+    "IONQ IonQ government contract 2022 before:2022-07-01",
+    "IonQ IONQ quantum news announcement April May June 2022 before:2022-07-01 after:2022-04-01",
+    "SPDR aerospace defense ETF XAR performance Ukraine 2022 before:2022-07-01",
+    "robotics market growth investment 2022 industrial automation news before:2022-07-01 after:2022-04-01",
+    "Amazon autonomous robot warehouse June 2022 before:2022-07-01",
+    "defense spending NATO 2022 Ukraine Q2 rearmament before:2022-07-01 after:2022-04-01",
+    "NATO defense spending increase Ukraine May June 2022 news before:2022-07-01"
   ]
 }

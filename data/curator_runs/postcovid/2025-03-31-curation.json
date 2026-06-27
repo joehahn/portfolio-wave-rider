@@ -3,76 +3,89 @@
   "rebalance_period": "quarterly",
   "adds": [
     {
-      "ticker": "BOTZ",
-      "wave_bucket": "robotics",
-      "rationale": "Fills the only declared profile wave (robotics) with zero watchlist coverage: January 2025 brought the broadest FDA clearance expansion in da Vinci 5 history, and the broader industrial-automation buildout confirms the wave is in early-buildup, not peak.",
+      "ticker": "WELL",
+      "wave_bucket": "demographics",
+      "rationale": "Welltower's C$4.6B acquisition of 38 Amica ultra-luxury senior housing communities (announced March 2, 2025) and strong Q4 2024 operating results (normalized FFO +17.7% YoY, senior housing same-store NOI +23.9%) deliver a concrete commercial milestone that gives the demographics wave its first watchlist representation, while also adding a defensive non-tech position at a time when DeepSeek and tariff fears are punishing AI-heavy tech names.",
       "news_evidence": [
         {
-          "summary": "Intuitive Surgical's da Vinci 5 received FDA clearance for nine cardiac procedures on Jan 22, 2025 \u2014 the most significant indication expansion since launch, opening a large new surgical-robotics market.",
-          "source": "Intuitive Surgical",
-          "url": "https://isrg.intuitive.com/news-releases/news-release-details/da-vinci-5-cleared-cardiac-procedures/",
-          "date": "2025-01-22"
+          "summary": "Welltower announced acquisition of 38 ultra-luxury Amica Senior Lifestyles communities from Ontario Teachers' Pension Plan for C$4.6B, forming a long-term senior housing growth partnership — the single largest senior housing transaction in Welltower's history",
+          "source": "Welltower Investor Room / PR Newswire",
+          "url": "https://welltower.investorroom.com/2025-03-02-Welltower-Announces-Acquisition-of-Ultra-Luxury-Amica-Senior-Lifestyles-Portfolio-for-C-4-6-Billion-and-Formation-of-Long-Term-Growth-Partnership",
+          "date": "2025-03-02"
         },
         {
-          "summary": "MassDevice: da Vinci 5 cardiac 510(k) clearances with analysts projecting 13-15% da Vinci procedure growth for 2025 \u2014 a durable multi-year robotics-surgery ramp.",
-          "source": "MassDevice",
-          "url": "https://www.massdevice.com/intuitive-fda-510k-clearances-cardiac-procedures-da-vinci-5/",
-          "date": "2025-01-22"
+          "summary": "Welltower Q4 2024 earnings: quarterly revenue $2.25B (beat analyst estimate of $2.12B), normalized FFO up 17.7% YoY to $1.13/share, Seniors Housing Operating same-store NOI +23.9%; net debt/EBITDA improved to 3.49x from 5.03x a year earlier",
+          "source": "GuruFocus",
+          "url": "https://www.gurufocus.com/news/2691807/welltower-inc-well-q4-2024-earnings-eps-misses-at-019-revenue-growth-driven-by-seniors-housing-portfolio",
+          "date": "2025-02-01"
+        },
+        {
+          "summary": "Health care REITs' defensive attributes kept the sector in favor heading into 2025; aging-population secular demand insulates the sector from macro uncertainty — outperforming in the same Q1 environment where AI-heavy tech names sold off on DeepSeek and tariff fears",
+          "source": "Nareit",
+          "url": "https://www.reit.com/news/articles/health-care-reits-defensive-attributes-keep-sector-in-favor-in-2025",
+          "date": "2025-01-10"
         }
       ]
     }
   ],
   "removes": [
     {
-      "ticker": "STNG",
-      "rationale": "The product-tanker thesis is softening as risk rises: Teekay's March 2025 update confirmed the tanker market started 2025 soft, a potential Houthi/Red Sea ceasefire threatens to dissolve the tonne-mile disruption premium baked into STNG, and Trump tariff uncertainty is a direct headwind to the trade volumes that drive rates.",
+      "ticker": "IONQ",
+      "rationale": "Quantum computing stocks hit peak-enthusiasm multiples after Google's Willow chip announcement (December 2024), leaving IONQ at roughly 150-200x trailing revenue entering Q1 2025; Amazon's Ocelot quantum chip (February 27, 2025) then showed hyperscalers building quantum capability in-house, creating a structural competitive threat to pure-play vendors — and GOOGL already in the watchlist provides quantum-theme exposure via Google's own Willow research program.",
       "news_evidence": [
         {
-          "summary": "Teekay Tankers (Mar 11, 2025): 'the tanker market started 2025 on a soft note,' flagging Red Sea normalization and US tariffs as the two biggest downside risks \u2014 exactly the pillars of STNG's geopolitical premium.",
-          "source": "Teekay",
-          "url": "https://www.teekay.com/blog/2025/03/11/teekay-tankers-market-update-march-2025/",
-          "date": "2025-03-11"
+          "summary": "Amazon Web Services announced Ocelot, its first quantum computing chip, on February 27, 2025 — built around cat-qubit architecture at Caltech, reducing error-correction resource requirements by up to 90%; a direct signal that hyperscalers are internalizing quantum R&D rather than procuring from pure-play vendors",
+          "source": "MIT Technology Review",
+          "url": "https://www.technologyreview.com/2025/02/27/1112560/amazon-quantum-computing-chip-makes-its-debut/",
+          "date": "2025-02-27"
         },
         {
-          "summary": "Breakwave Advisors' Jan 2025 outlook flagged mixed product-tanker fundamentals \u2014 new vessel supply and softening demand constraining a rate recovery even before tariff headwinds.",
-          "source": "Breakwave Advisors",
-          "url": "https://www.breakwaveadvisors.com/insights/2025/1/27/the-2025-outlook-for-dry-bulk-and-tanker-markets",
-          "date": "2025-01-27"
+          "summary": "IonQ Q4 2024 results: full-year 2024 revenue $43.1M (+95% YoY), Q4 revenue $11.7M, bookings $95.6M; 2025 guidance $75-95M — strong growth but a market cap implied by the post-Willow surge priced in revenues many years out, producing a P/S ratio the sell-side itself called 'stratospheric' and 'completely overvalued'",
+          "source": "Yahoo Finance / Quartr",
+          "url": "https://finance.yahoo.com/news/earnings-watch-ionq-inc-ionq-151430707.html",
+          "date": "2025-02-27"
+        },
+        {
+          "summary": "Seeking Alpha analysis: 'IonQ: Is Falling Behind Its Competitors While Being Completely Overvalued' — stock trading at P/S ratios exceeding 100x vs tech-industry average of ~4x, with hyperscalers (Google Willow, now AWS Ocelot) accelerating in-house quantum programs that crowd out third-party pure plays",
+          "source": "Seeking Alpha",
+          "url": "https://seekingalpha.com/article/4830968-ionq-is-falling-behind-its-competitors-while-being-completely-overvalued",
+          "date": "2025-01-15"
         }
       ]
     }
   ],
   "no_changes": false,
-  "rationale_overall": "The watchlist entered Q1 2025 full (8/8) with a conspicuous gap: robotics is a named next wave yet had zero representation. Swapping STNG for BOTZ closes that gap while removing the weakest-conviction holding. STNG's thesis (geopolitical disruption driving tonne-mile demand) faces two simultaneous threats as of March 2025: active Houthi ceasefire negotiations that could re-open the Red Sea, and tariff-driven trade uncertainty suppressing refined-product volumes. The geopolitical wave stays covered by ITA. Post-change all declared waves have a representative \u2014 AI (MSFT, NVDA), rockets (RKLB), quantum (QTUM), nuclear (NUKZ, CEG), defense (ITA), robotics (BOTZ) \u2014 at the 8-cap with no bucket over two.",
+  "rationale_overall": "One targeted swap: IONQ exits and WELL enters, keeping the total at the eight-ticker cap. Every other named wave in the profile retains coverage — AI through GOOGL, MSFT, and NVDA; robotics through BOTZ; nuclear through NUKZ; rockets/spacecraft through RKLB; defense/geopolitical through ITA — while the demographics wave, the one declared profile wave with zero representation, gets its first slot via Welltower. The IONQ remove is not a thesis rejection of quantum computing; it is an application of the profile's 'trim before the crest' rule: the post-Willow surge in December 2024 left IONQ at 150-200x revenue just as AWS Ocelot (February 27, 2025) confirmed hyperscalers are building quantum in-house, and GOOGL already provides quantum-wave exposure through Google's own Willow program. WELL enters on the strength of Welltower's record C$4.6B Amica acquisition (March 2, 2025) and a Q4 2024 earnings beat, and also brings meaningful diversification benefit — a defensive, income-generating non-tech REIT at a moment when the DeepSeek shock and early tariff anxiety are weighing on the AI-heavy positions.",
   "search_terms": [
-    "AI stocks news Q1 2025 before:2025-04-01",
-    "rockets spacecraft stocks news 2025 before:2025-04-01",
-    "robotics stocks news 2025 before:2025-04-01",
-    "quantum computing stocks news Q1 2025 before:2025-04-01",
-    "nuclear energy stocks SMR news Q1 2025 before:2025-04-01",
-    "defense stocks rearmament news Q1 2025 before:2025-04-01",
-    "tanker stocks shipping geopolitics news March 2025 before:2025-04-01",
-    "aging population demographics healthcare eldercare stocks 2025 before:2025-04-01",
-    "best performing ETF Q1 2025 before:2025-04-01",
-    "biggest stock gainers Q1 2025 before:2025-04-01",
-    "humanoid robot stocks investment 2025 before:2025-04-01",
-    "energy geopolitics oil tanker market outlook 2025 before:2025-04-01",
-    "NVDA Nvidia stock news Q1 2025 before:2025-04-01",
-    "MSFT Microsoft stock news Q1 2025 before:2025-04-01",
-    "RKLB Rocket Lab stock news Q1 2025 before:2025-04-01",
-    "QTUM quantum computing ETF news 2025 before:2025-04-01",
-    "ITA defense ETF news 2025 before:2025-04-01",
-    "NUKZ nuclear ETF news 2025 before:2025-04-01",
-    "STNG Scorpio Tankers stock news 2025 before:2025-04-01",
-    "CEG Constellation Energy stock news Q1 2025 before:2025-04-01",
-    "BOTZ robotics ETF Global X news 2025 before:2025-04-01",
-    "Scorpio Tankers STNG product tanker rates Q1 2025 February March before:2025-04-01",
-    "Constellation Energy CEG Microsoft nuclear power data center 2025 before:2025-04-01",
-    "ITA aerospace defense ETF DOGE spending cuts 2025 before:2025-04-01",
-    "product tanker market rates outlook Q1 2025 tariffs trade war before:2025-04-01",
-    "BOTZ Global X robotics ETF 2025 performance holdings before:2025-04-01",
-    "Teekay tankers market update March 2025 product rates",
-    "robotics automation stocks January February March 2025 news before:2025-04-01",
-    "Intuitive Surgical da Vinci 5 FDA clearance cardiac January 2025 before:2025-04-01"
+    "AI stocks 2025 DeepSeek impact semiconductor after:2025-01-01 before:2025-04-01",
+    "space stocks rocket launch 2025 after:2025-01-01 before:2025-04-01",
+    "robotics stocks humanoid robot 2025 after:2025-01-01 before:2025-04-01",
+    "quantum computing stocks 2025 after:2025-01-01 before:2025-04-01",
+    "nuclear energy stocks SMR fission 2025 after:2025-01-01 before:2025-04-01",
+    "defense stocks rearmament Europe 2025 after:2025-01-01 before:2025-04-01",
+    "aging population demographics healthcare stocks 2025 after:2025-01-01 before:2025-04-01",
+    "best performing ETF 2025 Q1 after:2025-01-01 before:2025-04-01",
+    "biggest stock gainers Q1 2025 after:2025-01-01 before:2025-04-01",
+    "tariffs interest rates stock market impact 2025 after:2025-01-01 before:2025-04-01",
+    "geopolitical oil gas shipping tanker stocks 2025 after:2025-01-01 before:2025-04-01",
+    "eldercare REIT healthcare ETF aging demographics 2025 after:2025-01-01 before:2025-04-01",
+    "NVDA Nvidia stock news Q1 2025 DeepSeek after:2025-01-01 before:2025-04-01",
+    "IONQ IonQ stock news earnings 2025 after:2025-01-01 before:2025-04-01",
+    "MSFT Microsoft stock news AI cloud 2025 after:2025-01-01 before:2025-04-01",
+    "RKLB Rocket Lab stock news 2025 after:2025-01-01 before:2025-04-01",
+    "BOTZ Global X Robotics ETF news 2025 after:2025-01-01 before:2025-04-01",
+    "NUKZ Range Nuclear Energy ETF news 2025 after:2025-01-01 before:2025-04-01",
+    "GOOGL Google Alphabet stock news Gemini AI 2025 after:2025-01-01 before:2025-04-01",
+    "ITA iShares defense ETF aerospace news 2025 after:2025-01-01 before:2025-04-01",
+    "IonQ IONQ Q4 2024 earnings results revenue 2025 after:2025-01-01 before:2025-04-01",
+    "Rocket Lab RKLB Q4 2024 earnings results Neutron 2025 after:2025-01-01 before:2025-04-01",
+    "AGNG Global X Aging Population ETF performance healthcare 2025 after:2025-01-01 before:2025-04-01",
+    "Welltower WELL healthcare REIT senior housing Q1 2025 after:2025-01-01 before:2025-04-01",
+    "Welltower WELL Amica acquisition announcement date before:2025-04-01",
+    "Welltower WELL Q4 2024 earnings fourth quarter results before:2025-04-01",
+    "IONQ quantum computing valuation overvalued peak 2025 after:2025-01-01 before:2025-04-01",
+    "nuclear power PPA data center AI electricity demand 2025 after:2025-01-01 before:2025-04-01",
+    "AWS Amazon Ocelot quantum chip announcement February 2025 before:2025-04-01",
+    "IonQ overvalued quantum peak January February 2025 before:2025-04-01"
   ]
 }

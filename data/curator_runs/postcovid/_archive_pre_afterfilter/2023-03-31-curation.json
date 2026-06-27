@@ -1,0 +1,78 @@
+{
+  "as_of_date": "2023-03-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "ITA",
+      "wave_bucket": "geopolitical",
+      "rationale": "The Ukraine war is catalyzing a structural multi-year NATO rearmament cycle with members legislating record defense budgets, yet the watchlist has no geopolitical/defense exposure; ITA is the benchmark US aerospace-and-defense ETF with a 17-year track record and deep liquidity.",
+      "news_evidence": [
+        {
+          "summary": "Poland and Estonia push NATO allies to raise spending beyond 2% of GDP citing Russia's war; Poland legislated a 4% GDP defense budget for 2023, the highest in NATO by share of output.",
+          "source": "Foreign Policy",
+          "url": "https://foreignpolicy.com/2023/02/02/eastern-europe-nato-defense-spending-ukraine-russia-poland-estonia/",
+          "date": "2023-02-02"
+        },
+        {
+          "summary": "World military spending grew for the eighth straight year in 2022 to an all-time high, driven by European NATO members; Germany's EUR100B Zeitenwende fund and Poland's 4% GDP target are the clearest structural signals.",
+          "source": "EconStor working paper",
+          "url": "https://www.econstor.eu/handle/10419/273445",
+          "date": "2023-02-01"
+        }
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "AAPL",
+      "rationale": "Apple reported its first quarterly revenue decline since 2016 in Q1 FY2023, with hardware units falling across iPhone, Mac, and iPad and the CFO guiding to a continuation; AAPL maps to no named wave (MSFT/GOOGL/NVDA cover AI, SPY covers broad markets), the weakest thematic fit at 8/8.",
+      "news_evidence": [
+        {
+          "summary": "Apple fiscal Q1 2023 revenue $117.2B, -5% YoY \u2014 first annual decline since 2019 \u2014 on iPhone 14 Pro China supply disruptions and a strong dollar; CFO guided to a similar declining trend for the March quarter.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2023/02/02/apple-aapl-earnings-q1-2023.html",
+          "date": "2023-02-02"
+        },
+        {
+          "summary": "Apple stock dropped on a rare earnings miss; Mac revenue fell ~30% and iPad also declined YoY, with no near-term catalyst to reverse the hardware weakness.",
+          "source": "TechCrunch",
+          "url": "https://techcrunch.com/2023/02/02/apple-revenue-drops-amid-quarterly-hardware-decline/",
+          "date": "2023-02-02"
+        }
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "The watchlist entered Q1 2023 with dense AI coverage (MSFT, GOOGL, NVDA) and seeded positions in every named tech next-wave (RKLB/rockets, QTUM/quantum, URA/nuclear) but zero geopolitical/defense exposure, which the Ukraine war is inflecting into a structural multi-year rearmament cycle. AAPL is the natural release valve: the only holding with no clean wave mapping, and its Feb 2023 earnings revealed the first hardware-revenue decline since 2016 with further weakness guided. Swapping AAPL for ITA fills the last uncovered wave, keeps the 8-cap, and concentrates AI where the signal is strongest \u2014 MSFT (Bing Chat, $10B OpenAI), GOOGL (Bard), NVDA (rising AI-training GPU demand).",
+  "search_terms": [
+    "AI stocks artificial intelligence investing 2023 before:2023-04-01",
+    "rockets spacecraft space stocks investing before:2023-04-01",
+    "robotics stocks humanoid robot investing 2023 before:2023-04-01",
+    "quantum computing stocks investing 2023 before:2023-04-01",
+    "nuclear stocks SMR small modular reactor investing 2023 before:2023-04-01",
+    "energy geopolitical tanker stocks oil gas investing 2023 before:2023-04-01",
+    "defense rearmament stocks ETF investing 2023 before:2023-04-01",
+    "aging population demographics healthcare eldercare stocks 2023 before:2023-04-01",
+    "best performing ETF this month March 2023 before:2023-04-01",
+    "biggest stock gainers Q1 2023 before:2023-04-01",
+    "AAPL Apple stock news Q1 2023 before:2023-04-01",
+    "MSFT Microsoft AI ChatGPT OpenAI news 2023 before:2023-04-01",
+    "GOOGL Google Alphabet AI Bard news 2023 before:2023-04-01",
+    "NVDA Nvidia GPU AI revenue news Q1 2023 before:2023-04-01",
+    "SPY S&P 500 market performance Q1 2023 before:2023-04-01",
+    "RKLB Rocket Lab news launches contracts 2023 before:2023-04-01",
+    "QTUM Defiance Quantum ETF news performance 2023 before:2023-04-01",
+    "URA uranium ETF nuclear price news Q1 2023 before:2023-04-01",
+    "ITA aerospace defense ETF Ukraine war spending news 2023 before:2023-04-01",
+    "BOTZ Global X Robotics AI ETF news 2023 before:2023-04-01",
+    "Rocket Lab RKLB launch mission Q1 2023 January February March before:2023-04-01",
+    "uranium price nuclear energy news March 2023 before:2023-04-01",
+    "defense spending NATO Ukraine war 2023 before:2023-04-01",
+    "IonQ quantum computing stock news 2023 before:2023-04-01",
+    "iShares ITA aerospace defense ETF Ukraine war defense budget rally site:seekingalpha.com OR site:reuters.com 2022 2023 before:2023-04-01",
+    "\"ITA\" OR \"XAR\" defense ETF news analysis January February March 2023 before:2023-04-01",
+    "NATO 2 percent GDP defense spending 2023 pledge before:2023-04-01",
+    "NATO defense spending Europe Germany Poland increase 2023 Reuters CNBC before:2023-04-01",
+    "Apple AAPL stock first revenue decline 2023 wave thesis review before:2023-04-01"
+  ]
+}

@@ -3,76 +3,70 @@
   "rebalance_period": "quarterly",
   "adds": [
     {
-      "ticker": "ITA",
-      "wave_bucket": "geopolitical",
-      "rationale": "The Ukraine war is catalyzing a structural multi-year NATO rearmament cycle with members legislating record defense budgets, yet the watchlist has no geopolitical/defense exposure; ITA is the benchmark US aerospace-and-defense ETF with a 17-year track record and deep liquidity.",
+      "ticker": "SMR",
+      "wave_bucket": "nuclear",
+      "rationale": "NuScale filed its 77 MWe VOYGR-6 Standard Design Approval application with the NRC on January 1, 2023 — a concrete regulatory milestone signaling the nuclear SMR buildup phase is advancing — and the watchlist has zero nuclear coverage against the profile's explicit SMR next-wave declaration.",
       "news_evidence": [
         {
-          "summary": "Poland and Estonia push NATO allies to raise spending beyond 2% of GDP citing Russia's war; Poland legislated a 4% GDP defense budget for 2023, the highest in NATO by share of output.",
-          "source": "Foreign Policy",
-          "url": "https://foreignpolicy.com/2023/02/02/eastern-europe-nato-defense-spending-ukraine-russia-poland-estonia/",
-          "date": "2023-02-02"
+          "summary": "NuScale Power Corporation completed submission of a Standard Design Approval application to the NRC on January 1, 2023 for its uprated 250 MWt (77 MWe) VOYGR-6 six-module SMR design, built on the same fundamental passive-safety case that earned NuScale the first-ever NRC approval of any SMR design.",
+          "source": "NuScale Power SEC Form 8-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/0001822966/000182296623000002/pressreleasesdasubmittal.htm",
+          "date": "2023-01-01"
         },
         {
-          "summary": "World military spending grew for the eighth straight year in 2022 to an all-time high, driven by European NATO members; Germany's EUR100B Zeitenwende fund and Poland's 4% GDP target are the clearest structural signals.",
-          "source": "EconStor working paper",
-          "url": "https://www.econstor.eu/handle/10419/273445",
-          "date": "2023-02-01"
+          "summary": "NuScale management scheduled one-on-one investor meetings at the NYSE Energy & Utilities Virtual Investor Access Day (March 23), UBS Infrastructure Conference Dallas (March 23), and Wells Fargo Clean Energy Symposium New York (March 28), indicating active institutional outreach around its SMR commercialization program during Q1 2023.",
+          "source": "NuScale Power SEC Form 8-K",
+          "url": "https://www.sec.gov/Archives/edgar/data/0001822966/000182296623000045/upcominginvestorconferen.htm",
+          "date": "2023-03-01"
+        },
+        {
+          "summary": "NuScale's original 50 MWe SMR design became the first in history to receive NRC Standard Design Approval, establishing NuScale as the only SMR developer with a certified US design ahead of the 2023 VOYGR-6 uprate application.",
+          "source": "Utility Dive",
+          "url": "https://www.utilitydive.com/news/nuscale-small-modular-reactor-design-becomes-first-to-get-nrc-safety-approv/584391/",
+          "date": "2020-09-01"
         }
       ]
     }
   ],
   "removes": [
     {
-      "ticker": "AAPL",
-      "rationale": "Apple reported its first quarterly revenue decline since 2016 in Q1 FY2023, with hardware units falling across iPhone, Mac, and iPad and the CFO guiding to a continuation; AAPL maps to no named wave (MSFT/GOOGL/NVDA cover AI, SPY covers broad markets), the weakest thematic fit at 8/8.",
+      "ticker": "SPY",
+      "rationale": "SPY is a broad-market index ETF with no exposure to any of the profile's declared waves; the watchlist now has four AI names plus three specific next-wave plays, making a general index slot redundant and better deployed toward the nuclear gap via SMR.",
       "news_evidence": [
         {
-          "summary": "Apple fiscal Q1 2023 revenue $117.2B, -5% YoY \u2014 first annual decline since 2019 \u2014 on iPhone 14 Pro China supply disruptions and a strong dollar; CFO guided to a similar declining trend for the March quarter.",
-          "source": "CNBC",
-          "url": "https://www.cnbc.com/2023/02/02/apple-aapl-earnings-q1-2023.html",
-          "date": "2023-02-02"
-        },
-        {
-          "summary": "Apple stock dropped on a rare earnings miss; Mac revenue fell ~30% and iPad also declined YoY, with no near-term catalyst to reverse the hardware weakness.",
-          "source": "TechCrunch",
-          "url": "https://techcrunch.com/2023/02/02/apple-revenue-drops-amid-quarterly-hardware-decline/",
-          "date": "2023-02-02"
+          "summary": "Silicon Valley Bank collapsed March 10, 2023 (second-largest US bank failure in history); US Treasury designated it a systemic risk and activated emergency depositor backstops; the KBW Nasdaq Bank Index fell 7.7% while the S&P 500 fell 1.7% on the same day — broad-market index exposure concentrates macro-systemic risk while adding no thesis-specific upside.",
+          "source": "Fortune",
+          "url": "https://fortune.com/2023/03/10/silicon-valey-bank-collapse-contagion-regional-banks-and-venture-capital-not-financial-system/",
+          "date": "2023-03-10"
         }
       ]
     }
   ],
   "no_changes": false,
-  "rationale_overall": "The watchlist entered Q1 2023 with dense AI coverage (MSFT, GOOGL, NVDA) and seeded positions in every named tech next-wave (RKLB/rockets, QTUM/quantum, URA/nuclear) but zero geopolitical/defense exposure, which the Ukraine war is inflecting into a structural multi-year rearmament cycle. AAPL is the natural release valve: the only holding with no clean wave mapping, and its Feb 2023 earnings revealed the first hardware-revenue decline since 2016 with further weakness guided. Swapping AAPL for ITA fills the last uncovered wave, keeps the 8-cap, and concentrates AI where the signal is strongest \u2014 MSFT (Bing Chat, $10B OpenAI), GOOGL (Bard), NVDA (rising AI-training GPU demand).",
+  "rationale_overall": "The single swap this quarter removes SPY (a general-market index ETF occupying a thesis-free slot) and adds SMR (NuScale Power, nuclear bucket), closing the most glaring next-wave gap at a moment when NuScale's January 1, 2023 NRC Standard Design Approval submission for its uprated 77 MWe VOYGR-6 module marks a concrete regulatory buildup signal the profile explicitly called out. Post-swap the watchlist carries four AI names (AAPL, MSFT, GOOGL, NVDA), one rockets/spacecraft name (RKLB), one robotics ETF (BOTZ), one defense/geopolitical ETF (ITA), and one nuclear name (SMR), reaching the eight-ticker cap with no bucket exceeding four tickers. Quantum computing (IONQ is the leading candidate) and aging-demographics remain uncovered but must wait for a future remove to free a slot; they are the top priority for the next rebalance.",
   "search_terms": [
-    "AI stocks artificial intelligence investing 2023 before:2023-04-01",
-    "rockets spacecraft space stocks investing before:2023-04-01",
-    "robotics stocks humanoid robot investing 2023 before:2023-04-01",
-    "quantum computing stocks investing 2023 before:2023-04-01",
-    "nuclear stocks SMR small modular reactor investing 2023 before:2023-04-01",
-    "energy geopolitical tanker stocks oil gas investing 2023 before:2023-04-01",
-    "defense rearmament stocks ETF investing 2023 before:2023-04-01",
-    "aging population demographics healthcare eldercare stocks 2023 before:2023-04-01",
-    "best performing ETF this month March 2023 before:2023-04-01",
-    "biggest stock gainers Q1 2023 before:2023-04-01",
-    "AAPL Apple stock news Q1 2023 before:2023-04-01",
-    "MSFT Microsoft AI ChatGPT OpenAI news 2023 before:2023-04-01",
-    "GOOGL Google Alphabet AI Bard news 2023 before:2023-04-01",
-    "NVDA Nvidia GPU AI revenue news Q1 2023 before:2023-04-01",
-    "SPY S&P 500 market performance Q1 2023 before:2023-04-01",
-    "RKLB Rocket Lab news launches contracts 2023 before:2023-04-01",
-    "QTUM Defiance Quantum ETF news performance 2023 before:2023-04-01",
-    "URA uranium ETF nuclear price news Q1 2023 before:2023-04-01",
-    "ITA aerospace defense ETF Ukraine war spending news 2023 before:2023-04-01",
-    "BOTZ Global X Robotics AI ETF news 2023 before:2023-04-01",
-    "Rocket Lab RKLB launch mission Q1 2023 January February March before:2023-04-01",
-    "uranium price nuclear energy news March 2023 before:2023-04-01",
-    "defense spending NATO Ukraine war 2023 before:2023-04-01",
-    "IonQ quantum computing stock news 2023 before:2023-04-01",
-    "iShares ITA aerospace defense ETF Ukraine war defense budget rally site:seekingalpha.com OR site:reuters.com 2022 2023 before:2023-04-01",
-    "\"ITA\" OR \"XAR\" defense ETF news analysis January February March 2023 before:2023-04-01",
-    "NATO 2 percent GDP defense spending 2023 pledge before:2023-04-01",
-    "NATO defense spending Europe Germany Poland increase 2023 Reuters CNBC before:2023-04-01",
-    "Apple AAPL stock first revenue decline 2023 wave thesis review before:2023-04-01"
+    "AI stocks artificial intelligence 2023 after:2023-01-01 before:2023-04-01",
+    "space stocks rockets spacecraft 2023 after:2023-01-01 before:2023-04-01",
+    "robotics stocks humanoid robot 2023 after:2023-01-01 before:2023-04-01",
+    "quantum computing stocks 2023 after:2023-01-01 before:2023-04-01",
+    "nuclear SMR stocks energy 2023 after:2023-01-01 before:2023-04-01",
+    "defense stocks rearmament ETF 2023 after:2023-01-01 before:2023-04-01",
+    "geopolitical energy stocks oil gas tanker LNG shipping 2023 after:2023-01-01 before:2023-04-01",
+    "aging population demographics healthcare eldercare stocks 2023 after:2023-01-01 before:2023-04-01",
+    "best performing ETF March 2023 after:2023-01-01 before:2023-04-01",
+    "biggest stock gainers Q1 2023 January February March after:2023-01-01 before:2023-04-01",
+    "IONQ IonQ IPO date listing date before:2023-04-01",
+    "SMR NuScale Power IPO listing date SPAC before:2023-04-01",
+    "IonQ IONQ quantum computing news 2023 after:2023-01-01 before:2023-04-01",
+    "NuScale Power SMR nuclear news 2023 after:2023-01-01 before:2023-04-01",
+    "NVDA NVIDIA AI stock news Q1 2023 after:2023-01-01 before:2023-04-01",
+    "SPY S&P 500 market outlook interest rates banking Q1 2023 after:2023-01-01 before:2023-04-01",
+    "RKLB Rocket Lab news 2023 after:2023-01-01 before:2023-04-01",
+    "Rocket Lab Electron launch manifest 2023 first quarter after:2023-01-01 before:2023-04-01",
+    "BOTZ Global X Robotics ETF news 2023 after:2023-01-01 before:2023-04-01",
+    "MSFT Microsoft OpenAI ChatGPT investment news 2023 after:2023-01-01 before:2023-04-01",
+    "ITA aerospace defense ETF Ukraine war NATO spending 2023 after:2023-01-01 before:2023-04-01",
+    "Silicon Valley Bank SVB collapse March 2023 S&P 500 systemic risk after:2023-01-01 before:2023-04-01",
+    "NuScale Power NRC standard design approval 2022 2023 SMR first nuclear before:2023-04-01"
   ]
 }

@@ -5,18 +5,18 @@
     {
       "ticker": "RKLB",
       "wave_bucket": "rockets_spacecraft",
-      "rationale": "Rocket Lab reported record Q3 2022 revenue of $63.1M (+1,093% YoY, +14% QoQ) with three successful Electron missions and $333M cash, a genuine revenue inflection for the rockets/spacecraft wave.",
+      "rationale": "Rocket Lab's November 2022 Q3 earnings confirmed $63.1M in record quarterly revenue (14% QoQ, 1,093% YoY) — a concrete commercial revenue inflection — placing the company squarely in the buildup phase of the profile's first-named 'next wave,' and no rockets/spacecraft name is currently in the watchlist.",
       "news_evidence": [
         {
-          "summary": "Rocket Lab Q3 2022: record revenue $63.1M (+1,093% YoY); Q4 guidance $51-54M; three successful Electron missions.",
-          "source": "Business Wire",
-          "url": "https://www.businesswire.com/news/home/20221109005991/en/Rocket-Lab-Announces-Third-Quarter-2022-Results-and-Guidance-for-Fourth-Quarter-2022",
+          "summary": "Rocket Lab Q3 FY2022 press release (Form 8-K): record revenue of $63.1M, +14% quarter-over-quarter and +1,093% year-over-year; Q4 guidance set at $51M-$54M as one launch customer shifted into 2023.",
+          "source": "SEC EDGAR — Rocket Lab USA Form 8-K FY2022",
+          "url": "https://www.sec.gov/Archives/edgar/data/0001819994/000095017022023906/rklb-ex99_1.htm",
           "date": "2022-11-09"
         },
         {
-          "summary": "CNBC: Rocket Lab record revenue + contract wins; adjusted EBITDA loss improved 62% YoY; Space Systems $40.1M of the $63.1M.",
-          "source": "CNBC",
-          "url": "https://www.cnbc.com/2022/11/09/rocket-lab-q3-results-record-revenue-added-contract-wins.html",
+          "summary": "Yahoo Finance reports RKLB stock rose sharply on Q3 2022 earnings beat, citing growing commercial launch manifest and expanding space systems (satellite components) revenue alongside launch services.",
+          "source": "Yahoo Finance",
+          "url": "https://finance.yahoo.com/news/rocket-lab-popping-q3-earnings-225207866.html",
           "date": "2022-11-09"
         }
       ]
@@ -24,75 +24,67 @@
     {
       "ticker": "ITA",
       "wave_bucket": "geopolitical",
-      "rationale": "Russia's 2022 invasion triggered a structural multi-year NATO rearmament cycle; ITA gained ~+10% in CY2022 while the S&P 500 fell ~18%, and the spending uplift is ongoing \u2014 opening the watchlist to the profile's geopolitical wave via a liquid established instrument.",
+      "rationale": "Russia's ongoing Ukraine war triggered durable structural rearmament commitments across NATO — NATO members raised equipment-spending share to 26% of defense budgets in 2022 (from 14% in 2014) — and ITA returned +9.95% in 2022 while the S&P 500 fell roughly 18%, confirming the wave is already in motion with multi-year procurement cycles ahead.",
       "news_evidence": [
         {
-          "summary": "Aerospace/defense ETFs surged on the Feb 24, 2022 invasion; ITA/PPA delivered ~+13% vs an S&P 500 decline; Maxar +40% post-invasion.",
-          "source": "Nasdaq / ETFdb",
-          "url": "https://www.nasdaq.com/articles/aerospace-defense-etfs-take-flight-on-russias-invasion-of-ukraine",
-          "date": "2022-03-01"
+          "summary": "iShares U.S. Aerospace & Defense ETF (ITA) posted a 2022 calendar-year market-price return of +9.95%, sharply outperforming the broad S&P 500 decline; ETF launched May 2006 and tracks US prime contractors including LMT, RTX, and NOC.",
+          "source": "ETFdb / iShares",
+          "url": "https://etfdb.com/etf/ITA/",
+          "date": "2022-12-31"
         },
         {
-          "summary": "Defense ETFs (ITA, PPA, XAR) at a one-year high on rising NATO budgets and order backlogs; ITA ~+10% in CY2022, outpacing broad benchmarks.",
-          "source": "Nasdaq",
-          "url": "https://www.nasdaq.com/articles/aerospace-defense-etfs-one-year-high-heres-why",
-          "date": "2022-12-15"
+          "summary": "Atlantic Council NATO defense spending tracker: NATO allies raised the average share of defense budgets devoted to equipment from 14% in 2014 to 26% in 2022 following Russia's invasion of Ukraine, with member states pledging to meet or exceed the 2% GDP spending target.",
+          "source": "Atlantic Council",
+          "url": "https://www.atlanticcouncil.org/commentary/trackers-and-data-visualizations/nato-defense-spending-tracker/",
+          "date": "2022-12-31"
         }
       ]
     },
     {
-      "ticker": "URNM",
+      "ticker": "CEG",
       "wave_bucket": "nuclear",
-      "rationale": "The Russia-Ukraine energy shock reversed European nuclear phase-outs and created a structural uranium supply deficit (2022 production ~58,200 MT vs ~60,000 MT demand); URNM, reorganized as a pure-play uranium-miners ETF under Sprott in April 2022, is the cleanest US-listed vehicle for the nuclear wave.",
+      "rationale": "Constellation Energy, the largest US nuclear fleet operator (spun off from Exelon in February 2022), reported solid Q3 2022 Adjusted EBITDA of $592M and its CEO explicitly cited the August 2022 Inflation Reduction Act as a structural tailwind for nuclear economics; the company also filed NRC intent to renew operating licenses at Clinton and Dresden, locking in decade-plus baseload generation that aligns directly with the profile's AI-data-center nuclear thesis.",
       "news_evidence": [
         {
-          "summary": "WEF (Feb 2022): nuclear-fuel supply concern spiked as Russia's enrichment control created vulnerability; countries signaled reversal of phase-out policies.",
-          "source": "World Economic Forum",
-          "url": "https://www.weforum.org/stories/2022/02/nuclear-energy-fuel-supply-crunch/",
-          "date": "2022-02-01"
+          "summary": "Constellation Energy Q3 2022 results: Adjusted EBITDA $592M; CEO Joe Dominguez cited the Inflation Reduction Act as enabling Constellation to 'create value and drive America's clean energy transition'; company notified NRC of intent to seek license renewals for Clinton and Dresden nuclear units.",
+          "source": "Constellation Energy Newsroom",
+          "url": "https://www.constellationenergy.com/newsroom/2022/constellation-reports-third-quarter-2022-results.html",
+          "date": "2022-11-08"
         },
         {
-          "summary": "Sprott reorganized the North Shore uranium ETF as the Sprott Uranium Miners ETF (URNM) on April 25, 2022 \u2014 companies with >=50% assets in uranium mining.",
-          "source": "Sprott ETFs",
-          "url": "https://sprottetfs.com/urnm-sprott-uranium-miners-etf/",
-          "date": "2022-04-25"
+          "summary": "Constellation Energy Corp Form 8-K (Q2 FY2022): detailed nuclear fleet operational results and financial outlook confirming consistent performance across the company's 21-unit nuclear fleet.",
+          "source": "SEC EDGAR — Constellation Energy Form 8-K FY2022",
+          "url": "https://www.sec.gov/Archives/edgar/data/0001868275/000186827522000064/ceg-20220804991.htm",
+          "date": "2022-08-04"
         }
       ]
     }
   ],
   "removes": [],
   "no_changes": false,
-  "rationale_overall": "The Q4 2022 rebalance opens the portfolio to three non-AI waves with active 2022 structural catalysts: RKLB (rockets, Q3 2022 revenue +1,093% YoY), ITA (geopolitical rearmament, ~28pp of 2022 outperformance vs the S&P 500), and URNM (nuclear, uranium supply-deficit and energy-security narrative set off by the same geopolitical shock). The AI bucket (AAPL, MSFT, GOOGL, NVDA) stays at its four-ticker max and SPY remains the broad-market anchor; the three adds bring the watchlist to its 8-ticker ceiling spanning five declared waves.",
+  "rationale_overall": "The portfolio enters this rebalance as a heavily AI-concentrated bundle of four megacap tech names plus SPY, with zero exposure to any of the profile's seven named 'next waves.' All four AI holdings (AAPL, MSFT, GOOGL, NVDA) retain their thesis — data-center demand is intact, no fundamental breach occurred — so no removes are warranted despite the broad 2022 tech selloff. The three adds fill all open slots to reach the max_watchlist_size of 8: RKLB opens the rockets/spacecraft lane at a commercially meaningful moment (record quarterly revenue, established launch manifest); ITA opens the defense/geopolitical lane as NATO rearmament transitions from rhetorical pledges to actual equipment procurement budgets; and CEG opens the nuclear lane at precisely the moment the Inflation Reduction Act improved nuclear unit economics and Constellation committed to decade-plus license renewals. The net effect is to dilute the AI concentration from 80% of ticker slots to 50%, while adding three thematically distinct exposures that each have durable, multi-year structural tailwinds named explicitly in the investor profile.",
   "search_terms": [
-    "rockets spacecraft stocks 2022 before:2023-01-01",
-    "robotics stocks 2022 before:2023-01-01",
-    "quantum computing stocks 2022 before:2023-01-01",
-    "nuclear energy stocks SMR 2022 before:2023-01-01",
-    "artificial intelligence stocks 2022 before:2023-01-01",
-    "energy tanker shipping geopolitical stocks 2022 before:2023-01-01",
-    "defense rearmament stocks ETF 2022 before:2023-01-01",
-    "aging population demographics healthcare eldercare REIT stocks 2022 before:2023-01-01",
-    "best performing ETF this month December 2022 before:2023-01-01",
-    "biggest stock gainers December 2022 before:2023-01-01",
-    "AAPL Apple stock news December 2022 before:2023-01-01",
-    "MSFT Microsoft stock news December 2022 before:2023-01-01",
-    "GOOGL Alphabet stock news December 2022 before:2023-01-01",
-    "NVDA Nvidia stock news December 2022 before:2023-01-01",
-    "Rocket Lab RKLB news 2022 before:2023-01-01",
-    "BOTZ Global X Robotics AI ETF 2022 before:2023-01-01",
-    "ITA iShares aerospace defense ETF 2022 performance before:2023-01-01",
-    "NuScale Power SMR nuclear stock 2022 before:2023-01-01",
-    "Rocket Lab RKLB launches milestones Q3 2022 before:2023-01-01",
-    "XAR SPDR aerospace defense ETF 2022 annual return performance before:2023-01-01",
-    "QTUM Defiance Quantum ETF 2022 before:2023-01-01",
-    "uranium mining ETF URNM URA 2022 nuclear energy before:2023-01-01",
-    "defense ETF outperform 2022 NATO rearmament Russia Ukraine before:2023-01-01",
-    "BOTZ robotics ETF performance 2022 industrial automation before:2023-01-01",
-    "Rocket Lab Electron launch 2022 backlog contracts before:2023-01-01",
-    "nuclear energy renaissance 2022 uranium demand energy crisis before:2023-01-01",
-    "Rocket Lab Q3 2022 earnings revenue November 2022 before:2023-01-01",
-    "ITA defense ETF 2022 return Russia Ukraine rearmament before:2023-01-01",
-    "\"aerospace defense ETF\" outperformed 2022 annual \"Russia Ukraine\" before:2023-01-01",
-    "URNM Sprott uranium miners ETF launch April 2022 nuclear energy before:2023-01-01"
+    "space stocks rocket launch satellites 2022 after:2022-10-01 before:2023-01-01",
+    "robotics stocks automation 2022 after:2022-10-01 before:2023-01-01",
+    "quantum computing stocks 2022 after:2022-10-01 before:2023-01-01",
+    "nuclear energy stocks SMR small modular reactor 2022 after:2022-10-01 before:2023-01-01",
+    "defense stocks rearmament NATO military spending 2022 after:2022-10-01 before:2023-01-01",
+    "oil gas energy stocks geopolitical 2022 after:2022-10-01 before:2023-01-01",
+    "tanker LNG shipping stocks 2022 after:2022-10-01 before:2023-01-01",
+    "healthcare eldercare aging population demographics stocks 2022 after:2022-10-01 before:2023-01-01",
+    "artificial intelligence AI stocks 2022 after:2022-10-01 before:2023-01-01",
+    "best performing ETF 2022 Q4 after:2022-10-01 before:2023-01-01",
+    "biggest stock gainers fourth quarter 2022 after:2022-10-01 before:2023-01-01",
+    "interest rates Federal Reserve inflation 2022 after:2022-10-01 before:2023-01-01",
+    "Rocket Lab RKLB stock news 2022 after:2022-10-01 before:2023-01-01",
+    "BOTZ robotics ETF Global X automation 2022 after:2022-10-01 before:2023-01-01",
+    "ITA defense ETF aerospace military stocks 2022 after:2022-10-01 before:2023-01-01",
+    "Rocket Lab RKLB Q3 2022 earnings November revenue growth after:2022-11-01 before:2023-01-01",
+    "Constellation Energy CEG nuclear 2022 stock performance after:2022-10-01 before:2023-01-01",
+    "NuScale SMR stock nuclear 2022 after:2022-10-01 before:2023-01-01",
+    "Constellation Energy CEG Q3 2022 earnings nuclear power results after:2022-10-01 before:2023-01-01",
+    "ITA defense ETF 2022 Ukraine rearmament performance after:2022-10-01 before:2023-01-01",
+    "NVDA Nvidia AI chips data center 2022 Q4 after:2022-10-01 before:2023-01-01",
+    "AAPL MSFT GOOGL tech stocks 2022 Q4 recession outlook after:2022-10-01 before:2023-01-01"
   ]
 }

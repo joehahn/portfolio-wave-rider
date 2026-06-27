@@ -1,0 +1,98 @@
+{
+  "as_of_date": "2022-12-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "RKLB",
+      "wave_bucket": "rockets_spacecraft",
+      "rationale": "Rocket Lab reported record Q3 2022 revenue of $63.1M (+1,093% YoY, +14% QoQ) with three successful Electron missions and $333M cash, a genuine revenue inflection for the rockets/spacecraft wave.",
+      "news_evidence": [
+        {
+          "summary": "Rocket Lab Q3 2022: record revenue $63.1M (+1,093% YoY); Q4 guidance $51-54M; three successful Electron missions.",
+          "source": "Business Wire",
+          "url": "https://www.businesswire.com/news/home/20221109005991/en/Rocket-Lab-Announces-Third-Quarter-2022-Results-and-Guidance-for-Fourth-Quarter-2022",
+          "date": "2022-11-09"
+        },
+        {
+          "summary": "CNBC: Rocket Lab record revenue + contract wins; adjusted EBITDA loss improved 62% YoY; Space Systems $40.1M of the $63.1M.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2022/11/09/rocket-lab-q3-results-record-revenue-added-contract-wins.html",
+          "date": "2022-11-09"
+        }
+      ]
+    },
+    {
+      "ticker": "ITA",
+      "wave_bucket": "geopolitical",
+      "rationale": "Russia's 2022 invasion triggered a structural multi-year NATO rearmament cycle; ITA gained ~+10% in CY2022 while the S&P 500 fell ~18%, and the spending uplift is ongoing \u2014 opening the watchlist to the profile's geopolitical wave via a liquid established instrument.",
+      "news_evidence": [
+        {
+          "summary": "Aerospace/defense ETFs surged on the Feb 24, 2022 invasion; ITA/PPA delivered ~+13% vs an S&P 500 decline; Maxar +40% post-invasion.",
+          "source": "Nasdaq / ETFdb",
+          "url": "https://www.nasdaq.com/articles/aerospace-defense-etfs-take-flight-on-russias-invasion-of-ukraine",
+          "date": "2022-03-01"
+        },
+        {
+          "summary": "Defense ETFs (ITA, PPA, XAR) at a one-year high on rising NATO budgets and order backlogs; ITA ~+10% in CY2022, outpacing broad benchmarks.",
+          "source": "Nasdaq",
+          "url": "https://www.nasdaq.com/articles/aerospace-defense-etfs-one-year-high-heres-why",
+          "date": "2022-12-15"
+        }
+      ]
+    },
+    {
+      "ticker": "URNM",
+      "wave_bucket": "nuclear",
+      "rationale": "The Russia-Ukraine energy shock reversed European nuclear phase-outs and created a structural uranium supply deficit (2022 production ~58,200 MT vs ~60,000 MT demand); URNM, reorganized as a pure-play uranium-miners ETF under Sprott in April 2022, is the cleanest US-listed vehicle for the nuclear wave.",
+      "news_evidence": [
+        {
+          "summary": "WEF (Feb 2022): nuclear-fuel supply concern spiked as Russia's enrichment control created vulnerability; countries signaled reversal of phase-out policies.",
+          "source": "World Economic Forum",
+          "url": "https://www.weforum.org/stories/2022/02/nuclear-energy-fuel-supply-crunch/",
+          "date": "2022-02-01"
+        },
+        {
+          "summary": "Sprott reorganized the North Shore uranium ETF as the Sprott Uranium Miners ETF (URNM) on April 25, 2022 \u2014 companies with >=50% assets in uranium mining.",
+          "source": "Sprott ETFs",
+          "url": "https://sprottetfs.com/urnm-sprott-uranium-miners-etf/",
+          "date": "2022-04-25"
+        }
+      ]
+    }
+  ],
+  "removes": [],
+  "no_changes": false,
+  "rationale_overall": "The Q4 2022 rebalance opens the portfolio to three non-AI waves with active 2022 structural catalysts: RKLB (rockets, Q3 2022 revenue +1,093% YoY), ITA (geopolitical rearmament, ~28pp of 2022 outperformance vs the S&P 500), and URNM (nuclear, uranium supply-deficit and energy-security narrative set off by the same geopolitical shock). The AI bucket (AAPL, MSFT, GOOGL, NVDA) stays at its four-ticker max and SPY remains the broad-market anchor; the three adds bring the watchlist to its 8-ticker ceiling spanning five declared waves.",
+  "search_terms": [
+    "rockets spacecraft stocks 2022 before:2023-01-01",
+    "robotics stocks 2022 before:2023-01-01",
+    "quantum computing stocks 2022 before:2023-01-01",
+    "nuclear energy stocks SMR 2022 before:2023-01-01",
+    "artificial intelligence stocks 2022 before:2023-01-01",
+    "energy tanker shipping geopolitical stocks 2022 before:2023-01-01",
+    "defense rearmament stocks ETF 2022 before:2023-01-01",
+    "aging population demographics healthcare eldercare REIT stocks 2022 before:2023-01-01",
+    "best performing ETF this month December 2022 before:2023-01-01",
+    "biggest stock gainers December 2022 before:2023-01-01",
+    "AAPL Apple stock news December 2022 before:2023-01-01",
+    "MSFT Microsoft stock news December 2022 before:2023-01-01",
+    "GOOGL Alphabet stock news December 2022 before:2023-01-01",
+    "NVDA Nvidia stock news December 2022 before:2023-01-01",
+    "Rocket Lab RKLB news 2022 before:2023-01-01",
+    "BOTZ Global X Robotics AI ETF 2022 before:2023-01-01",
+    "ITA iShares aerospace defense ETF 2022 performance before:2023-01-01",
+    "NuScale Power SMR nuclear stock 2022 before:2023-01-01",
+    "Rocket Lab RKLB launches milestones Q3 2022 before:2023-01-01",
+    "XAR SPDR aerospace defense ETF 2022 annual return performance before:2023-01-01",
+    "QTUM Defiance Quantum ETF 2022 before:2023-01-01",
+    "uranium mining ETF URNM URA 2022 nuclear energy before:2023-01-01",
+    "defense ETF outperform 2022 NATO rearmament Russia Ukraine before:2023-01-01",
+    "BOTZ robotics ETF performance 2022 industrial automation before:2023-01-01",
+    "Rocket Lab Electron launch 2022 backlog contracts before:2023-01-01",
+    "nuclear energy renaissance 2022 uranium demand energy crisis before:2023-01-01",
+    "Rocket Lab Q3 2022 earnings revenue November 2022 before:2023-01-01",
+    "ITA defense ETF 2022 return Russia Ukraine rearmament before:2023-01-01",
+    "\"aerospace defense ETF\" outperformed 2022 annual \"Russia Ukraine\" before:2023-01-01",
+    "URNM Sprott uranium miners ETF launch April 2022 nuclear energy before:2023-01-01"
+  ]
+}

@@ -5,75 +5,77 @@
     {
       "ticker": "CEG",
       "wave_bucket": "nuclear",
-      "rationale": "Constellation Energy's September 20, 2024 twenty-year 835 MW PPA with Microsoft to restart Three Mile Island Unit 1 is the first hyperscaler-anchored nuclear restart in US history and directly embodies the profile's 'utility PPAs to AI data centers' nuclear sub-thesis; CEG adds operating nuclear-utility cash-flow exposure distinct from URA's upstream uranium-mining exposure.",
+      "rationale": "Constellation Energy is the direct beneficiary of the September 20, 2024 Microsoft Three Mile Island PPA — a 20-year, 835-MW restart that explicitly links nuclear baseload to AI data-center demand — and is a profitable, operating nuclear fleet owner with contracted EPS growth raised from 10% to 13% annually through 2030, making it a fundamentally stronger nuclear expression than the speculative developer it replaces.",
       "news_evidence": [
         {
-          "summary": "Constellation to restart Three Mile Island Unit 1 after Microsoft signs a 20-year 835 MW PPA for AI data centers in PJM; CEG +~8% premarket; deal lifts EPS growth from 10% to 13% through 2030.",
+          "summary": "Constellation Energy announced a 20-year, 835-MW PPA with Microsoft on September 20, 2024 to restart Three Mile Island Unit 1 by 2028; Constellation expects the deal to raise its annual EPS growth rate from 10% to 13% through 2030.",
           "source": "CNBC",
           "url": "https://www.cnbc.com/2024/09/20/constellation-energy-to-restart-three-mile-island-and-sell-the-power-to-microsoft.html",
           "date": "2024-09-20"
         },
         {
-          "summary": "Constellation plans a 2028 restart (renamed Crane Clean Energy Center); $1.6B investment eligible for the 45Y clean-energy credit; fixed-price Microsoft contract underpins economics.",
+          "summary": "Constellation plans to spend ~$1.6B to restart Three Mile Island Unit 1 (renamed Crane Clean Energy Center) by 2028, producing ~7 million MWh/year and qualifying for federal 45Y clean energy tax credits; Microsoft will take 100% of output under the 20-year PPA.",
           "source": "Utility Dive",
           "url": "https://www.utilitydive.com/news/constellation-three-mile-island-nuclear-power-plant-microsoft-data-center-ppa/727652/",
           "date": "2024-09-20"
         },
         {
-          "summary": "Three Mile Island to return \u2014 first US nuclear restart after full closure; Microsoft signs a 20-year 835 MW carbon-free deal for AI data-center load.",
-          "source": "Data Center Dynamics",
-          "url": "https://www.datacenterdynamics.com/en/news/three-mile-island-nuclear-power-plant-to-return-as-microsoft-signs-20-year-835mw-ai-data-center-ppa/",
-          "date": "2024-09-20"
+          "summary": "Constellation Q2 2024 earnings (August 6, 2024): nation's largest nuclear fleet performed at industry-leading levels during one of the hottest summers on record; company repurchased approximately $500M of its common stock in the quarter.",
+          "source": "Constellation Energy (newsroom)",
+          "url": "https://www.constellationenergy.com/newsroom/2024/Constellation-Reports-Second-Quarter-2024-Results.html",
+          "date": "2024-08-06"
         }
       ]
     }
   ],
   "removes": [
     {
-      "ticker": "GOOGL",
-      "rationale": "Judge Mehta's August 5, 2024 ruling declared Google's core search business an illegally maintained monopoly and opened an active DOJ remedies process threatening Chrome/Android divestiture \u2014 a material legal overhang on Alphabet's primary revenue driver; AI remains covered by MSFT and NVDA, making GOOGL the weakest of the three AI names by thesis-risk-adjusted merit.",
+      "ticker": "SMR",
+      "rationale": "NuScale's Q2 2024 revenue collapsed to $1.0M from $5.8M a year earlier with a $74.4M net loss; its sole domestic commercial project (UAMPS) was cancelled in late 2023; and the nuclear wave's most visible Q3 2024 commercial event — the Microsoft Three Mile Island PPA — accrued to an operating utility rather than to NuScale, leaving it as a speculative pre-revenue developer with no near-term contracted revenue path.",
       "news_evidence": [
         {
-          "summary": "DOJ prevails: Judge Mehta rules Google illegally monopolized general search and search text advertising via exclusive distribution contracts.",
-          "source": "US DOJ",
-          "url": "https://www.justice.gov/opa/pr/department-justice-prevails-landmark-antitrust-case-against-google",
-          "date": "2024-08-05"
+          "summary": "NuScale Q2 2024 results (August 8, 2024): revenue $1.0M versus $5.8M in Q2 2023, net loss $74.4M (including $36.7M non-cash warrant expense), operating loss $41.9M; cash $136M with no debt but accelerating burn.",
+          "source": "NuScale Power (press release)",
+          "url": "https://www.nuscalepower.com/press-releases/2024/nuscale-power-reports-second-quarter-2024-results",
+          "date": "2024-08-08"
         },
         {
-          "summary": "CRS analysis: court held Google maintained its monopoly unlawfully; remedies range from data-licensing/contract restrictions to structural divestiture.",
-          "source": "Congressional Research Service",
-          "url": "https://www.congress.gov/crs-product/LSB11216",
-          "date": "2024-08-07"
+          "summary": "NuScale misses Q2 2024 EPS; company remains essentially pre-revenue with no domestic commercial project after the UAMPS cancellation; primary active engagement is a fee-for-study FEED Phase 2 contract in Romania, not a power plant order.",
+          "source": "InvestorPlace",
+          "url": "https://investorplace.com/earning-results/2024/08/smr-stock-earnings-nuscale-power-for-q2-of-2024/",
+          "date": "2024-08-08"
         }
       ]
     }
   ],
   "no_changes": false,
-  "rationale_overall": "One swap \u2014 CEG in, GOOGL out \u2014 reduces AI concentration from three names to two while capturing the most significant nuclear catalyst of 2024: the September 20 Three Mile Island restart PPA between Constellation and Microsoft, the first hyperscaler-anchored revival of a shuttered US nuclear plant \u2014 exactly the 'utility PPA to AI data centers' sub-thesis the profile names. GOOGL's removal is supported by Judge Mehta's August 5 monopoly ruling opening a live DOJ remedies process with potential Chrome/Android divestiture; AI remains covered by MSFT (the TMI PPA counterparty, reinforcing its nuclear/AI crossover) and NVDA. Post-change watchlist: two each in AI and nuclear, one each in rockets, quantum, defense, robotics; aging-demographics remains the one uncovered gap for a future quarter.",
+  "rationale_overall": "One action dominates Q3 2024: swapping the nuclear bucket from a speculative pre-revenue SMR developer (NuScale/SMR) to the nuclear utility that just captured the wave's most tangible commercial signal (Constellation Energy/CEG). The September 20 Microsoft-Constellation Three Mile Island PPA is exactly the 'utility PPA selling baseload power to an AI data-center operator' event the profile's nuclear thesis names as the near-term catalyst; Constellation is the nation's largest nuclear fleet operator and now has 20 years of contracted AI-driven baseload demand. The Federal Reserve's 50-bp rate cut on September 18 further supports rotation toward capital-intensive utilities as a rate-sensitive asset class. All other buckets retain thesis support without material negative catalysts through the quarter: AI (NVDA, MSFT, GOOGL), robotics (BOTZ), quantum (IONQ), rockets/spacecraft (RKLB), and defense/geopolitical (ITA) all hold. The watchlist stays at the 8-ticker cap with nuclear coverage upgraded from developer-stage speculation to contracted fleet operation.",
   "search_terms": [
-    "space stocks rockets spacecraft before:2024-10-01",
-    "robotics stocks humanoid robot before:2024-10-01",
-    "quantum computing stocks before:2024-10-01",
-    "nuclear stocks SMR fission utility before:2024-10-01",
-    "artificial intelligence stocks AI before:2024-10-01",
-    "tanker stocks energy geopolitical before:2024-10-01",
-    "defense stocks rearmament ETF before:2024-10-01",
-    "healthcare stocks aging population demographics before:2024-10-01",
-    "best performing ETF this month before:2024-10-01",
-    "Microsoft Constellation Energy Three Mile Island nuclear PPA 2024 before:2024-10-01",
-    "NVDA Nvidia stock news Q3 2024 before:2024-10-01",
-    "MSFT Microsoft stock news Q3 2024 before:2024-10-01",
-    "GOOGL Alphabet stock news Q3 2024 before:2024-10-01",
-    "RKLB Rocket Lab stock news 2024 before:2024-10-01",
-    "QTUM quantum computing ETF news 2024 before:2024-10-01",
-    "URA uranium ETF Global X news 2024 before:2024-10-01",
-    "ITA iShares aerospace defense ETF news 2024 before:2024-10-01",
-    "BOTZ Global X robotics AI ETF news 2024 before:2024-10-01",
-    "Constellation Energy CEG stock nuclear 2024 before:2024-10-01",
-    "biggest stock gainers September 2024 before:2024-10-01",
-    "XLV healthcare ETF aging demographics 2024 before:2024-10-01",
-    "Google DOJ antitrust monopoly ruling August 2024 before:2024-10-01",
-    "Constellation Energy CEG stock nuclear PPA September 2024 before:2024-10-01",
-    "nuclear power plant utility PPA hyperscaler AI data center 2024 before:2024-10-01"
+    "AI stocks best performers after:2024-07-01 before:2024-10-01",
+    "space stocks rocket launch spacecraft stocks after:2024-07-01 before:2024-10-01",
+    "robotics stocks humanoid robot stocks after:2024-07-01 before:2024-10-01",
+    "quantum computing stocks after:2024-07-01 before:2024-10-01",
+    "nuclear fission SMR small modular reactor stocks after:2024-07-01 before:2024-10-01",
+    "nuclear fusion stocks 2024 after:2024-07-01 before:2024-10-01",
+    "defense stocks ETF rearmament 2024 after:2024-07-01 before:2024-10-01",
+    "geopolitics energy oil tanker shipping stocks 2024 after:2024-07-01 before:2024-10-01",
+    "healthcare aging population demographics eldercare stocks 2024 after:2024-07-01 before:2024-10-01",
+    "biggest stock gainers Q3 2024 after:2024-07-01 before:2024-10-01",
+    "best performing ETF Q3 2024 after:2024-07-01 before:2024-10-01",
+    "Constellation Energy Three Mile Island Microsoft nuclear PPA 2024 after:2024-07-01 before:2024-10-01",
+    "RKLB Rocket Lab news 2024 after:2024-07-01 before:2024-10-01",
+    "SMR NuScale Power news 2024 after:2024-07-01 before:2024-10-01",
+    "IONQ IonQ news 2024 after:2024-07-01 before:2024-10-01",
+    "BOTZ robotics ETF news 2024 after:2024-07-01 before:2024-10-01",
+    "NVDA Nvidia news Q3 2024 after:2024-07-01 before:2024-10-01",
+    "ITA aerospace defense ETF news 2024 after:2024-07-01 before:2024-10-01",
+    "MSFT Microsoft news Q3 2024 after:2024-07-01 before:2024-10-01",
+    "Constellation Energy CEG stock nuclear PPA news 2024 after:2024-07-01 before:2024-10-01",
+    "Intuitive Machines LUNR stock news 2024 after:2024-07-01 before:2024-10-01",
+    "GOOGL Google Alphabet news Q3 2024 after:2024-07-01 before:2024-10-01",
+    "Federal Reserve rate cut September 2024 interest rates before:2024-10-01 after:2024-07-01",
+    "CEG Constellation Energy IPO listing date stock history before:2024-10-01",
+    "NuScale Power Q2 2024 earnings results revenue August 2024 before:2024-10-01",
+    "CEG Constellation Energy Q2 2024 earnings nuclear utility after:2024-07-01 before:2024-10-01"
   ]
 }

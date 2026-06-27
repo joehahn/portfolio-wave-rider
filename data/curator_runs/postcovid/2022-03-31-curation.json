@@ -5,56 +5,56 @@
     {
       "ticker": "RKLB",
       "wave_bucket": "rockets_spacecraft",
-      "rationale": "Rocket Lab is the only publicly traded pure-play small-satellite launch company; its Q4 2021 earnings (released February 28, 2022) showed contracted backlog nearly tripling from $241M to $545M in a single quarter \u2014 the clearest commercial-milestone signal in the emerging launch economy and an early-buildup entry for the profile's rockets-and-spacecraft wave.",
+      "rationale": "Rocket Lab's $143M spacecraft bus contract with MDA/Globalstar in February 2022 marks the largest commercial spacecraft manufacturing order in its history, confirming a revenue-generating buildup phase and providing the watchlist's first rockets-spacecraft exposure.",
       "news_evidence": [
         {
-          "summary": "Rocket Lab Q4 2021: full-year revenue $62.2M (+77% YoY), Q4 $27.5M above guidance, backlog surged $241M -> $545M as of Feb 28, 2022.",
-          "source": "SEC EDGAR (RKLB 8-K Ex 99.1)",
-          "url": "https://www.sec.gov/Archives/edgar/data/0001819994/000119312522057939/d263047dex991.htm",
-          "date": "2022-02-28"
+          "summary": "Rocket Lab selected by MDA to design and build 17 spacecraft buses for Globalstar's new LEO satellite constellation; $143M initial contract value is the largest spacecraft bus order in Rocket Lab's history, with options for up to nine additional spacecraft.",
+          "source": "BusinessWire / Rocket Lab press release",
+          "url": "https://businesswire.com/news/home/20220224005536/en",
+          "date": "2022-02-24"
         },
         {
-          "summary": "Rocket Lab launched 'The Owl's Night Continues' Electron mission Feb 28, 2022 from LC-1B for Synspective, demonstrating continued launch cadence.",
-          "source": "NASASpaceFlight",
-          "url": "https://www.nasaspaceflight.com/2022/08/rocket-labs-nrol-199/",
-          "date": "2022-02-28"
+          "summary": "Rocket Lab Signs $143M Satellite Bus Supply Contract with MDA for Globalstar LEO constellation, marking Rocket Lab's expansion from launch provider into large-scale spacecraft bus manufacturing.",
+          "source": "Aviation Week Network",
+          "url": "https://aviationweek.com/aerospace/commercial-space/rocket-lab-signs-143m-satellite-bus-supply-contract",
+          "date": "2022-02-24"
         }
       ]
     },
     {
-      "ticker": "QTUM",
-      "wave_bucket": "quantum",
-      "rationale": "The Defiance Quantum ETF (QTUM, launched September 2018) is the most liquid pure-play quantum vehicle; IBM's November 2021 Eagle 127-qubit processor \u2014 the first to exceed 100 qubits and classical-simulation capacity \u2014 is the early-buildup hardware milestone the profile identifies for the quantum wave.",
+      "ticker": "BOTZ",
+      "wave_bucket": "robotics",
+      "rationale": "Structural labor shortages from COVID-era workforce disruption are accelerating corporate automation investment across manufacturing, logistics, and healthcare, placing robotics in an early-buildup entry phase; BOTZ is a US-listed ETF launched in 2016 offering diversified exposure to this wave.",
       "news_evidence": [
         {
-          "summary": "IBM unveiled the Eagle 127-qubit processor on Nov 16, 2021 \u2014 the first to exceed 100 qubits, too large to reliably simulate classically.",
-          "source": "IBM Newsroom",
-          "url": "https://newsroom.ibm.com/2021-11-16-IBM-Unveils-Breakthrough-127-Qubit-Quantum-Processor",
-          "date": "2021-11-16"
+          "summary": "10 Robotics Stocks to Buy for 2022 and Beyond: labor constraints and supply-chain disruptions are pushing companies of all sizes toward industrial robots and automation systems; analysts cite 2022 as an early-buildup entry point for the robotics wave.",
+          "source": "Nasdaq.com",
+          "url": "https://www.nasdaq.com/articles/10-robotics-stocks-to-buy-for-2022-and-beyond",
+          "date": "2022-01-01"
         },
         {
-          "summary": "IBM Eagle nearly doubles its 65-qubit predecessor and surpasses Google's 53-qubit Sycamore; roadmap shows 433-qubit Osprey (2022) and 1,121-qubit Condor (2023).",
-          "source": "Singularity Hub",
-          "url": "https://singularityhub.com/2021/11/22/ibms-127-qubit-eagle-is-the-biggest-quantum-computer-yet/",
-          "date": "2021-11-22"
+          "summary": "15 Robotics Stocks and ETFs to Watch in 2022: CMC Markets highlights BOTZ as the leading thematic ETF for industrial robotics and AI hardware, noting the global robotics market exceeded $80 billion and labor shortages are a structural driver of adoption.",
+          "source": "CMC Markets",
+          "url": "https://www.cmcmarkets.com/en-gb/investing-guides/robotics-stocks",
+          "date": "2022-01-15"
         }
       ]
     },
     {
-      "ticker": "URA",
-      "wave_bucket": "nuclear",
-      "rationale": "Russia's Feb 24, 2022 invasion of Ukraine exposed Europe's dependence on Russian nuclear-fuel enrichment; uranium spot raced to a 10-year high as institutional buyers (Sprott bought 1.4M lbs on Feb 25 alone) front-ran supply disruption, making URA \u2014 the largest, most liquid uranium ETF \u2014 an early-buildup entry for the nuclear wave.",
+      "ticker": "ITA",
+      "wave_bucket": "geopolitical",
+      "rationale": "Germany's Zeitenwende €100B special defense fund announced February 27, 2022, combined with NATO-wide pledges to exceed the 2% GDP spending threshold, represents a durable structural inflection in global military budgets; ITA (iShares US Aerospace and Defense ETF, launched 2006) provides diversified liquid exposure to the US prime contractors most likely to capture this demand.",
       "news_evidence": [
         {
-          "summary": "Uranium spot surged to a 10-year high after the invasion; Sprott recorded its single largest day of uranium-trust purchases (1.4M lbs) on Feb 25, 2022.",
-          "source": "S&P Global Market Intelligence",
-          "url": "https://www.spglobal.com/marketintelligence/en/news-insights/latest-news-headlines/uranium-buyers-ukraine-conflict-drive-spot-price-to-10-year-high-69251651",
-          "date": "2022-03-01"
+          "summary": "German Chancellor Scholz announces Zeitenwende: a €100B off-budget special defense fund to modernize the Bundeswehr and push Germany above NATO's 2% GDP spending target — Germany's largest defense commitment since 1991 and a signal of structural, not cyclical, rearmament across the alliance.",
+          "source": "Wikipedia / Zeitenwende speech (delivered Bundestag)",
+          "url": "https://en.wikipedia.org/wiki/Zeitenwende_speech",
+          "date": "2022-02-27"
         },
         {
-          "summary": "Swedish utility Vattenfall announced Feb 24, 2022 it would halt planned Russian nuclear-fuel deliveries and place no new orders \u2014 a structural supply-chain shift supporting non-Russian uranium demand.",
-          "source": "S&P Global Market Intelligence",
-          "url": "https://www.spglobal.com/marketintelligence/en/news-insights/latest-news-headlines/uranium-buyers-ukraine-conflict-drive-spot-price-to-10-year-high-69251651",
+          "summary": "Germany committed to improving its defense after Zeitenwende: Atlantic Council analysis confirms the €100B pledge and Germany's intent to exceed 2% GDP on defense, reversing three decades of underspending in a single parliamentary session.",
+          "source": "Atlantic Council",
+          "url": "https://www.atlanticcouncil.org/blogs/new-atlanticist/germany-has-committed-to-improving-its-defense-its-budget-needs-to-reflect-this/",
           "date": "2022-03-01"
         }
       ]
@@ -62,36 +62,28 @@
   ],
   "removes": [],
   "no_changes": false,
-  "rationale_overall": "This first quarterly rebalance fills three wave buckets the starter watchlist left uncovered. The AI-heavy core (AAPL, MSFT, GOOGL, NVDA) is sound (AAPL record Q1 revenue $123.9B, NVDA record Q4 FY2022 $7.64B), so no removes. The three adds each respond to a buildup-phase signal visible at March 31, 2022: RKLB's backlog tripling in a quarter; IBM Eagle's 127-qubit milestone putting quantum on institutional radar (QTUM); and the Ukraine invasion's immediate stress on Russian nuclear-fuel supply activating the nuclear energy-security thesis (URA). Defense (ITA) was passed over \u2014 defense equities had already surged 15-20% post-invasion, and the profile's rule is to enter on buildup, not chase a completed re-rating. Robotics (BOTZ) was deferred to a later rebalance as no comparable buildup catalyst was visible and three adds already fill the watchlist to the 8-cap.",
+  "rationale_overall": "The Day-0 watchlist (AAPL, MSFT, GOOGL, NVDA, SPY) saturates the AI wave bucket (four tickers, at cap) but leaves rockets-spacecraft, robotics, and geopolitical buckets completely empty. RKLB fills the rockets-spacecraft bucket at a concrete commercial milestone. BOTZ fills the robotics bucket at what the profile would call early buildup, with labor shortages providing structural fuel. ITA fills the geopolitical bucket as Germany's Zeitenwende and the broader NATO rearmament pledge — the dominant macro event of Q1 2022 — create a durable multi-year tailwind for US defense primes. Nuclear, quantum, and demographics waves have no sufficiently liquid, already-listed US ticker that meets the listing-date guardrail as of March 2022, so those remain open for future rebalances. The post-change watchlist is exactly at the max-watchlist-size cap of 8.",
   "search_terms": [
-    "AI stocks to buy 2022 before:2022-04-01",
-    "space stocks rocket launch stocks 2022 before:2022-04-01",
-    "robotics stocks humanoid robot stocks 2022 before:2022-04-01",
-    "quantum computing stocks 2022 before:2022-04-01",
-    "nuclear stocks SMR uranium 2022 before:2022-04-01",
-    "energy stocks geopolitical oil tanker 2022 Ukraine before:2022-04-01",
-    "defense stocks rearmament NATO 2022 before:2022-04-01",
-    "healthcare aging population demographics stocks 2022 before:2022-04-01",
-    "best performing ETF 2022 before:2022-04-01",
-    "biggest stock gainers 2022 before:2022-04-01",
-    "AAPL Apple stock news Q1 2022 before:2022-04-01",
-    "MSFT Microsoft stock news Q1 2022 before:2022-04-01",
-    "GOOGL Alphabet stock news Q1 2022 before:2022-04-01",
-    "NVDA Nvidia stock news Q1 2022 before:2022-04-01",
-    "RKLB Rocket Lab stock news 2022 before:2022-04-01",
-    "BOTZ Global X Robotics AI ETF 2022 before:2022-04-01",
-    "ITA iShares aerospace defense ETF 2022 Ukraine before:2022-04-01",
-    "QTUM Defiance quantum computing ETF launch date 2021 before:2022-04-01",
-    "uranium ETF stocks 2022 nuclear energy before:2022-04-01",
-    "UFO Procure Space ETF 2022 before:2022-04-01",
-    "Rocket Lab RKLB launch contract news March 2022 before:2022-04-01",
-    "URA uranium ETF uranium price nuclear energy Ukraine 2022 before:2022-04-01",
-    "QTUM quantum computing ETF IBM Google quantum 2022 before:2022-04-01",
-    "BOTZ robotics ETF 2022 industrial automation stocks before:2022-04-01",
-    "ITA defense ETF aerospace Ukraine NATO spending 2022 before:2022-04-01",
-    "uranium price surge Russia Ukraine nuclear energy supply 2022 March before:2022-04-01",
-    "Rocket Lab Electron launch \"February 2022\" OR \"March 2022\" mission before:2022-04-01",
-    "IBM quantum computing Eagle 127 qubit 2021 2022 before:2022-04-01",
-    "Rocket Lab Q4 2021 earnings results revenue backlog 2022 before:2022-04-01"
+    "space stocks rockets spacecraft 2022 after:2022-01-01 before:2022-04-01",
+    "robotics stocks 2022 after:2022-01-01 before:2022-04-01",
+    "quantum computing stocks 2022 after:2022-01-01 before:2022-04-01",
+    "nuclear energy stocks SMR small modular reactor 2022 after:2022-01-01 before:2022-04-01",
+    "defense stocks rearmament Europe NATO 2022 after:2022-01-01 before:2022-04-01",
+    "geopolitical energy oil gas stocks 2022 Ukraine Russia after:2022-01-01 before:2022-04-01",
+    "aging population healthcare stocks demographics 2022 after:2022-01-01 before:2022-04-01",
+    "best performing ETF 2022 Q1 after:2022-01-01 before:2022-04-01",
+    "biggest stock gainers March 2022 after:2022-01-01 before:2022-04-01",
+    "tanker LNG shipping stocks energy 2022 Ukraine supply after:2022-01-01 before:2022-04-01",
+    "RKLB Rocket Lab news 2022 after:2022-01-01 before:2022-04-01",
+    "BOTZ Global X robotics AI ETF 2022 after:2022-01-01 before:2022-04-01",
+    "defense ETF ITA XAR aerospace 2022 Ukraine rally after:2022-01-01 before:2022-04-01",
+    "URA uranium ETF nuclear 2022 after:2022-01-01 before:2022-04-01",
+    "RKLB Rocket Lab IPO listing date 2021 launch SPAC before:2022-04-01",
+    "Rocket Lab Globalstar spacecraft bus contract 143 million 2022 February after:2022-01-01 before:2022-04-01",
+    "Germany 2 percent GDP defense spending Ukraine NATO 2022 February after:2022-01-01 before:2022-04-01",
+    "labor shortage automation robotics demand 2022 after:2022-01-01 before:2022-04-01",
+    "NVDA AAPL MSFT GOOGL stock news Q1 2022 after:2022-01-01 before:2022-04-01",
+    "Germany Zeitenwende defense 100 billion fund announced February 2022 ITA defense stocks before:2022-04-01",
+    "robotics stocks buy 2022 labor shortage automation investment after:2022-01-01 before:2022-03-31"
   ]
 }

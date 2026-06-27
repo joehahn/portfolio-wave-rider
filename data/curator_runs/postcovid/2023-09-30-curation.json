@@ -3,21 +3,27 @@
   "rebalance_period": "quarterly",
   "adds": [
     {
-      "ticker": "BOTZ",
-      "wave_bucket": "robotics",
-      "rationale": "Global X Robotics & AI ETF fills the profile's only unrepresented technology next-wave (robotics) as the 2023 AI surge accelerates demand for industrial automation; BOTZ has traded since September 2016 and its January 2023 prospectus confirms four robotics-plus-AI sub-themes \u2014 a clean, liquid on-ramp.",
+      "ticker": "IONQ",
+      "wave_bucket": "quantum",
+      "rationale": "IonQ is the only pure-play US-listed quantum computing stock and fills a complete gap in the watchlist for the quantum wave, which the investor profile names as a high-priority next-wave exposure; the Forte system launch and QuantumBasel deal in late June 2023 drove a 42% July gain and a guidance raise to $45-55M, providing concrete commercial-milestone support for entry.",
       "news_evidence": [
         {
-          "summary": "Global X 497K (Jan 31, 2023) identifies four BOTZ themes: Industrial Robotics & Automation, Drones, AI, and Non-Industrial Robotics; >=80% in the Indxx Global Robotics & AI index.",
-          "source": "SEC EDGAR / Global X 497K",
-          "url": "https://www.sec.gov/Archives/edgar/data/0001432353/000143235323000407/a497kroboticsartificialint.htm",
-          "date": "2023-01-31"
+          "summary": "IonQ stock soared 42% in July 2023 after the company launched its IonQ Forte quantum system for commercial use globally on June 22, signed a partnership with QuantumBasel to establish a European quantum data center, and raised full-year 2023 booking guidance to $45-55M from $38-42M; stock was up over 400% year-to-date as of the article date.",
+          "source": "The Motley Fool",
+          "url": "https://www.fool.com/investing/2023/08/04/why-ionq-stock-soared-42-in-july/",
+          "date": "2023-08-04"
         },
         {
-          "summary": "Defense One (Sep 12, 2023): European defense spending growth is 'sluggish' despite Ukraine, bottlenecked by production \u2014 defense ETFs lack a near-term catalyst, reinforcing robotics over defense as the gap to fill.",
-          "source": "Defense One",
-          "url": "https://www.defenseone.com/policy/2023/09/europes-defense-spending-sluggish-despite-ukraine-war/390236/",
-          "date": "2023-09-12"
+          "summary": "IonQ completed its SPAC merger with dMY Technology Group III and began trading on the NYSE under ticker IONQ on October 1, 2021, becoming the first pure-play quantum computing company listed on a major US exchange; confirms ticker has over two years of price history prior to the 2023-09-30 rebalance date.",
+          "source": "IonQ Newsroom",
+          "url": "https://www.ionq.com/news/october-01-2021-ionq-listed-on-nyse",
+          "date": "2021-10-01"
+        },
+        {
+          "summary": "IonQ filed its Form 10-Q for the quarter ended June 30, 2023 with the SEC, covering Q2 2023 financial results showing approximately 67% year-over-year revenue growth to $4.35M and confirming the guidance increase; demonstrates active SEC reporting and US-listing compliance.",
+          "source": "SEC EDGAR",
+          "url": "https://www.sec.gov/Archives/edgar/data/0001824920/000095017023041364/Financial_Report.xlsx",
+          "date": "2023-08-14"
         }
       ]
     }
@@ -25,49 +31,52 @@
   "removes": [
     {
       "ticker": "AAPL",
-      "rationale": "Apple is the weakest AI-thesis holder: China's September 2023 government iPhone ban \u2014 expanding from central agencies to state-owned enterprises \u2014 threatens ~one-fifth of revenue, while Huawei's Mate 60 5G launch adds structural competition in the same market, making AAPL the poorest near-term risk/reward of the four AI mega-caps.",
+      "rationale": "China's September 2023 government-worker iPhone ban introduced a material headwind to Apple's single largest geographic growth market (18% of revenue), and with the AI wave bucket already holding four tickers (MSFT, GOOGL, NVDA, AAPL) at the hard per-bucket cap, AAPL is the weakest direct AI thesis of the four and the natural trim to free a slot for quantum coverage.",
       "news_evidence": [
         {
-          "summary": "Apple fell 2.8% then 3.6% after China barred iPhones from central government agencies and signaled extension to state-backed entities; Huawei launched a made-in-China 5G phone at the same time.",
-          "source": "Al Jazeera",
-          "url": "https://www.aljazeera.com/economy/2023/9/7/apple-shares-fall-amid-reports-of-chinas-increasing-iphone-restrictions",
+          "summary": "Apple shares fell more than 3% on September 7 and 4% the prior day after reports emerged that China ordered officials at central government agencies to stop bringing iPhones into the office or using them for work; Greater China accounts for 18% of Apple's total revenue, making this ban a material top-line risk.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2023/09/07/apple-shares-fall-after-reports-that-china-banned-iphone-use-by-government-employees.html",
           "date": "2023-09-07"
         },
         {
-          "summary": "Apple poised to shed $194B in market value as China broadens the iPhone ban; Huawei Mate 60 adds competitive pressure in Apple's second-largest market.",
-          "source": "Bloomberg",
-          "url": "https://www.bloomberg.com/news/articles/2023-09-07/apple-poised-to-shed-194-billion-as-china-broadens-iphone-ban",
+          "summary": "NBC News confirmed Apple shares fell on China iPhone ban reports, noting the restrictions on government employees were issued without a public announcement and the full scope of the ban remained unclear, adding regulatory uncertainty on top of the demand headwind.",
+          "source": "NBC News",
+          "url": "https://www.nbcnews.com/news/world/apple-shares-fall-reports-china-banned-iphone-use-government-employees-rcna104018",
           "date": "2023-09-07"
         }
       ]
     }
   ],
   "no_changes": false,
-  "rationale_overall": "One swap: AAPL exits, BOTZ enters, keeping the watchlist at 8. Apple's China iPhone ban \u2014 a concrete dated headwind that wiped ~$200B of market cap in two days \u2014 makes it the weakest risk/reward among the four AI mega-caps; MSFT/GOOGL/NVDA retain the cleaner AI thesis. BOTZ gives the portfolio its first robotics-wave position. The macro backdrop reinforces conservatism (10-yr Treasury 4.57%, S&P 500 -4.77% in September), biasing toward highest-conviction names. URA, RKLB, QTUM, SPY survive on thesis support (uranium term pricing >$60/lb on utility re-contracting; RKLB growing bookings + a May 2023 NASA contract; QTUM the quantum anchor). Post-change: AI (MSFT/GOOGL/NVDA), robotics (BOTZ), rockets (RKLB), quantum (QTUM), nuclear (URA), general markets (SPY).",
+  "rationale_overall": "The watchlist was at the 8-ticker cap with no quantum computing coverage despite the investor profile naming it an explicit next-wave priority. IonQ's concrete June-July 2023 milestones (Forte system launch, European data center deal, guidance raised to $45-55M) make it the strongest evidence-backed add for that gap. AAPL is removed because the AI wave bucket was at its 4-ticker hard cap and AAPL carries the weakest direct AI thesis among the four AI names; the September 2023 China government iPhone ban added a China-decoupling headwind that further erodes the conviction case for holding it over the other three. Post-change, the watchlist covers six distinct wave buckets — AI (MSFT/GOOGL/NVDA), robotics (BOTZ), rockets/spacecraft (RKLB), quantum (IONQ), geopolitical/defense (ITA), and general markets (SPY) — aligning more tightly with the profile's multi-wave thesis.",
   "search_terms": [
-    "space stocks rockets spacecraft stocks 2023 before:2023-10-01",
-    "robotics stocks 2023 before:2023-10-01",
-    "quantum computing stocks 2023 before:2023-10-01",
-    "nuclear energy SMR stocks 2023 before:2023-10-01",
-    "AI stocks artificial intelligence 2023 before:2023-10-01",
-    "defense stocks rearmament 2023 before:2023-10-01",
-    "geopolitics energy tanker stocks oil shipping 2023 before:2023-10-01",
-    "healthcare eldercare aging population demographics stocks 2023 before:2023-10-01",
-    "best performing ETF September 2023 before:2023-10-01",
-    "biggest stock gainers Q3 2023 before:2023-10-01",
-    "uranium stocks nuclear ETF URA 2023 before:2023-10-01",
-    "interest rates stock market September 2023 before:2023-10-01",
-    "BOTZ robotics ETF Global X 2023 before:2023-10-01",
-    "ITA defense ETF aerospace 2023 before:2023-10-01",
-    "AAPL Apple stock China news September 2023 before:2023-10-01",
-    "NVDA Nvidia stock news Q3 2023 before:2023-10-01",
-    "RKLB Rocket Lab news 2023 before:2023-10-01",
-    "URA uranium ETF nuclear demand 2023 before:2023-10-01",
-    "MSFT Microsoft stock Azure AI Copilot news September 2023 before:2023-10-01",
-    "QTUM quantum ETF news performance 2023 before:2023-10-01",
-    "robotics automation AI wave investment themes Q3 2023 before:2023-10-01",
-    "Ukraine war defense spending Europe stocks September 2023 before:2023-10-01",
-    "BOTZ Global X robotics ETF performance July August September 2023 before:2023-10-01",
-    "\"BOTZ\" robotics artificial intelligence ETF returns 2023 before:2023-10-01"
+    "AI stocks artificial intelligence stocks after:2023-07-01 before:2023-10-01",
+    "space stocks rocket launch stocks after:2023-07-01 before:2023-10-01",
+    "robotics stocks humanoid robot stocks after:2023-07-01 before:2023-10-01",
+    "quantum computing stocks after:2023-07-01 before:2023-10-01",
+    "nuclear energy stocks SMR small modular reactor after:2023-07-01 before:2023-10-01",
+    "defense stocks defense ETF rearmament after:2023-07-01 before:2023-10-01",
+    "tanker stocks LNG shipping geopolitics oil after:2023-07-01 before:2023-10-01",
+    "healthcare stocks eldercare REIT aging population demographics after:2023-07-01 before:2023-10-01",
+    "best performing ETF this month after:2023-07-01 before:2023-10-01",
+    "biggest stock gainers September 2023 after:2023-07-01 before:2023-10-01",
+    "IonQ IONQ quantum computing stock news 2023 after:2023-07-01 before:2023-10-01",
+    "NuScale Power SMR nuclear stock news 2023 after:2023-07-01 before:2023-10-01",
+    "oil tanker stocks FRO DHT INSW crude tanker Q3 2023 after:2023-07-01 before:2023-10-01",
+    "RKLB Rocket Lab news 2023 after:2023-07-01 before:2023-10-01",
+    "BOTZ Global X Robotics AI ETF news 2023 after:2023-07-01 before:2023-10-01",
+    "IonQ IONQ stock July 2023 quarterly revenue earnings after:2023-07-01 before:2023-10-01",
+    "nuclear energy ETF URA NLR uranium stocks 2023 news after:2023-07-01 before:2023-10-01",
+    "AAPL Apple stock news 2023 after:2023-07-01 before:2023-10-01",
+    "ITA iShares aerospace defense ETF news 2023 after:2023-07-01 before:2023-10-01",
+    "NVDA Nvidia stock news Q3 2023 after:2023-07-01 before:2023-10-01",
+    "IonQ IONQ IPO date listing date SPAC before:2023-10-01",
+    "Apple AAPL China iPhone ban government workers September 2023 before:2023-10-01",
+    "Rocket Lab RKLB Q2 2023 earnings revenue record August 2023 before:2023-10-01",
+    "Nvidia NVDA Q2 fiscal 2024 earnings August 2023 guidance data center before:2023-10-01",
+    "MSFT Microsoft Azure OpenAI Copilot news Q3 2023 after:2023-07-01 before:2023-10-01",
+    "SPY S&P 500 interest rates September 2023 market performance after:2023-07-01 before:2023-10-01",
+    "GOOGL Google Bard AI cloud news Q3 2023 after:2023-07-01 before:2023-10-01"
   ]
 }

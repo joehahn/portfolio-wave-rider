@@ -3,21 +3,27 @@
   "rebalance_period": "quarterly",
   "adds": [
     {
-      "ticker": "BOTZ",
-      "wave_bucket": "robotics",
-      "rationale": "Adds the watchlist's only uncovered named next wave \u2014 robotics \u2014 via the Global X Robotics & AI ETF (US-listed, launched 2016, large liquid fund); Nvidia's May 2023 blowout Q1 FY2024 earnings validate the AI-compute surge that flows directly into BOTZ's largest holding, and robotics currently has zero watchlist representation.",
+      "ticker": "IONQ",
+      "wave_bucket": "quantum",
+      "rationale": "IonQ's commercial launch of IonQ Forte on June 22, 2023 — the highest-performing quantum system available, at #AQ 29 algorithmic qubits — is a concrete buildup-phase milestone for the quantum computing wave the profile explicitly names as a likely next wave, and the current watchlist has zero quantum exposure.",
       "news_evidence": [
         {
-          "summary": "Nvidia Q1 FY2024 (May 24, 2023): data-center revenue $4.28B and Q2 guidance of $11B vs ~$7.15B consensus (54% beat) \u2014 explosive AI-compute demand; NVDA is BOTZ's largest holding.",
-          "source": "SEC EDGAR (NVDA 8-K)",
-          "url": "https://www.sec.gov/Archives/edgar/data/0001045810/000104581023000087/q1fy24pr.htm",
-          "date": "2023-05-24"
+          "summary": "IonQ launched IonQ Forte for commercial availability worldwide on June 22, 2023, achieving a record #AQ 29 algorithmic qubit count; the system is accessible via Amazon Braket, Microsoft Azure, and Google Cloud.",
+          "source": "HPCwire",
+          "url": "https://www.hpcwire.com/off-the-wire/ionq-forte-launched-for-commercial-use-making-aq-29-available-for-customers-worldwide/",
+          "date": "2023-06-22"
         },
         {
-          "summary": "IonQ launched IonQ Forte on June 22, 2023 and raised FY2023 bookings guidance to $45-55M, confirming the advanced-computing ecosystem BOTZ tracks is accelerating.",
-          "source": "IonQ Investor Relations",
-          "url": "https://investors.ionq.com/news/default.aspx",
+          "summary": "Simultaneously with the Forte launch, IonQ announced that QuantumBasel acquired two on-site IonQ systems (targeting #AQ 35 and #AQ 64) to establish a European quantum data center, marking IonQ's first major international infrastructure deal.",
+          "source": "Interesting Engineering",
+          "url": "https://interestingengineering.com/innovation/ionq-quantum-system-forte-partnership-quantumbasel",
           "date": "2023-06-22"
+        },
+        {
+          "summary": "The Quantum Insider reported IonQ Forte launched for commercial use, noting it replaces legacy control hardware with individually addressed qubit-laser control for higher gate fidelity — advancing IonQ's roadmap toward fault tolerance.",
+          "source": "The Quantum Insider",
+          "url": "https://thequantuminsider.com/2023/06/23/ionq-launches-forte-for-commercial-use/",
+          "date": "2023-06-23"
         }
       ]
     }
@@ -25,43 +31,43 @@
   "removes": [
     {
       "ticker": "SPY",
-      "rationale": "SPY's broad-market diversifier role is structurally obsolete at max capacity: it expresses no named wave thesis, and the optimizer replicates its diversifying function via weights across the eight thematic tickers; the slot is better redeployed to the robotics-wave entry.",
+      "rationale": "SPY maps to no specific wave in the investor's thesis; its broad-market beta is now redundant given that AAPL, MSFT, GOOGL, and NVDA individually cover the large-cap tech universe, and the slot is better used for the quantum wave gap filled by IONQ.",
       "news_evidence": [
         {
-          "summary": "Morningstar's June 2023 review shows focused AI-wave names (MongoDB +39.9%, Unity +46.1% in June) far outpaced the S&P 500 \u2014 SPY's undifferentiated exposure carries rising opportunity cost at the 8-ticker cap.",
-          "source": "Morningstar",
-          "url": "https://www.morningstar.com/markets/top-stock-gainers-losers-june-2023",
+          "summary": "The S&P 500's strong H1 2023 performance was driven almost entirely by the 'Magnificent Seven' technology names, all of which the portfolio already holds individually as pure-play thematic positions, leaving SPY's incremental diversification signal near zero relative to its opportunity cost.",
+          "source": "etf.com",
+          "url": "https://www.etf.com/sections/etf-basics/best-performing-etfs-2023",
           "date": "2023-06-30"
         }
       ]
     }
   ],
   "no_changes": false,
-  "rationale_overall": "A 1-for-1 swap: BOTZ replaces SPY. AI is in full surge (Nvidia's May 2023 earnings revealed data-center demand far above consensus), and the four AI names already fill that bucket to its cap, so no further AI concentration. Robotics is the sole named next wave with zero representation; BOTZ (2016, large AUM, liquid) is the most accessible diversified entry. SPY exits because at max capacity a non-thematic placeholder crowds out a thesis-mapped position; its diversifying effect is replicated by the optimizer across eight thematic tickers. RKLB, QTUM, URA hold their seats for rockets, quantum, and nuclear.",
+  "rationale_overall": "The watchlist sat at its 8-ticker cap with no quantum computing exposure, despite quantum being an explicitly named likely-next-wave in the profile. IonQ's commercial launch of IonQ Forte on June 22, 2023 provided a concrete buildup-phase milestone — most powerful commercially available quantum system, first European data-center deal — that is exactly the kind of early-wave signal the curator looks for. Removing SPY costs the least thematic information: the four individual AI names (AAPL, MSFT, GOOGL, NVDA) already deliver broad large-cap market beta, rendering the index ETF a thematic dilutant rather than a signal. The post-change watchlist covers AI (four names), rockets/spacecraft (RKLB), robotics (BOTZ), defense/geopolitical (ITA), and now quantum (IONQ), aligning with every technology wave named in the profile while preserving the geopolitical/defense non-technology wave.",
   "search_terms": [
-    "space stocks rockets spacecraft 2023 before:2023-07-01",
-    "robotics stocks humanoid robot 2023 before:2023-07-01",
-    "quantum computing stocks 2023 before:2023-07-01",
-    "nuclear stocks SMR uranium 2023 before:2023-07-01",
-    "artificial intelligence stocks 2023 before:2023-07-01",
-    "energy tanker stocks geopolitics 2023 before:2023-07-01",
-    "defense stocks rearmament ETF 2023 before:2023-07-01",
-    "aging population healthcare eldercare REIT stocks 2023 before:2023-07-01",
-    "best performing ETF this month 2023 before:2023-07-01",
-    "biggest stock gainers June 2023 before:2023-07-01",
-    "AAPL Apple stock news Q2 2023 before:2023-07-01",
-    "MSFT Microsoft stock AI news Q2 2023 before:2023-07-01",
-    "GOOGL Alphabet stock AI news Q2 2023 before:2023-07-01",
-    "NVDA Nvidia stock AI chips news Q2 2023 before:2023-07-01",
-    "SPY S&P 500 ETF performance news June 2023 before:2023-07-01",
-    "RKLB Rocket Lab news 2023 before:2023-07-01",
-    "QTUM quantum ETF news 2023 before:2023-07-01",
-    "URA uranium ETF nuclear news Q2 2023 before:2023-07-01",
-    "BOTZ Global X Robotics AI ETF news 2023 before:2023-07-01",
-    "ITA iShares Aerospace Defense ETF news 2023 before:2023-07-01",
-    "IONQ quantum computing stock news 2023 before:2023-07-01",
-    "Welltower WELL healthcare REIT aging demographics 2023 before:2023-07-01",
-    "Rocket Lab RKLB launch contract milestone 2023 before:2023-07-01",
-    "Nvidia NVDA H100 GPU AI revenue guidance May 2023 before:2023-07-01"
+    "AI stocks artificial intelligence 2023 after:2023-04-01 before:2023-07-01",
+    "space stocks rocket launch stocks 2023 after:2023-04-01 before:2023-07-01",
+    "robotics stocks humanoid robot stocks 2023 after:2023-04-01 before:2023-07-01",
+    "quantum computing stocks 2023 after:2023-04-01 before:2023-07-01",
+    "nuclear stocks SMR small modular reactor stocks 2023 after:2023-04-01 before:2023-07-01",
+    "defense stocks rearmament ETF 2023 after:2023-04-01 before:2023-07-01",
+    "geopolitics oil gas tanker LNG shipping stocks 2023 after:2023-04-01 before:2023-07-01",
+    "healthcare stocks aging population eldercare demographics 2023 after:2023-04-01 before:2023-07-01",
+    "biggest stock gainers best performing ETF 2023 after:2023-04-01 before:2023-07-01",
+    "IonQ IONQ quantum computing stock news 2023 after:2023-04-01 before:2023-07-01",
+    "IonQ Forte launch June 2023 commercial quantum computing",
+    "IONQ IPO listing date stock market before:2023-07-01",
+    "NVDA Nvidia AI stock news Q2 2023 after:2023-04-01 before:2023-07-01",
+    "Nvidia earnings May 2023 AI GPU demand revenue guidance",
+    "Nvidia NVDA Q1 2023 earnings record revenue AI data center before:2023-07-01",
+    "RKLB Rocket Lab news 2023 after:2023-04-01 before:2023-07-01",
+    "Rocket Lab RKLB 2023 launch contract revenue news after:2023-04-01 before:2023-07-01",
+    "BOTZ robotics ETF 2023 holdings performance after:2023-04-01 before:2023-07-01",
+    "AAPL Apple stock news 2023 AI Vision Pro after:2023-04-01 before:2023-07-01",
+    "NuScale SMR nuclear power stock news 2023 after:2023-04-01 before:2023-07-01",
+    "nuclear energy uranium stocks Cameco Constellation Energy 2023 after:2023-04-01 before:2023-07-01",
+    "ITA iShares aerospace defense ETF 2023 defense spending after:2023-04-01 before:2023-07-01",
+    "SPY S&P 500 ETF market performance 2023 after:2023-04-01 before:2023-07-01",
+    "MSFT Microsoft AI OpenAI news Q2 2023 after:2023-04-01 before:2023-07-01"
   ]
 }

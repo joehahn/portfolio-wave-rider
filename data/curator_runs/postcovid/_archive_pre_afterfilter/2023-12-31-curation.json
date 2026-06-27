@@ -1,0 +1,68 @@
+{
+  "as_of_date": "2023-12-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "BOTZ",
+      "wave_bucket": "robotics",
+      "rationale": "Robotics is the first-named next tech wave in the profile and has zero watchlist coverage; BOTZ gained 16% in November 2023 and 29% YTD \u2014 an early-surge signal \u2014 while NVDA/MSFT/GOOGL give the optimizer enough AI exposure to absorb AAPL's removal.",
+      "news_evidence": [
+        {
+          "summary": "Global X Robotics & AI ETF (BOTZ) surged 16% in November 2023 (vs S&P 500 +9%), up 29% YTD, on Nvidia's AI tailwind and rate-cut expectations.",
+          "source": "The Motley Fool",
+          "url": "https://www.fool.com/investing/2023/12/05/why-the-global-x-robotics-artificial-intelligence/",
+          "date": "2023-12-05"
+        }
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "AAPL",
+      "rationale": "Apple posted its fourth consecutive quarter of declining revenue \u2014 its longest slump in 22 years \u2014 with Mac sales down ~34% YoY and flat holiday guidance; MSFT, GOOGL, NVDA already cover the AI wave, making AAPL the weakest-thesis slot and the natural pair for a robotics add.",
+      "news_evidence": [
+        {
+          "summary": "Apple Q4 FY2023 revenue fell for the fourth straight quarter (longest slump in 22 years), Mac -34% YoY, Greater China flat amid Huawei competition; no growth expected in the holiday quarter.",
+          "source": "Fortune",
+          "url": "https://fortune.com/2023/11/02/apple-earnings-q4-2023-china-revenue-mac-sales-miss-estimates/",
+          "date": "2023-11-02"
+        },
+        {
+          "summary": "Apple Q4 2023: revenue $89.5B (-1% YoY), every hardware line outside iPhone declined, Mac -34%; shares fell 3%+ after-hours on weak holiday guidance.",
+          "source": "CNBC",
+          "url": "https://www.cnbc.com/2023/11/02/apple-aapl-earnings-report-q4-2023.html",
+          "date": "2023-11-02"
+        }
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "The watchlist entered Q4 2023 full at 8/8 with four AI names and zero robotics coverage \u2014 an obvious thematic gap. Swapping AAPL (four straight quarterly revenue declines, Mac in freefall, no AI thesis distinct from MSFT/GOOGL/NVDA) for BOTZ opens the robotics bucket while keeping AI represented by three anchors. Remaining holdings confirmed: RKLB won a $515M US Space Force satellite contract (SEC filing Dec 21, 2023) and flew a successful return-to-flight Electron Dec 14; URA reinforced by COP28's Dec 2, 2023 pledge by 22 nations to triple nuclear capacity by 2050 (uranium spot up ~88% YTD); QTUM validated by quantum momentum (IONQ ~+290% in 2023). Defense and demographics remain unrepresented, to be revisited when a remove creates room.",
+  "search_terms": [
+    "space stocks rocket launch stocks 2023 before:2024-01-01",
+    "robotics stocks humanoid robot stocks 2023 before:2024-01-01",
+    "quantum computing stocks 2023 before:2024-01-01",
+    "nuclear stocks SMR uranium stocks 2023 before:2024-01-01",
+    "AI stocks artificial intelligence best performers 2023 before:2024-01-01",
+    "defense stocks defense ETF rearmament 2023 before:2024-01-01",
+    "tanker stocks shipping stocks geopolitics energy 2023 before:2024-01-01",
+    "healthcare stocks eldercare aging population demographics 2023 before:2024-01-01",
+    "best performing ETF 2023 before:2024-01-01",
+    "biggest stock gainers Q4 2023 before:2024-01-01",
+    "AAPL Apple stock news Q4 2023 before:2024-01-01",
+    "SPY S&P 500 ETF outlook December 2023 before:2024-01-01",
+    "RKLB Rocket Lab news 2023 before:2024-01-01",
+    "QTUM Defiance Quantum ETF news 2023 before:2024-01-01",
+    "URA Global X Uranium ETF news 2023 before:2024-01-01",
+    "BOTZ Global X Robotics AI ETF news 2023 before:2024-01-01",
+    "ITA iShares aerospace defense ETF 2023 performance before:2024-01-01",
+    "IONQ quantum computing stock 2023 before:2024-01-01",
+    "BOTZ robotics ETF November December 2023 performance before:2024-01-01",
+    "Apple AAPL revenue decline hardware Q4 2023 China headwinds before:2024-01-01",
+    "uranium nuclear energy stocks 2023 performance COP28 before:2024-01-01",
+    "Rocket Lab RKLB launches contracts 2023 before:2024-01-01",
+    "NVDA MSFT GOOGL AI fourth quarter 2023 before:2024-01-01",
+    "Rocket Lab Space Force satellite contract December 2023 before:2024-01-01",
+    "COP28 nuclear tripling pledge 20 nations December 2023 before:2024-01-01"
+  ]
+}

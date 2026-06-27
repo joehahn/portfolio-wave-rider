@@ -3,15 +3,27 @@
   "rebalance_period": "quarterly",
   "adds": [
     {
-      "ticker": "BOTZ",
-      "wave_bucket": "robotics",
-      "rationale": "Robotics is the first-named next tech wave in the profile and has zero watchlist coverage; BOTZ gained 16% in November 2023 and 29% YTD \u2014 an early-surge signal \u2014 while NVDA/MSFT/GOOGL give the optimizer enough AI exposure to absorb AAPL's removal.",
+      "ticker": "QTUM",
+      "wave_bucket": "quantum",
+      "rationale": "The quantum computing wave is explicitly named in the profile as a priority 'next wave' and has zero coverage in the current watchlist; IonQ's 283% YTD gain and ahead-of-schedule AQ 35 milestone in December 2023 confirm the sector entered a meaningful buildup phase, and QTUM (Defiance Quantum ETF, launched September 2018) provides diversified US-listed exposure across hardware, software, and quantum infrastructure without the single-name volatility risk of IONQ alone.",
       "news_evidence": [
         {
-          "summary": "Global X Robotics & AI ETF (BOTZ) surged 16% in November 2023 (vs S&P 500 +9%), up 29% YTD, on Nvidia's AI tailwind and rate-cut expectations.",
-          "source": "The Motley Fool",
-          "url": "https://www.fool.com/investing/2023/12/05/why-the-global-x-robotics-artificial-intelligence/",
-          "date": "2023-12-05"
+          "summary": "IonQ shares surged 283% year-to-date by December 2023; IonQ achieved its AQ 35 milestone on IonQ Forte in December 2023, a full year ahead of schedule, with the system also made available through Amazon Braket Direct — the strongest commercial-readiness signal yet in the sector.",
+          "source": "Nasdaq",
+          "url": "https://www.nasdaq.com/articles/2-quantum-computing-stocks-to-watch-in-december-2023",
+          "date": "2023-12-01"
+        },
+        {
+          "summary": "Seeking Alpha analysis documents quantum computing stocks surging in 2023 on AI-adjacent demand, with IBM, Google, and IonQ all racing toward commercial viability and investor sentiment tracking the AI wave's momentum into quantum.",
+          "source": "Seeking Alpha",
+          "url": "https://seekingalpha.com/article/4618292-2023-quantum-computing-stocks-surge-ai-potential",
+          "date": "2023-12-01"
+        },
+        {
+          "summary": "InvestorPlace December 2023 piece identifies seven quantum computing stocks with 10x return potential, citing Nvidia's DGX Quantum pairing with Quantum Machines hardware and Intel's Tunnel Falls qubit chip as structural markers that quantum is transitioning from research to commercial infrastructure.",
+          "source": "InvestorPlace",
+          "url": "https://investorplace.com/2023/12/7-quantum-computing-stocks-to-create-10x-returns/",
+          "date": "2023-12-01"
         }
       ]
     }
@@ -19,16 +31,16 @@
   "removes": [
     {
       "ticker": "AAPL",
-      "rationale": "Apple posted its fourth consecutive quarter of declining revenue \u2014 its longest slump in 22 years \u2014 with Mac sales down ~34% YoY and flat holiday guidance; MSFT, GOOGL, NVDA already cover the AI wave, making AAPL the weakest-thesis slot and the natural pair for a robotics add.",
+      "rationale": "Apple reported its fourth consecutive quarter of year-over-year revenue decline in November 2023 (Mac -34%, iPad -10%, guidance signaling continued weakness in the holiday quarter) and has no wave-specific thesis — no material AI catalyst, SMR exposure, or structural positioning in any of the profile's named waves — making it the watchlist's weakest thematic fit and the natural candidate to free a slot for quantum coverage.",
       "news_evidence": [
         {
-          "summary": "Apple Q4 FY2023 revenue fell for the fourth straight quarter (longest slump in 22 years), Mac -34% YoY, Greater China flat amid Huawei competition; no growth expected in the holiday quarter.",
-          "source": "Fortune",
-          "url": "https://fortune.com/2023/11/02/apple-earnings-q4-2023-china-revenue-mac-sales-miss-estimates/",
+          "summary": "Apple Q4 FY2023: revenue $89.5B (-1% YoY), fourth consecutive quarterly revenue decline; Mac sales -34% YoY, iPad -10%; shares fell more than 3% after-hours on guidance implying no return to growth in the December quarter.",
+          "source": "Apple Newsroom",
+          "url": "https://www.apple.com/newsroom/2023/11/apple-reports-fourth-quarter-results/",
           "date": "2023-11-02"
         },
         {
-          "summary": "Apple Q4 2023: revenue $89.5B (-1% YoY), every hardware line outside iPhone declined, Mac -34%; shares fell 3%+ after-hours on weak holiday guidance.",
+          "summary": "CNBC earnings coverage: Apple CEO Tim Cook noted iPhone 15 was tracking better than iPhone 14, but the quarter marked hardware weakness across Mac and iPad while Services ($22.3B, +16% YoY) remained the only consistent growth segment — insufficient to offset a fourth straight top-line miss.",
           "source": "CNBC",
           "url": "https://www.cnbc.com/2023/11/02/apple-aapl-earnings-report-q4-2023.html",
           "date": "2023-11-02"
@@ -37,32 +49,29 @@
     }
   ],
   "no_changes": false,
-  "rationale_overall": "The watchlist entered Q4 2023 full at 8/8 with four AI names and zero robotics coverage \u2014 an obvious thematic gap. Swapping AAPL (four straight quarterly revenue declines, Mac in freefall, no AI thesis distinct from MSFT/GOOGL/NVDA) for BOTZ opens the robotics bucket while keeping AI represented by three anchors. Remaining holdings confirmed: RKLB won a $515M US Space Force satellite contract (SEC filing Dec 21, 2023) and flew a successful return-to-flight Electron Dec 14; URA reinforced by COP28's Dec 2, 2023 pledge by 22 nations to triple nuclear capacity by 2050 (uranium spot up ~88% YTD); QTUM validated by quantum momentum (IONQ ~+290% in 2023). Defense and demographics remain unrepresented, to be revisited when a remove creates room.",
+  "rationale_overall": "The watchlist was at its 8-ticker cap with a structural gap: the profile's second named 'next wave' (quantum computing) had zero coverage while the starter-set placeholder AAPL had deteriorated into the portfolio's weakest thematic link — four consecutive revenue declines, no AI-specific catalyst, and no positioning in any of the profile's named waves. Swapping AAPL for QTUM fills the quantum slot cleanly with a diversified ETF rather than a single high-volatility pure-play, keeping wave-bucket counts well below the 4-ticker cap. All other holdings survived due diligence: NVDA reported +206% revenue growth on AI-accelerated compute demand; GOOGL launched Gemini on December 6; MSFT deepened OpenAI integration at DevDay in November; RKLB secured a $515M government manufacturing contract and set a record with 21 launches at 100% mission success in 2023; BOTZ returned ~39% for the year on AI-and-robotics tailwinds; and ITA remained supported by elevated defense budgets tied to Ukraine and the Israel-Hamas conflict. The nuclear wave (covered by neither NuScale, whose UAMPS project was cancelled November 8, nor any ETF available before the decision date) remains a gap to revisit when a liquid instrument with sufficient history becomes available.",
   "search_terms": [
-    "space stocks rocket launch stocks 2023 before:2024-01-01",
-    "robotics stocks humanoid robot stocks 2023 before:2024-01-01",
-    "quantum computing stocks 2023 before:2024-01-01",
-    "nuclear stocks SMR uranium stocks 2023 before:2024-01-01",
-    "AI stocks artificial intelligence best performers 2023 before:2024-01-01",
-    "defense stocks defense ETF rearmament 2023 before:2024-01-01",
-    "tanker stocks shipping stocks geopolitics energy 2023 before:2024-01-01",
-    "healthcare stocks eldercare aging population demographics 2023 before:2024-01-01",
-    "best performing ETF 2023 before:2024-01-01",
-    "biggest stock gainers Q4 2023 before:2024-01-01",
-    "AAPL Apple stock news Q4 2023 before:2024-01-01",
-    "SPY S&P 500 ETF outlook December 2023 before:2024-01-01",
-    "RKLB Rocket Lab news 2023 before:2024-01-01",
-    "QTUM Defiance Quantum ETF news 2023 before:2024-01-01",
-    "URA Global X Uranium ETF news 2023 before:2024-01-01",
-    "BOTZ Global X Robotics AI ETF news 2023 before:2024-01-01",
-    "ITA iShares aerospace defense ETF 2023 performance before:2024-01-01",
-    "IONQ quantum computing stock 2023 before:2024-01-01",
-    "BOTZ robotics ETF November December 2023 performance before:2024-01-01",
-    "Apple AAPL revenue decline hardware Q4 2023 China headwinds before:2024-01-01",
-    "uranium nuclear energy stocks 2023 performance COP28 before:2024-01-01",
-    "Rocket Lab RKLB launches contracts 2023 before:2024-01-01",
-    "NVDA MSFT GOOGL AI fourth quarter 2023 before:2024-01-01",
-    "Rocket Lab Space Force satellite contract December 2023 before:2024-01-01",
-    "COP28 nuclear tripling pledge 20 nations December 2023 before:2024-01-01"
+    "artificial intelligence stocks AI wave 2023 after:2023-10-01 before:2024-01-01",
+    "space stocks rocket launch stocks 2023 after:2023-10-01 before:2024-01-01",
+    "robotics stocks humanoid robot stocks 2023 after:2023-10-01 before:2024-01-01",
+    "quantum computing stocks 2023 after:2023-10-01 before:2024-01-01",
+    "nuclear energy stocks SMR small modular reactor stocks 2023 after:2023-10-01 before:2024-01-01",
+    "defense stocks rearmament ETF 2023 after:2023-10-01 before:2024-01-01",
+    "geopolitical energy stocks oil gas tanker LNG shipping stocks 2023 after:2023-10-01 before:2024-01-01",
+    "aging population demographics healthcare eldercare REIT stocks 2023 after:2023-10-01 before:2024-01-01",
+    "best performing ETF this month December 2023 after:2023-10-01 before:2024-01-01",
+    "biggest stock gainers December 2023 after:2023-10-01 before:2024-01-01",
+    "AAPL Apple stock news Q4 2023 after:2023-10-01 before:2024-01-01",
+    "NVDA Nvidia stock news Q4 2023 after:2023-10-01 before:2024-01-01",
+    "GOOGL Google Gemini AI news Q4 2023 after:2023-10-01 before:2024-01-01",
+    "RKLB Rocket Lab stock news December 2023 after:2023-10-01 before:2024-01-01",
+    "BOTZ robotics ETF performance news Q4 2023 after:2023-10-01 before:2024-01-01",
+    "ITA defense ETF aerospace news Q4 2023 after:2023-10-01 before:2024-01-01",
+    "MSFT Microsoft Azure AI OpenAI news Q4 2023 after:2023-10-01 before:2024-01-01",
+    "QTUM quantum computing ETF Defiance launch date before:2024-01-01",
+    "NuScale Power UAMPS project cancellation November 2023 before:2024-01-01",
+    "IONQ IonQ stock news October November December 2023 after:2023-10-01 before:2024-01-01",
+    "CCJ Cameco uranium nuclear stock news Q4 2023 after:2023-10-01 before:2024-01-01",
+    "SPY S&P 500 ETF performance macroeconomic outlook December 2023 after:2023-10-01 before:2024-01-01"
   ]
 }

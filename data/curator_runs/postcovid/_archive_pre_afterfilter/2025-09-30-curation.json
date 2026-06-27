@@ -1,0 +1,80 @@
+{
+  "as_of_date": "2025-09-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "BOTZ",
+      "wave_bucket": "robotics",
+      "rationale": "BOTZ fills the robotics wave \u2014 named in the profile as a likely next wave and the only declared wave with zero watchlist representation \u2014 as the sector transitions from science-project to buildout, per Morgan Stanley's April 2025 $5T long-run forecast and a ~39% CAGR projected through 2030.",
+      "news_evidence": [
+        {
+          "summary": "Morgan Stanley's 'A $5 Trillion Global Market' report projects ~1B humanoid units by 2050, with labor-cost substitution across physical industries as the structural driver \u2014 the mechanism in the profile's robotics thesis.",
+          "source": "Morgan Stanley Insights",
+          "url": "https://www.morganstanley.com/insights/articles/humanoid-robot-market-5-trillion-by-2050",
+          "date": "2025-04-29"
+        },
+        {
+          "summary": "MarketsandMarkets sizes humanoid robots at $2.92B in 2025 growing to $15.26B by 2030 (39.2% CAGR) on falling AI compute costs, reshoring, and aging-population automation \u2014 buildup-phase entry timing.",
+          "source": "MarketsandMarkets",
+          "url": "https://www.marketsandmarkets.com/Market-Reports/humanoid-robot-market-99567653.html",
+          "date": "2025-01-01"
+        }
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "STNG",
+      "rationale": "STNG's rerouting-premium thesis has breached: Q2 2025 net income fell 68% YoY to $73.5M and average daily TCE dropped from $38,813 (2024) to $25,569, and management's September 4 filing locks a vessel into a 5-year charter at $28,350/day rather than riding spot \u2014 a classic 'exit before the crest' signal.",
+      "news_evidence": [
+        {
+          "summary": "Scorpio Tankers Q2 2025: net income $73.5M vs $227.3M YoY (-68%); average TCE fell to $25,569 from $38,813; dividend cut to $0.40/share \u2014 sustained freight-rate normalization.",
+          "source": "TipRanks / Scorpio IR",
+          "url": "https://www.tipranks.com/news/company-announcements/scorpio-tankers-reports-q2-2025-earnings-and-dividend",
+          "date": "2025-07-30"
+        },
+        {
+          "summary": "Scorpio 6-K (Sep 4, 2025): locks the LR2 STI Orchard into a 5-year charter at $28,350/day while Q3 LR2 spot TCE of $32,700 remains ~16% below the 2024 peak \u2014 a signal spot rates are near/past their ceiling.",
+          "source": "GlobeNewswire / SEC 6-K",
+          "url": "https://www.globenewswire.com/news-release/2025/09/04/3144270/0/en/Scorpio-Tankers-Inc-Announces-a-Time-Charter-Out-Agreement-and-an-Update-on-Daily-TCE-Rates.html",
+          "date": "2025-09-04"
+        }
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Sole swap \u2014 STNG out, BOTZ in \u2014 tightens alignment with the profile's wave map. STNG exits on Q2-Q3 2025 fundamentals: freight rates 16-34% below 2024 peaks and management de-risking into long-term charters, signaling the rerouting premium has crested (the profile's guidance is to trim tankers as rates normalize). BOTZ closes the robotics gap \u2014 the only named tech wave with zero representation \u2014 as the April 2025 Morgan Stanley $5T forecast plus an accelerating ETF-launch cycle mark the transition from quiet buildup to early surge. Post-change spans AI (MSFT, NVDA), rockets (RKLB), quantum (QTUM), nuclear (NUKZ, CEG), defense (ITA), robotics (BOTZ), with defense the sole geopolitical expression after STNG's exit.",
+  "search_terms": [
+    "AI stocks technology 2025 before:2025-10-01",
+    "space stocks rockets spacecraft 2025 before:2025-10-01",
+    "robotics stocks humanoid robot 2025 before:2025-10-01",
+    "quantum computing stocks 2025 before:2025-10-01",
+    "nuclear SMR stocks utility PPA AI data center 2025 before:2025-10-01",
+    "tanker stocks shipping freight geopolitical energy 2025 before:2025-10-01",
+    "defense stocks rearmament NATO European 2025 before:2025-10-01",
+    "aging population demographics healthcare eldercare REIT stocks 2025 before:2025-10-01",
+    "best performing ETF September 2025 before:2025-10-01",
+    "biggest stock gainers Q3 2025 before:2025-10-01",
+    "robotics ETF BOTZ ROBO 2025 performance before:2025-10-01",
+    "Welltower WELL healthcare REIT 2025 before:2025-10-01",
+    "MSFT Microsoft stock news Q3 2025 before:2025-10-01",
+    "NVDA Nvidia stock news Q3 2025 before:2025-10-01",
+    "RKLB Rocket Lab news 2025 before:2025-10-01",
+    "QTUM quantum computing ETF news 2025 before:2025-10-01",
+    "ITA iShares defense ETF news 2025 before:2025-10-01",
+    "NUKZ nuclear energy ETF news 2025 before:2025-10-01",
+    "STNG Scorpio Tankers stock news 2025 before:2025-10-01",
+    "CEG Constellation Energy stock news 2025 before:2025-10-01",
+    "BOTZ Global X robotics ETF 2025 performance news before:2025-10-01",
+    "Constellation Energy CEG Calpine acquisition nuclear PPA 2025 before:2025-10-01",
+    "Scorpio Tankers STNG Q2 2025 earnings freight rates before:2025-10-01",
+    "KRMN Karman Holdings spacecraft stock IPO 2025 before:2025-10-01",
+    "BOTZ robotics ETF news August September 2025 before:2025-10-01",
+    "Rocket Lab RKLB Synspective Mars launch September 2025 before:2025-10-01",
+    "\"robotics\" \"ETF\" 2025 quarterly performance humanoid industrial automation before:2025-10-01",
+    "Microsoft MSFT Azure AI cloud revenue growth 2025 Q2 before:2025-10-01",
+    "Morgan Stanley humanoid robot report 2025 date \"Humanoid Tech 25\" before:2025-10-01",
+    "STNG Scorpio Tankers TCE rates freight normalization 2025 before:2025-10-01",
+    "NUKZ nuclear ETF \"energy demand\" \"data center\" August 2025 before:2025-10-01"
+  ]
+}

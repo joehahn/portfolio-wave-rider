@@ -10,31 +10,31 @@
 | Metric | Value |
 |---|---|
 | Curation calls applied | 15 |
-| Adds executed | 9 |
-| Removes executed | 6 |
-| Final watchlist size | 8 |
+| Adds executed | 7 |
+| Removes executed | 5 |
+| Final watchlist size | 7 |
 | Rebalances (optimizer calls) | 16 |
-| Mean L1 weight distance rebalance-to-rebalance | 1.1575 |
+| Mean L1 weight distance rebalance-to-rebalance | 1.2035 |
 
 ## Realized performance vs baselines
 
 | Strategy | Ending value | Total return | Active vs curator |
 |---|---|---|---|
-| Curator-driven | $505,109.85 | +910.22% | — |
-| Buy-and-hold starter (equal-weight, then hold) | $143,628.48 | +187.26% | +722.96pp |
+| Curator-driven | $458,309.68 | +816.62% | — |
+| Buy-and-hold starter (equal-weight, then hold) | $143,628.48 | +187.26% | +629.36pp |
 
 ## Risk and benchmarks
 
 | Metric | Value |
 |---|---|
-| Annualized return (curator) | +90.48% |
-| Max drawdown (curator) | -48.15% |
+| Annualized return (curator) | +85.39% |
+| Max drawdown (curator) | -54.78% |
 
 ### Benchmarks (over the same window)
 
 | Benchmark | Return | Active vs curator |
 |---|---|---|
-| SPY | +58.69% | +851.53pp |
+| SPY | +58.69% | +757.93pp |
 
 ## Caveats
 
