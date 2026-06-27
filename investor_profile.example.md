@@ -15,6 +15,12 @@ backtest:                         # only affects /run-backtest and sweeps, not l
   start_date: 2022-03-31          # window start (a quarter-end; first rebalance lands here). Post-COVID/post-stimulus 
   end_date: 2025-10-31            # window end (just before the late-2025 Iran-war runup)
   t_update_days: 1                # trading-day lag from rebalance signal to trade (1 = next session, 0 = same-close)
+  # Optional backtest-only optimizer overrides (omit to use the live values from
+  # financial_model + the top-level concentration_cap). Lets the backtest run more
+  # aggressive knobs than the live recommend path. Example:
+  #   risk_aversion: 0.33
+  #   lookback_years: 0.5
+  #   concentration_cap: 1.0
 ---
 
 # Goals

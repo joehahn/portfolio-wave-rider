@@ -136,11 +136,12 @@ PY
 .venv/bin/python -m src.cli backtest \
   --curator-runs-dir data/curator_runs/postcovid \
   --out-dir data/backtest_curator_postcovid \
-  --max-weight 0.70 --risk-aversion 0.5 \
   --benchmarks SPY
 ```
 
-Execution lag defaults to `--t-update-days 1` (each rebalance is decided on the rebalance date's close but the trade lands the next session — the realistic case for a live user who reviews and then trades later). Pass `--t-update-days 0` to reproduce the optimistic same-close run; the result is insensitive to the lag (within noise across 0-3 sessions).
+The optimizer knobs come from `investor_profile.md`'s `backtest` section: if `risk_aversion` / `lookback_years` / `concentration_cap` are set there (backtest-only overrides) they win; otherwise the live `financial_model` + top-level `concentration_cap` values are used. The published dashboard uses the aggressive overrides (λ=0.33 / lookback 0.5y / cap=1.0), which is why it renders +910% (a ~100%-RKLB, overfit ceiling) rather than the live/robust +313.6%. Do NOT pass `--max-weight` / `--risk-aversion` here — that would override the profile-driven config.
+
+Execution lag defaults to `--t-update-days 1` (rebalance decided on the close, trade lands the next session — the realistic case). Pass `--t-update-days 0` for the optimistic same-close upper bound; on this short window the lag is material.
 
 ### Step 6 — render the public dashboard (Bash)
 

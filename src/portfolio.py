@@ -98,6 +98,14 @@ _BACKTEST_DEFAULTS: dict[str, Any] = {
     # Trading-day lag from a rebalance signal (decided on the rebalance date's
     # close) to the trade actually landing. 1 = next session. Backtest-only.
     "t_update_days": 1,
+    # Optional BACKTEST-ONLY optimizer overrides. None => use the live
+    # financial_model / concentration_cap values. Set these to run the backtest
+    # with different optimizer knobs than the live recommend path (e.g. the
+    # sweep-optimal but more aggressive λ / lookback / cap), WITHOUT changing
+    # what the live optimizer recommends with real money.
+    "risk_aversion": None,
+    "lookback_years": None,
+    "concentration_cap": None,
 }
 
 

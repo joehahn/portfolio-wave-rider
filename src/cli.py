@@ -167,15 +167,21 @@ def main(argv: list[str] | None = None) -> int:
             result = portfolio.initialize_holdings(allocations, last_prices, holdings_path=args.out)
         elif args.cmd == "backtest":
             if args.curator_runs_dir:
+                # Backtest-only optimizer overrides from investor_profile.md's
+                # `backtest` section take precedence over the live values, so the
+                # backtest can run more aggressive knobs than live recommends.
+                ra = bc["risk_aversion"] if bc["risk_aversion"] is not None else args.risk_aversion
+                mw = bc["concentration_cap"] if bc["concentration_cap"] is not None else args.max_weight
                 result = portfolio.curator_backtest(
                     runs_dir=args.curator_runs_dir,
                     out_dir=args.out_dir,
-                    max_weight=args.max_weight,
+                    max_weight=mw,
                     objective="mean_variance",
-                    risk_aversion=args.risk_aversion,
+                    risk_aversion=ra,
                     risk_free_rate=args.risk_free_rate,
                     benchmarks=args.benchmarks,
                     t_update_days=args.t_update_days,
+                    lookback_years_override=bc["lookback_years"],
                 )
             else:
                 result = portfolio.backtest(
