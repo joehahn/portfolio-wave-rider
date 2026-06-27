@@ -1,5 +1,6 @@
 #!/bin/bash
-# Run the three optimizer-parameter sweeps over the 5y curator runs dir.
+# Run the three optimizer-parameter sweeps over the published post-COVID
+# curator runs dir (sweep.py default: data/curator_runs/postcovid).
 # Each is a pure replay (no LLM calls), takes a few seconds, and renders
 # its own docs/sweep_<param>.html.
 set -e

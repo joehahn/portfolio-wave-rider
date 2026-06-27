@@ -1831,7 +1831,7 @@ def _ticker_label(t: str) -> str:
 # the bare filenames (no path) of the published GitHub Pages files.
 _NAV_PAGES: list[tuple[str, str]] = [
     ("index.html", "live dashboard"),
-    ("backtest_curator.html", "5y backtest"),
+    ("backtest_curator.html", "Curator backtest"),
     ("sweep_risk_aversion.html", "sweep: risk_aversion"),
     ("sweep_lookback.html", "sweep: lookback"),
     ("sweep_concentration_cap.html", "sweep: concentration_cap"),

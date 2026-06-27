@@ -79,7 +79,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--param", required=True, choices=list(DEFAULTS.keys()))
     p.add_argument("--values", default=None,
                    help="comma-separated values to sweep (overrides defaults)")
-    p.add_argument("--runs-dir", default="data/curator_runs/5y-sweep-cap08")
+    p.add_argument("--runs-dir", default="data/curator_runs/postcovid")
     p.add_argument("--out", default=None,
                    help="output HTML path (default: docs/sweep_<param>.html)")
     p.add_argument("--benchmarks", nargs="*", default=["SPY"])
@@ -168,20 +168,28 @@ def main(argv: list[str] | None = None) -> int:
         rows = "".join(_fmt_row(*r) for r in summary)
         WALK_FORWARD_NOTES = {
             "risk_aversion": (
-                "we find that <code>risk_aversion=0.5</code> wins both halves "
-                "by both Sharpe and Calmar, so this setting is stable across "
-                "regimes."
+                "the highest total return on this window comes from "
+                "<code>risk_aversion=0.0</code> (pure return-max, +342.7% vs "
+                "+313.6% at 0.5) because a lower λ concentrates harder into the "
+                "single winner (RKLB) — overfitting to one outcome, not a robust "
+                "edge. The profile keeps <code>risk_aversion=0.5</code>, the value "
+                "chosen for stability across both halves of the longer 2021–2026 "
+                "window."
             ),
             "lookback": (
-                "we find that <code>lookback=1.5y</code> wins both halves by "
-                "both Sharpe and Calmar, so this setting is stable across "
-                "regimes."
+                "the highest total return comes from <code>lookback=0.5y</code> "
+                "(+519.2% vs +313.6% at 1.5y) because a shorter memory chases the "
+                "recent run-up (RKLB) harder — overfitting to this single window's "
+                "momentum. The profile keeps <code>lookback=1.5y</code>, chosen for "
+                "robustness on the longer 2021–2026 window."
             ),
             "concentration_cap": (
-                "we find that <code>concentration_cap=0.7</code> wins H2 by both "
-                "Sharpe and Calmar, while H1 prefers slightly higher (0.8 by "
-                "Sharpe, 0.9 by Calmar); the H1 gap is small (Sharpe 0.90 vs "
-                "0.99), so the 0.7 choice is reasonable."
+                "the highest total return comes from <code>concentration_cap=1.0</code> "
+                "(+410.7% vs +313.6% at 0.7) because a higher cap lets the optimizer "
+                "pile more into the single winner (RKLB) — overfitting, and a clear "
+                "single-name risk. The profile keeps <code>concentration_cap=0.7</code>, "
+                "which bounds per-position risk and was chosen for robustness on the "
+                "longer 2021–2026 window."
             ),
         }
         wf_note = WALK_FORWARD_NOTES.get(args.param, "")
@@ -203,9 +211,9 @@ def main(argv: list[str] | None = None) -> int:
             f"<strong>Calmar</strong> = annualized return / |max drawdown|; "
             f"penalizes deep drawdowns the way Sharpe doesn't.</p>"
             f"<p style='font-size:13px;color:#666;'>"
-            f"We also did a <strong>walk-forward check</strong> that splits "
-            f"the 5y backtest at its midpoint (2023-09-27) to ask whether the "
-            f"same parameter value wins on each half independently, and "
+            f"<strong>How to read the winner:</strong> this sweep runs over the "
+            f"published post-COVID window (2022-03-31 → 2025-10-31), which is "
+            f"dominated by a single position (RKLB) that ran in 2025, so "
             f"{wf_note}</p>"
         )
 
