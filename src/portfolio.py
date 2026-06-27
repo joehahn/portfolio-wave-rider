@@ -3220,13 +3220,14 @@ def build_curator_dashboard(
     bnh_return = (bnh_final / bnh_initial) - 1.0
 
     fig = make_subplots(
-        rows=4, cols=1, vertical_spacing=0.06,
-        row_heights=[0.242, 0.273, 0.151, 0.197],
+        rows=5, cols=1, vertical_spacing=0.06,
+        row_heights=[0.24, 0.27, 0.15, 0.14, 0.20],
         subplot_titles=(
             "1. Realized portfolio value: curator vs baselines vs benchmark",
             "2. Watchlist composition over time (color = wave bucket)",
-            "3. Cumulative $ gain per holding over the 5y window",
-            "4. Actual portfolio $ by wave over time",
+            "3. Cumulative $ gain per holding",
+            "4. Cumulative $ gain per wave bucket",
+            "5. Actual portfolio $ by wave over time",
         ),
     )
 
@@ -3356,7 +3357,40 @@ def build_curator_dashboard(
                      zeroline=True, zerolinewidth=1, zerolinecolor="#888",
                      row=3, col=1)
 
-    # Chart 4: actual portfolio $ by wave over time. Stacked area on
+    # Chart 4: cumulative $ gain per wave bucket. Same daily-P&L attribution
+    # as chart 3, re-aggregated from ticker to wave bucket. Buckets use the
+    # same display_bucket split as chart 5 (cash/bonds/metals/crypto pulled
+    # into "cashlike") so the bars and the stacked-area bands line up, and
+    # each bar is colored with its wave's color. Sorted by gain descending.
+    _gain_by_wave: dict[str, float] = {}
+    for _tk, _g in _gain_by_ticker.items():
+        _ac = ASSET_CLASS_BUCKET.get(TICKER_ASSET_CLASS.get(_tk, "equity"), "equities")
+        _wb = TICKER_WAVE.get(_tk, "general_markets")
+        if _ac in ("bonds", "cash", "precious metals", "crypto"):
+            _wb = "cashlike"
+        _gain_by_wave[_wb] = _gain_by_wave.get(_wb, 0.0) + _g
+    _wave_items = sorted(_gain_by_wave.items(), key=lambda kv: kv[1], reverse=True)
+    _wave_keys = [w for w, _ in _wave_items]
+    _wave_vals = [v for _, v in _wave_items]
+    fig.add_trace(
+        go.Bar(x=_wave_keys, y=_wave_vals,
+               marker_color=[WAVE_COLORS.get(w, "#888888") for w in _wave_keys],
+               name="$ gain by wave", showlegend=False,
+               hovertemplate="%{x}<br>$%{y:,.0f}<extra></extra>"),
+        row=4, col=1,
+    )
+    fig.update_xaxes(
+        tickmode="array",
+        tickvals=_wave_keys,
+        ticktext=[WAVE_DISPLAY_LABEL.get(w, w) for w in _wave_keys],
+        tickangle=-30,
+        row=4, col=1,
+    )
+    fig.update_yaxes(title_text="$ gain", tickformat="$,.0f",
+                     zeroline=True, zerolinewidth=1, zerolinecolor="#888",
+                     row=4, col=1)
+
+    # Chart 5: actual portfolio $ by wave over time. Stacked area on
     # linear y-axis: top edge = total portfolio value; each band's
     # thickness = that wave bucket's $ contribution.
     snaps_full = snaps.copy()
@@ -3387,10 +3421,10 @@ def build_curator_dashboard(
                        hovertemplate=f"{WAVE_DISPLAY_LABEL.get(wave, wave)}"
                                      "<br>%{x|%Y-%m-%d}"
                                      "<br>$%{y:,.0f}<extra></extra>"),
-            row=4, col=1,
+            row=5, col=1,
         )
-    fig.update_yaxes(title_text="$", tickformat="$,.0f", row=4, col=1)
-    fig.update_xaxes(range=[start, end], row=4, col=1)
+    fig.update_yaxes(title_text="$", tickformat="$,.0f", row=5, col=1)
+    fig.update_xaxes(range=[start, end], row=5, col=1)
 
 
     fig.update_layout(
@@ -3436,8 +3470,8 @@ def build_curator_dashboard(
     # 33% (149 px). Override each yaxis's domain and size the figure
     # in absolute pixels so individual subplot sizes are preserved
     # across edits.
-    ROW_PX = [393, 443, 246, 320]   # charts 1..4
-    GAP_PX = [111, 111, 149]         # 3 gaps; gap(3,4) wider
+    ROW_PX = [393, 443, 246, 246, 320]   # charts 1..5
+    GAP_PX = [111, 111, 111, 149]        # 4 gaps; gap(4,5) wider
     _new_fig_h = sum(ROW_PX) + sum(GAP_PX)
     _tops, _bots = [], []
     _y = 1.0
@@ -3448,19 +3482,20 @@ def build_curator_dashboard(
         if _i < len(GAP_PX):
             _y -= GAP_PX[_i] / _new_fig_h
     # Apply yaxis domains.
-    for _i in range(4):
+    for _i in range(5):
         _key = "yaxis" if _i == 0 else f"yaxis{_i + 1}"
         fig.layout[_key].domain = (max(0.0, _bots[_i]), min(1.0, _tops[_i]))
     # Reposition subplot-title annotations (~14px above each row top).
     _title_offset = 14 / _new_fig_h
-    for _i in range(min(4, len(fig.layout.annotations))):
+    for _i in range(min(5, len(fig.layout.annotations))):
         fig.layout.annotations[_i].update(y=_tops[_i] + _title_offset)
     # Reposition per-row legends to the new geometry.
-    # Rows: 0 = equity curve, 1 = Gantt, 2 = $ gain, 3 = wave area.
+    # Rows: 0 = equity curve, 1 = Gantt, 2 = $ gain/holding,
+    # 3 = $ gain/wave, 4 = wave area.
     fig.update_layout(
         height=_new_fig_h,
         legend5=dict(y=(_tops[1] + _bots[1]) / 2, yanchor="middle"),
-        legend4=dict(y=_tops[3], yanchor="top"),
+        legend4=dict(y=_tops[4], yanchor="top"),
     )
 
     # Curation event log table at the bottom.
