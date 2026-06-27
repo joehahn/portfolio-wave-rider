@@ -20,7 +20,7 @@
 
 | Strategy | Ending value | Total return | Active vs curator |
 |---|---|---|---|
-| Curator-driven | $312,557.54 | +525.12% | — |
+| Curator-driven | $312,557.37 | +525.11% | — |
 | Buy-and-hold starter (equal-weight, then hold) | $143,628.49 | +187.26% | +337.86pp |
 
 ## Risk and benchmarks

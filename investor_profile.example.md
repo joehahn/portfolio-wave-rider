@@ -21,6 +21,12 @@ backtest:                         # only affects /run-backtest and sweeps, not l
   #   risk_aversion: 0.5
   #   lookback_years: 1.0
   #   concentration_cap: 0.5
+  # Optional forward-test split (reporting only — never affects the optimizer or live
+  # recs). Set a date to split the backtest into in-sample (<= date) vs out-of-sample
+  # (> date) segments in report.md and the dashboard; that out-of-sample edge is the
+  # honest overfitting check. Use a date past the model's training cutoff and push
+  # end_date beyond it to populate the out-of-sample row. Omit for no split.
+  #   forward_split_date: 2026-01-01
 ---
 
 # Goals

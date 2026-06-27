@@ -100,12 +100,19 @@ _BACKTEST_DEFAULTS: dict[str, Any] = {
     "t_update_days": 1,
     # Optional BACKTEST-ONLY optimizer overrides. None => use the live
     # financial_model / concentration_cap values. Set these to run the backtest
-    # with different optimizer knobs than the live recommend path (e.g. the
-    # sweep-optimal but more aggressive λ / lookback / cap), WITHOUT changing
-    # what the live optimizer recommends with real money.
+    # with different optimizer knobs than the live recommend path (e.g. a
+    # candidate λ / lookback / cap), WITHOUT changing what the live optimizer
+    # recommends with real money.
     "risk_aversion": None,
     "lookback_years": None,
     "concentration_cap": None,
+    # Optional forward-test split. When set to a date, the backtest report and
+    # dashboard split realized performance into an IN-sample segment (rebalances
+    # on/before this date, where the LLM's training may already "know" the
+    # outcomes) and an OUT-of-sample segment (rebalances strictly after it,
+    # genuinely unknowable when decided) -- the honest overfitting check. None =>
+    # no split shown. Reporting-only; never affects optimizer math or live recs.
+    "forward_split_date": None,
 }
 
 
@@ -133,7 +140,7 @@ def load_backtest_config(profile_path: str = "investor_profile.md") -> dict[str,
     data = yaml.safe_load(m.group(1)) or {}
     bt = data.get("backtest") or {}
     out.update({k: bt[k] for k in _BACKTEST_DEFAULTS if k in bt})
-    for k in ("start_date", "end_date"):
+    for k in ("start_date", "end_date", "forward_split_date"):
         if out[k] is not None:
             out[k] = str(out[k])
     return out
@@ -1247,6 +1254,7 @@ def curator_backtest(
     benchmarks: list[str] | None = None,
     lookback_years_override: float | None = None,
     t_update_days: int = 1,
+    forward_split_date: str | None = None,
 ) -> dict[str, Any]:
     """Replay a curator-runs directory through the optimizer.
 
@@ -1569,6 +1577,59 @@ def curator_backtest(
     bnh_final = baselines_df["eq_total"].dropna().iloc[-1] if "eq_total" in baselines_df else None
     bnh_return = (bnh_final / bnh_initial - 1.0) if bnh_initial else None
 
+    # Forward-test split (REPORTING ONLY -- does not touch optimizer math or any
+    # live recommendation). Splits realized performance into in-sample (rebalances
+    # on/before forward_split_date, where the LLM's training may already know the
+    # outcomes) and out-of-sample (strictly after it, genuinely unknowable when
+    # decided). A curator edge that survives out-of-sample is evidence of real
+    # signal; one that collapses toward buy-and-hold is evidence of hindsight.
+    forward_split: dict[str, Any] | None = None
+    if forward_split_date:
+        _split = pd.Timestamp(forward_split_date)
+        _t = totals.copy()
+        _t.index = pd.to_datetime(_t.index)
+        _eq = None
+        if "eq_total" in baselines_df:
+            _e = baselines_df.dropna(subset=["eq_total"]).copy()
+            _e["date"] = pd.to_datetime(_e["date"])
+            _eq = _e.set_index("date")["eq_total"].sort_index()
+        _w0, _w1 = _t.index[0], _t.index[-1]
+
+        def _seg_ret(series, a, b):
+            if series is None:
+                return None
+            va, vb = series.asof(a), series.asof(b)
+            if pd.isna(va) or pd.isna(vb) or va == 0:
+                return None
+            return float(vb / va - 1.0)
+
+        _reb = [pd.Timestamp(c["date"]) for c in curation_summary
+                if isinstance(c, dict) and c.get("date") and "error" not in c]
+        n_in = sum(1 for d in _reb if d <= _split)
+        n_out = sum(1 for d in _reb if d > _split)
+        if _w0 <= _split <= _w1:
+            cur_in, cur_out = _seg_ret(_t, _w0, _split), _seg_ret(_t, _split, _w1)
+            bnh_in, bnh_out = _seg_ret(_eq, _w0, _split), _seg_ret(_eq, _split, _w1)
+            lift_in = (cur_in - bnh_in) if (cur_in is not None and bnh_in is not None) else None
+            lift_out = (cur_out - bnh_out) if (cur_out is not None and bnh_out is not None) else None
+            forward_split = {
+                "split_date": str(_split.date()),
+                "in_sample": {"curator": cur_in, "buy_and_hold": bnh_in,
+                              "lift_pp": (lift_in * 100 if lift_in is not None else None),
+                              "n_rebalances": n_in},
+                "out_sample": {"curator": cur_out, "buy_and_hold": bnh_out,
+                               "lift_pp": (lift_out * 100 if lift_out is not None else None),
+                               "n_rebalances": n_out},
+                "populated": n_out > 0,
+            }
+        else:
+            forward_split = {
+                "split_date": str(_split.date()), "populated": False,
+                "note": "split date is outside the backtest window; "
+                        "extend end_date past it to populate the out-of-sample segment",
+            }
+        (out / "forward_split.json").write_text(json.dumps(forward_split, indent=2))
+
     if benchmarks is None:
         benchmarks = ["SPY"]
     benchmark_returns: dict[str, float] = {}
@@ -1583,6 +1644,32 @@ def curator_backtest(
         f"| {b} | {ret * 100:+.2f}% | {(realized_return - ret) * 100:+.2f}pp |\n"
         for b, ret in benchmark_returns.items()
     )
+
+    # Optional forward-test section for report.md (reporting only).
+    fwd_section = ""
+    if forward_split and forward_split.get("in_sample"):
+        _fi, _fo = forward_split["in_sample"], forward_split["out_sample"]
+        _sd = forward_split["split_date"]
+        _p = lambda x: f"{x * 100:+.2f}%" if x is not None else "n/a"
+        _pp = lambda x: f"{x:+.2f}pp" if x is not None else "n/a"
+        fwd_section = (
+            f"## Forward test (out-of-sample split at {_sd})\n\n"
+            f"In-sample = rebalances on/before the split, where the curator LLM's "
+            f"training may already know the outcomes; out-of-sample = rebalances "
+            f"strictly after it, genuinely unknowable when decided. A curator lift "
+            f"that holds out-of-sample is evidence of real signal; one that collapses "
+            f"toward buy-and-hold is evidence the in-sample result was hindsight.\n\n"
+            f"| Segment | Rebalances | Curator | Buy-and-hold | Lift |\n|---|---|---|---|---|\n"
+            f"| In-sample (≤ {_sd}) | {_fi['n_rebalances']} | {_p(_fi['curator'])} | "
+            f"{_p(_fi['buy_and_hold'])} | {_pp(_fi['lift_pp'])} |\n"
+            f"| Out-of-sample (> {_sd}) | {_fo['n_rebalances']} | {_p(_fo['curator'])} | "
+            f"{_p(_fo['buy_and_hold'])} | {_pp(_fo['lift_pp'])} |\n\n"
+        )
+        if not forward_split.get("populated"):
+            fwd_section += (
+                "_No out-of-sample rebalances yet — extend the backtest window's "
+                "`end_date` past the split date to populate the out-of-sample row._\n\n"
+            )
 
     n_rebalances = len(weight_l1) + 1
     n_curations = sum(1 for c in curation_summary if "error" not in c)
@@ -1624,6 +1711,7 @@ def curator_backtest(
         f"### Benchmarks (over the same window)\n\n"
         f"| Benchmark | Return | Active vs curator |\n|---|---|---|\n"
         f"{bench_lines}\n"
+        f"{fwd_section}"
         f"## Caveats\n\n"
         f"- No transaction costs or taxes modeled.\n"
         f"- Execution lag: t_update_days={t_update_days}. Each rebalance is "
@@ -1665,6 +1753,7 @@ def curator_backtest(
         "annualized_return": round(annualized, 4),
         "max_drawdown": round(max_dd, 4),
         "weight_stability_l1": round(weight_stability, 4),
+        "forward_split": forward_split,
         "fixed_baseline_return": round(fix_return, 4) if fix_return is not None else None,
         "bnh_baseline_return": round(bnh_return, 4) if bnh_return is not None else None,
         "benchmark_returns": {b: round(r, 4) for b, r in benchmark_returns.items()},
@@ -3622,6 +3711,59 @@ def build_curator_dashboard(
         f"<tbody>{_param_tr}</tbody></table>"
     )
 
+    # Forward-test section (reporting only): in-sample vs out-of-sample split,
+    # read from forward_split.json if curator_backtest wrote one. Empty when no
+    # split date is configured, so the published dashboard is unchanged by default.
+    forward_html = ""
+    _fs_path = bd / "forward_split.json"
+    if _fs_path.exists():
+        try:
+            _fs = json.loads(_fs_path.read_text())
+        except Exception:  # noqa: BLE001
+            _fs = None
+        if _fs and _fs.get("in_sample"):
+            _sd = _html.escape(str(_fs.get("split_date", "")))
+            _fi, _fo = _fs["in_sample"], _fs["out_sample"]
+            def _pf(x):  # fraction -> %
+                return f"{x * 100:+.2f}%" if x is not None else "n/a"
+            def _ppf(x):  # already in pp
+                return f"{x:+.2f}pp" if x is not None else "n/a"
+            _rows = (
+                f"<tr><td style='padding:4px 14px 4px 0;'>In-sample (&le; {_sd})</td>"
+                f"<td style='padding:4px 14px;'>{_fi['n_rebalances']}</td>"
+                f"<td style='padding:4px 14px;'>{_pf(_fi['curator'])}</td>"
+                f"<td style='padding:4px 14px;'>{_pf(_fi['buy_and_hold'])}</td>"
+                f"<td style='padding:4px 0;'>{_ppf(_fi['lift_pp'])}</td></tr>"
+                f"<tr><td style='padding:4px 14px 4px 0;'>Out-of-sample (&gt; {_sd})</td>"
+                f"<td style='padding:4px 14px;'>{_fo['n_rebalances']}</td>"
+                f"<td style='padding:4px 14px;'>{_pf(_fo['curator'])}</td>"
+                f"<td style='padding:4px 14px;'>{_pf(_fo['buy_and_hold'])}</td>"
+                f"<td style='padding:4px 0;'>{_ppf(_fo['lift_pp'])}</td></tr>"
+            )
+            _pending = ("" if _fs.get("populated") else
+                        "<p style='color:#b45309;font-size:13px;max-width:780px;'>"
+                        "No out-of-sample rebalances yet — extend the backtest "
+                        "window's <code>end_date</code> past the split date to "
+                        "populate the out-of-sample row.</p>")
+            forward_html = (
+                "<h2 style='margin:1.4em 0 0.3em;'>Forward test (overfitting check)</h2>"
+                "<p style='color:#555;max-width:780px;margin:0 0 0.6em;'>In-sample "
+                "rebalances fall on/before the split, where the curator LLM's "
+                "training may already know the outcomes; out-of-sample rebalances "
+                "fall strictly after it, genuinely unknowable when decided. A "
+                "curator lift that holds out-of-sample is evidence of real signal; "
+                "one that collapses toward buy-and-hold is evidence the in-sample "
+                "result was hindsight.</p>"
+                "<table style='border-collapse:collapse;font-size:14px;margin-bottom:0.4em;'>"
+                "<thead><tr style='border-bottom:2px solid #ccc;text-align:left;'>"
+                "<th style='padding:5px 14px 5px 0;'>Segment</th>"
+                "<th style='padding:5px 14px;'>Rebalances</th>"
+                "<th style='padding:5px 14px;'>Curator</th>"
+                "<th style='padding:5px 14px;'>Buy-and-hold</th>"
+                "<th style='padding:5px 0;'>Lift</th></tr></thead>"
+                f"<tbody>{_rows}</tbody></table>{_pending}"
+            )
+
     chart_html = fig.to_html(full_html=False, include_plotlyjs="cdn", config={"displayModeBar": False})
     page = (
         '<!doctype html><html><head><meta charset="utf-8">'
@@ -3652,6 +3794,7 @@ def build_curator_dashboard(
         '<code>cashlike</code> = bonds + cash-equivalents + precious metals '
         '(e.g., AGG, BIL, IAU).</p>'
         + params_html
+        + forward_html
         + chart_html
         + log_html
         + search_html

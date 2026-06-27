@@ -129,6 +129,13 @@ def main(argv: list[str] | None = None) -> int:
                            "review and placing the order. Defaults to t_update_days "
                            "in investor_profile.md (1 = next session); 0 reproduces "
                            "the optimistic same-close 'smart money' run.")
+    p_bt.add_argument("--forward-split-date", default=bc["forward_split_date"],
+                      help="curator mode only: split realized performance into "
+                           "in-sample (<= this date) and out-of-sample (> this date) "
+                           "segments in report.md and the dashboard -- the forward "
+                           "test for overfitting. Reporting only; never affects the "
+                           "optimizer or live recs. Defaults to forward_split_date in "
+                           "investor_profile.md's backtest section (None = no split).")
     p_bt.add_argument("--curator-runs-dir", default=None,
                       help="path to a directory of curator JSON payloads "
                            "(<dir>/_starter.json + <date>-curation.json files). "
@@ -186,6 +193,7 @@ def main(argv: list[str] | None = None) -> int:
                     benchmarks=args.benchmarks,
                     t_update_days=args.t_update_days,
                     lookback_years_override=lb,
+                    forward_split_date=args.forward_split_date,
                 )
             else:
                 result = portfolio.backtest(
