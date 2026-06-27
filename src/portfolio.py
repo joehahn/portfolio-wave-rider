@@ -2235,8 +2235,7 @@ def build_dashboard(
     R_TRADE_TABLE     = 5 if is_live else None
     R_ACTUAL_WEIGHTS  = 6 if is_live else None
     R_GAIN_INIT       = 7 if is_live else 5
-    R_GAIN_REVIEW     = 8 if is_live else None
-    _after_gain       = 9 if is_live else 6
+    _after_gain       = 8 if is_live else 6
     R_ASSET_USD       = _after_gain
     R_WAVE_USD        = _after_gain + 1
     R_EXP_VS_REAL     = None
@@ -2276,10 +2275,6 @@ def build_dashboard(
     titles_list.append(
         f"{R_GAIN_INIT}. Cumulative $ gain since {_chart5_anchor}"
     )
-    if R_GAIN_REVIEW is not None:
-        titles_list.append(
-            f"{R_GAIN_REVIEW}. Cumulative $ gain since last rebalance"
-        )
     titles_list.append(
         f"{R_ASSET_USD}. Actual portfolio $ by asset class over time"
     )
@@ -2717,53 +2712,7 @@ def build_dashboard(
             )
         )
 
-    # 6. Cumulative $ gain per holding since the most recent /review-portfolio
-    # rebalance. Same daily-PnL math as chart 5, but the snapshot window is
-    # restricted to dates >= the latest rebalance in recommendations.csv.
-    # Shows how the current allocation has performed since the last
-    # optimizer fire — answers "is the latest recommendation working?"
-    # Backtest dashboard skips this chart since it has no "most recent
-    # /review-portfolio" anchor.
-    if is_live and snap_path.exists() and rec_path.exists():
-        recs_for_recent = pd.read_csv(rec_path, parse_dates=["date"])
-        if not recs_for_recent.empty:
-            last_rebalance = recs_for_recent["date"].max()
-            recent = snaps_full[snaps_full["date"] >= last_rebalance].copy()
-            recent_gain_by_ticker: dict[str, float] = {}
-            for ticker, sub in recent.groupby("ticker"):
-                sub = sub.sort_values("date").reset_index(drop=True)
-                price_change = sub["price"].diff()
-                prior_shares = sub["shares"].shift(1)
-                daily_pnl = (prior_shares * price_change).fillna(0.0)
-                recent_gain_by_ticker[ticker] = float(daily_pnl.sum())
-            # Preserve the same ticker order as chart 5 so the eye can
-            # compare each ticker's since-init bar to its since-rebalance bar.
-            recent_values = [recent_gain_by_ticker.get(t, 0.0) for t in gain_tickers]
-            recent_colors = ["#2ca02c" if v >= 0 else "#d62728" for v in recent_values]
-            fig.add_trace(
-                go.Bar(x=gain_tickers, y=recent_values,
-                       marker_color=recent_colors,
-                       name="Since last rebalance", showlegend=False),
-                row=R_GAIN_REVIEW, col=1,
-            )
-            fig.update_xaxes(
-                tickmode="array",
-                tickvals=gain_tickers,
-                ticktext=ticktext_4,
-                tickangle=0,
-                row=R_GAIN_REVIEW, col=1,
-            )
-            # Inject total gain into the chart's title.
-            _total_recent = sum(recent_values)
-            _chart6_prefix = f"{R_GAIN_REVIEW}. Cumulative $ gain since last rebalance"
-            fig.layout.annotations[R_GAIN_REVIEW - 1].update(
-                text=fig.layout.annotations[R_GAIN_REVIEW - 1].text.replace(
-                    _chart6_prefix,
-                    f"{_chart6_prefix} (total: ${_total_recent:+,.0f})",
-                )
-            )
-
-    # 7. $ by asset class over time and 8. $ by wave over time. Both
+    # $ by asset class over time and $ by wave over time. Both
     # roll up the per-ticker per-day $ values from snapshots.csv. Each
     # ticker contributes to exactly one bucket in each chart, so the sum
     # of all lines in either chart equals the portfolio total.
@@ -2935,9 +2884,6 @@ def build_dashboard(
         fig.update_yaxes(title_text="portfolio %", row=R_ACTUAL_WEIGHTS, col=1, tickformat=".0%")
     fig.update_yaxes(title_text="$ gain", row=R_GAIN_INIT, col=1, zeroline=True,
                      zerolinewidth=1, zerolinecolor="#888")
-    if R_GAIN_REVIEW is not None:
-        fig.update_yaxes(title_text="$ gain", row=R_GAIN_REVIEW, col=1, zeroline=True,
-                         zerolinewidth=1, zerolinecolor="#888")
     fig.update_yaxes(title_text="$", row=R_ASSET_USD, col=1, tickformat="$,.0f")
     fig.update_yaxes(title_text="$", row=R_WAVE_USD, col=1, tickformat="$,.0f")
     fig.update_yaxes(title_text="turnover (%)", row=R_TURNOVER, col=1, rangemode="tozero")
