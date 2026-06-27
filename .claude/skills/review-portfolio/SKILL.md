@@ -82,7 +82,7 @@ Returns a JSON blob with `optimization` (weights, Sharpe, expected return, vol) 
 
 Appends today's optimizer output to `data/recommendations.csv` so the dashboard's weight-history chart picks up the new row block. `--force` is required because re-running on the same day should overwrite, not duplicate.
 
-### Step 5 — write the report (Task)
+### Step 5 — write the report (Task, with watchdog + inline fallback)
 
 Spawn the `report-writer` subagent. Pass:
 
@@ -98,6 +98,22 @@ Spawn the `report-writer` subagent. Pass:
 ```
 
 The report is written to `data/reports/YYYY-MM-DD-review-portfolio.md`.
+
+**Watchdog (required).** The `report-writer` subagent has stalled in practice: it reads all its inputs successfully and then the background generation step hangs, so it never emits the `Write` and never sends a completion notification, which would otherwise block the run forever. The cause is not the inputs or tools (every tool call returns) but a flaky background-inference generation; the main loop's own generation has not shown this. So do NOT wait indefinitely on the subagent. Right after spawning it, launch a background watchdog that polls for the report file with a timeout, e.g.:
+
+```bash
+f="data/reports/$(date +%F)-review-portfolio.md"
+for i in $(seq 1 16); do [ -f "$f" ] && { echo "REPORT_WRITTEN after $((i*15))s"; exit 0; }; sleep 15; done
+echo "TIMEOUT: report-writer stalled — falling back to inline"
+```
+
+Run it with `run_in_background: true` so whichever finishes first (the subagent's completion notification or the watchdog) wakes you. If the report file exists, continue. If the watchdog times out with no file:
+
+1. Stop the stalled subagent with `TaskStop` (so a late zombie can't overwrite the file).
+2. Tell the user the report-writer stalled and you are writing the report inline.
+3. **Write the report yourself** with the Write tool, directly to `data/reports/<today>-review-portfolio.md`, from the same inputs (the analyze JSON, `data/curator_latest.json`, the curate result, `holdings.csv`, `data/thesis_baseline.json`, `investor_profile.md`). Match the `report-writer` spec's sections — Watchlist changes (curator adds/removes/rationale with dated news evidence), Recommended weights vs actual holdings (the trades to move actual → target), **Profile conflicts** (cite the violated `investor_profile.md` line; flag single-name concentration at the cap; never silently clamp), and a note that recommendations don't execute trades. Follow the repo prose rules (no em dashes in narrative; numbers only from the `src.cli` outputs).
+
+The inline fallback is not a cure for the flaky generation; it removes the silent-stall failure mode (no completion notification → infinite wait) and makes the step retryable in the main loop, which has been reliable.
 
 ### Step 6 — refresh snapshot, then dashboard (Bash)
 
