@@ -3152,6 +3152,37 @@ def build_dashboard(
                 + "".join(blocks)
             )
 
+    # Funded-ticker quick links: each real holding (shares > 0 in today's
+    # snapshot) links to its live Google Finance card — the interactive
+    # 1D/1M/.../1Y/Max price chart — by way of a "<TICKER> ticker" Google
+    # search, which avoids hardcoding each ticker's exchange suffix.
+    ticker_links = ""
+    if is_live and snap_path.exists():
+        try:
+            _s_tl = pd.read_csv(snap_path, parse_dates=["date"])
+            _sl_tl = _s_tl[_s_tl["date"] == _s_tl["date"].max()]
+            _funded = sorted(_sl_tl[_sl_tl["shares"] > 0]["ticker"].unique())
+            if _funded:
+                _chips = "".join(
+                    f"<a href='https://www.google.com/search?q={_html.escape(t)}+ticker' "
+                    "target='_blank' rel='noopener' "
+                    "style='display:inline-block;background:#f0f7f0;border:1px solid #cde0cd;"
+                    "border-radius:12px;padding:3px 12px;margin:3px 6px 3px 0;font-size:14px;"
+                    "font-weight:600;color:#0a7a3a;text-decoration:none;'>"
+                    f"{_html.escape(t)} &#8599;</a>"
+                    for t in _funded
+                )
+                ticker_links = (
+                    "<h2 style='margin-top:2em;'>Live ticker charts</h2>"
+                    "<p style='font-size:14px;color:#555;max-width:780px;'>"
+                    "Each funded holding links to its live Google Finance card "
+                    "(interactive 1D / 1M / 1Y / Max price chart) — the same view a "
+                    "&ldquo;TICKER ticker&rdquo; Google search returns. Opens in a new tab.</p>"
+                    f"<div style='margin:6px 0 12px;'>{_chips}</div>"
+                )
+        except Exception:  # noqa: BLE001 - skip if snapshot is malformed
+            pass
+
     page = (
         '<!doctype html><html><head><meta charset="utf-8">'
         '<title>Portfolio Wave Rider — live dashboard</title>'
@@ -3161,6 +3192,7 @@ def build_dashboard(
         '</head><body>'
         + _nav_strip("index.html")
         + chart_html
+        + ticker_links
         + live_curation
         + live_search +
         '</body></html>'
