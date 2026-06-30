@@ -2,6 +2,7 @@
 initial_investment_usd: 50000     # total dollars to allocate on day 0
 concentration_cap: 0.80           # no single position > 80% of portfolio
 min_trade_size_usd: 1000          # don't propose trades smaller than this
+dashboard_growth_guides_pct_per_week: [0.5, 1.0, 1.5]   # dotted reference curves on dashboard plot 1 (% per week); cosmetic yardstick only, no effect on recommendations
 exclusions:                       # sector / theme exclusions
   - solar energy (companies and ETFs)
   - wind energy (companies and ETFs)

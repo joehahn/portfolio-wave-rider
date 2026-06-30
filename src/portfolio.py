@@ -146,6 +146,36 @@ def load_backtest_config(profile_path: str = "investor_profile.md") -> dict[str,
     return out
 
 
+# Default constant-rate reference curves drawn on dashboard plot 1, in
+# percent-per-week. Pure cosmetic yardstick -- never touches the optimizer.
+_DASHBOARD_GROWTH_GUIDES_PCT_PER_WEEK = [0.5, 1.0, 1.5]
+
+
+def load_dashboard_guides(profile_path: str = "investor_profile.md") -> list[float]:
+    """Read the top-level `dashboard_growth_guides_pct_per_week` list.
+
+    These are the dotted constant-growth reference lines on the live
+    dashboard's value chart (plot 1), expressed in percent per week. They
+    are a visual yardstick only -- they do not affect any recommendation,
+    so they live at the profile's top level rather than in `financial_model`.
+    Missing / malformed => the hard-coded default [0.5, 1.0, 1.5].
+    """
+    import re
+    import yaml
+
+    p = Path(profile_path)
+    if not p.exists():
+        return list(_DASHBOARD_GROWTH_GUIDES_PCT_PER_WEEK)
+    m = re.match(r"^---\s*\n(.*?)\n---\s*\n", p.read_text(), re.DOTALL)
+    if not m:
+        return list(_DASHBOARD_GROWTH_GUIDES_PCT_PER_WEEK)
+    data = yaml.safe_load(m.group(1)) or {}
+    rates = data.get("dashboard_growth_guides_pct_per_week")
+    if not isinstance(rates, list) or not rates:
+        return list(_DASHBOARD_GROWTH_GUIDES_PCT_PER_WEEK)
+    return [float(r) for r in rates]
+
+
 # ---------------------------------------------------------------------------
 # Market data: fetch prices and turn them into a returns bundle.
 # ---------------------------------------------------------------------------
@@ -2404,14 +2434,22 @@ def build_dashboard(
                     row=1, col=1,
                 )
         # Constant-rate reference curves: dotted lines showing what the
-        # thesis baseline portfolio would be worth at 0.5% / 1% / 1.5%
-        # per week from day zero. Live dashboard only — anchored at the
-        # thesis-baseline date.
+        # thesis baseline portfolio would be worth at each profile-specified
+        # growth rate (default 0.5% / 1% / 1.5% per week) from day zero. Live
+        # dashboard only — anchored at the thesis-baseline date.
         if is_live and len(snaps) > 0:
             anchor_date = snaps["date"].min()
             anchor_value = float(totals.iloc[0])
             ref_dates = pd.to_datetime(totals.index)
-            ref_shades = {0.005: "#cccccc", 0.01: "#888888", 0.015: "#444444"}
+            # Profile-driven rates (percent/week) -> fractions, slowest first.
+            ref_rates = sorted(r / 100.0 for r in load_dashboard_guides())
+            # Grey ramp light (slow) -> dark (fast); single rate -> mid grey.
+            n_ref = len(ref_rates)
+            ref_shades = {}
+            for i, rate in enumerate(ref_rates):
+                frac = i / (n_ref - 1) if n_ref > 1 else 0.5
+                g = round(0xCC + (0x44 - 0xCC) * frac)
+                ref_shades[rate] = f"#{g:02x}{g:02x}{g:02x}"
             for _ref_idx, (rate, color) in enumerate(ref_shades.items()):
                 days = (ref_dates - anchor_date).days
                 ref_vals = anchor_value * (1 + rate) ** (days / 7.0)
@@ -2419,7 +2457,7 @@ def build_dashboard(
                     go.Scatter(x=ref_dates, y=ref_vals, mode="lines",
                                name=f"{rate * 100:g}%/wk",
                                line={"width": 1, "color": color, "dash": "dot"},
-                               legend="legend", legendrank=3 - _ref_idx),
+                               legend="legend", legendrank=n_ref - _ref_idx),
                     row=1, col=1,
                 )
         # Thesis buy-and-hold counterfactual (live only): if the day-1
