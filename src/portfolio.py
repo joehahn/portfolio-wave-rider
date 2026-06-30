@@ -2404,20 +2404,20 @@ def build_dashboard(
                     row=1, col=1,
                 )
         # Constant-rate reference curves: dotted lines showing what the
-        # thesis baseline portfolio would be worth at 1% / 2% / 3%
+        # thesis baseline portfolio would be worth at 0.5% / 1% / 1.5%
         # per week from day zero. Live dashboard only — anchored at the
         # thesis-baseline date.
         if is_live and len(snaps) > 0:
             anchor_date = snaps["date"].min()
             anchor_value = float(totals.iloc[0])
             ref_dates = pd.to_datetime(totals.index)
-            ref_shades = {0.01: "#cccccc", 0.02: "#888888", 0.03: "#444444"}
+            ref_shades = {0.005: "#cccccc", 0.01: "#888888", 0.015: "#444444"}
             for _ref_idx, (rate, color) in enumerate(ref_shades.items()):
                 days = (ref_dates - anchor_date).days
                 ref_vals = anchor_value * (1 + rate) ** (days / 7.0)
                 fig.add_trace(
                     go.Scatter(x=ref_dates, y=ref_vals, mode="lines",
-                               name=f"{int(rate * 100)}%/wk",
+                               name=f"{rate * 100:g}%/wk",
                                line={"width": 1, "color": color, "dash": "dot"},
                                legend="legend", legendrank=3 - _ref_idx),
                     row=1, col=1,
