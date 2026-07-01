@@ -2,6 +2,7 @@
 initial_investment_usd: 50000     # total dollars to allocate on day 0
 concentration_cap: 0.80           # no single position > 80% of portfolio
 min_trade_size_usd: 1000          # don't propose trades smaller than this
+always_include: [SPY, AGG, IAU]   # permanent optimizer anchors (equity / bond / gold safe havens); always in the universe, OUTSIDE the curator's max_watchlist_size, never added/removed by the curator. Leave empty [] to disable.
 dashboard_growth_guides_pct_per_week: [0.5, 1.0, 1.5]   # dotted reference curves on dashboard plot 1 (% per week)
 exclusions:                       # sector / theme exclusions
   - solar energy (companies and ETFs)
