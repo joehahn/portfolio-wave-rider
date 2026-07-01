@@ -194,6 +194,7 @@ def main(argv: list[str] | None = None) -> int:
                     t_update_days=args.t_update_days,
                     lookback_years_override=lb,
                     forward_split_date=args.forward_split_date,
+                    always_include=fm["always_include"],
                 )
             else:
                 result = portfolio.backtest(

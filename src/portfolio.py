@@ -48,6 +48,12 @@ _FINANCIAL_MODEL_DEFAULTS: dict[str, Any] = {
     # level, not inside the financial_model block; load_financial_model reads
     # it from there so the cap has a single source of truth (investor_profile).
     "concentration_cap": 0.25,
+    # always_include: tickers permanently injected into the optimizer universe
+    # as safe-haven / diversification anchors (e.g. SPY, AGG, IAU). They live
+    # as shares=0 rows in holdings.csv but are OUTSIDE the curator's
+    # max_watchlist_size budget: the curator never manages them, cannot remove
+    # them, and they do not count toward the cap. Top-level profile key.
+    "always_include": [],
 }
 
 
@@ -87,6 +93,10 @@ def load_financial_model(profile_path: str = "investor_profile.md") -> dict[str,
     # concentration_cap is a top-level profile key, not part of financial_model.
     if "concentration_cap" in data:
         out["concentration_cap"] = data["concentration_cap"]
+    # always_include is also a top-level key; normalize to uppercase tickers.
+    if "always_include" in data:
+        out["always_include"] = [str(t).upper().strip()
+                                 for t in (data["always_include"] or [])]
     return out
 
 
@@ -738,6 +748,7 @@ def apply_curator_decisions(
     """
     fm = load_financial_model(profile_path)
     max_size = int(fm.get("max_watchlist_size", 12))
+    anchors = set(fm.get("always_include", []))
 
     h_path = Path(holdings_path)
     if not h_path.exists():
@@ -747,13 +758,38 @@ def apply_curator_decisions(
         raise ValueError(f"{h_path} must have ticker,shares columns")
     current_watchlist = holdings["ticker"].astype(str).tolist()
 
+    # The always_include anchors sit in holdings.csv but are OUTSIDE the
+    # curator's managed set: they do not count toward max_watchlist_size and
+    # the curator may not add (already permanent) or remove (protected) them.
+    # Intercept any anchor-targeting proposal up front with a clear reason,
+    # then validate the rest against the managed (non-anchor) watchlist so the
+    # cap accounting and membership checks ignore the anchors entirely.
+    anchor_rejections: list[dict[str, Any]] = []
+    filtered_payload = dict(payload)
+    kept_adds, kept_removes = [], []
+    for a in payload.get("adds") or []:
+        if isinstance(a, dict) and str(a.get("ticker", "")).upper() in anchors:
+            anchor_rejections.append({"ticker": a.get("ticker"), "action": "add",
+                                      "reason": "already a permanent always_include anchor"})
+        else:
+            kept_adds.append(a)
+    for r in payload.get("removes") or []:
+        if isinstance(r, dict) and str(r.get("ticker", "")).upper() in anchors:
+            anchor_rejections.append({"ticker": r.get("ticker"), "action": "remove",
+                                      "reason": "protected always_include anchor; cannot be removed"})
+        else:
+            kept_removes.append(r)
+    filtered_payload["adds"] = kept_adds
+    filtered_payload["removes"] = kept_removes
+    managed_watchlist = [t for t in current_watchlist if t.upper() not in anchors]
+
     validated = _validate_curator_payload(
-        payload, current_watchlist, max_size,
+        filtered_payload, managed_watchlist, max_size,
         listing_check=listing_check, as_of_date=as_of_date,
     )
     valid_adds = validated["valid_adds"]
     valid_removes = validated["valid_removes"]
-    rejections = validated["rejections"]
+    rejections = anchor_rejections + validated["rejections"]
 
     # Block removes for tickers with shares > 0 - the user has a live
     # position that must be liquidated in the brokerage first.
@@ -1285,6 +1321,7 @@ def curator_backtest(
     lookback_years_override: float | None = None,
     t_update_days: int = 1,
     forward_split_date: str | None = None,
+    always_include: list[str] | None = None,
 ) -> dict[str, Any]:
     """Replay a curator-runs directory through the optimizer.
 
@@ -1321,6 +1358,13 @@ def curator_backtest(
         raise FileNotFoundError(f"runs dir missing _starter.json: {runs}")
     starter = json.loads(starter_path.read_text())
     starter_watchlist = [t.upper() for t in starter["starter_watchlist"]]
+    # Permanent safe-haven anchors: always in the curator strategy's universe
+    # and protected from removal, outside the max_watchlist_size budget. This
+    # is the FULL always_include set even if some anchor is also a starter
+    # ticker (so it is protected regardless). Baselines below use
+    # starter_watchlist as-is, so any anchor NOT already in the starter stays
+    # out of them (the lift figure then reflects curation + the anchor policy).
+    anchors = [t.upper() for t in (always_include or [])]
     start_date = pd.Timestamp(starter["start_date"])
     end_date = pd.Timestamp(starter["end_date"])
     cadence = starter.get("rebalance_period", "monthly")
@@ -1330,8 +1374,8 @@ def curator_backtest(
     max_size = int(starter.get("max_watchlist_size", 12))
 
     # Union of every ticker that could appear across the run, so the
-    # bulk yfinance fetch only happens once.
-    union: set[str] = set(starter_watchlist)
+    # bulk yfinance fetch only happens once. Anchors are always in the fetch.
+    union: set[str] = set(starter_watchlist) | set(anchors)
     curation_files: dict[pd.Timestamp, Path] = {}
     for p in sorted(runs.glob("*-curation.json")):
         d = pd.Timestamp(p.stem.replace("-curation", ""))
@@ -1360,14 +1404,21 @@ def curator_backtest(
     sandbox.mkdir(parents=True, exist_ok=True)
     sandbox_holdings = sandbox / "holdings.csv"
     sandbox_history = sandbox / "curation_history.csv"
-    pd.DataFrame({"ticker": starter_watchlist,
-                  "shares": [0] * len(starter_watchlist)}).to_csv(
+    # Anchors seed the sandbox holdings alongside the starter watchlist, so the
+    # curator strategy's universe always includes them; apply_curator_decisions
+    # (via the sandbox profile's always_include) keeps them out of the cap
+    # count and protects them from removal.
+    sandbox_tickers = starter_watchlist + [a for a in anchors if a not in starter_watchlist]
+    pd.DataFrame({"ticker": sandbox_tickers,
+                  "shares": [0] * len(sandbox_tickers)}).to_csv(
         sandbox_holdings, index=False)
     if sandbox_history.exists():
         sandbox_history.unlink()
     sandbox_profile = sandbox / "profile.md"
+    _anchor_yaml = "[" + ", ".join(anchors) + "]"
     sandbox_profile.write_text(
-        f"---\nfinancial_model:\n  max_watchlist_size: {max_size}\n---\n"
+        f"---\nalways_include: {_anchor_yaml}\n"
+        f"financial_model:\n  max_watchlist_size: {max_size}\n---\n"
     )
 
     # Four parallel walk-forwards.

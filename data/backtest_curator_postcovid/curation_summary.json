@@ -23,19 +23,17 @@
   },
   {
     "date": "2022-12-31",
-    "adds": [],
+    "adds": [
+      "CEG"
+    ],
     "removes": [],
-    "rejections": 3
+    "rejections": 2
   },
   {
     "date": "2023-03-31",
-    "adds": [
-      "SMR"
-    ],
-    "removes": [
-      "SPY"
-    ],
-    "rejections": 0
+    "adds": [],
+    "removes": [],
+    "rejections": 2
   },
   {
     "date": "2023-06-30",
@@ -61,13 +59,9 @@
   },
   {
     "date": "2024-03-31",
-    "adds": [
-      "NUKZ"
-    ],
-    "removes": [
-      "SMR"
-    ],
-    "rejections": 0
+    "adds": [],
+    "removes": [],
+    "rejections": 2
   },
   {
     "date": "2024-06-30",
