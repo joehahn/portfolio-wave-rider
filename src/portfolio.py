@@ -3232,6 +3232,36 @@ def build_dashboard(
         except Exception:  # noqa: BLE001 - skip if snapshot is malformed
             pass
 
+    # Parameter-settings table: the exact optimizer knobs /review-portfolio uses
+    # with real money, read from investor_profile.md. Mirrors the backtest
+    # dashboard's table so the two pages read side by side. Live path has no
+    # backtest window / starter, so only the optimizer + curation knobs appear.
+    _lfm = load_financial_model()
+    _live_param_rows = [
+        ("Risk aversion (λ)", f"{_lfm['risk_aversion']:g}", ""),
+        ("Lookback (μ/Σ estimation)", f"{_lfm['lookback_period']}", ""),
+        ("Concentration cap (max weight)", f"{_lfm['concentration_cap']:.0%}", ""),
+        ("Rebalance cadence", f"{_lfm['rebalance_period']}", ""),
+        ("Max watchlist size", f"{_lfm['max_watchlist_size']}", ""),
+        ("Always-include anchors", ", ".join(_lfm["always_include"]) or "—",
+         "permanent optimizer anchors, outside max_watchlist_size"),
+        ("Risk-free rate", f"{_lfm['risk_free_rate']:.0%}", ""),
+    ]
+    _live_param_tr = "".join(
+        f"<tr><td style='padding:5px 14px 5px 0;color:#555;white-space:nowrap;'>{_html.escape(k)}</td>"
+        f"<td style='padding:5px 14px 5px 0;font-weight:600;'>{_html.escape(str(v))}</td>"
+        f"<td style='padding:5px 0;color:#b45309;font-size:13px;'>{_html.escape(note)}</td></tr>"
+        for k, v, note in _live_param_rows
+    )
+    live_params_html = (
+        "<h2 style='margin:1.4em 0 0.3em;'>Parameter settings</h2>"
+        "<p style='color:#555;max-width:780px;margin:0 0 0.6em;'>The optimizer knobs "
+        "behind the recommendations below, read from <code>investor_profile.md</code>, "
+        "the config <code>/review-portfolio</code> uses with real money.</p>"
+        "<table style='border-collapse:collapse;font-size:14px;margin-bottom:1.2em;'>"
+        f"<tbody>{_live_param_tr}</tbody></table>"
+    )
+
     page = (
         '<!doctype html><html><head><meta charset="utf-8">'
         '<title>Portfolio Wave Rider — live dashboard</title>'
@@ -3240,6 +3270,7 @@ def build_dashboard(
         'th,td{border-bottom:1px solid #eee;}</style>'
         '</head><body>'
         + _nav_strip("index.html")
+        + live_params_html
         + chart_html
         + ticker_links
         + live_curation
