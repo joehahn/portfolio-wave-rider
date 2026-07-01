@@ -26,9 +26,12 @@ Spawn the `watchlist-curator` subagent. Pass a self-contained prompt with these 
   "rebalance_period": "<from profile, default monthly>",
   "recent_news_lookback_days": <30 for monthly, 90 for quarterly>,
   "profile_wave_thesis": "<prose extracted from the 'Strategy & beliefs' section of investor_profile.md>",
-  "exclusions": [<exclusions array from profile YAML>]
+  "exclusions": [<exclusions array from profile YAML>],
+  "user_supplied_articles": [<optional; one {"url": ..., "note": ...} per link the user pasted with this review request; omit the field entirely if none>]
 }
 ```
+
+**User-supplied articles.** If the message that triggered this review includes one or more article URLs, collect them into `user_supplied_articles` (a list of `{"url": ..., "note": ...}` objects; `note` carries any context the user gave, else omit that key). The curator fetches and weighs each one, and cites it in `news_evidence` if it drives a decision, but it does not auto-add the ticker: the article is evidence, and every guardrail still applies. Pass only URLs the user actually provided; never invent or add your own. If the user pasted no links, omit the field.
 
 This is a LIVE run, not a backtest. **Do NOT pass a `post_date_events` suppression list** and **do NOT instruct the agent to apply WebSearch `before:` filters**. The agent should use any current information available. The "as-of-date discipline" sections of the watchlist-curator spec only apply when `as_of_date` is in the past; the agent will skip them automatically.
 

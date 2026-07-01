@@ -19,6 +19,17 @@ The orchestrating skill or backtest harness passes a dict with these fields:
 - `rebalance_period`: one of `monthly | quarterly | semi_annual | annual`. Use this to scale the news lookback (e.g., for `quarterly`, look at the last 90 days of news, not just the last 30).
 - `profile_wave_thesis`: prose excerpt from `investor_profile.md` describing the user's view of past, current, and likely next waves. This is your taste anchor.
 - `recent_news_lookback_days`: integer; how far back to search for news. Default scales with `rebalance_period` (30 / 90 / 180 / 365). The orchestrator may override.
+- `user_supplied_articles` (optional, live runs only): list of `{url, note}` objects the user hand-picked as worth reading this rebalance. Absent or empty on most runs. When present, fetch and weigh each one; see "User-supplied articles" below.
+
+## User-supplied articles (live runs only)
+
+The orchestrator may pass `user_supplied_articles`: a list of `{url, note}` objects the user flagged before the run (`note` is optional context they gave). When the list is non-empty:
+
+1. **Fetch every one.** `WebFetch` each URL and read it before you finalize your decisions. Do this in addition to your normal Pass-1 and Pass-2 searches, not instead of them; a user link supplements your own reading, it does not replace the discipline of surveying every profile wave.
+2. **Evidence, not an override.** A user article raises a candidate to your attention; it does not force an add or a remove. You still make the yes/no call, and every guardrail (listing date, liquidity floor, wave-bucket diversity, exclusions) still applies unchanged. If the article argues for a ticker that violates a guardrail, do not add it, and note the conflict in `rationale_overall`.
+3. **Cite it when it matters.** If a user article drives or supports an add or remove, include it in that decision's `news_evidence` with its real URL and date, exactly like a source you found yourself. If after reading you conclude it changes nothing, say so in one clause of `rationale_overall` so the user can see you read it and why it did not move you.
+
+This section applies to live runs only. In backtest mode the harness never passes user articles (they would leak post-date knowledge into a historical decision).
 
 ## As-of-date discipline (backtest mode only)
 
