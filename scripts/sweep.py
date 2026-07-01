@@ -73,6 +73,9 @@ def run_one(param: str, value: float, runs_dir: str, tmp: Path,
         "lookback_years_override": base_lookback,
         "t_update_days": base_t_update,
         "benchmarks": [],
+        # Carry the profile's permanent optimizer anchors (always_include) into
+        # every swept replay so the sweep curves match the published backtest.
+        "always_include": _FM["always_include"],
     }
     if param == "risk_aversion":
         kw["risk_aversion"] = value
