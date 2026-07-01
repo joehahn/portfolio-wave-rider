@@ -2,7 +2,7 @@
 initial_investment_usd: 50000     # total dollars to allocate on day 0
 concentration_cap: 0.80           # no single position > 80% of portfolio
 min_trade_size_usd: 1000          # don't propose trades smaller than this
-dashboard_growth_guides_pct_per_week: [0.5, 1.0, 1.5]   # dotted reference curves on dashboard plot 1 (% per week); cosmetic yardstick only, no effect on recommendations
+dashboard_growth_guides_pct_per_week: [0.5, 1.0, 1.5]   # dotted reference curves on dashboard plot 1 (% per week)
 exclusions:                       # sector / theme exclusions
   - solar energy (companies and ETFs)
   - wind energy (companies and ETFs)
@@ -22,12 +22,7 @@ backtest:                         # only affects /run-backtest and sweeps, not l
   #   risk_aversion: 0.5
   #   lookback_years: 1.0
   #   concentration_cap: 0.5
-  # Optional forward-test split (reporting only — never affects the optimizer or live
-  # recs). Set a date to split the backtest into in-sample (<= date) vs out-of-sample
-  # (> date) segments in report.md and the dashboard; that out-of-sample edge is the
-  # honest overfitting check. Use a date past the model's training cutoff and push
-  # end_date beyond it to populate the out-of-sample row. Omit for no split.
-  #   forward_split_date: 2026-01-01
+
 ---
 
 # Goals
