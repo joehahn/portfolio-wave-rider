@@ -3771,6 +3771,8 @@ def build_curator_dashboard(
         ("Concentration cap (max weight)", f"{_cap:.0%}",
          f"backtest-only override — live uses {_fm['concentration_cap']:.0%}" if _cap_ov else ""),
         ("Max watchlist size", f"{_fm['max_watchlist_size']}", ""),
+        ("Always-include anchors", ", ".join(_fm["always_include"]) or "—",
+         "permanent optimizer anchors, outside max_watchlist_size"),
         ("Risk-free rate", f"{_fm['risk_free_rate']:.0%}", ""),
         ("Execution lag", f"{_bc['t_update_days']} trading day(s) after each rebalance signal", ""),
     ]

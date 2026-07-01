@@ -266,6 +266,8 @@ def main(argv: list[str] | None = None) -> int:
             _knob("Concentration cap (max weight)", args.base_max_weight, _pctf,
                   args.param == "concentration_cap"),
             ("Max watchlist size", f"{_fm2['max_watchlist_size']}", ""),
+            ("Always-include anchors", ", ".join(_fm2["always_include"]) or "—",
+             "permanent optimizer anchors, outside max_watchlist_size"),
             ("Risk-free rate", f"{RISK_FREE_RATE:.0%}", ""),
             ("Execution lag", f"{base_t_update} trading day(s)", ""),
             ("Swept parameter", f"<code>{args.param}</code>",
