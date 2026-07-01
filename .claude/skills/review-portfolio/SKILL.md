@@ -7,7 +7,7 @@ The math here is identical to the curator backtest (`backtest --curator-runs-dir
 ## Before you start
 
 1. Read `investor_profile.md`. If missing or empty, stop and tell the user to copy `investor_profile.example.md` to `investor_profile.md` and edit. Do not fall back to a default.
-2. Read `holdings.csv` for the current watchlist. Every ticker in this file is passed to the curator as `current_watchlist` (including rows with `shares=0`).
+2. Read `holdings.csv` for the current watchlist. Every ticker in this file is passed to the curator as `current_watchlist` (including rows with `shares=0`), **except the profile's `always_include` anchors** (e.g. SPY/AGG/IAU). Those are permanent optimizer-universe anchors that sit OUTSIDE the curator's `max_watchlist_size`: exclude them from `current_watchlist` so the curator manages only the thematic slots and never proposes adding or removing an anchor. They stay in `holdings.csv` and still flow into `analyze`/`recommend` (Steps 3-4).
 3. **Empty-holdings guard**: if every row in `holdings.csv` has `shares == 0`, stop and tell the user this is a fresh repo; they should run `/initialize-portfolio` first to set the thesis allocation. Do not proceed.
 4. Read `data/thesis_baseline.json` if it exists. Its contents (`date`, `allocations_usd`, `reasoning`, `holdings`) are passed to the report-writer so every review report can render the thesis-vs-recommended comparison.
 5. Load the profile's `financial_model` settings via `python -m src.cli` (the CLI does this automatically via `portfolio.load_financial_model`). Defaults: `rebalance_period: monthly`, `max_watchlist_size: 8`.
@@ -21,7 +21,7 @@ Spawn the `watchlist-curator` subagent. Pass a self-contained prompt with these 
 ```json
 {
   "as_of_date": "<today, YYYY-MM-DD>",
-  "current_watchlist": [<ticker list from holdings.csv>],
+  "current_watchlist": [<ticker list from holdings.csv, EXCLUDING the always_include anchors>],
   "max_watchlist_size": <from profile, default 8>,
   "rebalance_period": "<from profile, default monthly>",
   "recent_news_lookback_days": <30 for monthly, 90 for quarterly>,
