@@ -1,0 +1,47 @@
+# Deploy the static dashboard in docs/ to GitHub Pages via GitHub Actions.
+#
+# Replaces the legacy branch-based Pages builder, which was failing
+# intermittently on this repo (instant "Page build failed" errors) and
+# leaving the public site stale even when the committed files were current.
+# This pipeline just uploads docs/ as-is and deploys it — no Jekyll, no
+# build step that can choke on the dashboard's embedded Plotly/JSON.
+#
+# Triggers on any push that touches docs/ (which is what the cron snapshot
+# and the /review-portfolio + /run-backtest publish steps do), and can be
+# run by hand from the Actions tab (workflow_dispatch).
+name: Deploy dashboard to Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+# Permissions the deploy-pages action needs to publish.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Only one deploy at a time; a newer push cancels an in-flight run so the
+# latest docs/ always wins.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+      - id: deployment
+        uses: actions/deploy-pages@v4
