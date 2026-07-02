@@ -496,3 +496,30 @@ def test_curator_backtest_replays_synthetic_run(tmp_path, monkeypatch) -> None:
     assert "bnh_total" in baselines.columns
     assert result["fixed_baseline_return"] is not None
     assert result["bnh_baseline_return"] is not None
+
+
+def test_effective_ticker_wave_reads_curation_log(tmp_path) -> None:
+    # The live dashboard buckets tickers by wave from curation_history.csv,
+    # so a ticker the curator added but that is NOT in the static TICKER_WAVE
+    # map still resolves to its curated wave (no silent general_markets drift).
+    history = tmp_path / "curation_history.csv"
+    history.write_text(
+        "date,action,ticker,wave_bucket,rationale,news_evidence_urls\n"
+        # ZZZZ is a made-up ticker guaranteed absent from the static map.
+        "2026-01-01,add,ZZZZ,demographics,made up,\n"
+        # A remove row must not affect the wave mapping.
+        "2026-02-01,remove,ZZZZ,,gone,\n"
+        # Most recent add wins when a ticker is re-added under a new wave.
+        "2026-03-01,add,ZZZZ,robotics,readded,\n"
+    )
+    m = portfolio._effective_ticker_wave(history_path=str(history))
+    assert "ZZZZ" not in portfolio.TICKER_WAVE  # would-be general_markets
+    assert m["ZZZZ"] == "robotics"              # resolved from the log instead
+    # Tickers never curated keep their static bucket (anchors, starters).
+    assert m["SPY"] == portfolio.TICKER_WAVE["SPY"]
+
+
+def test_effective_ticker_wave_falls_back_when_log_missing(tmp_path) -> None:
+    # No curation_history.csv -> the map is just the static TICKER_WAVE.
+    m = portfolio._effective_ticker_wave(history_path=str(tmp_path / "nope.csv"))
+    assert m == portfolio.TICKER_WAVE

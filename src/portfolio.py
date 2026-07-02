@@ -1987,19 +1987,55 @@ WAVE_DISPLAY_LABEL: dict[str, str] = {
 }
 
 
-def _ticker_label(t: str) -> str:
+def _ticker_label(t: str, ticker_wave: dict[str, str] | None = None) -> str:
     """Two-line tick label: ticker on top, wave bucket (equities) or
     asset class (non-equities) on a tighter second line. <sup> shifts
     the second-line baseline UP (superscript), so the wave/asset text
-    sits ~half-ex closer to the ticker than a plain second line would."""
+    sits ~half-ex closer to the ticker than a plain second line would.
+
+    ``ticker_wave`` is the effective ticker->wave map (curation_history
+    overlaid on TICKER_WAVE); pass the live dashboard's merged map so new
+    curator adds show their real wave. Falls back to the static
+    TICKER_WAVE when not supplied (e.g. the curator-backtest dashboard)."""
+    tw = ticker_wave if ticker_wave is not None else TICKER_WAVE
     cls = TICKER_ASSET_CLASS.get(t, "equity")
     if cls == "equity":
-        wave = WAVE_DISPLAY_LABEL.get(TICKER_WAVE.get(t, "general_markets"), "")
+        wave = WAVE_DISPLAY_LABEL.get(tw.get(t, "general_markets"), "")
         return f"{t}<br><sup>{wave}</sup>"
     if cls == "equity ETF":
-        wave = WAVE_DISPLAY_LABEL.get(TICKER_WAVE.get(t, "general_markets"), "")
+        wave = WAVE_DISPLAY_LABEL.get(tw.get(t, "general_markets"), "")
         return f"{t}<br><sup>{wave} ETF</sup>"
     return f"{t}<br><sup>{cls}</sup>"
+
+
+def _effective_ticker_wave(
+    history_path: str = "data/curation_history.csv",
+) -> dict[str, str]:
+    """Ticker -> wave bucket, read straight from the curator's own log so
+    the live dashboard's wave charts never drift when a new ticker enters
+    the watchlist. Each ticker is bucketed by the wave_bucket the curator
+    assigned it on its most recent ``add`` row in curation_history.csv;
+    the static TICKER_WAVE map is the fallback for tickers that predate
+    curation (the starter watchlist and the always_include anchors).
+
+    Returns ``{**TICKER_WAVE, **<curated overrides>}`` so curated tickers
+    win and everything else keeps its static bucket."""
+    overrides: dict[str, str] = {}
+    p = Path(history_path)
+    if p.exists():
+        try:
+            hist = pd.read_csv(p)
+            # File is append-only chronological, so iterating in row order
+            # lets the most recent add for each ticker overwrite earlier ones.
+            for row in hist[hist["action"] == "add"].itertuples():
+                wb = str(getattr(row, "wave_bucket", "") or "").strip()
+                if wb in _VALID_WAVE_BUCKETS:
+                    overrides[row.ticker] = wb
+        except Exception:
+            # A malformed log should never break the dashboard; fall back
+            # to the static map for every ticker.
+            overrides = {}
+    return {**TICKER_WAVE, **overrides}
 
 
 
@@ -2244,6 +2280,13 @@ def build_dashboard(
     # and skips chart 6 — a backtest has no "most recent /review-portfolio"
     # anchor in the live sense, so the chart is meaningless there.
     is_live = thesis_baseline_path is not None and Path(thesis_baseline_path).exists()
+
+    # Effective ticker -> wave map: the curator's own curation_history.csv
+    # overlaid on the static TICKER_WAVE. Every wave chart below uses this
+    # instead of TICKER_WAVE directly, so a ticker the curator adds is
+    # bucketed by the wave it was added under and never silently drifts
+    # into general_markets when it's missing from the static map.
+    ticker_wave = _effective_ticker_wave()
 
     # Composition text for the thesis buy-and-hold caption that appears
     # below plot 1 in live mode. Populated when the buy-and-hold trace
@@ -2580,7 +2623,7 @@ def build_dashboard(
     if rec_path.exists():
         recs = pd.read_csv(rec_path, parse_dates=["date"])
         recs["wave_bucket"] = recs["ticker"].map(
-            lambda t: TICKER_WAVE.get(t, "general_markets")
+            lambda t: ticker_wave.get(t, "general_markets")
         )
         wv_weight = recs.groupby(["date", "wave_bucket"])["weight"].sum().unstack(fill_value=0)
         wv_order = [w for w in _WAVE_DISPLAY_ORDER if w in wv_weight.columns]
@@ -2617,14 +2660,14 @@ def build_dashboard(
     # asset class already says everything.
     if latest_weights is not None and not latest_weights.empty:
         tickers_in_chart = latest_weights["ticker"].tolist()
-        ticktext_3 = [_ticker_label(t) for t in tickers_in_chart]
+        ticktext_3 = [_ticker_label(t, ticker_wave) for t in tickers_in_chart]
         # Group tickers by wave and emit one Bar trace per wave so the
         # legend matches chart 4 (wave colors and labels), not a
         # per-ticker spaghetti. Categorical x-axis order is set
         # explicitly so the bars still read in weight-descending order.
         latest_with_wave = latest_weights.copy()
         latest_with_wave["wave_bucket"] = latest_with_wave["ticker"].map(
-            lambda t: TICKER_WAVE.get(t, "general_markets")
+            lambda t: ticker_wave.get(t, "general_markets")
         )
         fig.update_xaxes(categoryorder="array", categoryarray=tickers_in_chart,
                          row=R_LATEST_WEIGHTS, col=1)
@@ -2723,10 +2766,10 @@ def build_dashboard(
             _latest_now["weight"] = _latest_now["value"] / _total_now
             _latest_now = _latest_now.sort_values("weight", ascending=False)
             _latest_now["wave_bucket"] = _latest_now["ticker"].map(
-                lambda t: TICKER_WAVE.get(t, "general_markets")
+                lambda t: ticker_wave.get(t, "general_markets")
             )
             _tickers_in_chart5 = _latest_now["ticker"].tolist()
-            _ticktext_5 = [_ticker_label(t) for t in _tickers_in_chart5]
+            _ticktext_5 = [_ticker_label(t, ticker_wave) for t in _tickers_in_chart5]
             fig.update_xaxes(categoryorder="array", categoryarray=_tickers_in_chart5,
                              row=R_ACTUAL_WEIGHTS, col=1)
             _waves_in_chart5 = [w for w in _WAVE_DISPLAY_ORDER
@@ -2773,7 +2816,7 @@ def build_dashboard(
         gain_items = sorted(gain_by_ticker.items(), key=lambda kv: kv[1], reverse=True)
         gain_tickers = [t for t, _ in gain_items]
         gain_values = [v for _, v in gain_items]
-        ticktext_4 = [_ticker_label(t) for t in gain_tickers]
+        ticktext_4 = [_ticker_label(t, ticker_wave) for t in gain_tickers]
         # Color positive bars green, negative red so a glance reads
         # winners vs losers without consulting the y-axis number.
         bar_colors = ["#2ca02c" if v >= 0 else "#d62728" for v in gain_values]
@@ -2812,7 +2855,7 @@ def build_dashboard(
             lambda t: ASSET_CLASS_BUCKET.get(TICKER_ASSET_CLASS.get(t, "equity"), "equities")
         )
         snaps_full["wave_bucket"] = snaps_full["ticker"].map(
-            lambda t: TICKER_WAVE.get(t, "general_markets")
+            lambda t: ticker_wave.get(t, "general_markets")
         )
 
         # Asset-class chart. Stacked area on a linear y-axis: top edge
