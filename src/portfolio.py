@@ -1900,6 +1900,7 @@ TICKER_ASSET_CLASS: dict[str, str] = {
     "QTUM": "equity ETF", "NUKZ": "equity ETF",
     "VIG": "equity ETF",
     "BWET": "equity ETF",
+    "HUMN": "equity ETF", "SPCX": "equity ETF",
 }
 
 # Map raw asset-class labels to the broader buckets shown on the
@@ -1929,10 +1930,10 @@ TICKER_WAVE: dict[str, str] = {
     "ASML": "AI", "VRT": "AI", "PLTR": "AI", "ORCL": "AI",
     # Robotics
     "BOTZ": "robotics", "ROBO": "robotics",
-    "ISRG": "robotics", "SYM": "robotics",
+    "ISRG": "robotics", "SYM": "robotics", "HUMN": "robotics",
     # Rockets / spacecraft
     "RKLB": "rockets_spacecraft", "ARKX": "rockets_spacecraft",
-    "ASTS": "rockets_spacecraft",
+    "ASTS": "rockets_spacecraft", "SPCX": "rockets_spacecraft",
     # Engineered biology
     "ARKG": "engineered_biology",
     # Quantum computing
@@ -1945,7 +1946,7 @@ TICKER_WAVE: dict[str, str] = {
     "GEV": "nuclear", "LEU": "nuclear",
     # Demographics (aging-population thesis: GLP-1 leaders, healthcare,
     # eldercare REITs, automation that backfills labor shortages).
-    "LLY": "demographics", "XLV": "demographics",
+    "LLY": "demographics", "XLV": "demographics", "WELL": "demographics",
     # Geopolitical (energy / shipping / LNG, defense, profile's non-tech wave).
     "BWET": "geopolitical", "LNG": "geopolitical", "XLE": "geopolitical",
     "LMT": "geopolitical", "NOC": "geopolitical", "ITA": "geopolitical",
