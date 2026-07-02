@@ -2814,12 +2814,35 @@ def build_dashboard(
         # Sort tickers by gain descending. Use the same x-axis labels as
         # chart 3 so the reader can scan the two side by side.
         gain_items = sorted(gain_by_ticker.items(), key=lambda kv: kv[1], reverse=True)
-        gain_tickers = [t for t, _ in gain_items]
-        gain_values = [v for _, v in gain_items]
-        ticktext_4 = [_ticker_label(t, ticker_wave) for t in gain_tickers]
-        # Color positive bars green, negative red so a glance reads
-        # winners vs losers without consulting the y-axis number.
-        bar_colors = ["#2ca02c" if v >= 0 else "#d62728" for v in gain_values]
+        # snapshots.csv accumulates every ticker ever held, so over a long
+        # window the bar-per-ticker x-axis crowds into unreadable labels.
+        # Keep the informative ends — the biggest winners and biggest losers —
+        # and collapse the near-zero middle into one labelled spacer bar. The
+        # total-gain annotation below still sums ALL tickers, so the headline
+        # is unaffected; only the display is trimmed.
+        _TOP_N = 7
+        _SPACER = "⋯"  # horizontal ellipsis; safe as a fake ticker key
+        if len(gain_items) > 2 * _TOP_N + 2:
+            _hidden = len(gain_items) - 2 * _TOP_N
+            plot_items = gain_items[:_TOP_N] + [(_SPACER, 0.0)] + gain_items[-_TOP_N:]
+        else:
+            _hidden = 0
+            plot_items = gain_items
+        gain_tickers = [t for t, _ in plot_items]
+        gain_values = [v for _, v in plot_items]
+        ticktext_4 = [
+            f"⋯<br><sup>{_hidden} more</sup>" if t == _SPACER
+            else _ticker_label(t, ticker_wave)
+            for t in gain_tickers
+        ]
+        # Color positive bars green, negative red so a glance reads winners
+        # vs losers without consulting the y-axis number; the spacer bar is
+        # transparent (zero height, just a visual break for the hidden middle).
+        bar_colors = [
+            "rgba(0,0,0,0)" if t == _SPACER
+            else ("#2ca02c" if v >= 0 else "#d62728")
+            for t, v in plot_items
+        ]
         fig.add_trace(
             go.Bar(x=gain_tickers, y=gain_values,
                    marker_color=bar_colors,
@@ -2836,7 +2859,7 @@ def build_dashboard(
         # Inject total gain into the chart's title via the annotation at
         # position (R_GAIN_INIT - 1) — subplot titles map 1:1 to the
         # figure's annotations in row order.
-        _total_init = sum(gain_values)
+        _total_init = sum(gain_by_ticker.values())
         _chart5_prefix = f"{R_GAIN_INIT}. Cumulative $ gain since {_chart5_anchor}"
         fig.layout.annotations[R_GAIN_INIT - 1].update(
             text=fig.layout.annotations[R_GAIN_INIT - 1].text.replace(
