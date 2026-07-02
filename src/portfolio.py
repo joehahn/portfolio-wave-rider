@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import html as _html
 import json
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -2057,17 +2058,24 @@ _NAV_PAGES: list[tuple[str, str]] = [
 def _nav_strip(current: str) -> str:
     """Return an HTML <nav> with links to all published pages.
     The entry whose filename matches ``current`` is rendered as bold text
-    instead of a link, so a reader can see which page they're on."""
+    instead of a link, so a reader can see which page they're on. The strip
+    also carries a right-aligned "generated <local time>" stamp — the moment
+    this page's HTML was produced — so a reader can tell fresh from stale
+    content on GitHub Pages at a glance."""
     parts = []
     for fname, label in _NAV_PAGES:
         if fname == current:
             parts.append(f"<strong>{label}</strong>")
         else:
             parts.append(f'<a href="{fname}">{label}</a>')
+    # Local wall-clock time with tz abbreviation (e.g. "2026-07-02 14:40 EDT").
+    generated = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M %Z")
     return (
         '<nav style="font-size:14px;color:#555;margin:0 0 1em 0;'
-        'padding-bottom:0.5em;border-bottom:1px solid #eee;">'
-        + " · ".join(parts) +
+        'padding-bottom:0.5em;border-bottom:1px solid #eee;display:flex;'
+        'justify-content:space-between;flex-wrap:wrap;gap:0.5em;">'
+        '<span>' + " · ".join(parts) + '</span>'
+        f'<span style="color:#999;white-space:nowrap;">generated {generated}</span>'
         '</nav>'
     )
 
