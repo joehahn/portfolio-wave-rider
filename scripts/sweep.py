@@ -159,7 +159,7 @@ def main(argv: list[str] | None = None) -> int:
 
         fig.update_layout(
             template="seaborn",
-            title=f"Curator backtest swept across {args.param} "
+            title=f"Plot 1. Curator backtest swept across {args.param} "
                   f"({start.date()} to {end.date()})",
             xaxis_title="date",
             yaxis_title="portfolio value ($)",
@@ -177,6 +177,29 @@ def main(argv: list[str] | None = None) -> int:
             default_v = args.base_max_weight
         else:  # lookback — the live default from investor_profile.md
             default_v = args.base_lookback
+
+        # Plot 2: final portfolio value vs the swept quantity, as a
+        # connected-dot curve — a compact view of how the headline outcome
+        # moves with the parameter, with the profile default marked.
+        _pts = sorted((r[0], r[1]) for r in summary)  # (swept value, final $)
+        fig2 = go.Figure()
+        fig2.add_trace(go.Scatter(
+            x=[p[0] for p in _pts], y=[p[1] for p in _pts],
+            mode="lines+markers", line={"color": "#1f77b4", "width": 2},
+            marker={"size": 8}, showlegend=False,
+            hovertemplate=f"{args.param}=%{{x}}<br>final $%{{y:,.0f}}<extra></extra>",
+        ))
+        fig2.add_vline(x=default_v, line_dash="dot", line_color="#888",
+                       annotation_text="profile default", annotation_position="top")
+        fig2.update_layout(
+            template="seaborn",
+            title=f"Plot 2. Final portfolio value vs {args.param}",
+            xaxis_title=("lookback (years)" if args.param == "lookback" else args.param),
+            yaxis_title="final portfolio value ($)",
+            yaxis_tickformat="$,.0f",
+            height=420,
+            margin={"t": 60, "b": 60, "l": 80, "r": 30},
+        )
 
         def _fmt_row(v, final, ret, ann, mdd, sharpe, calmar):
             tr = "<tr style='font-weight:bold;'>" if abs(v - default_v) < 1e-9 else "<tr>"
@@ -318,6 +341,8 @@ def main(argv: list[str] | None = None) -> int:
             + params_table
             + fig.to_html(full_html=False, include_plotlyjs="cdn",
                           config={"displayModeBar": False})
+            + fig2.to_html(full_html=False, include_plotlyjs=False,
+                           config={"displayModeBar": False})
             + table
             + '</body></html>'
         )

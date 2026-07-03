@@ -134,7 +134,7 @@ def main() -> int:
         ))
     fig.update_layout(
         template="seaborn",
-        title=f"Curator backtest swept across max_watchlist_size "
+        title=f"Plot 1. Curator backtest swept across max_watchlist_size "
               f"({start.date()} to {end.date()})",
         xaxis_title="date",
         yaxis_title="portfolio value ($)",
@@ -144,6 +144,28 @@ def main() -> int:
     )
 
     default_cap = 5
+
+    # Plot 2: final portfolio value vs max_watchlist_size, as a connected-dot
+    # curve, with the project default cap marked.
+    _pts = sorted((r[0], r[1]) for r in summary)  # (cap, final $)
+    fig2 = go.Figure()
+    fig2.add_trace(go.Scatter(
+        x=[p[0] for p in _pts], y=[p[1] for p in _pts],
+        mode="lines+markers", line={"color": "#1f77b4", "width": 2},
+        marker={"size": 8}, showlegend=False,
+        hovertemplate="max_watchlist_size=%{x}<br>final $%{y:,.0f}<extra></extra>",
+    ))
+    fig2.add_vline(x=default_cap, line_dash="dot", line_color="#888",
+                   annotation_text="project default", annotation_position="top")
+    fig2.update_layout(
+        template="seaborn",
+        title="Plot 2. Final portfolio value vs max_watchlist_size",
+        xaxis_title="max_watchlist_size",
+        yaxis_title="final portfolio value ($)",
+        yaxis_tickformat="$,.0f",
+        height=420,
+        margin={"t": 60, "b": 60, "l": 80, "r": 30},
+    )
 
     def _fmt_row(cap, final, ret, ann, mdd, sharpe, calmar):
         tr = "<tr style='font-weight:bold;'>" if cap == default_cap else "<tr>"
@@ -197,6 +219,8 @@ def main() -> int:
         'project default (bolded).</p>'
         + fig.to_html(full_html=False, include_plotlyjs="cdn",
                       config={"displayModeBar": False})
+        + fig2.to_html(full_html=False, include_plotlyjs=False,
+                       config={"displayModeBar": False})
         + table
         + '</body></html>'
     )
