@@ -9,10 +9,10 @@ walk-forward variant lands in stage C2.
 
 Usage:
     python -m src.cli init-holdings      --allocations '{"AAPL": 5000, ...}' --out holdings.csv
-    python -m src.cli analyze            --tickers AAPL MSFT NVDA --period 3y [--max-weight 0.35]
+    python -m src.cli analyze            --tickers AAPL MSFT NVDA --period 0.5y [--max-weight 0.80]
     python -m src.cli curate             --input curator_payload.json [--as-of-date YYYY-MM-DD]
     python -m src.cli snapshot           [--date YYYY-MM-DD] [--force]
-    python -m src.cli recommend          [--max-weight 0.35] [--force]
+    python -m src.cli recommend          [--max-weight 0.80] [--force]
     python -m src.cli backtest           [--start-date YYYY-MM-DD] [--end-date YYYY-MM-DD] [--initial-usd 50000]
     python -m src.cli dashboard
 """

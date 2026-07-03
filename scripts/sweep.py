@@ -186,13 +186,17 @@ def main(argv: list[str] | None = None) -> int:
             )
 
         rows = "".join(_fmt_row(*r) for r in summary)
+        # Profile values are read from the live config (args.base_*, which default
+        # to investor_profile.md) rather than hardcoded, so the prose can't drift
+        # out of sync with the settings table above it.
         WALK_FORWARD_NOTES = {
             "risk_aversion": (
                 "total return on this window keeps rising as λ falls toward 0, "
                 "because a smaller variance penalty lets the optimizer concentrate "
                 "harder into the single 2025 winner (RKLB). That is the in-sample "
                 "tail, not proof of a durable edge. The profile sets "
-                "<code>risk_aversion=0.33</code> — return-tilted but still penalizing "
+                f"<code>risk_aversion={args.base_risk_aversion:g}</code> — "
+                "return-tilted but still penalizing "
                 "variance; whether an even lower λ is genuinely better is a question "
                 "for <b>forward testing</b> on out-of-sample quarters, not this "
                 "in-sample curve."
@@ -200,7 +204,8 @@ def main(argv: list[str] | None = None) -> int:
             "lookback": (
                 "shorter lookbacks tend to score higher here because a shorter memory "
                 "chases this window's recent run-up (RKLB) harder — an in-sample "
-                "momentum artifact. The profile sets <code>lookback=1.5y</code>, a "
+                "momentum artifact. The profile sets "
+                f"<code>lookback={args.base_lookback:g}y</code>, a "
                 "steadier μ/Σ estimate; <b>forward testing</b> on out-of-sample "
                 "quarters is the real check on whether a shorter window helps."
             ),
@@ -208,7 +213,8 @@ def main(argv: list[str] | None = None) -> int:
                 "total return rises with the cap because a higher cap lets the "
                 "optimizer pile more into the single winner (RKLB) — higher "
                 "single-name risk, and an in-sample artifact. The profile sets "
-                "<code>concentration_cap=0.80</code>, which still allows high "
+                f"<code>concentration_cap={args.base_max_weight:.2f}</code>, which "
+                "still allows high "
                 "conviction while bounding any one position; <b>forward testing</b> "
                 "is the arbiter of whether a higher cap is worth the concentration."
             ),
