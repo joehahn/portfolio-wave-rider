@@ -1,0 +1,44 @@
+{
+  "as_of_date": "2023-06-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "AMD",
+      "wave_bucket": "AI",
+      "rationale": "AMD's June 13, 2023 Data Center and AI Technology Premiere unveiled the Instinct MI300X with 192GB HBM3 aimed squarely at large-language-model training/inference, positioning AMD as a credible second-source GPU vendor just as the AI buildout wave (already the portfolio's dominant thesis via NVDA) broadens beyond a single supplier.",
+      "news_evidence": [
+        {"summary": "AMD unveils Instinct MI300X accelerator with 192GB HBM3, 5.2TB/s bandwidth, positioned for generative-AI training and inference; sampling Q3, launch Q4 2023", "source": "AMD Newsroom / Tom's Hardware", "url": "https://www.amd.com/en/newsroom/press-releases/2023-6-13-amd-expands-leadership-data-center-portfolio-with-.html", "date": "2023-06-13"},
+        {"summary": "AMD announces it will showcase next-generation data center and AI technology at a June 13 livestream event, teasing the Instinct MI300 series ahead of the reveal", "source": "AMD Newsroom", "url": "https://www.amd.com/en/newsroom/press-releases/2023-5-9-amd-to-showcase-next-generation-data-center-and-ai.html", "date": "2023-05-09"}
+      ]
+    }
+  ],
+  "removes": [],
+  "no_changes": false,
+  "rationale_overall": "No thesis breaches surfaced across the current 14-name watchlist this quarter: Rocket Lab kept launching (HASTE debut, TROPICS cubesats), IonQ hit its Forte milestone and raised revenue guidance, General Dynamics posted solid backlog growth, and NuScale/Frontline/Rockwell/Intuitive Surgical/Lockheed/ITA showed no adverse news in the trailing quarter — so no removes. The one addition, AMD, reflects the dominant AI wave entering its broadening/surge phase: a second major silicon vendor (beyond NVDA) unveiled a shipping-ready large-model accelerator in June 2023, evidence the AI buildout is deepening rather than cresting. Rejected SMCI as an AI-server add because its only news inside the lookback window was an April 24, 2023 guidance miss; its subsequent guidance raise falls after the as-of-date. Net effect: watchlist grows from 14 to 15, AI bucket goes from 1 to 2 names, well within the wave-diversity guardrail.",
+  "search_terms": [
+    "AI stocks after:2023-04-01 before:2023-07-01",
+    "space stocks rocket launch after:2023-04-01 before:2023-07-01",
+    "robotics stocks humanoid robot after:2023-04-01 before:2023-07-01",
+    "quantum computing stocks after:2023-04-01 before:2023-07-01",
+    "nuclear stocks SMR stocks after:2023-04-01 before:2023-07-01",
+    "defense stocks defense ETF rearmament after:2023-04-01 before:2023-07-01",
+    "tanker stocks shipping freight rates oil reserve after:2023-04-01 before:2023-07-01",
+    "healthcare stocks eldercare REIT aging population demographics after:2023-04-01 before:2023-07-01",
+    "best performing etf this month after:2023-04-01 before:2023-07-01",
+    "biggest stock gainers after:2023-04-01 before:2023-07-01",
+    "interest rates Federal Reserve June 2023 after:2023-04-01 before:2023-07-01",
+    "NVDA Nvidia earnings AI chip demand after:2023-04-01 before:2023-07-01",
+    "AMD MI300 Computex data center AI accelerator after:2023-04-01 before:2023-07-01",
+    "Super Micro Computer SMCI AI server demand after:2023-04-01 before:2023-07-01",
+    "Rocket Lab RKLB launch news after:2023-04-01 before:2023-07-01",
+    "NuScale Power SMR news after:2023-04-01 before:2023-07-01",
+    "IonQ quantum computing news after:2023-04-01 before:2023-07-01",
+    "Nvidia May 24 2023 earnings data center revenue guidance surge",
+    "AMD Data Center AI Technology Premiere June 13 2023 MI300X",
+    "Intuitive Surgical ISRG da Vinci news after:2023-04-01 before:2023-07-01",
+    "Rockwell Automation ROK news after:2023-04-01 before:2023-07-01",
+    "Lockheed Martin LMT General Dynamics GD Q1 2023 earnings after:2023-04-01 before:2023-07-01",
+    "Frontline FRO tanker rates dividend after:2023-04-01 before:2023-07-01",
+    "Super Micro Computer Q3 fiscal 2023 earnings April 27 2023 AI GPU server guidance"
+  ]
+}

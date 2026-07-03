@@ -1,0 +1,75 @@
+{
+  "as_of_date": "2022-06-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "SMR",
+      "wave_bucket": "nuclear",
+      "rationale": "NuScale Power completed its SPAC merger and began trading in May 2022 as the first pure-play publicly listed small modular reactor company, giving direct exposure to the profile's near-term fission-SMR wave that was previously uncovered in the watchlist.",
+      "news_evidence": [
+        {"summary": "NuScale Power completes merger with Spring Valley Acquisition Corp, begins trading on NYSE under ticker SMR; ~$1.9B enterprise value and ~$380M gross proceeds (incl. $235M PIPE) to fund SMR commercialization", "source": "NuScale Power press release / BusinessWire", "url": "https://www.nuscalepower.com/press-releases/2022/nuscale-completes-merger-with-spring-valley", "date": "2022-05-02"}
+      ]
+    },
+    {
+      "ticker": "LMT",
+      "wave_bucket": "geopolitical",
+      "rationale": "Ukraine-war-driven weapons replenishment is producing concrete order flow for Lockheed's Javelin/Stinger lines, filling the profile's explicit call to own a US defense prime alongside the broad ETF (ITA) already held.",
+      "news_evidence": [
+        {"summary": "Lockheed Martin CEO James Taiclet says company will nearly double Javelin production to 4,000 units/year amid Ukraine-driven demand; Biden tours Javelin factory", "source": "Defense News", "url": "https://www.defensenews.com/industry/2022/05/02/bidens-javelin-factory-tour-spotlights-struggle-to-backfill-ukraine-munitions/", "date": "2022-05-02"},
+        {"summary": "US Army signs deal to backfill Stingers sent to Ukraine, adding to the Lockheed-Raytheon Javelin joint-venture backlog build from prior contract mods ($239M, $309M)", "source": "Defense News", "url": "https://www.defensenews.com/land/2022/05/27/us-army-signs-deal-to-backfill-stingers-sent-to-ukraine/", "date": "2022-05-27"}
+      ]
+    },
+    {
+      "ticker": "FRO",
+      "wave_bucket": "commodities",
+      "rationale": "Russia-sanctions-driven rerouting of oil trade flows is structurally lengthening tanker voyages and lifting spot rates, matching the profile's named tactical tanker/freight exposure for tightening oil-reroute dynamics.",
+      "news_evidence": [
+        {"summary": "Frontline Q1 2022 earnings call: CEO says 'volatility returned to the tanker market' as Ukraine war and Russia sanctions create new, longer trade lanes into Europe; Q2 guided spot TCE roughly doubled quarter-over-quarter for Suezmax ($32,700 vs $16,900/day) and LR2 ($46,300 vs $19,000/day)", "source": "Motley Fool (Frontline Q1 2022 earnings call transcript)", "url": "https://www.fool.com/earnings/call-transcripts/2022/06/01/frontline-fro-q1-2022-earnings-call-transcript/", "date": "2022-06-01"},
+        {"summary": "EU adopts sixth sanctions package banning seaborne Russian crude oil imports, forcing tankers onto longer alternative routes and tightening global tanker supply", "source": "Council of the European Union", "url": "https://www.consilium.europa.eu/en/press/press-releases/2022/06/03/russia-s-aggression-against-ukraine-eu-adopts-sixth-package-of-sanctions/", "date": "2022-06-03"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "IONQ",
+      "rationale": "A credible short-seller report attacking the core technical claims (qubit count, error rates) and revenue recognition, followed by multiple securities-fraud class actions, is a direct thesis-integrity breach on the watchlist's only quantum-computing holding.",
+      "news_evidence": [
+        {"summary": "Scorpion Capital releases investigative report alleging IonQ misrepresented its qubit count and error rates and derived a significant share of revenue from improper related-party 'round-tripping' transactions", "source": "The D&O Diary (summarizing Scorpion Capital report)", "url": "https://www.dandodiary.com/2022/06/articles/securities-litigation/quantum-computing-company-hit-with-spac-related-securities-suit-after-short-seller-report/", "date": "2022-05-03"},
+        {"summary": "Securities class action filed in the District of Maryland against IonQ and two officers, covering purchasers from March 30, 2021 through May 2, 2022", "source": "Rosen Law Firm case filing summary", "url": "https://rosenlegal.com/case/ionq-inc/", "date": "2022-05-31"},
+        {"summary": "Investor alert reminding shareholders of the lead-plaintiff deadline in the IonQ securities class action, confirming multiple law firms are pursuing the case", "source": "BusinessWire", "url": "https://www.businesswire.com/news/home/20220610005541/en/INVESTOR-ALERT-Investors-in-IonQ-Inc.-with-Substantial-Losses-Have-Opportunity-to-Lead-Class-Action-Lawsuit---IONQ-IONQWS", "date": "2022-06-10"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Net effect: the watchlist gains its first direct nuclear-SMR exposure (SMR) and rounds out the geopolitical/rearmament and tanker-freight legs the profile explicitly names (LMT alongside the existing ITA; FRO for sanctions-driven rerouting), while dropping the sole quantum-computing name (IONQ) on a credible, dated short-seller fraud allegation and subsequent securities litigation rather than mere volatility. AI-core holdings (AAPL, MSFT, GOOGL, NVDA) and the rockets/spacecraft position (RKLB, which posted three successful Q2 launches including the CAPSTONE lunar mission) are kept as-is; NVDA's May 2022 guidance trim was macro/COVID-lockdown noise, not a thesis breach. No robotics, humanoid-robot, healthcare, or eldercare candidate cleared the bar for a dated commercial catalyst this quarter, so demographics and robotics remain unfilled next-wave gaps to revisit.",
+  "search_terms": [
+    "space stocks after:2022-04-01 before:2022-07-01",
+    "rocket launch stocks after:2022-04-01 before:2022-07-01",
+    "robotics stocks after:2022-04-01 before:2022-07-01",
+    "humanoid robot stocks after:2022-04-01 before:2022-07-01",
+    "quantum computing stocks after:2022-04-01 before:2022-07-01",
+    "nuclear stocks SMR after:2022-04-01 before:2022-07-01",
+    "defense stocks after:2022-04-01 before:2022-07-01",
+    "defense ETF after:2022-04-01 before:2022-07-01",
+    "geopolitics defense spending Europe after:2022-04-01 before:2022-07-01",
+    "shipping stocks tanker stocks after:2022-04-01 before:2022-07-01",
+    "healthcare stocks after:2022-04-01 before:2022-07-01",
+    "eldercare REIT senior housing stocks after:2022-04-01 before:2022-07-01",
+    "best performing etf this month after:2022-04-01 before:2022-07-01",
+    "biggest stock gainers after:2022-04-01 before:2022-07-01",
+    "Federal Reserve interest rate hike inflation after:2022-04-01 before:2022-07-01",
+    "tariffs trade war after:2022-04-01 before:2022-07-01",
+    "Rocket Lab RKLB news after:2022-04-01 before:2022-07-01",
+    "IonQ IONQ news after:2022-04-01 before:2022-07-01",
+    "Rocket Lab 2022 Q2 launch news May June",
+    "IonQ shareholder lawsuit class action 2022 SPAC merger",
+    "Nvidia NVDA news May June 2022 stock",
+    "Lockheed Martin Northrop Grumman Q2 2022 Ukraine weapons orders backlog",
+    "crude oil tanker rates Q2 2022 Russia sanctions rerouting Scorpio Tankers Frontline",
+    "NuScale Power SMR stock IPO May 2022 SPAC merger Spring Valley",
+    "Lockheed Martin Javelin Stinger Ukraine backlog order May 2022 Reuters",
+    "Frontline FRO first quarter 2022 earnings report tanker rates results May 2022",
+    "EU sixth sanctions package Russia adopted June 3 2022 oil embargo",
+    "ITA iShares aerospace defense ETF inflows performance Q2 2022"
+  ]
+}

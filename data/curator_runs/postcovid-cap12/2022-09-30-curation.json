@@ -1,0 +1,59 @@
+{
+  "as_of_date": "2022-09-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "IONQ",
+      "wave_bucket": "quantum",
+      "rationale": "First pure-play quantum computer to go public is now showing early commercial traction with named enterprise partners and cloud distribution, fitting the profile's third-ranked next wave for early exposure.",
+      "news_evidence": [
+        {"summary": "IonQ Q2 2022 results: $2.6M revenue, and the company detailed a growing commercial partner lineup", "source": "Business Wire / The Quantum Insider", "url": "https://www.businesswire.com/news/home/20220815005614/en/IonQ-Announces-Second-Quarter-2022-Financial-Results", "date": "2022-08-15"},
+        {"summary": "IonQ's Aria system (23 algorithmic qubits) made available to all users of Microsoft Azure Quantum; paid contracts with Dow (materials discovery) and GE Research (quantum risk-management algorithm) disclosed", "source": "The Quantum Insider", "url": "https://thequantuminsider.com/2022/08/16/ionq-announces-revenue-of-2-6-million-lists-commercial-partner-lineup-in-2022-q2-report/", "date": "2022-08-16"}
+      ]
+    },
+    {
+      "ticker": "FRO",
+      "wave_bucket": "commodities",
+      "rationale": "Crude-tanker consolidation and multi-year charter-rate lock-ins signal the tactical tanker/freight exposure the profile flags for tightening oil-rerouting dynamics following the shift away from Russian energy.",
+      "news_evidence": [
+        {"summary": "Frontline and Euronav signed a definitive stock-for-stock combination agreement (1.45 FRO shares per Euronav share) to create the largest independent oil tanker operator, unanimously approved by both boards", "source": "SEC 6-K / joint press release", "url": "https://www.sec.gov/Archives/edgar/data/913290/000091957422004186/d9701025_ex99-2.htm", "date": "2022-07-11"},
+        {"summary": "Frontline entered fixed-rate, three-year time charter-out contracts for two LR2/Aframax tankers to third parties, a sign owners are locking in strong day rates as the crude-tanker market tightens", "source": "Frontline 6-K filing", "url": "https://ml-eu.globenewswire.com/Resource/Download/bc1b161d-bc6c-4596-94f2-f12a54ebb731", "date": "2022-09-15"}
+      ]
+    },
+    {
+      "ticker": "WELL",
+      "wave_bucket": "demographics",
+      "rationale": "Senior-housing portfolio expansion and accelerating same-store growth give early, income-generating exposure to the multi-decade aging-population wave the profile is watching.",
+      "news_evidence": [
+        {"summary": "Welltower Q2 2022 results: 8.9% normalized FFO growth y/y, 8.7% total portfolio same-store NOI growth, and an expanded relationship with StoryPoint Senior Living to acquire 33 senior-housing communities", "source": "Welltower 8-K / earnings release", "url": "https://www.sec.gov/Archives/edgar/data/0000766704/000076670422000046/a2q22earningsrelease991.htm", "date": "2022-08-09"}
+      ]
+    }
+  ],
+  "removes": [],
+  "no_changes": false,
+  "rationale_overall": "Held AAPL/MSFT/GOOGL/NVDA/SPY/RKLB/ITA/SMR/BOTZ steady this quarter — Q2 2022 prints from MSFT/GOOGL were solid, RKLB posted a record $55.5M quarter (+392% y/y) plus a NASA VADR launch-services award, NuScale continued regulatory and commercialization progress, and ITA/BOTZ show no thesis-breaking news; NVDA's newly disclosed China A100/H100 export licensing requirement (~$400M revenue at risk) is a watch-item but not yet a crest signal given the AI wave is still in its buildup phase, so no remove is warranted. To broaden beyond the current AI/robotics/rockets/nuclear/defense concentration, three adds fill named-but-uncovered waves: IONQ gives pure-play early exposure to the quantum computing wave (ranked #3 next-wave) on the back of its first disclosed enterprise partnerships; FRO adds the tactical tanker/freight exposure the profile calls out under energy-and-commodity cycles, timed to a tanker-industry consolidation move and tightening charter rates; WELL opens the previously-absent aging-population demographics wave via a senior-housing operator expanding its portfolio. This brings the watchlist to 12 (cap), spread across six distinct wave buckets.",
+  "search_terms": [
+    "AI stocks artificial intelligence after:2022-07-01 before:2022-10-01",
+    "space stocks rocket launch after:2022-07-01 before:2022-10-01",
+    "robotics stocks humanoid robot after:2022-07-01 before:2022-10-01",
+    "quantum computing stocks after:2022-07-01 before:2022-10-01",
+    "nuclear stocks SMR small modular reactor after:2022-07-01 before:2022-10-01",
+    "defense stocks defense ETF rearmament after:2022-07-01 before:2022-10-01",
+    "healthcare stocks eldercare REIT aging population demographics stocks after:2022-07-01 before:2022-10-01",
+    "tanker stocks shipping stocks oil reserve after:2022-07-01 before:2022-10-01",
+    "best performing etf this month after:2022-07-01 before:2022-10-01",
+    "biggest stock gainers after:2022-07-01 before:2022-10-01",
+    "interest rates Fed rate hike after:2022-07-01 before:2022-10-01",
+    "IonQ IONQ news after:2022-07-01 before:2022-10-01",
+    "Frontline FRO tanker stock news after:2022-07-01 before:2022-10-01",
+    "Welltower WELL Omega Healthcare OHI news after:2022-07-01 before:2022-10-01",
+    "Rocket Lab RKLB news after:2022-07-01 before:2022-10-01",
+    "NuScale Power SMR stock news after:2022-07-01 before:2022-10-01",
+    "Nvidia NVDA news after:2022-07-01 before:2022-10-01",
+    "IonQ quantum computer commercial partnership 2022 Q2 earnings",
+    "Rocket Lab Q2 2022 earnings launch NASA contract",
+    "Nvidia export restrictions China A100 H100 August September 2022",
+    "IonQ IPO date SPAC merger listing October 2021 before:2022-10-01",
+    "Frontline Euronav merger announcement date July 2022 press release"
+  ]
+}

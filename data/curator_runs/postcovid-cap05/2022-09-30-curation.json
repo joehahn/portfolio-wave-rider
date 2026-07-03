@@ -1,0 +1,50 @@
+{
+  "as_of_date": "2022-09-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "SMR",
+      "wave_bucket": "nuclear",
+      "rationale": "NuScale's small modular reactor design became the first SMR ever certified by the NRC on July 29, 2022, a concrete regulatory milestone marking the buildup phase of the nuclear wave the profile names as a likely next wave, and the stock has traded on NYSE since its May 2022 SPAC listing so it clears the liquidity/history bar.",
+      "news_evidence": [
+        {"summary": "NRC Commission votes to certify NuScale's 50-MWe SMR design, the first small modular reactor design ever approved for use in the US", "source": "Utility Dive / PowerMag", "url": "https://www.utilitydive.com/news/nuscale-small-modular-reactor-design-becomes-first-to-get-nrc-safety-approv/584391/", "date": "2022-07-29"},
+        {"summary": "NuScale Power completes business combination with Spring Valley Acquisition Corp., begins trading on NYSE as SMR", "source": "NuScale Power press release", "url": "https://www.nuscalepower.com/press-releases/2022/nuscale-completes-merger-with-spring-valley", "date": "2022-05-02"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "AAPL",
+      "rationale": "AAPL is the weakest wave-thesis fit on the current watchlist (a general-market mega-cap hardware holding, not aligned with the named AI/defense/rockets/nuclear waves), and Q3 news shows a concrete demand deceleration -- Apple scrapped plans to boost iPhone 14 production after soft launch demand, on top of an earlier hiring slowdown tied to recession fears -- so the slot is better used for the emerging nuclear buildup candidate.",
+      "news_evidence": [
+        {"summary": "Apple tells suppliers to pull back from a planned 6-million-unit iPhone 14 production increase after first three days of China sales ran 11% below the iPhone 13 launch", "source": "Bloomberg", "url": "https://www.bloomberg.com/news/articles/2022-09-28/apple-iphone-14-sales-not-strong-enough-to-trigger-production-boost", "date": "2022-09-28"},
+        {"summary": "Apple reportedly plans to slow hiring and spending growth in some divisions amid recession fears", "source": "Forbes", "url": "https://www.forbes.com/sites/dereksaul/2022/07/18/apple-reportedly-plans-to-slow-hiring-amid-recession-fears/", "date": "2022-07-18"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Net effect: swap AAPL (a general-market mega-cap with no clear tie to the profile's named waves, and now showing a Q3 demand deceleration in iPhone 14 sell-through plus an earlier hiring slowdown) for SMR, which captures the nuclear wave's July 2022 regulatory buildup signal (first-ever NRC SMR design certification) that the profile flags as a likely next wave for early exposure. MSFT and NVDA are kept as the AI-wave core (NVDA's late-August China export-license headwind is a specific commercial friction, not a thesis breach, so it stays); LMT is kept for the defense/geopolitical wave; RKLB is kept for the rockets/spacecraft wave on continued execution -- record Q2 revenue reported Aug 11, accelerated Neutron engine-test siting, and an on-track path to a US Wallops launch. Post-change watchlist (MSFT, NVDA, LMT, RKLB, SMR) stays at the 5-ticker cap with clean bucket diversity: 2 AI, 1 defense/geopolitical, 1 rockets_spacecraft, 1 nuclear.",
+  "search_terms": [
+    "AI stocks after:2022-07-01 before:2022-10-01",
+    "space stocks rocket launch after:2022-07-01 before:2022-10-01",
+    "robotics stocks after:2022-07-01 before:2022-10-01",
+    "quantum computing stocks after:2022-07-01 before:2022-10-01",
+    "nuclear stocks SMR after:2022-07-01 before:2022-10-01",
+    "defense stocks defense ETF after:2022-07-01 before:2022-10-01",
+    "tanker stocks oil shipping freight after:2022-07-01 before:2022-10-01",
+    "eldercare REIT healthcare stocks aging population after:2022-07-01 before:2022-10-01",
+    "biggest stock gainers after:2022-07-01 before:2022-10-01",
+    "best performing etf this month after:2022-09-01 before:2022-10-01",
+    "interest rates Federal Reserve after:2022-09-01 before:2022-10-01",
+    "AAPL Apple news after:2022-07-01 before:2022-10-01",
+    "MSFT Microsoft news after:2022-07-01 before:2022-10-01",
+    "NVDA Nvidia news after:2022-07-01 before:2022-10-01",
+    "LMT Lockheed Martin news after:2022-07-01 before:2022-10-01",
+    "RKLB Rocket Lab news after:2022-07-01 before:2022-10-01",
+    "SMR NuScale Power news after:2022-07-01 before:2022-10-01",
+    "Apple hiring freeze slowing growth iPhone demand 2022",
+    "Nvidia China export restrictions GPU chips September 2022",
+    "NuScale Power NRC design certification standard design approval 2022",
+    "Apple scraps iPhone 14 production increase soft demand September 2022"
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "as_of_date": "2022-09-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "ISRG",
+      "wave_bucket": "robotics",
+      "rationale": "Surgical-robotics leader posted a Q2-22 earnings beat with da Vinci procedure volume up ~14% y/y despite lingering COVID drag, filling the watchlist's empty robotics bucket with a name that also rides the aging-population demand curve.",
+      "news_evidence": [
+        {"summary": "Intuitive Surgical reports Q2 2022 earnings of $2.19/share vs. $1.92 consensus; worldwide da Vinci procedures grew ~14% y/y", "source": "Nasdaq / SEC 8-K", "url": "https://www.sec.gov/Archives/edgar/data/0001035267/000103526722000123/q222ex-991earningsrelease.htm", "date": "2022-07-21"}
+      ]
+    },
+    {
+      "ticker": "LEU",
+      "wave_bucket": "nuclear",
+      "rationale": "Centrus Energy is the only NRC-licensed HALEU producer (the advanced fuel SMRs need) and sits at the center of a live geopolitical push to de-risk the US enrichment supply chain from Russia, evidenced by the Commerce/ITC sunset review of the Russian Suspension Agreement opening this quarter.",
+      "news_evidence": [
+        {"summary": "Fifth-round 'sunset review' of the Russian Suspension Agreement on enriched uranium opens with the U.S. Department of Commerce and ITC, spotlighting US reliance on Russian enrichment", "source": "World Nuclear Association / Centrus 10-Q", "url": "https://world-nuclear-news.org/Articles/US-begins-sunset-review-of-Russian-enrichment-agree", "date": "2022-09-01"}
+      ]
+    },
+    {
+      "ticker": "ITA",
+      "wave_bucket": "geopolitical",
+      "rationale": "The profile explicitly wants both defense primes and broad defense ETFs; Congress's FY23 NDAA markup this quarter authorized $37-45B above the White House's request, a fresh buildup signal that argues for diversifying single-name LMT exposure with the broad US aerospace & defense ETF.",
+      "news_evidence": [
+        {"summary": "House passes FY2023 NDAA (H.R. 7900) authorizing $839.3B, ~$37B (4.6%) above the President's request", "source": "Roll Call / USNI News", "url": "https://rollcall.com/2022/07/18/senate-ndaa-has-13-billion-extra-for-defense-inflation/", "date": "2022-07-18"},
+        {"summary": "Senate Armed Services Committee completes FY23 NDAA markup, recommending $846.86B for defense, $45B above the President's budget request", "source": "Senate Armed Services Committee", "url": "https://www.armed-services.senate.gov/press-releases/sasc-completes-markup-of-fiscal-year-2023-national-defense-authorization-act", "date": "2022-07-18"}
+      ]
+    }
+  ],
+  "removes": [],
+  "no_changes": false,
+  "rationale_overall": "Net effect is three adds and zero removes, growing the watchlist from 11 to 14 (within the 16 cap) while filling gaps the profile names but the watchlist previously lacked exposure to: robotics (ISRG, also a demographics/eldercare crossover via surgical volumes), nuclear fuel-supply-chain/geopolitical decoupling from Russia (LEU, HALEU capability), and broad defense-sector breadth alongside single-name LMT (ITA, backstopped by this quarter's above-request NDAA markup). Core AI (AAPL/MSFT/GOOGL/NVDA/SPY), rockets (RKLB), quantum (IONQ/RGTI) and tanker/commodities (STNG) exposure is kept unchanged: I found nothing in the trailing quarter rising to a fundamental thesis breach for any incumbent — the IonQ short-seller/litigation overhang is stale (May 2022, already priced in well before this quarter's lookback window) rather than a new catalyst, so it does not meet the remove bar.",
+  "search_terms": [
+    "space stocks after:2022-07-01 before:2022-10-01",
+    "rocket launch stocks news after:2022-07-01 before:2022-10-01",
+    "robotics stocks after:2022-07-01 before:2022-10-01",
+    "quantum computing stocks after:2022-07-01 before:2022-10-01",
+    "nuclear stocks SMR after:2022-07-01 before:2022-10-01",
+    "defense stocks rearmament after:2022-07-01 before:2022-10-01",
+    "tanker stocks shipping rates after:2022-07-01 before:2022-10-01",
+    "eldercare REIT healthcare stocks aging population after:2022-07-01 before:2022-10-01",
+    "best performing etf this month after:2022-07-01 before:2022-10-01",
+    "biggest stock gainers after:2022-07-01 before:2022-10-01",
+    "Federal Reserve interest rates September 2022 after:2022-07-01 before:2022-10-01",
+    "Apple AAPL news after:2022-07-01 before:2022-10-01",
+    "Microsoft MSFT news after:2022-07-01 before:2022-10-01",
+    "Google Alphabet GOOGL news after:2022-07-01 before:2022-10-01",
+    "Nvidia NVDA news after:2022-07-01 before:2022-10-01",
+    "Rocket Lab RKLB news after:2022-07-01 before:2022-10-01",
+    "Lockheed Martin LMT news after:2022-07-01 before:2022-10-01",
+    "IonQ IONQ news after:2022-07-01 before:2022-10-01",
+    "Rigetti Computing RGTI news after:2022-07-01 before:2022-10-01",
+    "NuScale Power SMR news after:2022-07-01 before:2022-10-01",
+    "Scorpio Tankers STNG news after:2022-07-01 before:2022-10-01",
+    "iRobot Amazon acquisition August 2022 after:2022-07-01 before:2022-10-01",
+    "industrial automation labor shortage robotics demand 2022 after:2022-07-01 before:2022-10-01",
+    "Intuitive Surgical ISRG earnings Q2 2022 after:2022-07-01 before:2022-10-01",
+    "IonQ short seller report Scorpion Capital after:2022-07-01 before:2022-10-01",
+    "NATO defense spending increase Germany Zeitenwende budget after:2022-07-01 before:2022-10-01",
+    "Centrus Energy LEU uranium enrichment Russia after:2022-07-01 before:2022-10-01",
+    "NDAA 2023 defense budget increase Senate House July 2022 after:2022-07-01 before:2022-10-01",
+    "Centrus Energy HALEU contract Department of Energy after:2022-07-01 before:2022-10-01"
+  ]
+}

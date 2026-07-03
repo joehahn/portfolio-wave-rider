@@ -1,0 +1,68 @@
+{
+  "as_of_date": "2022-03-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "RKLB",
+      "wave_bucket": "rockets_spacecraft",
+      "rationale": "Rocket Lab is the clearest pure-play early-buildup vehicle for the profile's #1 next-wave (rockets & spacecraft), with an active Electron launch cadence and public financial guidance as of Q1 2022; it has traded since its August 2021 SPAC listing so it clears the listing-date guardrail with room to spare.",
+      "news_evidence": [
+        {"summary": "Rocket Lab issued Q1 2022 revenue guidance of $42M-$47M ahead of quarter close, reflecting its ramping Electron launch cadence and satellite-services backlog.", "source": "SEC 8-K / Rocket Lab", "url": "https://www.sec.gov/Archives/edgar/data/0001819994/000119312522083895/d336996dex991.htm", "date": "2022-02-28"},
+        {"summary": "Rocket Lab updated expected Q1 2022 revenue to approximately $40M after a dedicated BlackSky/Spaceflight Inc. Electron mission slipped its launch window into Q2, evidence of a still-building (not yet crested) commercial launch cadence.", "source": "SEC 8-K / Rocket Lab", "url": "https://www.sec.gov/Archives/edgar/data/0001819994/000095017022023906/rklb-ex99_1.htm", "date": "2022-03-30"}
+      ]
+    },
+    {
+      "ticker": "LMT",
+      "wave_bucket": "geopolitical",
+      "rationale": "Russia's February 24, 2022 invasion of Ukraine has triggered the early buildup phase of the geopolitical realignment / rearmament wave the profile explicitly names; Lockheed Martin is the largest US defense prime and is a direct beneficiary of both the surge in emergency Ukraine-aid weapons procurement and the broader FY22 defense appropriations bump.",
+      "news_evidence": [
+        {"summary": "Congress's FY22 omnibus defense appropriations, passed in the weeks after Russia's invasion, funds 20 more Lockheed Martin C-130J transport planes than the Pentagon requested, on top of over $1B already spent arming Ukraine with Lockheed-made Javelin missiles.", "source": "CSIS", "url": "https://www.csis.org/analysis/how-supporting-ukraine-revitalizing-us-defense-industrial-base", "date": "2022-03-15"},
+        {"summary": "Aerospace & defense ETFs (ITA, XAR, PPA) pulled in nearly $2B in combined net inflows in the month following the invasion, with the S&P Aerospace & Defense Select Industry Index up 9.0% YTD through March 24, 2022, confirming a sector-wide re-rating rather than an LMT-specific move.", "source": "Nasdaq", "url": "https://www.nasdaq.com/articles/5-sector-etfs-benefiting-from-russia-ukraine-tensions", "date": "2022-03-28"}
+      ]
+    },
+    {
+      "ticker": "IONQ",
+      "wave_bucket": "quantum",
+      "rationale": "IonQ posted three consecutive technical and commercial milestones this quarter — a new quantum-gate breakthrough with Duke, a record-qubit-count system, and a Microsoft Azure Quantum distribution deal — that mark quantum computing's move from lab curiosity toward the early commercial buildup the profile flags as next-wave priority #3; the stock has traded since its October 2021 SPAC listing.",
+      "news_evidence": [
+        {"summary": "Duke University and IonQ announced a new, more efficient N-qubit Toffoli quantum gate possible only on IonQ's trapped-ion architecture.", "source": "IonQ newsroom", "url": "https://ionq.com/news/february-10-2022-duke-ionq-new-qc-gate", "date": "2022-02-10"},
+        {"summary": "IonQ Aria reached a record 20 algorithmic qubits, demonstrating over 550 usable gates versus dozens for competing superconducting systems.", "source": "IonQ newsroom", "url": "https://www.ionq.com/news/february-23-2022-ionq-aria-furthers-lead", "date": "2022-02-23"},
+        {"summary": "IonQ signed an agreement to bring its Aria quantum computer to Microsoft's Azure Quantum cloud platform, a distribution deal that broadens commercial reach beyond direct sales.", "source": "IonQ / Microsoft", "url": "https://insidehpc.com/2022/03/ionq-aria-coming-to-microsofts-azure-quantum-platform/", "date": "2022-03-21"}
+      ]
+    }
+  ],
+  "removes": [],
+  "no_changes": false,
+  "rationale_overall": "This is the day-0 rebalance: the starter watchlist (AAPL, MSFT, GOOGL, NVDA, SPY) remains intact — Q1 2022 earnings for the mega-caps showed no thesis breach (NVDA posted record Q4 FY22 revenue despite the ARM deal falling through on regulatory grounds; MSFT beat on both EPS and revenue with Teams and Windows 11 momentum) — so all five stay as the AI/mega-cap core the profile calls the current dominant wave. Three adds fill the most obvious thematic gaps the profile names as likely next waves and are each grounded in dated Q1 2022 news: RKLB (rockets & spacecraft, the profile's #1 next-wave priority, evidenced by Rocket Lab's active Q1 launch-guidance updates), LMT (geopolitical realignment / rearmament, evidenced by the buildup in defense appropriations and ETF inflows triggered by Russia's February 24 invasion of Ukraine), and IONQ (quantum computing, the profile's #3 next-wave priority, evidenced by IonQ's Duke gate breakthrough, record-qubit Aria system, and new Microsoft Azure distribution deal). Nuclear/SMR exposure (NuScale) was searched but excluded from this call because its only near-term public vehicle had not yet begun trading as of March 31, 2022 (SPAC merger not slated to close until May 2022); robotics and demographics/eldercare turned up no comparably strong, dated catalyst this quarter and are left for a future rebalance. Net effect: watchlist grows from 5 to 8 tickers (well under the cap of 16), adding one ticker each in three distinct wave buckets (rockets_spacecraft, geopolitical, quantum) with no thematic stacking.",
+  "search_terms": [
+    "space stocks after:2022-01-01 before:2022-04-01",
+    "rocket launch stocks after:2022-01-01 before:2022-04-01",
+    "robotics stocks after:2022-01-01 before:2022-04-01",
+    "quantum computing stocks after:2022-01-01 before:2022-04-01",
+    "nuclear stocks SMR after:2022-01-01 before:2022-04-01",
+    "defense stocks after:2022-01-01 before:2022-04-01",
+    "defense ETF after:2022-01-01 before:2022-04-01",
+    "tanker stocks shipping after:2022-01-01 before:2022-04-01",
+    "healthcare stocks eldercare REIT after:2022-01-01 before:2022-04-01",
+    "aging population demographics stocks after:2022-01-01 before:2022-04-01",
+    "best performing etf this month after:2022-01-01 before:2022-04-01",
+    "biggest stock gainers after:2022-01-01 before:2022-04-01",
+    "interest rates Fed after:2022-01-01 before:2022-04-01",
+    "Russia Ukraine invasion energy oil markets after:2022-02-01 before:2022-04-01",
+    "Rocket Lab RKLB news after:2022-01-01 before:2022-04-01",
+    "Rocket Lab RKLB IPO date SPAC merger before:2022-04-01",
+    "Lockheed Martin LMT stock news after:2022-01-01 before:2022-04-01",
+    "IonQ IONQ stock news after:2022-01-01 before:2022-04-01",
+    "IonQ IPO date listing before:2022-04-01",
+    "\"Rocket Lab\" launch contract 2022 Q1 news",
+    "Lockheed Martin defense budget Ukraine March 2022",
+    "IonQ quantum computing partnership 2022 first quarter",
+    "XAR ITA defense ETF inflows Russia Ukraine March 2022",
+    "IonQ Aria Microsoft Azure Quantum announcement date 2022",
+    "IonQ news February 2022",
+    "Apple AAPL news after:2022-01-01 before:2022-04-01",
+    "Microsoft MSFT news after:2022-01-01 before:2022-04-01",
+    "Google Alphabet GOOGL news after:2022-01-01 before:2022-04-01",
+    "Nvidia NVDA news after:2022-01-01 before:2022-04-01"
+  ]
+}

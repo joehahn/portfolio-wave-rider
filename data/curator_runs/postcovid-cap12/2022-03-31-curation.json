@@ -1,0 +1,58 @@
+{
+  "as_of_date": "2022-03-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "RKLB",
+      "wave_bucket": "rockets_spacecraft",
+      "rationale": "Rocket Lab is converting from pure-play small-launch provider into a vertically integrated medium-lift player, with a concrete site and manufacturing commitment for its Neutron rocket landing this quarter — the buildup-phase commercial milestone the profile's 'rockets & spacecraft' next-wave calls for.",
+      "news_evidence": [
+        {"summary": "Rocket Lab selects NASA Wallops Flight Facility (Virginia) as the Neutron launch site and commits to building a 250,000 sq ft manufacturing and operations facility adjacent to it", "source": "Rocket Lab / SpaceNews coverage", "url": "https://rocketlabcorp.com/launch/neutron/", "date": "2022-02-28"}
+      ]
+    },
+    {
+      "ticker": "ITA",
+      "wave_bucket": "geopolitical",
+      "rationale": "Russia's invasion of Ukraine triggered an immediate, broad-based defense-sector re-rating and a wave of new orders and allied spending pledges, exactly matching the profile's 'enter on buildup' instruction for the defense & rearmament wave; ITA gives diversified US aerospace/defense exposure rather than single-name risk.",
+      "news_evidence": [
+        {"summary": "Lockheed Martin +18%, Northrop Grumman +22%, General Dynamics +12%, Raytheon +8% in the weeks following the Feb 24 invasion; iShares U.S. Aerospace & Defense ETF (ITA) up more than 5% over the same span", "source": "Forbes", "url": "https://www.forbes.com/sites/sergeiklebnikov/2022/03/04/war-stocks-are-surging-as-russia-ukraine-conflict-rages-on-lockheed-martin-northrop-up-20/", "date": "2022-03-04"},
+        {"summary": "Lockheed Martin secures $319M order for 308 air-to-ground missiles from the US and a separate order for 35 F-35 jets from Germany, evidencing concrete order-book growth beyond sentiment alone", "source": "Reuters/Axios coverage", "url": "https://www.axios.com/2022/04/04/russia-ukraine-boosts-raytheon-lockheed-stock", "date": "2022-03-22"}
+      ]
+    }
+  ],
+  "removes": [],
+  "no_changes": false,
+  "rationale_overall": "The five-name starter watchlist (AAPL, MSFT, GOOGL, NVDA, SPY) all cleared due diligence this quarter with positive, dated catalysts in the trailing 90 days — MSFT's $68.7B Activision Blizzard deal (2022-01-18), GOOGL's 20-for-1 split announcement that popped shares ~10% (2022-02-01), NVDA's record Q4 FY22 revenue print (2022-02-16) plus a Jetson Orin edge-robotics announcement (March 2022), and AAPL's 'Peek Performance' launch event (2022-03-08) — so none are removed. Two adds bring in the profile's named next-waves that surfaced concrete, dated Q1-2022 catalysts: RKLB for the rockets & spacecraft buildup (Neutron site/manufacturing commitment) and ITA for the geopolitical defense & rearmament wave, which went from dormant to an active buildup signal the moment Russia invaded Ukraine on Feb 24. Quantum (IonQ — only a stale Jan-2021 SPAC-era IPO date and no dated Q1-2022 news survived the filter) and nuclear (NuScale's SPAC merger had not yet closed as of 2022-03-31, so SMR was not investable) and robotics (no dated Q1-2022 commercial catalyst beyond generic labor-shortage commentary) were surveyed but skipped for lack of qualifying evidence in the window, consistent with the profile's stated priority order (rockets ahead of robotics, quantum, and nuclear). Tanker/freight and eldercare/demographics were also surveyed; oil spiked past $100/bbl on the invasion but no single dated tanker-name catalyst cleared the bar this quarter, and demographics remained quiet as expected for a slow-moving wave.",
+  "search_terms": [
+    "space stocks rocket launch stocks after:2022-01-01 before:2022-04-01",
+    "robotics stocks humanoid robot stocks after:2022-01-01 before:2022-04-01",
+    "quantum computing stocks after:2022-01-01 before:2022-04-01",
+    "nuclear stocks SMR stocks after:2022-01-01 before:2022-04-01",
+    "defense stocks defense ETF rearmament after:2022-01-01 before:2022-04-01",
+    "tanker stocks shipping stocks oil freight after:2022-01-01 before:2022-04-01",
+    "healthcare stocks eldercare REIT aging population demographics after:2022-01-01 before:2022-04-01",
+    "best performing etf this month after:2022-01-01 before:2022-04-01",
+    "biggest stock gainers this month after:2022-01-01 before:2022-04-01",
+    "interest rates Fed rate hikes 2022 after:2022-01-01 before:2022-04-01",
+    "tariffs trade war 2022 after:2022-01-01 before:2022-04-01",
+    "Rocket Lab RKLB stock news after:2022-01-01 before:2022-04-01",
+    "\"Rocket Lab\" IPO SPAC merger date before:2022-04-01",
+    "IonQ stock IPO date before:2022-04-01",
+    "defense stocks rally Russia Ukraine invasion Lockheed Raytheon after:2022-02-24 before:2022-04-01",
+    "oil prices energy stocks surge Ukraine invasion after:2022-02-24 before:2022-04-01",
+    "Nvidia NVDA news earnings after:2022-01-01 before:2022-04-01",
+    "Apple AAPL news after:2022-01-01 before:2022-04-01",
+    "Microsoft MSFT news Activision after:2022-01-01 before:2022-04-01",
+    "Google Alphabet GOOGL news stock split after:2022-01-01 before:2022-04-01",
+    "S&P 500 SPY market volatility after:2022-01-01 before:2022-04-01",
+    "\"Rocket Lab\" Neutron contract launch news February March 2022 after:2022-01-01 before:2022-04-01",
+    "IonQ news contract partnership after:2022-01-01 before:2022-04-01",
+    "iShares Aerospace Defense ETF ITA inflows after:2022-02-24 before:2022-04-01",
+    "\"ITA\" ETF launch date iShares aerospace defense before:2022-04-01",
+    "robotics industry news automation labor shortage after:2022-01-01 before:2022-04-01",
+    "IonQ IONQ stock news January February March 2022 after:2022-01-01 before:2022-04-01",
+    "\"iRobot\" OR \"Teradyne\" OR \"ABB\" robotics news after:2022-01-01 before:2022-04-01",
+    "Apple event iPhone SE March 2022 after:2022-01-01 before:2022-04-01",
+    "Nvidia Omniverse Isaac robotics platform announcement after:2022-01-01 before:2022-04-01"
+  ]
+}

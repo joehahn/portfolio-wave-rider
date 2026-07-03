@@ -1,0 +1,66 @@
+{
+  "as_of_date": "2022-03-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "RKLB",
+      "wave_bucket": "rockets_spacecraft",
+      "rationale": "Pure-play launch/space-systems name with almost seven months of trading history (listed Aug 25, 2021) just posted a strong Q4 2021 commercial inflection and a Space Force upper-stage award, giving early-buildup exposure to the profile's #1-ranked next wave.",
+      "news_evidence": [
+        {"summary": "Rocket Lab reports Q4 2021 revenue of $27.5M, up 420% sequentially and above prior guidance; Space Systems segment grew 229% quarter-over-quarter", "source": "Rocket Lab / SEC Form 8-K", "url": "https://www.sec.gov/Archives/edgar/data/0001819994/000119312522057939/d263047dex991.htm", "date": "2022-02-28"},
+        {"summary": "Rocket Lab awarded $24.35M U.S. Space Force Space Systems Command contract to develop the Neutron launch vehicle's upper stage", "source": "Rocket Lab Q4 2021 earnings release", "url": "https://www.sec.gov/Archives/edgar/data/0001819994/000119312522057939/d263047dex991.htm", "date": "2022-02-28"}
+      ]
+    },
+    {
+      "ticker": "IONQ",
+      "wave_bucket": "quantum",
+      "rationale": "IonQ (trading since its Oct 1, 2021 SPAC close) is showcasing a technical lead via a new industry benchmark, an early but concrete commercial-credibility signal for the profile's quantum wave.",
+      "news_evidence": [
+        {"summary": "IonQ presents its new 'Algorithmic Qubits' (#AQ) benchmark at the QIP 2022 conference at Caltech; IonQ Aria executes circuits with 550+ gates versus dozens for competing superconducting systems", "source": "IonQ newsroom", "url": "https://www.ionq.com/news/march-04-2022-ionq-presents-at-qip-2022", "date": "2022-03-04"}
+      ]
+    },
+    {
+      "ticker": "ITA",
+      "wave_bucket": "geopolitical",
+      "rationale": "Broad, liquid US defense-primes ETF captures the rearmament buildup the profile names, with defense stocks already re-rating on Russia's invasion of Ukraine.",
+      "news_evidence": [
+        {"summary": "Defense stocks surge after Russia's invasion of Ukraine; Lockheed Martin and Northrop Grumman up roughly 20%, iShares U.S. Aerospace & Defense ETF (ITA) up more than 5% since the Feb. 24 invasion", "source": "Forbes", "url": "https://www.forbes.com/sites/sergeiklebnikov/2022/03/04/war-stocks-are-surging-as-russia-ukraine-conflict-rages-on-lockheed-martin-northrop-up-20/", "date": "2022-03-04"}
+      ]
+    }
+  ],
+  "removes": [],
+  "no_changes": false,
+  "rationale_overall": "This is effectively the day-0 rebalance: the starter set (AAPL/MSFT/GOOGL/NVDA/SPY) stays intact — all five continue to show healthy Q1 2022 fundamentals (Apple's Jan 27 beat, Alphabet's 32% YoY Q4 revenue growth and split announcement) with nothing in the news window breaching their theses. Three adds fill in the profile's next-wave gaps with names that actually clear the listing-date and evidence bars as of today: RKLB (rockets & spacecraft, the top-ranked next wave, backed by a real Q4 2021 revenue beat and a Neutron/Space Force award), IONQ (quantum computing, backed by a fresh technical benchmark), and ITA (geopolitical/defense rearmament, backed by the visible post-invasion re-rating of US primes). Candidates considered and rejected on guardrails: NuScale (SMR) has not completed its SPAC merger yet (trades starting May 2022, after this date) and Rigetti (RGTI) has only ~4 weeks of trading history since its March 2, 2022 SPAC close — both too thin to add this quarter. No compelling, dated pre-3/31 catalyst surfaced for robotics, tanker/shipping, or eldercare/demographics, so those waves are left for a future rebalance.",
+  "search_terms": [
+    "artificial intelligence stocks after:2022-01-01 before:2022-04-01",
+    "space stocks rocket launch stocks after:2022-01-01 before:2022-04-01",
+    "robotics stocks humanoid robot stocks after:2022-01-01 before:2022-04-01",
+    "quantum computing stocks after:2022-01-01 before:2022-04-01",
+    "nuclear stocks SMR stocks after:2022-01-01 before:2022-04-01",
+    "defense stocks defense ETF rearmament after:2022-01-01 before:2022-04-01",
+    "tanker stocks shipping stocks freight rates after:2022-01-01 before:2022-04-01",
+    "healthcare stocks eldercare REIT aging population demographics after:2022-01-01 before:2022-04-01",
+    "best performing etf this month after:2022-01-01 before:2022-04-01",
+    "biggest stock gainers after:2022-01-01 before:2022-04-01",
+    "interest rates Fed rate hikes 2022 outlook after:2022-01-01 before:2022-04-01",
+    "tariffs trade war 2022 after:2022-01-01 before:2022-04-01",
+    "Russia Ukraine invasion defense stocks Lockheed Raytheon rally March 2022 before:2022-04-01",
+    "Rocket Lab RKLB stock news Q1 2022 after:2022-01-01 before:2022-04-01",
+    "IonQ IONQ stock IPO date SPAC before:2022-04-01",
+    "Rigetti Computing RGTI IPO listing date SPAC before:2022-04-01",
+    "NuScale Power SMR SPAC merger IPO date before:2022-04-01",
+    "Cameco CCJ Centrus LEU BWXT nuclear stock news March 2022 after:2022-01-01 before:2022-04-01",
+    "oil tanker rates surge Russia sanctions crude shipping March 2022 after:2022-01-01 before:2022-04-01",
+    "Global X Robotics BOTZ ARKQ ETF stock 2022 after:2022-01-01 before:2022-04-01",
+    "Rocket Lab RKLB fourth quarter 2021 earnings report date after:2022-01-01 before:2022-04-01",
+    "oil tanker rates spike Ukraine invasion sanctions February March 2022 Frontline Euronav after:2022-01-01 before:2022-04-01",
+    "IonQ IONQ news quantum computer after:2022-01-01 before:2022-04-01",
+    "Apple AAPL stock news after:2022-01-01 before:2022-04-01",
+    "Microsoft MSFT stock news after:2022-01-01 before:2022-04-01",
+    "Alphabet GOOGL Google stock news after:2022-01-01 before:2022-04-01",
+    "Nvidia NVDA stock news after:2022-01-01 before:2022-04-01",
+    "S&P 500 SPY stock market news outlook after:2022-01-01 before:2022-04-01",
+    "\"Rocket Lab\" fourth quarter 2021 results revenue guidance Neutron February 28 2022",
+    "Rocket Lab RKLB listing date SPAC Vector Acquisition merger August 2021"
+  ]
+}

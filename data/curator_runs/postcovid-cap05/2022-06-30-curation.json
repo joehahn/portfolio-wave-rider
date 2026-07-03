@@ -1,0 +1,50 @@
+{
+  "as_of_date": "2022-06-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "RKLB",
+      "wave_bucket": "rockets_spacecraft",
+      "rationale": "Rocket Lab's Q1 2022 print shows genuine buildup-phase commercial traction in the user's top-priority next wave, freeing capacity by trimming the weakest of four AI-bucket mega-caps.",
+      "news_evidence": [
+        {"summary": "Rocket Lab reports Q1 2022 revenue of $40.7M, up 124% YoY, with Space Systems segment revenue up 1,873% YoY; guides Q2 2022 revenue of $51-54M", "source": "Rocket Lab (Businesswire)", "url": "https://www.businesswire.com/news/home/20220516005897/en/Rocket-Lab-Announces-First-Quarter-2022-Financial-Results-and-Guidance-for-Second-Quarter-2022", "date": "2022-05-16"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "GOOGL",
+      "rationale": "Weakest of the four AI-bucket mega-caps this quarter: Q1 2022 print showed YouTube ad revenue decelerating sharply to 14% YoY (from 49% a year earlier), missing estimates by over $600M, partly on European advertiser pullback tied to the Ukraine war, making it the marginal holding to trim to fund next-wave entry.",
+      "news_evidence": [
+        {"summary": "Alphabet Q1 2022: YouTube ad revenue growth decelerates to 14% YoY ($6.9B), missing Wall Street estimates by over $600M; slowdown partly attributed to European brand-advertiser pullback tied to Russia's war on Ukraine", "source": "Variety", "url": "https://variety.com/2022/digital/news/youtube-q1-2022-ad-revenue-slows-alphabet-earnings-1235241508/", "date": "2022-04-26"},
+        {"summary": "Alphabet Q1 2022 8-K: total revenue $68.01B (+23% YoY) but net income down 8% YoY, missing on both top and bottom line", "source": "Alphabet Inc. (SEC 8-K)", "url": "https://www.sec.gov/Archives/edgar/data/0001652044/000165204422000025/googexhibit991q12022.htm", "date": "2022-04-26"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Kept AAPL, MSFT, NVDA and LMT: MSFT's Azure grew 46% YoY and NVDA posted record Data Center and Gaming revenue in their most recent prints (both filed before this quarter's cutoff), and LMT's Ukraine-driven Javelin replenishment contracts (May-June 2022) strongly reconfirm the defense/rearmament thesis. Trimmed GOOGL, whose Q1 2022 print showed the softest signal of the four AI names (YouTube ad deceleration, war-linked European ad pullback), to fund an entry into RKLB on the strength of a genuine, dated Q1 2022 commercial buildup (124% revenue growth) in the user's #1-ranked next wave, rockets & spacecraft. Considered but did not add tanker names (FRO/STNG, benefiting from 2022 war-driven freight-rate spikes) and uranium/nuclear names (CCJ, benefiting from Russia-uranium-supply concerns) given no free slot remained after this single swap; these remain candidates for a future rebalance. Net effect: watchlist shape shifts from 4-AI/1-defense to 3-AI/1-defense/1-rockets, adding the first foothold in a named next wave without breaching the 4-per-bucket diversity cap or the 5-ticker size cap.",
+  "search_terms": [
+    "rocket launch stocks space stocks news after:2022-04-01 before:2022-07-01",
+    "robotics stocks humanoid robot news after:2022-04-01 before:2022-07-01",
+    "quantum computing stocks news after:2022-04-01 before:2022-07-01",
+    "nuclear stocks SMR stocks news after:2022-04-01 before:2022-07-01",
+    "Rocket Lab RKLB stock news June 2022",
+    "IonQ quantum computing stock news 2022",
+    "defense stocks Ukraine war rearmament spending increase 2022",
+    "Lockheed Martin LMT news Javelin Ukraine June 2022",
+    "Rocket Lab Nasdaq-100 index inclusion June 22 2022",
+    "robotics ETF BOTZ ROBO stocks 2022",
+    "tanker stocks oil shipping freight rates 2022",
+    "best performing ETF stock market gainers June 2022",
+    "Frontline FRO Scorpio Tankers STNG stock 2022 tanker rates surge",
+    "Cameco CCJ uranium stock 2022 Europe energy crisis nuclear",
+    "Rocket Lab Neutron rocket 2022 first quarter earnings",
+    "Nvidia stock news June 2022 data center guidance",
+    "Apple iPhone China lockdown supply chain warning 2022",
+    "Google Alphabet advertising revenue slowdown Q1 2022 earnings",
+    "Microsoft Azure cloud growth Q3 fiscal 2022 earnings April",
+    "Nvidia Q1 fiscal 2023 earnings May 2022 data center gaming guidance cut",
+    "artificial intelligence AI stocks news 2022",
+    "healthcare eldercare aging population demographics stocks 2022"
+  ]
+}

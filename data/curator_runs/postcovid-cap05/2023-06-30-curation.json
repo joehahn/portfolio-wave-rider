@@ -1,0 +1,33 @@
+{
+  "as_of_date": "2023-06-30",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "Quiet-but-solid quarter for all five incumbents, so no swap clears the bar even though one strong outside candidate surfaced. NVDA delivered the quarter's single biggest catalyst (May 24 FY24-Q1 print: $7.19B revenue, record $4.28B data-center revenue, next-quarter guidance raised to $11.00B on generative-AI demand) and MSFT reinforced the same AI wave at Build 2023 — the dominant wave is still in surge, not cresting, so both stay. RKLB continued buildup-phase execution (Neutron composite tank testing, Archimedes engine hardware). LMT posted steady, guidance-reaffirming Q1 results (April 18). SMR was scrutinized hardest given the Carbon Free Power Project cost escalation reported January 2023, but the last dated fact in evidence is that 26 of 27 UAMPS subscribers reaffirmed commitment in February 2023 — a recommitment signal, not a breach. IonQ surfaced strong buildup evidence (Forte commercial launch June 22) and is the top next-wave candidate, but the watchlist is at the 5-ticker cap and no incumbent cleared removal, so no swap was forced. Net effect: watchlist unchanged (MSFT/NVDA/LMT/RKLB/SMR).",
+  "search_terms": [
+    "artificial intelligence stocks after:2023-04-01 before:2023-07-01",
+    "space stocks rocket launch stocks after:2023-04-01 before:2023-07-01",
+    "robotics stocks humanoid robot stocks after:2023-04-01 before:2023-07-01",
+    "quantum computing stocks after:2023-04-01 before:2023-07-01",
+    "nuclear stocks SMR stocks after:2023-04-01 before:2023-07-01",
+    "defense stocks defense ETF after:2023-04-01 before:2023-07-01",
+    "tanker stocks shipping stocks geopolitics oil after:2023-04-01 before:2023-07-01",
+    "healthcare stocks eldercare REIT aging population demographics after:2023-04-01 before:2023-07-01",
+    "best performing etf June 2023",
+    "biggest stock gainers June 2023",
+    "interest rates Fed June 2023 rate hike pause",
+    "Microsoft MSFT news after:2023-04-01 before:2023-07-01",
+    "Nvidia NVDA news after:2023-04-01 before:2023-07-01",
+    "Lockheed Martin LMT news after:2023-04-01 before:2023-07-01",
+    "Rocket Lab RKLB news after:2023-04-01 before:2023-07-01",
+    "NuScale Power SMR news after:2023-04-01 before:2023-07-01",
+    "Nvidia earnings guidance May 24 2023 AI chip demand blowout",
+    "IonQ quantum computing stock news 2023",
+    "Lockheed Martin Q1 2023 earnings April 2023 results",
+    "Rocket Lab Neutron rocket launch contract 2023 first half",
+    "IonQ Forte launch June 22 2023",
+    "NuScale UAMPS project members remain committed 2023 May June",
+    "Microsoft Build 2023 May Copilot OpenAI Azure announcements"
+  ]
+}
