@@ -48,7 +48,9 @@ _BASE_LOOKBACK = float(_m.group(1)) if _m else 1.5
 
 DEFAULTS = {
     "risk_aversion":     [0.0, 0.1, 0.2, 0.33, 0.5, 0.67, 1.0, 1.5, 2.0, 3.0],
-    "lookback":          [0.2, 0.33, 0.4, 0.5, 0.67, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 3.0],
+    # 0.1y requested but omitted: too short a window, the replay produces no
+    # snapshots (empirical floor is ~0.15y); 0.15 is the nearest viable value.
+    "lookback":          [0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.85, 1.0, 1.25, 1.5, 1.75, 2.0, 3.0],
     "concentration_cap": [0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90, 1.00],
 }
 
