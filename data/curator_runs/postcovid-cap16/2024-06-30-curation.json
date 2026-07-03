@@ -1,0 +1,56 @@
+{
+  "as_of_date": "2024-06-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "ASTS",
+      "wave_bucket": "rockets_spacecraft",
+      "rationale": "AST SpaceMobile signed definitive commercial agreements with both AT&T and Verizon in May 2024 for nationwide space-based cellular broadband, a concrete commercial milestone in the satellite-services buildup the profile names as the top next-wave priority, and a stronger near-term catalyst than the space-bucket incumbent it replaces.",
+      "news_evidence": [
+        {"summary": "AST SpaceMobile strikes definitive commercial agreement with AT&T through 2030, targeting near-100% continental US coverage on premium low-band spectrum", "source": "Bloomberg", "url": "https://www.bloomberg.com/news/videos/2024-05-30/ast-spacemobile-strikes-deal-with-verizon-and-at-t-video", "date": "2024-05-30"},
+        {"summary": "Verizon makes $100M strategic commitment to AST SpaceMobile ($65M prepayment + $35M convertible notes) as part of a space-based broadband partnership", "source": "SpaceNews", "url": "https://spacenews.com/ast-spacemobile-gains-verizon-ally-amid-spacexs-direct-to-device-push/", "date": "2024-05-30"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "PL",
+      "rationale": "Planet Labs' growth has decelerated into the mid-teens with continued heavy cash burn and the stock printed a fresh all-time low this quarter, a fundamental softening of the thesis relative to the stronger satellite-services buildup signal now available in the same wave bucket.",
+      "news_evidence": [
+        {"summary": "Planet Labs stock hit an all-time low of $1.67 on April 30, 2024", "source": "Market data aggregator", "url": "https://finance.yahoo.com/quote/PL/", "date": "2024-04-30"},
+        {"summary": "Fiscal Q1 2025 results (period ended April 30, 2024, reported June 6): revenue up only 15% YoY to $60.4M, net loss of $29.3M, continued cash burn despite 95% recurring ACV", "source": "Planet Labs 8-K / press release", "url": "https://www.sec.gov/Archives/edgar/data/0001836833/000183683324000061/exhibit991q12025.htm", "date": "2024-06-06"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "The watchlist was already well diversified across every named wave and sits at the 16-ticker cap, so this quarter's action is a single swap. Rocket Lab posted record Q1 revenue (+69% YoY) and continued Neutron progress, Centrus/Cameco got a real regulatory tailwind from the May 13 signing of the Prohibiting Russian Uranium Imports Act, quantum names broadly rallied reinforcing IonQ, and Nvidia/Microsoft AI fundamentals remained strong (Nvidia Q1 FY25 data-center revenue +427% YoY) — none of these current holdings show thesis breach, so they are kept. The one swap trades a weakening, cash-burning Planet Labs position for AST SpaceMobile, which just landed definitive nationwide commercial agreements with AT&T and Verizon, a cleaner buildup-phase satellite-services bet inside the same wave bucket. A prospective second quantum add was considered but not actioned for lack of a clean offsetting removal.",
+  "search_terms": [
+    "AI stocks after:2024-04-01 before:2024-07-01",
+    "space stocks after:2024-04-01 before:2024-07-01",
+    "rocket launch stocks after:2024-04-01 before:2024-07-01",
+    "robotics stocks after:2024-04-01 before:2024-07-01",
+    "quantum computing stocks after:2024-04-01 before:2024-07-01",
+    "nuclear stocks after:2024-04-01 before:2024-07-01",
+    "SMR stocks small modular reactor after:2024-04-01 before:2024-07-01",
+    "defense stocks after:2024-04-01 before:2024-07-01",
+    "defense ETF after:2024-04-01 before:2024-07-01",
+    "tanker stocks shipping stocks after:2024-04-01 before:2024-07-01",
+    "healthcare eldercare REIT aging population stocks after:2024-04-01 before:2024-07-01",
+    "best performing etf this month after:2024-04-01 before:2024-07-01",
+    "biggest stock gainers after:2024-04-01 before:2024-07-01",
+    "interest rates Fed after:2024-04-01 before:2024-07-01",
+    "MSFT Microsoft news after:2024-04-01 before:2024-07-01",
+    "NVDA Nvidia news after:2024-04-01 before:2024-07-01",
+    "RKLB Rocket Lab news after:2024-04-01 before:2024-07-01",
+    "IONQ news after:2024-04-01 before:2024-07-01",
+    "STNG Scorpio Tankers news after:2024-04-01 before:2024-07-01",
+    "LEU Centrus Energy news after:2024-04-01 before:2024-07-01",
+    "CCJ Cameco news after:2024-04-01 before:2024-07-01",
+    "PL Planet Labs news after:2024-04-01 before:2024-07-01",
+    "LUNR Intuitive Machines news after:2024-04-01 before:2024-07-01",
+    "Nvidia Q1 fiscal 2025 earnings May 22 2024 data center revenue",
+    "Prohibiting Russian Uranium Imports Act signed law May 2024",
+    "AST SpaceMobile ASTS AT&T Verizon deal April May 2024",
+    "Planet Labs PL fiscal Q1 2025 earnings results June 2024"
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "as_of_date": "2024-06-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "OKLO",
+      "wave_bucket": "nuclear",
+      "rationale": "Oklo just completed its SPAC listing and immediately produced the exact buildup-phase tell the profile names for nuclear -- a hyperscaler data-center power deal -- making it the cleanest quiet-buildup entry into the fission/SMR wave available this quarter.",
+      "news_evidence": [
+        {"summary": "Oklo Inc. began trading on the NYSE under ticker OKLO after AltC Acquisition Corp shareholders approved the SPAC merger, with $306M gross proceeds and Sam Altman as board chairman.", "source": "Oklo newsroom / SEC 8-K", "url": "https://oklo.com/newsroom/news-details/2024/Oklo-Inc.-Begins-Trading-on-the-New-York-Stock-Exchange/default.aspx", "date": "2024-05-10"},
+        {"summary": "Oklo signed a non-binding letter of intent with Wyoming Hyperscale to deliver 100 megawatts via a planned 20-year power purchase agreement to power an AI-driven data center campus.", "source": "Business Wire / Oklo newsroom", "url": "https://oklo.com/newsroom/news-details/2024/Oklo-Partners-with-Wyoming-Hyperscale-to-Deliver-100-Megawatts-to-its-Data-Centers/default.aspx", "date": "2024-05-23"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "LMT",
+      "rationale": "Defense has been rallying for two-plus years and is now priced for perfection: Lockheed beat Q1 top- and bottom-line estimates yet the stock sold off on weak cash flow, signaling the wave's easy re-rating is behind it relative to nuclear's fresher entry point.",
+      "news_evidence": [
+        {"summary": "Lockheed Martin reported Q1 2024 net sales of $17.2B beating estimates, but shares fell on the week as cash flow disappointed and guidance underwhelmed.", "source": "Lockheed Martin newsroom / Motley Fool", "url": "https://news.lockheedmartin.com/2024-04-23-Lockheed-Martin-Reports-First-Quarter-2024-Financial-Results", "date": "2024-04-23"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Net effect: swap a mature, richly-priced defense holding (LMT) for a genuinely early-innings nuclear name (OKLO) whose first commercial deal directly matches the profile's own stated tell for the nuclear wave -- SMR power sold to AI data centers -- while AI (MSFT, NVDA), rockets (RKLB, still showing 69% YoY revenue growth and Neutron progress), and quantum (IONQ) hold unchanged since none showed a thesis breach or peak-enthusiasm signal this quarter. Robotics and eldercare/demographics turned up only generic, undated commentary in this window, not a citable buildup catalyst, so no add was proposed there this cycle.",
+  "search_terms": [
+    "AI stocks news after:2024-04-01 before:2024-07-01",
+    "space stocks rocket launch news after:2024-04-01 before:2024-07-01",
+    "robotics stocks humanoid robot news after:2024-04-01 before:2024-07-01",
+    "quantum computing stocks news after:2024-04-01 before:2024-07-01",
+    "nuclear SMR stocks news after:2024-04-01 before:2024-07-01",
+    "defense stocks rearmament news after:2024-04-01 before:2024-07-01",
+    "tanker shipping stocks oil freight news after:2024-04-01 before:2024-07-01",
+    "healthcare eldercare REIT aging population stocks news after:2024-04-01 before:2024-07-01",
+    "best performing etf this month before:2024-07-01",
+    "biggest stock gainers June 2024 before:2024-07-01",
+    "interest rates Fed outlook news after:2024-04-01 before:2024-07-01",
+    "OKLO stock IPO listing date before:2024-07-01",
+    "MSFT Microsoft news after:2024-04-01 before:2024-07-01",
+    "NVDA Nvidia news after:2024-04-01 before:2024-07-01",
+    "LMT Lockheed Martin news after:2024-04-01 before:2024-07-01",
+    "RKLB Rocket Lab news after:2024-04-01 before:2024-07-01",
+    "IONQ IonQ news after:2024-04-01 before:2024-07-01",
+    "Oklo nuclear stock news May June 2024 after:2024-04-01 before:2024-07-01",
+    "Lockheed Martin defense contract stock valuation after:2024-04-01 before:2024-07-01",
+    "Oklo Wyoming Hyperscale data center power purchase agreement May 2024",
+    "Lockheed Martin Q1 2024 earnings stock reaction April 2024 before:2024-07-01"
+  ]
+}

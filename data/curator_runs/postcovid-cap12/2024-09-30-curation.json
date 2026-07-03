@@ -1,0 +1,55 @@
+{
+  "as_of_date": "2024-09-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "TER",
+      "wave_bucket": "robotics",
+      "rationale": "Fills the watchlist's zero-exposure gap in the user's #2 next-wave (robotics/automation) with an established, liquid industrial name whose cobot division is already monetizing AI-accelerated automation rather than pre-revenue humanoid hype.",
+      "news_evidence": [
+        {"summary": "Teradyne Robotics (Universal Robots + MiR) announces collaboration with NVIDIA, integrating Jetson AGX Orin and the Isaac Manipulator cuMotion path planner into the UR5e cobot; also launches AI-powered MiR1200 Pallet Jack", "source": "Teradyne press release", "url": "https://investors.teradyne.com/news-events/press-releases/detail/32/teradyne-robotics-to-bring-the-power-of-ai-to-robotics-with-nvidia", "date": "2024-03-19"},
+        {"summary": "Q2 2024 results: total revenue $730M, with the Robotics segment (UR + MiR) contributing $90M, evidence the AI-automation push is translating into current-quarter revenue", "source": "Teradyne 8-K", "url": "https://www.sec.gov/Archives/edgar/data/0000097210/000095017024086252/ter-ex99_1.htm", "date": "2024-07-24"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "FRO",
+      "rationale": "The tactical tanker thesis was entered on tightening reroute/oil-reserve dynamics, but by quarter-end the dominant driver has flipped to soft, structural Chinese crude demand pulling VLCC rates toward multi-year seasonal lows — a fundamental breach of the 'tighten' framing that justified a tactical (not core) position.",
+      "news_evidence": [
+        {"summary": "\"Weight of Freight: VLCC rally hits a snag with weak Chinese demand\" — ship operators' hopes for a continued summer rate rally dashed by sluggish Chinese crude demand", "source": "Argus Media", "url": "https://www.argusmedia.com/en/news-and-insights/market-opinion-and-analysis-blog/weight-of-freight-vlcc-rally-hits-a-snag-with-weak-chinese-demand", "date": "2024-08-07"},
+        {"summary": "DHT Holdings management flags Chinese economic growth and oil demand running slower than expected, weighing on VLCC rates", "source": "Lloyd's List", "url": "https://www.lloydslist.com/LL1150203/VLCC-rates-weighed-down-by-weakerthanexpected-Chinese-growth-says-DHT", "date": "2024-08-13"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Net effect: swap a weakening tactical commodity-cycle position (FRO, whose 'tighten' thesis is breaching as Chinese demand softens) for a first foothold in the robotics wave (TER), the user's explicitly named #2 next-wave that had zero dedicated exposure. All other current holdings show continued buildup-phase evidence: RKLB (Archimedes engine hot-fire at Stennis), IONQ (ARLIS DoD contract Aug 6, $54.5M USAF award Sept 27), ASTS (Block 1 BlueBird satellites launched Sept 12, direct-to-cell field tests), LUNR (NASA CLPS south-pole award, Near Space Network contract), OKLO (Equinix 500MW LOI plus $25M prepayment, DOE fuel-facility design approval), WELL (record occupancy growth, raised 2024 guidance), and ITA/defense (fastest spending growth in four decades). MSFT/GOOGL/NVDA/SPY remain the AI-wave and market core. Watchlist stays at the 12-ticker cap.",
+  "search_terms": [
+    "space stocks after:2024-07-01 before:2024-10-01",
+    "rocket launch stocks after:2024-07-01 before:2024-10-01",
+    "robotics stocks after:2024-07-01 before:2024-10-01",
+    "humanoid robot stocks after:2024-07-01 before:2024-10-01",
+    "quantum computing stocks after:2024-07-01 before:2024-10-01",
+    "nuclear stocks SMR after:2024-07-01 before:2024-10-01",
+    "defense stocks defense ETF after:2024-07-01 before:2024-10-01",
+    "shipping stocks tanker stocks after:2024-07-01 before:2024-10-01",
+    "healthcare eldercare REIT aging population demographics after:2024-07-01 before:2024-10-01",
+    "best performing etf this month after:2024-07-01 before:2024-10-01",
+    "biggest stock gainers after:2024-07-01 before:2024-10-01",
+    "interest rates Fed rate cut September 2024 after:2024-07-01 before:2024-10-01",
+    "MSFT Microsoft news after:2024-07-01 before:2024-10-01",
+    "NVDA Nvidia news after:2024-07-01 before:2024-10-01",
+    "RKLB Rocket Lab news after:2024-07-01 before:2024-10-01",
+    "ITA aerospace defense ETF news after:2024-07-01 before:2024-10-01",
+    "IONQ IonQ news after:2024-07-01 before:2024-10-01",
+    "FRO Frontline tanker news after:2024-07-01 before:2024-10-01",
+    "WELL Welltower news after:2024-07-01 before:2024-10-01",
+    "ASTS AST SpaceMobile news after:2024-07-01 before:2024-10-01",
+    "LUNR Intuitive Machines news after:2024-07-01 before:2024-10-01",
+    "OKLO Oklo news after:2024-07-01 before:2024-10-01",
+    "AST SpaceMobile BlueBird satellites launch September 2024 AT&T Verizon test",
+    "VLCC tanker rates fall weak China demand September 2024",
+    "Teradyne Q2 2024 earnings robotics segment revenue July 2024",
+    "Teradyne Robotics NVIDIA collaboration cobot 2024"
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "as_of_date": "2025-09-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "ITA",
+      "wave_bucket": "geopolitical",
+      "rationale": "NATO's newly-inked 5%-of-GDP defense-spending commitment and the resulting rearmament order backlog are a live buildup-phase catalyst for the profile's explicitly-named geopolitical wave, which currently has zero watchlist representation, and a broad US aerospace & defense ETF captures the primes named in the thesis without picking a single name.",
+      "news_evidence": [
+        {"summary": "All 32 NATO members but Spain agree to raise defense/security spending to 5% of GDP by 2035 (3.5% core + 1.5% security-related)", "source": "CNBC", "url": "https://www.cnbc.com/2025/06/25/nato-allies-agree-to-higher-5percent-defense-spending-target.html", "date": "2025-06-25"},
+        {"summary": "Aerospace & defense ETFs XAR and ITA show sustained multi-year outperformance versus broad equities, reflecting the sector's ongoing re-rating through the rearmament cycle", "source": "PortfoliosLab", "url": "https://portfolioslab.com/tools/stock-comparison/XAR/ITA", "date": "2025-08-28"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "OKLO",
+      "rationale": "OKLO shows a classic unpriced peak-enthusiasm signal after its 2025 run -- Goldman initiated coverage at Neutral flagging a stretched valuation and capital-intensity risk the same week that the CEO, CFO, and a director all sold stock, which is exactly the trim-before-the-crest trigger the profile's wave thesis calls for even though the broader nuclear/SMR wave itself is intact.",
+      "news_evidence": [
+        {"summary": "Oklo fell 16% over two days after CEO, CFO, and a company director each sold shares and Goldman Sachs urged caution on the stock", "source": "CNBC", "url": "https://www.cnbc.com/2025/09/25/oklo-nuclear-shares-fall-ai-data-center.html", "date": "2025-09-25"},
+        {"summary": "Goldman Sachs initiated Oklo at Neutral with a $117 price target, below the prevailing market price, citing unfinalized customer agreements and the capital burden of Oklo's build-own-operate model", "source": "Investing.com", "url": "https://www.investing.com/news/analyst-ratings/goldman-sachs-initiates-oklo-stock-with-neutral-rating-117-price-target-93CH-4254691", "date": "2025-09-25"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Net effect is a one-for-one thematic swap, not a size change: OKLO's peak-enthusiasm signal (insider selling into a fresh Goldman Neutral initiation, after a 500%+ 2025 run) argues for trimming the nuclear position now rather than waiting for a harder breach, while the vacated slot is redeployed into ITA to give the geopolitical/rearmament wave -- named explicitly in the profile but previously absent from this watchlist -- its first representation via a diversified US aerospace & defense ETF. The other four legs (MSFT/AI, RKLB/rockets, BOTZ/robotics, QTUM/quantum) all showed continued buildup-phase strength this quarter (record Microsoft cloud/AI earnings, Rocket Lab's Synspective launch deals, IonQ deals feeding the QTUM basket) and were kept as-is. Post-change wave buckets (AI, rockets_spacecraft, robotics, quantum, geopolitical) are each single-ticker, well inside the diversity guardrail.",
+  "search_terms": [
+    "space stocks after:2025-07-01 before:2025-10-01",
+    "robotics stocks after:2025-07-01 before:2025-10-01",
+    "quantum computing stocks after:2025-07-01 before:2025-10-01",
+    "nuclear stocks SMR after:2025-07-01 before:2025-10-01",
+    "defense stocks rearmament after:2025-07-01 before:2025-10-01",
+    "tanker stocks shipping freight rates after:2025-07-01 before:2025-10-01",
+    "Oklo stock news September 2025 before:2025-10-01",
+    "Rocket Lab RKLB news August September 2025 before:2025-10-01",
+    "IonQ Rigetti quantum stock news August September 2025 before:2025-10-01",
+    "Microsoft stock news September 2025 before:2025-10-01",
+    "BOTZ robotics ETF news 2025 before:2025-10-01",
+    "NATO defense spending 5 percent GDP June 2025 before:2025-10-01",
+    "biggest stock gainers September 2025 before:2025-10-01",
+    "best performing etf Q3 2025 before:2025-10-01",
+    "ITA XAR defense ETF inflows performance July August September 2025 before:2025-10-01",
+    "Oklo Goldman Sachs neutral rating valuation September 2025 before:2025-10-01",
+    "Oklo stock rally record high August 2025 before:2025-10-01",
+    "Federal Reserve interest rate cut September 2025 before:2025-10-01",
+    "eldercare REIT healthcare aging population stocks 2025 before:2025-10-01"
+  ]
+}

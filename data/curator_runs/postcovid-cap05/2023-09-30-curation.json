@@ -1,0 +1,51 @@
+{
+  "as_of_date": "2023-09-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "IONQ",
+      "wave_bucket": "quantum",
+      "rationale": "IonQ posted a genuine Q3 buildup-phase commercial inflection this quarter (111% YoY revenue growth, raised full-year bookings guidance, and an early technical milestone), giving the profile's #3-ranked next tech wave (quantum computing) its first concrete entry point.",
+      "news_evidence": [
+        {"summary": "IonQ Q2 2023 revenue of $5.5M, up 111% YoY and above guidance; raised FY2023 revenue guidance to $18.9-19.3M and bookings guidance to $49-56M", "source": "IonQ / BusinessWire", "url": "https://www.businesswire.com/news/home/20230810541196/en/IonQ-Announces-Second-Quarter-2023-Financial-Results", "date": "2023-08-10"},
+        {"summary": "IonQ hit its 2023 target of 29 algorithmic qubits (#AQ) seven months ahead of schedule, launched IonQ Forte, and opened a first European quantum data center with QuantumBasel", "source": "IonQ press release", "url": "https://www.ionq.com/news/ionq-announces-second-quarter-2023-financial-results", "date": "2023-08-10"},
+        {"summary": "IonQ shares climbed 42% in July 2023 on new partnerships and a raised outlook", "source": "The Motley Fool", "url": "https://www.fool.com/investing/2023/08/04/why-ionq-stock-soared-42-in-july/", "date": "2023-08-04"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "SMR",
+      "rationale": "NuScale's flagship CFPP project economics remain strained by January's 53% target-price hike to $89/MWh, and Q3 brought no offsetting subscription or customer win, leaving it the weakest thesis this quarter next to the AI, defense, rocket, and now quantum names that all posted fresh commercial catalysts.",
+      "news_evidence": [
+        {"summary": "NuScale/UAMPS raised the CFPP target power price 53% to $89/MWh (from $58/MWh) on steel and construction cost inflation, straining project economics", "source": "Neutron Bytes", "url": "https://neutronbytes.com/2023/01/24/nuscales-smr-costs-hit-hard-by-inflation/", "date": "2023-01-24"},
+        {"summary": "NuScale's September 11, 2023 corporate/analyst-day update carried no new project subscriptions or customer announcements, with the CFPP subscription deadline still looming", "source": "NuScale Power SEC 8-K", "url": "https://www.sec.gov/Archives/edgar/data/0001822966/000182296623000239/a2023-09x11xanalystpress.htm", "date": "2023-09-11"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Core AI (MSFT, NVDA), defense (LMT), and rockets (RKLB) exposure all confirmed strong this quarter via fresh Q2 prints -- NVDA's data-center revenue up 171% YoY, LMT's record $158B backlog, MSFT nearing its Activision close, and RKLB's growing backlog -- so none of those four is disturbed. The one swap rotates nuclear (SMR), whose flagship project has carried an unresolved cost/subscription overhang since January with no Q3 catalyst, into quantum computing (IONQ), whose Q3 bookings and revenue growth are the strongest buildup-phase signal surfaced this cycle and fill the profile's #3-ranked next tech wave. Robotics (#2) was searched but surfaced no qualifying dated commercial milestone this quarter. Net watchlist stays at the 5-ticker cap: MSFT, NVDA, LMT, RKLB, IONQ.",
+  "search_terms": [
+    "artificial intelligence stocks after:2023-07-01 before:2023-10-01",
+    "space stocks rocket launch stocks after:2023-07-01 before:2023-10-01",
+    "robotics stocks humanoid robot stocks after:2023-07-01 before:2023-10-01",
+    "quantum computing stocks after:2023-07-01 before:2023-10-01",
+    "nuclear stocks SMR stocks after:2023-07-01 before:2023-10-01",
+    "defense stocks defense ETF after:2023-07-01 before:2023-10-01",
+    "oil prices tanker shipping stocks after:2023-07-01 before:2023-10-01",
+    "healthcare stocks eldercare REIT aging population after:2023-07-01 before:2023-10-01",
+    "best performing ETF this month after:2023-07-01 before:2023-10-01",
+    "biggest stock gainers after:2023-07-01 before:2023-10-01",
+    "IonQ IONQ stock news after:2023-07-01 before:2023-10-01",
+    "Lockheed Martin LMT stock news after:2023-07-01 before:2023-10-01",
+    "Rocket Lab RKLB stock news after:2023-07-01 before:2023-10-01",
+    "NuScale Power SMR stock news after:2023-07-01 before:2023-10-01",
+    "Nvidia NVDA stock news after:2023-07-01 before:2023-10-01",
+    "Microsoft MSFT stock news after:2023-07-01 before:2023-10-01",
+    "Nvidia Q2 fiscal 2024 earnings August 2023 data center revenue",
+    "Rocket Lab Q2 2023 earnings launch August 2023",
+    "NuScale Power UAMPS Idaho project September 2023",
+    "Lockheed Martin Q2 2023 earnings backlog July 2023",
+    "IonQ second quarter 2023 earnings results bookings guidance August 2 2023"
+  ]
+}

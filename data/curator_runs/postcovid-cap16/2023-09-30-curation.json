@@ -1,0 +1,61 @@
+{
+  "as_of_date": "2023-09-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "CTRE",
+      "wave_bucket": "demographics",
+      "rationale": "CareTrust REIT is actively deploying equity-funded capital into skilled-nursing and seniors-housing real estate, giving the watchlist the eldercare-REIT exposure the thesis names explicitly but that ISRG (surgical robotics, not real estate) does not capture.",
+      "news_evidence": [
+        {"summary": "CareTrust REIT closed $45 million of new investments in skilled nursing and seniors housing facilities.", "source": "CareTrust REIT press release", "url": "https://www.caretrustreit.com", "date": "2023-07-07"},
+        {"summary": "CareTrust reported Q2 2023 results: 96% of $215.4 million invested year-to-date was equity-funded (no incremental leverage), and the board declared a $0.28/share quarterly dividend.", "source": "CareTrust REIT / SEC 8-K", "url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001590717", "date": "2023-08-04"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "SMR",
+      "rationale": "NuScale's flagship Carbon Free Power Project — the near-term commercial proof point for the SMR thesis — is running well short of the subscription level it needs to survive, with a hard February 2024 deadline four months away and no fresh commitments surfacing this quarter.",
+      "news_evidence": [
+        {"summary": "NuScale raised the CFPP target power price 53% to $89/MWh as the project's construction cost estimate jumped 75% to $9.3 billion.", "source": "NuScale Power / Utility Dive", "url": "https://www.utilitydive.com/news/nuscale-smr-uamps-funding-nrc-doe-idaho-lab/645262/", "date": "2023-01-01"},
+        {"summary": "26 of 27 UAMPS participants voted to continue the CFPP, but committed subscription stood at only ~120 MWe of the 370 MWe required (~32%), with an 80% subscription threshold due by February 1, 2024.", "source": "Utility Dive", "url": "https://www.utilitydive.com/news/nuscale-smr-uamps-funding-nrc-doe-idaho-lab/645262/", "date": "2023-02-28"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Most of the current watchlist re-confirmed its thesis this quarter with clean Q2 2023 prints: NVDA (+101% YoY revenue), MSFT/GOOGL (cloud and AI-driven beats), RKLB (revenue +12% YoY, 10 new launch contracts, raised Q3 guidance), IONQ (record $28M bookings), LMT (net sales +8%, F-35 Lot 17 orders), ISRG (da Vinci procedures +22% YoY), STNG ($132M net income), CCJ (long-term contracts growing), and LEU (HALEU demonstration cascade completed) all argue for staying the course, so I left them untouched. The one clear swap trims SMR — whose flagship UAMPS reactor project is materially behind the subscription level it needs with a hard deadline four months out and construction costs already up 75% — and replaces it with CTRE, giving the demographics wave the eldercare-REIT exposure the profile names explicitly, which ISRG's surgical-robotics business does not provide. Planet Labs' September 7 print and UEC's August acquisition were read but neither cleared the bar. The watchlist stays at the 16-ticker cap.",
+  "search_terms": [
+    "AI stocks after:2023-07-01 before:2023-10-01",
+    "space stocks after:2023-07-01 before:2023-10-01",
+    "rocket launch stocks after:2023-07-01 before:2023-10-01",
+    "robotics stocks after:2023-07-01 before:2023-10-01",
+    "humanoid robot stocks after:2023-07-01 before:2023-10-01",
+    "quantum computing stocks after:2023-07-01 before:2023-10-01",
+    "nuclear stocks after:2023-07-01 before:2023-10-01",
+    "SMR stocks small modular reactor after:2023-07-01 before:2023-10-01",
+    "defense stocks after:2023-07-01 before:2023-10-01",
+    "defense ETF after:2023-07-01 before:2023-10-01",
+    "tanker stocks after:2023-07-01 before:2023-10-01",
+    "geopolitics oil reserves after:2023-07-01 before:2023-10-01",
+    "healthcare stocks after:2023-07-01 before:2023-10-01",
+    "eldercare REIT stocks after:2023-07-01 before:2023-10-01",
+    "aging population demographics stocks after:2023-07-01 before:2023-10-01",
+    "best performing etf this month after:2023-07-01 before:2023-10-01",
+    "biggest stock gainers after:2023-07-01 before:2023-10-01",
+    "AAPL Apple stock news after:2023-07-01 before:2023-10-01",
+    "MSFT Microsoft stock news after:2023-07-01 before:2023-10-01",
+    "GOOGL Alphabet stock news after:2023-07-01 before:2023-10-01",
+    "NVDA Nvidia stock news after:2023-07-01 before:2023-10-01",
+    "RKLB Rocket Lab stock news after:2023-07-01 before:2023-10-01",
+    "LMT Lockheed Martin stock news after:2023-07-01 before:2023-10-01",
+    "IONQ IonQ stock news after:2023-07-01 before:2023-10-01",
+    "NuScale Power SMR stock news after:2023-07-01 before:2023-10-01",
+    "Scorpio Tankers STNG stock news after:2023-07-01 before:2023-10-01",
+    "Centrus Energy LEU stock news after:2023-07-01 before:2023-10-01",
+    "Cameco CCJ stock news after:2023-07-01 before:2023-10-01",
+    "CareTrust REIT CTRE stock news after:2023-07-01 before:2023-10-01",
+    "Planet Labs PL stock news after:2023-07-01 before:2023-10-01",
+    "NuScale UAMPS subscription level minimum threshold vote 2023 before:2023-10-01",
+    "Centrus Energy HALEU production 2023 cascade Piketon"
+  ]
+}

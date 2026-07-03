@@ -1,0 +1,51 @@
+{
+  "as_of_date": "2024-12-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "BOTZ",
+      "wave_bucket": "robotics",
+      "rationale": "Robotics — the profile's #2-ranked next wave — showed concrete Q4 2024 buildup signals (major corporate capital commitment, government-backed R&D, new commercial humanoid product launches) with zero current watchlist exposure, so a diversified robotics ETF fills the gap without single-name concentration risk.",
+      "news_evidence": [
+        {"summary": "Samsung Electronics announced it will raise its stake in Rainbow Robotics to 35% for roughly $181M, becoming the humanoid robot maker's largest shareholder and creating a Future Robotics Office.", "source": "TechCrunch / Samsung Newsroom", "url": "https://techcrunch.com/2024/12/30/samsung-pays-181m-to-become-largest-shareholder-of-rainbow-robotics/", "date": "2024-12-31"},
+        {"summary": "ROBOTIS (South Korea) announced a partnership with MIT to develop 'Physical AI' under a government-backed international R&D project worth up to 10 billion won.", "source": "ROBOTIS", "url": "https://www.robotis.us/robotis-ir-pr-blog/robotis-partners-with-mit-to-develop-advanced-physical-ai-technology/", "date": "2024-11-19"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "IONQ",
+      "rationale": "IonQ's 2024 rally reversed sharply into year-end even as losses persisted on thin revenue, and Google's in-house Willow chip breakthrough signals a well-capitalized hyperscaler competitor racing into quantum hardware — a peak-enthusiasm-plus-competition signal that argues for trimming the sole quantum slot in favor of the more clearly buildup-stage robotics wave.",
+      "news_evidence": [
+        {"summary": "IonQ was up 97% YTD in mid-October 2024, but that gain had collapsed to just 8% YTD by December 29, 2024, even after beating Q3 revenue guidance with a $52.5M net loss.", "source": "IonQ Q3 2024 results / market coverage", "url": "https://investors.ionq.com/news/news-details/2024/IonQ-Announces-Third-Quarter-2024-Financial-Results/default.aspx", "date": "2024-12-29"},
+        {"summary": "Google Quantum AI announced its Willow chip, achieving below-threshold quantum error correction — a large, well-funded hyperscaler advancing its own in-house quantum hardware.", "source": "Google Blog / NPR", "url": "https://blog.google/innovation-and-ai/technology/research/google-willow-quantum-chip/", "date": "2024-12-09"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Net effect is a one-for-one swap that re-balances the watchlist toward the profile's own wave-priority ordering: robotics (ranked #2) enters via a diversified ETF on the back of concrete Q4 2024 buildup evidence (Samsung's $181M controlling stake in Rainbow Robotics, government-backed ROBOTIS-MIT R&D), while IonQ (the sole quantum holding, ranked #3) is trimmed after its 2024 surge visibly cooled into year-end and Google's Willow chip raised the competitive bar for quantum pure-plays. AI (MSFT, NVDA), rockets (RKLB — record backlog and revenue growth per Q3 2024), and nuclear (OKLO — advancing its Groves Isotope Test Reactor through DOE review) are all left intact as their in-window news continued to support the buildup/surge thesis.",
+  "search_terms": [
+    "space stocks after:2024-10-01 before:2025-01-01",
+    "rocket launch stocks after:2024-10-01 before:2025-01-01",
+    "robotics stocks after:2024-10-01 before:2025-01-01",
+    "humanoid robot stocks after:2024-10-01 before:2025-01-01",
+    "quantum computing stocks after:2024-10-01 before:2025-01-01",
+    "nuclear stocks after:2024-10-01 before:2025-01-01",
+    "defense stocks after:2024-10-01 before:2025-01-01",
+    "defense ETF after:2024-10-01 before:2025-01-01",
+    "tanker stocks after:2024-10-01 before:2025-01-01",
+    "healthcare stocks eldercare REIT after:2024-10-01 before:2025-01-01",
+    "best performing etf this month after:2024-10-01 before:2025-01-01",
+    "biggest stock gainers after:2024-10-01 before:2025-01-01",
+    "interest rates Federal Reserve December 2024 after:2024-10-01 before:2025-01-01",
+    "MSFT Microsoft news after:2024-10-01 before:2025-01-01",
+    "NVDA Nvidia news after:2024-10-01 before:2025-01-01",
+    "RKLB Rocket Lab news after:2024-10-01 before:2025-01-01",
+    "IONQ IonQ news after:2024-10-01 before:2025-01-01",
+    "OKLO Oklo news after:2024-10-01 before:2025-01-01",
+    "Google Willow quantum chip December 2024 before:2025-01-01",
+    "IonQ stock valuation net loss Q3 2024 after:2024-10-01 before:2025-01-01",
+    "Samsung Rainbow Robotics stake increase December 2024 before:2025-01-01",
+    "ROBOTIS MIT Physical AI partnership November 2024 before:2025-01-01"
+  ]
+}

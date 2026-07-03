@@ -1,0 +1,56 @@
+{
+  "as_of_date": "2025-06-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "VOYG",
+      "wave_bucket": "rockets_spacecraft",
+      "rationale": "Fresh NYSE debut of a national-security space and space-infrastructure company (Starlab, the planned ISS successor) gives the watchlist distinct exposure to orbital infrastructure and defense-space convergence, complementing RKLB's launch-vehicle exposure and ASTS's satellite-to-phone network rather than duplicating either.",
+      "news_evidence": [
+        {"summary": "Voyager Technologies begins trading on NYSE under ticker VOYG at a $3.8B IPO valuation on debut", "source": "CNBC", "url": "https://www.cnbc.com/2025/06/11/space-tech-firm-voyager-valued-at-3point8-billion-as-shares-surge-in-nyse-debut.html", "date": "2025-06-11"},
+        {"summary": "Voyager restructured into three segments (Defense & National Security, Space Solutions, Starlab Space Stations); ~50% of revenue from national-security customers; Starlab is a LEO commercial space station JV with Airbus targeting launch before ISS decommissioning", "source": "SpaceNews / company site", "url": "https://spacenews.com/voyager-space-rebrands-to-expand-focus-on-national-security/", "date": "2025-06-11"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "BOTZ",
+      "rationale": "BOTZ's basket is a broad, generic industrial-automation/AI wrapper whose top holdings already duplicate NVDA and ISRG that we hold directly, so it adds thematic overlap rather than distinct robotics signal; a purer humanoid-robotics vehicle (KraneShares KOID) just entered the market and is a better watch for next rebalance, freeing this slot for the sharper VOYG space-infrastructure thesis now.",
+      "news_evidence": [
+        {"summary": "NVIDIA and Intuitive Surgical are among BOTZ's top-5 holdings, both already held directly in the watchlist, reducing BOTZ's incremental diversification value", "source": "Fund holdings data (Global X / stockanalysis.com)", "url": "https://stockanalysis.com/etf/botz/holdings/", "date": "2025-03-31"},
+        {"summary": "KraneShares launched the first US-listed pure-play humanoid robotics/embodied-AI ETF (KOID) on Nasdaq, giving the robotics wave a more targeted vehicle than BOTZ's broad mandate", "source": "KraneShares", "url": "https://kraneshares.com/kraneshares-launches-first-global-humanoid-embodied-intelligence-etf-ticker-koid-on-nasdaq/", "date": "2025-06-04"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "One clean, well-evidenced swap this quarter: drop the generic BOTZ robotics/AI basket (redundant with directly-held NVDA and ISRG) for VOYG, a fresh NYSE listing that adds space-station/national-security-space infrastructure exposure distinct from RKLB (launch) and ASTS (satellite comms), serving the thesis's #1 next wave. Existing positions all checked out: RKLB (Motiv Space Systems robotics acquisition, ~$8B Iridium deal announced late June), LEU (completed its 900kg HALEU delivery milestone to DOE and secured a Phase III extension), IONQ (SkyWater acquisition, SHIELD IDIQ selection), CTRE (Care REIT UK acquisition closed, dividend raised), ASTS (Q1 business update confirming deployment cadence), and LMT/ITA (large THAAD production award, continued defense-budget tailwind) all show fresh momentum. STNG was reviewed for removal on the June 2025 Israel-Iran conflict but the aftermath sources blurred into a later 2026 crisis I could not cleanly separate, so per leakage discipline that remove was dropped. KraneShares KOID and BWXT surfaced as strong candidates but were held back rather than forcing a second removal against the 16-ticker cap. Watchlist stays at cap.",
+  "search_terms": [
+    "AI stocks after:2025-04-01 before:2025-07-01",
+    "space stocks after:2025-04-01 before:2025-07-01",
+    "rocket launch stocks after:2025-04-01 before:2025-07-01",
+    "robotics stocks humanoid robot after:2025-04-01 before:2025-07-01",
+    "quantum computing stocks after:2025-04-01 before:2025-07-01",
+    "nuclear stocks SMR after:2025-04-01 before:2025-07-01",
+    "defense stocks defense ETF after:2025-04-01 before:2025-07-01",
+    "tanker stocks shipping after:2025-04-01 before:2025-07-01",
+    "healthcare eldercare REIT aging population demographics after:2025-04-01 before:2025-07-01",
+    "best performing etf this month after:2025-04-01 before:2025-07-01",
+    "biggest stock gainers after:2025-04-01 before:2025-07-01",
+    "interest rates Fed tariffs after:2025-04-01 before:2025-07-01",
+    "MSFT GOOGL NVDA news after:2025-04-01 before:2025-07-01",
+    "RKLB Rocket Lab Iridium Motiv news after:2025-04-01 before:2025-07-01",
+    "LMT Lockheed Martin THAAD news after:2025-04-01 before:2025-07-01",
+    "IONQ SkyWater SHIELD news after:2025-04-01 before:2025-07-01",
+    "STNG Scorpio Tankers news after:2025-04-01 before:2025-07-01",
+    "ISRG Intuitive Surgical news after:2025-04-01 before:2025-07-01",
+    "LEU Centrus Energy HALEU delivery news after:2025-04-01 before:2025-07-01",
+    "CCJ Cameco news after:2025-04-01 before:2025-07-01",
+    "CTRE CareTrust REIT Care REIT UK acquisition news after:2025-04-01 before:2025-07-01",
+    "ASTS AST SpaceMobile news after:2025-04-01 before:2025-07-01",
+    "SYM Symbotic news after:2025-04-01 before:2025-07-01",
+    "Voyager Technologies VOYG IPO date NYSE Starlab before:2025-07-01",
+    "KraneShares Humanoid Robotics ETF KOID launch date before:2025-07-01",
+    "Israel Iran conflict oil tanker rates Strait of Hormuz June 2025 after:2025-06-01 before:2025-07-01",
+    "BWX Technologies BWXT news after:2025-04-01 before:2025-07-01"
+  ]
+}
