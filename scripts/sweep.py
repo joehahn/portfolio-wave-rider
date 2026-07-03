@@ -96,7 +96,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--param", required=True, choices=list(DEFAULTS.keys()))
     p.add_argument("--values", default=None,
                    help="comma-separated values to sweep (overrides defaults)")
-    p.add_argument("--runs-dir", default="data/curator_runs/postcovid")
+    p.add_argument("--runs-dir", default="data/curator_runs/postcovid-cap05")
     p.add_argument("--out", default=None,
                    help="output HTML path (default: docs/sweep_<param>.html)")
     p.add_argument("--benchmarks", nargs="*", default=["SPY"])

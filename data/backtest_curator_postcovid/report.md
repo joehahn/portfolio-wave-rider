@@ -3,38 +3,38 @@
 **Window:** 2022-03-31 to 2025-10-31 (1310 calendar days, 901 trading days)
 **Starter watchlist:** AAPL, MSFT, GOOGL, NVDA, SPY
 **Cadence:** quarterly
-**Optimizer:** `mean_variance`, lookback 0.5y, max_weight 0.80
+**Optimizer:** `mean_variance`, lookback 0.5y, max_weight 0.90
 
 ## Curation activity
 
 | Metric | Value |
 |---|---|
 | Curation calls applied | 15 |
-| Adds executed | 6 |
-| Removes executed | 3 |
-| Final watchlist size | 10 |
+| Adds executed | 8 |
+| Removes executed | 7 |
+| Final watchlist size | 8 |
 | Rebalances (optimizer calls) | 16 |
-| Mean L1 weight distance rebalance-to-rebalance | 1.3374 |
+| Mean L1 weight distance rebalance-to-rebalance | 1.0530 |
 
 ## Realized performance vs baselines
 
 | Strategy | Ending value | Total return | Active vs curator |
 |---|---|---|---|
-| Curator-driven | $366,033.09 | +632.07% | — |
-| Buy-and-hold starter (equal-weight, then hold) | $143,628.47 | +187.26% | +444.81pp |
+| Curator-driven | $908,169.09 | +1716.34% | — |
+| Buy-and-hold starter (equal-weight, then hold) | $143,628.48 | +187.26% | +1529.08pp |
 
 ## Risk and benchmarks
 
 | Metric | Value |
 |---|---|
-| Annualized return (curator) | +74.14% |
-| Max drawdown (curator) | -50.48% |
+| Annualized return (curator) | +124.31% |
+| Max drawdown (curator) | -48.60% |
 
 ### Benchmarks (over the same window)
 
 | Benchmark | Return | Active vs curator |
 |---|---|---|
-| SPY | +58.69% | +573.38pp |
+| SPY | +58.69% | +1657.65pp |
 
 ## Caveats
 

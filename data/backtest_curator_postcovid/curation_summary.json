@@ -2,49 +2,25 @@
   {
     "date": "2022-03-31",
     "adds": [
-      "RKLB",
-      "BOTZ",
-      "ITA"
+      "LMT"
     ],
     "removes": [],
-    "rejections": 0
+    "rejections": 1
   },
   {
     "date": "2022-06-30",
-    "adds": [],
-    "removes": [],
-    "rejections": 3
+    "adds": [
+      "RKLB"
+    ],
+    "removes": [
+      "GOOGL"
+    ],
+    "rejections": 0
   },
   {
     "date": "2022-09-30",
-    "adds": [],
-    "removes": [],
-    "rejections": 3
-  },
-  {
-    "date": "2022-12-31",
     "adds": [
-      "CEG"
-    ],
-    "removes": [],
-    "rejections": 2
-  },
-  {
-    "date": "2023-03-31",
-    "adds": [],
-    "removes": [],
-    "rejections": 2
-  },
-  {
-    "date": "2023-06-30",
-    "adds": [],
-    "removes": [],
-    "rejections": 2
-  },
-  {
-    "date": "2023-09-30",
-    "adds": [
-      "IONQ"
+      "SMR"
     ],
     "removes": [
       "AAPL"
@@ -52,42 +28,78 @@
     "rejections": 0
   },
   {
+    "date": "2022-12-31",
+    "adds": [],
+    "removes": [],
+    "rejections": 0
+  },
+  {
+    "date": "2023-03-31",
+    "adds": [],
+    "removes": [],
+    "rejections": 0
+  },
+  {
+    "date": "2023-06-30",
+    "adds": [],
+    "removes": [],
+    "rejections": 0
+  },
+  {
+    "date": "2023-09-30",
+    "adds": [
+      "IONQ"
+    ],
+    "removes": [
+      "SMR"
+    ],
+    "rejections": 0
+  },
+  {
     "date": "2023-12-31",
     "adds": [],
     "removes": [],
-    "rejections": 2
+    "rejections": 0
   },
   {
     "date": "2024-03-31",
     "adds": [],
     "removes": [],
-    "rejections": 2
+    "rejections": 0
   },
   {
     "date": "2024-06-30",
-    "adds": [],
-    "removes": [],
-    "rejections": 2
+    "adds": [
+      "OKLO"
+    ],
+    "removes": [
+      "LMT"
+    ],
+    "rejections": 0
   },
   {
     "date": "2024-09-30",
     "adds": [],
     "removes": [],
-    "rejections": 2
+    "rejections": 0
   },
   {
     "date": "2024-12-31",
-    "adds": [],
-    "removes": [],
-    "rejections": 2
+    "adds": [
+      "BOTZ"
+    ],
+    "removes": [
+      "IONQ"
+    ],
+    "rejections": 0
   },
   {
     "date": "2025-03-31",
     "adds": [
-      "WELL"
+      "QTUM"
     ],
     "removes": [
-      "IONQ"
+      "NVDA"
     ],
     "rejections": 0
   },
@@ -99,10 +111,12 @@
   },
   {
     "date": "2025-09-30",
-    "adds": [],
-    "removes": [
-      "MSFT"
+    "adds": [
+      "ITA"
     ],
-    "rejections": 1
+    "removes": [
+      "OKLO"
+    ],
+    "rejections": 0
   }
 ]
