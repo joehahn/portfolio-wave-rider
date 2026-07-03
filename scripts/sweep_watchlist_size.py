@@ -42,8 +42,9 @@ from src.portfolio import (
 
 RISK_FREE_RATE = 0.04
 
-# Cap -> curator-runs dir. cap=8 is the project default and reuses the canonical
-# postcovid run dir shared with the other three sweeps.
+# Cap -> curator-runs dir. cap=5 is the project default (postcovid-cap05/ is the
+# canonical run the other three sweeps and the published backtest now replay);
+# cap=8 is the preserved older default at postcovid/.
 CAPS: list[tuple[int, Path]] = [
     (5,  Path("data/curator_runs/postcovid-cap05")),
     (8,  Path("data/curator_runs/postcovid")),
@@ -142,7 +143,7 @@ def main() -> int:
         margin={"t": 60, "b": 60, "l": 80, "r": 30},
     )
 
-    default_cap = 8
+    default_cap = 5
 
     def _fmt_row(cap, final, ret, ann, mdd, sharpe, calmar):
         tr = "<tr style='font-weight:bold;'>" if cap == default_cap else "<tr>"
@@ -192,8 +193,8 @@ def main() -> int:
         '<code>[AAPL, MSFT, GOOGL, NVDA, SPY]</code> and only the '
         '<code>max_watchlist_size</code> input changing. All other optimizer '
         'knobs are held at their <code>investor_profile.md</code> defaults, so '
-        'the curves are directly comparable to the other sweeps. cap=8 is the '
-        'project default.</p>'
+        'the curves are directly comparable to the other sweeps. cap=5 is the '
+        'project default (bolded).</p>'
         + fig.to_html(full_html=False, include_plotlyjs="cdn",
                       config={"displayModeBar": False})
         + table

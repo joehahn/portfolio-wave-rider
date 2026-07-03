@@ -23,7 +23,7 @@ is a cheap forward-extension / truncation.
 
 ## Before you start
 
-1. The runs dir is `data/curator_runs/postcovid/`. Commit this dir
+1. The runs dir is `data/curator_runs/postcovid-cap05/`. Commit this dir
    (and the regenerated `data/backtest_curator_postcovid/` outputs +
    `docs/backtest_curator.html`) at the end of the run so the public
    demo always reflects the profile-defined window.
@@ -79,13 +79,13 @@ rate-limit pattern from the original 5y experiment). Between batches,
 update the `current_watchlist` for subsequent batches by replaying the
 just-completed dates' applied adds/removes.
 
-Save each agent return to `data/curator_runs/postcovid/<date>-curation.json`.
+Save each agent return to `data/curator_runs/postcovid-cap05/<date>-curation.json`.
 
 Then preserve that agent's **real** WebSearch queries. Each `Task` result includes an `output_file:` path (the agent transcript); per-agent attribution works even though the agents run in parallel, because each has its own transcript. For each completed date run:
 
 ```bash
 .venv/bin/python scripts/extract_search_terms.py <that agent's output_file> \
-  --into data/curator_runs/postcovid/<date>-curation.json
+  --into data/curator_runs/postcovid-cap05/<date>-curation.json
 ```
 
 This writes the actual `WebSearch` tool calls (verbatim, including the `before:` filters) into that date's `search_terms`, falling back to the agent's self-reported `search_terms` if the transcript can't be parsed. This is how the backtest preserves its query terms per rebalance date.
@@ -95,9 +95,9 @@ This writes the actual `WebSearch` tool calls (verbatim, including the `before:`
 For each date in `stale_dates`:
 
 ```bash
-mkdir -p data/curator_runs/postcovid/_archive
-mv data/curator_runs/postcovid/<date>-curation.json \
-   data/curator_runs/postcovid/_archive/<date>-curation.json
+mkdir -p data/curator_runs/postcovid-cap05/_archive
+mv data/curator_runs/postcovid-cap05/<date>-curation.json \
+   data/curator_runs/postcovid-cap05/_archive/<date>-curation.json
 ```
 
 Archive rather than delete so the historical decisions stay
@@ -112,7 +112,7 @@ import json, pandas as pd
 from pathlib import Path
 from src.portfolio import load_backtest_config
 bc = load_backtest_config()                     # window from investor_profile.md
-runs = Path("data/curator_runs/postcovid")
+runs = Path("data/curator_runs/postcovid-cap05")
 dates = sorted(pd.Timestamp(p.stem.replace("-curation","")) for p in runs.glob("*-curation.json"))
 starter = {
     "starter_watchlist": ["AAPL", "MSFT", "GOOGL", "NVDA", "SPY"],
@@ -134,12 +134,14 @@ PY
 
 ```bash
 .venv/bin/python -m src.cli backtest \
-  --curator-runs-dir data/curator_runs/postcovid \
+  --curator-runs-dir data/curator_runs/postcovid-cap05 \
   --out-dir data/backtest_curator_postcovid \
   --benchmarks SPY
 ```
 
-The optimizer knobs come from `investor_profile.md`'s `backtest` section: if `risk_aversion` / `lookback_years` / `concentration_cap` are set there (backtest-only overrides) they win; otherwise the live `financial_model` + top-level `concentration_cap` values are used. The published dashboard uses the aggressive overrides (λ=0.33 / lookback 0.5y / cap=1.0), which is why it renders +910% (a ~100%-RKLB, overfit ceiling) rather than the live/robust +313.6%. Do NOT pass `--max-weight` / `--risk-aversion` here — that would override the profile-driven config.
+The optimizer knobs come from `investor_profile.md`'s `backtest` section: if `risk_aversion` / `lookback_years` / `concentration_cap` are set there (backtest-only overrides) they win; otherwise the live `financial_model` + top-level `concentration_cap` values are used. The current `backtest` section carries no optimizer overrides (only `start_date` / `end_date` / `t_update_days`), so the replay uses the live config (λ=0.67 / lookback 0.5y / concentration_cap=0.90 / max_watchlist_size=5), which renders **+1716.3%** (ending ~90% RKLB / 10% QTUM — the tight-cap, high-concentration ceiling; hindsight-tinted). Do NOT pass `--max-weight` / `--risk-aversion` here — that would override the profile-driven config.
+
+The runs dir is `postcovid-cap05/` because max_watchlist_size=5 is the live default: the published backtest replays the cap=5 curation so "backtest == live." (The old cap=8 run is preserved at `postcovid/`; the other cap variants live in `postcovid-cap{12,16,24}/`.)
 
 Execution lag defaults to `--t-update-days 1` (rebalance decided on the close, trade lands the next session — the realistic case). Pass `--t-update-days 0` for the optimistic same-close upper bound; on this short window the lag is material.
 
@@ -148,21 +150,21 @@ Execution lag defaults to `--t-update-days 1` (rebalance decided on the close, t
 ```bash
 .venv/bin/python -m src.cli dashboard \
   --curator-backtest-dir data/backtest_curator_postcovid \
-  --curator-runs-dir data/curator_runs/postcovid \
+  --curator-runs-dir data/curator_runs/postcovid-cap05 \
   --benchmarks SPY
 ```
 
 ### Step 7 — commit and push (Bash)
 
 ```bash
-git add data/curator_runs/postcovid/*.json \
+git add data/curator_runs/postcovid-cap05/*.json \
         data/backtest_curator_postcovid/ \
         docs/backtest_curator.html
 git commit -m "Refresh curator backtest (profile window, regenerated $(date +%Y-%m-%d))"
 git push origin main
 ```
 
-If `data/curator_runs/postcovid/_archive/` got new entries this run,
+If `data/curator_runs/postcovid-cap05/_archive/` got new entries this run,
 stage them too. Skip the commit if nothing changed (replay produced
 identical output and no JSONs were added/archived).
 
@@ -185,7 +187,7 @@ One short message:
   even for very recent quarter-ends. Pass the suppression list from
   `events_after(date)` even if it's empty for the most-recent date.
 - Don't delete stale JSONs; archive them. The committed
-  `data/curator_runs/postcovid/_archive/` directory is the
+  `data/curator_runs/postcovid-cap05/_archive/` directory is the
   historical record of what the backtest used to include.
 - Commit + push is part of the skill, not a follow-up step the user
   has to remember. The public dashboard must always reflect the
