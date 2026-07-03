@@ -139,7 +139,7 @@ PY
   --benchmarks SPY
 ```
 
-The optimizer knobs come from `investor_profile.md`'s `backtest` section: if `risk_aversion` / `lookback_years` / `concentration_cap` are set there (backtest-only overrides) they win; otherwise the live `financial_model` + top-level `concentration_cap` values are used. The current `backtest` section carries no optimizer overrides (only `start_date` / `end_date` / `t_update_days`), so the replay uses the live config (λ=0.67 / lookback 0.5y / concentration_cap=0.90 / max_watchlist_size=5), which renders **+1716.3%** (ending ~90% RKLB / 10% QTUM — the tight-cap, high-concentration ceiling; hindsight-tinted). Do NOT pass `--max-weight` / `--risk-aversion` here — that would override the profile-driven config.
+The optimizer knobs come from `investor_profile.md`'s `backtest` section: if `risk_aversion` / `lookback_years` / `concentration_cap` are set there (backtest-only overrides) they win; otherwise the live `financial_model` + top-level `concentration_cap` values are used. The current `backtest` section carries no optimizer overrides (only `start_date` / `end_date` / `t_update_days`), so the replay uses the live config (λ=0.5 / lookback 0.5y / concentration_cap=0.90 / max_watchlist_size=5), which renders **+2124.8%** (ending ~90% RKLB / 10% QTUM — the tight-cap, high-concentration ceiling; hindsight-tinted). Do NOT pass `--max-weight` / `--risk-aversion` here — that would override the profile-driven config.
 
 The runs dir is `postcovid-cap05/` because max_watchlist_size=5 is the live default: the published backtest replays the cap=5 curation so "backtest == live." (The old cap=8 run is preserved at `postcovid/`; the other cap variants live in `postcovid-cap{12,16,24}/`.)
 

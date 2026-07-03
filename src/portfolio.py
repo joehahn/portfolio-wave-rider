@@ -1932,9 +1932,13 @@ TICKER_WAVE: dict[str, str] = {
     # Robotics
     "BOTZ": "robotics", "ROBO": "robotics",
     "ISRG": "robotics", "SYM": "robotics", "HUMN": "robotics",
+    "TER": "robotics", "ROK": "robotics", "KOID": "robotics",
     # Rockets / spacecraft
     "RKLB": "rockets_spacecraft", "ARKX": "rockets_spacecraft",
     "ASTS": "rockets_spacecraft", "SPCX": "rockets_spacecraft",
+    "LUNR": "rockets_spacecraft", "KRMN": "rockets_spacecraft",
+    "VOYG": "rockets_spacecraft", "FLY": "rockets_spacecraft",
+    "PL": "rockets_spacecraft",
     # Engineered biology
     "ARKG": "engineered_biology",
     # Quantum computing
@@ -1944,14 +1948,17 @@ TICKER_WAVE: dict[str, str] = {
     # firms like Commonwealth Fusion or Helion if they go public).
     "NUKZ": "nuclear", "NLR": "nuclear", "URA": "nuclear", "CCJ": "nuclear",
     "CEG": "nuclear", "VST": "nuclear", "BWXT": "nuclear", "SMR": "nuclear",
-    "GEV": "nuclear", "LEU": "nuclear",
+    "GEV": "nuclear", "LEU": "nuclear", "OKLO": "nuclear",
     # Demographics (aging-population thesis: GLP-1 leaders, healthcare,
     # eldercare REITs, automation that backfills labor shortages).
     "LLY": "demographics", "XLV": "demographics", "WELL": "demographics",
-    # Geopolitical (energy / shipping / LNG, defense, profile's non-tech wave).
+    "CTRE": "demographics",
+    # Geopolitical (energy / shipping / LNG / tankers, defense; profile's
+    # non-tech wave covering energy-commodity cycles and rearmament).
     "BWET": "geopolitical", "LNG": "geopolitical", "XLE": "geopolitical",
     "LMT": "geopolitical", "NOC": "geopolitical", "ITA": "geopolitical",
-    "EUAD": "geopolitical",
+    "EUAD": "geopolitical", "GD": "geopolitical", "AVAV": "geopolitical",
+    "STNG": "geopolitical", "FRO": "geopolitical",
     # General markets (broad ETFs, bonds, cash, metals, crypto)
     "AGG": "general_markets", "BND": "general_markets", "TLT": "general_markets",
     "IEF": "general_markets", "SHY": "general_markets", "MUB": "general_markets",
@@ -3604,7 +3611,8 @@ def build_curator_dashboard(
     # Chart 3: cumulative $ gain per ticker over the 5y window. Daily
     # P&L = prior_day_shares × price_change, summed across the window.
     # Mirrors the live dashboard's chart 5 attribution. Tickers ordered
-    # by gain descending, colored green (positive) or red (negative).
+    # by gain descending, each bar colored by its wave bucket (matching
+    # charts 2/4/5) so a reader can see which waves drove the P&L.
     snaps_sorted = snaps.sort_values(["ticker", "date"])
     _gain_by_ticker: dict[str, float] = {}
     for _tk, _sub in snaps_sorted.groupby("ticker"):
@@ -3615,7 +3623,8 @@ def build_curator_dashboard(
     _gain_items = sorted(_gain_by_ticker.items(), key=lambda kv: kv[1], reverse=True)
     _gain_tickers = [t for t, _ in _gain_items]
     _gain_values = [v for _, v in _gain_items]
-    _bar_colors = ["#2ca02c" if v >= 0 else "#d62728" for v in _gain_values]
+    _bar_colors = [WAVE_COLORS.get(TICKER_WAVE.get(t, "general_markets"), "#888888")
+                   for t in _gain_tickers]
     fig.add_trace(
         go.Bar(x=_gain_tickers, y=_gain_values, marker_color=_bar_colors,
                name="$ gain", showlegend=False,
