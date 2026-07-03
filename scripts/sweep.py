@@ -47,7 +47,7 @@ _m = _re.match(r"(\d+(?:\.\d+)?)", str(_FM["lookback_period"]))
 _BASE_LOOKBACK = float(_m.group(1)) if _m else 1.5
 
 DEFAULTS = {
-    "risk_aversion":     [0.0, 0.1, 0.2, 0.33, 0.5, 0.67, 1.0, 1.5, 2.0, 3.0],
+    "risk_aversion":     [0.0, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.7, 1.0, 1.5, 2.0],
     # 0.1y requested but omitted: too short a window, the replay produces no
     # snapshots (empirical floor is ~0.15y); 0.15 is the nearest viable value.
     "lookback":          [0.15, 0.2, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 1.0, 1.25, 1.5, 1.75, 2.0],
