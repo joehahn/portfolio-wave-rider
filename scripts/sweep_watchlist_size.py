@@ -155,8 +155,6 @@ def main() -> int:
         marker={"size": 8}, showlegend=False,
         hovertemplate="max_watchlist_size=%{x}<br>final $%{y:,.0f}<extra></extra>",
     ))
-    fig2.add_vline(x=default_cap, line_dash="dot", line_color="#888",
-                   annotation_text="project default", annotation_position="top")
     fig2.update_layout(
         template="seaborn",
         title="Plot 2. Final portfolio value vs max_watchlist_size",
