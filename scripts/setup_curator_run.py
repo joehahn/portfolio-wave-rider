@@ -36,6 +36,34 @@ ASOF_DATES_5Y_QUARTERLY = [
     "2026-03-31", "2026-04-30",
 ]
 
+# Quarterly cadence over the canonical post-COVID window (2022-03-31 to
+# 2025-10-31, 15 curator calls). Matches postcovid/_starter.json and the window
+# the other three parameter sweeps replay, so the max_watchlist_size sweep is
+# directly comparable to them.
+ASOF_DATES_POSTCOVID_QUARTERLY = [
+    "2022-03-31", "2022-06-30", "2022-09-30", "2022-12-31",
+    "2023-03-31", "2023-06-30", "2023-09-30", "2023-12-31",
+    "2024-03-31", "2024-06-30", "2024-09-30", "2024-12-31",
+    "2025-03-31", "2025-06-30", "2025-09-30",
+]
+
+
+def _postcovid_cap(cap: int) -> dict:
+    """A postcovid curator-run config at a given max_watchlist_size. Mirrors
+    postcovid/_starter.json (the canonical cap=8 run) with only the cap swapped,
+    so every cap variant shares the same window/starter/cadence."""
+    return {
+        "starter_watchlist": ["AAPL", "MSFT", "GOOGL", "NVDA", "SPY"],
+        "as_of_dates": ASOF_DATES_POSTCOVID_QUARTERLY,
+        "rebalance_period": "quarterly",
+        "initial_usd": 50000.0,
+        "lookback_years": 1.5,
+        "max_watchlist_size": cap,
+        "start_date": "2022-03-31",
+        "end_date": "2025-10-31",
+    }
+
+
 RUNS = {
     "5y-quarterly": {
         "starter_watchlist": ["AAPL", "MSFT", "GOOGL", "SPY", "AGG"],
@@ -47,6 +75,11 @@ RUNS = {
         "start_date": "2021-09-30",
         "end_date": "2026-04-30",
     },
+    # max_watchlist_size sweep variants (cap=8 is the canonical postcovid/ dir).
+    "postcovid-cap05": _postcovid_cap(5),
+    "postcovid-cap12": _postcovid_cap(12),
+    "postcovid-cap16": _postcovid_cap(16),
+    "postcovid-cap24": _postcovid_cap(24),
 }
 
 

@@ -1,41 +1,55 @@
 """Aggregate the max_watchlist_size sweep into docs/sweep_max_watchlist_size.html.
 
-Reads each cap variant's snapshots.csv (from running the math replay
-once per cap), builds an overlay equity-curve chart plus a summary
-table (final value, total %, annualized %, Sharpe), and renders an
-HTML page with the same nav strip and visual style as the other three
-sweep dashboards.
+Unlike the three optimizer-knob sweeps (risk_aversion, lookback,
+concentration_cap), the cap shapes the *curator's* decisions, not just the
+optimizer's response, so each cap needs its own curator-runs dir rather than a
+re-replay of a shared one. This script replays each cap's runs dir through
+``curator_backtest`` with the SAME held-constant optimizer config the other
+three sweeps use (read from ``investor_profile.md``), so all four sweeps are
+directly comparable over the same window.
 
-Per-cap input layout:
-  cap=8 is the project default and feeds the canonical
-  data/backtest_curator_5y/ outputs via /run-backtest.
-  Per-cap inputs for this sweep:
-    cap=N: data/curator_runs/5y-sweep-capNN/_backtest/snapshots.csv
-    cap=12: data/curator_runs/5y-quarterly/_backtest/snapshots.csv
-            (historical reference at the previous default)
+All caps run over the canonical post-COVID window (2022-03-31 -> 2025-10-31,
+15 quarterly curator calls), identical to the window in ``postcovid/`` that the
+other three sweeps replay. Per-cap runs-dir layout:
 
-If a cap's snapshots.csv is missing, that cap is silently skipped (so
-the page can render mid-build before all curator calls have completed).
+    cap= 5: data/curator_runs/postcovid-cap05/
+    cap= 8: data/curator_runs/postcovid/        (project default = canonical run)
+    cap=12: data/curator_runs/postcovid-cap12/
+    cap=16: data/curator_runs/postcovid-cap16/
+    cap=24: data/curator_runs/postcovid-cap24/
+
+A cap whose runs dir has no curation JSONs yet is silently skipped, so the page
+can render mid-build before all curator calls have completed.
 """
 from __future__ import annotations
 
+import re as _re
 import sys
+import tempfile
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 
-from src.portfolio import _fetch_benchmark_curves, _nav_strip
+from src.portfolio import (
+    _fetch_benchmark_curves,
+    _nav_strip,
+    curator_backtest,
+    load_backtest_config,
+    load_financial_model,
+)
 
 RISK_FREE_RATE = 0.04
 
+# Cap -> curator-runs dir. cap=8 is the project default and reuses the canonical
+# postcovid run dir shared with the other three sweeps.
 CAPS: list[tuple[int, Path]] = [
-    (5,  Path("data/curator_runs/5y-sweep-cap05/_backtest/snapshots.csv")),
-    (8,  Path("data/curator_runs/5y-sweep-cap08/_backtest/snapshots.csv")),
-    (12, Path("data/curator_runs/5y-quarterly/_backtest/snapshots.csv")),
-    (16, Path("data/curator_runs/5y-sweep-cap16/_backtest/snapshots.csv")),
-    (24, Path("data/curator_runs/5y-sweep-cap24/_backtest/snapshots.csv")),
+    (5,  Path("data/curator_runs/postcovid-cap05")),
+    (8,  Path("data/curator_runs/postcovid")),
+    (12, Path("data/curator_runs/postcovid-cap12")),
+    (16, Path("data/curator_runs/postcovid-cap16")),
+    (24, Path("data/curator_runs/postcovid-cap24")),
 ]
 
 PALETTE = [
@@ -43,21 +57,48 @@ PALETTE = [
     "#9467bd", "#8c564b", "#e377c2", "#7f7f7f",
 ]
 
+# Held-constant optimizer config, same source of truth as sweep.py so the
+# max_watchlist_size curves are directly comparable to the other three sweeps.
+_FM = load_financial_model()
+_BASE_MAX_WEIGHT = float(_FM["concentration_cap"])
+_BASE_RISK_AVERSION = float(_FM["risk_aversion"])
+_m = _re.match(r"(\d+(?:\.\d+)?)", str(_FM["lookback_period"]))
+_BASE_LOOKBACK = float(_m.group(1)) if _m else 1.5
+
+
+def _replay(runs_dir: Path, tmp: Path) -> pd.Series:
+    """Replay one cap's curator runs dir through the optimizer at the live-config
+    base and return a date-indexed Series of total portfolio value."""
+    out_dir = tmp / runs_dir.name
+    base_t_update = int(load_backtest_config()["t_update_days"])
+    curator_backtest(
+        runs_dir=str(runs_dir),
+        out_dir=str(out_dir),
+        max_weight=_BASE_MAX_WEIGHT,
+        risk_aversion=_BASE_RISK_AVERSION,
+        lookback_years_override=_BASE_LOOKBACK,
+        t_update_days=base_t_update,
+        benchmarks=[],
+        always_include=_FM["always_include"],
+    )
+    snaps = pd.read_csv(out_dir / "snapshots.csv", parse_dates=["date"])
+    return snaps.groupby("date")["total_value"].first().sort_index()
+
 
 def main() -> int:
+    tmp = Path(tempfile.mkdtemp(prefix="sweep_wls_"))
     curves: dict[int, pd.Series] = {}
-    for cap, path in CAPS:
-        if not path.exists():
-            print(f"  cap={cap}: {path} missing — skipping", file=sys.stderr)
+    for cap, runs_dir in CAPS:
+        if not list(runs_dir.glob("*-curation.json")):
+            print(f"  cap={cap}: {runs_dir} has no curation JSONs — skipping",
+                  file=sys.stderr)
             continue
-        snaps = pd.read_csv(path, parse_dates=["date"])
-        totals = snaps.groupby("date")["total_value"].first().sort_index()
-        curves[cap] = totals
-        print(f"  cap={cap}: {len(totals)} days, final ${totals.iloc[-1]:,.0f}",
-              file=sys.stderr)
+        curves[cap] = _replay(runs_dir, tmp)
+        print(f"  cap={cap}: {len(curves[cap])} days, "
+              f"final ${curves[cap].iloc[-1]:,.0f}", file=sys.stderr)
 
     if not curves:
-        print("error: no per-cap snapshots found; run the math replays first.",
+        print("error: no per-cap curator runs found; fire the curator calls first.",
               file=sys.stderr)
         return 1
 
@@ -125,19 +166,11 @@ def main() -> int:
         "<th style='padding:4px 12px;'>Calmar</th></tr></thead>"
         f"<tbody>{rows}</tbody></table>"
         f"<p style='font-size:13px;color:#666;'>"
-        f"<strong>Sharpe</strong> = (annualized return − "
+        f"<strong>Sharpe</strong> = (annualized return &minus; "
         f"{RISK_FREE_RATE * 100:.0f}% risk-free) / annualized daily-return "
-        f"σ × √252.<br>"
+        f"&sigma; &times; &radic;252.<br>"
         f"<strong>Calmar</strong> = annualized return / |max drawdown|; "
         f"penalizes deep drawdowns the way Sharpe doesn't.</p>"
-        f"<p style='font-size:13px;color:#666;'>"
-        f"We also did a <strong>walk-forward check</strong> that splits the "
-        f"5y backtest at its midpoint (2023-09-27) to ask whether the same "
-        f"parameter value wins on each half independently, and we find that "
-        f"cap=5 wins H1 by both Sharpe and Calmar (H1 Calmar 1.22 vs 0.77 for "
-        f"cap=8) while cap=8 wins H2 decisively (H2 Sharpe 1.99 vs 1.32); the "
-        f"H1 result reflects the early-window watchlist's thematic narrowness, "
-        f"and cap=8 carries the full 5y window cleanly.</p>"
     )
 
     nav = _nav_strip("sweep_max_watchlist_size.html")
@@ -153,10 +186,14 @@ def main() -> int:
         '<p style="color:#555;max-width:780px;">Unlike the three optimizer-knob '
         'sweeps, this one re-fires the curator at each cap value because the cap '
         'shapes the curator\'s decisions, not just the optimizer\'s response. '
-        'Each curve is a separate curator-driven walk-forward through the 5y '
-        'window, with starter watchlist <code>[AAPL, MSFT, GOOGL, NVDA, SPY]</code> '
-        'and only the <code>max_watchlist_size</code> input changing. cap=8 is '
-        'the project default (Sharpe 1.18, the best risk-adjusted result here).</p>'
+        'Each curve is a separate curator-driven walk-forward over the same '
+        'post-COVID window (2022-03-31 to 2025-10-31, 15 quarterly calls) the '
+        'other three sweeps use, with starter watchlist '
+        '<code>[AAPL, MSFT, GOOGL, NVDA, SPY]</code> and only the '
+        '<code>max_watchlist_size</code> input changing. All other optimizer '
+        'knobs are held at their <code>investor_profile.md</code> defaults, so '
+        'the curves are directly comparable to the other sweeps. cap=8 is the '
+        'project default.</p>'
         + fig.to_html(full_html=False, include_plotlyjs="cdn",
                       config={"displayModeBar": False})
         + table
