@@ -1,0 +1,27 @@
+{
+  "as_of_date": "2025-03-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "SHLD",
+      "wave_bucket": "geopolitical",
+      "rationale": "The European rearmament buildout entered a concrete fiscal phase this quarter (Germany's debt-brake reform, EU's EUR800B Readiness 2030 plan), and SHLD gives direct US-listed exposure to the defense-tech names (Rheinmetall, Leonardo, Thales, RTX, Palantir) driving that move.",
+      "news_evidence": [
+        {"summary": "European Commission proposes 'ReArm Europe / Readiness 2030' to mobilize up to EUR800B for defense by 2030", "source": "Euronews", "url": "https://www.euronews.com/my-europe/2025/03/05/how-can-the-eu-unlock-up-to-800bn-for-its-rearmament-plan", "date": "2025-03-05"},
+        {"summary": "Rheinmetall shares surge past EUR1,000 in February on Germany's debt-brake reform and a proposed EUR500B defense/infrastructure fund", "source": "Seeking Alpha", "url": "https://seekingalpha.com/article/4872921-rheinmetall-germanys-defense-spending-surge", "date": "2025-02-28"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "CEG",
+      "rationale": "DeepSeek R1 exposed the AI-power-demand narrative underpinning CEG's nuclear-PPA thesis to a genuine efficiency shock (CEG -21% in a single session); with AI already triple-covered by MSFT/GOOGL/NVDA at a 4-slot cap, CEG is the most redundant single-thesis leg to trim for the fresher geopolitical buildup.",
+      "news_evidence": [
+        {"summary": "DeepSeek R1 triggers AI/power-stock selloff; Constellation Energy (CEG) tumbles 21% on doubts about AI data-center power demand", "source": "Yahoo Finance", "url": "https://finance.yahoo.com/news/ai-exposed-power-stocks-crushed-deepseek-210706810.html", "date": "2025-01-27"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "The watchlist rotates one slot from single-name nuclear-power AI exposure (CEG, dinged by DeepSeek) into direct European rearmament/defense-tech exposure (SHLD), keeping the AI trio (MSFT, GOOGL, NVDA) intact on continued momentum (MSFT's $80B FY25 capex plan, GOOGL's Mar 18 Wiz agreement, NVDA's GTC Blackwell-in-production). This reflects the profile's mandate to trim before crest on a wave that just took a valuation gut-check, and to enter on buildup in defense now that EU/Germany commitments went from rhetoric to priced policy. Quantum/robotics/rockets produced no dated catalyst strong enough to displace a name at this 4-ticker cap. Result: MSFT, GOOGL, NVDA, SHLD.",
+  "search_terms": ["defense stocks Europe rearmament after:2025-01-01 before:2025-04-01", "DeepSeek R1 AI selloff power stocks CEG after:2025-01-01 before:2025-04-01", "quantum computing stocks after:2025-01-01 before:2025-04-01", "robotics stocks humanoid robot after:2025-01-01 before:2025-04-01", "EU ReArm Europe 800 billion defense plan March 2025", "Rheinmetall stock price surge Germany defense budget February 2025", "Constellation Energy CEG news March 2025 nuclear data center", "Nvidia NVDA news March 2025 GTC Blackwell", "Global X Defense Tech ETF SHLD holdings assets", "Microsoft MSFT news March 2025 capex data center AI", "Google GOOGL news March 2025 Gemini AI Wiz acquisition", "space stocks rocket launch news after:2025-01-01 before:2025-04-01"]
+}

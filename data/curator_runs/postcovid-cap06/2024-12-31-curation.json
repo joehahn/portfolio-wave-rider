@@ -1,0 +1,9 @@
+{
+  "as_of_date": "2024-12-31",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "Q4 2024 was a strong quarter for every wave already represented in this six-name at-cap watchlist, not one that surfaced a new one: the Nov 5 election catalyzed nuclear (OKLO's Equinix data-center deal validates the SMR-to-hyperscaler thesis directly) and quantum (Google's Dec 9 Willow plus a post-election rally lifted IONQ), while RKLB logged a November multi-launch Neutron agreement consistent with rockets still in buildup. MSFT/NVDA (AI) and ITA (defense) show no thesis breach. None of the six meets the removal bar, so there is no clean pairing to fund an add of an unrepresented wave (demographics, or the weak Q4 tanker tape). Hold steady at cap=6.",
+  "search_terms": ["space stocks after:2024-10-01 before:2025-01-01", "robotics stocks after:2024-10-01 before:2025-01-01", "humanoid robot stocks after:2024-10-01 before:2025-01-01", "quantum computing stocks after:2024-10-01 before:2025-01-01", "nuclear stocks SMR after:2024-10-01 before:2025-01-01", "defense stocks defense ETF after:2024-10-01 before:2025-01-01", "shipping tanker stocks after:2024-10-01 before:2025-01-01", "eldercare REIT healthcare aging population stocks after:2024-10-01 before:2025-01-01", "MSFT stock news after:2024-10-01 before:2025-01-01", "NVDA stock news after:2024-10-01 before:2025-01-01", "ITA aerospace defense ETF news after:2024-10-01 before:2025-01-01", "RKLB Rocket Lab Neutron news after:2024-10-01 before:2025-01-01", "IONQ stock news after:2024-10-01 before:2025-01-01", "OKLO Oklo Equinix data center news after:2024-10-01 before:2025-01-01"]
+}

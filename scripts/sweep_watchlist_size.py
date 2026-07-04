@@ -46,16 +46,21 @@ RISK_FREE_RATE = 0.04
 # canonical run the other three sweeps and the published backtest now replay);
 # cap=8 is the preserved older default at postcovid/.
 CAPS: list[tuple[int, Path]] = [
+    (1,  Path("data/curator_runs/postcovid-cap01")),
+    (2,  Path("data/curator_runs/postcovid-cap02")),
+    (3,  Path("data/curator_runs/postcovid-cap03")),
+    (4,  Path("data/curator_runs/postcovid-cap04")),
     (5,  Path("data/curator_runs/postcovid-cap05")),
+    (6,  Path("data/curator_runs/postcovid-cap06")),
     (8,  Path("data/curator_runs/postcovid")),
+    (10, Path("data/curator_runs/postcovid-cap10")),
     (12, Path("data/curator_runs/postcovid-cap12")),
     (16, Path("data/curator_runs/postcovid-cap16")),
-    (24, Path("data/curator_runs/postcovid-cap24")),
 ]
 
 PALETTE = [
-    "#1f77b4", "#ff7f0e", "#2ca02c", "#d62728",
-    "#9467bd", "#8c564b", "#e377c2", "#7f7f7f",
+    "#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd",
+    "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf",
 ]
 
 # Held-constant optimizer config, same source of truth as sweep.py so the

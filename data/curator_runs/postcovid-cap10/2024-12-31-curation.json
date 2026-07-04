@@ -1,0 +1,17 @@
+{
+  "as_of_date": "2024-12-31",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [
+    {
+      "ticker": "SYM",
+      "rationale": "Symbotic disclosed Nov 18 2024 it would restate unaudited Q1-Q3 FY2024 financials for revenue-recognition errors, filed the restated financials Dec 4, and now faces securities-fraud class actions — a fundamental thesis breach (integrity of the reported warehouse-automation ramp), so it exits the robotics bucket without a replacement given no clearly-stronger dated robotics opportunity in the window.",
+      "news_evidence": [
+        {"summary": "Securities fraud class action against Symbotic tied to improperly accelerated revenue recognition and the Nov 18 / Dec 4 restatement of Q1-Q3 FY2024 financials", "source": "Business Wire", "url": "https://www.businesswire.com/news/home/20241205502389/en/", "date": "2024-12-05"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Watchlist was full at cap 10, so this quarter was due diligence rather than discovery: MSFT/GOOGL/NVDA hold on continued AI-infrastructure spend plus GOOGL's Dec 9 Willow quantum breakthrough (reinforcing the IONQ quantum leg); RKLB holds on a November multi-launch Neutron agreement; ITA, FRO, WELL, CEG show no dated breach of their defense, tanker, eldercare, and nuclear theses. SYM is the one dated in-window fundamental breach (revenue-recognition restatement + fraud suits) and is removed. No Pass-1 query surfaced a robotics name with a comparably strong dated catalyst to swap in, so the watchlist drops to 9/10 this quarter rather than forcing a replacement.",
+  "search_terms": ["AI stocks news after:2024-10-01 before:2025-01-01", "space stocks rocket launch stocks after:2024-10-01 before:2025-01-01", "robotics stocks humanoid robot stocks after:2024-10-01 before:2025-01-01", "quantum computing stocks after:2024-10-01 before:2025-01-01", "nuclear stocks SMR stocks after:2024-10-01 before:2025-01-01", "defense stocks defense ETF after:2024-10-01 before:2025-01-01", "tanker stocks shipping stocks geopolitics after:2024-10-01 before:2025-01-01", "healthcare stocks eldercare REIT aging population demographics stocks after:2024-10-01 before:2025-01-01", "GOOGL stock news Willow quantum chip after:2024-10-01 before:2025-01-01", "NVDA stock news Blackwell after:2024-10-01 before:2025-01-01", "RKLB Rocket Lab news Neutron after:2024-10-01 before:2025-01-01", "SYM Symbotic stock news restatement after:2024-10-01 before:2025-01-01", "CEG Constellation Energy stock news nuclear after:2024-10-01 before:2025-01-01", "Symbotic accounting restatement lawsuit December 2024", "Teradyne robotics stock news after:2024-10-01 before:2025-01-01"]
+}

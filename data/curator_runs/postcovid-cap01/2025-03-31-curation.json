@@ -1,0 +1,9 @@
+{
+  "as_of_date": "2025-03-31",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "Held NVDA as the sole slot. DeepSeek R1 (Jan 20) drove a sharp Jan 27 selloff and tariff-driven volatility followed (Feb 3), but neither reads as a confirmed crest: NVDA's Q4 FY2025 results (Feb 26) showed data-center revenue $35.6B (+93% YoY) and guided Q1 FY26 to ~$43.0B — demand accelerating, not decelerating, after the scare. Jensen Huang's framing of robotics as NVDA's second growth leg keeps the ticker straddling the buildup of two named waves. Checked alternatives across every named wave (nuclear — Citi cut SMR to Sell this quarter; space — sub-scale high-variance names; quantum — negligible revenue pure-plays; defense/REITs — no launching catalyst) and found none clearly stronger than NVDA as a sole exposure. Held through the DeepSeek dip rather than treating it as a trim signal.",
+  "search_terms": ["AI stocks news after:2025-01-01 before:2025-04-01", "NVDA news DeepSeek tariffs after:2025-01-01 before:2025-04-01", "space stocks rocket launch stocks news after:2025-01-01 before:2025-04-01", "robotics stocks humanoid robot stocks news after:2025-01-01 before:2025-04-01", "quantum computing stocks news after:2025-01-01 before:2025-04-01", "nuclear stocks SMR stocks news after:2025-01-01 before:2025-04-01", "defense stocks defense ETF news after:2025-01-01 before:2025-04-01", "tanker stocks shipping stocks geopolitics news after:2025-01-01 before:2025-04-01", "healthcare stocks eldercare REIT aging population demographics stocks after:2025-01-01 before:2025-04-01", "NVDA Nvidia stock news Blackwell earnings after:2025-01-01 before:2025-04-01", "NVIDIA fourth quarter fiscal 2025 earnings report February 26 2025"]
+}

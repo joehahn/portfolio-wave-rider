@@ -1,0 +1,9 @@
+{
+  "as_of_date": "2025-06-30",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "All three buckets were reinforced, not undermined: NVDA posted an 85% YoY Q1 beat with a $91B Q2 guide and MSFT's AI infrastructure buildout continued despite April tariff volatility, so AI momentum resumed rather than crested; CEG's nuclear thesis was strengthened by a dated in-window milestone (Meta's 20-year 1.1GW nuclear PPA for its Illinois AI data centers, June 2025) — exactly the SMR/fission-to-hyperscaler PPA mechanism the profile names. The mid-June Israel-Iran conflict spiked tanker rates on Hormuz risk, but by the June 24 ceasefire that premium was already unwinding — a late, reversing spike, not a buildup entry, so no tanker add. No holding shows a breach or peak signal. Hold MSFT/NVDA/CEG.",
+  "search_terms": ["AI stocks news after:2025-04-01 before:2025-07-01", "space stocks rocket launch stocks news after:2025-04-01 before:2025-07-01", "robotics stocks humanoid robot news after:2025-04-01 before:2025-07-01", "quantum computing stocks news after:2025-04-01 before:2025-07-01", "nuclear stocks SMR stocks news after:2025-04-01 before:2025-07-01", "tanker stocks shipping stocks geopolitics news after:2025-04-01 before:2025-07-01", "defense stocks defense ETF rearmament news after:2025-04-01 before:2025-07-01", "healthcare stocks eldercare REIT aging population demographics news after:2025-04-01 before:2025-07-01", "MSFT Microsoft stock news after:2025-04-01 before:2025-07-01", "NVDA Nvidia stock news after:2025-04-01 before:2025-07-01", "CEG Constellation Energy Meta nuclear PPA June 2025", "Israel Iran conflict oil market stocks June 2025"]
+}

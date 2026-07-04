@@ -1,0 +1,9 @@
+{
+  "as_of_date": "2024-12-31",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "All three incumbents remain in active buildup with no dated crest or breach: NVDA's Blackwell is shipping at scale into hyperscaler demand (AWS, Microsoft, Meta, Oracle, xAI); MSFT is a primary Blackwell buyer and CEG's Three Mile Island PPA counterparty; CEG's Q3 call (Nov) reaffirmed bipartisan nuclear-policy support straddling the election alongside the Microsoft deal. Google's Willow quantum chip (Dec 9) is a genuine buildup signal for the quantum wave, but at cap=3 an add requires displacing an incumbent and none of MSFT/NVDA/CEG shows a peak or breach signal. Hold MSFT/NVDA/CEG; quantum a watch item.",
+  "search_terms": ["AI stocks after:2024-10-01 before:2025-01-01", "nuclear stocks SMR after:2024-10-01 before:2025-01-01", "quantum computing stocks after:2024-10-01 before:2025-01-01", "space stocks rocket launch after:2024-10-01 before:2025-01-01", "robotics stocks after:2024-10-01 before:2025-01-01", "defense stocks defense ETF after:2024-10-01 before:2025-01-01", "tanker shipping stocks geopolitics after:2024-10-01 before:2025-01-01", "healthcare eldercare REIT aging population stocks after:2024-10-01 before:2025-01-01", "NVDA Nvidia Blackwell news after:2024-10-01 before:2025-01-01", "MSFT Microsoft Azure AI news after:2024-10-01 before:2025-01-01", "CEG Constellation Energy Q3 2024 earnings nuclear PPA after:2024-10-01 before:2025-01-01", "GOOGL Google Willow quantum chip December 2024"]
+}

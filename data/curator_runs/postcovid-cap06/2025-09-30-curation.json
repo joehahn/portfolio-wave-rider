@@ -1,0 +1,9 @@
+{
+  "as_of_date": "2025-09-30",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "Held flat at cap (MSFT, NVDA, ITA, RKLB, IONQ, OKLO). Every name is validated by fresh commercial evidence, not just price: MSFT's Jul 30 FY25-Q4 (Azure +39%, Copilot 100M MAU); NVDA's Aug 27 FY26-Q2 (data-center $41.1B +56% YoY); RKLB's Aug Q2 (+36% YoY, new $90M Space Force GEO contract); IONQ's Aug 7 Q2 (+81.8% YoY, widening losses a mild caution but not a breach); OKLO's Aug 11 update (Equinix 500MW 20-yr PPA with $25M prepayment, Switch 12GW master agreement, Vertiv, ~2,100MW pipeline). The nuclear/quantum summer run looks fundamentally supported, so no forced trim clears the bar. WELL (demographics, Q2 FFO +22%) is a clean candidate but at cap=6 no incumbent cleared removal — noted for next rebalance. Hold.",
+  "search_terms": ["AI stocks news after:2025-07-01 before:2025-10-01", "space stocks rocket launch stocks news after:2025-07-01 before:2025-10-01", "robotics stocks humanoid robot stocks news after:2025-07-01 before:2025-10-01", "quantum computing stocks news after:2025-07-01 before:2025-10-01", "nuclear stocks SMR stocks news after:2025-07-01 before:2025-10-01", "tanker stocks shipping freight rates news after:2025-07-01 before:2025-10-01", "defense stocks rearmament defense ETF news after:2025-07-01 before:2025-10-01", "Middle East reconstruction ceasefire stocks after:2025-07-01 before:2025-10-01", "healthcare eldercare REIT aging population demographics stocks after:2025-07-01 before:2025-10-01", "OKLO Oklo Equinix Switch PPA Q2 2025 August 2025", "IONQ IonQ Q2 2025 earnings August 2025", "RKLB Rocket Lab Q2 2025 Space Force GEO contract August 2025", "ITA aerospace defense ETF news after:2025-07-01 before:2025-10-01", "Welltower Q2 2025 earnings FFO July 2025"]
+}

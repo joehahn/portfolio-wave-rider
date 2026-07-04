@@ -1,0 +1,9 @@
+{
+  "as_of_date": "2025-06-30",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "Holding the six unchanged. Every incumbent shows continued in-window strength: MSFT/NVDA anchor AI (Microsoft Build in May unveiled a major Azure AI Foundry expansion); ITA got a fresh lift from the mid-June Israel-Iran conflict; RKLB posted Q1 2025 revenue $123M (+32% YoY, May 8 beat); IONQ executed a string of quantum-networking acquisitions in-window (ID Quantique May, Lightsynq June, Oxford Ionics agreement June 9) — buildup-phase consolidation, not crest; OKLO logged multiple DOE approvals (Aurora PDSA) and fuel partnerships (Centrus, Standard Nuclear). None shows a breach or overweight peak signal, and at cap=6 an add requires sacrificing a live thesis. SYM (robotics) and WELL (demographics) were noted as gaps but no forcing removal exists. Voyager (VOYG, June 11 IPO) rejected on ~3 weeks history. Hold.",
+  "search_terms": ["AI stocks news after:2025-04-01 before:2025-07-01", "robotics stocks after:2025-04-01 before:2025-07-01", "space stocks rocket launch stocks after:2025-04-01 before:2025-07-01", "quantum computing stocks after:2025-04-01 before:2025-07-01", "nuclear stocks SMR stocks after:2025-04-01 before:2025-07-01", "defense stocks defense ETF after:2025-04-01 before:2025-07-01", "tanker stocks shipping freight rates after:2025-04-01 before:2025-07-01", "Middle East reconstruction stocks ceasefire Iran Israel after:2025-04-01 before:2025-07-01", "aging population demographics healthcare eldercare REIT stocks after:2025-04-01 before:2025-07-01", "IonQ news Q2 2025 Oxford Ionics Lightsynq after:2025-04-01 before:2025-07-01", "Oklo news DOE Aurora after:2025-04-01 before:2025-07-01", "Rocket Lab RKLB Q1 2025 earnings May 2025", "iShares Aerospace Defense ETF ITA Israel Iran conflict June 2025", "Microsoft Build 2025 Azure AI Foundry May 2025"]
+}

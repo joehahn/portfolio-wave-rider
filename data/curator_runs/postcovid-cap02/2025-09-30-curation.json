@@ -1,0 +1,9 @@
+{
+  "as_of_date": "2025-09-30",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "At the 2-slot cap, NVDA (AI) and RTX (defense) both show continued in-window strength: NVDA's Q2 FY26 print (Aug 27) beat on revenue ($46.74B, +56% YoY) and guided next quarter to $54B with an incremental $60B buyback — AI buildup still accelerating; RTX's Q2 (Jul 22) showed 9% sales growth, an $236B backlog (defense ~40%), munitions capacity ramping, and fresh wins (Navy missile deal, Netherlands Patriot, Germany-funded Ukraine Patriot). Pass-1 across the other waves found no single dated catalyst strong enough to displace either at cap=2. Hold NVDA/RTX.",
+  "search_terms": ["AI stocks capex data center after:2025-07-01 before:2025-10-01", "space stocks rocket launch stocks after:2025-07-01 before:2025-10-01", "robotics stocks humanoid robot stocks after:2025-07-01 before:2025-10-01", "quantum computing stocks after:2025-07-01 before:2025-10-01", "nuclear stocks SMR stocks after:2025-07-01 before:2025-10-01", "defense stocks defense ETF after:2025-07-01 before:2025-10-01", "NVDA Nvidia news Q2 earnings August 2025", "RTX Raytheon news Q2 2025 earnings defense contract", "tanker stocks shipping stocks freight rates September 2025", "eldercare REIT healthcare demographics stocks 2025"]
+}

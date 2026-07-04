@@ -1,0 +1,9 @@
+{
+  "as_of_date": "2025-03-31",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "The watchlist is at its six-ticker cap with every name showing an in-window (Jan-Mar 2025) catalyst reinforcing its thesis: MSFT's AI revenue run-rate hit $13B (+175% YoY) at its Jan 29 print, NVDA reasserted AI-infra at GTC (Blackwell full production, quantum research lab) after shrugging off the Jan 27 DeepSeek selloff, ITA sits on the EU's March EUR800B rearmament commitment, RKLB posted record Q4 2024 revenue (backlog $1.07B) despite a Neutron slip to H2 2025, IONQ beat guidance and hit AQ64 early, and OKLO advanced its DOE Nuclear Safety Design Agreement for Aurora in March. A robotics candidate (SYM) surfaced but sold off on its print with securities suits, and no incumbent cleared the removal bar a full watchlist requires. Hold unchanged: MSFT, NVDA, ITA, RKLB, IONQ, OKLO.",
+  "search_terms": ["AI stocks news after:2025-01-01 before:2025-04-01", "rocket launch stocks space stocks news after:2025-01-01 before:2025-04-01", "robotics stocks humanoid robot stocks news after:2025-01-01 before:2025-04-01", "quantum computing stocks news after:2025-01-01 before:2025-04-01", "nuclear stocks SMR stocks news after:2025-01-01 before:2025-04-01", "defense stocks defense ETF rearmament Europe news after:2025-01-01 before:2025-04-01", "tanker stocks shipping stocks oil news after:2025-01-01 before:2025-04-01", "eldercare REIT healthcare aging population stocks news after:2025-01-01 before:2025-04-01", "DeepSeek AI stock market reaction January 2025 after:2025-01-01 before:2025-04-01", "NVDA Nvidia GTC 2025 news after:2025-01-01 before:2025-04-01", "RKLB Rocket Lab Q4 2024 earnings Neutron February 2025", "IONQ IonQ quantum AQ64 news after:2025-01-01 before:2025-04-01", "OKLO Oklo DOE Aurora nuclear news March 2025", "ITA iShares US Aerospace Defense ETF news after:2025-01-01 before:2025-04-01"]
+}

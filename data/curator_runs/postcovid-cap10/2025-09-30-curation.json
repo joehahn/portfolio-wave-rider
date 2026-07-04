@@ -1,0 +1,9 @@
+{
+  "as_of_date": "2025-09-30",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "Full at cap 10 with every named wave represented (AI: MSFT/GOOGL/NVDA; rockets: RKLB; quantum: IONQ; defense: ITA; tanker: FRO; demographics: WELL; nuclear: CEG; robotics: ISRG). Pass-1 and Pass-2 within the Jul-Sep 2025 window found continuation-of-thesis, not breach: Frontline's Q2 (Aug 29) showed strong TCE rates with Q3 days booked at premium; Welltower's Jul 28 update kept the demographics thesis intact; IonQ's Q2 (~$20.7M revenue, raised FY guide) showed no quantum breach. New humanoid-robotics ETFs (KOID, HUMN, listed June 2025) surfaced but have only ~3 months of history — too little to justify swapping out an established incumbent under the full-watchlist guardrail; noted for a future rebalance. No dated news documents a breach, lost contract, regulatory block, or sell-side capitulation for any of the ten. No change.",
+  "search_terms": ["AI datacenter stocks capex after:2025-07-01 before:2025-10-01", "space stocks rocket launch after:2025-07-01 before:2025-10-01", "robotics stocks humanoid robot after:2025-07-01 before:2025-10-01", "quantum computing stocks after:2025-07-01 before:2025-10-01", "nuclear stocks SMR after:2025-07-01 before:2025-10-01", "tanker stocks shipping freight after:2025-07-01 before:2025-10-01", "defense stocks defense ETF after:2025-07-01 before:2025-10-01", "healthcare eldercare REIT aging population demographics stocks after:2025-07-01 before:2025-10-01", "Middle East reconstruction ceasefire stocks after:2025-07-01 before:2025-10-01", "FRO Frontline tanker Q2 2025 earnings August 2025", "WELL Welltower Q2 2025 business update July 2025", "IONQ IonQ Q2 2025 earnings August 2025", "KOID HUMN humanoid robotics ETF launch June 2025", "CEG Constellation Energy news after:2025-07-01 before:2025-10-01", "NVDA Nvidia Q2 FY26 earnings August 2025"]
+}

@@ -1,0 +1,9 @@
+{
+  "as_of_date": "2025-03-31",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "Q1 2025 was dominated by the Jan 27 DeepSeek shock, which hit AI (NVDA -17%) and AI-power names (CEG -21% on 'less compute needed' fears), but neither holding shows a guardrail-qualifying breach: MSFT's Jan 29 FY25-Q2 showed AI Cloud accelerating (AI ARR run-rate +175% YoY), and CEG's Jan 10 $16.4B Calpine acquisition shows management doubling down on the power-demand thesis with capital rather than retreating — so the drawdown reads as sentiment noise on an intact thesis. Pass-1 surfaced a strong defense buildup catalyst (EU ReArm/Readiness 2030, ~EUR800B) with a listed vehicle (SHLD), but at cap=3 no current holding met the removal bar. Hold MSFT/NVDA/CEG; flag defense for next rebalance.",
+  "search_terms": ["AI stocks after:2025-01-01 before:2025-04-01", "nuclear stocks SMR after:2025-01-01 before:2025-04-01", "defense stocks defense ETF Europe rearmament after:2025-01-01 before:2025-04-01", "quantum computing stocks after:2025-01-01 before:2025-04-01", "robotics stocks humanoid robot after:2025-01-01 before:2025-04-01", "space stocks rocket launch stocks after:2025-01-01 before:2025-04-01", "ReArm Europe defense spending plan March 2025", "healthcare stocks eldercare REIT aging population demographics after:2025-01-01 before:2025-04-01", "Constellation Energy CEG stock DeepSeek nuclear power demand January 2025", "MSFT Microsoft news January February March 2025 earnings capex", "NVDA Nvidia news DeepSeek January 2025 stock drop", "Constellation Energy Calpine acquisition announced January 2025 16.4 billion"]
+}

@@ -1,0 +1,29 @@
+{
+  "as_of_date": "2025-03-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "RTX",
+      "wave_bucket": "geopolitical",
+      "rationale": "European rearmament entered its concrete buildup phase this quarter (EU Readiness 2030/ReArm plan; Germany's debt-brake reform), and RTX enters on a record defense backlog capturing both US and allied European demand.",
+      "news_evidence": [
+        {"summary": "RTX reports Q4 2024: total backlog $218B (+11% YoY), including a record $93B defense backlog", "source": "PR Newswire / RTX", "url": "https://www.prnewswire.com/news-releases/rtx-reports-2024-results-and-announces-2025-outlook-302361892.html", "date": "2025-01-28"},
+        {"summary": "European Commission unveils 'Readiness 2030' (ReArm Europe), mobilizing up to EUR800B for defense", "source": "White & Case", "url": "https://www.whitecase.com/insight-alert/big-bang-european-commission-unveils-proposals-support-surge-defence-spending", "date": "2025-03-04"},
+        {"summary": "German Bundestag approves historic debt-brake exemption for defense spending", "source": "CNBC", "url": "https://www.cnbc.com/2025/03/18/german-parliament-to-vote-on-fiscal-package.html", "date": "2025-03-18"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "MSFT",
+      "rationale": "TD Cowen's dated reporting that Microsoft walked away from ~2GW of US/European data-center leases on AI-compute oversupply is the 'trim before crest' signal for the AI-capex sub-thesis, so MSFT gives way to fresh European-rearmament exposure while NVDA (the more direct AI-compute bet, recovered from the DeepSeek scare) is retained.",
+      "news_evidence": [
+        {"summary": "TD Cowen: Microsoft walked away from ~200MW-2GW of data center developments and leases", "source": "The Register", "url": "https://www.theregister.com/2025/02/24/does_microsoft_pull_back_on/", "date": "2025-02-24"},
+        {"summary": "TD Cowen follow-up: Microsoft abandoned more US/European data center projects (~2GW) on AI-compute oversupply", "source": "Bloomberg", "url": "https://www.bloomberg.com/news/articles/2025-03-26/microsoft-abandons-more-data-center-projects-td-cowen-says", "date": "2025-03-26"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "One paired swap at the size-2 cap: MSFT exits on a dated MSFT-specific AI-capex pullback (TD Cowen's abandoned data-center leases, Feb 24 and Mar 26), exactly the 'trim before crest' behavior the profile asks for even while the AI wave itself hasn't crested. NVDA is kept as the more direct AI-compute exposure (the Jan 27 DeepSeek -17% selloff faded quickly). RTX enters as the first non-AI slot, riding the concrete buildup of European defense/rearmament (EU EUR800B Readiness 2030, Germany debt-brake reform) with a record $218B backlog as an earnings anchor. Result: NVDA, RTX.",
+  "search_terms": ["AI stocks after:2025-01-01 before:2025-04-01", "DeepSeek AI capex scare Nvidia stock after:2025-01-01 before:2025-04-01", "defense stocks Europe rearmament after:2025-01-01 before:2025-04-01", "EU ReArm Europe plan announcement March 2025 defense spending 800 billion", "Germany debt brake reform defense spending March 2025 Bundestag", "space stocks rocket launch stocks news January February March 2025", "robotics stocks humanoid robot stocks news January February March 2025", "quantum computing stocks news January February March 2025", "nuclear stocks SMR stocks news January February March 2025", "Microsoft MSFT data center lease pullback capex February 2025 TD Cowen", "Nvidia NVDA earnings guidance March 2025 Blackwell demand", "RTX Corporation Q4 2024 earnings backlog defense February 2025"]
+}
