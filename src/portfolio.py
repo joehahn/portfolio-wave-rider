@@ -3514,14 +3514,15 @@ def build_curator_dashboard(
     bnh_return = (bnh_final / bnh_initial) - 1.0
 
     fig = make_subplots(
-        rows=5, cols=1, vertical_spacing=0.06,
-        row_heights=[0.24, 0.27, 0.15, 0.14, 0.20],
+        rows=6, cols=1, vertical_spacing=0.06,
+        row_heights=[0.22, 0.24, 0.13, 0.12, 0.17, 0.12],
         subplot_titles=(
             "1. Realized portfolio value: curator vs baselines vs benchmark",
             "2. Watchlist composition over time (color = wave bucket)",
             "3. Cumulative $ gain per holding",
             "4. Cumulative $ gain per wave bucket",
-            "5. Actual portfolio $ by wave over time (log scale)",
+            "5. Actual portfolio $ by wave over time",
+            "6. Total portfolio value (log scale)",
         ),
     )
 
@@ -3686,12 +3687,9 @@ def build_curator_dashboard(
                      zeroline=True, zerolinewidth=1, zerolinecolor="#888",
                      row=4, col=1)
 
-    # Chart 5: actual portfolio $ by wave over time. One line per wave on a
-    # LOG y-axis: log lets each wave's growth read across orders of magnitude
-    # (a $1k position and a $1M position are both legible). Not stacked — a
-    # stacked area can't sit on a log axis (its $0 baseline is -inf on log, and
-    # band thicknesses would no longer be proportional to dollars), so each
-    # wave is drawn as its own unstacked line instead.
+    # Chart 5: actual portfolio $ by wave over time. Stacked area on
+    # linear y-axis: top edge = total portfolio value; each band's
+    # thickness = that wave bucket's $ contribution.
     snaps_full = snaps.copy()
     snaps_full["asset_bucket"] = snaps_full["ticker"].map(
         lambda t: ASSET_CLASS_BUCKET.get(TICKER_ASSET_CLASS.get(t, "equity"), "equities")
@@ -3711,22 +3709,33 @@ def build_curator_dashboard(
     for wave in wv_order:
         if (wv[wave] <= 0).all():
             continue
-        # Zeros can't plot on a log axis, so mask non-positive $ to NaN (the
-        # line simply has a gap where a wave held nothing that day).
-        _y = wv[wave].where(wv[wave] > 0)
         fig.add_trace(
-            go.Scatter(x=wv.index, y=_y, mode="lines",
+            go.Scatter(x=wv.index, y=wv[wave], mode="lines",
                        name=WAVE_DISPLAY_LABEL.get(wave, wave),
                        legend="legend4",
-                       line={"color": WAVE_COLORS.get(wave), "width": 1.8},
-                       connectgaps=False,
+                       stackgroup="wave",
+                       line={"color": WAVE_COLORS.get(wave), "width": 0.5},
                        hovertemplate=f"{WAVE_DISPLAY_LABEL.get(wave, wave)}"
                                      "<br>%{x|%Y-%m-%d}"
                                      "<br>$%{y:,.0f}<extra></extra>"),
             row=5, col=1,
         )
-    fig.update_yaxes(title_text="$", type="log", tickformat="$,.0f", row=5, col=1)
+    fig.update_yaxes(title_text="$", tickformat="$,.0f", row=5, col=1)
     fig.update_xaxes(range=[start, end], row=5, col=1)
+
+    # Chart 6: total portfolio value vs date on a LOG y-axis. Same curator
+    # equity curve as chart 1's headline line, but alone and log-scaled so its
+    # multi-order-of-magnitude compounding reads as a roughly straight line
+    # (constant % growth) instead of a hockey stick. Single trace, no legend.
+    fig.add_trace(
+        go.Scatter(x=totals.index, y=totals.values, mode="lines",
+                   name="Total portfolio value", showlegend=False,
+                   line={"color": "#d97706", "width": 2.5},
+                   hovertemplate="%{x|%Y-%m-%d}<br>$%{y:,.0f}<extra></extra>"),
+        row=6, col=1,
+    )
+    fig.update_yaxes(title_text="$", type="log", tickformat="$,.0f", row=6, col=1)
+    fig.update_xaxes(range=[start, end], row=6, col=1)
 
 
     fig.update_layout(
@@ -3765,15 +3774,15 @@ def build_curator_dashboard(
         ),
     )
 
-    # --- Per-gap vertical spacing override (5-row layout) ---
+    # --- Per-gap vertical spacing override (6-row layout) ---
     # Plotly's make_subplots only supports a single uniform
     # vertical_spacing. Each chart-to-chart gap is shrunk to 50% of
     # plotly's default (111 px) except gap(4,5) which is shrunk only
     # 33% (149 px). Override each yaxis's domain and size the figure
     # in absolute pixels so individual subplot sizes are preserved
     # across edits.
-    ROW_PX = [393, 443, 246, 246, 320]   # charts 1..5
-    GAP_PX = [111, 111, 111, 149]        # 4 gaps; gap(4,5) wider
+    ROW_PX = [393, 443, 246, 246, 320, 320]   # charts 1..6
+    GAP_PX = [111, 111, 111, 149, 111]         # 5 gaps; gap(4,5) wider
     _new_fig_h = sum(ROW_PX) + sum(GAP_PX)
     _tops, _bots = [], []
     _y = 1.0
@@ -3784,12 +3793,12 @@ def build_curator_dashboard(
         if _i < len(GAP_PX):
             _y -= GAP_PX[_i] / _new_fig_h
     # Apply yaxis domains.
-    for _i in range(5):
+    for _i in range(6):
         _key = "yaxis" if _i == 0 else f"yaxis{_i + 1}"
         fig.layout[_key].domain = (max(0.0, _bots[_i]), min(1.0, _tops[_i]))
     # Reposition subplot-title annotations (~14px above each row top).
     _title_offset = 14 / _new_fig_h
-    for _i in range(min(5, len(fig.layout.annotations))):
+    for _i in range(min(6, len(fig.layout.annotations))):
         fig.layout.annotations[_i].update(y=_tops[_i] + _title_offset)
     # Reposition per-row legends to the new geometry.
     # Rows: 0 = equity curve, 1 = Gantt, 2 = $ gain/holding,
