@@ -89,12 +89,14 @@ def _replay(runs_dir: Path, tmp: Path) -> pd.Series:
 def main() -> int:
     tmp = Path(tempfile.mkdtemp(prefix="sweep_wls_"))
     curves: dict[int, pd.Series] = {}
+    rendered_dirs: dict[int, Path] = {}
     for cap, runs_dir in CAPS:
         if not list(runs_dir.glob("*-curation.json")):
             print(f"  cap={cap}: {runs_dir} has no curation JSONs — skipping",
                   file=sys.stderr)
             continue
         curves[cap] = _replay(runs_dir, tmp)
+        rendered_dirs[cap] = runs_dir
         print(f"  cap={cap}: {len(curves[cap])} days, "
               f"final ${curves[cap].iloc[-1]:,.0f}", file=sys.stderr)
 
@@ -194,6 +196,51 @@ def main() -> int:
         f"penalizes deep drawdowns the way Sharpe doesn't.</p>"
     )
 
+    # Parameter-settings table (mirrors the other three sweeps and the backtest
+    # dashboard): the knobs held constant across this sweep, plus the swept
+    # parameter (max_watchlist_size) and the cap values it took.
+    import json as _json2
+    base_t_update = int(load_backtest_config()["t_update_days"])
+    _starter_dir = rendered_dirs.get(default_cap) or next(iter(rendered_dirs.values()))
+    _starter = _json2.loads((_starter_dir / "_starter.json").read_text())
+    _swept_caps = sorted(curves.keys())
+    _param_rows = [
+        ("Backtest window", f"{start.date()} &rarr; {end.date()}", ""),
+        ("Rebalance cadence",
+         f"{_starter.get('rebalance_period', 'quarterly')} "
+         f"({len(_starter.get('as_of_dates', []))} curator calls)", ""),
+        ("Starter watchlist", ", ".join(_starter.get("starter_watchlist", [])) or "—", ""),
+        ("Initial capital", f"${initial:,.0f}", ""),
+        ("Risk aversion (&lambda;)", f"{_BASE_RISK_AVERSION:g}", ""),
+        ("Lookback (&mu;/&Sigma; estimation)", f"{_BASE_LOOKBACK:g}y", ""),
+        ("Concentration cap (max weight)", f"{_BASE_MAX_WEIGHT:.0%}", ""),
+        ("Max watchlist size", "swept &darr;", "this sweep's variable"),
+        ("Always-include anchors", ", ".join(_FM["always_include"]) or "—",
+         "permanent optimizer anchors, outside max_watchlist_size"),
+        ("Risk-free rate", f"{RISK_FREE_RATE:.0%}", ""),
+        ("Execution lag", f"{base_t_update} trading day(s)", ""),
+        ("Swept parameter", "<code>max_watchlist_size</code>",
+         "varied across the values below"),
+        ("Swept values", ", ".join(str(c) for c in _swept_caps), ""),
+    ]
+    _ptr = "".join(
+        f"<tr><td style='padding:5px 14px 5px 0;color:#555;white-space:nowrap;'>{k}</td>"
+        f"<td style='padding:5px 14px 5px 0;font-weight:600;'>{v}</td>"
+        f"<td style='padding:5px 0;color:#b45309;font-size:13px;'>{note}</td></tr>"
+        for k, v, note in _param_rows
+    )
+    params_table = (
+        "<h2 style='margin:1.2em 0 0.3em;'>Parameter settings</h2>"
+        "<p style='color:#555;max-width:780px;margin:0 0 0.6em;'>The "
+        "optimizer/backtest knobs held constant across this sweep, read from "
+        "<code>investor_profile.md</code> (the same config "
+        "<code>/review-portfolio</code> uses with real money). Only "
+        "<code>max_watchlist_size</code> is varied — across the cap values listed "
+        "in the last row.</p>"
+        "<table style='border-collapse:collapse;font-size:14px;margin-bottom:1.2em;'>"
+        f"<tbody>{_ptr}</tbody></table>"
+    )
+
     nav = _nav_strip("sweep_max_watchlist_size.html")
 
     page = (
@@ -215,6 +262,7 @@ def main() -> int:
         'knobs are held at their <code>investor_profile.md</code> defaults, so '
         'the curves are directly comparable to the other sweeps. cap=5 is the '
         'project default (bolded).</p>'
+        + params_table
         + fig.to_html(full_html=False, include_plotlyjs="cdn",
                       config={"displayModeBar": False})
         + fig2.to_html(full_html=False, include_plotlyjs=False,
