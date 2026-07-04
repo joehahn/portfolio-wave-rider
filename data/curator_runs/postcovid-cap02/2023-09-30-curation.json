@@ -1,0 +1,9 @@
+{
+  "as_of_date": "2023-09-30",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "At cap=2, both incumbents cleared a dated in-window bar: NVDA's Aug 23 2023 Q2 print was a blowout confirming the AI buildup is still accelerating, and MSFT's Sept 21 2023 announcement of Copilot as a unified 'everyday AI companion' across Windows 11/M365/Edge/Bing shows it converting its OpenAI bet into a shipping product. Neither shows a thesis breach or peak signal. Pass-1 across every named wave turned up only generic sector commentary or earnings-calendar items, not a milestone strong enough to force a swap at a 2-slot cap. Hold MSFT/NVDA.",
+  "search_terms": ["AI stocks after:2023-07-01 before:2023-10-01", "space stocks rocket launch news after:2023-07-01 before:2023-10-01", "robotics stocks news after:2023-07-01 before:2023-10-01", "quantum computing stocks news after:2023-07-01 before:2023-10-01", "nuclear SMR stocks news after:2023-07-01 before:2023-10-01", "tanker shipping stocks geopolitics after:2023-07-01 before:2023-10-01", "defense stocks defense ETF news after:2023-07-01 before:2023-10-01", "healthcare eldercare REIT aging population stocks after:2023-07-01 before:2023-10-01", "NVDA Nvidia earnings August 2023 after:2023-07-01 before:2023-10-01", "MSFT Microsoft AI Copilot news after:2023-07-01 before:2023-10-01"]
+}

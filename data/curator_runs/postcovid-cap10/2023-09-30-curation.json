@@ -1,0 +1,9 @@
+{
+  "as_of_date": "2023-09-30",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "Watchlist is full at cap 10 with every named wave represented. Pass-1 surfaced no new ticker with dated in-window (Jul-Sep 2023) evidence strong enough to displace a holding, and Pass-2 found no dated thesis-breach: NVDA's Aug 23 Q2 (data-center +171% YoY) and MSFT's Sep 21 Copilot reinforce AI; RKLB's Aug 8 Q2 (Virgin Orbit asset buy, Neutron site work, 10 new bookings) reinforces rockets; SYM's Jul 24 GreenBox/SoftBank JV (~$7.5B contract) reinforces robotics; SMR's Romania $275M commitment and Nucor MOU reinforce nuclear (the Nov 8 UAMPS/Idaho cancellation is a post-date event, not used); Sep 6 Ukraine FMF reinforces defense; WELL's Q3 (FFO $0.92, same-store NOI +14.1%) reinforces demographics. IONQ and FRO have no fresh breach. Hold the full ten unchanged.",
+  "search_terms": ["AI stocks after:2023-07-01 before:2023-10-01", "space stocks rocket launch after:2023-07-01 before:2023-10-01", "robotics stocks humanoid robot after:2023-07-01 before:2023-10-01", "quantum computing stocks after:2023-07-01 before:2023-10-01", "nuclear stocks SMR stocks after:2023-07-01 before:2023-10-01", "defense stocks defense ETF after:2023-07-01 before:2023-10-01", "tanker stocks shipping stocks after:2023-07-01 before:2023-10-01", "healthcare stocks eldercare REIT aging population demographics stocks after:2023-07-01 before:2023-10-01", "NVDA Nvidia Q2 earnings August 2023 data center revenue", "RKLB Rocket Lab news September 2023", "SMR NuScale Power news August September 2023 before:2023-10-01", "Symbotic SYM GreenBox SoftBank joint venture 2023", "Frontline FRO tanker stock news 2023", "Welltower WELL stock news 2023", "MSFT Microsoft Copilot AI news September 2023"]
+}

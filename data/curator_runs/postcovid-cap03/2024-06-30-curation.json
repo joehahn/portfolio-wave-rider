@@ -1,0 +1,9 @@
+{
+  "as_of_date": "2024-06-30",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "All three holdings carry fresh dated in-window catalysts: NVDA's blowout Q1 FY25 (record $26.0B revenue +262% YoY; data-center $21.6B +427% YoY) on May 22, effective 10-for-1 split June 7, and a dividend hike — buildup-phase strength, no crest, no trim; MSFT's Q3 FY24 (Apr 25) showed Cloud +23% YoY with Copilot cited; LMT's Q1 (Apr 23) showed net sales $17.2B on F-35 volume, confirming the defense thesis. Pass-1 across the other named waves found no company-specific dated milestone strong enough to displace any of the three at cap=3. Hold MSFT/NVDA/LMT.",
+  "search_terms": ["space stocks rocket launch stocks after:2024-04-01 before:2024-07-01", "robotics stocks humanoid robot stocks after:2024-04-01 before:2024-07-01", "quantum computing stocks after:2024-04-01 before:2024-07-01", "nuclear stocks SMR stocks after:2024-04-01 before:2024-07-01", "defense stocks defense ETF after:2024-04-01 before:2024-07-01", "tanker stocks shipping stocks geopolitics oil after:2024-04-01 before:2024-07-01", "healthcare stocks eldercare REIT aging population demographics stocks after:2024-04-01 before:2024-07-01", "NVDA Nvidia news stock split earnings after:2024-04-01 before:2024-07-01", "MSFT Microsoft news AI earnings after:2024-04-01 before:2024-07-01", "LMT Lockheed Martin news contract earnings after:2024-04-01 before:2024-07-01"]
+}

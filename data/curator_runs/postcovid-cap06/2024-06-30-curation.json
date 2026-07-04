@@ -1,0 +1,27 @@
+{
+  "as_of_date": "2024-06-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "OKLO",
+      "wave_bucket": "nuclear",
+      "rationale": "Oklo, a pure-play SMR fission developer, went public via SPAC on May 10 2024 and reports ~80% of inbound customer inquiries come from data-center operators — a direct in-window match to the profile's named next wave (SMR fission + PPAs to AI data centers) that the uranium-mining proxy CCJ does not capture.",
+      "news_evidence": [
+        {"summary": "Sam Altman's nuclear startup Oklo goes public via SPAC with AltC; shares begin trading on NYSE as OKLO on May 10 2024", "source": "CNBC", "url": "https://www.cnbc.com/2024/05/10/sam-altman-takes-nuclear-startup-oklo-public-to-power-ai-ambitions.html", "date": "2024-05-10"},
+        {"summary": "Oklo CEO says ~80% of inbound inquiries are from data-center operators seeking nuclear power for AI compute", "source": "Bloomberg", "url": "https://www.bloomberg.com/news/articles/2024-05-24/altman-backed-oklo-sees-rising-nuke-demand-from-data-centers", "date": "2024-05-24"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "CCJ",
+      "rationale": "Cameco's Q1 2024 results confirm the uranium-mining leg is solid but mature and already broadly recognized (in line with guidance); at the 6-ticker cap this slot is better used on OKLO, a fresher buildup-phase name mapping precisely onto the profile's SMR/AI-data-center sub-thesis.",
+      "news_evidence": [
+        {"summary": "Cameco Q1 2024 in line with outlook: adjusted net earnings $56M, adjusted EBITDA $345M, uranium segment earnings up 34% YoY — a steady consensus story, not a new catalyst", "source": "Cameco / SEC Form 6-K", "url": "https://www.cameco.com/media/news/cameco-reports-2024-first-quarter-results", "date": "2024-04-30"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "One swap within the nuclear bucket: OKLO (freshly-listed SMR pure-play with dated AI-data-center demand evidence) replaces CCJ (mature, already-consensus uranium exposure), sharpening the fit to the profile's 'SMR fission + PPAs to AI data centers' next wave while holding at cap 6. The rest held: AI (MSFT, NVDA) remains the dominant riding wave with no crest (NVDA's split and ascent to most-valuable-company read as confirmation); ITA (defense) and RKLB (rockets, Neutron testing progressing) intact; IONQ (quantum) beat Q1 revenue guidance and raised bookings. Tanker names were declining off spring highs (poor entry). Result: MSFT, NVDA, ITA, RKLB, IONQ, OKLO.",
+  "search_terms": ["AI stocks rally after:2024-04-01 before:2024-07-01", "robotics stocks humanoid robot after:2024-04-01 before:2024-07-01", "space stocks rocket launch stocks after:2024-04-01 before:2024-07-01", "quantum computing stocks after:2024-04-01 before:2024-07-01", "nuclear stocks SMR stocks after:2024-04-01 before:2024-07-01", "shipping stocks tanker stocks after:2024-04-01 before:2024-07-01", "healthcare stocks eldercare REIT aging population demographics after:2024-04-01 before:2024-07-01", "defense stocks defense ETF after:2024-04-01 before:2024-07-01", "NVDA Nvidia news May June 2024 after:2024-04-01 before:2024-07-01", "IONQ IonQ Q1 2024 earnings revenue guidance", "CCJ Cameco Q1 2024 earnings uranium price after:2024-04-01 before:2024-07-01", "Oklo AltC Acquisition merger completion May 2024", "Oklo Sam Altman nuclear data center demand May June 2024", "Rocket Lab Neutron rocket news Q2 2024"]
+}

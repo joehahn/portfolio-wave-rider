@@ -1,0 +1,9 @@
+{
+  "as_of_date": "2024-06-30",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "All four incumbents remain the strongest dated theses in-window: NVDA's May 22 FY25-Q1 blowout plus the announced 10-for-1 split reaffirms AI; GOOGL's Apr 25 Q1 introduced its first-ever dividend and a $70B buyback (bullish AI-monetization); MSFT's Apr 25 Q3 showed Azure accelerating on AI workloads; STNG's tanker thesis remains intact with Red Sea rerouting supporting elevated rates through Q2. Oklo's May 2024 SPAC listing is a notable on-thesis SMR candidate, but at cap=4 with no breach or peak signal against any of the four, no paired removal is supported — Oklo noted for a future rebalance. Hold MSFT/GOOGL/NVDA/STNG.",
+  "search_terms": ["AI stocks news after:2024-04-01 before:2024-07-01", "space stocks rocket launch news after:2024-04-01 before:2024-07-01", "robotics stocks humanoid robot news after:2024-04-01 before:2024-07-01", "quantum computing stocks news after:2024-04-01 before:2024-07-01", "nuclear SMR stocks news after:2024-04-01 before:2024-07-01", "tanker stocks shipping stocks news after:2024-04-01 before:2024-07-01", "defense stocks defense ETF rearmament news after:2024-04-01 before:2024-07-01", "eldercare REIT healthcare aging population stocks news after:2024-04-01 before:2024-07-01", "NVDA Nvidia news after:2024-04-01 before:2024-07-01", "GOOGL Google Alphabet dividend buyback news after:2024-04-01 before:2024-07-01", "STNG Scorpio Tankers news after:2024-04-01 before:2024-07-01", "Oklo OKLO SPAC listing nuclear SMR May 2024"]
+}

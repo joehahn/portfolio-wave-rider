@@ -1,0 +1,27 @@
+{
+  "as_of_date": "2024-09-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "CEG",
+      "wave_bucket": "nuclear",
+      "rationale": "Microsoft signed a 20-year PPA with Constellation on Sep 20 2024 to restart Three Mile Island Unit 1 (Crane Clean Energy Center), dedicating 835MW to its AI data centers — the most concrete, capital-committed buildup signal of the quarter for the profile's nuclear wave, sitting directly at the AI/nuclear intersection this cap had no exposure to.",
+      "news_evidence": [
+        {"summary": "Constellation announces 20-year PPA with Microsoft; Crane Clean Energy Center to restart TMI Unit 1, 835MW carbon-free power dedicated to Microsoft AI data centers", "source": "Constellation Energy newsroom", "url": "https://www.constellationenergy.com/news/2024/Constellation-to-Launch-Crane-Clean-Energy-Center.html", "date": "2024-09-20"},
+        {"summary": "CEG shares surge ~22% on the Sep 20 announcement; the deal reprices the AI-nuclear thesis sector-wide", "source": "CNBC", "url": "https://www.cnbc.com/2024/09/20/constellation-energy-to-restart-three-mile-island-and-sell-the-power-to-microsoft.html", "date": "2024-09-20"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "LMT",
+      "rationale": "At a binding cap of 3, LMT is the weakest incumbent to fund the fresh nuclear entry: no incremental Q3 catalyst (F-35 TR-3, backlog steady-state), a premium valuation, and the stock cooled ~16% over three months — a mature wave with no fresh catalyst versus one entering buildup.",
+      "news_evidence": [
+        {"summary": "Lockheed Martin shares down ~16% over the trailing three months on valuation reassessment even as backlog stayed solid ($165.69B) — a cooling after a geopolitical-driven rally, not a fresh catalyst", "source": "Nasdaq", "url": "https://www.nasdaq.com/articles/lockheed-martin-stock-loses-16-3-months-time-hold-or-fold", "date": "2024-09-30"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Swap the sole defense holding (LMT) for the sole nuclear holding (CEG), keeping the watchlist at cap=3 (MSFT, NVDA, CEG). This trades a mature, already-priced defense wave with no fresh Q3 catalyst for the clearest dated buildup signal of the quarter in the profile's next-wave nuclear thesis — Microsoft's own 20-year PPA to restart Three Mile Island for AI data centers — which also reinforces the AI wave held via MSFT and NVDA. CEG was chosen over NuScale (pre-revenue), VST, and OKLO (more speculative) as the direct PPA counterparty and most liquid name. No change to the AI side; no Q3 news breached that thesis.",
+  "search_terms": ["nuclear stocks SMR after:2024-07-01 before:2024-10-01", "Microsoft Constellation Three Mile Island nuclear power purchase agreement after:2024-07-01 before:2024-10-01", "space stocks rocket launch after:2024-07-01 before:2024-10-01", "robotics stocks after:2024-07-01 before:2024-10-01", "quantum computing stocks after:2024-07-01 before:2024-10-01", "defense stocks defense ETF after:2024-07-01 before:2024-10-01", "tanker stocks shipping geopolitics oil after:2024-07-01 before:2024-10-01", "healthcare eldercare REIT aging population stocks after:2024-07-01 before:2024-10-01", "Constellation Energy CEG stock news after:2024-07-01 before:2024-10-01", "Vistra VST Cameco CCJ nuclear stock news after:2024-07-01 before:2024-10-01", "Lockheed Martin LMT news valuation after:2024-07-01 before:2024-10-01", "NVDA Nvidia news after:2024-07-01 before:2024-10-01", "MSFT Microsoft news after:2024-07-01 before:2024-10-01"]
+}

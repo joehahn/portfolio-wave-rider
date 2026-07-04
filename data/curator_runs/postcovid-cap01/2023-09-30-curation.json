@@ -1,0 +1,9 @@
+{
+  "as_of_date": "2023-09-30",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "Single-slot watchlist (cap=1) stays on NVDA. Pass-1 across every named wave found no dated in-window ticker with a commercial catalyst strong enough to displace NVDA's own catalyst. NVDA's Q2 FY2024 results (Aug 23 2023) showed record revenue of $13.51B (+101% YoY) and record data-center revenue of $10.32B on generative-AI demand — direct dated confirmation the AI wave is still in buildup/surge for NVDA, with no peak-enthusiasm or thesis-breach signal on/before 2023-09-30. Hold NVDA.",
+  "search_terms": ["AI stocks after:2023-07-01 before:2023-10-01", "space stocks rocket launch stocks after:2023-07-01 before:2023-10-01", "robotics stocks humanoid robot stocks after:2023-07-01 before:2023-10-01", "nuclear stocks SMR stocks after:2023-07-01 before:2023-10-01", "quantum computing stocks after:2023-07-01 before:2023-10-01", "NVDA earnings Q2 2023 revenue after:2023-07-01 before:2023-10-01", "Nvidia data center revenue guidance forecast after:2023-07-01 before:2023-10-01", "Nvidia stock AI chip demand after:2023-08-01 before:2023-10-01"]
+}

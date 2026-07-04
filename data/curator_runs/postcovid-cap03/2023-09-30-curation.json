@@ -1,0 +1,9 @@
+{
+  "as_of_date": "2023-09-30",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "At cap=3, the slate (MSFT, NVDA AI; LMT defense) is anchored by strong dated Q3-2023 catalysts: NVDA's Aug 23 Q2 FY24 print showed record $10.32B data-center revenue reinforcing the AI buildup; MSFT announced the Copilot launch across Windows 11/M365/Edge/Bing Sep 21; and LMT was tapped by the Space Development Agency for 36 Tranche 2 Transport Layer satellites, reinforcing the defense/rearmament wave. Pass-1 surfaced candidates (e.g. IONQ's Aug 10 print) but none clearly stronger than the three held theses, and no incumbent showed a breach. Hold unchanged.",
+  "search_terms": ["AI stocks after:2023-07-01 before:2023-10-01", "space stocks rocket launch stocks after:2023-07-01 before:2023-10-01", "robotics stocks humanoid robot stocks after:2023-07-01 before:2023-10-01", "quantum computing stocks after:2023-07-01 before:2023-10-01", "nuclear stocks SMR stocks after:2023-07-01 before:2023-10-01", "defense stocks defense ETF after:2023-07-01 before:2023-10-01", "tanker stocks shipping stocks geopolitics after:2023-07-01 before:2023-10-01", "eldercare REIT stocks healthcare aging population stocks after:2023-07-01 before:2023-10-01", "NVIDIA Q2 fiscal 2024 earnings August 23 2023 data center revenue", "Microsoft Copilot AI announcement September 2023", "Lockheed Martin news September 2023 contract SDA Tranche 2", "IonQ IONQ news July August September 2023"]
+}

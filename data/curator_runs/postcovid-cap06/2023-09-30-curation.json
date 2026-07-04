@@ -1,0 +1,9 @@
+{
+  "as_of_date": "2023-09-30",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "All six holdings cleared quarter-end diligence with supportive or neutral in-window news: MSFT shipped Copilot (Sep 21), GOOGL rolled out Bard extensions and confirmed a late-2023 Gemini roadmap, NVDA delivered its Aug 23 blowout Q2, ITA's primes booked further Ukraine-replenishment orders, and SMR had no adverse in-window news. RKLB had mixed news — a solid Aug 8 Q2 followed by a Sept 19 launch anomaly cutting Q3 guidance — a real setback but not a thesis breach for the sole rocket name, so it stays with a flag. Pass-1 surfaced strong next-wave candidates (IONQ Aug 10 beat-and-raise; FRO best Q2 since 2008; WELL 24% same-store NOI growth) but at cap=6 no incumbent cleared removal, so hold. IONQ/FRO/WELL noted for reconsideration.",
+  "search_terms": ["AI stocks news after:2023-07-01 before:2023-10-01", "space stocks rocket launch after:2023-07-01 before:2023-10-01", "robotics stocks humanoid robot after:2023-07-01 before:2023-10-01", "quantum computing stocks after:2023-07-01 before:2023-10-01", "nuclear stocks SMR stocks after:2023-07-01 before:2023-10-01", "tanker stocks shipping freight geopolitics after:2023-07-01 before:2023-10-01", "defense stocks defense ETF after:2023-07-01 before:2023-10-01", "healthcare eldercare REIT aging population demographics stocks after:2023-07-01 before:2023-10-01", "Rocket Lab RKLB news Q2 2023 earnings August September 2023 launch anomaly", "IonQ Q2 2023 earnings August 2023 revenue guidance", "Frontline FRO Q2 2023 earnings report tanker rates August 2023", "Welltower WELL Q2 2023 earnings senior housing August 2023", "Microsoft MSFT news September 2023 AI Copilot", "NuScale Power SMR stock news September 2023"]
+}

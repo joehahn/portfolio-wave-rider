@@ -1,0 +1,9 @@
+{
+  "as_of_date": "2024-09-30",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "Single-slot watchlist (cap=1) holds NVDA. Its Aug 28 Q2 FY25 print showed record revenue $30.0B (+122% YoY), data-center $26.3B (+154% YoY), and ~$32.5B Q3 guidance — the AI buildout still accelerating. The Aug 5 selloff (NVDA -9.5%) was a liquidity-driven vol spike, not a fundamentals break, reaffirmed by earnings weeks later. The Sep 20 Microsoft-Constellation Three Mile Island PPA validates nuclear-for-AI-datacenters but is a supply-side adjacency, not a stronger sole AI exposure than NVDA; at cap=1 a swap would trade the demand-side leader for an adjacency. Hold NVDA.",
+  "search_terms": ["AI stocks news after:2024-07-01 before:2024-10-01", "nuclear stocks SMR PPA AI data center after:2024-07-01 before:2024-10-01", "space stocks rocket launch news after:2024-07-01 before:2024-10-01", "robotics stocks humanoid robot news after:2024-07-01 before:2024-10-01", "quantum computing stocks news after:2024-07-01 before:2024-10-01", "defense stocks rearmament ETF after:2024-07-01 before:2024-10-01", "tanker shipping stocks oil reserves after:2024-07-01 before:2024-10-01", "healthcare eldercare REIT aging population stocks after:2024-07-01 before:2024-10-01", "NVDA Nvidia earnings Q2 FY25 after:2024-07-01 before:2024-10-01", "Nvidia stock August 5 2024 selloff volatility after:2024-08-01 before:2024-08-10"]
+}

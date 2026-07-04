@@ -1,0 +1,9 @@
+{
+  "as_of_date": "2024-09-30",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "At cap=2, MSFT and NVDA both cleared the dated-signal bar. NVDA posted a strong Q2 FY25 (Aug 28: record $26.3B data-center revenue +154% YoY, fresh $50B buyback) plus demand pull-through (Oracle's Sep 12 Blackwell pre-orders); a Sep 11 DOJ antitrust subpoena is a watch-item not a breach. MSFT's Sep 20 20-year PPA with Constellation to restart Three Mile Island for AI power directly underwrites the nuclear leg of the AI wave, reinforcing its thesis and giving incidental nuclear exposure without a dedicated SMR ticker. Pass-1 across the other waves turned up only general commentary or post-date events. No swap warranted. Hold MSFT/NVDA.",
+  "search_terms": ["AI stocks news after:2024-07-01 before:2024-10-01", "space stocks rocket launch news after:2024-07-01 before:2024-10-01", "robotics stocks news after:2024-07-01 before:2024-10-01", "quantum computing stocks news after:2024-07-01 before:2024-10-01", "nuclear SMR stocks news after:2024-07-01 before:2024-10-01", "tanker freight shipping stocks news after:2024-07-01 before:2024-10-01", "defense stocks defense ETF news after:2024-07-01 before:2024-10-01", "healthcare eldercare aging population stocks news after:2024-07-01 before:2024-10-01", "NVIDIA NVDA Q2 earnings August 28 2024 after:2024-07-01 before:2024-10-01", "Microsoft Constellation Three Mile Island nuclear power purchase agreement September 2024", "Microsoft MSFT news September 2024 after:2024-07-01 before:2024-10-01"]
+}

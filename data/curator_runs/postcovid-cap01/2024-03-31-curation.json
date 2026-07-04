@@ -1,0 +1,9 @@
+{
+  "as_of_date": "2024-03-31",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "NVDA remains the single strongest sole exposure to the AI wave, and the profile calls for riding until a crest, not trimming early. In-window evidence is unambiguous: NVIDIA's Feb 21 Q4 FY24 showed data-center revenue $18.4B (+409% YoY), the stock crossed $2T in February, and the Mar 18 GTC keynote unveiled Blackwell/GB200 with AWS/Google/Azure/OCI lined up — a forward-looking catalyst. Pass-1 across every named wave surfaced future candidates (IONQ, NuScale, Intuitive Machines) but none remotely comparable in magnitude to NVDA's Q4 beat plus GTC reveal, and at cap=1 a swap means abandoning the strongest signal. No breach or peak signal. Hold NVDA.",
+  "search_terms": ["AI stocks after:2024-01-01 before:2024-04-01", "space stocks rocket launch stocks after:2024-01-01 before:2024-04-01", "robotics stocks humanoid robot stocks after:2024-01-01 before:2024-04-01", "quantum computing stocks after:2024-01-01 before:2024-04-01", "nuclear stocks SMR stocks after:2024-01-01 before:2024-04-01", "defense stocks defense ETF geopolitics tanker stocks after:2024-01-01 before:2024-04-01", "healthcare stocks eldercare REIT aging population demographics stocks after:2024-01-01 before:2024-04-01", "NVDA Nvidia earnings Q4 stock news after:2024-01-01 before:2024-04-01", "Nvidia GTC 2024 Blackwell GB200 announcement after:2024-01-01 before:2024-04-01", "Nvidia market cap $2 trillion after:2024-01-01 before:2024-04-01"]
+}

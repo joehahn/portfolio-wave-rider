@@ -1,0 +1,9 @@
+{
+  "as_of_date": "2024-06-30",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "Cap=1 forces a single-slot decision, and NVDA remains the strongest available AI-wave proxy: Q1 FY25 revenue $26.0B (+262% YoY), a 10-for-1 split announced May 22, and NVDA briefly becoming the world's most valuable company June 19 (~$3.34T). These are peak-enthusiasm signals worth flagging for trim discipline, but no dated news this quarter surfaces another single ticker with a milestone strong enough to justify swapping out the sole AI exposure for a narrower bet. Hold NVDA pending a clearer single-ticker trim case.",
+  "search_terms": ["AI stocks news after:2024-04-01 before:2024-07-01", "space stocks rocket launch stocks after:2024-04-01 before:2024-07-01", "robotics stocks humanoid robot stocks after:2024-04-01 before:2024-07-01", "quantum computing stocks news after:2024-04-01 before:2024-07-01", "nuclear stocks SMR stocks news after:2024-04-01 before:2024-07-01", "tanker stocks shipping stocks geopolitics after:2024-04-01 before:2024-07-01", "defense stocks defense ETF news after:2024-04-01 before:2024-07-01", "healthcare eldercare REIT aging population stocks after:2024-04-01 before:2024-07-01", "NVDA Nvidia Q1 FY25 earnings stock split news after:2024-04-01 before:2024-07-01", "Nvidia most valuable company world after:2024-05-01 before:2024-06-25"]
+}
