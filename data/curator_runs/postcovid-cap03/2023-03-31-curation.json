@@ -1,0 +1,9 @@
+{
+  "as_of_date": "2023-03-31",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "No dated in-window signal clears the bar for a swap. MSFT and GOOGL both have concrete Q1 2023 AI milestones (Microsoft's GPT-4/Azure OpenAI integration; Google's Bard announcement in February, a direct competitive response), and LMT's Q4 2022 results (Jan 24 2023, sales $19.0B) are consistent with the defense/rearmament thesis with no breach. Pass-1 across the other named waves surfaced only thin or undated signals in the Jan-Mar window (NuScale investor-conference appearances are not commercial milestones; stronger-sounding quantum/space claims could not be confirmed dated on/before 2023-03-31 and were discarded). At cap=3 the MSFT/GOOGL/LMT set already spans the strongest available dated theses. Hold unchanged.",
+  "search_terms": ["AI stocks generative AI after:2023-01-01 before:2023-04-01", "space stocks rocket launch stocks after:2023-01-01 before:2023-04-01", "robotics stocks after:2023-01-01 before:2023-04-01", "quantum computing stocks after:2023-01-01 before:2023-04-01", "nuclear stocks SMR stocks after:2023-01-01 before:2023-04-01", "defense stocks defense ETF rearmament after:2023-01-01 before:2023-04-01", "tanker stocks shipping freight rates oil after:2023-01-01 before:2023-04-01", "healthcare eldercare REIT demographics stocks after:2023-01-01 before:2023-04-01", "interest rates Federal Reserve March 2023 banking crisis", "Microsoft MSFT news OpenAI GPT-4 after:2023-01-01 before:2023-04-01", "Google GOOGL Bard news after:2023-01-01 before:2023-04-01", "Lockheed Martin LMT news earnings after:2023-01-01 before:2023-04-01"]
+}

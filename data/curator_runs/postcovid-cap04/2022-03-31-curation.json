@@ -1,0 +1,34 @@
+{
+  "as_of_date": "2022-03-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "ITA",
+      "wave_bucket": "geopolitical",
+      "rationale": "Russia's Feb 24 invasion of Ukraine and Germany's Feb 27 pledge to permanently lift defense spending above 2% of GDP mark the buildup phase of the profile's named defense & rearmament wave, and the broad-basket ETF format avoids single-prime concentration risk.",
+      "news_evidence": [
+        {"summary": "iShares U.S. Aerospace & Defense ETF (ITA) up more than 5% since the Feb 24 invasion; Lockheed Martin and Northrop Grumman shares up roughly 20% as 'war stocks' rally", "source": "Forbes", "url": "https://www.forbes.com/sites/sergeiklebnikov/2022/03/04/war-stocks-are-surging-as-russia-ukraine-conflict-rages-on-lockheed-martin-northrop-up-20/", "date": "2022-03-04"},
+        {"summary": "Chancellor Scholz pledges a EUR100bn special fund and commits Germany to spending over 2% of GDP on defense in his Zeitenwende speech to the Bundestag", "source": "Euronews", "url": "https://www.euronews.com/2022/02/27/new-era-scholz-pledges-100bn-boost-to-german-defence-spending", "date": "2022-02-27"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "AAPL",
+      "rationale": "Weakest wave-alignment among the four mega-cap tech names now that the cap is cut to 4: Apple's Q1 FY22 results reflect ordinary iPhone/Mac/services growth with no exposure to the AI-compute buildout or any other profile-named wave.",
+      "news_evidence": [
+        {"summary": "Apple reports record fiscal Q1 2022 revenue of $123.9B (+11% YoY), driven by Mac (+25%) and Other Products; no AI-specific growth driver cited", "source": "Apple Newsroom / CNBC", "url": "https://www.apple.com/newsroom/2022/01/apple-reports-first-quarter-results/", "date": "2022-01-27"}
+      ]
+    },
+    {
+      "ticker": "SPY",
+      "rationale": "SPY is a passive market-beta placeholder that captures no identifiable wave; with only 4 slots available, generic index exposure is the weakest hold relative to a wave-timing mandate, and the newly-begun Fed hiking cycle raises the discount rate on the index it tracks.",
+      "news_evidence": [
+        {"summary": "Federal Reserve approves its first rate hike in more than three years (25bp) and signals six more hikes in 2022 to fight 40-year-high inflation", "source": "CNBC", "url": "https://www.cnbc.com/2022/03/16/federal-reserve-meeting.html", "date": "2022-03-16"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Trimming from 5 to the new cap of 4 by dropping the two least wave-differentiated holdings (AAPL, SPY) and adding ITA to open the profile's geopolitical/defense-rearmament wave, which entered its buildup phase this quarter via the Ukraine invasion and Germany's Zeitenwende pledge. The resulting watchlist (MSFT, GOOGL, NVDA, ITA) keeps AI exposure through three names while adding the first non-technology wave named in the thesis. A tanker/freight add (FRO, BWET) was considered but its supporting data postdated 2022-03-31 (and BWET did not list until 2023), so both were dropped under the leakage guard and listing-date guardrail.",
+  "search_terms": ["artificial intelligence stocks after:2022-01-01 before:2022-04-01", "space stocks rocket launch stocks after:2022-01-01 before:2022-04-01", "robotics stocks after:2022-01-01 before:2022-04-01", "quantum computing stocks after:2022-01-01 before:2022-04-01", "nuclear stocks SMR small modular reactor after:2022-01-01 before:2022-04-01", "defense stocks Ukraine Russia rearmament after:2022-01-01 before:2022-04-01", "tanker shipping stocks oil energy after:2022-01-01 before:2022-04-01", "healthcare eldercare REIT aging population stocks after:2022-01-01 before:2022-04-01", "best performing etf this month after:2022-01-01 before:2022-04-01", "biggest stock gainers after:2022-01-01 before:2022-04-01", "Frontline FRO stock tanker Ukraine after:2022-01-01 before:2022-04-01", "Breakwave Tanker Shipping ETF BWET launch date before:2022-04-01", "Germany Scholz defense spending 100 billion Zeitenwende announcement February 27 2022", "Federal Reserve rate hike March 2022 first hike inflation stock market", "iShares Aerospace Defense ETF ITA news after:2022-01-01 before:2022-04-01"]
+}

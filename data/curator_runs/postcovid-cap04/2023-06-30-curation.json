@@ -1,0 +1,9 @@
+{
+  "as_of_date": "2023-06-30",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "The watchlist stays MSFT/GOOGL/NVDA/STNG. Pass-1 across every named wave turned up no dated in-window milestone strong enough to displace a holding at cap=4. Within the four: NVDA's May 24 earnings and the data-center demand surge confirm the AI wave is still in buildup/surge, not at a trim-worthy crest; MSFT's ~27% Azure growth (Apr 25) reinforces the AI thesis; GOOGL showed no dated thesis-changing event; STNG's April dividend initiation and June 26 Strong-Buy upgrade support the tanker/geopolitical thesis. No breach or peak-enthusiasm signal for any of the four. Hold unchanged.",
+  "search_terms": ["AI stocks after:2023-04-01 before:2023-07-01", "space stocks rocket launch stocks after:2023-04-01 before:2023-07-01", "robotics stocks humanoid robot stocks after:2023-04-01 before:2023-07-01", "quantum computing stocks after:2023-04-01 before:2023-07-01", "nuclear stocks SMR stocks after:2023-04-01 before:2023-07-01", "tanker stocks shipping stocks after:2023-04-01 before:2023-07-01", "defense stocks defense ETF rearmament after:2023-04-01 before:2023-07-01", "healthcare stocks eldercare REIT aging population demographics after:2023-04-01 before:2023-07-01", "Nvidia NVDA stock news after:2023-04-01 before:2023-07-01", "Microsoft MSFT stock news after:2023-04-01 before:2023-07-01", "Google Alphabet GOOGL stock news after:2023-04-01 before:2023-07-01", "Scorpio Tankers STNG stock news after:2023-04-01 before:2023-07-01"]
+}

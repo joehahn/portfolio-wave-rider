@@ -1,0 +1,9 @@
+{
+  "as_of_date": "2023-03-31",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "Holding at cap=6. The AI wave (MSFT, GOOGL, NVDA) is still in early buildup, not crest: Microsoft confirmed its multibillion-dollar OpenAI investment Jan 23, Google announced Bard Feb 6 in response, and OpenAI shipped GPT-4 Mar 14 with 365 Copilot Mar 17 — accelerating adoption, not exhaustion, so no trim signal. ITA (defense), SMR (nuclear), and RKLB (rockets) show no thesis-breaching news. Pass-1 surfaced quantum (IONQ/RGTI, operating updates only), tanker (FRO/STNG, incremental), and eldercare REITs (no dated Q1 catalyst), none clearing the add bar to justify displacing an intact holding at cap=6. SVB collapse noted as macro context only. Hold unchanged: three AI, one defense, one nuclear, one rockets.",
+  "search_terms": ["AI stocks after:2023-01-01 before:2023-04-01", "space stocks rocket launch after:2023-01-01 before:2023-04-01", "robotics stocks after:2023-01-01 before:2023-04-01", "quantum computing stocks after:2023-01-01 before:2023-04-01", "nuclear SMR stocks after:2023-01-01 before:2023-04-01", "defense stocks defense ETF after:2023-01-01 before:2023-04-01", "tanker shipping stocks geopolitics oil reserves after:2023-01-01 before:2023-04-01", "healthcare eldercare REIT aging population demographics stocks after:2023-01-01 before:2023-04-01", "IonQ IONQ stock news March 2023", "Frontline FRO Scorpio Tankers STNG stock news February March 2023", "MSFT Microsoft OpenAI $10 billion investment January 2023", "GOOGL Google Bard AI announcement February 2023", "NVDA Nvidia stock news March 2023 GTC", "SMR NuScale Power stock news March 2023", "RKLB Rocket Lab stock news Q1 2023", "GPT-4 launch March 14 2023 Microsoft", "Silicon Valley Bank collapse March 2023 stock market impact"]
+}

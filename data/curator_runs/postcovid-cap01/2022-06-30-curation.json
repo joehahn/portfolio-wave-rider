@@ -1,0 +1,19 @@
+{
+  "as_of_date": "2022-06-30",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [
+    {
+      "ticker": "MSFT",
+      "rationale": "Both names show strong AI-adjacent growth, but NVDA is the purer AI-wave bet: record Data Center revenue up 83% YoY on the new Hopper/H100 platform, versus MSFT's Azure growth which is broad enterprise cloud with AI as one sub-component; with only one slot, NVDA is kept and MSFT removed.",
+      "news_evidence": [
+        {"summary": "NVIDIA reports record Q1 FY2023 revenue of $8.29B (+46% YoY); Data Center segment hits record $3.75B, up 83% YoY", "source": "NVIDIA Newsroom / SEC 8-K", "url": "https://www.sec.gov/Archives/edgar/data/0001045810/000104581022000073/q1fy23pr.htm", "date": "2022-05-25"},
+        {"summary": "NVIDIA unveils Hopper architecture and H100 Tensor Core GPU at GTC, up to 9x faster AI training vs A100", "source": "HPCwire", "url": "https://www.hpcwire.com/2022/03/22/nvidia-launches-hopper-h100-gpu-new-dgxs-and-grace-megachips/", "date": "2022-03-22"},
+        {"summary": "Microsoft Q3 FY2022: revenue $49.4B (+18%); Azure and other cloud services revenue up 46%; Intelligent Cloud $19.1B, up 26%", "source": "Microsoft IR / SEC 8-K", "url": "https://www.sec.gov/Archives/edgar/data/0000789019/000119312522120207/d328712dex991.htm", "date": "2022-04-26"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "The cap is cut from 2 to 1, forcing a choice within the AI wave. NVIDIA's Data Center revenue grew 83% YoY to a record $3.75B (reported May 25, 2022) and it had just launched the Hopper/H100 AI GPU at GTC in March 2022 — a purer, more direct AI-buildout bet than Microsoft, whose Azure +46% reflects broad enterprise cloud. MSFT is removed and NVDA kept as the single AI slot; near-term crypto-linked gaming softness is a separate segment from the data-center thesis.",
+  "search_terms": ["Nvidia stock news after:2022-04-01 before:2022-07-01", "Microsoft stock news after:2022-04-01 before:2022-07-01", "AI stocks artificial intelligence after:2022-04-01 before:2022-07-01", "Nvidia first quarter fiscal 2023 earnings May 2022", "Nvidia gaming inventory correction cryptocurrency mining slowdown 2022", "Microsoft Azure AI cloud growth Q3 fiscal 2022 earnings call", "Nvidia Hopper H100 AI supercomputing GTC March 2022", "Microsoft Q3 fiscal 2022 earnings Azure revenue growth April 26 2022", "Nvidia stock price decline 2022 tech selloff rate hikes semiconductor"]
+}

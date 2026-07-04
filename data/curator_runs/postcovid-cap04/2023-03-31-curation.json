@@ -1,0 +1,9 @@
+{
+  "as_of_date": "2023-03-31",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "At cap=4, the set (MSFT/GOOGL/NVDA AI; STNG tanker) still checks out against dated Q1 2023 evidence: NVDA's Feb 22 print and GTC keep the AI buildup intact; MSFT's in-window OpenAI investment underscores the wave; GOOGL's Feb Bard-demo selloff is a stumble not a breach, with sentiment recovering by the March public launch; STNG benefits from the March 29 OPEC+ surprise cut tightening tanker economics plus a first-ever quarterly dividend. Pass-1 across rockets/robotics/quantum/nuclear/defense/demographics found no dated in-window milestone strong enough to displace an incumbent at this tight cap. Hold unchanged.",
+  "search_terms": ["space stocks rocket launch stocks news after:2023-01-01 before:2023-04-01", "robotics stocks news after:2023-01-01 before:2023-04-01", "quantum computing stocks news after:2023-01-01 before:2023-04-01", "nuclear stocks SMR stocks news after:2023-01-01 before:2023-04-01", "tanker stocks shipping stocks geopolitics news after:2023-01-01 before:2023-04-01", "defense stocks defense ETF rearmament news after:2023-01-01 before:2023-04-01", "healthcare stocks eldercare REIT aging population demographics news after:2023-01-01 before:2023-04-01", "best performing etf this month after:2023-01-01 before:2023-04-01", "Scorpio Tankers STNG stock news after:2023-01-01 before:2023-04-01", "NVDA Nvidia stock news after:2023-01-01 before:2023-04-01", "Microsoft MSFT stock news OpenAI after:2023-01-01 before:2023-04-01", "Google GOOGL Bard stock news after:2023-01-01 before:2023-04-01"]
+}

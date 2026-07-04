@@ -1,0 +1,27 @@
+{
+  "as_of_date": "2022-09-30",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "RKLB",
+      "wave_bucket": "rockets_spacecraft",
+      "rationale": "Rocket Lab is a trading, liquid pure-play on the rockets/spacecraft wave and just delivered a concrete engineering milestone (Neutron redesign) plus a scientific mission win, making now a reasonable buildup-phase entry.",
+      "news_evidence": [
+        {"summary": "Rocket Lab unveiled a revised Neutron medium-lift design at its investor day, raising first-stage engines from seven to nine and switching to oxygen-rich staged combustion.", "source": "Rocket Lab investor day materials", "url": "https://en.wikipedia.org/wiki/Rocket_Lab_Neutron", "date": "2022-09-22"},
+        {"summary": "Rocket Lab won a ~$190M deal to test hypersonic tech for the US military and revealed a privately funded Venus atmosphere probe aboard Electron.", "source": "Space.com", "url": "https://www.space.com/space-exploration/launches-spacecraft/rocket-lab-scores-usd190-million-launch-deal-to-test-hypersonic-tech-for-us-military", "date": "2022-08-01"}
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "AAPL",
+      "rationale": "AAPL is the weakest-linked of the four AI-bucket incumbents to the AI thesis (no dedicated model/GPU story vs MSFT/GOOGL/NVDA) and now carries a fresh dated supply-chain headwind into its most important quarter; freeing this slot opens rockets/spacecraft exposure.",
+      "news_evidence": [
+        {"summary": "Key Apple suppliers in China's Chengdu region were caught in fresh COVID lockdowns shortly after the iPhone 14 launch, raising production-disruption risk into the holiday quarter.", "source": "Fortune", "url": "https://fortune.com/2022/09/08/apple-iphone-china-supply-chain-lockdown/", "date": "2022-09-08"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "The AI bucket shrinks from 4 to 3 (MSFT/GOOGL/NVDA) by dropping AAPL, the least AI-thesis-specific incumbent facing a fresh dated supply headwind, while the freed slot opens rockets/spacecraft via RKLB (listed pure-play that cleared a Neutron-design milestone and Venus-mission win this window). ITA (defense) and SMR (nuclear) kept: September Ukraine defense-aid actions support geopolitical, and NuScale's Q2 print reaffirmed commercialization. NVDA's China export curb (~$400M) is noted but not large enough to justify removal vs its AI-pure-play status. Watchlist stays at cap 6: MSFT, GOOGL, NVDA, ITA, SMR, RKLB.",
+  "search_terms": ["space stocks rocket launch after:2022-07-01 before:2022-10-01", "robotics stocks after:2022-07-01 before:2022-10-01", "quantum computing stocks after:2022-07-01 before:2022-10-01", "nuclear SMR stocks after:2022-07-01 before:2022-10-01", "tanker shipping stocks after:2022-07-01 before:2022-10-01", "defense stocks ETF after:2022-07-01 before:2022-10-01", "Rocket Lab RKLB stock news September 2022", "IonQ IONQ stock quantum computing news August September 2022", "Apple AAPL news September 2022 iPhone 14 supply chain", "Nvidia NVDA China export ban data center chips news September 2022", "NuScale Power SMR second quarter 2022 earnings August 2022", "defense budget Congress Ukraine weapons spending news September 2022", "Rocket Lab Electron Neutron rocket development July August September 2022", "AI artificial intelligence stocks news August September 2022"]
+}

@@ -1,0 +1,9 @@
+{
+  "as_of_date": "2022-12-31",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "Single-slot watchlist (cap=1) stays on NVDA. The quarter's defining event, ChatGPT's 2022-11-30 public launch, is a dated buildup signal for the AI wave, and NVDA is the sole liquid pure-play on the data-center GPU compute those generative-AI workloads run on — the strongest concrete news-to-ticker link available at cap=1. Other named waves produced no comparably strong single-ticker catalyst in the trailing 90 days. The Oct-2022 BIS A100/H100 China export curb is a headwind but does not touch NVDA's core North American/hyperscaler AI demand. Hold NVDA.",
+  "search_terms": ["AI stocks after:2022-10-01 before:2023-01-01", "space stocks rocket launch stocks after:2022-10-01 before:2023-01-01", "robotics stocks after:2022-10-01 before:2023-01-01", "nuclear stocks SMR stocks after:2022-10-01 before:2023-01-01", "quantum computing stocks after:2022-10-01 before:2023-01-01", "defense stocks defense ETF after:2022-10-01 before:2023-01-01", "tanker stocks shipping stocks geopolitics after:2022-10-01 before:2023-01-01", "healthcare eldercare REIT stocks aging population after:2022-10-01 before:2023-01-01", "best performing etf this month after:2022-10-01 before:2023-01-01", "Nvidia NVDA stock news November December 2022 data center AI chips", "ChatGPT launch November 30 2022 OpenAI reaction"]
+}

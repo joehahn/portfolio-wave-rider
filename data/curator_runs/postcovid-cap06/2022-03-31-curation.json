@@ -1,0 +1,20 @@
+{
+  "as_of_date": "2022-03-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "ITA",
+      "wave_bucket": "geopolitical",
+      "rationale": "Russia's invasion of Ukraine triggered a concrete, dated buildup-phase signal for the defense/rearmament wave the profile names under geopolitical realignment: aerospace-defense ETFs rallied double digits in a week with accelerating inflows, while Germany and other NATO allies announced structural defense-budget increases.",
+      "news_evidence": [
+        {"summary": "iShares U.S. Aerospace & Defense ETF (ITA) and peers gained nearly double-digits in the week following Russia's Feb 24 invasion; ITA up 5%+ since the invasion", "source": "Nasdaq/ETFTrends", "url": "https://www.etftrends.com/defense-etfs-climb-following-russias-advance-into-ukraine/", "date": "2022-02-25"},
+        {"summary": "Defense-sector ETFs hauled in $126M of inflows in the week to Feb 21, almost doubling their 2022 YTD total, as the Ukraine crisis raised the prospect of higher military spending", "source": "Nasdaq", "url": "https://www.nasdaq.com/articles/aerospace-defense-etfs-take-flight-on-russias-invasion-of-ukraine", "date": "2022-02-22"},
+        {"summary": "Lockheed Martin and Northrop Grumman shares up roughly 20% as war stocks surge; Germany announces defense budget will rise above 2% of GDP", "source": "Forbes", "url": "https://www.forbes.com/sites/sergeiklebnikov/2022/03/04/war-stocks-are-surging-as-russia-ukraine-conflict-rages-on-lockheed-martin-northrop-up-20/", "date": "2022-03-04"}
+      ]
+    }
+  ],
+  "removes": [],
+  "no_changes": false,
+  "rationale_overall": "The watchlist stays AI-heavy (AAPL, MSFT, GOOGL, NVDA, SPY all kept) because Q1 2022 news shows the big-tech names still executing on thesis, not cresting: Apple posted a record $123.9B quarter, Microsoft announced the $68.7B Activision deal, Alphabet announced a 20-for-1 split, and Nvidia's terminated Arm acquisition is a regulatory setback but not a thesis breach for its core AI/semiconductor business. The single add, ITA, fills the geopolitical/defense-and-rearmament wave with clean dated evidence of a buildup move; it brings the watchlist to the 6-ticker cap. No removes this quarter: no incumbent shows a fundamental thesis breach or peak-enthusiasm signal yet.",
+  "search_terms": ["AI stocks after:2022-01-01 before:2022-04-01", "space stocks rocket launch stocks after:2022-01-01 before:2022-04-01", "robotics stocks after:2022-01-01 before:2022-04-01", "quantum computing stocks after:2022-01-01 before:2022-04-01", "nuclear stocks SMR small modular reactor after:2022-01-01 before:2022-04-01", "defense stocks defense ETF Russia Ukraine after:2022-01-01 before:2022-04-01", "tanker stocks shipping stocks oil after:2022-01-01 before:2022-04-01", "healthcare stocks eldercare REIT aging population after:2022-01-01 before:2022-04-01", "best performing etf this month after:2022-01-01 before:2022-04-01", "biggest stock gainers Q1 2022 after:2022-01-01 before:2022-04-01", "interest rates Federal Reserve rate hike after:2022-01-01 before:2022-04-01", "AAPL Apple stock news after:2022-01-01 before:2022-04-01", "MSFT Microsoft stock news after:2022-01-01 before:2022-04-01", "GOOGL Alphabet Google stock news after:2022-01-01 before:2022-04-01", "NVDA Nvidia stock news after:2022-01-01 before:2022-04-01", "SPY S&P 500 ETF news after:2022-01-01 before:2022-04-01", "ITA iShares Aerospace Defense ETF news after:2022-01-01 before:2022-04-01", "Microsoft Activision Blizzard acquisition January 2022", "Alphabet Google 20-for-1 stock split February 2022", "Nvidia Arm deal terminated February 2022"]
+}

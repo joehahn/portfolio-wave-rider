@@ -1,0 +1,9 @@
+{
+  "as_of_date": "2023-03-31",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "At a hard cap of 2, MSFT and NVDA are the two cleanest expressions of the dominant AI wave in buildup: Microsoft's multibillion-dollar OpenAI investment (deepened Jan 2023) and GPT-4's March release give MSFT a direct commercial stake, while NVDA's Feb 22 Q4 FY23 print flagged AI as an inflection with Hopper/H100 demand ramping. Neither shows a peak-enthusiasm signal or thesis breach; SVB's failure is a banking event with no direct read-through. Pass-1 across the other named waves turned up only forward-looking or out-of-window material once filters were applied, so nothing cleared the bar to force a swap. Hold as-is.",
+  "search_terms": ["AI stocks generative AI boom after:2023-01-01 before:2023-04-01", "rocket launch stocks space stocks after:2023-01-01 before:2023-04-01", "robotics stocks after:2023-01-01 before:2023-04-01", "quantum computing stocks after:2023-01-01 before:2023-04-01", "nuclear stocks SMR stocks after:2023-01-01 before:2023-04-01", "tanker stocks shipping stocks geopolitics oil after:2023-01-01 before:2023-04-01", "defense stocks defense ETF rearmament after:2023-01-01 before:2023-04-01", "healthcare stocks eldercare REIT aging population demographics stocks after:2023-01-01 before:2023-04-01", "best performing etf this month after:2023-01-01 before:2023-04-01", "Microsoft MSFT news after:2023-01-01 before:2023-04-01", "Nvidia NVDA news after:2023-01-01 before:2023-04-01"]
+}

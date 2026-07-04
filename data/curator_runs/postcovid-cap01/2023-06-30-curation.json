@@ -1,0 +1,9 @@
+{
+  "as_of_date": "2023-06-30",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "At cap=1, only a clearly stronger sole exposure would justify a swap. Pass-1 across every named wave found no in-window ticker with a catalyst rivaling NVDA's: Nvidia's May 24 2023 print showed record $4.28B data-center revenue with Q2 FY24 guidance of $11.0B, and the stock pushed through a $1T market cap on May 30-31 as the first pure-play AI semiconductor to do so. Quantum (IONQ/D-Wave) and SMR names are pre-commercial and thinly traded vs NVDA's confirmed revenue inflection; defense/shipping/eldercare reflect steady trends, not a buildup catalyst strong enough to displace the dominant wave's clearest exposure. No crest signal yet. Hold NVDA.",
+  "search_terms": ["AI stocks news after:2023-04-01 before:2023-07-01", "space stocks rocket launch news after:2023-04-01 before:2023-07-01", "robotics stocks news after:2023-04-01 before:2023-07-01", "quantum computing stocks news after:2023-04-01 before:2023-07-01", "nuclear SMR stocks news after:2023-04-01 before:2023-07-01", "defense stocks rearmament tanker shipping stocks after:2023-04-01 before:2023-07-01", "eldercare healthcare aging population stocks after:2023-04-01 before:2023-07-01", "biggest stock gainers June 2023", "NVDA Nvidia news after:2023-04-01 before:2023-07-01", "Nvidia earnings May 24 2023 data center guidance blowout", "Nvidia $1 trillion market cap June 2023"]
+}

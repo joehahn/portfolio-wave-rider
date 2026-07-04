@@ -1,0 +1,9 @@
+{
+  "as_of_date": "2022-09-30",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "NVDA remains the strongest single sole-exposure to the profile's dominant AI wave despite two dated headwinds: the Aug 26 2022 US restriction on A100/H100 exports to China (~$400M one-quarter hit per Nvidia's own disclosure) and continued crypto-driven gaming GPU weakness (Q2 FY23 gaming revenue down sharply). Neither breaches the core data-center AI-compute thesis: the China curb is product-specific/licensable and data-center revenue was still the growing segment. Pass-1 discovery across the other named waves surfaced no single ticker with a dated Q3-2022 catalyst compelling enough to displace NVDA as the sole cap=1 slot. Hold NVDA.",
+  "search_terms": ["NVDA Nvidia stock news after:2022-07-01 before:2022-10-01", "AI stocks news after:2022-07-01 before:2022-10-01", "space stocks rocket launch stocks news after:2022-07-01 before:2022-10-01", "robotics stocks news after:2022-07-01 before:2022-10-01", "quantum computing stocks news after:2022-07-01 before:2022-10-01", "nuclear stocks SMR stocks news after:2022-07-01 before:2022-10-01", "defense stocks defense ETF rearmament news after:2022-07-01 before:2022-10-01", "tanker stocks shipping freight oil geopolitics news after:2022-07-01 before:2022-10-01", "healthcare eldercare REIT aging population stocks news after:2022-07-01 before:2022-10-01", "best performing etf this month after:2022-07-01 before:2022-10-01", "Nvidia gaming GPU crypto mining demand slump August 2022", "Nvidia stock price crash September 2022 China export restrictions"]
+}

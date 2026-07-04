@@ -1,0 +1,36 @@
+{
+  "as_of_date": "2022-03-31",
+  "rebalance_period": "quarterly",
+  "adds": [
+    {
+      "ticker": "RKLB",
+      "wave_bucket": "rockets_spacecraft",
+      "rationale": "Rocket Lab's Q4 2021 results (reported Feb 28, 2022) showed revenue up 420% sequentially and backlog more than doubling to $545M, an early-surge commercial inflection in the rockets & spacecraft wave; the stock has traded since its Aug 2021 SPAC listing so it clears the listing-date guardrail.",
+      "news_evidence": [
+        {"summary": "Rocket Lab reports Q4 2021 revenue of $27.5M (420% sequential growth) and backlog growing to $545M as of Feb 28, 2022", "source": "SEC 8-K / Rocket Lab investor release", "url": "https://www.sec.gov/Archives/edgar/data/0001819994/000119312522057939/d263047dex991.htm", "date": "2022-02-28"},
+        {"summary": "Rocket Lab completed its SPAC merger with Vector Acquisition Corp and began trading as RKLB on Nasdaq", "source": "BusinessWire", "url": "https://www.businesswire.com/news/home/20210825005365/en/Rocket-Lab-Completes-Merger-with-Vector-Acquisition-Corporation", "date": "2021-08-25"}
+      ]
+    },
+    {
+      "ticker": "IONQ",
+      "wave_bucket": "quantum",
+      "rationale": "IonQ's first full-year results as a public company (reported Mar 28, 2022) confirmed revenue growth ahead of its own guidance and a growing bookings pipeline, giving the profile's quantum-computing next-wave a pure-play, already-listed vehicle.",
+      "news_evidence": [
+        {"summary": "IonQ FY2021 results: revenue $2.1M (31% above the company's own $1.6M forecast), full-year contract bookings of $16.7M", "source": "IonQ investor relations / SEC 8-K", "url": "https://ionq.com/news/march-07-2022-ionq-fourth-quarter-results-on-march-28", "date": "2022-03-28"},
+        {"summary": "IonQ became the first publicly traded, pure-play quantum computing company, closing its SPAC merger with dMY Technology Group III and beginning trading on the NYSE", "source": "IonQ press release", "url": "https://www.ionq.com/news/october-01-2021-ionq-listed-on-nyse", "date": "2021-10-01"}
+      ]
+    },
+    {
+      "ticker": "ITA",
+      "wave_bucket": "geopolitical",
+      "rationale": "Russia's invasion of Ukraine triggered an immediate, broad-based defense-sector re-rating (Lockheed +18%, Northrop +22%, General Dynamics +12% in the days following the invasion), the concrete rearmament catalyst the profile's geopolitical-realignment wave is watching for; ITA gives diversified exposure to the primes in one long-listed, highly liquid ETF.",
+      "news_evidence": [
+        {"summary": "Defense stocks surge after Russia's invasion of Ukraine: Lockheed +18%, Northrop +22%, General Dynamics +12%; iShares U.S. Aerospace & Defense ETF (ITA) up more than 5% since the invasion", "source": "Forbes", "url": "https://www.forbes.com/sites/sergeiklebnikov/2022/03/04/war-stocks-are-surging-as-russia-ukraine-conflict-rages-on-lockheed-martin-northrop-up-20/", "date": "2022-03-04"}
+      ]
+    }
+  ],
+  "removes": [],
+  "no_changes": false,
+  "rationale_overall": "This is the day-0-plus-one curation on the starter watchlist, so the goal is filling the most obvious thematic gaps the profile already names rather than trimming: RKLB and IONQ give direct, already-listed exposure to the rockets/spacecraft and quantum-computing 'likely next waves,' and ITA captures the geopolitical/rearmament wave that just received a concrete catalyst in the Ukraine invasion. Nuclear (SMR) was searched but NuScale's SPAC merger does not close until May 2022, so no fission vehicle exists yet; robotics and aging-demographics searches turned up no Q1-2022-dated catalyst strong enough to clear the bar. No removes: all five starter tickers are unchanged holdings with no thesis breach.",
+  "search_terms": ["space stocks rocket launch stocks after:2022-01-01 before:2022-04-01", "robotics stocks humanoid robot stocks after:2022-01-01 before:2022-04-01", "quantum computing stocks after:2022-01-01 before:2022-04-01", "nuclear stocks SMR small modular reactor stocks after:2022-01-01 before:2022-04-01", "defense stocks defense ETF rearmament after:2022-01-01 before:2022-04-01", "tanker stocks shipping stocks oil geopolitics Russia Ukraine energy after:2022-01-01 before:2022-04-01", "eldercare REIT healthcare aging population demographics stocks after:2022-01-01 before:2022-04-01", "best performing etf this month after:2022-01-01 before:2022-04-01", "biggest stock gainers after:2022-01-01 before:2022-04-01", "interest rates tariffs macro outlook after:2022-01-01 before:2022-04-01", "Rocket Lab RKLB Q4 2021 earnings contract news February 2022", "IonQ IONQ news January February March 2022 quantum computing partnership", "nuclear stocks March 2022 small modular reactor NuScale Oklo news", "defense stocks March 2022 Lockheed Martin Northrop Raytheon Ukraine invasion rally", "Welltower Ventas healthcare REIT stock news March 2022", "Rocket Lab RKLB stock IPO SPAC merger completion date August 2021", "IonQ IONQ stock IPO SPAC merger date October 2021", "iShares Aerospace Defense ETF ITA launch date history"]
+}

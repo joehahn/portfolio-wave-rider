@@ -76,7 +76,13 @@ RUNS = {
         "end_date": "2026-04-30",
     },
     # max_watchlist_size sweep variants (cap=8 is the canonical postcovid/ dir).
+    "postcovid-cap01": _postcovid_cap(1),
+    "postcovid-cap02": _postcovid_cap(2),
+    "postcovid-cap03": _postcovid_cap(3),
+    "postcovid-cap04": _postcovid_cap(4),
     "postcovid-cap05": _postcovid_cap(5),
+    "postcovid-cap06": _postcovid_cap(6),
+    "postcovid-cap10": _postcovid_cap(10),
     "postcovid-cap12": _postcovid_cap(12),
     "postcovid-cap16": _postcovid_cap(16),
     "postcovid-cap24": _postcovid_cap(24),

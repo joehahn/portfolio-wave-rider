@@ -1,0 +1,26 @@
+{
+  "as_of_date": "2022-03-31",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [
+    {
+      "ticker": "AAPL",
+      "wave_bucket": "general_markets",
+      "rationale": "Apple posted strong but thesis-generic hardware/services results (record $123.9B holiday-quarter revenue) with no distinct tie to the AI, rockets, robotics, quantum, or nuclear waves the profile is riding, making it the weakest thematic hold at a 3-slot cap.",
+      "news_evidence": [
+        {"summary": "Apple posts all-time revenue record of $123.9B for holiday quarter, +11% YoY, driven by iPhone/Mac/Services", "source": "CNBC/9to5Mac", "url": "https://www.cnbc.com/2022/01/27/apple-aapl-earnings-q1-2022.html", "date": "2022-01-27"}
+      ]
+    },
+    {
+      "ticker": "SPY",
+      "wave_bucket": "general_markets",
+      "rationale": "SPY is a broad, wave-agnostic index holding; with the Fed beginning its rate-hike cycle in March 2022 pressuring growth multiples broadly, a 3-ticker cap is better spent on the strongest identifiable AI-wave exposures than on a generic market anchor.",
+      "news_evidence": [
+        {"summary": "Fed begins rate-hike cycle in March 2022; S&P 500 has worst start to a year since the 2020 selloff amid rising-rate concerns", "source": "Bloomberg", "url": "https://www.bloomberg.com/news/articles/2022-03-13/what-happens-to-stocks-when-the-fed-hikes-a-historical-guide", "date": "2022-03-13"}
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "The cap dropped from 5 to 3 this rebalance, forcing a trim rather than an add. NVDA, MSFT, and GOOGL are kept as the three strongest, most differentiated AI-wave exposures: NVDA posted record Q4 FY22 data-center revenue (Feb 16 2022), MSFT's Azure grew 46% (Jan 25 2022), and GOOGL highlighted deep AI investment (Feb 1 2022). AAPL and SPY are removed as the two weakest thematic holds. Pass-1 discovery across the other named waves surfaced no ticker strong enough to displace the three AI incumbents, and no adds are permitted this call since the cap fell below the current watchlist size.",
+  "search_terms": ["AI stocks semiconductor demand after:2022-01-01 before:2022-04-01", "NVDA Nvidia news after:2022-01-01 before:2022-04-01", "Nvidia data center revenue Q4 2021 earnings February 2022", "Apple AAPL Q1 2022 earnings iPhone March 2022", "Microsoft MSFT Azure cloud earnings January 2022", "Google Alphabet GOOGL earnings cloud AI February 2022", "S&P 500 SPY market March 2022 Fed rate hike", "space stocks rocket launch news 2022", "robotics stocks news early 2022", "quantum computing stocks news early 2022", "nuclear small modular reactor SMR stocks early 2022", "defense stocks Russia Ukraine invasion March 2022", "tanker shipping oil prices Ukraine war March 2022", "eldercare healthcare aging population stocks early 2022", "best performing etf February 2022", "biggest stock gainers March 2022"]
+}

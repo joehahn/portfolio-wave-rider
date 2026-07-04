@@ -1,0 +1,9 @@
+{
+  "as_of_date": "2022-09-30",
+  "rebalance_period": "quarterly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "Held the 2-slot watchlist (MSFT, NVDA) unchanged. NVDA absorbed real dated headwinds (Aug 26 2022 Commerce license requirement blocking A100/H100 exports to China, ~$400M Q3 risk; Q2 FY23 gaming revenue down 44% QoQ with a $1.32B inventory charge) but its Data Center segment still grew 61% YoY, so the AI thesis is pressured not breached, and the stock is well off any peak — neither removal guardrail is cleanly met. MSFT's cloud franchise (Azure +46%) reinforces the anchor. Pass-1 surfaced genuine defense (Raytheon NASAMS/Ukraine) and tanker buildup signals, but with the cap at 2 and no clean NVDA removal, adding would require displacing an AI anchor on weak grounds. Deferring.",
+  "search_terms": ["space stocks rocket launch after:2022-07-01 before:2022-10-01", "robotics stocks after:2022-07-01 before:2022-10-01", "quantum computing stocks after:2022-07-01 before:2022-10-01", "nuclear stocks SMR after:2022-07-01 before:2022-10-01", "tanker freight shipping stocks oil reserves after:2022-07-01 before:2022-10-01", "defense stocks defense ETF rearmament after:2022-07-01 before:2022-10-01", "healthcare eldercare REIT aging population stocks after:2022-07-01 before:2022-10-01", "AI stocks artificial intelligence after:2022-07-01 before:2022-10-01", "best performing etf this month after:2022-07-01 before:2022-10-01", "Nvidia August 2022 China export restrictions A100 H100", "Nvidia Q2 fiscal 2023 earnings August 2022 gaming revenue decline guidance", "Microsoft September 2022 news cloud Azure earnings", "Lockheed Martin Raytheon Northrop contract August September 2022 Ukraine HIMARS NASAMS"]
+}
