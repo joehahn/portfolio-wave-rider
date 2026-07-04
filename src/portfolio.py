@@ -3734,6 +3734,20 @@ def build_curator_dashboard(
                    hovertemplate="%{x|%Y-%m-%d}<br>$%{y:,.0f}<extra></extra>"),
         row=6, col=1,
     )
+    # Orange squares marking each quarterly rebalance, same markers/hover as
+    # chart 1 (reusing _rebal_x/_rebal_y/_rebal_text: the y-values already sit
+    # on the total-value curve).
+    fig.add_trace(
+        go.Scatter(x=_rebal_x, y=_rebal_y, mode="markers", name="Rebalanced",
+                   showlegend=False, marker=_REBALANCE_MARKER,
+                   hovertext=_rebal_text,
+                   hoverlabel={"align": "left", "bgcolor": "white",
+                               "bordercolor": "#7c2d12"},
+                   hovertemplate="<b>Rebalanced %{x|%Y-%m-%d}</b>"
+                                 "<br>portfolio $%{y:,.0f}<br>%{hovertext}"
+                                 "<extra></extra>"),
+        row=6, col=1,
+    )
     fig.update_yaxes(title_text="$", type="log", tickformat="$,.0f", row=6, col=1)
     fig.update_xaxes(range=[start, end], row=6, col=1)
 
