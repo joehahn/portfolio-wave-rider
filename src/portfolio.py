@@ -49,6 +49,11 @@ _FINANCIAL_MODEL_DEFAULTS: dict[str, Any] = {
     # level, not inside the financial_model block; load_financial_model reads
     # it from there so the cap has a single source of truth (investor_profile).
     "concentration_cap": 0.25,
+    # min_trade_size_usd is the smallest dollar trade the optimizer will
+    # propose; positions below it are filtered out of the recommendation. Like
+    # concentration_cap it lives at the profile's top level, not inside the
+    # financial_model block.
+    "min_trade_size_usd": 1000.0,
     # always_include: tickers permanently injected into the optimizer universe
     # as safe-haven / diversification anchors (e.g. SPY, AGG, IAU). They live
     # as shares=0 rows in holdings.csv but are OUTSIDE the curator's
@@ -61,11 +66,12 @@ _FINANCIAL_MODEL_DEFAULTS: dict[str, Any] = {
 def load_financial_model(profile_path: str = "investor_profile.md") -> dict[str, Any]:
     """Read `financial_model` from investor_profile.md's YAML front matter.
 
-    Returns a dict with six fields (`risk_aversion`, `risk_free_rate`,
-    `lookback_period`, `rebalance_period`, `max_watchlist_size`, and the
-    top-level `concentration_cap`); any missing field falls back to the
-    hard-coded default. If the profile file doesn't exist or has no front
-    matter, all defaults are returned.
+    Returns a dict with the `financial_model` fields (`risk_aversion`,
+    `risk_free_rate`, `lookback_period`, `rebalance_period`,
+    `max_watchlist_size`) plus the top-level keys `concentration_cap`,
+    `min_trade_size_usd`, and `always_include`; any missing field falls back
+    to the hard-coded default. If the profile file doesn't exist or has no
+    front matter, all defaults are returned.
 
     Backtest-only knobs (window dates, execution lag) live in a separate
     `backtest` section and are read by ``load_backtest_config`` instead, since
@@ -94,6 +100,9 @@ def load_financial_model(profile_path: str = "investor_profile.md") -> dict[str,
     # concentration_cap is a top-level profile key, not part of financial_model.
     if "concentration_cap" in data:
         out["concentration_cap"] = data["concentration_cap"]
+    # min_trade_size_usd is also a top-level key (smallest proposed trade).
+    if "min_trade_size_usd" in data:
+        out["min_trade_size_usd"] = data["min_trade_size_usd"]
     # always_include is also a top-level key; normalize to uppercase tickers.
     if "always_include" in data:
         out["always_include"] = [str(t).upper().strip()
@@ -3323,6 +3332,8 @@ def build_dashboard(
         ("Risk aversion (λ)", f"{_lfm['risk_aversion']:g}", ""),
         ("Lookback (μ/Σ estimation)", f"{_lfm['lookback_period']}", ""),
         ("Concentration cap (max weight)", f"{_lfm['concentration_cap']:.0%}", ""),
+        ("Min trade size", f"${_lfm['min_trade_size_usd']:,.0f}",
+         "smallest proposed trade; smaller positions are filtered out"),
         ("Rebalance cadence", f"{_lfm['rebalance_period']}", ""),
         ("Max watchlist size", f"{_lfm['max_watchlist_size']}", ""),
         ("Always-include anchors", ", ".join(_lfm["always_include"]) or "—",
@@ -3510,7 +3521,7 @@ def build_curator_dashboard(
             "2. Watchlist composition over time (color = wave bucket)",
             "3. Cumulative $ gain per holding",
             "4. Cumulative $ gain per wave bucket",
-            "5. Actual portfolio $ by wave over time",
+            "5. Actual portfolio $ by wave over time (log scale)",
         ),
     )
 
@@ -3675,9 +3686,12 @@ def build_curator_dashboard(
                      zeroline=True, zerolinewidth=1, zerolinecolor="#888",
                      row=4, col=1)
 
-    # Chart 5: actual portfolio $ by wave over time. Stacked area on
-    # linear y-axis: top edge = total portfolio value; each band's
-    # thickness = that wave bucket's $ contribution.
+    # Chart 5: actual portfolio $ by wave over time. One line per wave on a
+    # LOG y-axis: log lets each wave's growth read across orders of magnitude
+    # (a $1k position and a $1M position are both legible). Not stacked — a
+    # stacked area can't sit on a log axis (its $0 baseline is -inf on log, and
+    # band thicknesses would no longer be proportional to dollars), so each
+    # wave is drawn as its own unstacked line instead.
     snaps_full = snaps.copy()
     snaps_full["asset_bucket"] = snaps_full["ticker"].map(
         lambda t: ASSET_CLASS_BUCKET.get(TICKER_ASSET_CLASS.get(t, "equity"), "equities")
@@ -3697,18 +3711,21 @@ def build_curator_dashboard(
     for wave in wv_order:
         if (wv[wave] <= 0).all():
             continue
+        # Zeros can't plot on a log axis, so mask non-positive $ to NaN (the
+        # line simply has a gap where a wave held nothing that day).
+        _y = wv[wave].where(wv[wave] > 0)
         fig.add_trace(
-            go.Scatter(x=wv.index, y=wv[wave], mode="lines",
+            go.Scatter(x=wv.index, y=_y, mode="lines",
                        name=WAVE_DISPLAY_LABEL.get(wave, wave),
                        legend="legend4",
-                       stackgroup="wave",
-                       line={"color": WAVE_COLORS.get(wave), "width": 0.5},
+                       line={"color": WAVE_COLORS.get(wave), "width": 1.8},
+                       connectgaps=False,
                        hovertemplate=f"{WAVE_DISPLAY_LABEL.get(wave, wave)}"
                                      "<br>%{x|%Y-%m-%d}"
                                      "<br>$%{y:,.0f}<extra></extra>"),
             row=5, col=1,
         )
-    fig.update_yaxes(title_text="$", tickformat="$,.0f", row=5, col=1)
+    fig.update_yaxes(title_text="$", type="log", tickformat="$,.0f", row=5, col=1)
     fig.update_xaxes(range=[start, end], row=5, col=1)
 
 
@@ -3885,6 +3902,8 @@ def build_curator_dashboard(
          f"backtest-only override — live uses {str(_fm['lookback_period'])}" if _lb_ov else ""),
         ("Concentration cap (max weight)", f"{_cap:.0%}",
          f"backtest-only override — live uses {_fm['concentration_cap']:.0%}" if _cap_ov else ""),
+        ("Min trade size", f"${_fm['min_trade_size_usd']:,.0f}",
+         "smallest proposed trade; smaller positions are filtered out"),
         ("Max watchlist size", f"{_fm['max_watchlist_size']}", ""),
         ("Always-include anchors", ", ".join(_fm["always_include"]) or "—",
          "permanent optimizer anchors, outside max_watchlist_size"),

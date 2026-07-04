@@ -294,6 +294,8 @@ def main(argv: list[str] | None = None) -> int:
                   args.param == "lookback"),
             _knob("Concentration cap (max weight)", args.base_max_weight, _pctf,
                   args.param == "concentration_cap"),
+            ("Min trade size", f"${_fm2['min_trade_size_usd']:,.0f}",
+             "smallest proposed trade; smaller positions are filtered out"),
             ("Max watchlist size", f"{_fm2['max_watchlist_size']}", ""),
             ("Always-include anchors", ", ".join(_fm2["always_include"]) or "—",
              "permanent optimizer anchors, outside max_watchlist_size"),
