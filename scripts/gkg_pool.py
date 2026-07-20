@@ -119,6 +119,14 @@ MAJOR_DOMAINS = _major_source_domains()                  # recognized wires / ma
 RECOGNIZED_DOMAINS = PREFERRED_DOMAINS | MAJOR_DOMAINS    # credible carriers: salience is counted here
 
 
+def _domain_in(src: str, domains) -> bool:
+    """True if source domain `src` equals or is a subdomain of any domain in `domains`. Boundary-aware,
+    unlike a raw substring test: 'proactiveinvestors.com' does NOT match 'investors.com', and
+    'finance.yahoo.com' DOES match 'yahoo.com'. Used for the block / authority / recognized checks."""
+    src = (src or "").lower()
+    return any(src == d or src.endswith("." + d) for d in domains)
+
+
 SOURCE_BLOCKLIST, SOURCE_ALLOWLIST = _profile_source_lists()   # content-farm domains / preferred desks
 _KW_WAVE = {kw.lower(): wave for wave, kws in WAVE_KEYWORDS.items() for kw in kws}
 
@@ -283,10 +291,10 @@ def build_pool(client: bigquery.Client, as_of_str: str, write: bool = True) -> d
         if not url:
             continue
         src = (r["SourceCommonName"] or "").lower()
-        hit = next((b for b in SOURCE_BLOCKLIST if b in src), None)
+        hit = _domain_in(src, SOURCE_BLOCKLIST)
         if hit:                                          # drop content-farm / 13F-mill domains
             audit["dropped_blocklist"] += 1
-            audit["blocked_domains"][r["SourceCommonName"] or hit] += 1
+            audit["blocked_domains"][r["SourceCommonName"] or "unknown"] += 1
             continue
         title = _page_title(r["Extras"]) or _slug_title(url)
         if SPAM_TITLE_RE.search(title):

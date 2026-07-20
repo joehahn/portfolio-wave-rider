@@ -79,7 +79,7 @@ def _filtered_articles(rows) -> list[dict]:
     for r in rows:
         url = r["DocumentIdentifier"] or ""
         src = (r["SourceCommonName"] or "").lower()
-        if not url or any(b in src for b in g.SOURCE_BLOCKLIST):
+        if not url or g._domain_in(src, g.SOURCE_BLOCKLIST):
             continue
         title = g._page_title(r["Extras"]) or g._slug_title(url)
         if g.SPAM_TITLE_RE.search(title) or not g._article_waves(f"{title} {url}") \
@@ -125,9 +125,9 @@ def _authority(source: str) -> float:
     specialty allow-list (2.0) > recognized major outlets (1.5) > long tail (1.0). Block-list
     domains are already dropped upstream."""
     src = (source or "").lower()
-    if any(dom in src for dom in g.PREFERRED_DOMAINS):
+    if g._domain_in(src, g.PREFERRED_DOMAINS):
         return 2.0
-    if any(dom in src for dom in g.MAJOR_DOMAINS):
+    if g._domain_in(src, g.MAJOR_DOMAINS):
         return 1.5
     return 1.0
 
@@ -172,7 +172,7 @@ def build_article_pool(as_of: date, news_lookback_days: int,
             s = stories[nt] = {"rep": art, "sources": set(), "rec": set()}
         src = (art["source"] or "").lower()
         s["sources"].add(src)
-        if any(dom in src for dom in g.RECOGNIZED_DOMAINS):
+        if g._domain_in(src, g.RECOGNIZED_DOMAINS):
             s["rec"].add(src)
         if _authority(art["source"]) > _authority(s["rep"]["source"]):
             s["rep"] = art
