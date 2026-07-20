@@ -2101,15 +2101,18 @@ _NAV_PAGES: list[tuple[str, str]] = [
 ]
 
 
-def _nav_strip(current: str) -> str:
-    """Return an HTML <nav> with links to all published pages.
+def _nav_strip(current: str, pages: "list[tuple[str, str]] | None" = None) -> str:
+    """Return an HTML <nav> with links to published pages.
     The entry whose filename matches ``current`` is rendered as bold text
     instead of a link, so a reader can see which page they're on. The strip
     also carries a right-aligned "generated <local time>" stamp — the moment
     this page's HTML was produced — so a reader can tell fresh from stale
-    content on GitHub Pages at a glance."""
+    content on GitHub Pages at a glance. ``pages`` overrides the default
+    ``_NAV_PAGES`` list (used by the GKG dashboards, which link only to the
+    README and their sibling DB while the new design has nothing else to show
+    yet)."""
     parts = []
-    for fname, label in _NAV_PAGES:
+    for fname, label in (pages if pages is not None else _NAV_PAGES):
         if fname == current:
             parts.append(f"<strong>{label}</strong>")
         else:
@@ -4046,7 +4049,10 @@ def build_curator_dashboard(
         'table{margin-top:0.5em;}'
         'th,td{border-bottom:1px solid #eee;}'
         '</style></head><body>'
-        + _nav_strip("backtest_curator.html") +
+        + _nav_strip("", pages=[
+            ("https://github.com/joehahn/portfolio-wave-rider/blob/main/README.md", "README"),
+            ("retrieval_pwr.html", "retrieval DB"),
+        ]) +
         f'<h1>Curator-driven backtest '
         f'<span style="font-size:0.55em;color:#666;font-weight:400;">'
         f'— {start.date()} to {end.date()}</span></h1>'

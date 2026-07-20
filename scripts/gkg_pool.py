@@ -52,8 +52,31 @@ TOP_COMPANIES = _eng["top_companies"]     # cap the discovered-company ranking f
 SAMPLE_HEADLINES = _eng["sample_headlines"]
 MAX_SCAN_GB = _eng["max_scan_gb"]         # dry-run cost guard
 WAVE_KEYWORDS = _cfg["wave_keywords"]                       # {wave: [keyword, ...]}
-ORG_STOPLIST = {s.lower() for s in _cfg["org_stoplist"]}
-SOURCE_BLOCKLIST = {s.lower() for s in _cfg.get("source_blocklist", [])}    # content-farm domains
+ORG_STOPLIST = {s.lower() for s in _cfg["org_stoplist"]}   # non-company ENTITIES (engine mechanics)
+
+
+def _profile_source_lists() -> "tuple[set, list]":
+    """Read source_block / source_allow (domain substrings) from news_sources.md's YAML front matter
+    — the single source of truth for SOURCE curation. news_sources.md is tracked (public), unlike
+    investor_profile.md, so the block-list ships with the repo. Returns (block_set, allow_list); empty
+    on any missing/parse issue (a missing news_sources.md is non-fatal per CLAUDE.md — the gather then
+    runs unfiltered). Only source_block is applied by the single-pass gather (drop content-farm
+    domains); source_allow is exposed but not yet used here (staged for the forward engine, task #10)."""
+    import re
+    import yaml
+    p = ROOT / "news_sources.md"
+    if not p.exists():
+        return set(), []
+    m = re.match(r"^---\s*\n(.*?)\n---\s*\n", p.read_text(), re.DOTALL)
+    if not m:
+        return set(), []
+    data = yaml.safe_load(m.group(1)) or {}
+    block = {str(s).lower() for s in (data.get("source_block") or [])}
+    allow = [str(s).lower() for s in (data.get("source_allow") or [])]
+    return block, allow
+
+
+SOURCE_BLOCKLIST, SOURCE_ALLOWLIST = _profile_source_lists()   # content-farm domains / preferred desks
 _KW_WAVE = {kw.lower(): wave for wave, kws in WAVE_KEYWORDS.items() for kw in kws}
 
 # Securities class-action / 13F-holding boilerplate spam floods financial news — drop it.
@@ -205,7 +228,7 @@ def build_pool(client: bigquery.Client, as_of_str: str, write: bool = True) -> d
     agg = collections.defaultdict(lambda: {"articles": 0, "tone": [], "waves": collections.Counter(),
                                            "samples": []})
     # filter audit: WHY articles were dropped, so we can verify (later) we aren't discarding
-    # useful news — especially which domains the source_blocklist removed and how many each.
+    # useful news — especially which domains the source_block list removed and how many each.
     audit = {"dropped_blocklist": 0, "dropped_spam": 0, "dropped_no_wave": 0,
              "dropped_no_subject_org": 0, "blocked_domains": collections.Counter(),
              "kept_sources": collections.Counter(),      # KEPT article domains (source diversity)
