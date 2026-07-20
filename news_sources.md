@@ -31,6 +31,20 @@ source_block:
   - ts2.tech
   - pr-inside.com
   - financialnewsmedia.com
+  # added 2026-07-20 from live-curator citation audit: listicle mills / algo-forecast farms / broker promo
+  - fool.com
+  - money.usnews.com
+  - investorplace.com
+  - stockinvest.us
+  - tradingkey.com
+  - top1markets.com
+  - fxleaders.com
+  - phemex.com
+  - xtb.com
+  - stocktwits.com
+  - globalxetfs.com          # ETF-issuer self-PR
+  - tech-insider.org
+  - thedefensenews.com        # copycat of the real defensenews.com
 source_major:
   - reuters.com
   - apnews.com
@@ -57,6 +71,13 @@ source_major:
   - theguardian.com
   - npr.org
   - finance.yahoo.com          # the finance aggregator specifically (bare yahoo.com would over-match Yahoo Sports/etc.)
+  # added 2026-07-20 from live-curator citation audit: reputable outlets/portals
+  - morningstar.com
+  - investing.com
+  - nasdaq.com
+  - coindesk.com
+  - nbcnews.com
+  - aljazeera.com
 ---
 
 # Specialty news sources
@@ -140,6 +161,7 @@ Covers fission (uranium, utilities, small modular reactors, the AI-data-center e
 - **World Nuclear News** — https://www.world-nuclear-news.org — fission and fusion industry news, regulatory filings, PPAs.
 - **Fusion Industry Association** — https://www.fusionindustryassociation.org — trade-body briefings and state-of-industry reports.
 - **Nature — Fusion** — https://www.nature.com/subjects/nuclear-fusion-and-fission — peer-reviewed milestones.
+- **IEA** — https://www.iea.org — International Energy Agency; authoritative primary source on electricity demand/supply, feeding the nuclear/SMR AI-data-center-power narrative.
 
 ## Defense / rearmament
 
@@ -164,3 +186,6 @@ For tickers that don't map cleanly to a single wave, or for macro context.
 - **Yahoo Finance — ticker news** — https://finance.yahoo.com — ticker-scoped recent headlines aggregator.
 - **FT Alphaville** — https://www.ft.com/alphaville — *skeptic.* Rigorous, skeptical markets commentary; Bryce Elder's columns are especially good for accounting-irregularity and valuation-skepticism framing. The credibility-weighted contrarian foil to the wire-service primary sources above.
 - **Zero Hedge** — https://www.zerohedge.com — contrarian macro/markets blog; often early on stories wires are slow on, but framing is editorial and signal-to-noise is mixed — treat as a cross-check, not a primary source.
+- **ETF Trends** — https://www.etftrends.com — ETF-industry desk; flows, launches, and thematic-ETF coverage (useful for the wave-ETF vehicles).
+- **Freight Perspectives** — https://www.freightperspectives.com — shipping/freight trade desk; rates and capacity for the tankers/shipping (geopolitical) wave.
+- **McKnight's Senior Living** — https://www.mcknightsseniorliving.com — senior-housing/eldercare trade desk for the aging-population-demographics wave.
