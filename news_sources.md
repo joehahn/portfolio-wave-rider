@@ -56,7 +56,12 @@ source_major:
   - bbc.co.uk
   - theguardian.com
   - npr.org
-  - yahoo.com
+  - finance.yahoo.com          # the finance aggregator specifically (bare yahoo.com would over-match Yahoo Sports/etc.)
+source_demote:                 # prose sources NOT given the specialty (2.0) tier — not credible news
+  - openai.com                 #   desks: company/private PR blogs. They stay in the prose for the live
+  - anthropic.com              #   curator but rank as tail (1.0). Extend this list to demote more later.
+  - ibm.com
+  - quantumai.google
 ---
 
 # Specialty news sources
