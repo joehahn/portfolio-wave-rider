@@ -36,10 +36,7 @@ sys.path.insert(0, "scripts")
 import gkg_pool as g  # noqa: E402  (wave/domain-tier classifiers; needs the repo's scripts/ on path)
 
 ROOT = Path(__file__).resolve().parent.parent
-RUN_REL = "data/curator_runs/gkg-1yr-weekly-v2"      # data folder (relative to repo root)
-POOLS = sorted(glob.glob(str(ROOT / RUN_REL / "*-pool.json")))
-CORPUS = sorted(glob.glob(str(ROOT / RUN_REL / "_corpus" / "gkg-*.json")))
-OUT = ROOT / "docs" / "retrieval_pwr.html"
+DEFAULT_RUN_REL = "data/curator_runs/gkg-2yr-weekly"   # data folder (relative to repo root)
 
 BLUE, GREEN, ORANGE, RED, GREY = "#1f77b4", "#2ca02c", "#ff7f0e", "#e03131", "#adb5bd"
 DOW = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
@@ -62,7 +59,10 @@ def _iso(s):
         return None
 
 
-def build():
+def build(run_rel, out):
+    POOLS = sorted(glob.glob(str(ROOT / run_rel / "*-pool.json")))
+    CORPUS = sorted(glob.glob(str(ROOT / run_rel / "_corpus" / "gkg-*.json")))
+
     # ---- corpus: total gathered (stat card only) ----
     corpus_total = 0
     for f in CORPUS:
@@ -80,37 +80,44 @@ def build():
 
     as_of = [p.get("as_of_date", "") for p in pools]
     pool_n = [p.get("n_articles", len(p.get("articles", []))) for p in pools]
-    pool_lede = [sum(1 for a in p.get("articles", []) if a.get("lede")) for p in pools]
-    hit_rate = [p.get("hit_rate") for p in pools]
+    # Two per-window lede rates: CLEAN (Wayback, look-ahead-safe = hit_rate) and TOTAL coverage
+    # (clean + live-fallback). The gap between them is the LOOK-AHEAD-BIASED live-fallback contribution.
+    def _rate(p, keys):
+        ls, n = p.get("lede_sources", {}), max(p.get("n_articles", 1), 1)
+        return sum(ls.get(k, 0) for k in keys) / n
+    clean_rate = [p.get("hit_rate", _rate(p, ("wayback",))) for p in pools]
+    total_rate = [_rate(p, ("wayback", "live")) for p in pools]
 
     # ---- unique articles across all pools, deduped by url ----
-    # Each unique article keeps its date/source/title/url and has_wayback = ANY appearance had a lede.
+    # Each unique article keeps its date/source/title/url and a lede_state: "clean" (Wayback lede, ANY
+    # appearance), else "live" (live-fallback lede, ANY appearance), else "none". Clean wins over live.
     uniq = {}
     for p in pools:
         for a in p.get("articles", []):
             url = a.get("url")
             if not url:
                 continue
-            hw = bool(a.get("lede"))
+            clean, live = bool(a.get("lede")), bool(a.get("lede_live"))
             if url not in uniq:
-                uniq[url] = {
-                    "date": a.get("date", ""),
-                    "source": a.get("source", ""),
-                    "title": a.get("title", ""),
-                    "url": url,
-                    "has_wayback": hw,
-                }
-            elif hw:
-                uniq[url]["has_wayback"] = True
+                uniq[url] = {"date": a.get("date", ""), "source": a.get("source", ""),
+                             "title": a.get("title", ""), "url": url,
+                             "has_clean": clean, "has_live": live}
+            else:
+                uniq[url]["has_clean"] |= clean
+                uniq[url]["has_live"] |= live
     articles = list(uniq.values())
+    for a in articles:
+        a["has_wayback"] = a["has_clean"]           # back-compat alias for the per-bucket overlays below
     n_uniq = len(articles)
-    n_wb = sum(1 for a in articles if a["has_wayback"])
-    pct_wb = (100.0 * n_wb / n_uniq) if n_uniq else 0.0
-    # Average per-window Wayback join-rate = mean of the pools' hit_rate. This is the metric plot 8
-    # charts; it differs from n_wb/n_uniq because an article recurs across overlapping windows and
-    # counts as a unique "hit" if ANY appearance got a lede (an OR that inflates the unique rate).
-    _hr = [h for h in hit_rate if h is not None]
-    avg_hit = 100.0 * sum(_hr) / len(_hr) if _hr else 0.0
+    n_clean = sum(1 for a in articles if a["has_clean"])
+    n_live = sum(1 for a in articles if a["has_live"] and not a["has_clean"])
+    n_none = n_uniq - n_clean - n_live
+    pct_clean = (100.0 * n_clean / n_uniq) if n_uniq else 0.0
+    pct_cov = (100.0 * (n_clean + n_live) / n_uniq) if n_uniq else 0.0
+    # Average per-window rates (mean of the pools' rates); differ from the unique %s because an article
+    # recurs across overlapping windows and counts once as unique if ANY appearance got a lede.
+    avg_clean = 100.0 * sum(clean_rate) / len(clean_rate) if clean_rate else 0.0
+    avg_total = 100.0 * sum(total_rate) / len(total_rate) if total_rate else 0.0
 
     # ---- monthly / weekly / daily / day-of-week buckets over UNIQUE articles ----
     mon_g, mon_w = Counter(), Counter()
@@ -179,8 +186,9 @@ def build():
         "4. Unique articles by DAY OF WEEK<br><sub><i>publication cadence: weekend dip is normal news "
         "behavior, not a gap</i></sub>",
         "5. Unique articles by wave<br><sub><i>coverage by theme (first matched wave, else general)</i></sub>",
-        "6. Wayback join-rate over the year<br><sub><i>per-window archived-lede yield (hit_rate): the "
-        "quality of the Wayback join across the run</i></sub>",
+        "6. Lede coverage over time — clean vs clean+live<br><sub><i>per-window lede yield: GREEN = "
+        "clean Wayback join (look-ahead-safe), ORANGE = clean + live-fallback (the gap = the "
+        "look-ahead-BIASED live ledes that fill Wayback-misses)</i></sub>",
         f"7. Source utilization — every configured desk (incl. {n_rec_zero} that GKG surfaced ZERO "
         f"times) + top {N_GREY} others<br><sub><i>green = specialty (2.0), blue = major wire (1.5), "
         "grey = other (1.0); zero-length bars = configured desks GKG never indexed (e.g. paywalled "
@@ -201,8 +209,11 @@ def build():
     # 5. per-wave horizontal bars
     fig.add_trace(go.Bar(x=[v for _, v in wv][::-1], y=[k for k, _ in wv][::-1],
                          orientation="h", marker_color=GREEN), row=5, col=1)
-    # 6. wayback join-rate over time
-    fig.add_trace(go.Scatter(x=as_of, y=hit_rate, mode="lines+markers",
+    # 6. lede coverage over time: clean (Wayback) and clean+live (total). The band between them is the
+    # look-ahead-biased live-fallback contribution.
+    fig.add_trace(go.Scatter(x=as_of, y=total_rate, mode="lines+markers", name="clean + live",
+                             line={"color": ORANGE, "width": 2}, marker={"size": 5}), row=6, col=1)
+    fig.add_trace(go.Scatter(x=as_of, y=clean_rate, mode="lines+markers", name="clean (Wayback)",
                              line={"color": GREEN, "width": 2}, marker={"size": 5}), row=6, col=1)
     # 7. source utilization horizontal, tier-colored (all recognized incl zeros + top other).
     # Log x-axis; a zero-contributor is plotted at 0.5 so it shows a tiny bar (log 0 is undefined).
@@ -215,7 +226,7 @@ def build():
     for r in (1, 2, 3, 4):
         fig.update_yaxes(title_text="articles", row=r, col=1)
     fig.update_xaxes(title_text="unique articles", row=5, col=1)
-    fig.update_yaxes(title_text="join rate", row=6, col=1)
+    fig.update_yaxes(title_text="lede rate (clean vs +live)", row=6, col=1)
     fig.update_xaxes(title_text="unique articles (log; 0 plotted at 0.5)", type="log", row=7, col=1)
     fig.update_layout(template="seaborn", height=int(340 * 9.6), barmode="group", showlegend=False,
                       title={"text": "Portfolio Wave Rider — news retrieval dashboard (GKG + Wayback)",
@@ -231,9 +242,9 @@ def build():
     n_full = sum(1 for n in pool_n if n >= 100)
     cards = (card(f"{corpus_total:,}", "articles gathered (full corpus)")
              + card(len(pools), "pools / weekly rebalances")
-             + card(f"{n_full}/{len(pools)}", "windows filled to the 100-article cap")
              + card(f"{n_uniq:,}", "unique articles shown to curator")
-             + card(f"{avg_hit:.0f}%", "avg Wayback join-rate / window (plot 6)")
+             + card(f"{avg_clean:.0f}%", "avg CLEAN Wayback lede / window (plot 6, green)")
+             + card(f"{avg_total:.0f}%", "avg CLEAN+LIVE coverage / window (plot 6, orange)")
              + card(f"{n_rec_zero}/{len(rec_rows)}", "configured desks GKG surfaced 0x (plot 7)")
              + card("$0", "BigQuery cost (free tier)"))
     ts = datetime.now().strftime("%Y-%m-%d %H:%M %Z").strip()
@@ -256,19 +267,27 @@ def build():
         'historical pull and whether the calendar has gaps, upstream of the curator and free of '
         'PageRank-mooning. The pool the curator actually receives is the <b>ranked top-100</b> '
         '(salience + authority + per-wave weighting) — the shape that resembles live WebSearch results, '
-        'not a raw dump. Plot 8 tracks the <b>Wayback join-rate</b> — the share of each window\'s ranked '
-        f'articles that got an archived lede. {len(pools)} weekly 21-day windows.</p>'
-        f'<p style="color:#555">Raw data (inspect any file): <a href="../{RUN_REL}/"><code>{RUN_REL}/</code></a> — '
-        f'per-window <code>&lt;date&gt;-pool.json</code> (ranked article list with a <code>lede</code> '
-        f'field = the Wayback join), plus <code>_corpus/</code> (full gathering, one file per day). '
-        f'Example: <a href="../{RUN_REL}/2025-05-04-pool.json"><code>2025-05-04-pool.json</code></a>.</p>'
+        'not a raw dump. Each article carries a <b>lede</b>: first a look-ahead-<b>clean</b> Wayback '
+        'snapshot (≤ as_of); where Wayback has no capture, a <b>live-fallback</b> fetches today’s '
+        'page (LOOK-AHEAD-BIASED, tagged separately). Plot 6 tracks both: the clean join-rate and the '
+        f'clean+live coverage. {len(pools)} weekly 21-day windows.</p>'
+        f'<p style="color:#555">Raw data (inspect any file): <a href="../{run_rel}/"><code>{run_rel}/</code></a> — '
+        f'per-window <code>&lt;date&gt;-pool.json</code> (ranked article list; <code>lede</code> = clean '
+        f'Wayback join, <code>lede_live</code> = biased live-fallback, <code>lede_sources</code> = the '
+        f'clean/live/none split), plus <code>_corpus/</code> (full gathering, one file per day).</p>'
         + f'<div style="margin:1em 0 1.5em">{cards}</div>' + chart_html + '</body></html>'
     )
-    OUT.write_text(page)
-    print(f"wrote {OUT}")
+    out.write_text(page)
+    print(f"wrote {out}")
     print(f"  corpus {corpus_total:,} gathered | {len(pools)} pools | {n_uniq:,} unique shown | "
-          f"avg join-rate {avg_hit:.0f}%/window ({n_wb:,} unique w/ lede)")
+          f"clean {pct_clean:.0f}% + live {100.0*n_live/max(n_uniq,1):.0f}% = {pct_cov:.0f}% covered "
+          f"(per-window avg: clean {avg_clean:.0f}% / total {avg_total:.0f}%)")
 
 
 if __name__ == "__main__":
-    build()
+    import argparse
+    ap = argparse.ArgumentParser(description="Build the PWR news-retrieval dashboard.")
+    ap.add_argument("--run-dir", default=DEFAULT_RUN_REL, help="pool run dir (relative to repo root)")
+    ap.add_argument("--out", default=str(ROOT / "docs" / "retrieval_pwr.html"))
+    args = ap.parse_args()
+    build(args.run_dir, Path(args.out))

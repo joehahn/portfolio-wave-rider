@@ -133,6 +133,26 @@ def _authority(source: str) -> float:
     return 1.0
 
 
+_TITLE_STOP = {"the", "and", "for", "with", "that", "this", "from", "have", "will", "been", "are",
+               "was", "new", "said", "its", "has", "after", "into", "about", "over", "more", "than",
+               "2023", "2024", "2025", "2026", "inc", "corp", "ltd", "plc", "news", "report", "update",
+               "says", "amid", "could", "would", "first", "week", "year", "day"}
+
+
+def _title_consistent(title: str, lede: str) -> bool:
+    """Guard against URL-recycling aggregators (finanznachrichten, tmcnet-style wires) that serve a
+    DIFFERENT, often LATER article at the same URL — the worst live-fallback look-ahead case. Keep a
+    live lede only if it still shares a distinctive word with the GKG-recorded title. Deliberately
+    conservative: reject ONLY when the title has enough distinctive words to judge (>=3) AND the live
+    text shares NONE of them, so benign extraction drift (same story, different span) is kept."""
+    toks = [t for t in re.findall(r"[a-z0-9]+", title.lower()) if len(t) >= 4 and t not in _TITLE_STOP]
+    dist = list(dict.fromkeys(toks))
+    if len(dist) < 3:
+        return True                 # too few distinctive words to judge -> keep (don't over-reject)
+    low = lede.lower()
+    return any(t in low for t in dist)
+
+
 def _apply_live_fallback(arts: list[dict]) -> None:
     """LOOK-AHEAD-BIASED lede recovery: for Wayback-MISSES, fetch the source URL as it exists TODAY and
     extract its lede, writing it to a SEPARATE `lede_live` field (never `lede`) and tagging
@@ -145,9 +165,11 @@ def _apply_live_fallback(arts: list[dict]) -> None:
         return
     live = w.live_ledes(miss)
     for a in arts:
-        if not a.get("lede") and live.get(a["url"]):
-            a["lede_live"] = live[a["url"]]
+        lv = live.get(a["url"], "")
+        if not a.get("lede") and lv and _title_consistent(a["title"], lv):
+            a["lede_live"] = lv
             a["lede_source"] = "live"
+        # else: stays lede_source="none" (dead link, OR a topic-swapped URL-recycle we reject)
 
 
 def build_article_pool(as_of: date, news_lookback_days: int, max_articles: int,
