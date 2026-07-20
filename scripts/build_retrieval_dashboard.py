@@ -106,6 +106,11 @@ def build():
     n_uniq = len(articles)
     n_wb = sum(1 for a in articles if a["has_wayback"])
     pct_wb = (100.0 * n_wb / n_uniq) if n_uniq else 0.0
+    # Average per-window Wayback join-rate = mean of the pools' hit_rate. This is the metric plot 8
+    # charts; it differs from n_wb/n_uniq because an article recurs across overlapping windows and
+    # counts as a unique "hit" if ANY appearance got a lede (an OR that inflates the unique rate).
+    _hr = [h for h in hit_rate if h is not None]
+    avg_hit = 100.0 * sum(_hr) / len(_hr) if _hr else 0.0
 
     # ---- monthly / weekly / daily / day-of-week buckets over UNIQUE articles ----
     mon_g, mon_w = Counter(), Counter()
@@ -159,16 +164,16 @@ def build():
 
     # ---- figure (8 rows) ----
     titles = (
-        f"1. Pool size vs Wayback-lede joins per rebalance window<br><sub><i>each of {len(pools)} "
-        "weekly pools = ranked top-100 (blue); green = how many carried an archived lede</i></sub>",
-        "2. Unique articles per MONTH — GKG vs Wayback<br><sub><i>completeness (coarse): blue = shown, "
-        "green = archived lede joined</i></sub>",
-        "3. Unique articles per WEEK — GKG bars, Wayback curve<br><sub><i>gap check (finer): "
-        "Monday-anchored; green line = lede joins</i></sub>",
-        "4. Unique articles per DAY — GKG vs Wayback (log scale)<br><sub><i>gap check (finest): zero "
-        "days break the line; log y compresses the range</i></sub>",
-        "5. Unique articles by DAY OF WEEK — GKG vs Wayback<br><sub><i>publication cadence: weekend dip "
-        "is normal news behavior, not a gap</i></sub>",
+        f"1. Pool size per rebalance window<br><sub><i>each of {len(pools)} weekly pools = the ranked "
+        "top-100 fed to the curator (flat = the max_articles cap is always met)</i></sub>",
+        "2. Unique articles per MONTH<br><sub><i>completeness (coarse): distinct articles shown to the "
+        "curator that month</i></sub>",
+        "3. Unique articles per WEEK<br><sub><i>gap check (finer), Monday-anchored: the two empty weeks "
+        "(mid-June 2025) are a real GDELT/GKG outage, not a pipeline gap</i></sub>",
+        "4. Unique articles per DAY<br><sub><i>gap check (finest): zero days break the line "
+        "(mid-June-2025 GKG outage)</i></sub>",
+        "5. Unique articles by DAY OF WEEK<br><sub><i>publication cadence: weekend dip is normal news "
+        "behavior, not a gap</i></sub>",
         "6. Unique articles by wave<br><sub><i>coverage by theme (first matched wave, else general)</i></sub>",
         "7. Top source domains — tier-colored<br><sub><i>green = preferred/specialty desk, blue = major "
         "wire/outlet, grey = other</i></sub>",
@@ -177,22 +182,16 @@ def build():
     )
     fig = make_subplots(rows=8, cols=1, vertical_spacing=0.045, subplot_titles=titles)
 
-    # 1. paired bars per window
+    # 1. pool size per window (GKG only)
     fig.add_trace(go.Bar(x=as_of, y=pool_n, marker_color=BLUE, name="pool size (100)"), row=1, col=1)
-    fig.add_trace(go.Bar(x=as_of, y=pool_lede, marker_color=GREEN, name="Wayback ledes"), row=1, col=1)
-    # 2. paired bars per month
+    # 2. articles per month (GKG only)
     fig.add_trace(go.Bar(x=mo_keys, y=[mon_g[m] for m in mo_keys], marker_color=BLUE, name="GKG"), row=2, col=1)
-    fig.add_trace(go.Bar(x=mo_keys, y=[mon_w[m] for m in mo_keys], marker_color=GREEN, name="Wayback"), row=2, col=1)
-    # 3. weekly bars + wayback line
+    # 3. articles per week (GKG only)
     fig.add_trace(go.Bar(x=wk_keys, y=[wk_g[w] for w in wk_keys], marker_color=BLUE, name="GKG"), row=3, col=1)
-    fig.add_trace(go.Scatter(x=wk_keys, y=[wk_w[w] for w in wk_keys], mode="lines",
-                             line={"color": GREEN, "width": 2}, name="Wayback"), row=3, col=1)
-    # 4. daily lines (log y)
+    # 4. articles per day (GKG only, linear y)
     fig.add_trace(go.Scatter(x=day_x, y=day_yg, mode="lines", line={"color": BLUE, "width": 1}, name="GKG"), row=4, col=1)
-    fig.add_trace(go.Scatter(x=day_x, y=day_yw, mode="lines", line={"color": GREEN, "width": 1}, name="Wayback"), row=4, col=1)
-    # 5. day-of-week paired bars
+    # 5. day-of-week (GKG only)
     fig.add_trace(go.Bar(x=DOW, y=[dow_g.get(d, 0) for d in DOW], marker_color=BLUE, name="GKG"), row=5, col=1)
-    fig.add_trace(go.Bar(x=DOW, y=[dow_w.get(d, 0) for d in DOW], marker_color=GREEN, name="Wayback"), row=5, col=1)
     # 6. per-wave horizontal bars
     fig.add_trace(go.Bar(x=[v for _, v in wv][::-1], y=[k for k, _ in wv][::-1],
                          orientation="h", marker_color=GREEN), row=6, col=1)
@@ -205,7 +204,6 @@ def build():
 
     for r in (1, 2, 3, 4, 5):
         fig.update_yaxes(title_text="articles", row=r, col=1)
-    fig.update_yaxes(type="log", row=4, col=1)
     fig.update_xaxes(title_text="unique articles", row=6, col=1)
     fig.update_xaxes(title_text="unique articles", row=7, col=1)
     fig.update_yaxes(title_text="join rate", row=8, col=1)
@@ -223,7 +221,7 @@ def build():
     cards = (card(f"{corpus_total:,}", "articles gathered (full corpus)")
              + card(len(pools), "pools / weekly rebalances")
              + card(f"{n_uniq:,}", "unique articles shown to curator")
-             + card(f"{n_wb:,} ({pct_wb:.0f}%)", "with a Wayback lede joined")
+             + card(f"{avg_hit:.0f}%", "avg Wayback join-rate / window (plot 8)")
              + card("$0", "BigQuery cost (free tier)"))
     ts = datetime.now().strftime("%Y-%m-%d %H:%M %Z").strip()
 
@@ -245,8 +243,8 @@ def build():
         'historical pull and whether the calendar has gaps, upstream of the curator and free of '
         'PageRank-mooning. The pool the curator actually receives is the <b>ranked top-100</b> '
         '(salience + authority + per-wave weighting) — the shape that resembles live WebSearch results, '
-        'not a raw dump. The green <b>Wayback</b> series shows how many of those ranked articles got an '
-        f'archived lede joined. {len(pools)} weekly 21-day windows.</p>'
+        'not a raw dump. Plot 8 tracks the <b>Wayback join-rate</b> — the share of each window\'s ranked '
+        f'articles that got an archived lede. {len(pools)} weekly 21-day windows.</p>'
         f'<p style="color:#555">Raw data (inspect any file): <a href="../{RUN_REL}/"><code>{RUN_REL}/</code></a> — '
         f'per-window <code>&lt;date&gt;-pool.json</code> (ranked article list with a <code>lede</code> '
         f'field = the Wayback join), plus <code>_corpus/</code> (full gathering, one file per day). '
@@ -256,7 +254,7 @@ def build():
     OUT.write_text(page)
     print(f"wrote {OUT}")
     print(f"  corpus {corpus_total:,} gathered | {len(pools)} pools | {n_uniq:,} unique shown | "
-          f"{n_wb:,} wayback ({pct_wb:.1f}%)")
+          f"avg join-rate {avg_hit:.0f}%/window ({n_wb:,} unique w/ lede)")
 
 
 if __name__ == "__main__":
