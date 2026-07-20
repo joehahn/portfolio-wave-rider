@@ -151,18 +151,21 @@ def build():
         wave_c[waves[0] if waves else "general"] += 1
     wv = wave_c.most_common()
 
-    # ---- top source domains (unique articles), colored by authority tier ----
+    # ---- source utilization (unique articles): EVERY configured recognized desk, incl. the ones
+    # that contributed ZERO articles (GKG under-indexes many paywalled/specialty domains), plus the
+    # top non-configured contributors for context. Colored by authority tier. ----
     src_c = Counter(a["source"] for a in articles if a["source"])
-    N_SRC = 25
-    top_src = src_c.most_common(N_SRC)
     n_src_total = len(src_c)
 
-    def tier_color(src):
-        if g._domain_in(src, g.PREFERRED_DOMAINS):
-            return GREEN
-        if g._domain_in(src, g.MAJOR_DOMAINS):
-            return BLUE
-        return GREY
+    def _dom_count(dom):                              # articles from a configured domain + its subdomains
+        return sum(c for s, c in src_c.items() if g._domain_in(s, {dom}))
+    rec_rows = [(d, _dom_count(d), GREEN if d in g.PREFERRED_DOMAINS else BLUE)
+                for d in sorted(g.PREFERRED_DOMAINS | g.MAJOR_DOMAINS)]
+    n_rec_zero = sum(1 for _, c, _ in rec_rows if c == 0)
+    N_GREY = 12
+    grey_rows = sorted(((s, c, GREY) for s, c in src_c.items()
+                        if not g._domain_in(s, g.RECOGNIZED_DOMAINS)), key=lambda r: -r[1])[:N_GREY]
+    src_rows = sorted(rec_rows + grey_rows, key=lambda r: r[1])   # ascending -> highest at top (h-bars)
 
     # ---- figure (7 rows) ---- (pool-size-per-window plot dropped: it was flat at the 100-article
     # cap for all 53 windows; that one fact is now a stat card instead.)
@@ -176,12 +179,16 @@ def build():
         "4. Unique articles by DAY OF WEEK<br><sub><i>publication cadence: weekend dip is normal news "
         "behavior, not a gap</i></sub>",
         "5. Unique articles by wave<br><sub><i>coverage by theme (first matched wave, else general)</i></sub>",
-        f"6. Top {N_SRC} source domains (of {n_src_total} total) — tier-colored<br><sub><i>green = "
-        "specialty desk (2.0), blue = major wire/outlet (1.5), grey = other (1.0)</i></sub>",
+        f"6. Source utilization — every configured desk (incl. {n_rec_zero} that GKG surfaced ZERO "
+        f"times) + top {N_GREY} others<br><sub><i>green = specialty (2.0), blue = major wire (1.5), "
+        "grey = other (1.0); zero-length bars = configured desks GKG never indexed (e.g. paywalled "
+        f"wires). {n_src_total} distinct sources appeared overall.</i></sub>",
         "7. Wayback join-rate over the year<br><sub><i>per-window archived-lede yield (hit_rate): the "
         "quality of the Wayback join across the run</i></sub>",
     )
-    fig = make_subplots(rows=7, cols=1, vertical_spacing=0.045, subplot_titles=titles)
+    # Plot 6 lists ~70 domains, so give its row much more vertical room than the others.
+    fig = make_subplots(rows=7, cols=1, vertical_spacing=0.03, subplot_titles=titles,
+                        row_heights=[1, 1, 1, 1, 1, 3.6, 1])
 
     # 1. articles per month (GKG only)
     fig.add_trace(go.Bar(x=mo_keys, y=[mon_g[m] for m in mo_keys], marker_color=BLUE, name="GKG"), row=1, col=1)
@@ -194,9 +201,9 @@ def build():
     # 5. per-wave horizontal bars
     fig.add_trace(go.Bar(x=[v for _, v in wv][::-1], y=[k for k, _ in wv][::-1],
                          orientation="h", marker_color=GREEN), row=5, col=1)
-    # 6. top sources horizontal, tier-colored
-    fig.add_trace(go.Bar(x=[c for _, c in top_src][::-1], y=[s for s, _ in top_src][::-1],
-                         orientation="h", marker_color=[tier_color(s) for s, _ in top_src][::-1]), row=6, col=1)
+    # 6. source utilization horizontal, tier-colored (all recognized incl zeros + top other)
+    fig.add_trace(go.Bar(x=[c for _, c, _ in src_rows], y=[s for s, _, _ in src_rows],
+                         orientation="h", marker_color=[col for _, _, col in src_rows]), row=6, col=1)
     # 7. wayback join-rate over time
     fig.add_trace(go.Scatter(x=as_of, y=hit_rate, mode="lines+markers",
                              line={"color": GREEN, "width": 2}, marker={"size": 5}), row=7, col=1)
@@ -206,7 +213,7 @@ def build():
     fig.update_xaxes(title_text="unique articles", row=5, col=1)
     fig.update_xaxes(title_text="unique articles", row=6, col=1)
     fig.update_yaxes(title_text="join rate", row=7, col=1)
-    fig.update_layout(template="seaborn", height=380 * 7, barmode="group", showlegend=False,
+    fig.update_layout(template="seaborn", height=int(340 * 9.6), barmode="group", showlegend=False,
                       title={"text": "Portfolio Wave Rider — news retrieval dashboard (GKG + Wayback)",
                              "y": 0.999, "yanchor": "top"},
                       margin={"t": 70, "l": 200}, hovermode="closest")
@@ -223,6 +230,7 @@ def build():
              + card(f"{n_full}/{len(pools)}", "windows filled to the 100-article cap")
              + card(f"{n_uniq:,}", "unique articles shown to curator")
              + card(f"{avg_hit:.0f}%", "avg Wayback join-rate / window (plot 7)")
+             + card(f"{n_rec_zero}/{len(rec_rows)}", "configured desks GKG surfaced 0x (plot 6)")
              + card("$0", "BigQuery cost (free tier)"))
     ts = datetime.now().strftime("%Y-%m-%d %H:%M %Z").strip()
 
