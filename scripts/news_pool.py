@@ -37,7 +37,9 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 
 import requests
-from bs4 import BeautifulSoup
+import trafilatura
+from wayback import Mode, WaybackClient
+from wayback.exceptions import RateLimitError, WaybackRetryError
 
 ROOT = Path(__file__).resolve().parent.parent
 RUN_DIR = ROOT / "data" / "curator_runs" / "postcovid-gdelt"
@@ -45,16 +47,8 @@ CACHE = RUN_DIR / "_cache"
 CAP05_STARTER = ROOT / "data" / "curator_runs" / "postcovid-cap05" / "_starter.json"
 
 GDELT_URL = "https://api.gdeltproject.org/api/v2/doc/doc"
-WAYBACK_CDX = "http://web.archive.org/cdx/search/cdx"   # (legacy; _wb_snapshot now uses the avail API)
-WAYBACK_AVAIL = "http://archive.org/wayback/available"  # single closest-snapshot lookup (fast path)
-# archive.org asks automated clients to identify themselves with contact info.
-WAYBACK_UA = "portfolio-wave-rider/1.0 (+contact: jmh.datasciences@gmail.com)"
-WAYBACK_MIN_INTERVAL = 0.6     # ~100 req/min. The old 1.5s (CDX's ~60/min ceiling) is moot now that
-                               # _wb_snapshot uses the lightweight availability API instead of a CDX
-                               # scan; probes never saw a single 429/Retry-After, so the pacing (not
-                               # archive.org) was the bottleneck. Kept modest as a courtesy margin.
-WAYBACK_RETRY_STATUS = {429, 500, 502, 503, 504}
-CDX_FROM_DAYS = 120            # CDX scan lower bound (cutoff-120d); without it, busy URLs 504
+WAYBACK_MIN_INTERVAL = 0.6     # politeness pace (s) for our concurrent enrich workers, on top of the
+                               # wayback library's own internal rate-limit/retry handling.
 # A named User-Agent identifies us as a polite client; the default python-requests UA is what
 # rate-limiters clamp first. IMPORTANT: every GDELT call must route through gdelt_fetch() so it
 # goes through the single serial pacer — never make out-of-band probes (that trips the
@@ -102,9 +96,6 @@ GDELT_THROTTLE = 15.0     # seconds between GDELT calls, serial. GHR-proven: 15s
 GDELT_RETRIES = 1         # on a rate-limit, back off once then TOLERATE THE MISS — do NOT
                           # hammer (hammering during a block only extends it). The miss isn't
                           # cached, so it retries on the next run (resume from cache).
-WAYBACK_TIMEOUT = 12       # a CDX snapshot lookup that doesn't answer in 12s is a poorly-archived
-                           # deep URL that won't resolve on a 4th retry either — fail fast, cache a
-                           # miss (bulk mode), and let the article fall back to its title.
 
 # ticker-naming detection (a validation proxy; the curator does the real extraction).
 # Explicit market forms only, to keep false positives low.
@@ -207,51 +198,27 @@ def _parse_gdelt_date(seendate: str):
 
 
 # ------------------------------------------------------------------ Wayback
-def _extract_article_text(soup: BeautifulSoup) -> str:
-    """Pull the article's own text, preferring embedded JSON-LD structured data (most news
-    sites carry `articleBody`/`headline`/`description` there — clean and boilerplate-free),
-    then og:description/meta, then body paragraphs as a last resort. Capped at ~800 chars,
-    which is plenty for the curator to name the ticker without hauling the whole article."""
-    # 1) JSON-LD
-    for tag in soup.find_all("script", attrs={"type": "application/ld+json"}):
-        try:
-            data = json.loads(tag.string or "")
-        except Exception:
-            continue
-        for node in (data if isinstance(data, list) else [data]):
-            if not isinstance(node, dict):
-                continue
-            graph = node.get("@graph") if isinstance(node.get("@graph"), list) else [node]
-            for g in graph:
-                if not isinstance(g, dict):
-                    continue
-                body = g.get("articleBody") or g.get("description")
-                head = g.get("headline") or ""
-                if body:
-                    return " ".join(f"{head}. {body}".split())[:800]
-    # 2) meta description / og:description
-    meta = (soup.find("meta", attrs={"name": "description"})
-            or soup.find("meta", attrs={"property": "og:description"}))
-    if meta and meta.get("content"):
-        return " ".join(meta["content"].split())[:800]
-    # 3) first substantial body paragraph
-    for p in soup.find_all("p"):
-        t = p.get_text(" ", strip=True)
-        if len(t) > 80:
-            return " ".join(t.split())[:800]
-    return ""
+# Memento lookup via the `wayback` library (SURT-canonicalized search — matches www/http/param
+# variants of a URL, a big hit-rate win over an exact-URL availability lookup) + trafilatura for
+# article-body extraction (far more robust than the old JSON-LD/meta/paragraph heuristic).
+_MIN_LEDE = 40                 # reject sub-fragment extractions (a truncated meta value, a nav crumb)
+_MAX_LEDE = 500                # a lede is a sentence or two; cap it (render truncates further)
+_wb_client_local = threading.local()
 
 
-class WaybackTransient(Exception):
-    """A retryable archive.org failure (throttle/5xx/timeout). Callers must NOT cache it as a
-    permanent miss, or a rate-limit blip poisons the cache with false 'not-archived'."""
+def _wb_client() -> WaybackClient:
+    """One WaybackClient per worker thread — its underlying requests session is not shared-safe, so
+    the concurrent enrich pool needs a client per thread."""
+    c = getattr(_wb_client_local, "c", None)
+    if c is None:
+        c = _wb_client_local.c = WaybackClient()
+    return c
 
 
 def _wb_throttle() -> None:
     """Thread-safe rate limiter: RESERVES the next WAYBACK_MIN_INTERVAL-spaced start slot under the
-    lock, then sleeps OUTSIDE it. Concurrent enrich workers thus get evenly staggered starts (still
-    <= ~40/min, the safe serial rate) while their multi-second archive.org latencies overlap instead
-    of serializing on one shared sleep -- the whole point of the thread pool."""
+    lock, then sleeps OUTSIDE it, so the concurrent enrich workers get evenly staggered starts (a
+    politeness pace on top of the wayback library's own internal rate-limit/retry handling)."""
     with _wb_lock:
         now = time.monotonic()
         slot = max(now, _wb_last[0] + WAYBACK_MIN_INTERVAL)
@@ -261,86 +228,47 @@ def _wb_throttle() -> None:
         time.sleep(wait)
 
 
-def _wb_get(url: str, timeout: int = WAYBACK_TIMEOUT, tries: int = 2):
-    """GET archive.org with pacing + backoff on 429/5xx (honoring Retry-After). Returns the
-    response for any non-retryable status (incl. 404); raises WaybackTransient if retries
-    are exhausted or the connection keeps failing. tries=2 (one retry): the diagnostic showed
-    CDX timeouts don't resolve on deeper retries, they just burn 60-80s/URL — so fail fast."""
-    delay = 4.0
-    for attempt in range(tries):
-        _wb_throttle()
-        _WB_STAT["requests"] += 1
-        try:
-            r = requests.get(url, timeout=timeout, headers={"User-Agent": WAYBACK_UA})
-        except requests.exceptions.RequestException:
-            _WB_STAT["timeout"] += 1
-            if attempt == tries - 1:
-                raise WaybackTransient()
-            time.sleep(delay); delay = min(delay * 2, 120); continue
-        if r.status_code in WAYBACK_RETRY_STATUS:
-            _WB_STAT["http_429" if r.status_code == 429 else "http_5xx"] += 1
-            ra = r.headers.get("Retry-After", "")
-            time.sleep(min(float(ra), 120) if ra.isdigit() else delay)
-            delay = min(delay * 2, 120); continue
-        return r
-    raise WaybackTransient()
-
-
-def _wb_snapshot(url: str, cutoff: date) -> str | None:
-    """Availability API: the timestamp of the snapshot CLOSEST to cutoff, returned iff that snapshot
-    is AT-OR-BEFORE cutoff (look-ahead-clean). None if the URL was never archived, or the closest
-    snapshot is AFTER cutoff (a clean miss — we never use future content; this makes hit-rate a safe
-    LOWER bound). Raises WaybackTransient on a throttle/parse blip.
-
-    Why not CDX search: a diagnostic showed CDX's from/to scan runs 20-83s/URL (deep news URLs make
-    it 504/timeout, then blind-retry) at a 15% hit-rate, while this single-lookup availability API
-    runs ~5s/URL at a 63% hit-rate — 12x faster AND 4x more hits on the identical URL set."""
-    ts = cutoff.strftime("%Y%m%d") + "235959"
-    r = _wb_get(f"{WAYBACK_AVAIL}?url={requests.utils.quote(url, safe='')}&timestamp={ts}")
-    if r.status_code >= 400:
-        return None
-    try:
-        snap = r.json().get("archived_snapshots", {}).get("closest", {})
-    except Exception:
-        raise WaybackTransient()          # 200 but non-JSON = a throttle page; retry later
-    snap_ts = snap.get("timestamp", "") if snap.get("available") else ""
-    if not snap_ts or snap_ts[:8] > cutoff.strftime("%Y%m%d"):
-        return None                       # not archived, or closest capture is AFTER cutoff -> miss
-    return snap_ts
+def _clean_lede(text: "str | None") -> str:
+    """Whitespace-collapse trafilatura's article text into a snippet; drop sub-fragment extractions."""
+    if not text:
+        return ""
+    t = " ".join(text.split())
+    return t[:_MAX_LEDE] if len(t) >= _MIN_LEDE else ""
 
 
 def wayback_lede(url: str, target: date) -> tuple[str, bool]:
-    """Fetch the as-of-date archived page's lede (ticker-naming lead text). Returns (lede,
-    hit). Caches a CONFIRMED result (a real lede, or a confirmed not-archived miss); on a
-    transient throttle it returns ('', False) WITHOUT caching, so a later run retries."""
+    """As-of-date lede for `url`, look-ahead-clean. Finds the LATEST 200-status memento captured
+    AT-OR-BEFORE `target` via the wayback library (SURT-canonicalized, so www/http/trailing-slash/
+    tracking-param variants still match), then extracts the article body with trafilatura. Returns
+    (lede, hit). Caches a CONFIRMED result; a transient rate-limit is not cached (retry next run)
+    unless bulk mode, so a blip never poisons the cache with a false 'not-archived'."""
     key = f"{url}|{target}"
     hit = _cache_get("wayback", key)
     if hit is not None:
         return hit.get("lede", ""), hit.get("hit", False)
-    # Note: --no-pull gates only GDELT (the rate-limited API); Wayback always enriches, since
-    # it self-paces (WAYBACK_MIN_INTERVAL) and never caches a transient throttle.
+    to_dt = datetime(target.year, target.month, target.day, 23, 59, 59)
     try:
-        ts = _wb_snapshot(url, target)
-        if not ts:
-            _cache_put("wayback", key, {"lede": "", "hit": False})   # confirmed not archived
+        _wb_throttle()
+        _WB_STAT["requests"] += 1
+        recs = list(_wb_client().search(url, to_date=to_dt, filter_field="statuscode:200", limit=-1))
+        if not recs:
+            _cache_put("wayback", key, {"lede": "", "hit": False})   # confirmed: no memento <= target
             return "", False
-        # `id_` raw-content modifier: original page HTML, not archive.org's wrapper/toolbar.
-        r = _wb_get(f"http://web.archive.org/web/{ts}id_/{url}")
-        if r.status_code >= 400:
-            _cache_put("wayback", key, {"lede": "", "hit": False})
-            return "", False
-        lede = _extract_article_text(BeautifulSoup(r.text, "html.parser"))
-        if any(s in lede.lower() for s in
-               ("capture a web page as it appears now", "wayback machine",
-                "internet archive", "sign fight for the future")):
-            lede = ""                     # never let an archive.org interstitial leak in
+        _wb_throttle()
+        _WB_STAT["requests"] += 1
+        mem = _wb_client().get_memento(recs[-1], mode=Mode.original)  # raw archived HTML (no IA chrome)
+        lede = _clean_lede(trafilatura.extract(mem.content.decode("utf-8", "ignore"),
+                                               favor_precision=True, include_comments=False))
         _cache_put("wayback", key, {"lede": lede, "hit": bool(lede)})
         return lede, bool(lede)
-    except WaybackTransient:
-        if _wb_bulk[0]:                   # bulk build: accept the miss and cache it (no lede for this
-            _cache_put("wayback", key, {"lede": "", "hit": False})   # URL) so we never re-burn 60-80s
-            return "", False
-        return "", False                  # live path: DO NOT cache — retry on the next run
+    except (RateLimitError, WaybackRetryError):
+        _WB_STAT["http_429"] += 1
+        if _wb_bulk[0]:                   # bulk build: accept the miss so a re-run doesn't re-burn it
+            _cache_put("wayback", key, {"lede": "", "hit": False})
+        return "", False                  # transient: DO NOT cache on the live path — retry next run
+    except Exception:                     # blocked site / playback error / decode -> confirmed miss
+        _cache_put("wayback", key, {"lede": "", "hit": False})
+        return "", False
 
 
 def wayback_ledes(urls: list[str], target: date,
