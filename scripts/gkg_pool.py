@@ -122,29 +122,10 @@ def _domain_in(src: str, domains) -> bool:
     return any(src == d or src.endswith("." + d) for d in domains)
 
 
-def _demote_source_domains() -> "set":
-    """Domains listed in news_sources.md's `source_demote` front matter: prose sources that should NOT
-    get the specialty (2.0) authority tier because they aren't credible news DESKS — company/private
-    PR blogs, etc. They stay in the prose (live-curator reading list) but rank as tail (1.0). Easy to
-    extend as we decide to demote more."""
-    import re
-    import yaml
-    p = ROOT / "news_sources.md"
-    if not p.exists():
-        return set()
-    m = re.match(r"^---\s*\n(.*?)\n---\s*\n", p.read_text(), re.DOTALL)
-    if not m:
-        return set()
-    data = yaml.safe_load(m.group(1)) or {}
-    return {str(s).lower() for s in (data.get("source_demote") or [])}
-
-
 MAJOR_DOMAINS = _major_source_domains()          # major wires (mid tier, 1.5)
-DEMOTE_DOMAINS = _demote_source_domains()         # prose sources demoted out of the specialty tier
-# Specialty desks (top tier, 2.0) = the prose sources, MINUS any that are (subdomain of) a major wire
-# (major wins the overlap) and minus the explicitly demoted non-desks.
-PREFERRED_DOMAINS = {d for d in _specialty_source_domains()
-                     if not _domain_in(d, MAJOR_DOMAINS) and not _domain_in(d, DEMOTE_DOMAINS)}
+# Specialty desks (top tier, 2.0) = the prose sources, MINUS any that are a (subdomain of a) major
+# wire — major wins the overlap. To demote a source, just delete it from the prose (it drops here).
+PREFERRED_DOMAINS = {d for d in _specialty_source_domains() if not _domain_in(d, MAJOR_DOMAINS)}
 RECOGNIZED_DOMAINS = PREFERRED_DOMAINS | MAJOR_DOMAINS    # specialty + major = credible carriers (salience counted here)
 
 

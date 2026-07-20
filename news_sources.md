@@ -57,11 +57,6 @@ source_major:
   - theguardian.com
   - npr.org
   - finance.yahoo.com          # the finance aggregator specifically (bare yahoo.com would over-match Yahoo Sports/etc.)
-source_demote:                 # prose sources NOT given the specialty (2.0) tier — not credible news
-  - openai.com                 #   desks: company/private PR blogs. They stay in the prose for the live
-  - anthropic.com              #   curator but rank as tail (1.0). Extend this list to demote more later.
-  - ibm.com
-  - quantumai.google
 ---
 
 # Specialty news sources
@@ -100,8 +95,6 @@ For LLM / ML platform / semiconductor coverage.
 - **SemiAnalysis** — https://www.semianalysis.com — Dylan Patel on semiconductors, data-center economics, AI compute supply.
 - **MIT Technology Review** — https://www.technologyreview.com — AI section is editorially strong, less churn than news wires.
 - **Ars Technica — AI** — https://arstechnica.com/ai/ — technical but accessible.
-- **Anthropic blog** — https://www.anthropic.com/news — primary source for Claude models and research.
-- **OpenAI blog** — https://openai.com/news/ — primary source for GPT models and research.
 - **Gary Marcus** — https://garymarcus.substack.com — *skeptic.* Neuroscientist and prominent LLM-hype critic; deflationary takes on AGI timelines and AI-capex returns. Useful contrarian foil to the cheerleader outlets above.
 
 ## Rockets & spacecraft
@@ -138,8 +131,6 @@ Pre-commercial but with rapid research-cadence.
 
 - **Quantum Computing Report** — https://quantumcomputingreport.com — industry news and vendor tracker.
 - **Nature — Quantum Information** — https://www.nature.com/npjqi/ — peer-reviewed results.
-- **IBM Quantum blog** — https://www.ibm.com/quantum/blog — primary source for IBM's roadmap.
-- **Google Quantum AI** — https://quantumai.google — primary source for Google's quantum research.
 - **Shtetl-Optimized (Scott Aaronson)** — https://scottaaronson.blog — *skeptic.* UT Austin computer scientist; the most prominent and rigorous public quantum-hype skeptic. Calls out vendor claims point-by-point and distinguishes peer-reviewed milestones from press-release theater.
 
 ## Nuclear
