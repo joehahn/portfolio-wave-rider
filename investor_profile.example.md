@@ -1,8 +1,30 @@
 ---
 initial_investment_usd: 50000     # total dollars to allocate on day 0
 concentration_cap: 0.80           # no single position > 80% of portfolio
-min_trade_size_usd: 1000          # don't propose trades smaller than this
+min_trade_size_frac: 0.1          # don't propose trades smaller than this FRACTION of portfolio value (0.1 = 10%)
 always_include: [SPY, AGG, IAU]   # permanent optimizer anchors (equity / bond / gold safe havens); always in the universe, OUTSIDE the curator's max_watchlist_size, never added/removed by the curator. Leave empty [] to disable.
+# News-SOURCE curation (substring-matched against each article's source domain). Single source of truth
+# for source lists (relocated from gkg_config.json / news_sources.md). GHR calls these mill_block / specialty_allow.
+#   source_block: content-farm / low-signal domains dropped from the GKG pool. APPLIED by the single-pass gather.
+#   source_allow: preferred specialty desks. NOT applied by single-pass (block-only); the home for the allow-list,
+#     staged for the forward/WebSearch engine. Edit both to taste; leave [] to disable either.
+source_block:
+  - marketbeat.com
+  - tickerreport.com
+  - defenseworld.net
+  - 247wallst.com
+  - stockstory.org
+  - ts2.tech
+  - insidermonkey.com
+source_allow:
+  - semianalysis.com               # AI / semiconductors
+  - spacenews.com                  # rockets & spacecraft
+  - therobotreport.com             # robotics
+  - endpts.com                     # engineered biology
+  - quantumcomputingreport.com     # quantum computing
+  - world-nuclear-news.org         # nuclear
+  - breakingdefense.com            # defense / rearmament
+  - reuters.com                    # general markets
 dashboard_growth_guides_pct_per_week: [0.5, 1.0, 1.5]   # dotted reference curves on dashboard plot 1 (% per week)
 exclusions:                       # sector / theme exclusions
   - solar energy (companies and ETFs)
