@@ -153,27 +153,35 @@ def _title_consistent(title: str, lede: str) -> bool:
     return any(t in low for t in dist)
 
 
-def _apply_live_fallback(arts: list[dict]) -> None:
-    """LOOK-AHEAD-BIASED lede recovery: for Wayback-MISSES, fetch the source URL as it exists TODAY and
-    extract its lede, writing it to a SEPARATE `lede_live` field (never `lede`) and tagging
-    `lede_source="live"`. Keeping the clean Wayback lede in `lede` untouched means the clean baseline
-    (which reads only `lede`) is unaffected — the two variants differ solely by whether the curator is
-    also shown `lede_live` (render_articles(use_live=...)). This lets one fetch pass serve BOTH the clean
-    (Wayback-only) and the fuller (Wayback+live) A/B runs. Misses that stay dead keep lede_source="none"."""
-    miss = [a["url"] for a in arts if not a.get("lede")]
-    if not miss:
+def _apply_live_fallback(arts: list[dict], all_urls: bool = False) -> None:
+    """LOOK-AHEAD-BIASED lede recovery: fetch the source URL as it exists TODAY (trafilatura), gated by
+    _title_consistent, and store it in a SEPARATE `lede_live` field (never `lede`). The clean Wayback
+    lede in `lede` is untouched, so which render an arm gets is decided at render time (clean / fuller /
+    live-only), not here.
+
+    all_urls=False (default): only Wayback-MISSES are fetched; a gated hit promotes lede_source
+      none->live. This serves the clean (Wayback-only) and fuller (Wayback+live) arms.
+    all_urls=True: ALSO fetch Wayback-HITS, attaching lede_live as an alternative WITHOUT changing
+      lede_source (it stays "wayback"). This additionally serves the live-only arm (which renders
+      lede_live for every article, ignoring the clean field) — the "do we even need Wayback" test."""
+    targets = [a["url"] for a in arts
+               if not a.get("lede_live") and (all_urls or not a.get("lede"))]
+    if not targets:
         return
-    live = w.live_ledes(miss)
+    live = w.live_ledes(list(dict.fromkeys(targets)))
     for a in arts:
+        if a.get("lede_live"):
+            continue
         lv = live.get(a["url"], "")
-        if not a.get("lede") and lv and _title_consistent(a["title"], lv):
-            a["lede_live"] = lv
-            a["lede_source"] = "live"
-        # else: stays lede_source="none" (dead link, OR a topic-swapped URL-recycle we reject)
+        if not lv or not _title_consistent(a["title"], lv):
+            continue                      # dead link OR a topic-swapped URL-recycle we reject
+        a["lede_live"] = lv
+        if not a.get("lede"):
+            a["lede_source"] = "live"     # a Wayback-miss promoted; hits keep lede_source="wayback"
 
 
 def build_article_pool(as_of: date, news_lookback_days: int, max_articles: int,
-                       run_dir: Path, live_fallback: bool = False) -> list[dict]:
+                       run_dir: Path, live_fallback: bool = False, live_all: bool = False) -> list[dict]:
     """Assemble one rebalance's pool by SLICING the pre-ingested corpus for (as_of - news_lookback,
     as_of], then RANKING it like a search engine (so the curator's input resembles live WebSearch),
     NOT sampling arbitrarily. No GKG query here — changing news_lookback_days only re-slices.
@@ -188,10 +196,13 @@ def build_article_pool(as_of: date, news_lookback_days: int, max_articles: int,
     cache = run_dir / "_cache" / f"pool-{as_of}-{news_lookback_days}d-{max_articles}.json"
     if cache.exists():
         arts = json.loads(cache.read_text())
-        if not live_fallback or all("lede_source" in a for a in arts):
-            return arts
-        _apply_live_fallback(arts)          # cache predates live-fallback: augment + rewrite (no re-query)
-        cache.write_text(json.dumps(arts))
+        changed = False
+        if live_fallback and not all("lede_source" in a for a in arts):
+            _apply_live_fallback(arts); changed = True     # cache predates live-fallback: augment
+        if live_all and any(not a.get("lede_live") and a.get("lede") for a in arts):
+            _apply_live_fallback(arts, all_urls=True); changed = True   # attach live to Wayback-hits too
+        if changed:
+            cache.write_text(json.dumps(arts))             # rewrite (no GKG re-query; Wayback/live cached)
         return arts
     cache.parent.mkdir(parents=True, exist_ok=True)
     cdir = run_dir / "_corpus"
@@ -259,20 +270,27 @@ def build_article_pool(as_of: date, news_lookback_days: int, max_articles: int,
     for a in arts:
         a["lede"] = ledes.get(a["url"], "")
         a["lede_source"] = "wayback" if a["lede"] else "none"   # tagged; live-fallback may upgrade "none"
-    if live_fallback:
-        _apply_live_fallback(arts)
+    if live_fallback or live_all:
+        _apply_live_fallback(arts, all_urls=live_all)
     cache.write_text(json.dumps(arts))
     return arts
 
 
-def render_articles(arts: list[dict], use_live: bool = False) -> str:
-    """Render the pool as the curator's news input. Clean mode (use_live=False) shows only look-ahead-clean
-    Wayback ledes (title-only for misses). Fuller mode (use_live=True) also shows the LOOK-AHEAD-BIASED
-    live-fallback ledes — the A/B variant for measuring how much those biased snippets move decisions."""
+def render_articles(arts: list[dict], mode: str = "clean") -> str:
+    """Render the pool as the curator's news input, choosing which lede each article shows:
+      clean     — only look-ahead-CLEAN Wayback ledes (`lede`), title-only otherwise. The trustworthy floor.
+      fuller    — clean Wayback lede, else the biased live-fallback (`lede_live`). Wayback + fallback.
+      live_only — the live lede (`lede_live`) for EVERY article, ignoring the clean field; title-only if
+                  no live lede. Fully look-ahead-biased — the "do we even need Wayback" arm."""
     lines = ["DATE-CLEAN NEWS ARTICLES (title + snippet). Discover the tickers; discard non-investable "
              "noise (war/weather events, private cos, foreign/OTC, keyword false-matches):"]
     for a in arts:
-        lede = a.get("lede") or (a.get("lede_live", "") if use_live else "")
+        if mode == "live_only":
+            lede = a.get("lede_live", "")
+        elif mode == "fuller":
+            lede = a.get("lede") or a.get("lede_live", "")
+        else:
+            lede = a.get("lede", "")
         snip = (lede or a["title"])[:220]
         lines.append(f"\n[{a['date']} | {a['source']}] {a['title'][:90]}\n   {snip} ({a['url']})")
     return "\n".join(lines)
@@ -360,15 +378,21 @@ def main(argv=None) -> int:
     ap.add_argument("--log-llm", action="store_true")
     ap.add_argument("--pools-only", action="store_true", help="build article pools, skip curator + replay")
     ap.add_argument("--live-fallback", action="store_true",
-                    help="for Wayback-misses, fetch the source URL live TODAY (LOOK-AHEAD-BIASED, stored "
-                         "in lede_live + tagged lede_source=live); fills the pool but does NOT feed the "
-                         "curator unless --use-live-ledes is also set")
-    ap.add_argument("--use-live-ledes", action="store_true",
-                    help="the fuller A/B variant: curator also reads the live-fallback ledes (implies "
-                         "--live-fallback). Default (off) = clean Wayback-only baseline")
+                    help="fetch live ledes for Wayback-MISSES (LOOK-AHEAD-BIASED, stored in lede_live); "
+                         "fills the pool data but only feeds the curator per --news-mode")
+    ap.add_argument("--live-all", action="store_true",
+                    help="ALSO fetch live ledes for Wayback-HITS (attached as lede_live, clean field kept) "
+                         "so the pool can serve the live_only arm; implied by --news-mode live_only")
+    ap.add_argument("--news-mode", choices=["clean", "fuller", "live_only"], default="clean",
+                    help="which lede the curator reads: clean=Wayback-only (floor); fuller=Wayback+live "
+                         "fallback; live_only=live ledes for every url (ignores Wayback). Default clean")
     a = ap.parse_args(argv)
-    if a.use_live_ledes:
-        a.live_fallback = True            # can't show the curator live ledes we never fetched
+    if a.news_mode == "fuller":
+        a.live_fallback = True            # can't show live ledes we never fetched
+    if a.news_mode == "live_only":
+        a.live_all = True                 # live_only renders lede_live for every article
+    if a.live_all:
+        a.live_fallback = True
 
     from src import portfolio
     fm = portfolio.load_financial_model()            # investor_profile.md is authoritative; CLI overrides
@@ -427,7 +451,7 @@ def main(argv=None) -> int:
     # 10-worker pool, and serial pool-builds avoid racing the module-global _wb_bulk flag in news_pool).
     pool_ex = ThreadPoolExecutor(max_workers=1)
     pool_futs = {d: pool_ex.submit(build_article_pool, date.fromisoformat(d), news_lb,
-                                   a.max_articles, run_dir, a.live_fallback)
+                                   a.max_articles, run_dir, a.live_fallback, a.live_all)
                  for d in dates}
     try:
         for d in dates:
@@ -445,7 +469,7 @@ def main(argv=None) -> int:
             cur_wl = portfolio.reconstruct_watchlist_at(d, a.starter, str(hist))
             log = (run_dir / "_log" / f"{d}-curator.json") if a.log_llm else None
             cur = call_curator(cli, a.model, d, cur_wl, thesis, exclusions, a.max_watchlist_size,
-                               anchors, render_articles(arts, a.use_live_ledes), a.cadence, log,
+                               anchors, render_articles(arts, a.news_mode), a.cadence, log,
                                run_dir / "_parse_fail")
             cur["as_of_date"] = d
             (run_dir / f"{d}-curation.json").write_text(json.dumps(cur, indent=2))
