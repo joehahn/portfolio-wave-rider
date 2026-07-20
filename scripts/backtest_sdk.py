@@ -269,21 +269,39 @@ def _rebalance_dates(start: str, end: str, cadence_days: int) -> list[str]:
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="SDK GKG+Wayback backtest harness.")
     ap.add_argument("--start", required=True); ap.add_argument("--end", required=True)
-    ap.add_argument("--cadence", default="weekly", choices=list(CADENCE_DAYS))
-    ap.add_argument("--news-lookback-days", type=int, default=None, help="default = cadence")
-    ap.add_argument("--optimizer-lookback-days", type=int, default=30)
+    # These default to investor_profile.md (the source of truth); a CLI flag overrides per invocation.
+    ap.add_argument("--cadence", default=None, help="default: profile rebalance_period")
+    ap.add_argument("--news-lookback-days", type=int, default=None, help="default: profile news_lookback_days")
+    ap.add_argument("--optimizer-lookback-days", type=int, default=None, help="default: profile optimizer_lookback_days")
+    ap.add_argument("--max-watchlist-size", type=int, default=None, help="default: profile max_watchlist_size")
+    ap.add_argument("--max-weight", type=float, default=None, help="default: profile concentration_cap")
+    ap.add_argument("--risk-aversion", type=float, default=None, help="default: profile risk_aversion")
     ap.add_argument("--max-articles", type=int, default=100)
     ap.add_argument("--starter", nargs="+", default=["AAPL", "MSFT", "GOOGL", "NVDA", "SPY"])
-    ap.add_argument("--max-watchlist-size", type=int, default=5)
-    ap.add_argument("--max-weight", type=float, default=1.0)
-    ap.add_argument("--risk-aversion", type=float, default=0.5)
     ap.add_argument("--model", default="claude-sonnet-5")
     ap.add_argument("--run-dir", required=True)
     ap.add_argument("--log-llm", action="store_true")
     ap.add_argument("--pools-only", action="store_true", help="build article pools, skip curator + replay")
     a = ap.parse_args(argv)
 
-    news_lb = a.news_lookback_days or CADENCE_DAYS[a.cadence]
+    from src import portfolio
+    fm = portfolio.load_financial_model()            # investor_profile.md is authoritative; CLI overrides
+    if a.cadence is None:
+        a.cadence = fm["rebalance_period"]
+    if a.cadence not in CADENCE_DAYS:
+        sys.exit(f"unsupported cadence {a.cadence!r}; choose from {list(CADENCE_DAYS)}")
+    if a.news_lookback_days is None:
+        a.news_lookback_days = fm.get("news_lookback_days") or CADENCE_DAYS[a.cadence]
+    if a.optimizer_lookback_days is None:
+        a.optimizer_lookback_days = fm.get("optimizer_lookback_days") or 30
+    if a.max_watchlist_size is None:
+        a.max_watchlist_size = int(fm["max_watchlist_size"])
+    if a.max_weight is None:
+        a.max_weight = float(fm["concentration_cap"])
+    if a.risk_aversion is None:
+        a.risk_aversion = float(fm["risk_aversion"])
+
+    news_lb = a.news_lookback_days
     run_dir = ROOT / a.run_dir; run_dir.mkdir(parents=True, exist_ok=True)
     (run_dir / "_log").mkdir(exist_ok=True)
     dates = _rebalance_dates(a.start, a.end, CADENCE_DAYS[a.cadence])
@@ -298,7 +316,6 @@ def main(argv=None) -> int:
     anchors = ["SPY", "AGG", "IAU"]
     tok_in = tok_out = 0
 
-    from src import portfolio
     hist = run_dir / "_wf_history.csv"
     hist.write_text("date,action,ticker,wave_bucket,rationale,news_evidence_urls\n")
     sb_hold = run_dir / "_wf_holdings.csv"
