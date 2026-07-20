@@ -1,0 +1,22 @@
+{
+  "as_of_date": "2025-06-15",
+  "rebalance_period": "weekly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "This week's pool is dominated by noise the guardrails require discarding: geopolitical/war reporting with no direct equity linkage (Israel-Iran missile exchanges, F-16 vs Su-35 dogfight recap, rocket attacks in Bajaur, LA protest coverage), private/non-investable companies (SpaceX Ax-4 and Starlink launches, Blue Origin New Glenn delay, Venus Aerospace hypersonic startup, Meta's Scale AI stake which is a private-company investment), and foreign/thin-float names that fail the liquidity or listing checks (Nuclear Fuels Corp's Kaycee uranium drill on the CSE, Yaskawa's HQ move, China's rocket-engine test, Russia/China-built Kazakh nuclear plants, Sizewell C in the UK). The two genuine US-listed catalysts surfaced -- Rocket Lab's 10th routine Electron mission for BlackSky and a single-day pop in Quantum Computing Inc (QUBT) with no accompanying fundamental driver in the snippet -- are each too thin on their own to justify swapping out a current AI-wave anchor (AAPL/GOOGL/MSFT/NVDA) under this period's swap-requires-pair rule; RKLB's launch cadence is incremental rather than a step-change, and QUBT's move reads as speculative rather than buildup evidence. Nothing here constitutes a thesis breach for the current holdings (Apple Intelligence coverage and Nvidia/Meta AI-model news simply reaffirm the existing AI wave) or a decisive next-wave entry signal strong enough to earn a paired removal, so the watchlist is held unchanged this week.",
+  "search_terms": [
+    "space stocks rocket launch news",
+    "quantum computing stocks",
+    "nuclear stocks SMR",
+    "robotics stocks",
+    "defense stocks geopolitical",
+    "AI stocks Nvidia Microsoft Google Apple news",
+    "RKLB recent news",
+    "QUBT recent news",
+    "AAPL recent news",
+    "GOOGL recent news",
+    "MSFT recent news",
+    "NVDA recent news"
+  ]
+}

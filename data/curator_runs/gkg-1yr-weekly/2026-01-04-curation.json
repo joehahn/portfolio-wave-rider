@@ -1,0 +1,21 @@
+{
+  "as_of_date": "2026-01-04",
+  "rebalance_period": "weekly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "Scanned the week's pool across AI, quantum, rockets/space, nuclear, robotics, and geopolitical/defense beats. Existing holdings continue to have live, on-thesis coverage (RKLB profiled on competitive execution vs larger space rivals; GOOGL named in AMD/Samsung 2nm AI-chip supply talks; South Korea's reactor approval is a mild nuclear tailwind consistent with the SMR thesis), with no fundamental thesis breach or peak-enthusiasm signal on any current holding. On the discovery side, filtered out: non-investable/private names (SpaceX, LandSpace, Terran Orbital now owned by Lockheed), foreign-only or thin-float names not cleanly tradable on US exchanges (SK Telecom's AI model, SoftBank's OpenAI stake), pure geopolitical/military event noise with no direct US-listed equity angle (DPRK/Pakistan/Iran missile tests, Sudan satellite imagery, Kharkov strike denial), keyword false-matches, and generic listicle/opinion pieces ('3 AI stocks to buy/leave behind') with no company-specific catalyst. The one plausible rising-wave candidate, IonQ's 100-qubit South Korea rollout, and AST SpaceMobile's AT&T BlueBird-6 milestone, are each backed by only a single non-tier-1 article this week (biztoc, satnews) - not the clearly-stronger, multi-sourced catalyst the swap bar requires against an already-thesis-aligned incumbent. Weekly cadence argues for patience here: watchlist unchanged.",
+  "search_terms": [
+    "AI stocks news",
+    "quantum computing stocks",
+    "rockets space stocks",
+    "nuclear SMR stocks",
+    "robotics stocks",
+    "defense rearmament stocks",
+    "geopolitical missile news",
+    "RKLB recent news",
+    "NVDA recent news",
+    "GOOGL recent news",
+    "SMR recent news"
+  ]
+}

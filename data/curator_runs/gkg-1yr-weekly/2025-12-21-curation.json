@@ -1,0 +1,21 @@
+{
+  "as_of_date": "2025-12-21",
+  "rebalance_period": "weekly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "This week's pool is mostly noise or reinforcement of existing theses rather than a genuinely stronger new wave vehicle. Filtered out: keyword false-matches on 'rocket' (Army-Navy game, Rocket Arena AHL, Rocket 105/iHeart music posts, Ukrainian BMW rocket launcher, Rocket Companies RKT mortgage lender), non-investable private entities (SpaceX/Starlink, Blue Origin, ULA, Anduril, Zenno Astronautics, Stellar Solutions, Radiant microreactor), thin/foreign uranium juniors (Skyharbour, Sprott/ASX uranium commentary), a literal 'notice to disregard' filing (AMC Robotics), academic/agri-robotics items with no ticker, vague Space Force contract mentions with no named issuer, and pure geopolitical event coverage (Belarus missile deployment, Odesa strike) with no tradable vehicle attached. The remaining signals largely confirm current holdings' theses rather than surface a clearly superior alternative: nuclear power demand from AI data centers (supports SMR), continued Electron launch cadence and a same-day RKLB rally (supports RKLB), and mixed NVDA commentary (H200 China demand upside vs. a JPMorgan note favoring an unnamed 'better' pick, which names no swap-in ticker and so is not actionable). Serve Robotics (SERV) drew a single analyst-upgrade pop and Ondas' (ONDS) tactical-robotics acquisition are noted as robotics-wave watch items, but neither clears the bar of a clearly stronger rising vehicle warranting a swap out of a core, thesis-central holding on one week of coverage. No change to the managed watchlist this period.",
+  "search_terms": [
+    "news_pool: AI stocks",
+    "news_pool: nuclear/SMR stocks",
+    "news_pool: rockets & spacecraft stocks",
+    "news_pool: robotics stocks",
+    "news_pool: quantum computing stocks",
+    "news_pool: geopolitical/defense/drones",
+    "news_pool: aging demographics",
+    "GOOGL recent news",
+    "NVDA recent news",
+    "RKLB recent news",
+    "SMR recent news"
+  ]
+}

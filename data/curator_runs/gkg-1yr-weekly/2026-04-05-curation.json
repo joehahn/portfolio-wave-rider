@@ -1,0 +1,33 @@
+{
+  "as_of_date": "2026-04-05",
+  "rebalance_period": "weekly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "This week's pool surfaced one genuine catalyst worth flagging for future weeks \u2014 Amazon reportedly in talks to acquire Globalstar (GSAT) for ~$9B (moneycontrol 2026-04-02, corroborated by Yahoo Finance 2026-04-03 framing it as an Apple-satellite-partner risk) \u2014 a real M&A-driven satellite/space-infrastructure story adjacent to the rockets & spacecraft wave. However, none of the four managed holdings (GOOGL, NVDA, RKLB, SMR) showed a thesis-breach or peak-exhaustion signal this week to justify the paired removal a GSAT add would require: RKLB already anchors the rockets/spacecraft bucket with no negative news, NVDA/GOOGL got only reinforcing commentary (Huang's robotics remark; Pixel 10a review), and the SMR-adjacent nuclear item was a low-quality PR-wire 'market boom' press release, not a dated catalyst. Filtered as noise/non-investable: private-company launches (SpaceX, ULA joint venture, Starlink breakup), foreign-government programs (Artemis II/NASA, Russia's Plesetsk military satellite, ISRO Mission MITRA, Saudi Shams satellite, India's Suryastra rocket system), pure geopolitical/conflict reporting with no listed-equity angle (Iran/Israel/Kuwait missile and drone exchanges, Ukraine war updates, Kim Jong Un missile test, F-35 crash/losses), keyword false-matches (Rocket Pharmaceuticals/RCKT is gene-therapy biotech not spaceflight; 'Rocket Close/Better' in Scotsman Guide is Rocket Mortgage/RKT, not aerospace), thinly-traded/foreign-exchange tickers (NXN.V on the CVE), pre-IPO private raises (Rebellions AI chip startup), and generic AI-hype op-eds/policy pieces with no specific ticker. Pratt & Whitney's $3.8B F135 deal (RTX) and Lockheed's missile-margin story (LMT) are noted as candidate defense/geopolitical exposure for a future rebalance but do not clear the bar alone without a paired removal this week. Holding steady.",
+  "search_terms": [
+    "space stocks",
+    "rocket launch stocks",
+    "nuclear stocks",
+    "SMR stocks",
+    "robotics stocks",
+    "humanoid robot stocks",
+    "quantum computing stocks",
+    "defense stocks",
+    "defense ETF",
+    "geopolitics",
+    "shipping stocks",
+    "tanker stocks",
+    "healthcare stocks",
+    "eldercare REIT stocks",
+    "aging population demographics stocks",
+    "best performing etf this month",
+    "biggest stock gainers",
+    "interest rates",
+    "tariffs",
+    "GOOGL recent news",
+    "NVDA recent news",
+    "RKLB recent news",
+    "SMR recent news"
+  ]
+}

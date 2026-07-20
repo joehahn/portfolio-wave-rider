@@ -1,0 +1,21 @@
+{
+  "as_of_date": "2025-11-23",
+  "rebalance_period": "weekly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "This week's pool is dominated by noise that doesn't clear the swap bar: student/hobbyist robotics competitions, a uranium film festival, foreign military/drone conflict reporting (Russia-Ukraine, Iran, India-Pakistan arms deals, a Tejas crash), private-company or non-investable items (SpaceX Starship test flight, Holtec/Utah nuclear-hub MOU, China's state molten-salt reactor claim, Greenpeace uranium-shipment photo), and generic AI listicle click-bait. The substantive items this week reinforce existing holdings rather than surface a clearly stronger new vehicle: GOOGL got real catalysts (Gemini 3 launch, $40B Texas data-center buildout), NVDA got real catalysts ($15B Anthropic pledge with Microsoft, RIKEN quantum-AI supercomputer tie-up, and a Fool piece arguing NVDA itself is a levered way to play quantum upside), RKLB had a routine confidential-payload launch, and SMR had a minor 2% pullback with no thesis-relevant news. Quantum Computing Inc (QUBT) popped on an earnings beat, a legitimate quantum-wave data point, but a single volatile microcap earnings pop is not yet a 'clearly stronger' case for swapping out a core AI or nuclear/rockets holding, especially with NVDA itself flagged as capturing quantum upside. No swap justified this week; watchlist unchanged pending a stronger, corroborated catalyst.",
+  "search_terms": [
+    "AI stocks",
+    "quantum computing stocks",
+    "nuclear stocks / SMR stocks",
+    "rocket launch stocks / space stocks",
+    "robotics stocks",
+    "geopolitical defense stocks / drones",
+    "uranium stocks",
+    "GOOGL recent news",
+    "NVDA recent news",
+    "RKLB recent news",
+    "SMR recent news"
+  ]
+}

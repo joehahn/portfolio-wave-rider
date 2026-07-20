@@ -1,0 +1,24 @@
+{
+  "as_of_date": "2026-03-22",
+  "rebalance_period": "weekly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "This week's pool is dominated by noise irrelevant to ticker-level decisions: an Iran-Israel-Gulf missile/war escalation cycle (Arad, Dimona, Diego Garcia, Qatar LNG, Baghdad embassy) with no US-listed defense/tanker ticker named in coverage; North Korea rocket-artillery drills and India's Pinaka artillery (foreign military, not investable); several micro-cap/OTC uranium exploration juniors (Nexus Uranium, Global Uranium Corp, AuKing/Moab) that fail the liquidity floor; and speculative 'next Nvidia' listicle bait (fool.com) with no concrete catalyst. On the AI/robotics side, Nvidia's own platform launch and Qualcomm's AI/robotics commentary reinforce theses already held via NVDA rather than surfacing a new name, and SpaceX/NASA rocket items reference a private company and legacy programs, not a new investable rocket ticker beyond RKLB already held. The Softbank Ohio data-center item is actually a tell against near-term nuclear buildout (gas plant chosen over reactors for speed), not a catalyst to add nuclear exposure beyond SMR. Nothing here clears the bar of a genuine rising-wave catalyst strong enough to displace GOOGL, NVDA, RKLB, or SMR, so the watchlist is held unchanged this week.",
+  "search_terms": [
+    "AI stocks news",
+    "space stocks rocket launch news",
+    "robotics stocks news",
+    "quantum computing stocks news",
+    "nuclear SMR stocks news",
+    "defense rearmament stocks news",
+    "tanker shipping stocks news",
+    "aging population demographics stocks",
+    "biggest stock gainers this week",
+    "best performing etf this week",
+    "GOOGL recent news",
+    "NVDA recent news",
+    "RKLB recent news",
+    "SMR recent news"
+  ]
+}

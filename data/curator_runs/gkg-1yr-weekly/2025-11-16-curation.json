@@ -1,0 +1,47 @@
+{
+  "as_of_date": "2025-11-16",
+  "rebalance_period": "weekly",
+  "adds": [
+    {
+      "ticker": "RKLB",
+      "wave_bucket": "rockets_spacecraft",
+      "rationale": "Rocket Lab posted a genuine Q3 catalyst -- record quarterly revenue of $155M (48% YoY growth) at record gross margin, with the stock rallying on the beat and guidance -- giving the portfolio its first concrete, early-stage exposure to the rockets & spacecraft wave named as a near-term next wave in the thesis.",
+      "news_evidence": [
+        {
+          "summary": "Rocket Lab Q3 2025 results: record quarterly revenue of $155M, up 48% YoY, at record gross margin",
+          "source": "GlobeNewswire via Manila Times",
+          "url": "https://www.manilatimes.net/2025/11/11/tmt-newswire/globenewswire/rocket-lab-announces-third-quarter-2025-financial-results-posts-record-quarterly-revenue-of-155m-representing-48-year-on-year-growth-at-record-gross-margin/2220608",
+          "date": "2025-11-10"
+        },
+        {
+          "summary": "Rocket Lab stock rises on Q3 earnings beat and strong guidance, annual launch record just days away",
+          "source": "Benzinga",
+          "url": "https://www.benzinga.com/markets/earnings/25/11/48767967/rocket-lab-stock-rises-on-q3-earnings-beat-strong-guidance-new-annual-launch-record-is-just-days-away",
+          "date": "2025-11-10"
+        },
+        {
+          "summary": "Rocket Lab and AST SpaceMobile deliver earnings after rallies of 104% and 217% in 2025",
+          "source": "Investor's Business Daily",
+          "url": "https://www.investors.com/news/rocket-lab-ast-spacemobile-space-stocks-earnings/",
+          "date": "2025-11-10"
+        }
+      ]
+    }
+  ],
+  "removes": [
+    {
+      "ticker": "AAPL",
+      "rationale": "This week's only AAPL coverage is a speculative Bloomberg/Gurman leak about future satellite-feature roadmap items with no revenue or launch timeline attached -- a quiet, non-catalytic week that makes AAPL the weakest wave-linked slot to fund a clearer, earnings-backed rockets/spacecraft entry.",
+      "news_evidence": [
+        {
+          "summary": "Report describes Apple developing satellite-powered Maps, photo messaging, and third-party app support for iPhone -- roadmap speculation, no product or financial catalyst",
+          "source": "iClarified (Gurman/Bloomberg)",
+          "url": "https://www.iclarified.com/98996/apple-developing-satellitepowered-maps-photo-messaging-and-thirdparty-app-support-for-iphone-gurman",
+          "date": "2025-11-09"
+        }
+      ]
+    }
+  ],
+  "no_changes": false,
+  "rationale_overall": "Filtered out heavy noise this week: Blue Origin/SpaceX/Starlink launch logistics (private, not investable), GoviEx Uranium (CVE-listed, thinly traded, not US-listed), Quantum Computing Inc (QUBT, down on no real catalyst), IBM's quantum 'breakthrough' headline (mega-cap, already priced, not an early-wave entry), Nvidia-backed Firmus funding (private company), Japan nuclear financing policy and Greenpeace uranium-to-Russia story (structural/geopolitical color, no specific US ticker), F-35/Saudi deal chatter and Russia-Ukraine drone barrage (geopolitical wave color, no named investable ticker), and general AI-adoption trend pieces (airlines, healthcare, EU AI Act) that named no tickers. The one genuine catalyst was Rocket Lab's record Q3 revenue beat, which finally gives the watchlist real exposure to the rockets & spacecraft wave; AAPL's only news this week was pure feature-roadmap speculation, making it the natural funding source for the swap while AI-wave holdings (GOOGL, NVDA) and the nuclear-wave holding (SMR) had either positive or neutral-but-thesis-intact news and were left untouched."
+}

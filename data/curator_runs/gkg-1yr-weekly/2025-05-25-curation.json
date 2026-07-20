@@ -1,0 +1,17 @@
+{
+  "as_of_date": "2025-05-25",
+  "rebalance_period": "weekly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "This week's article pool was heavy on noise: keyword false-matches (Arsenal's 'Rice Rocket' goal, Penn State 'satellite campus' closures, Met Opera 'live via satellite'), non-investable actors (SpaceX, Venus Aerospace, Anduril, Chinese rocket firms are private; Indian ISRO, Guam missile defense, KF-21, BrahMos, Golden Dome talks are sovereign programs with no listed ticker), and thin/OTC uranium juniors (Blue Sky Uranium, Standard Uranium) that fail the liquidity floor. Two marginal candidates surfaced -- Serve Robotics (SERV) pitching public-market scaling of delivery robotics, and Uranium Energy Corp (UEC) popping on an unspecified catalyst -- but neither cleared a bar strong enough to justify swapping out an existing AI-wave holding on a single week of coverage; both are logged as watch items for future weeks if the catalyst firms up (e.g. a contract, financing round, or fuel-cycle policy news). The dominant thread remains Nvidia's China chip workaround (cheaper Blackwell variant post export curbs) and Google's Gemini/Veo3 push, both of which are evidence for keeping NVDA and GOOGL as-is rather than a reason to add or trim. No genuine crest or breach signal touched AAPL, GOOGL, MSFT, or NVDA this week, so the managed watchlist is left unchanged per the swap-only mandate.",
+  "search_terms": [
+    "rockets & spacecraft news",
+    "robotics stocks news",
+    "nuclear / uranium / SMR news",
+    "quantum computing news",
+    "AI stocks news",
+    "geopolitical / defense / drone news",
+    "aging demographics news"
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "as_of_date": "2025-09-28",
+  "rebalance_period": "weekly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "Filtered out substantial noise this week: private-company SpaceX/Starlink launches (not investable), a UFO/Hellfire missile story, a video-game named 'Little Rocket Lab', a Down Syndrome charity walk titled 'Rocket City', foreign/OTC uranium junior-miner financings (Myriad Uranium, Terra Clean Energy), a pre-listing SPAC merger (Kodiak Robotics via AACT, still volatile with high redemptions), tariff/regulatory chatter on robotics with no single-name catalyst, and Russia/NATO/Iran geopolitical items with no tradeable US ticker attached. Two items had real tickers behind them - Quantum Computing Inc. (QUBT) closing an oversubscribed $500M private placement, and a vague 'huge news' Rocket Lab (RKLB) piece with no specifics - but neither rises to a 'clearly stronger than a current holding' bar: the QUBT raise is a financing event (dilution risk) rather than a commercial/regulatory milestone, and the RKLB headline lacked substantive detail to cite as evidence. None of the four managed holdings (AAPL, GOOGL, NVDA, SMR) show a thesis breach or peak-exhaustion signal this week - NVDA's AI-chip competitive news (AMD MI450X) is incremental, not a breach. Holding steady this week; watchlist unchanged with SPY as an anchor.",
+  "search_terms": [
+    "AI stocks",
+    "best performing etf this month",
+    "biggest stock gainers",
+    "rocket launch stocks",
+    "space stocks",
+    "quantum computing stocks",
+    "nuclear stocks SMR",
+    "robotics stocks",
+    "geopolitics defense stocks",
+    "drone stocks",
+    "tanker shipping stocks",
+    "aging population demographics stocks",
+    "AAPL recent news",
+    "GOOGL recent news",
+    "NVDA recent news",
+    "SMR recent news"
+  ]
+}

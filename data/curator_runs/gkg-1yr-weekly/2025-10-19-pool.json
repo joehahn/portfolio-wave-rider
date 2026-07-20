@@ -1,0 +1,401 @@
+{
+  "as_of_date": "2025-10-19",
+  "news_lookback_days": 7,
+  "source": "gkg-wayback-articles",
+  "n_articles": 56,
+  "hit_rate": 0.25,
+  "articles": [
+    {
+      "title": "SpaceX tries for 2 successful Starship missions in a row with Monday's launch",
+      "date": "2025-10-12",
+      "source": "gowatertown.net",
+      "url": "https://www.gowatertown.net/syndicated-article/?id=1641084",
+      "lede": ". Watertown News and Happenings"
+    },
+    {
+      "title": "Rocket Lab Contracts For 2 JAXA Launches | Aero-News Network",
+      "date": "2025-10-12",
+      "source": "aero-news.net",
+      "url": "https://aero-news.net:443/AnnTicker.cfm?do=main.textpost&id=9B5832D2-412C-44AB-BB2A-71B281BBF46A",
+      "lede": "Separate Electron Payloads Include Single Satellite And Rideshare Rocket Lab Corp., based in Long Beach, California, announced it has secured a| Published: Sun, Oct 12, 2025 | Aero-News Network"
+    },
+    {
+      "title": "Starship Flight 11: End of an era, but the beginning of a new one",
+      "date": "2025-10-12",
+      "source": "nasaspaceflight.com",
+      "url": "https://www.nasaspaceflight.com/2025/10/starship-flight-11-the-end-beginning-new/",
+      "lede": ". Huge fan of the St. Louis Blues and Cardinals Space enthusiast."
+    },
+    {
+      "title": "SpaceX prepping for Starship's 11th launch out of Starbase",
+      "date": "2025-10-12",
+      "source": "krgv.com",
+      "url": "https://www.krgv.com/news/spacex-prepping-for-starship-s-11th-launch-out-of-starbase",
+      "lede": "SpaceX will launch its Starship rocket for the 11th time on Monday, the company announced. The rocket is set to launch from SpaceX\u2019s launch site in Cameron County on Monday, Oct. 13, with a 75-minute launch window that starts at 6:15 p.m. central. Starship\u2019s last launch was on Aug. 26, and the company said Monday\u2019s launch will include similar flight experiments such as stress-testing Starship\u2019s heatshield. The launch will use maneuvers that will mimic the upper stage\u2019s final approach for a future return to the launch site, SpaceX said. \u201cResidents of Cameron County and those in the nearby area may hear a loud noise resulting from the rocket\u2019s 33 Raptor engines firing upon ignition and as the vehicle launches toward space, but what people experience will depend on weather and other condition"
+    },
+    {
+      "title": "North Korea unveils new intercontinental ballistic missile that may be tested in coming weeks",
+      "date": "2025-10-12",
+      "source": "fortune.com",
+      "url": "https://fortune.com/2025/10/12/north-korea-new-intercontinental-ballistic-missile-hwasong-20-flight-test/",
+      "lede": "North Korea unveils new intercontinental ballistic missile that may be tested in coming weeks. North Korean state media said Saturday that the parade featured a new, yet-to-be-tested ICBM called the Hwasong-20."
+    },
+    {
+      "title": "Five-day workshop on Python for Artificial Intelligence concludes at NIT Srinagar",
+      "date": "2025-10-12",
+      "source": "kashmirreader.com",
+      "url": "https://kashmirreader.com/2025/10/13/five-day-workshop-on-python-for-artificial-intelligence-concludes-at-nit-srinagar/",
+      "lede": ""
+    },
+    {
+      "title": "IsoEnergy to Acquire Toro Energy, Strengthening a Top-Tier Uranium Portfolio in a Rising Market",
+      "date": "2025-10-12",
+      "source": "prnewswire.com",
+      "url": "https://www.prnewswire.com/news-releases/isoenergy-to-acquire-toro-energy-strengthening-a-top-tier-uranium-portfolio-in-a-rising-market-302581511.html",
+      "lede": ""
+    },
+    {
+      "title": "Space-tech firm GalaxEye to launch world's first multi-sensor EO satellite in 2026",
+      "date": "2025-10-13",
+      "source": "indiatimes.com",
+      "url": "https://economictimes.indiatimes.com/news/science/space-tech-firm-galaxeye-to-launch-worlds-first-multi-sensor-eo-satellite-in-2026/articleshow/124516043.cms",
+      "lede": ""
+    },
+    {
+      "title": "Mass-produced AI podcasts disrupt a fragile industry",
+      "date": "2025-10-13",
+      "source": "channelnewsasia.com",
+      "url": "https://www.channelnewsasia.com/world/artificial-intelligence-ai-podcasts-mass-produce-disrupt-industry-5397886",
+      "lede": ""
+    },
+    {
+      "title": "SpaceX's 11th Starship Test Flight Set for Monday in Texas",
+      "date": "2025-10-13",
+      "source": "webpronews.com",
+      "url": "https://www.webpronews.com/spacexs-11th-starship-test-flight-set-for-monday-in-texas/",
+      "lede": ""
+    },
+    {
+      "title": "SpaceX photos show Starship stacked and ready to launch",
+      "date": "2025-10-13",
+      "source": "digitaltrends.com",
+      "url": "https://www.digitaltrends.com/space/spacex-photos-starship-ready-11th-flight/",
+      "lede": ""
+    },
+    {
+      "title": "Rocket Lab secures multiple launches with JAXA &#x2013; SatNews",
+      "date": "2025-10-13",
+      "source": "satnews.com",
+      "url": "https://news.satnews.com/2025/10/12/rocket-lab-secures-multiple-launches-with-jaxa/",
+      "lede": ""
+    },
+    {
+      "title": "Kim Jong-un unveils 'most powerful' nuclear missile at military parade",
+      "date": "2025-10-13",
+      "source": "yahoo.com",
+      "url": "https://www.yahoo.com/news/articles/kim-jong-un-unveils-most-120105500.html",
+      "lede": ""
+    },
+    {
+      "title": "Live coverage: SpaceX to launch final Version 2 Starship-Super Heavy from Starbase &#x2013; Spaceflight Now",
+      "date": "2025-10-13",
+      "source": "spaceflightnow.com",
+      "url": "https://spaceflightnow.com/2025/10/12/live-coverage-spacex-to-launch-final-version-2-starship-super-heavy-from-starbase/",
+      "lede": ""
+    },
+    {
+      "title": "Why Starship Flight 11 Was A Success Despite Nothing Remaining In Space",
+      "date": "2025-10-14",
+      "source": "4cc.com.au",
+      "url": "https://www.4cc.com.au/trending/stories/why-starship-flight-11-was-a-success-despite-nothing-remaining-in-space/",
+      "lede": ""
+    },
+    {
+      "title": "Maine's 1st AI data center is coming to Aroostook County",
+      "date": "2025-10-14",
+      "source": "bangordailynews.com",
+      "url": "https://www.bangordailynews.com/2025/10/14/aroostook/aroostook-business/ai-data-center-loring-air-force-base/",
+      "lede": ""
+    },
+    {
+      "title": "Serve Robotics Named to Fast Company's Next Big Things in Tech List",
+      "date": "2025-10-14",
+      "source": "manilatimes.net",
+      "url": "https://www.manilatimes.net/2025/10/15/tmt-newswire/globenewswire/serve-robotics-named-to-fast-companys-next-big-things-in-tech-list/2200856",
+      "lede": ""
+    },
+    {
+      "title": "Rocket Lab launches 7th StriX Earth observation satellites for Japan-based Synspective &#x2013; Spaceflight Now",
+      "date": "2025-10-14",
+      "source": "spaceflightnow.com",
+      "url": "https://spaceflightnow.com/2025/10/14/rocket-lab-launches-7th-strix-earth-observation-satellites-for-japan-based-synspective/",
+      "lede": ""
+    },
+    {
+      "title": "Army wants to break ground for a microreactor on a US base by 2027",
+      "date": "2025-10-14",
+      "source": "defenseone.com",
+      "url": "https://www.defenseone.com/technology/2025/10/army-wants-break-ground-microreactor-us-base-2027/408795/",
+      "lede": "Army wants to break ground for a microreactor on a US base by 2027. The service is pushing to make bases energy-independent, but safety and fuel-supply concerns persist."
+    },
+    {
+      "title": "Missed Out on Nvidia: 1 No-Brainer Artificial Intelligence (AI) Stock to Buy Before It Crushes the Market in 2026 and Beyond",
+      "date": "2025-10-14",
+      "source": "yahoo.com",
+      "url": "https://finance.yahoo.com/news/missed-nvidia-1-no-brainer-130000084.html",
+      "lede": ""
+    },
+    {
+      "title": "Namibia's Langer Heinrich Uranium Output Jumps 66% to 1.06 Million Pounds in Q1 FY2026",
+      "date": "2025-10-14",
+      "source": "ecofinagency.com",
+      "url": "https://www.ecofinagency.com/news-industry/1410-49551-namibia-s-langer-heinrich-uranium-output-jumps-66-to-1-06-million-pounds-in-q1-fy2026",
+      "lede": ""
+    },
+    {
+      "title": "World Robot Olympiad Expands in Africa, Empowering Youth Through Robotics and Innovation",
+      "date": "2025-10-15",
+      "source": "africa.com",
+      "url": "https://africa.com/world-robot-olympiad-expands-in-africa-empowering-youth-through-robotics-and-innovation/",
+      "lede": ""
+    },
+    {
+      "title": "Watch these cool tracking shots of SpaceX Starship landing on water",
+      "date": "2025-10-15",
+      "source": "digitaltrends.com",
+      "url": "https://www.digitaltrends.com/space/tracking-shots-spacex-starship-landing/",
+      "lede": ""
+    },
+    {
+      "title": "Ukraine Developing Roadmap For New SMR Capacity",
+      "date": "2025-10-15",
+      "source": "eurasiareview.com",
+      "url": "https://www.eurasiareview.com/15102025-ukraine-developing-roadmap-for-new-smr-capacity/",
+      "lede": ""
+    },
+    {
+      "title": "Mysterious Fall Over Bridgers: Satellite or Meteor?",
+      "date": "2025-10-15",
+      "source": "newstalkkgvo.com",
+      "url": "https://newstalkkgvo.com/ixp/117/p/falling-object-bridger/",
+      "lede": ""
+    },
+    {
+      "title": "Intel Unveils Crescent Island AI Chip to Reignite Data Center Ambitions",
+      "date": "2025-10-15",
+      "source": "econotimes.com",
+      "url": "http://www.econotimes.com/Intel-Unveils-Crescent-Island-AI-Chip-to-Reignite-Data-Center-Ambitions-1723245",
+      "lede": ""
+    },
+    {
+      "title": "Google to invest $15 billion in India AI data center",
+      "date": "2025-10-15",
+      "source": "biztoc.com",
+      "url": "https://biztoc.com/x/0bc94a627fc881d5",
+      "lede": ""
+    },
+    {
+      "title": "Google Commits $15 Billion to India AI Data Center Expansion",
+      "date": "2025-10-15",
+      "source": "el-balad.com",
+      "url": "https://www.el-balad.com/6732787",
+      "lede": ""
+    },
+    {
+      "title": "Lyon County could potentially get a nuclear power facility",
+      "date": "2025-10-16",
+      "source": "yahoo.com",
+      "url": "https://www.yahoo.com/news/articles/lyon-county-could-potentially-nuclear-023343559.html",
+      "lede": ""
+    },
+    {
+      "title": "Provaris powers ahead with hydrogen prototype as new robotics centre comes online in Norway",
+      "date": "2025-10-16",
+      "source": "proactiveinvestors.com.au",
+      "url": "https://www.proactiveinvestors.com.au/companies/news/1080446/provaris-powers-ahead-with-hydrogen-prototype-as-new-robotics-centre-comes-online-in-norway-1080446.html",
+      "lede": ""
+    },
+    {
+      "title": "AI Model Can Distinguish Race From ECG Readings",
+      "date": "2025-10-16",
+      "source": "medscape.com",
+      "url": "https://www.medscape.com/viewarticle/ai-model-can-distinguish-race-ecg-readings-people-higher-2025a1000rvo",
+      "lede": ""
+    },
+    {
+      "title": "BlackRock, Nvidia-backed group strikes $40 billion AI data center deal",
+      "date": "2025-10-16",
+      "source": "thehindu.com",
+      "url": "https://www.thehindu.com/sci-tech/technology/blackrock-nvidia-backed-group-strikes-40-billion-ai-data-center-deal/article70169908.ece",
+      "lede": ""
+    },
+    {
+      "title": "Meta taps Arm Holdings to power AI recommendations across Facebook, Instagram",
+      "date": "2025-10-16",
+      "source": "indianexpress.com",
+      "url": "https://indianexpress.com/article/technology/artificial-intelligence/meta-taps-arm-holdings-to-power-ai-recommendations-across-facebook-instagram-10309719/",
+      "lede": ""
+    },
+    {
+      "title": "Investors on guard for risks that could derail the AI gravy train",
+      "date": "2025-10-16",
+      "source": "indianexpress.com",
+      "url": "https://indianexpress.com/article/technology/artificial-intelligence/investors-on-guard-for-risks-that-could-derail-the-ai-gravy-train-10309726/",
+      "lede": ""
+    },
+    {
+      "title": "Jensen Huang reveals 6 AI model names that all Nvidia employees use at work; here's the full list",
+      "date": "2025-10-16",
+      "source": "livemint.com",
+      "url": "https://www.livemint.com/companies/people/jensen-huang-reveals-6-ai-model-openai-cursor-replit-lovable-harvey-openevidence-all-nvidia-employees-use-work-full-list-11760575968859.html",
+      "lede": ""
+    },
+    {
+      "title": "Dazzling satellite photos show California mountains before and after snowstorms",
+      "date": "2025-10-17",
+      "source": "yahoo.com",
+      "url": "https://www.yahoo.com/news/articles/dazzling-satellite-photos-show-california-000801632.html",
+      "lede": ""
+    },
+    {
+      "title": "T&#x101;whaki aerospace centre pivots from rocket launches to flying cars",
+      "date": "2025-10-17",
+      "source": "rnz.co.nz",
+      "url": "https://www.rnz.co.nz/news/national/576220/tawhaki-aerospace-centre-pivots-from-rocket-launches-to-flying-cars",
+      "lede": ""
+    },
+    {
+      "title": "ROCKET DOCTOR AI INC. ANNOUNCES ENGAGEMENT OF FN MEDIA GROUP",
+      "date": "2025-10-17",
+      "source": "itnewsonline.com",
+      "url": "https://www.itnewsonline.com/GlobeNewswire/ROCKET-DOCTOR-AI-INC.-ANNOUNCES-ENGAGEMENT-OF-FN-MEDIA-GROUP/108533",
+      "lede": ""
+    },
+    {
+      "title": "Uranium Royalty Announces Voting Results",
+      "date": "2025-10-17",
+      "source": "cantechletter.com",
+      "url": "https://www.cantechletter.com/newswires/uranium-royalty-announces-voting-results/",
+      "lede": ""
+    },
+    {
+      "title": "How Rio Tinto shares could rocket 49% into 2026",
+      "date": "2025-10-17",
+      "source": "fool.com.au",
+      "url": "https://www.fool.com.au/2025/10/17/how-rio-tinto-shares-could-rocket-49-into-2026/",
+      "lede": ""
+    },
+    {
+      "title": "Power Integrations joins Nvidia's 800V AI data center supply chain",
+      "date": "2025-10-17",
+      "source": "digitimes.com",
+      "url": "https://www.digitimes.com/news/a20251015PD233/pmic-data-center-gan-supply-chain-nvidia.html",
+      "lede": ""
+    },
+    {
+      "title": "Amazon Updates SMR Progress, With New Images Of Proposed Plant",
+      "date": "2025-10-17",
+      "source": "eurasiareview.com",
+      "url": "https://www.eurasiareview.com/17102025-amazon-updates-smr-progress-with-new-images-of-proposed-plant/",
+      "lede": ""
+    },
+    {
+      "title": "SpaceX Starship Launch",
+      "date": "2025-10-18",
+      "source": "washtimesherald.com",
+      "url": "https://www.washtimesherald.com/news/national_news/spacex-starship-launch/image_a9a53768-88bb-5928-aafc-b23f88d368ac.html",
+      "lede": "SpaceX's mega rocket Starship makes a test flight from Starbase, Texas, Monday, Oct. 13, 2025. (AP Photo/Eric Gay)"
+    },
+    {
+      "title": "Top broker outlines how Fortescue shares could rocket 83% into 2026",
+      "date": "2025-10-18",
+      "source": "fool.com.au",
+      "url": "https://www.fool.com.au/2025/10/19/top-broker-outlines-how-fortescue-shares-could-rocket-83-into-2026/",
+      "lede": ""
+    },
+    {
+      "title": "Satellite imagery reveals widespread destruction in Alaska towns flooded by Typhoon Halong remnants",
+      "date": "2025-10-18",
+      "source": "foxweather.com",
+      "url": "https://www.foxweather.com/extreme-weather/satellite-imagery-kipnuk-alaska-flooding-typhoon-halong-remnants",
+      "lede": ""
+    },
+    {
+      "title": "Strategic Insights: Quantum Computing Market by Type",
+      "date": "2025-10-18",
+      "source": "openpr.com",
+      "url": "https://www.openpr.com/news/4230277/strategic-insights-quantum-computing-market-by-type",
+      "lede": "Press release - Market Research Intellect - Strategic Insights: Quantum Computing Market by Type and Application Witnesses Steady 15.5% CAGR Till 2033 - published on openPR.com"
+    },
+    {
+      "title": "SpaceX Set to Launch 10,000th Starlink Satellite: What This Means for Your Internet Speed!",
+      "date": "2025-10-18",
+      "source": "dailygalaxy.com",
+      "url": "https://dailygalaxy.com/2025/10/spacex-launch-10000th-starlink-satellite/",
+      "lede": "SpaceX Set to Launch 10,000th Starlink Satellite: What This Means for Your Internet Speed!. SpaceX is set to launch its 10,000th Starlink satellite, bringing global connectivity closer than ever before\u2014here\u2019s what it means for the future of internet access."
+    },
+    {
+      "title": "Live coverage: SpaceX to launch Falcon 9 rocket on record-breaking 31st flight &#x2013; Spaceflight Now",
+      "date": "2025-10-18",
+      "source": "spaceflightnow.com",
+      "url": "https://spaceflightnow.com/2025/10/18/live-coverage-spacex-to-launch-falcon-9-rocket-on-record-breaking-31st-flight/",
+      "lede": "SpaceX is set to break another reuse record on Sunday when it launches a Falcon 9 booster for a record-breaking 31st time."
+    },
+    {
+      "title": "Defence Minister Rajnath Singh, CM Yogi Flag Off First BrahMos Missile Batch From Lucknow Unit",
+      "date": "2025-10-18",
+      "source": "orissadiary.com",
+      "url": "https://orissadiary.com/defence-minister-rajnath-singh-cm-yogi-flag-off-first-brahmos-missile-batch-from-lucknow-unit/",
+      "lede": ""
+    },
+    {
+      "title": "Couple Arrested For Selling Information On US Nuclear Warship : World News",
+      "date": "2025-10-19",
+      "source": "rashtranews.com",
+      "url": "https://www.rashtranews.com/couple-arrested-for-selling-information-on-us-nuclear-warship-world-news/",
+      "lede": ". Find Articles Latest News, Pictures on Articles and see latest news updates, information from RaashtraNews.COM. Explore more on Latest News in India"
+    },
+    {
+      "title": "Restart of Huge Nuclear Power Plant Faces Backlash in Japan",
+      "date": "2025-10-19",
+      "source": "oilprice.com",
+      "url": "https://oilprice.com/Alternative-Energy/Nuclear-Power/Restart-of-Huge-Nuclear-Power-Plant-Faces-Backlash-in-Japan.html",
+      "lede": "Restart of Huge Nuclear Power Plant Faces Backlash in Japan. Local residents and anti-nuclear activists in Japan oppose the restart of one of the world's biggest nuclear power plants and its operator's plan to invest money in revitalizing the regional economy. Tokyo Electric Power Company TEPCO, which also operated the nuclear power plant in Fukushima prior to the 2011 disaster, has planned for years to restart the Kashiwazaki-Kariwa power plant in the Niigata prefecture. But the company faces backlash over its restart plans and proposal from August this year to \"contribute monetarily to vitalizing the regional economy,\" and invest in projects to contribute to improving safety and security. TEPCO's monetary proposal is for the creation of a $667 million 100 billion yen fund for the benefit"
+    },
+    {
+      "title": "Provaris Energy showcases hydrogen tank prototype at Robotics Innovation Centre",
+      "date": "2025-10-19",
+      "source": "proactiveinvestors.com",
+      "url": "https://www.proactiveinvestors.com/companies/news/1080585/provaris-energy-showcases-hydrogen-tank-prototype-at-robotics-innovation-centre-1080585.html",
+      "lede": ""
+    },
+    {
+      "title": "Pakistan Launches First Hyperspectral Satellite for Agriculture and Climate Monitoring &#x2013; Shafaqna English",
+      "date": "2025-10-19",
+      "source": "shafaqna.com",
+      "url": "https://en.shafaqna.com/426731/pakistan-launches-first-hyperspectral-satellite-for-agriculture-and-climate-monitoring/",
+      "lede": ""
+    },
+    {
+      "title": "Pakistan's national space agency launches country's first Hyperspectral Satellite",
+      "date": "2025-10-19",
+      "source": "arabnews.com",
+      "url": "https://www.arabnews.com/node/2619413/pakistan",
+      "lede": "Pakistan\u2019s national space agency launches country\u2019s first Hyperspectral Satellite . <p> ISLAMABAD: Pakistan\u2019s national space agency has launched the country\u2019s first Hyperspectral Satellite (HS-1) from the Chinese Satellite Launch Center, the foreign ministry said on Sunday, stressing the technology would help capture data to enhance capabilities in precision agriculture, urban planning and disaster management.&nbsp;</p> <p> The foreign ministry said the HS-1 is equipped with advanced hyperspectral imaging technology that can capture data across hundreds of narrow spectral bands. It added that this capability will enable precise monitoring and analysis of land use, vegetation health, water resources and urban development.</p> <p> \u201cThe satellite is expected to significantly enhance national "
+    },
+    {
+      "title": "AiMOGA Robotics: From Presentation to Full-Service Reception: AiMOGA Robot Demonstrates Human Assistant Capabilities at the 2025 Chery Global Innovation Conference",
+      "date": "2025-10-19",
+      "source": "finanznachrichten.de",
+      "url": "https://www.finanznachrichten.de/nachrichten-2025-10/66732090-aimoga-robotics-from-presentation-to-full-service-reception-aimoga-robot-demonstrates-human-assistant-capabilities-at-the-2025-chery-global-innova-008.htm",
+      "lede": "WUHU, China, Oct. 19, 2025 /PRNewswire/ -- At the 2025 Chery Global Innovation Conference, an extraordinary \"guest\" took the stage - Mornine, the intelligent robot from AiMOGA Robotics. Opening"
+    },
+    {
+      "title": "Watch SpaceX launch its 10,000th Starlink satellite to orbit today on rocket's record-breaking 31st flight",
+      "date": "2025-10-19",
+      "source": "space.com",
+      "url": "https://www.space.com/space-exploration/launches-spacecraft/spacex-falcon-9-31st-flight-rocket-reuse-record-starlink-launch",
+      "lede": ""
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "as_of_date": "2025-10-05",
+  "rebalance_period": "weekly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "This week's pool is dominated by noise irrelevant to ticker selection: geopolitical/kinetic event reporting (Russia-Ukraine drone and missile strikes, Houthi missile intercepts, Pakistan cruise-missile test, Pentagon rocket-sale approvals to Canada, MBDA/Raytheon defense contract news) with no clean US-listed pure-play beneficiary named beyond incumbents already outside the watchlist's scope; non-investable private-company items (SpaceX Starlink/Starship launches, Apptronik humanoid-robot investment, Samsung/SoftBank robotics R&D); a withdrawn IPO (Cerebras, no longer a listing candidate); keyword false-matches unrelated to any wave (loitering-law lawsuits, casino AI trivia, ASX penny-stock puff piece, farming-robot radio segment); and thin/ambiguous small-cap uranium exploration items with no clear liquid ticker. Two genuine catalysts did surface -- Rocket Lab's newly disclosed 10-launch Synspective deal (rockets & spacecraft wave) and a fresh sell-side Buy initiation on Quantum Computing Inc/QUBT (quantum wave) -- but neither rises to the bar of displacing a current holding: none of AAPL, GOOGL, NVDA, or SMR shows a thesis breach or peak-exhaustion signal this week (GOOGL in fact drew a bullish long-horizon AI note, and NVDA's AMD-competition/UAE-delay items are incremental, not thesis-breaking). Per this rebalance's rule that any add must be paired with a remove, and with no holding warranting removal, the correct call is no_changes; RKLB and QUBT remain logged as watch candidates for a future rebalance if their catalysts strengthen or a current holding weakens.",
+  "search_terms": [
+    "AI stocks",
+    "space stocks",
+    "rocket launch stocks",
+    "robotics stocks",
+    "humanoid robot stocks",
+    "quantum computing stocks",
+    "nuclear stocks",
+    "SMR stocks",
+    "defense stocks",
+    "drone stocks",
+    "shipping tanker stocks",
+    "aging population demographics stocks",
+    "biggest stock gainers",
+    "best performing etf this month",
+    "AAPL recent news",
+    "GOOGL recent news",
+    "NVDA recent news",
+    "SMR recent news",
+    "RKLB recent news",
+    "QUBT recent news"
+  ]
+}

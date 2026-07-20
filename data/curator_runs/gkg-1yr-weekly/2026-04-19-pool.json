@@ -1,0 +1,401 @@
+{
+  "as_of_date": "2026-04-19",
+  "news_lookback_days": 7,
+  "source": "gkg-wayback-articles",
+  "n_articles": 56,
+  "hit_rate": 0.09,
+  "articles": [
+    {
+      "title": "Meta triples initial plans, builds 10 gas-fired power plants for AI data center in Louisiana",
+      "date": "2026-04-12",
+      "source": "yahoo.com",
+      "url": "https://finance.yahoo.com/sectors/energy/articles/meta-triples-initial-plans-builds-203000961.html",
+      "lede": ""
+    },
+    {
+      "title": "Hidden in plain sight: Robots reveal 'shipwreck city' below the surface of a Washington lake",
+      "date": "2026-04-12",
+      "source": "11alive.com",
+      "url": "https://www.11alive.com/article/news/nation-world/robotics-underwater-detection-shipwrecks-sonar-survey-remote-operated-vehicle-washington-lake-union/507-d5e09930-31c1-491f-8c8b-01f9fcbba5b8",
+      "lede": ""
+    },
+    {
+      "title": "If I Could Only Buy 1 Artificial Intelligence (AI) Stock for the Rest of 2026, This Would Be It",
+      "date": "2026-04-12",
+      "source": "fool.com",
+      "url": "https://www.fool.com/investing/2026/04/12/if-could-buy-artificial-intelligence-ai-stock/",
+      "lede": ""
+    },
+    {
+      "title": "Nano Nuclear Energy (NNE) Submits Proposal for Uranium Production Facility in Argentina",
+      "date": "2026-04-12",
+      "source": "yahoo.com",
+      "url": "https://finance.yahoo.com/sectors/energy/articles/nano-nuclear-energy-nne-submits-205814140.html",
+      "lede": ""
+    },
+    {
+      "title": "White House Tells Banks to Use Anthropic to Spot Vulnerabilities",
+      "date": "2026-04-12",
+      "source": "pymnts.com",
+      "url": "https://www.pymnts.com/artificial-intelligence-2/2026/white-house-tells-banks-to-use-anthropic-to-spot-vulnerabilities/",
+      "lede": ""
+    },
+    {
+      "title": "UK regulators rushing to assess risks of latest&#xA0;Anthropic&#xA0;AI model: report",
+      "date": "2026-04-12",
+      "source": "nypost.com",
+      "url": "https://nypost.com/2026/04/12/business/uk-regulators-rushing-to-assess-risks-of-latest-anthropic-ai-model-report/",
+      "lede": ""
+    },
+    {
+      "title": "Boeing's moon rocket faces uncertain future under Trump's NASA | Business",
+      "date": "2026-04-12",
+      "source": "unionleader.com",
+      "url": "https://www.unionleader.com/news/business/boeing-s-moon-rocket-faces-uncertain-future-under-trump-s-nasa/article_e5bedd5b-0a86-4f6c-b8ed-f58b29d4edc6.html",
+      "lede": ""
+    },
+    {
+      "title": "Black Hills uranium exploration hearing moved to May 18&#x2013;22 in Hot Springs",
+      "date": "2026-04-13",
+      "source": "kotatv.com",
+      "url": "https://www.kotatv.com/2026/04/13/black-hills-uranium-exploration-permit-hearing-postponed-may/",
+      "lede": ""
+    },
+    {
+      "title": "341st Missile Wing identifies airman killed in crash as Daris Benally",
+      "date": "2026-04-13",
+      "source": "kotatv.com",
+      "url": "https://www.kotatv.com/2026/04/13/great-falls-airman-rapid-city-identified-deadly-off-base-vehicle-accident/",
+      "lede": ""
+    },
+    {
+      "title": "Reeves: Mini nuclear reactor deal 'more important than ever' amid Iran crisis",
+      "date": "2026-04-13",
+      "source": "andoveradvertiser.co.uk",
+      "url": "https://www.andoveradvertiser.co.uk/news/national/26017362.reeves-mini-nuclear-reactor-deal-more-important-ever-amid-iran-crisis/",
+      "lede": ""
+    },
+    {
+      "title": "U.S. resupply mission docks with space station-Xinhua",
+      "date": "2026-04-13",
+      "source": "english.news.cn",
+      "url": "https://english.news.cn/northamerica/20260414/edc62745bc584a138f8b643ceb22e068/c.html",
+      "lede": ""
+    },
+    {
+      "title": "Steffan Szumowski from the Nuclear Energy Content Hub Details How the Future of Uranium Enrichment Is Being Developed Today",
+      "date": "2026-04-13",
+      "source": "cantechletter.com",
+      "url": "https://www.cantechletter.com/newswires/steffan-szumowski-from-the-nuclear-energy-content-hub-details-how-the-future-of-uranium-enrichment-is-being-developed-today/",
+      "lede": ""
+    },
+    {
+      "title": "Citi Arms Wealth Advisors With 4 AI Tools to Cut Busywork",
+      "date": "2026-04-13",
+      "source": "pymnts.com",
+      "url": "https://www.pymnts.com/artificial-intelligence-2/2026/citi-arms-wealth-advisors-with-4-ai-tools-to-cut-busywork/",
+      "lede": ""
+    },
+    {
+      "title": "Brownsville middle school robotics team advances to VEX Robotics World Championship in Missouri",
+      "date": "2026-04-13",
+      "source": "krgv.com",
+      "url": "https://www.krgv.com/news/brownsville-middle-school-robotics-team-advances-to-vex-robotics-world-championship-in-missouri",
+      "lede": ""
+    },
+    {
+      "title": "Amazon's $11.6 billion Globalstar deal amps up rivalry with Musk &#x2013; Boston Herald",
+      "date": "2026-04-14",
+      "source": "bostonherald.com",
+      "url": "https://www.bostonherald.com/2026/04/14/amazon-buys-globalstar-battles-musk-starlink-satellite/",
+      "lede": "Amazon.com Inc.\u2019s $11.6 billion deal to buy Globalstar Inc. ramps up competition with Elon Musk\u2019s Starlink in satellite communications, a market predicted to double to $200 billion in the coming years. On Tuesday, Amazon announced plans to buy the satellite operator for a mix of stock and up to $90 a share and said that in 2028 it will launch a direct-to-device service, offering connectivity ..."
+    },
+    {
+      "title": "Amazon's $11.6 billion Globalstar deal amps up rivalry with Musk &#x2013; Broomfield Enterprise",
+      "date": "2026-04-14",
+      "source": "broomfieldenterprise.com",
+      "url": "https://www.broomfieldenterprise.com/2026/04/14/amazon-buys-globalstar-battles-musk-starlink-satellite/",
+      "lede": "Amazon.com Inc.\u2019s $11.6 billion deal to buy Globalstar Inc. ramps up competition with Elon Musk\u2019s Starlink in satellite communications, a market predicted to double to $200 billion in the coming years. On Tuesday, Amazon announced plans to buy the satellite operator for a mix of stock and up to $90 a share and said that in 2028 it will launch a direct-to-device service, offering connectivity ..."
+    },
+    {
+      "title": "Amazon's $11.6 billion Globalstar deal amps up rivalry with Musk &#x2013; Orange County Register",
+      "date": "2026-04-14",
+      "source": "ocregister.com",
+      "url": "https://www.ocregister.com/2026/04/14/amazon-buys-globalstar-battles-musk-starlink-satellite/",
+      "lede": ""
+    },
+    {
+      "title": "Amazon's $11.6 billion Globalstar deal amps up rivalry with Musk &#x2013; Oroville Mercury-Register",
+      "date": "2026-04-14",
+      "source": "orovillemr.com",
+      "url": "https://www.orovillemr.com/2026/04/14/amazon-buys-globalstar-battles-musk-starlink-satellite/",
+      "lede": ""
+    },
+    {
+      "title": "Data Center Opposition Impacts Elections in Missouri City",
+      "date": "2026-04-14",
+      "source": "govtech.com",
+      "url": "https://www.govtech.com/artificial-intelligence/data-center-opposition-impacts-elections-in-missouri-city",
+      "lede": ""
+    },
+    {
+      "title": "Jeff Bezos Posts Night-Time Photo Of Blue Origin's New Glenn Rocket Ahead Of Its Third Test Flight, Space",
+      "date": "2026-04-14",
+      "source": "benzinga.com",
+      "url": "https://www.benzinga.com/news/26/04/51795239/jeff-bezos-posts-night-time-photo-of-blue-origins-new-glenn-rocket-ahead-of-its-third-test-flight-spacex-ceo",
+      "lede": "Jeff Bezos Posts Night-Time Photo Of Blue Origin's New Glenn Rocket Ahead Of Its Third Test Flight, Space. Jeff Bezos on Monday shared a striking nighttime photograph of Blue Origin's New Glenn rocket standing on the pad as the company readies the vehicle for its third test flight, offering another public sign that the heavy-lift launcher is nearing a return to action after its second mission in November. Bezos Post Draws Musk Reaction Bezos posted the image on X as Blue Origin continues final preparations for the flight, known as NG-3. The photo showed New Glenn illuminated against the night sky at Launch Complex 36 at Cape Canaveral Space Force Station. SpaceX CEO Elon Musk replied with a brief compliment, writing, \"Looks good!\" Looks good!&mdash; Elon Musk (@elonmusk) April 13, 2026 Blu"
+    },
+    {
+      "title": "The Human Problem Behind Every Failed AI Investment",
+      "date": "2026-04-14",
+      "source": "pymnts.com",
+      "url": "https://www.pymnts.com/artificial-intelligence-2/2026/the-human-problem-behind-every-failed-ai-investment/",
+      "lede": ""
+    },
+    {
+      "title": "Uss Carl M. Levin Coyote Launcher: New U.S. Navy Upgrade Raises Counter-Drone Stakes",
+      "date": "2026-04-15",
+      "source": "el-balad.com",
+      "url": "https://www.el-balad.com/16914211",
+      "lede": ""
+    },
+    {
+      "title": "FinancialContent - Amazon's $11.6 Billion Globalstar Acquisition: The Rise of 'Amazon Leo' and the New Satellite Monopoly",
+      "date": "2026-04-15",
+      "source": "financialcontent.com",
+      "url": "https://markets.financialcontent.com/stocks/article/marketminute-2026-4-15-amazons-116-billion-globalstar-acquisition-the-rise-of-amazon-leo-and-the-new-satellite-monopoly",
+      "lede": "Amazon\u2019s $11.6 Billion Globalstar Acquisition: The Rise of 'Amazon Leo' and the New Satellite Monopoly"
+    },
+    {
+      "title": "Louisiana AI data centers to use large quantities of water, energy, land",
+      "date": "2026-04-15",
+      "source": "neworleanscitybusiness.com",
+      "url": "https://neworleanscitybusiness.com/blog/2026/04/15/louisiana-ai-data-center-investments-amazon-meta-hut8/",
+      "lede": ". The Business Newspaper of Metropolitan New Orleans"
+    },
+    {
+      "title": "California Ethics Panel Turns Up the Heat on Artificial Intelligence | Esquire Deposition Solutions, LLC",
+      "date": "2026-04-15",
+      "source": "jdsupra.com",
+      "url": "https://www.jdsupra.com/legalnews/california-ethics-panel-turns-up-the-5999771/",
+      "lede": ""
+    },
+    {
+      "title": "Amazon inks $11.57 billion Globalstar deal to boost satellite push",
+      "date": "2026-04-15",
+      "source": "pakistantelegraph.com",
+      "url": "http://www.pakistantelegraph.com/news/278983999/amazon-inks-usd11-57-billion-globalstar-deal-to-boost-satellite-push",
+      "lede": ""
+    },
+    {
+      "title": "'Iran secretly acquired Chinese spy satellite to target US bases in Middle East'",
+      "date": "2026-04-15",
+      "source": "kashmirreader.com",
+      "url": "https://kashmirreader.com/2026/04/16/iran-secretly-acquired-chinese-spy-satellite-to-target-us-bases-in-middle-east/",
+      "lede": ""
+    },
+    {
+      "title": "Blue Origin one step closer to launching New Glenn from Vandenberg Space Force Base &#x2013; Spaceflight Now",
+      "date": "2026-04-15",
+      "source": "spaceflightnow.com",
+      "url": "https://spaceflightnow.com/2026/04/15/blue-origin-one-step-closer-to-launching-new-glenn-from-vandenberg-space-force-base/",
+      "lede": ""
+    },
+    {
+      "title": "RailTel shares rocket 25% in just 2 days! What's triggering this massive surge?",
+      "date": "2026-04-16",
+      "source": "indiatimes.com",
+      "url": "https://economictimes.indiatimes.com/markets/stocks/news/railtel-shares-rocket-25-in-just-2-days-whats-triggering-this-massive-surge/articleshow/130297729.cms",
+      "lede": ""
+    },
+    {
+      "title": "Skild AI acquires Zebra Technologies robotics automation business",
+      "date": "2026-04-16",
+      "source": "seekingalpha.com",
+      "url": "https://seekingalpha.com/news/4575526-skild-ai-acquires-zebra-technologies-robotics-automation-business",
+      "lede": ""
+    },
+    {
+      "title": "South Korean military eyes AI-powered platform to integrate satellite, geospatial data",
+      "date": "2026-04-16",
+      "source": "koreaherald.com",
+      "url": "https://www.koreaherald.com/article/10718852",
+      "lede": ""
+    },
+    {
+      "title": "China sold Iran spy satellite that was used to target U.S. bases: report",
+      "date": "2026-04-16",
+      "source": "freerepublic.com",
+      "url": "https://freerepublic.com/focus/f-news/4375104/posts",
+      "lede": ""
+    },
+    {
+      "title": "Sparks Police launch artificial intelligence system to assist with non-emergency calls",
+      "date": "2026-04-16",
+      "source": "2news.com",
+      "url": "https://www.2news.com/news/local/sparks-police-launch-artificial-intelligence-system-to-assist-with-non-emergency-calls/article_8aa88474-7118-47d2-b8f7-14133161a626.html",
+      "lede": ""
+    },
+    {
+      "title": "Cadence and Nvidia Unite to Revolutionize Robotics with AI, ETTelecom",
+      "date": "2026-04-16",
+      "source": "indiatimes.com",
+      "url": "https://telecom.economictimes.indiatimes.com/news/devices/cadence-and-nvidia-unite-to-revolutionize-robotics-with-ai/130295987",
+      "lede": ""
+    },
+    {
+      "title": "TSMC posts record profits on continued AI demand",
+      "date": "2026-04-16",
+      "source": "cnbc.com",
+      "url": "https://www.cnbc.com/2026/04/16/tsmc-q1-profit-58-percent-ai-chip-demand-record.html",
+      "lede": ""
+    },
+    {
+      "title": "Memorial Middle and High School Robotics Teams earn first place at regional competition",
+      "date": "2026-04-17",
+      "source": "krmg.com",
+      "url": "https://krmg.com/2026/04/17/memorial-middle-and-high-school-robotics-teams-earn-first-place-at-regional-competition/",
+      "lede": ""
+    },
+    {
+      "title": "Iran says its enriched uranium 'not going to be transferred' &#x2013; The Frontier Post",
+      "date": "2026-04-17",
+      "source": "thefrontierpost.com",
+      "url": "https://thefrontierpost.com/iran-says-its-enriched-uranium-not-going-to-be-transferred/",
+      "lede": ""
+    },
+    {
+      "title": "NASA's Mark Pestana speaks about the International Space Station at Rotary | Lifestyle",
+      "date": "2026-04-17",
+      "source": "tehachapinews.com",
+      "url": "https://www.tehachapinews.com/lifestyle/nasa-s-mark-pestana-speaks-about-the-international-space-station-at-rotary/article_ddde5b13-8e0d-46a0-992c-d52194f799f3.html",
+      "lede": ""
+    },
+    {
+      "title": "PHOTOS: The Minutemen Missile National Historic Site near Philip",
+      "date": "2026-04-17",
+      "source": "rapidcityjournal.com",
+      "url": "https://rapidcityjournal.com/news/local/military/collection_fe739203-ec7d-4482-8323-7c3a9748f058.html",
+      "lede": ""
+    },
+    {
+      "title": "Huntsville robotics team to compete in provincial championships this weekend : My Muskoka Now",
+      "date": "2026-04-17",
+      "source": "mymuskokanow.com",
+      "url": "https://www.mymuskokanow.com/148309/news/community/huntsville-robotics-team-to-compete-in-provincial-championships-this-weekend/",
+      "lede": ""
+    },
+    {
+      "title": "SpaceX Does The BIG Test! Starship Super Heavy ROARS To Life! Flight 12 Next! [25:02]",
+      "date": "2026-04-17",
+      "source": "freerepublic.com",
+      "url": "https://freerepublic.com/focus/f-bloggers/4375336/posts",
+      "lede": ""
+    },
+    {
+      "title": "Iran rejects US President Trump's Uranium transfer claim",
+      "date": "2026-04-17",
+      "source": "aninews.in",
+      "url": "https://aninews.in/news/world/middle-east/iran-rejects-us-president-trumps-uranium-transfer-claim20260418023641/",
+      "lede": ""
+    },
+    {
+      "title": "Commercial Satellite Broadband Market Size, Trends 2035",
+      "date": "2026-04-18",
+      "source": "briefingwire.com",
+      "url": "https://www.briefingwire.com/pr/commercial-satellite-broadband-market-size-trends-2035",
+      "lede": ""
+    },
+    {
+      "title": "India eyeing to launch G20 satellite in 2027: ISRO chief",
+      "date": "2026-04-18",
+      "source": "tribuneindia.com",
+      "url": "https://www.tribuneindia.com/news/top-headlines/india-eyeing-to-launch-g20-satellite-in-2027-isro-chief/",
+      "lede": ""
+    },
+    {
+      "title": "Beijing set to launch Satellite Town - ChinaTechNews.com",
+      "date": "2026-04-18",
+      "source": "chinatechnews.com",
+      "url": "https://www.chinatechnews.com/2026/04/19/120095-beijing-set-to-launch-satellite-town",
+      "lede": ""
+    },
+    {
+      "title": "'All seven were false': Iran just rejected Trump's uranium claim and called out six other \"lies\" he told in a single hour",
+      "date": "2026-04-18",
+      "source": "attackofthefanboy.com",
+      "url": "https://attackofthefanboy.com/politics/all-seven-were-false-iran-just-rejected-trumps-uranium-claim-and-called-out-six-other-lies-he-told-in-a-single-hour/",
+      "lede": ""
+    },
+    {
+      "title": "TMHS Titans robotics team builds skill, momentum",
+      "date": "2026-04-18",
+      "source": "homenewshere.com",
+      "url": "https://homenewshere.com/tewksbury_town_crier/news/article_e43d879b-c931-4fbc-920b-7bc82c7889a9.html",
+      "lede": ""
+    },
+    {
+      "title": "The RAM shortage could last years",
+      "date": "2026-04-18",
+      "source": "theverge.com",
+      "url": "https://www.theverge.com/ai-artificial-intelligence/914672/the-ram-shortage-could-last-years",
+      "lede": ""
+    },
+    {
+      "title": "Reese Witherspoon faces backlash after encouraging women to adopt AI",
+      "date": "2026-04-18",
+      "source": "indianexpress.com",
+      "url": "https://indianexpress.com/article/books-and-literature/reese-witherspoon-book-club-women-ai-feminism-artificial-intelligence-10643321/",
+      "lede": ""
+    },
+    {
+      "title": "A humanoid robot beats the human half-marathon world record in Beijing",
+      "date": "2026-04-19",
+      "source": "wdbo.com",
+      "url": "https://www.wdbo.com/news/world/humanoid-robot/XUF5BWS4NM2G3JYQC67GMSEOII/",
+      "lede": ""
+    },
+    {
+      "title": "Blue Origin set to launch rocket with reusable booster for first time",
+      "date": "2026-04-19",
+      "source": "djournal.com",
+      "url": "https://www.djournal.com/news/national/blue-origin-set-to-launch-rocket-with-reusable-booster-for-first-time/article_a3f2d953-f23e-5e49-bdbf-2ca762f32072.html",
+      "lede": ""
+    },
+    {
+      "title": "A humanoid robot sprints to victory in Beijing, beating the human half-marathon world record",
+      "date": "2026-04-19",
+      "source": "oskaloosa.com",
+      "url": "https://www.oskaloosa.com/news/national_news/a-humanoid-robot-sprints-to-victory-in-beijing-beating-the-human-half-marathon-world-record/article_418fbd61-6680-5edd-ba06-bd4aa2760282.html",
+      "lede": ""
+    },
+    {
+      "title": "A humanoid robot sprints to victory in Beijing, beating the human half-marathon world record &#x2013; Winnipeg Free Press",
+      "date": "2026-04-19",
+      "source": "winnipegfreepress.com",
+      "url": "https://www.winnipegfreepress.com/business/2026/04/18/a-humanoid-robot-sprints-to-victory-in-beijing-beating-the-human-half-marathon-world-record",
+      "lede": ""
+    },
+    {
+      "title": "Pinaka Takes Priority as Indian Army Reassesses 122mm Grad Rocket Replacement Plans",
+      "date": "2026-04-19",
+      "source": "idrw.org",
+      "url": "https://idrw.org/pinaka-takes-priority-as-indian-army-reassesses-122mm-grad-rocket-replacement-plans/",
+      "lede": ""
+    },
+    {
+      "title": "Humanoid robot sprints to victory in Beijing, beating human half-marathon record",
+      "date": "2026-04-19",
+      "source": "abcnews.com",
+      "url": "https://abcnews.com/International/wireStory/humanoid-robot-sprints-victory-beijing-beating-human-half-132179294",
+      "lede": ""
+    },
+    {
+      "title": "OpenAI sees executive departures amid enterprise pivot, pullback from 'side quests' | Technology News",
+      "date": "2026-04-19",
+      "source": "indianexpress.com",
+      "url": "https://indianexpress.com/article/technology/artificial-intelligence/openai-exits-enterprise-pivot-sora-10644520/",
+      "lede": ""
+    }
+  ]
+}

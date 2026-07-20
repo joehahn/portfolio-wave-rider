@@ -1,0 +1,22 @@
+{
+  "as_of_date": "2025-12-14",
+  "rebalance_period": "weekly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "This week's pool is dominated by noise that does not clear the bar for a swap: geopolitical events with no attached US-listed ticker (Japan-China air incident, India BMD interceptors, Ukraine drone/missile strikes), private-company or foreign-only items (SpaceX Starlink launches, Reliable Robotics/NASA, China's Long March launches, Global Uranium Corp's terminated option, an ASX uranium stock, a California firm's Utah reactor project with no clear ticker), generic listicles with no named ticker ('Best Robotics Stocks to Keep an Eye On', robotics competitions, book reviews), and keyword false-matches (hot-hatch 'pocket rocket', UK business-rates 'rocket', a fireball/satellite sighting). The substantive items instead reinforce current holdings rather than displacing them: NVDA got incremental positive news (Trump administration clearing H200 chip sales to approved China buyers, with Nvidia weighing a production ramp), RKLB continues its Neutron buildup (Hungry Hippo fairing move, stock up 5.1% with bullish coverage), and broad nuclear tailwinds (Poland breaking ground on its first plant) support the SMR thesis. GOOGL saw mixed AI-competitive news (Disney's OpenAI investment/cease-and-desist letter, AI glasses for 2026) but nothing that breaches the original thesis. No emerging rocket, robotics, quantum, or nuclear vehicle surfaced with a genuine, ticker-specific catalyst strong enough to displace a current holding, so the watchlist is left unchanged this week per the swap-only-on-clear-signal rule.",
+  "search_terms": [
+    "AI stocks",
+    "rockets & spacecraft stocks",
+    "robotics stocks",
+    "quantum computing stocks",
+    "nuclear SMR stocks",
+    "geopolitical realignment defense drones",
+    "tankers shipping stocks",
+    "aging demographics healthcare stocks",
+    "GOOGL recent news",
+    "NVDA recent news",
+    "RKLB recent news",
+    "SMR recent news"
+  ]
+}

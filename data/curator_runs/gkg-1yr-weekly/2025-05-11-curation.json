@@ -1,0 +1,30 @@
+{
+  "as_of_date": "2025-05-11",
+  "rebalance_period": "weekly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "This week's pool is overwhelmingly noise relative to the watchlist: India-Pakistan missile/conflict reporting (geopolitical event coverage, not tied to any investable ticker), SpaceX/Starbase and Starlink items (private company, no ticker), school/youth robotics competitions, a defunct Soviet spacecraft re-entry, and generic AI listicles/papal commentary. The one item with a real catalyst -- Constellation Energy (CEG) reorienting toward grid-connected AI data-center power deals -- is a legitimate nuclear/AI-adjacent signal worth tracking, but it is not clearly stronger than the four core AI-wave holdings already held (AAPL, GOOGL, MSFT, NVDA), and a swap requires displacing one of them without a comparably strong deterioration signal on any of those names. No genuine catalyst this week justifies forcing an add+remove pair, so the watchlist is held unchanged; CEG remains a candidate to revisit if its AI-power/nuclear catalyst strengthens.",
+  "search_terms": [
+    "AI stocks",
+    "robotics stocks",
+    "rocket launch stocks",
+    "space stocks",
+    "quantum computing stocks",
+    "nuclear stocks",
+    "SMR stocks",
+    "defense stocks",
+    "geopolitics",
+    "shipping stocks",
+    "tanker stocks",
+    "aging population demographics stocks",
+    "biggest stock gainers",
+    "best performing etf this month",
+    "AAPL recent news",
+    "GOOGL recent news",
+    "MSFT recent news",
+    "NVDA recent news",
+    "CEG recent news",
+    "KITT recent news"
+  ]
+}

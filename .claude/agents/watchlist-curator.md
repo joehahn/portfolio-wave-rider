@@ -20,6 +20,7 @@ The orchestrating skill or backtest harness passes a dict with these fields:
 - `profile_wave_thesis`: prose excerpt from `investor_profile.md` describing the user's view of past, current, and likely next waves. This is your taste anchor.
 - `recent_news_lookback_days`: integer; how far back to search for news. Default scales with `rebalance_period` (30 / 90 / 180 / 365). The orchestrator may override.
 - `user_supplied_articles` (optional, live runs only): list of `{url, note}` objects the user hand-picked as worth reading this rebalance. Absent or empty on most runs. When present, fetch and weigh each one; see "User-supplied articles" below.
+- `news_pool` (optional, backtest GKG discovery mode only): a pre-fetched, date-bounded pool built by `scripts/gkg_pool.py` from GDELT's GKG index on BigQuery. It is NOT a list of pre-tickered articles — it is a ranked `companies` list. Wave-news was pulled by KEYWORD (rocket, microreactor, quantum computing, ...) with no tickers named, and the organizations GKG extracted were ranked by coverage volume + sentiment tone. Each entry is `{company, articles, avg_tone, waves, samples:[{title,date,source,url}]}`, all within the trailing window on or before `as_of_date`. When present, read it INSTEAD of WebSearch and discover the tickers yourself. See "GKG discovery mode" below.
 
 ## User-supplied articles (live runs only)
 
@@ -42,6 +43,20 @@ If `as_of_date` is in the past, you are running a counterfactual: the harness wa
 4. **Self-critique pass.** Before emitting your final JSON, re-read your proposed adds and removes. For each one, identify the specific evidence that drove it. If any evidence depends on knowledge dated after `as_of_date`, drop the add or remove.
 
 For live runs (`as_of_date` is today), ignore the as-of-date discipline; you can use any current information.
+
+## GKG discovery mode (backtest, when `news_pool` is provided)
+
+When the harness passes a `news_pool`, you are in the look-ahead-clean backtest path. The pool is GDELT GKG on BigQuery: articles whose URL/title contained a WAVE KEYWORD were pulled — no ticker named in the query — and the organizations GKG extracted were ranked by wave-news coverage volume and average sentiment tone. It is date-honest by construction (every article on or before `as_of_date`). Your job is the discovery: turn this ranked list of company NAMES into ticker add/remove decisions. Each `companies` entry has `company` (name), `articles` (wave-coverage volume this quarter), `avg_tone` (GDELT sentiment, ~ −10..+10), `waves` (dominant first), and `samples` (real headlines with date/source/url).
+
+1. **The pool is your entire news universe. Do NOT run WebSearch or WebFetch.** Everything you cite comes from the pool. Date-honesty is already enforced; the persona reset and suppression list still apply as belt-and-suspenders.
+2. **Map each company name to its ticker, and filter to investables — your core discovery step.** For each candidate: map the name to a US-listed ticker (Nvidia → NVDA, Rocket Lab → RKLB). DROP non-investables: private companies (SpaceX, Blue Origin, Isar — no ticker), governments/agencies, and keyword false-matches (e.g. "Rocket Companies" is Rocket *Mortgage* (RKT), not space — exclude). Skip foreign-only listings without a liquid US line. The pool is deliberately noisy on this axis; sifting it is your job.
+3. **Judge buildup vs peak from coverage + tone + headlines, guided by the profile's wave thesis.** A vehicle with rising wave-coverage, positive tone, and headlines describing concrete catalysts (contract win, milestone, funding, regulatory clearance) is in *buildup* → an ADD candidate. An already-run mega-cap, or a name with fading coverage / negative tone / "record high, everyone owns it" headlines, is at *peak* → weigh for a TRIM. Coverage volume favors mega-caps (they always draw the most news) — do NOT just add the top of the list; the profile wants EARLY exposure to *rising* wave vehicles, so prefer emerging names with a real catalyst over established names that have already run.
+4. **Every add cites pool evidence.** An add's `news_evidence` must reference one or more of that company's `samples` (`url`, `date`, one-line summary from the headline). If the pool surfaced no wave-news for a name, you cannot add it this rebalance.
+5. **All guardrails still apply**: `max_watchlist_size`, wave-bucket diversity, exclusions, listing-date check, no double-add / no stale-remove, `always_include` anchors off-limits.
+6. **A thin or mega-cap-only pool is a real signal.** If nothing emerging surfaced for a wave this quarter, emit `no_changes` or a small change rather than forcing an add. Do not invent coverage.
+7. **`search_terms`**: report the pool's `wave_keywords` as your `search_terms` for the dashboard.
+
+The two-pass WebSearch flow below applies only to live runs. In GKG discovery mode, replace it with a careful read of the ranked companies.
 
 ## What to search for
 

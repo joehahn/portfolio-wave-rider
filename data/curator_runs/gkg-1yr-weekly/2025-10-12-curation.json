@@ -1,0 +1,23 @@
+{
+  "as_of_date": "2025-10-12",
+  "rebalance_period": "weekly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "This week's pool contained one genuine buildup signal \u2014 Rocket Lab (RKLB) drew three separate positive items (stock rally, a new JAXA multi-launch contract, continued Starship-cycle coverage) squarely in the profile's next-wave rockets & spacecraft bucket \u2014 and one plausible robotics signal (Serve Robotics/SERV via DoorDash's autonomous delivery fleet expansion). Neither rises to a swap: none of the four managed holdings (AAPL, GOOGL, NVDA, SMR) showed any thesis-breach or peak-exhaustion signal this week to justify displacement \u2014 NVDA's 'China challenges Nvidia' coverage is routine competitive noise, not a breach, and SMR's nuclear thesis was reinforced rather than undermined (Wyoming plant construction, uranium-market tightness). Filtered as noise/non-investable: SpaceX and Stoke Space (private, no ticker), DEEP Robotics (China-only listing), Kraken Robotics (thin Canadian micro-cap with a lock-up expiry, a mildly bearish signal not an add case), IsoEnergy/Western Uranium & Vanadium (illiquid/OTC-adjacent uranium juniors below the liquidity floor), and the large volume of missile/defense-parade and unrelated local-news items (North Korea ICBM reveal, Yemen missile intercept, India missile-sector policy, robotics club/lecture human-interest pieces) which are geopolitical or educational filler with no tradeable US equity attached. Watchlist unchanged this period; RKLB and SERV are logged as candidates to revisit if next week's catalysts persist or a current holding shows genuine decay.",
+  "search_terms": [
+    "AI stocks",
+    "rocket launch stocks",
+    "space stocks",
+    "robotics stocks",
+    "nuclear stocks",
+    "SMR stocks",
+    "quantum computing stocks",
+    "defense stocks",
+    "geopolitics",
+    "AAPL recent news",
+    "GOOGL recent news",
+    "NVDA recent news",
+    "SMR recent news"
+  ]
+}

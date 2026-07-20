@@ -1,0 +1,30 @@
+{
+  "as_of_date": "2025-07-13",
+  "rebalance_period": "weekly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "Filtered a large volume of noise this week: private/non-investable nuclear names (Westinghouse, Radiant DOE microreactor selection), a Canadian junior uranium explorer with no liquid US line (North Shore Uranium), a China state uranium project, foreign/OTC names (Samsung, Huawei chip stories), unrelated satellite stories (Bezos-backed MethaneSAT loss, Israeli Dror 1 launch, astronomy/volcano satellite imagery, Melrose brand awards, a Missile Command video game), geopolitical missile/attack reporting with no tradeable equity attached (Iran-Qatar, Yemen-Israel, Taiwan HIMARS), and vague clickbait 'this AI stock' pieces that never name a ticker. NVDA's chip-export and $4T-cap coverage reaffirms the current AI wave but changes nothing about the existing holding. The one genuine catalyst \u2014 Rocket Lab (RKLB), up 33.5% last month and continuing to surge, a real rockets & spacecraft wave vehicle \u2014 is real but reads more like a stock already mid-run than early buildup, and per this run's rule an add requires a paired remove; none of AAPL/GOOGL/MSFT/NVDA show a peaking or thesis-breach signal strong enough to justify swapping out a core AI holding for a single week's momentum print. Watchlist held unchanged this period.",
+  "search_terms": [
+    "AI stocks",
+    "AI chip export restrictions",
+    "rockets and spacecraft stocks",
+    "space stocks",
+    "robotics stocks",
+    "quantum computing stocks",
+    "nuclear stocks",
+    "SMR microreactor stocks",
+    "uranium stocks",
+    "geopolitical defense stocks",
+    "drone stocks",
+    "tanker shipping stocks",
+    "aging population demographics stocks",
+    "biggest stock gainers",
+    "best performing etf this month",
+    "AAPL recent news",
+    "GOOGL recent news",
+    "MSFT recent news",
+    "NVDA recent news",
+    "RKLB recent news"
+  ]
+}

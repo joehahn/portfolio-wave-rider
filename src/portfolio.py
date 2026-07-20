@@ -42,6 +42,15 @@ _FINANCIAL_MODEL_DEFAULTS: dict[str, Any] = {
     "risk_aversion": 1.0,
     "risk_free_rate": 0.04,
     "lookback_period": "3y",
+    # optimizer_lookback_days / news_lookback_days are the day-denominated
+    # successors to the fractional-year ``lookback_period`` string. When
+    # optimizer_lookback_days is set in the profile it is the source of truth for
+    # the μ/Σ estimation window; load_financial_model derives the legacy
+    # ``lookback_period`` string from it so older readers keep working.
+    # news_lookback_days is the trailing news window the curator reads each
+    # rebalance (typically == the rebalance cadence in days).
+    "optimizer_lookback_days": None,
+    "news_lookback_days": None,
     "rebalance_period": "monthly",
     "max_watchlist_size": 12,
     # concentration_cap is the optimizer's per-position max weight (the
@@ -107,6 +116,12 @@ def load_financial_model(profile_path: str = "investor_profile.md") -> dict[str,
     if "always_include" in data:
         out["always_include"] = [str(t).upper().strip()
                                  for t in (data["always_include"] or [])]
+    # Back-compat: if the profile uses the day-denominated optimizer_lookback_days,
+    # derive the legacy fractional-year ``lookback_period`` string from it so every
+    # existing reader (CLI --period default, dashboard labels) keeps working off a
+    # single source of truth.
+    if out.get("optimizer_lookback_days"):
+        out["lookback_period"] = f"{float(out['optimizer_lookback_days']) / 365.0:.4f}y"
     return out
 
 
@@ -1280,6 +1295,12 @@ def backtest(
 
 def _cadence_period_id(date: pd.Timestamp, cadence: str) -> tuple[int, ...]:
     """Period bucket used to detect rebalance boundaries."""
+    if cadence == "weekly":
+        iso = date.isocalendar()          # (ISO year, ISO week, weekday) — buckets by calendar week
+        return (int(iso[0]), int(iso[1]))
+    if cadence == "biweekly":
+        iso = date.isocalendar()
+        return (int(iso[0]), int(iso[1]) // 2)
     if cadence == "monthly":
         return (date.year, date.month)
     if cadence == "quarterly":
@@ -1381,6 +1402,12 @@ def curator_backtest(
     initial_usd = float(starter.get("initial_usd", 50000.0))
     lookback_years = float(lookback_years_override) if lookback_years_override is not None \
         else float(starter.get("lookback_years", 1.3))
+    # Minimum trading-day observations required to (re)optimize at a rebalance. Must SCALE with the
+    # lookback window: a short optimizer_lookback (e.g. 30 calendar days ~= 21 trading days) can never
+    # clear a fixed 30-obs floor, so every rebalance would be skipped and the backtest would produce
+    # no snapshots. Use ~half the lookback's expected trading days, with a small absolute floor so a
+    # covariance over a handful of assets is still estimable.
+    min_obs = max(10, int(round(lookback_years * 252 * 0.5)))
     max_size = int(starter.get("max_watchlist_size", 12))
 
     # Union of every ticker that could appear across the run, so the
@@ -1525,7 +1552,7 @@ def curator_backtest(
             lookback_start = date - pd.Timedelta(days=365 * lookback_years)
             slice_cur = full_prices.loc[lookback_start:date, cur_watchlist].dropna(how="any", axis=1)
             cur_watchlist = list(slice_cur.columns)
-            if len(slice_cur) < 30 or not cur_watchlist:
+            if len(slice_cur) < min_obs or not cur_watchlist:
                 # Not enough history yet; carry forward without rebalancing.
                 last_period = period
                 continue
@@ -1557,7 +1584,7 @@ def curator_backtest(
             slice_fix = full_prices.loc[lookback_start:date, starter_watchlist].dropna(how="any", axis=1)
             fix_watch = list(slice_fix.columns)
             fix_weights = None
-            if len(slice_fix) >= 30 and fix_watch:
+            if len(slice_fix) >= min_obs and fix_watch:
                 fix_returns = compute_returns(slice_fix)
                 fix_opt = _optimize_or_equal_weight(
                     fix_returns, fix_watch, objective, max_weight,
@@ -3493,11 +3520,13 @@ def build_curator_dashboard(
     # Watchlist periods for the Gantt chart.
     starter_tickers: list[str] = []
     rebalance_dates: list[str] = []
+    _cadence = "quarterly"          # cadence label for the copy below; overridden from _starter.json
     runs_starter = Path(runs_dir) / "_starter.json"
     if runs_starter.exists():
         _starter = json.loads(runs_starter.read_text())
         starter_tickers = _starter.get("starter_watchlist", [])
         rebalance_dates = _starter.get("as_of_dates", [])
+        _cadence = _starter.get("rebalance_period", _cadence)
     periods, _ = _build_ticker_periods(runs_dir, starter_tickers, end)
 
     # Realized return numbers for the headline summary.
@@ -3842,7 +3871,7 @@ def build_curator_dashboard(
             )
         log_html = (
             "<h2 style='margin-top:2em;'>Curation log</h2>"
-            "<p style='color:#555;'>Each row is one quarterly curator call. "
+            f"<p style='color:#555;'>Each row is one {_html.escape(_cadence)} curator call. "
             "The <em>Rejections</em> column counts adds and removes the validator "
             "dropped as invalid (see "
             "<a href='https://github.com/joehahn/portfolio-wave-rider/blob/main/REFERENCE.md#cli-reference'>"
@@ -3856,10 +3885,10 @@ def build_curator_dashboard(
             f"<tbody>{''.join(rows)}</tbody></table>"
         )
 
-    # Search-terms history: the actual WebSearch queries the curator ran at each
-    # rebalance, as collapsible blocks in chronological order. Mirrors the live
-    # dashboard's panel; data comes from each <date>-curation.json's search_terms
-    # (preserved from the agent transcripts).
+    # Search-terms history: the wave beats the curator worked at each rebalance,
+    # as collapsible blocks in chronological order. Mirrors the live dashboard's
+    # panel; data comes from each <date>-curation.json's search_terms (the wave
+    # keywords behind that rebalance's news pool, preserved from the agent output).
     search_html = ""
     _st_blocks = []
     _runs = Path(runs_dir)
@@ -3888,10 +3917,11 @@ def build_curator_dashboard(
     if _st_blocks:
         search_html = (
             "<h2 style='margin-top:2em;'>Curator search terms</h2>"
-            "<p style='color:#555;max-width:780px;'>Every news query the curator "
-            "ran at each quarterly rebalance, captured verbatim from the agent's "
-            "WebSearch tool calls (the trailing-window <code>after:…before:…</code> "
-            "filters confirm the as-of-date discipline). Click a rebalance to expand.</p>"
+            f"<p style='color:#555;max-width:780px;'>The wave beats the curator "
+            f"worked at each {_html.escape(_cadence)} rebalance. In this run the "
+            "news pool is built upstream from GDELT&nbsp;GKG + Wayback (date-clean, "
+            "look-ahead-reduced); these are the wave keywords behind that pool. "
+            "Click a rebalance to expand.</p>"
             + "".join(_st_blocks)
         )
 
@@ -3916,7 +3946,7 @@ def build_curator_dashboard(
                  if start <= pd.Timestamp(_d) <= end)
     _param_rows = [
         ("Backtest window", f"{start.date()} → {end.date()}", ""),
-        ("Rebalance cadence", f"quarterly ({_n_reb} curator calls)", ""),
+        ("Rebalance cadence", f"{_cadence} ({_n_reb} curator calls)", ""),
         ("Starter watchlist", ", ".join(starter_tickers) or "—", ""),
         ("Initial capital", f"${initial:,.0f}", ""),
         ("Risk aversion (λ)", f"{_ra:g}",
@@ -4018,17 +4048,20 @@ def build_curator_dashboard(
         f'<h1>Curator-driven backtest '
         f'<span style="font-size:0.55em;color:#666;font-weight:400;">'
         f'— {start.date()} to {end.date()}</span></h1>'
-        '<p style="color:#555;max-width:780px;">The watchlist-curator agent was called quarterly over a 5 year historical window. '
-        'At each rebalance it read the news of the preceding quarter and proposed '
+        f'<p style="color:#555;max-width:780px;">The watchlist-curator agent was called '
+        f'{_html.escape(_cadence)} over the {start.date()} to {end.date()} window. '
+        f'At each rebalance it read a date-clean news pool for the preceding '
+        f'{_html.escape(_cadence)} window (built upstream from GDELT&nbsp;GKG + Wayback, '
+        f'look-ahead-reduced) and proposed '
         'adds and removes against the active watchlist; the optimizer then ran '
         'mean-variance on the revised watchlist. Each rebalance is marked by an '
         'orange square on the curator curve in chart 1 — hover over one to see '
-        'that quarter\'s adds, removes, and the curator\'s rationale. '
+        'that rebalance\'s adds, removes, and the curator\'s rationale. '
         'The buy-and-hold curve below is '
         'the value of the initial portfolio (which never gets rebalanced or '
         'optimized) over time. The buy-and-hold portfolio has equal amounts of '
-        '<code>[AAPL, MSFT, GOOGL, NVDA, SPY]</code> and is held without any '
-        'rebalancing across the 5 year window. '
+        f'<code>[{_html.escape(", ".join(starter_tickers))}]</code> and is held without any '
+        'rebalancing across the window. '
         'Throughout the charts below: <code>general_markets</code> = defensive '
         'equity ETFs (broad-market / dividend / utilities / staples); '
         '<code>cashlike</code> = bonds + cash-equivalents + precious metals '

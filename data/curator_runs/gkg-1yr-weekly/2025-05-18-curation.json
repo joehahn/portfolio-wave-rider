@@ -1,0 +1,32 @@
+{
+  "as_of_date": "2025-05-18",
+  "rebalance_period": "weekly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "This week's pool is dominated by non-investable noise: volcano ash advisories, a defunct Soviet spacecraft reentry, missile/defense geopolitical reporting (BrahMos, Patriot training, Golden Dome, Guam missile defense), UFO sightings, and generic AI-adoption human-interest pieces (FDA, Penn, malaria diagnosis, grandparent scams) with no tickers attached. Rocket Lab (RKLB) surfaces twice (stock pop, Japanese satellite launch) but RKLB is already absent from a portfolio that has no rockets/spacecraft exposure yet and one favorable week of coverage on a name not currently held doesn't clear the bar for a swap against a core AI/mega-cap holding without a paired thesis-breach elsewhere. enCore Energy's Q1 results and a Utah uranium mine fast-track are early-stage nuclear-fuel-cycle news, not SMR operator catalysts, and the 'first SMR in 5 years' piece names no ticker. IBM's quantum-computing framing and the Cathie Wood AI-chip-stock piece are also ticker-thin or already-known-name reiterations. No current holding (AAPL, GOOGL, MSFT, NVDA) shows a fundamental thesis breach this week -- the Apple/Google search-share story is a valid AI-competitive watch item but not yet a breach. Weekly cadence argues for patience; holding steady.",
+  "search_terms": [
+    "space stocks",
+    "rocket launch stocks",
+    "robotics stocks",
+    "quantum computing stocks",
+    "nuclear stocks",
+    "SMR stocks",
+    "geopolitics",
+    "defense stocks",
+    "tanker stocks",
+    "shipping stocks",
+    "drone stocks",
+    "healthcare stocks",
+    "aging population demographics stocks",
+    "biggest stock gainers",
+    "best performing etf this month",
+    "interest rates",
+    "tariffs",
+    "AAPL recent news",
+    "GOOGL recent news",
+    "MSFT recent news",
+    "NVDA recent news",
+    "SPY recent news"
+  ]
+}

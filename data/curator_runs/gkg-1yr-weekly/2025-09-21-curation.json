@@ -1,0 +1,33 @@
+{
+  "as_of_date": "2025-09-21",
+  "rebalance_period": "weekly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "This week's pool is mostly noise for a managed watchlist that already carries AI (AAPL, GOOGL, NVDA) and nuclear (SMR) exposure. Filtered out: private/non-investable names (SpaceX Starship coverage, Figure robotics funding round), OTC/penny uranium juniors (American Uranium, First American Uranium, Standard Uranium, azomining/goldseiten items), pure geopolitical/war noise with no clean US-listed equity attached (Zapad drills, Hamas/Qatar strike, Polish missile incident, Taiwan arms fair, Pentagon counter-drone search), and generic thematic market-size reports with no ticker catalyst (robotics TAM projection, GSMA satellite guidelines). Rocket Lab (RKLB) surfaced repeatedly but with a negative/mixed signal this week (after-hours selling pressure, stock 'plummeted'), which is a peak-noise wobble rather than a buildup catalyst worth swapping in over an existing holding. GE Vernova's reactor-timeline comment is incremental, not a fresh wave-entry signal, and duplicates the nuclear exposure SMR already provides. Microsoft's AI data-center capex and Alibaba's efficient model are reinforcing, not new, AI-wave evidence and don't clear the bar for a swap out of AAPL/GOOGL/NVDA. No genuinely stronger rising-wave vehicle displaced a current holding this week, so watchlist composition is unchanged.",
+  "search_terms": [
+    "space stocks",
+    "rocket launch stocks",
+    "robotics stocks",
+    "humanoid robot stocks",
+    "quantum computing stocks",
+    "nuclear stocks",
+    "SMR stocks",
+    "uranium stocks",
+    "defense stocks",
+    "defense ETF",
+    "geopolitics",
+    "drone stocks",
+    "shipping stocks",
+    "tanker stocks",
+    "aging population demographics stocks",
+    "best performing etf this month",
+    "biggest stock gainers",
+    "AAPL recent news",
+    "GOOGL recent news",
+    "NVDA recent news",
+    "SMR recent news",
+    "RKLB recent news",
+    "GEV recent news"
+  ]
+}

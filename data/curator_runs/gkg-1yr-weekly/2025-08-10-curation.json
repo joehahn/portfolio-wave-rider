@@ -1,0 +1,25 @@
+{
+  "as_of_date": "2025-08-10",
+  "rebalance_period": "weekly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "This week's pool is dominated by non-investable noise: routine SpaceX/ISS crew-rotation and splashdown stories (no new financial catalyst), Zaporizhzhia plant shelling and Russia's missile-treaty withdrawal (geopolitical risk, not a tradeable equity catalyst), a Boeing fighter-jet labor strike (negative, not thesis-relevant to any held name), and scattered small-cap/robotics-competition/local-news filler. The one candidate with real financial substance -- Rocket Lab (RKLB) beating Q2 estimates and guiding to a 'record year' -- is undercut by its own coverage framing ('after soaring 800% in 12 months, is RKLB still a buy?'), which reads as a maturing/peak-enthusiasm signal rather than an early-buildup entry point, and NuScale's SMR project trouble is an outright negative for the nuclear wave rather than a reason to add. Denison's uranium results and the AI-chip/data-center items (Samsung-Tesla, Alibaba, GPT-5) are single-article, non-catalytic mentions with no dated evidence of a durable inflection. Nothing here breaches the thesis for AAPL, GOOGL, MSFT, or NVDA, and no rising-wave vehicle clears the bar for a swap this week. Holding the current watchlist unchanged.",
+  "search_terms": [
+    "news_pool: rockets & spacecraft",
+    "news_pool: nuclear/SMR",
+    "news_pool: robotics",
+    "news_pool: geopolitical/defense",
+    "news_pool: AI",
+    "news_pool: demographics",
+    "RKLB recent news",
+    "NuScale Power recent news",
+    "Denison Mines recent news",
+    "AST SpaceMobile recent news",
+    "Boeing recent news",
+    "AAPL recent news",
+    "GOOGL recent news",
+    "MSFT recent news",
+    "NVDA recent news"
+  ]
+}

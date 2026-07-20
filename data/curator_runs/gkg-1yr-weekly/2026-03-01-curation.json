@@ -1,0 +1,26 @@
+{
+  "as_of_date": "2026-03-01",
+  "rebalance_period": "weekly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "This week's pool is dominated by noise that does not clear the bar for a paired swap: a war-news cluster (Iran-UAE-Dubai missile/drone strikes, Gulf diplomatic calls, Syria airspace closure) is a pure geopolitical event story with no specific investable ticker attached, not a stock catalyst; 'Rocket League Championship' is an esports event, not aerospace; the Russian-missile-hits-Oreo-factory pieces are a keyword false-match on 'missile,' not a defense play; school/college robotics-team stories (St. Mary's, Decatur Christian, Texas Rocket Engineering Lab) are non-investable; Firehawk Aerospace and HD Hyundai's warship delivery involve a private US startup and a foreign (Korean) issuer respectively, neither a clean US-listed add; China's humanoid-robotics standard and India's QpiAI quantum chip are non-US-investable; IBM's vague India quantum/cloud investment note and the generic uranium-supercycle commentary lack a specific, non-mega-cap ticker with a concrete catalyst strong enough to displace an existing holding. The NVDA-specific items (Rubin chip timeline, Blackwell/DeepSeek chip story, earnings preview) and GOOGL's Gemini/robotics-in-house items are simply incremental due-diligence support for tickers already held, not new-add cases. Given the constraint that any add this period requires a paired remove, and nothing here is clearly a stronger rising-wave vehicle than GOOGL, NVDA, RKLB, or SMR, the watchlist is left unchanged this week.",
+  "search_terms": [
+    "nuclear stocks",
+    "SMR stocks",
+    "rocket launch stocks",
+    "space stocks",
+    "robotics stocks",
+    "quantum computing stocks",
+    "defense stocks",
+    "geopolitics",
+    "shipping stocks",
+    "tanker stocks",
+    "NVDA recent news",
+    "GOOGL recent news",
+    "RKLB recent news",
+    "SMR recent news",
+    "biggest stock gainers",
+    "best performing etf this month"
+  ]
+}

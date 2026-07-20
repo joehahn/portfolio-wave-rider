@@ -1,0 +1,28 @@
+{
+  "as_of_date": "2025-08-24",
+  "rebalance_period": "weekly",
+  "adds": [],
+  "removes": [],
+  "no_changes": true,
+  "rationale_overall": "Filtered out a large volume of non-investable noise: foreign government/military items (Indian and Pakistani nuclear/satellite programs, North Korea missile tests, Kursk plant drone strike, Taiwan referendum, India-HAL/GE talks), private-company coverage with no public ticker (SpaceX Starship test-flight cycle, FieldAI funding round), and generic 'top AI stocks to buy' listicles that name no fresh catalyst for names not already held. The two candidates with a real US-listed ticker attached \u2014 Rocket Lab (RKLB, rockets_spacecraft wave) and Uranium Royalty Corp (nuclear wave) \u2014 were each weak: RKLB's coverage this week is a stock-down-today piece plus speculative price-target chatter, not a commercial milestone, and Uranium Royalty's news is a routine at-the-market equity program (dilutive housekeeping, plus thin/TSX-primary liquidity), not a buildup catalyst. Nvidia's H20/China chip-curb story touches an existing holding (NVDA) but is regulatory friction, not a thesis breach, so it doesn't warrant a remove. No candidate cleared the bar of a genuine rising-wave catalyst strong enough to justify swapping out AAPL, GOOGL, MSFT, or NVDA under the paired add/remove constraint, so the watchlist is unchanged this week.",
+  "search_terms": [
+    "space stocks",
+    "rocket launch stocks",
+    "nuclear stocks",
+    "SMR stocks",
+    "robotics stocks",
+    "quantum computing stocks",
+    "defense stocks",
+    "geopolitics",
+    "shipping stocks",
+    "aging population demographics stocks",
+    "biggest stock gainers",
+    "best performing etf this month",
+    "AAPL recent news",
+    "GOOGL recent news",
+    "MSFT recent news",
+    "NVDA recent news",
+    "RKLB recent news",
+    "UROY recent news"
+  ]
+}

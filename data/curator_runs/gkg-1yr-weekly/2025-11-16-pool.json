@@ -1,0 +1,401 @@
+{
+  "as_of_date": "2025-11-16",
+  "news_lookback_days": 7,
+  "source": "gkg-wayback-articles",
+  "n_articles": 56,
+  "hit_rate": 0.23,
+  "articles": [
+    {
+      "title": "Hot Take: The True AI Chip Challenge for NVIDIA Isn't from AMD or Intel &#x2014; It's Google's TPUs Heating Up the Race",
+      "date": "2025-11-09",
+      "source": "wccftech.com",
+      "url": "https://wccftech.com/hot-take-the-true-ai-chip-challenge-for-nvidia-isnt-from-amd-or-intel-its-googles-tpus-heating-up-the-race/",
+      "lede": "Hot Take: The True AI Chip Challenge for NVIDIA Isn\u2019t from AMD or Intel \u2014 It\u2019s Google\u2019s TPUs Heating Up the Race. NVIDIA&#039;s biggest competition in the AI industry, which has emerged as a formidable rival, is not currently AMD or Intel, but rather Google."
+    },
+    {
+      "title": "Apple's Satellite-Powered Features for iPhones: A Journey Spanning Over A Decade - Alphabet (NASDAQ:GOOGL), Apple (NASDAQ:AAPL)",
+      "date": "2025-11-09",
+      "source": "benzinga.com",
+      "url": "https://www.benzinga.com/markets/tech/25/11/48742865/apples-satellite-powered-features-for-iphones-a-journey-spanning-over-a-decade",
+      "lede": ""
+    },
+    {
+      "title": "SCRUBBED: Blue Origin Scrubs Launch Mars Mission Aboard New Glenn Rocket from Cape Canaveral",
+      "date": "2025-11-09",
+      "source": "spacecoastdaily.com",
+      "url": "https://spacecoastdaily.com/2025/11/watch-blue-origin-set-to-launch-mars-mission-aboard-new-glenn-rocket-from-cape-canaveral/",
+      "lede": ". NASA is preparing to send a pair of small spacecraft on a journey to Mars this afternoon, marking a significant milestone for both the agency and Blue Origin."
+    },
+    {
+      "title": "Bezos's Blue Origin postpones rocket launch over weather",
+      "date": "2025-11-09",
+      "source": "yahoo.com",
+      "url": "https://www.yahoo.com/news/articles/bezoss-blue-origin-postpones-rocket-215406787.html",
+      "lede": ""
+    },
+    {
+      "title": "Apple Developing Satellite-Powered Maps, Photo Messaging, and Third-Party App Support for iPhone [Gurman]",
+      "date": "2025-11-09",
+      "source": "iclarified.com",
+      "url": "https://www.iclarified.com/98996/apple-developing-satellitepowered-maps-photo-messaging-and-thirdparty-app-support-for-iphone-gurman",
+      "lede": ""
+    },
+    {
+      "title": "Apple's Satellite Leap: iPhone's Ambitious Push Beyond Earthly Networks",
+      "date": "2025-11-09",
+      "source": "webpronews.com",
+      "url": "https://www.webpronews.com/apples-satellite-leap-iphones-ambitious-push-beyond-earthly-networks/",
+      "lede": ". Apple is expanding iPhone satellite features beyond emergencies, including Maps navigation, photo messaging, indoor connectivity, 5G NTN integration, and third-party app support, as reported by Bloomberg and others. This ambitious push aims to provide seamless off-grid access, potentially revolutionizing global connectivity by 2026."
+    },
+    {
+      "title": "New Glenn launch postponed: What's at stake in Blue Origin's Mars mission?",
+      "date": "2025-11-09",
+      "source": "hindustantimes.com",
+      "url": "https://www.hindustantimes.com/world-news/new-glenn-rocket-launch-postponed-what-s-at-stake-in-jeff-bezoss-blue-origin-mars-mission-101762721788892.html",
+      "lede": ". New Glenn's inaugural flight in January was marked as a success as its payload achieved orbit and successfully performed tests. | World News"
+    },
+    {
+      "title": "Rocket Lab, AST SpaceMobile, Up 104% and 217% In 2025, Deliver Earnings",
+      "date": "2025-11-10",
+      "source": "investors.com",
+      "url": "https://www.investors.com/news/rocket-lab-ast-spacemobile-space-stocks-earnings/",
+      "lede": ". Rocket Lab rallied after narrowing losses, while AST SpaceMobile edged higher after missing analyst targets."
+    },
+    {
+      "title": "Rocket Lab Stock Rises On Q3 Earnings Beat, Strong Guidance - Rocket Lab (NASDAQ:RKLB)",
+      "date": "2025-11-10",
+      "source": "benzinga.com",
+      "url": "https://www.benzinga.com/markets/earnings/25/11/48767967/rocket-lab-stock-rises-on-q3-earnings-beat-strong-guidance-new-annual-launch-record-is-just-days-away",
+      "lede": "Rocket Lab Stock Rises On Q3 Earnings Beat, Strong Guidance - Rocket Lab (NASDAQ:RKLB). Rocket Lab Corp (NASDAQ:RKLB) reported financial results for the third quarter after the market close on Monday. Here's a look at the key details from the report. RKLB stock is showing exceptional strength. View the charts here. Q3 Highlights: Rocket Lab reported third-quarter revenue of $155.05 million, beating the consensus estimate of $151.75 million. The end-to-end space company reported a third-quarter loss of three cents per share, beating analyst estimates for a loss of 11 cents per share, according to Benzinga Pro. Rocket Lab said it secured 17 Electron launch contracts in the quarter. The company expects to surpass its previous annual launch record in the fourth quarter and remains on track to "
+    },
+    {
+      "title": "Rocket Lab Announces Third Quarter 2025 Financial Results, Posts Record Quarterly Revenue of $155m, Representing 48% Year-on-Year Growth at Record Gross Margin",
+      "date": "2025-11-10",
+      "source": "manilatimes.net",
+      "url": "https://www.manilatimes.net/2025/11/11/tmt-newswire/globenewswire/rocket-lab-announces-third-quarter-2025-financial-results-posts-record-quarterly-revenue-of-155m-representing-48-year-on-year-growth-at-record-gross-margin/2220608",
+      "lede": ""
+    },
+    {
+      "title": "Japan looks to allow public financing of nuclear power projects",
+      "date": "2025-11-10",
+      "source": "nikkei.com",
+      "url": "https://asia.nikkei.com/business/energy/japan-looks-to-allow-public-financing-of-nuclear-power-projects",
+      "lede": "TOKYO -- Japan's Ministry of Economy, Trade and Industry is aiming to change the laws for investment in nuclear power generation and electrical grids"
+    },
+    {
+      "title": "Rocket Lab Reveals Q3 2025 Financial Results",
+      "date": "2025-11-10",
+      "source": "el-balad.com",
+      "url": "https://www.el-balad.com/6762537",
+      "lede": "Rocket Lab Reveals Q3 2025 Financial Results. Rocket Lab Corporation, a prominent player in the aerospace industry, disclosed its financial performance for the third quarter of fiscal year 2025, ending September 30. The company reported a significant revenue increase, reaching $155 million, alongside a GAAP gross margin of 37%, indicating robust financial health. Key Financial Highlights from Q3 2025 CEO Sir Peter Beck emphasized that Rocket Lab\u2019s performance highlights both its operational success and strategic goals. Key achievements during the quarter include: Record Revenue: $155 million for Q3 2025. Launch Contracts: Secured 17 Electron launch contracts, marking a new record. Launch Achievements: Successfully completed two HASTE missions focused on advancing hypersonic technology. Mer"
+    },
+    {
+      "title": "Rocket Lab's (NASDAQ:RKLB) Q3 Sales Beat Estimates, Stock Soars",
+      "date": "2025-11-10",
+      "source": "financialcontent.com",
+      "url": "https://markets.financialcontent.com/stocks/article/stockstory-2025-11-10-rocket-labs-nasdaqrklb-q3-sales-beat-estimates-stock-soars",
+      "lede": ""
+    },
+    {
+      "title": "For Sale: Grand Banks Eastbay EB60",
+      "date": "2025-11-10",
+      "source": "yachtingmagazine.com",
+      "url": "https://www.yachtingmagazine.com/brokerage/grand-banks-eb60-satellite-for-sale/",
+      "lede": ""
+    },
+    {
+      "title": "Airlines Turn to AI to Manage Disruptions",
+      "date": "2025-11-11",
+      "source": "pymnts.com",
+      "url": "https://www.pymnts.com/artificial-intelligence-2/2025/airlines-turn-to-ai-to-manage-disruptions/",
+      "lede": ". AI systems that forecast delays, automate rebookings, and manage crew logistics are now embedded across major airlines."
+    },
+    {
+      "title": "After Multiple Delays, AST SpaceMobile's Prototype Satellite to Launch in December",
+      "date": "2025-11-11",
+      "source": "pcmag.com",
+      "url": "https://www.pcmag.com/news/after-delays-ast-spacemobile-prototype-satellite-december-launch",
+      "lede": ""
+    },
+    {
+      "title": "Live coverage: SpaceX to launch 29 Starlink satellites on Falcon 9 rocket from Cape Canaveral &#x2013; Spaceflight Now",
+      "date": "2025-11-11",
+      "source": "spaceflightnow.com",
+      "url": "https://spaceflightnow.com/2025/11/10/live-coverage-spacex-to-launch-29-starlink-satellites-on-falcon-9-rocket-from-cape-canaveral-3/",
+      "lede": ""
+    },
+    {
+      "title": "GoviEx Uranium (CVE:GXU) Stock Price Down 45.5% &#x2013; Time to Sell?",
+      "date": "2025-11-11",
+      "source": "dailypolitical.com",
+      "url": "https://www.dailypolitical.com/2025/11/10/goviex-uranium-cvegxu-stock-price-down-45-5-time-to-sell.html",
+      "lede": ""
+    },
+    {
+      "title": "GoviEx Uranium (CVE:GXU) Stock Price Down 45.5% &#x2013; Here's Why",
+      "date": "2025-11-11",
+      "source": "dailypolitical.com",
+      "url": "https://www.dailypolitical.com/2025/11/10/goviex-uranium-cvegxu-stock-price-down-45-5-heres-why.html",
+      "lede": ""
+    },
+    {
+      "title": "Quantum Computing (NASDAQ:QUBT) Shares Down 1.2% &#x2013; What's Next?",
+      "date": "2025-11-11",
+      "source": "dailypolitical.com",
+      "url": "https://www.dailypolitical.com/2025/11/10/quantum-computing-nasdaqqubt-shares-down-1-2-whats-next.html",
+      "lede": ""
+    },
+    {
+      "title": "Uranium Week: Biggest Spot Fall Since March",
+      "date": "2025-11-11",
+      "source": "fnarena.com",
+      "url": "https://fnarena.com/index.php/2025/11/11/uranium-week-biggest-spot-fall-since-march/",
+      "lede": ""
+    },
+    {
+      "title": "Indra Navia Leading the Evolution Towards Dual-Frequency GBAS - Inside GNSS - Global Navigation Satellite Systems Engineering, Policy, and Design",
+      "date": "2025-11-12",
+      "source": "insidegnss.com",
+      "url": "https://insidegnss.com/indra-navia-leading-the-evolution-towards-dual-frequency-gbas/",
+      "lede": ""
+    },
+    {
+      "title": "Anthropic, Microsoft announce new AI data center projects as industry's construction push continues",
+      "date": "2025-11-12",
+      "source": "hngnews.com",
+      "url": "https://www.hngnews.com/state/anthropic-microsoft-announce-new-ai-data-center-projects-as-industrys-construction-push-continues/article_0fd23d1f-1bde-5ab7-9191-c9772f1f6adb.html",
+      "lede": ""
+    },
+    {
+      "title": "This Blue Chip Company Just Announced Quantum Computing 'Breakthroughs.' Its Stock Hit a New High",
+      "date": "2025-11-12",
+      "source": "investopedia.com",
+      "url": "https://www.investopedia.com/this-blue-chip-company-just-announced-quantum-computing-breakthroughs-ibm-stock-11847822",
+      "lede": ""
+    },
+    {
+      "title": "SES and AMN upgrade rural telecoms sites across C&#xF4;te d'Ivoire",
+      "date": "2025-11-12",
+      "source": "developingtelecoms.com",
+      "url": "https://www.developingtelecoms.com/telecom-technology/satellite-communications-networks/19327-ses-and-amn-upgrade-rural-telecoms-sites-across-cote-divoire.html",
+      "lede": ""
+    },
+    {
+      "title": "Starlink aims to transform rural India with affordable satellite internet",
+      "date": "2025-11-12",
+      "source": "aninews.in",
+      "url": "https://aninews.in/news/business/starlink-aims-to-transform-rural-india-with-affordable-satellite-internet20251112085852/",
+      "lede": ""
+    },
+    {
+      "title": "Avanti targets Southern Africa with extra capacity from T&#xFC;rksat",
+      "date": "2025-11-12",
+      "source": "developingtelecoms.com",
+      "url": "https://www.developingtelecoms.com/telecom-technology/satellite-communications-networks/19328-avanti-targets-southern-africa-with-extra-capacity-from-tuerksat.html",
+      "lede": ""
+    },
+    {
+      "title": "GoviEx Uranium (CVE:GXU) Stock Price Up 33.3% &#x2013; Still a Buy?",
+      "date": "2025-11-12",
+      "source": "dailypolitical.com",
+      "url": "https://www.dailypolitical.com/2025/11/11/goviex-uranium-cvegxu-stock-price-up-33-3-still-a-buy.html",
+      "lede": ""
+    },
+    {
+      "title": "Blue Origin launches rocket carrying twin NASA spacecraft to Mars",
+      "date": "2025-11-13",
+      "source": "courant.com",
+      "url": "https://www.courant.com/2025/11/13/blue-origin-rocket-mars/",
+      "lede": ""
+    },
+    {
+      "title": "Blue Origin launches huge rocket carrying twin NASA spacecraft to Mars",
+      "date": "2025-11-13",
+      "source": "castanetkamloops.net",
+      "url": "https://www.castanetkamloops.net/news/World/583857/Blue-Origin-launches-huge-rocket-carrying-twin-NASA-spacecraft-to-Mars",
+      "lede": ""
+    },
+    {
+      "title": "&#x1F3A5;Blue Origin launches huge rocket carrying twin NASA spacecraft to Mars",
+      "date": "2025-11-13",
+      "source": "jcpost.com",
+      "url": "https://jcpost.com/posts/2054256d-794f-40ff-9fb4-5315d8e18379",
+      "lede": ""
+    },
+    {
+      "title": "EU Slows AI Act Rollout While Industry Calls for Clarity",
+      "date": "2025-11-13",
+      "source": "pymnts.com",
+      "url": "https://www.pymnts.com/artificial-intelligence-2/2025/eu-slows-ai-act-rollout-while-industry-calls-for-clarity-over-leniency/",
+      "lede": ""
+    },
+    {
+      "title": "Jeff Bezos' Blue Origin launches New Glenn rocket destined for Mars",
+      "date": "2025-11-13",
+      "source": "independent.co.uk",
+      "url": "https://www.independent.co.uk/space/blue-origin-launch-jeff-bezos-new-glenn-rocket-b2864965.html",
+      "lede": "Jeff Bezos\u2019 Blue Origin launches New Glenn rocket destined for Mars. An ecstatic Bezos watched the action from Launch Control"
+    },
+    {
+      "title": "Blue Origin launches huge rocket carrying twin NASA spacecraft to Mars | 104.9 The Fox &#x2013; Jonesboro, AR",
+      "date": "2025-11-13",
+      "source": "thefox1049.com",
+      "url": "https://thefox1049.com/news/030030-blue-origin-launches-huge-rocket-carrying-twin-nasa-spacecraft-to-mars/",
+      "lede": ""
+    },
+    {
+      "title": "U.S. Bishops Receive Briefing On Artificial Intelligence",
+      "date": "2025-11-13",
+      "source": "ncregister.com",
+      "url": "https://www.ncregister.com/cna/u-s-bishops-receive-briefing-on-artificial-intelligence",
+      "lede": ""
+    },
+    {
+      "title": "Nvidia-Backed Firmus Raises $327 Million for AI Data Center Push",
+      "date": "2025-11-14",
+      "source": "bloomberg.com",
+      "url": "https://www.bloomberg.com:443/news/articles/2025-11-14/nvidia-backed-firmus-raises-327-million-for-ai-data-center-push",
+      "lede": ""
+    },
+    {
+      "title": "Bezos' Blue Origin Lofts NASA Craft, Nails Booster Landing",
+      "date": "2025-11-14",
+      "source": "bloomberg.com",
+      "url": "https://www.bloomberg.com/news/articles/2025-11-13/bezos-blue-origin-new-glenn-rocket-launches-first-nasa-mission",
+      "lede": ""
+    },
+    {
+      "title": "Baidu Slumps as Latest AI Model Fails to Impress Wary Investors",
+      "date": "2025-11-14",
+      "source": "bloomberg.com",
+      "url": "https://www.bloomberg.com:443/news/articles/2025-11-14/baidu-slumps-as-latest-ai-model-fails-to-impress-wary-investors",
+      "lede": ""
+    },
+    {
+      "title": "Rocket Lab Delays Debut of SpaceX-Challenging Rocket to 2026",
+      "date": "2025-11-14",
+      "source": "bloomberg.com",
+      "url": "https://www.bloomberg.com:443/news/articles/2025-11-10/rocket-lab-delays-debut-of-spacex-challenging-rocket-to-2026",
+      "lede": ""
+    },
+    {
+      "title": "Nvidia Faces Growing Pressure As Amazon, Microsoft Support Curbs On AI Chip Exports To China: Report",
+      "date": "2025-11-14",
+      "source": "biztoc.com",
+      "url": "https://biztoc.com/x/3f72eeac1036e2cf",
+      "lede": "Nvidia Faces Growing Pressure As Amazon, Microsoft Support Curbs On AI Chip Exports To China: Report. Amazon.com, Inc. (NASDAQ:AMZN) and Microsoft Corporation (NASDAQ:MSFT) are reportedly lining up behind new U.S. legislation that could further curb Nvidia\u2026"
+    },
+    {
+      "title": "China's stranded astronauts returning from space station on spacecraft that brought new crew",
+      "date": "2025-11-14",
+      "source": "wboc.com",
+      "url": "https://www.wboc.com/news/international/chinas-stranded-astronauts-returning-from-space-station-on-spacecraft-that-brought-new-crew/article_169d8376-b6cf-54a5-bbd9-2caa856aeeda.html",
+      "lede": "BEIJING (AP) \u2014 Three Chinese astronauts stranded at their nation's space station after their spacecraft was apparently hit by space debris departed for home Friday using the craft that had"
+    },
+    {
+      "title": "FIS Debuts AI-Powered GETPAID and Treasury Risk Manager",
+      "date": "2025-11-14",
+      "source": "pymnts.com",
+      "url": "https://www.pymnts.com/artificial-intelligence-2/2025/fis-debuts-ai-powered-getpaid-and-treasury-risk-manager-solutions-on-microsoft-marketplace/",
+      "lede": ""
+    },
+    {
+      "title": "Artificial Intelligence (AI) in Healthcare Market worth",
+      "date": "2025-11-15",
+      "source": "openpr.com",
+      "url": "https://www.openpr.com/news/4271946/artificial-intelligence-ai-in-healthcare-market-worth",
+      "lede": ""
+    },
+    {
+      "title": "Shecky Form&#xE9; 25th Anniversary of 002 w/ guests Slow Fresh Oil, Hot Little Rocket and Djewel &#x2013; CJSW Radio",
+      "date": "2025-11-15",
+      "source": "cjsw.com",
+      "url": "https://cjsw.com/event/shecky-forme-25th-anniversary-of-002-w-guests-slow-fresh-oil-hot-little-rocket-and-djewel/",
+      "lede": ""
+    },
+    {
+      "title": "Live coverage: SpaceX to launch predawn Starlink mission from Cape Canaveral &#x2013; Spaceflight Now",
+      "date": "2025-11-15",
+      "source": "spaceflightnow.com",
+      "url": "https://spaceflightnow.com/2025/11/14/live-coverage-spacex-to-launch-predawn-starlink-mission-from-cape-canaveral/",
+      "lede": ""
+    },
+    {
+      "title": "Live coverage: SpaceX to launch 29 Starlink satellites on Falcon 9 rocket from NASA's Kennedy Space Center &#x2013; Spaceflight Now",
+      "date": "2025-11-15",
+      "source": "spaceflightnow.com",
+      "url": "https://spaceflightnow.com/2025/11/14/live-coverage-spacex-to-launch-29-starlink-satellites-on-falcon-9-rocket-from-nasas-kennedy-space-center-2/",
+      "lede": "SpaceX headed into the weekend with a pair of launches planned for Florida\u2019s Space Coast with both supporting the company\u2019s Starlink broadband satellite internet constellation."
+    },
+    {
+      "title": "Rocket attack in Syria's capital wounds one person&#xA0; - Dominican Republic Post &#x2013; Caribbean News, Business, Travel & Culture",
+      "date": "2025-11-15",
+      "source": "dominicanrepublicpost.com",
+      "url": "https://dominicanrepublicpost.com/rocket-attack-in-syrias-capital-wounds-one-person/",
+      "lede": ""
+    },
+    {
+      "title": "Blue Origin's New Glenn rocket launches NASA's ESCAPADE Mars probes",
+      "date": "2025-11-15",
+      "source": "upi.com",
+      "url": "https://www.upi.com/Science_News/2025/11/13/Blue-Origins-New-Glenn-rocket-launches-NASAs-ESCAPADE-Mars-probes/1621763070496/",
+      "lede": ""
+    },
+    {
+      "title": "Trump says he is considering F-35 fighter jet deal with Saudis",
+      "date": "2025-11-15",
+      "source": "asiaone.com",
+      "url": "https://www.asiaone.com/world/trump-says-he-considering-f-35-fighter-jet-deal-saudis",
+      "lede": ""
+    },
+    {
+      "title": "Greenpeace says French uranium being sent to Russia",
+      "date": "2025-11-16",
+      "source": "digitaljournal.com",
+      "url": "https://www.digitaljournal.com/world/greenpeace-says-french-uranium-being-sent-to-russia/article",
+      "lede": ""
+    },
+    {
+      "title": "Sakurajima Volcano Volcanic Ash Advisory: VA IS NOT IDENTIFIABLE IN SATELLITE IMAGERY.",
+      "date": "2025-11-16",
+      "source": "volcanodiscovery.com",
+      "url": "https://www.volcanodiscovery.com/sakurajima/news/287043/vaac-advisory-2025-376.html",
+      "lede": ""
+    },
+    {
+      "title": "Everything You Need to Know About Rocket Lab's Neutron Delay, Straight From Peter Beck",
+      "date": "2025-11-16",
+      "source": "yahoo.com",
+      "url": "https://finance.yahoo.com/news/everything-know-rocket-labs-neutron-120700195.html",
+      "lede": ""
+    },
+    {
+      "title": "US Kills Three In Fresh Strike As Its Largest Warship Enters Caribbean Amid Venezuela Tensions",
+      "date": "2025-11-16",
+      "source": "news18.com",
+      "url": "https://www.news18.com/world/us-kills-three-in-fresh-strike-as-its-largest-warship-enters-caribbean-amid-venezuela-tensions-ws-kl-9712279.html",
+      "lede": ""
+    },
+    {
+      "title": "Amazon Rebrands Satellite Network, Abandons Affordability Promise",
+      "date": "2025-11-16",
+      "source": "el-balad.com",
+      "url": "https://www.el-balad.com/6769068",
+      "lede": ""
+    },
+    {
+      "title": "What Would a \"Simplified\" Starship Plan for the Moon Actually Look Like? &#x2013; HotAir",
+      "date": "2025-11-16",
+      "source": "hotair.com",
+      "url": "https://hotair.com/headlines/2025/11/16/what-would-a-simplified-starship-plan-for-the-moon-actually-look-like-n3808942",
+      "lede": ""
+    },
+    {
+      "title": "Nine Dead as Russia Launches Massive Missile and Drone Barrage Across Ukraine",
+      "date": "2025-11-16",
+      "source": "voiceofvienna.org",
+      "url": "https://voiceofvienna.org/nine-dead-as-russia-launches-massive-missile-and-drone-barrage-across-ukraine/",
+      "lede": ""
+    }
+  ]
+}
