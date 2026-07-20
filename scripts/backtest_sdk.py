@@ -27,6 +27,7 @@ import math
 import re
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor
 from datetime import date, timedelta
 from pathlib import Path
 
@@ -327,34 +328,48 @@ def main(argv=None) -> int:
     # covered). After this, each pool is a pure slice — changing news_lookback_days re-queries nothing.
     ingest_gkg_corpus(bq, date.fromisoformat(a.start) - timedelta(days=CORPUS_INGEST_BUFFER),
                       date.fromisoformat(a.end), run_dir)
-    for d in dates:
-        cur_wl = portfolio.reconstruct_watchlist_at(d, a.starter, str(hist))
-        arts = build_article_pool(date.fromisoformat(d), news_lb, a.max_articles, run_dir)
-        (run_dir / f"{d}-pool.json").write_text(json.dumps(
-            {"as_of_date": d, "news_lookback_days": news_lb, "source": "gkg-wayback-articles",
-             "n_articles": len(arts), "hit_rate": round(sum(1 for x in arts if x.get("lede"))/max(len(arts),1), 2),
-             "articles": arts}, indent=2))
-        if a.pools_only:
-            print(f"  {d}: {len(arts)} articles", file=sys.stderr); continue
-        log = (run_dir / "_log" / f"{d}-curator.json") if a.log_llm else None
-        cur = call_curator(cli, a.model, d, cur_wl, thesis, exclusions, a.max_watchlist_size,
-                           anchors, render_articles(arts), a.cadence, log)
-        cur["as_of_date"] = d
-        (run_dir / f"{d}-curation.json").write_text(json.dumps(cur, indent=2))
-        portfolio.apply_curator_decisions(cur, holdings_path=str(sb_hold), history_path=str(hist),
-                                          profile_path="investor_profile.md", listing_check=False, as_of_date=d)
-        if log:
-            lg = json.loads(log.read_text()); tok_in += lg["usage"]["in"]; tok_out += lg["usage"]["out"]
-        print(f"  {d}: {len(arts)} arts | adds={[x['ticker'] for x in cur.get('adds',[])]} "
-              f"removes={[x['ticker'] for x in cur.get('removes',[])]}", file=sys.stderr)
-
-    if a.pools_only:
-        return 0
-    # write _starter.json and replay
+    # Write _starter.json up front (not after the loop) so a dashboard can be rendered mid-run against
+    # whatever curations have completed so far — the run builds chronologically, so it grows in time.
     (run_dir / "_starter.json").write_text(json.dumps(
         {"starter_watchlist": a.starter, "as_of_dates": dates, "rebalance_period": a.cadence,
          "initial_usd": 50000.0, "lookback_years": a.optimizer_lookback_days / 365.0,
          "max_watchlist_size": a.max_watchlist_size, "start_date": a.start, "end_date": a.end}, indent=2))
+    # Pool-building is watchlist-INDEPENDENT (it slices the corpus + fetches Wayback ledes), so
+    # pre-fetch every week's pool in a background worker while the sequential curator loop below (which
+    # IS watchlist-dependent — walk-forward) consumes them. This overlaps the curator's ~1 min/week with
+    # the ongoing Wayback fetching instead of interleaving them, cutting wall time toward max(Wayback,
+    # curator). max_workers=1: pools build one at a time (each already parallelizes its own Wayback via a
+    # 10-worker pool, and serial pool-builds avoid racing the module-global _wb_bulk flag in news_pool).
+    pool_ex = ThreadPoolExecutor(max_workers=1)
+    pool_futs = {d: pool_ex.submit(build_article_pool, date.fromisoformat(d), news_lb, a.max_articles, run_dir)
+                 for d in dates}
+    try:
+        for d in dates:
+            arts = pool_futs[d].result()          # blocks until this week's pool is built (usually ahead)
+            (run_dir / f"{d}-pool.json").write_text(json.dumps(
+                {"as_of_date": d, "news_lookback_days": news_lb, "source": "gkg-wayback-articles",
+                 "n_articles": len(arts), "hit_rate": round(sum(1 for x in arts if x.get("lede"))/max(len(arts),1), 2),
+                 "articles": arts}, indent=2))
+            if a.pools_only:
+                print(f"  {d}: {len(arts)} articles", file=sys.stderr); continue
+            cur_wl = portfolio.reconstruct_watchlist_at(d, a.starter, str(hist))
+            log = (run_dir / "_log" / f"{d}-curator.json") if a.log_llm else None
+            cur = call_curator(cli, a.model, d, cur_wl, thesis, exclusions, a.max_watchlist_size,
+                               anchors, render_articles(arts), a.cadence, log)
+            cur["as_of_date"] = d
+            (run_dir / f"{d}-curation.json").write_text(json.dumps(cur, indent=2))
+            portfolio.apply_curator_decisions(cur, holdings_path=str(sb_hold), history_path=str(hist),
+                                              profile_path="investor_profile.md", listing_check=False, as_of_date=d)
+            if log:
+                lg = json.loads(log.read_text()); tok_in += lg["usage"]["in"]; tok_out += lg["usage"]["out"]
+            print(f"  {d}: {len(arts)} arts | adds={[x['ticker'] for x in cur.get('adds',[])]} "
+                  f"removes={[x['ticker'] for x in cur.get('removes',[])]}", file=sys.stderr)
+    finally:
+        pool_ex.shutdown(wait=True)
+
+    if a.pools_only:
+        return 0
+    # _starter.json was written up front; replay the full run now.
     res = portfolio.curator_backtest(
         runs_dir=str(run_dir), out_dir=str(run_dir / "_backtest"), max_weight=a.max_weight,
         risk_aversion=a.risk_aversion, benchmarks=["SPY"],

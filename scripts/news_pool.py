@@ -38,8 +38,7 @@ from pathlib import Path
 
 import requests
 import trafilatura
-from wayback import Mode, WaybackClient
-from wayback.exceptions import RateLimitError, WaybackRetryError
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 ROOT = Path(__file__).resolve().parent.parent
 RUN_DIR = ROOT / "data" / "curator_runs" / "postcovid-gdelt"
@@ -47,8 +46,9 @@ CACHE = RUN_DIR / "_cache"
 CAP05_STARTER = ROOT / "data" / "curator_runs" / "postcovid-cap05" / "_starter.json"
 
 GDELT_URL = "https://api.gdeltproject.org/api/v2/doc/doc"
-WAYBACK_MIN_INTERVAL = 0.6     # politeness pace (s) for our concurrent enrich workers, on top of the
-                               # wayback library's own internal rate-limit/retry handling.
+WAYBACK_MIN_INTERVAL = 0.15    # politeness pace (s) between availability-API request STARTS across the
+                               # concurrent enrich workers. The availability API is light + tolerant
+                               # (~150+/min), so this stays low; it's not the CDX ~3.5/min bottleneck.
 # A named User-Agent identifies us as a polite client; the default python-requests UA is what
 # rate-limiters clamp first. IMPORTANT: every GDELT call must route through gdelt_fetch() so it
 # goes through the single serial pacer — never make out-of-band probes (that trips the
@@ -198,27 +198,31 @@ def _parse_gdelt_date(seendate: str):
 
 
 # ------------------------------------------------------------------ Wayback
-# Memento lookup via the `wayback` library (SURT-canonicalized search — matches www/http/param
-# variants of a URL, a big hit-rate win over an exact-URL availability lookup) + trafilatura for
-# article-body extraction (far more robust than the old JSON-LD/meta/paragraph heuristic).
+# Snapshot lookup via archive.org's fast availability API (~150/min) + trafilatura for article-body
+# extraction. The `wayback` library's CDX/SURT search recalls ~2x more snapshots but archive.org
+# rate-limits concurrent CDX to ~3.5/min (a ~27h 2-year build), so we take the fast path: a light URL
+# canonicalizer (drop www/scheme/tracking-params) recovers some variant matches, and trafilatura does
+# the heavy lifting on extraction (the old JSON-LD/meta/paragraph heuristic missed clean snapshots).
 _MIN_LEDE = 40                 # reject sub-fragment extractions (a truncated meta value, a nav crumb)
 _MAX_LEDE = 500                # a lede is a sentence or two; cap it (render truncates further)
-_wb_client_local = threading.local()
+_AVAIL = "http://archive.org/wayback/available"
+_UA = "portfolio-wave-rider/1.0 (+contact: jmh.datasciences@gmail.com)"
+_TRACK = re.compile(r"^(utm_|fbclid|gclid|mc_|ref$|ref_|referrer|cmpid|ncid|mkt_tok|igshid|_hsenc|"
+                    r"_hsmi|spm|yclid|dclid|msclkid|guccounter|guce_|at_medium|at_campaign|smid)", re.I)
+_wb_sess_local = threading.local()
 
 
-def _wb_client() -> WaybackClient:
-    """One WaybackClient per worker thread — its underlying requests session is not shared-safe, so
-    the concurrent enrich pool needs a client per thread."""
-    c = getattr(_wb_client_local, "c", None)
-    if c is None:
-        c = _wb_client_local.c = WaybackClient()
-    return c
+def _wb_session() -> requests.Session:
+    """One requests.Session per worker thread (sessions aren't thread-safe) for connection reuse."""
+    s = getattr(_wb_sess_local, "s", None)
+    if s is None:
+        s = _wb_sess_local.s = requests.Session()
+    return s
 
 
 def _wb_throttle() -> None:
-    """Thread-safe rate limiter: RESERVES the next WAYBACK_MIN_INTERVAL-spaced start slot under the
-    lock, then sleeps OUTSIDE it, so the concurrent enrich workers get evenly staggered starts (a
-    politeness pace on top of the wayback library's own internal rate-limit/retry handling)."""
+    """Thread-safe pacer: RESERVES the next WAYBACK_MIN_INTERVAL-spaced start slot under the lock, then
+    sleeps OUTSIDE it, so concurrent enrich workers get evenly staggered (polite) request starts."""
     with _wb_lock:
         now = time.monotonic()
         slot = max(now, _wb_last[0] + WAYBACK_MIN_INTERVAL)
@@ -226,6 +230,21 @@ def _wb_throttle() -> None:
     wait = slot - now
     if wait > 0:
         time.sleep(wait)
+
+
+def _canon(url: str, scheme: str) -> str:
+    """Light URL canonicalizer for the availability lookup: chosen scheme, lowercase host, drop www.,
+    strip tracking query params, sort the rest, drop the fragment. Recovers some variant matches (a
+    crude approximation of CDX's SURT canonicalization, which is more thorough but far slower)."""
+    try:
+        s = urlsplit(url)
+    except Exception:
+        return url
+    host = (s.hostname or "").lower()
+    if host.startswith("www."):
+        host = host[4:]
+    q = sorted((k, v) for k, v in parse_qsl(s.query, keep_blank_values=True) if not _TRACK.match(k))
+    return urlunsplit((scheme, host, s.path or "/", urlencode(q), ""))
 
 
 def _clean_lede(text: "str | None") -> str:
@@ -236,48 +255,61 @@ def _clean_lede(text: "str | None") -> str:
     return t[:_MAX_LEDE] if len(t) >= _MIN_LEDE else ""
 
 
+def _avail_snapshot(url: str, target: date) -> "str | None":
+    """archive.org availability API: 14-digit timestamp of the closest snapshot, iff it is AT-OR-BEFORE
+    target (look-ahead-clean); else None. Raises requests exceptions on a transient network blip."""
+    ts = target.strftime("%Y%m%d") + "235959"
+    _wb_throttle()
+    _WB_STAT["requests"] += 1
+    r = _wb_session().get(_AVAIL, params={"url": url, "timestamp": ts},
+                          timeout=12, headers={"User-Agent": _UA})
+    snap = r.json().get("archived_snapshots", {}).get("closest", {})
+    st = snap.get("timestamp", "") if snap.get("available") else ""
+    return st if st and st[:8] <= target.strftime("%Y%m%d") else None
+
+
 def wayback_lede(url: str, target: date) -> tuple[str, bool]:
-    """As-of-date lede for `url`, look-ahead-clean. Finds the LATEST 200-status memento captured
-    AT-OR-BEFORE `target` via the wayback library (SURT-canonicalized, so www/http/trailing-slash/
-    tracking-param variants still match), then extracts the article body with trafilatura. Returns
-    (lede, hit). Caches a CONFIRMED result; a transient rate-limit is not cached (retry next run)
+    """As-of-date lede for `url`, look-ahead-clean. For each of a few canonical URL forms, ask the fast
+    availability API for the latest snapshot AT-OR-BEFORE `target`, fetch the raw archived HTML (id_
+    modifier, no IA chrome), and extract the article body with trafilatura; first hit wins. Returns
+    (lede, hit). Caches a CONFIRMED result; a transient network error is not cached (retry next run)
     unless bulk mode, so a blip never poisons the cache with a false 'not-archived'."""
     key = f"{url}|{target}"
     hit = _cache_get("wayback", key)
     if hit is not None:
         return hit.get("lede", ""), hit.get("hit", False)
-    to_dt = datetime(target.year, target.month, target.day, 23, 59, 59)
     try:
-        _wb_throttle()
-        _WB_STAT["requests"] += 1
-        recs = list(_wb_client().search(url, to_date=to_dt, filter_field="statuscode:200", limit=-1))
-        if not recs:
-            _cache_put("wayback", key, {"lede": "", "hit": False})   # confirmed: no memento <= target
-            return "", False
-        _wb_throttle()
-        _WB_STAT["requests"] += 1
-        mem = _wb_client().get_memento(recs[-1], mode=Mode.original)  # raw archived HTML (no IA chrome)
-        lede = _clean_lede(trafilatura.extract(mem.content.decode("utf-8", "ignore"),
-                                               favor_precision=True, include_comments=False))
-        _cache_put("wayback", key, {"lede": lede, "hit": bool(lede)})
-        return lede, bool(lede)
-    except (RateLimitError, WaybackRetryError):
-        _WB_STAT["http_429"] += 1
+        seen: list[str] = []
+        for cand in (_canon(url, "https"), _canon(url, "http"), url):
+            if cand in seen:
+                continue
+            seen.append(cand)
+            ts = _avail_snapshot(cand, target)
+            if not ts:
+                continue
+            _wb_throttle()
+            _WB_STAT["requests"] += 1
+            r = _wb_session().get(f"http://web.archive.org/web/{ts}id_/{cand}",
+                                  timeout=15, headers={"User-Agent": _UA})
+            lede = _clean_lede(trafilatura.extract(r.text, favor_precision=True, include_comments=False))
+            if lede:
+                _cache_put("wayback", key, {"lede": lede, "hit": True})
+                return lede, True
+        _cache_put("wayback", key, {"lede": "", "hit": False})   # no snapshot / no extractable lede
+        return "", False
+    except requests.exceptions.RequestException:
+        _WB_STAT["timeout"] += 1
         if _wb_bulk[0]:                   # bulk build: accept the miss so a re-run doesn't re-burn it
             _cache_put("wayback", key, {"lede": "", "hit": False})
         return "", False                  # transient: DO NOT cache on the live path — retry next run
-    except Exception:                     # blocked site / playback error / decode -> confirmed miss
-        _cache_put("wayback", key, {"lede": "", "hit": False})
-        return "", False
 
 
 def wayback_ledes(urls: list[str], target: date,
                   workers: int = WAYBACK_ENRICH_WORKERS) -> dict[str, str]:
-    """Concurrent batch of wayback_lede: fetch every URL's as-of-`target` lede through a small
-    thread pool and return {url: lede}. CDX snapshot lookups are individually slow (7-22s) but
-    archive.org isn't rate-limiting, so overlapping them is a ~Nx speedup over the serial loop.
-    _wb_throttle (slot-reserved) keeps request STARTS <= ~40/min; per-URL caching is unchanged, so
-    a re-run is all cache hits. Dedupes URLs. Misses / transient failures map to ''."""
+    """Concurrent batch of wayback_lede: fetch every URL's as-of-`target` lede through a small thread
+    pool and return {url: lede}. The availability API is light + fast (~150/min aggregate here);
+    _wb_throttle (slot-reserved) keeps request STARTS polite. Per-URL caching is unchanged, so a re-run
+    is all cache hits. Dedupes URLs. Misses / transient failures map to ''."""
     return wayback_ledes_dated([(u, target) for u in urls], workers)
 
 

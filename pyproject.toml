@@ -16,8 +16,7 @@ dependencies = [
     "scipy>=1.13.0",
     "plotly>=5.0",
     "pyyaml>=6.0",
-    "wayback>=0.5.1",           # GKG-backtest: SURT-canonicalized Wayback memento lookup
-    "trafilatura>=2.1.0",       # GKG-backtest: robust archived-article body extraction
+    "trafilatura>=2.1.0",       # GKG-backtest: archived-article body extraction (availability API + this)
 ]
 
 [project.optional-dependencies]
