@@ -162,52 +162,49 @@ def build():
             return BLUE
         return GREY
 
-    # ---- figure (8 rows) ----
+    # ---- figure (7 rows) ---- (pool-size-per-window plot dropped: it was flat at the 100-article
+    # cap for all 53 windows; that one fact is now a stat card instead.)
     titles = (
-        f"1. Pool size per rebalance window<br><sub><i>each of {len(pools)} weekly pools = the ranked "
-        "top-100 fed to the curator (flat = the max_articles cap is always met)</i></sub>",
-        "2. Unique articles per MONTH<br><sub><i>completeness (coarse): distinct articles shown to the "
+        "1. Unique articles per MONTH<br><sub><i>completeness (coarse): distinct articles shown to the "
         "curator that month</i></sub>",
-        "3. Unique articles per WEEK<br><sub><i>gap check (finer), Monday-anchored: the two empty weeks "
+        "2. Unique articles per WEEK<br><sub><i>gap check (finer), Monday-anchored: the two empty weeks "
         "(mid-June 2025) are a real GDELT/GKG outage, not a pipeline gap</i></sub>",
-        "4. Unique articles per DAY<br><sub><i>gap check (finest): zero days break the line "
+        "3. Unique articles per DAY<br><sub><i>gap check (finest): zero days break the line "
         "(mid-June-2025 GKG outage)</i></sub>",
-        "5. Unique articles by DAY OF WEEK<br><sub><i>publication cadence: weekend dip is normal news "
+        "4. Unique articles by DAY OF WEEK<br><sub><i>publication cadence: weekend dip is normal news "
         "behavior, not a gap</i></sub>",
-        "6. Unique articles by wave<br><sub><i>coverage by theme (first matched wave, else general)</i></sub>",
-        "7. Top source domains — tier-colored<br><sub><i>green = preferred/specialty desk, blue = major "
+        "5. Unique articles by wave<br><sub><i>coverage by theme (first matched wave, else general)</i></sub>",
+        "6. Top source domains — tier-colored<br><sub><i>green = preferred/specialty desk, blue = major "
         "wire/outlet, grey = other</i></sub>",
-        "8. Wayback join-rate over the year<br><sub><i>per-window archived-lede yield (hit_rate): the "
+        "7. Wayback join-rate over the year<br><sub><i>per-window archived-lede yield (hit_rate): the "
         "quality of the Wayback join across the run</i></sub>",
     )
-    fig = make_subplots(rows=8, cols=1, vertical_spacing=0.045, subplot_titles=titles)
+    fig = make_subplots(rows=7, cols=1, vertical_spacing=0.045, subplot_titles=titles)
 
-    # 1. pool size per window (GKG only)
-    fig.add_trace(go.Bar(x=as_of, y=pool_n, marker_color=BLUE, name="pool size (100)"), row=1, col=1)
-    # 2. articles per month (GKG only)
-    fig.add_trace(go.Bar(x=mo_keys, y=[mon_g[m] for m in mo_keys], marker_color=BLUE, name="GKG"), row=2, col=1)
-    # 3. articles per week (GKG only)
-    fig.add_trace(go.Bar(x=wk_keys, y=[wk_g[w] for w in wk_keys], marker_color=BLUE, name="GKG"), row=3, col=1)
-    # 4. articles per day (GKG only, linear y)
-    fig.add_trace(go.Scatter(x=day_x, y=day_yg, mode="lines", line={"color": BLUE, "width": 1}, name="GKG"), row=4, col=1)
-    # 5. day-of-week (GKG only)
-    fig.add_trace(go.Bar(x=DOW, y=[dow_g.get(d, 0) for d in DOW], marker_color=BLUE, name="GKG"), row=5, col=1)
-    # 6. per-wave horizontal bars
+    # 1. articles per month (GKG only)
+    fig.add_trace(go.Bar(x=mo_keys, y=[mon_g[m] for m in mo_keys], marker_color=BLUE, name="GKG"), row=1, col=1)
+    # 2. articles per week (GKG only)
+    fig.add_trace(go.Bar(x=wk_keys, y=[wk_g[w] for w in wk_keys], marker_color=BLUE, name="GKG"), row=2, col=1)
+    # 3. articles per day (GKG only, linear y)
+    fig.add_trace(go.Scatter(x=day_x, y=day_yg, mode="lines", line={"color": BLUE, "width": 1}, name="GKG"), row=3, col=1)
+    # 4. day-of-week (GKG only)
+    fig.add_trace(go.Bar(x=DOW, y=[dow_g.get(d, 0) for d in DOW], marker_color=BLUE, name="GKG"), row=4, col=1)
+    # 5. per-wave horizontal bars
     fig.add_trace(go.Bar(x=[v for _, v in wv][::-1], y=[k for k, _ in wv][::-1],
-                         orientation="h", marker_color=GREEN), row=6, col=1)
-    # 7. top sources horizontal, tier-colored
+                         orientation="h", marker_color=GREEN), row=5, col=1)
+    # 6. top sources horizontal, tier-colored
     fig.add_trace(go.Bar(x=[c for _, c in top_src][::-1], y=[s for s, _ in top_src][::-1],
-                         orientation="h", marker_color=[tier_color(s) for s, _ in top_src][::-1]), row=7, col=1)
-    # 8. wayback join-rate over time
+                         orientation="h", marker_color=[tier_color(s) for s, _ in top_src][::-1]), row=6, col=1)
+    # 7. wayback join-rate over time
     fig.add_trace(go.Scatter(x=as_of, y=hit_rate, mode="lines+markers",
-                             line={"color": GREEN, "width": 2}, marker={"size": 5}), row=8, col=1)
+                             line={"color": GREEN, "width": 2}, marker={"size": 5}), row=7, col=1)
 
-    for r in (1, 2, 3, 4, 5):
+    for r in (1, 2, 3, 4):
         fig.update_yaxes(title_text="articles", row=r, col=1)
+    fig.update_xaxes(title_text="unique articles", row=5, col=1)
     fig.update_xaxes(title_text="unique articles", row=6, col=1)
-    fig.update_xaxes(title_text="unique articles", row=7, col=1)
-    fig.update_yaxes(title_text="join rate", row=8, col=1)
-    fig.update_layout(template="seaborn", height=380 * 8, barmode="group", showlegend=False,
+    fig.update_yaxes(title_text="join rate", row=7, col=1)
+    fig.update_layout(template="seaborn", height=380 * 7, barmode="group", showlegend=False,
                       title={"text": "Portfolio Wave Rider — news retrieval dashboard (GKG + Wayback)",
                              "y": 0.999, "yanchor": "top"},
                       margin={"t": 70, "l": 200}, hovermode="closest")
@@ -218,10 +215,12 @@ def build():
         return (f'<div style="display:inline-block;margin:0 1.6em 0.6em 0">'
                 f'<b style="font-size:1.5em;color:#0b7285">{v}</b><br>'
                 f'<span style="font-size:.8em;color:#555">{label}</span></div>')
+    n_full = sum(1 for n in pool_n if n >= 100)
     cards = (card(f"{corpus_total:,}", "articles gathered (full corpus)")
              + card(len(pools), "pools / weekly rebalances")
+             + card(f"{n_full}/{len(pools)}", "windows filled to the 100-article cap")
              + card(f"{n_uniq:,}", "unique articles shown to curator")
-             + card(f"{avg_hit:.0f}%", "avg Wayback join-rate / window (plot 8)")
+             + card(f"{avg_hit:.0f}%", "avg Wayback join-rate / window (plot 7)")
              + card("$0", "BigQuery cost (free tier)"))
     ts = datetime.now().strftime("%Y-%m-%d %H:%M %Z").strip()
 
