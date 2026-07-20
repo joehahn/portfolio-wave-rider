@@ -219,7 +219,7 @@ def main() -> int:
         ("Risk aversion (&lambda;)", f"{_BASE_RISK_AVERSION:g}", ""),
         ("Lookback (&mu;/&Sigma; estimation)", f"{_BASE_LOOKBACK:g}y", ""),
         ("Concentration cap (max weight)", f"{_BASE_MAX_WEIGHT:.0%}", ""),
-        ("Min trade size", f"${float(_FM['min_trade_size_usd']):,.0f}",
+        ("Min trade size", f"{float(_FM['min_trade_size_frac']):.0%} of portfolio",
          "smallest proposed trade; smaller positions are filtered out"),
         ("Max watchlist size", "swept &darr;", "this sweep's variable"),
         ("Always-include anchors", ", ".join(_FM["always_include"]) or "—",

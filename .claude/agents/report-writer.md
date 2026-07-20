@@ -257,8 +257,8 @@ match.
 - The "Profile conflicts" section must be present even when empty
   (write "None — the recommendation satisfies every stated constraint").
   Its emptiness or non-emptiness is the demo's central signal to the user.
-- Never recommend a trade smaller than `min_trade_size_usd` from the
-  profile.
+- Never recommend a trade smaller than `min_trade_size_frac` (a fraction of
+  portfolio value, e.g. 0.1 = 10%) from the profile.
 - Never recommend a position in an excluded sector without flagging it
   as a conflict.
 - The report ends with the `Caveats` section. No closing opinions or

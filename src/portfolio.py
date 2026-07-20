@@ -58,11 +58,12 @@ _FINANCIAL_MODEL_DEFAULTS: dict[str, Any] = {
     # level, not inside the financial_model block; load_financial_model reads
     # it from there so the cap has a single source of truth (investor_profile).
     "concentration_cap": 0.25,
-    # min_trade_size_usd is the smallest dollar trade the optimizer will
-    # propose; positions below it are filtered out of the recommendation. Like
-    # concentration_cap it lives at the profile's top level, not inside the
+    # min_trade_size_frac is the smallest trade the optimizer will propose,
+    # expressed as a FRACTION of current portfolio value (0.1 = 10%); proposed
+    # trades below frac * portfolio_value are filtered out of the recommendation.
+    # Like concentration_cap it lives at the profile's top level, not inside the
     # financial_model block.
-    "min_trade_size_usd": 1000.0,
+    "min_trade_size_frac": 0.1,
     # always_include: tickers permanently injected into the optimizer universe
     # as safe-haven / diversification anchors (e.g. SPY, AGG, IAU). They live
     # as shares=0 rows in holdings.csv but are OUTSIDE the curator's
@@ -78,7 +79,7 @@ def load_financial_model(profile_path: str = "investor_profile.md") -> dict[str,
     Returns a dict with the `financial_model` fields (`risk_aversion`,
     `risk_free_rate`, `lookback_period`, `rebalance_period`,
     `max_watchlist_size`) plus the top-level keys `concentration_cap`,
-    `min_trade_size_usd`, and `always_include`; any missing field falls back
+    `min_trade_size_frac`, and `always_include`; any missing field falls back
     to the hard-coded default. If the profile file doesn't exist or has no
     front matter, all defaults are returned.
 
@@ -109,9 +110,11 @@ def load_financial_model(profile_path: str = "investor_profile.md") -> dict[str,
     # concentration_cap is a top-level profile key, not part of financial_model.
     if "concentration_cap" in data:
         out["concentration_cap"] = data["concentration_cap"]
-    # min_trade_size_usd is also a top-level key (smallest proposed trade).
-    if "min_trade_size_usd" in data:
-        out["min_trade_size_usd"] = data["min_trade_size_usd"]
+    # min_trade_size_frac is also a top-level key (smallest proposed trade, as a
+    # fraction of portfolio value). Accept the legacy min_trade_size_usd key too,
+    # but the fraction wins if both are present.
+    if "min_trade_size_frac" in data:
+        out["min_trade_size_frac"] = data["min_trade_size_frac"]
     # always_include is also a top-level key; normalize to uppercase tickers.
     if "always_include" in data:
         out["always_include"] = [str(t).upper().strip()
@@ -2346,23 +2349,19 @@ def build_dashboard(
     _bh_alloc_html: "str | None" = None
 
     # Pre-compute the trade list before the row layout: when every proposed
-    # trade falls below `min_trade_size_usd` from investor_profile.md the
-    # whole trade-table chart is omitted and subsequent charts shift up.
-    # Also up front so the table row can be sized to fit every trade row
-    # (Plotly Tables truncate instead of scrolling when their subplot
-    # domain is too small). Returns (ticker, action, shares, $, cur, target)
-    # tuples plus running totals; empty list when there's nothing to trade.
-    _min_trade_usd = 1.0
-    if is_live:
-        try:
-            import yaml as _yaml
-            import re as _re
-            _profile_text = Path("investor_profile.md").read_text()
-            _m = _re.match(r"^---\s*\n(.*?)\n---\s*\n", _profile_text, _re.DOTALL)
-            _min_trade_usd = float((_yaml.safe_load(_m.group(1)) or {}).get(
-                "min_trade_size_usd", 1.0)) if _m else 1.0
-        except (OSError, ValueError, AttributeError):
-            _min_trade_usd = 1.0
+    # trade falls below `min_trade_size_frac` (a fraction of portfolio value)
+    # from investor_profile.md the whole trade-table chart is omitted and
+    # subsequent charts shift up. Also up front so the table row can be sized
+    # to fit every trade row (Plotly Tables truncate instead of scrolling when
+    # their subplot domain is too small). Returns (ticker, action, shares, $,
+    # cur, target) tuples plus running totals; empty list when nothing to trade.
+    # The fraction is converted to a dollar floor below, once portfolio value
+    # (trade_total_value) is known.
+    _min_trade_frac = load_financial_model().get("min_trade_size_frac", 0.0) if is_live else 0.0
+    try:
+        _min_trade_frac = float(_min_trade_frac)
+    except (TypeError, ValueError):
+        _min_trade_frac = 0.0
     trade_rows: list[tuple] = []
     trade_total_buy = 0.0
     trade_total_sell = 0.0
@@ -2374,6 +2373,9 @@ def build_dashboard(
             _snap_latest_tt = _snaps_tt[_snaps_tt["date"] == _snaps_tt["date"].max()].copy()
             _rec_latest_tt = _recs_tt[_recs_tt["date"] == _recs_tt["date"].max()].copy()
             trade_total_value = float(_snap_latest_tt["value"].sum())
+            # Convert the fractional floor to a dollar floor now that we know the
+            # portfolio value (e.g. frac 0.1 on a $95k book => a $9.5k min trade).
+            _min_trade_usd = _min_trade_frac * trade_total_value
             if trade_total_value > 0:
                 _price_by = dict(zip(_snap_latest_tt["ticker"], _snap_latest_tt["price"]))
                 _shares_by = dict(zip(_snap_latest_tt["ticker"], _snap_latest_tt["shares"]))
@@ -2402,7 +2404,7 @@ def build_dashboard(
             trade_rows = []
 
     # Row layout. Chart 5 (the trade table) is always present on the live
-    # dashboard; rows below min_trade_size_usd are filtered out above, and
+    # dashboard; rows below min_trade_size_frac * portfolio are filtered out above, and
     # when that leaves the table empty only the header renders.
     R_PORTFOLIO       = 1
     R_TURNOVER        = 2
@@ -3359,7 +3361,7 @@ def build_dashboard(
         ("Risk aversion (λ)", f"{_lfm['risk_aversion']:g}", ""),
         ("Lookback (μ/Σ estimation)", f"{_lfm['lookback_period']}", ""),
         ("Concentration cap (max weight)", f"{_lfm['concentration_cap']:.0%}", ""),
-        ("Min trade size", f"${_lfm['min_trade_size_usd']:,.0f}",
+        ("Min trade size", f"{_lfm['min_trade_size_frac']:.0%} of portfolio",
          "smallest proposed trade; smaller positions are filtered out"),
         ("Rebalance cadence", f"{_lfm['rebalance_period']}", ""),
         ("Max watchlist size", f"{_lfm['max_watchlist_size']}", ""),
@@ -3955,7 +3957,7 @@ def build_curator_dashboard(
          f"backtest-only override — live uses {str(_fm['lookback_period'])}" if _lb_ov else ""),
         ("Concentration cap (max weight)", f"{_cap:.0%}",
          f"backtest-only override — live uses {_fm['concentration_cap']:.0%}" if _cap_ov else ""),
-        ("Min trade size", f"${_fm['min_trade_size_usd']:,.0f}",
+        ("Min trade size", f"{_fm['min_trade_size_frac']:.0%} of portfolio",
          "smallest proposed trade; smaller positions are filtered out"),
         ("Max watchlist size", f"{_fm['max_watchlist_size']}", ""),
         ("Always-include anchors", ", ".join(_fm["always_include"]) or "—",
