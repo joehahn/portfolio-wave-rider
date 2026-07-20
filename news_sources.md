@@ -1,13 +1,16 @@
 ---
-# Machine-readable BLOCK list (substring-matched against each article's source domain), read by
-# scripts/gkg_pool.py. This file is tracked (public), unlike investor_profile.md, so the block-list
-# ships with the repo.
-#   source_block: content-farm / low-signal domains dropped from the GKG pool. APPLIED by the current
-#     single-pass gather (broad wave beats, minus these domains). (GHR calls this mill_block.)
-# The ALLOW list (preferred specialty desks — GHR's specialty_allow) is the prose "News sources"
-# section below: the single home for preferred sources AND their rationale, read by the live WebSearch
-# curator. It is NOT machine-parsed yet (single-pass is block-only); when the forward engine needs
-# allow-domains programmatically (task #10) we derive them from that section then.
+# Machine-readable SOURCE lists (substring-matched against each article's source domain), read by
+# scripts/gkg_pool.py. This file is tracked (public), unlike investor_profile.md, so they ship with
+# the repo.
+#   source_block: content-farm / low-signal domains dropped from the GKG pool. APPLIED by the gather
+#     (broad wave beats, minus these domains). (GHR calls this mill_block.)
+#   source_major: recognized wire services / major outlets. Used by the backtest ranker as the
+#     "recognized" tier — a story's salience = how many of THESE (plus the specialty allow-list below)
+#     carried it, and a story's representative URL is preferred from this tier (well-archived). This
+#     scopes salience to credible coverage so viral-but-obscure stories don't dominate.
+# The specialty ALLOW list (preferred niche desks — GHR's specialty_allow) is the prose "News sources"
+# section below: the single home for those sources AND their rationale (read by the live WebSearch
+# curator, and parsed by the ranker as the top authority tier). Recognized = source_major + allow.
 source_block:
   - marketbeat.com
   - tickerreport.com
@@ -26,6 +29,32 @@ source_block:
   - ts2.tech
   - pr-inside.com
   - financialnewsmedia.com
+source_major:
+  - reuters.com
+  - apnews.com
+  - bloomberg.com
+  - cnbc.com
+  - wsj.com
+  - ft.com
+  - nytimes.com
+  - washingtonpost.com
+  - marketwatch.com
+  - barrons.com
+  - forbes.com
+  - businessinsider.com
+  - fortune.com
+  - investors.com
+  - seekingalpha.com
+  - benzinga.com
+  - theverge.com
+  - techcrunch.com
+  - axios.com
+  - cnn.com
+  - bbc.com
+  - bbc.co.uk
+  - theguardian.com
+  - npr.org
+  - yahoo.com
 ---
 
 # News sources
