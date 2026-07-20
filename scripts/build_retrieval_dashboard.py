@@ -201,9 +201,13 @@ def build():
     # 5. per-wave horizontal bars
     fig.add_trace(go.Bar(x=[v for _, v in wv][::-1], y=[k for k, _ in wv][::-1],
                          orientation="h", marker_color=GREEN), row=5, col=1)
-    # 6. source utilization horizontal, tier-colored (all recognized incl zeros + top other)
-    fig.add_trace(go.Bar(x=[c for _, c, _ in src_rows], y=[s for s, _, _ in src_rows],
-                         orientation="h", marker_color=[col for _, _, col in src_rows]), row=6, col=1)
+    # 6. source utilization horizontal, tier-colored (all recognized incl zeros + top other).
+    # Log x-axis; a zero-contributor is plotted at 0.5 so it shows a tiny bar (log 0 is undefined).
+    # The hover keeps the TRUE count so the 0.5 substitution isn't misleading.
+    fig.add_trace(go.Bar(x=[c if c > 0 else 0.5 for _, c, _ in src_rows], y=[s for s, _, _ in src_rows],
+                         orientation="h", marker_color=[col for _, _, col in src_rows],
+                         customdata=[c for _, c, _ in src_rows],
+                         hovertemplate="%{y}: %{customdata} articles<extra></extra>"), row=6, col=1)
     # 7. wayback join-rate over time
     fig.add_trace(go.Scatter(x=as_of, y=hit_rate, mode="lines+markers",
                              line={"color": GREEN, "width": 2}, marker={"size": 5}), row=7, col=1)
@@ -211,7 +215,7 @@ def build():
     for r in (1, 2, 3, 4):
         fig.update_yaxes(title_text="articles", row=r, col=1)
     fig.update_xaxes(title_text="unique articles", row=5, col=1)
-    fig.update_xaxes(title_text="unique articles", row=6, col=1)
+    fig.update_xaxes(title_text="unique articles (log; 0 plotted at 0.5)", type="log", row=6, col=1)
     fig.update_yaxes(title_text="join rate", row=7, col=1)
     fig.update_layout(template="seaborn", height=int(340 * 9.6), barmode="group", showlegend=False,
                       title={"text": "Portfolio Wave Rider — news retrieval dashboard (GKG + Wayback)",
