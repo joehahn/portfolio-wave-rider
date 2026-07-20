@@ -51,6 +51,10 @@ _FINANCIAL_MODEL_DEFAULTS: dict[str, Any] = {
     # rebalance (typically == the rebalance cadence in days).
     "optimizer_lookback_days": None,
     "news_lookback_days": None,
+    # max_articles: GKG-backtest retrieval knob — max ranked articles fed to the curator per rebalance.
+    # Backtest-only (live WebSearch sets its own per-query result count); kept here next to
+    # news_lookback_days so the two "how much news the curator reads" knobs live together.
+    "max_articles": 100,
     "rebalance_period": "monthly",
     "max_watchlist_size": 12,
     # concentration_cap is the optimizer's per-position max weight (the

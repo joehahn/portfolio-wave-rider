@@ -276,7 +276,7 @@ def main(argv=None) -> int:
     ap.add_argument("--max-watchlist-size", type=int, default=None, help="default: profile max_watchlist_size")
     ap.add_argument("--max-weight", type=float, default=None, help="default: profile concentration_cap")
     ap.add_argument("--risk-aversion", type=float, default=None, help="default: profile risk_aversion")
-    ap.add_argument("--max-articles", type=int, default=100)
+    ap.add_argument("--max-articles", type=int, default=None, help="default: profile max_articles")
     ap.add_argument("--starter", nargs="+", default=["AAPL", "MSFT", "GOOGL", "NVDA", "SPY"])
     ap.add_argument("--model", default="claude-sonnet-5")
     ap.add_argument("--run-dir", required=True)
@@ -300,6 +300,8 @@ def main(argv=None) -> int:
         a.max_weight = float(fm["concentration_cap"])
     if a.risk_aversion is None:
         a.risk_aversion = float(fm["risk_aversion"])
+    if a.max_articles is None:
+        a.max_articles = int(fm.get("max_articles") or 100)
 
     news_lb = a.news_lookback_days
     run_dir = ROOT / a.run_dir; run_dir.mkdir(parents=True, exist_ok=True)
