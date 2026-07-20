@@ -179,16 +179,16 @@ def build():
         "4. Unique articles by DAY OF WEEK<br><sub><i>publication cadence: weekend dip is normal news "
         "behavior, not a gap</i></sub>",
         "5. Unique articles by wave<br><sub><i>coverage by theme (first matched wave, else general)</i></sub>",
-        f"6. Source utilization — every configured desk (incl. {n_rec_zero} that GKG surfaced ZERO "
+        "6. Wayback join-rate over the year<br><sub><i>per-window archived-lede yield (hit_rate): the "
+        "quality of the Wayback join across the run</i></sub>",
+        f"7. Source utilization — every configured desk (incl. {n_rec_zero} that GKG surfaced ZERO "
         f"times) + top {N_GREY} others<br><sub><i>green = specialty (2.0), blue = major wire (1.5), "
         "grey = other (1.0); zero-length bars = configured desks GKG never indexed (e.g. paywalled "
         f"wires). {n_src_total} distinct sources appeared overall.</i></sub>",
-        "7. Wayback join-rate over the year<br><sub><i>per-window archived-lede yield (hit_rate): the "
-        "quality of the Wayback join across the run</i></sub>",
     )
-    # Plot 6 lists ~70 domains, so give its row much more vertical room than the others.
+    # Plot 7 lists ~70 domains, so give its row much more vertical room than the others.
     fig = make_subplots(rows=7, cols=1, vertical_spacing=0.03, subplot_titles=titles,
-                        row_heights=[1, 1, 1, 1, 1, 3.6, 1])
+                        row_heights=[1, 1, 1, 1, 1, 1, 3.6])
 
     # 1. articles per month (GKG only)
     fig.add_trace(go.Bar(x=mo_keys, y=[mon_g[m] for m in mo_keys], marker_color=BLUE, name="GKG"), row=1, col=1)
@@ -201,22 +201,22 @@ def build():
     # 5. per-wave horizontal bars
     fig.add_trace(go.Bar(x=[v for _, v in wv][::-1], y=[k for k, _ in wv][::-1],
                          orientation="h", marker_color=GREEN), row=5, col=1)
-    # 6. source utilization horizontal, tier-colored (all recognized incl zeros + top other).
+    # 6. wayback join-rate over time
+    fig.add_trace(go.Scatter(x=as_of, y=hit_rate, mode="lines+markers",
+                             line={"color": GREEN, "width": 2}, marker={"size": 5}), row=6, col=1)
+    # 7. source utilization horizontal, tier-colored (all recognized incl zeros + top other).
     # Log x-axis; a zero-contributor is plotted at 0.5 so it shows a tiny bar (log 0 is undefined).
     # The hover keeps the TRUE count so the 0.5 substitution isn't misleading.
     fig.add_trace(go.Bar(x=[c if c > 0 else 0.5 for _, c, _ in src_rows], y=[s for s, _, _ in src_rows],
                          orientation="h", marker_color=[col for _, _, col in src_rows],
                          customdata=[c for _, c, _ in src_rows],
-                         hovertemplate="%{y}: %{customdata} articles<extra></extra>"), row=6, col=1)
-    # 7. wayback join-rate over time
-    fig.add_trace(go.Scatter(x=as_of, y=hit_rate, mode="lines+markers",
-                             line={"color": GREEN, "width": 2}, marker={"size": 5}), row=7, col=1)
+                         hovertemplate="%{y}: %{customdata} articles<extra></extra>"), row=7, col=1)
 
     for r in (1, 2, 3, 4):
         fig.update_yaxes(title_text="articles", row=r, col=1)
     fig.update_xaxes(title_text="unique articles", row=5, col=1)
-    fig.update_xaxes(title_text="unique articles (log; 0 plotted at 0.5)", type="log", row=6, col=1)
-    fig.update_yaxes(title_text="join rate", row=7, col=1)
+    fig.update_yaxes(title_text="join rate", row=6, col=1)
+    fig.update_xaxes(title_text="unique articles (log; 0 plotted at 0.5)", type="log", row=7, col=1)
     fig.update_layout(template="seaborn", height=int(340 * 9.6), barmode="group", showlegend=False,
                       title={"text": "Portfolio Wave Rider — news retrieval dashboard (GKG + Wayback)",
                              "y": 0.999, "yanchor": "top"},
@@ -233,8 +233,8 @@ def build():
              + card(len(pools), "pools / weekly rebalances")
              + card(f"{n_full}/{len(pools)}", "windows filled to the 100-article cap")
              + card(f"{n_uniq:,}", "unique articles shown to curator")
-             + card(f"{avg_hit:.0f}%", "avg Wayback join-rate / window (plot 7)")
-             + card(f"{n_rec_zero}/{len(rec_rows)}", "configured desks GKG surfaced 0x (plot 6)")
+             + card(f"{avg_hit:.0f}%", "avg Wayback join-rate / window (plot 6)")
+             + card(f"{n_rec_zero}/{len(rec_rows)}", "configured desks GKG surfaced 0x (plot 7)")
              + card("$0", "BigQuery cost (free tier)"))
     ts = datetime.now().strftime("%Y-%m-%d %H:%M %Z").strip()
 
