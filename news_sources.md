@@ -4,13 +4,15 @@
 # the repo.
 #   source_block: content-farm / low-signal domains dropped from the GKG pool. APPLIED by the gather
 #     (broad wave beats, minus these domains). (GHR calls this mill_block.)
-#   source_major: recognized wire services / major outlets. Used by the backtest ranker as the
-#     "recognized" tier — a story's salience = how many of THESE (plus the specialty allow-list below)
-#     carried it, and a story's representative URL is preferred from this tier (well-archived). This
-#     scopes salience to credible coverage so viral-but-obscure stories don't dominate.
-# The specialty ALLOW list (preferred niche desks — GHR's specialty_allow) is the prose "News sources"
-# section below: the single home for those sources AND their rationale (read by the live WebSearch
-# curator, and parsed by the ranker as the top authority tier). Recognized = source_major + allow.
+#   source_major: broad wire services / major outlets — the ranker's MID authority tier (weight 1.5,
+#     blue in the retrieval dashboard). A story's salience = how many RECOGNIZED outlets carried it
+#     (major + specialty), which scopes salience to credible coverage so viral-but-obscure stories
+#     don't dominate; the representative URL is preferred from a recognized outlet (well-archived).
+# The SPECIALTY desks (niche, wave-specific — the ranker's TOP tier, weight 2.0, green in the dashboard)
+# are the prose "Specialty news sources" section below: their single home + rationale, read by the live
+# WebSearch curator and parsed by the ranker. A domain in BOTH lists is treated as MAJOR (major wins),
+# so the broad wires stay 1.5 even though the prose also lists them for the live curator's convenience.
+# Recognized = source_major (major) + specialty prose (minus any that are also major).
 source_block:
   - marketbeat.com
   - tickerreport.com
@@ -57,14 +59,18 @@ source_major:
   - yahoo.com
 ---
 
-# News sources
+# Specialty news sources
 
-Curated list of news sources the `watchlist-curator` subagent consults
-first when researching tickers each rebalance period. Grouped by the
-technology waves named in `investor_profile.md`. Sections appear in the
-same order the profile lists them: the current wave (AI) first, then the
-next waves in nearest-term-impact order, with general markets last as a
-catch-all.
+Curated list of **specialty** news desks the `watchlist-curator` subagent
+consults first when researching tickers each rebalance period. These are the
+niche, wave-specific desks that carry the early/deep coverage — the top
+authority tier (the retrieval dashboard colors them **green**, weight 2.0). The
+broad **major wires** (Reuters, AP, Bloomberg, CNBC, WSJ, FT…) are the separate
+`source_major` front-matter list above (the mid tier, **blue**, weight 1.5) —
+consult them freely; any wire that also appears below is treated as major, not
+specialty. Grouped by the technology waves named in `investor_profile.md`, in
+the profile's order: the current wave (AI) first, then the next waves in
+nearest-term-impact order, with general markets last as a catch-all.
 
 **How this is used.** For each ticker the curator is considering (an
 add candidate, a current holding, or a potential remove), it picks the

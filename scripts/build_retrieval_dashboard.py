@@ -153,7 +153,9 @@ def build():
 
     # ---- top source domains (unique articles), colored by authority tier ----
     src_c = Counter(a["source"] for a in articles if a["source"])
-    top_src = src_c.most_common(18)
+    N_SRC = 25
+    top_src = src_c.most_common(N_SRC)
+    n_src_total = len(src_c)
 
     def tier_color(src):
         if g._domain_in(src, g.PREFERRED_DOMAINS):
@@ -174,8 +176,8 @@ def build():
         "4. Unique articles by DAY OF WEEK<br><sub><i>publication cadence: weekend dip is normal news "
         "behavior, not a gap</i></sub>",
         "5. Unique articles by wave<br><sub><i>coverage by theme (first matched wave, else general)</i></sub>",
-        "6. Top source domains — tier-colored<br><sub><i>green = preferred/specialty desk, blue = major "
-        "wire/outlet, grey = other</i></sub>",
+        f"6. Top {N_SRC} source domains (of {n_src_total} total) — tier-colored<br><sub><i>green = "
+        "specialty desk (2.0), blue = major wire/outlet (1.5), grey = other (1.0)</i></sub>",
         "7. Wayback join-rate over the year<br><sub><i>per-window archived-lede yield (hit_rate): the "
         "quality of the Wayback join across the run</i></sub>",
     )

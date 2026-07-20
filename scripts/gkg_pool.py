@@ -79,11 +79,12 @@ def _profile_source_lists() -> "tuple[set, list]":
     return block, allow
 
 
-def _preferred_source_domains() -> "set":
-    """Preferred-source domains parsed from news_sources.md's prose 'News sources' section (the
-    allow-list lives there, not in the front matter). First real consumer of the allow-list: the
-    backtest ranking upweights these authoritative desks. Returns bare domains (www. stripped).
-    Robust to prose edits — it just harvests every https URL below the front matter."""
+def _specialty_source_domains() -> "set":
+    """Specialty-desk domains parsed from news_sources.md's prose section — the top authority tier
+    (weight 2.0), the niche wave-specific desks that carry the early/deep coverage. Returns bare
+    domains (www. stripped). Robust to prose edits: it just harvests every https URL below the
+    front matter. The caller subtracts MAJOR_DOMAINS so a broad wire that also appears in the prose
+    (e.g. reuters.com in the general-markets catch-all) is treated as MAJOR, not specialty."""
     import re
     p = ROOT / "news_sources.md"
     if not p.exists():
@@ -96,13 +97,11 @@ def _preferred_source_domains() -> "set":
     return doms
 
 
-PREFERRED_DOMAINS = _preferred_source_domains()   # specialty allow-list (top authority tier)
-
-
 def _major_source_domains() -> "set":
-    """Recognized wire / major-outlet domains from news_sources.md's `source_major` front-matter list.
-    The backtest ranker counts a story's salience over these plus the specialty allow-list, so viral-
-    but-obscure stories (carried only by content-farm-adjacent locals) don't dominate."""
+    """Major wire / mainstream-outlet domains from news_sources.md's `source_major` front-matter list —
+    the mid authority tier (weight 1.5). The ranker counts a story's salience over these plus the
+    specialty desks, so viral-but-obscure stories (carried only by content-farm-adjacent locals)
+    don't dominate."""
     import re
     import yaml
     p = ROOT / "news_sources.md"
@@ -115,8 +114,12 @@ def _major_source_domains() -> "set":
     return {str(s).lower() for s in (data.get("source_major") or [])}
 
 
-MAJOR_DOMAINS = _major_source_domains()                  # recognized wires / major outlets (mid tier)
-RECOGNIZED_DOMAINS = PREFERRED_DOMAINS | MAJOR_DOMAINS    # credible carriers: salience is counted here
+MAJOR_DOMAINS = _major_source_domains()                        # major wires (mid tier, 1.5)
+PREFERRED_DOMAINS = _specialty_source_domains() - MAJOR_DOMAINS  # specialty desks (top tier, 2.0);
+#   a domain in BOTH the prose and source_major is MAJOR, not specialty (major wins the overlap).
+
+
+RECOGNIZED_DOMAINS = PREFERRED_DOMAINS | MAJOR_DOMAINS    # specialty + major = credible carriers (salience counted here)
 
 
 def _domain_in(src: str, domains) -> bool:
