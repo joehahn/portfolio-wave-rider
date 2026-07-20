@@ -56,12 +56,15 @@ ORG_STOPLIST = {s.lower() for s in _cfg["org_stoplist"]}   # non-company ENTITIE
 
 
 def _profile_source_lists() -> "tuple[set, list]":
-    """Read source_block / source_allow (domain substrings) from news_sources.md's YAML front matter
-    — the single source of truth for SOURCE curation. news_sources.md is tracked (public), unlike
-    investor_profile.md, so the block-list ships with the repo. Returns (block_set, allow_list); empty
-    on any missing/parse issue (a missing news_sources.md is non-fatal per CLAUDE.md — the gather then
-    runs unfiltered). Only source_block is applied by the single-pass gather (drop content-farm
-    domains); source_allow is exposed but not yet used here (staged for the forward engine, task #10)."""
+    """Read the source_block domain list from news_sources.md's YAML front matter — the single source
+    of truth for the BLOCK list. news_sources.md is tracked (public), unlike investor_profile.md, so
+    the block-list ships with the repo. Returns (block_set, allow_list); empty on any missing/parse
+    issue (a missing news_sources.md is non-fatal per CLAUDE.md — the gather then runs unfiltered).
+
+    The ALLOW list is intentionally NOT in the front matter: it lives as the prose 'News sources'
+    section (preferred desks + rationale, read by the live curator) since single-pass is block-only.
+    `allow` is therefore normally empty; it stays wired so that when the forward engine (task #10)
+    needs machine-readable allow-domains, we can populate source_allow here without a signature change."""
     import re
     import yaml
     p = ROOT / "news_sources.md"

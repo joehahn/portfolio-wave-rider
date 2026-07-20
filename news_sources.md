@@ -1,13 +1,13 @@
 ---
-# Machine-readable SOURCE lists (substring-matched against each article's source domain). This is
-# the single source of truth for source curation, read by scripts/gkg_pool.py. This file is tracked
-# (public), unlike investor_profile.md, so the block-list ships with the repo. The prose below is the
-# human rationale for each allow-list source; keep the two roughly in sync when editing.
+# Machine-readable BLOCK list (substring-matched against each article's source domain), read by
+# scripts/gkg_pool.py. This file is tracked (public), unlike investor_profile.md, so the block-list
+# ships with the repo.
 #   source_block: content-farm / low-signal domains dropped from the GKG pool. APPLIED by the current
-#     single-pass gather (broad wave beats, minus these domains).
-#   source_allow: preferred specialty desks per wave. NOT applied by the single-pass gather (block-only);
-#     it is the designated home for the allow-list, staged for the forward/WebSearch engine (task #10).
-#     (GHR calls these mill_block / specialty_allow.)
+#     single-pass gather (broad wave beats, minus these domains). (GHR calls this mill_block.)
+# The ALLOW list (preferred specialty desks — GHR's specialty_allow) is the prose "News sources"
+# section below: the single home for preferred sources AND their rationale, read by the live WebSearch
+# curator. It is NOT machine-parsed yet (single-pass is block-only); when the forward engine needs
+# allow-domains programmatically (task #10) we derive them from that section then.
 source_block:
   - marketbeat.com
   - tickerreport.com
@@ -26,53 +26,6 @@ source_block:
   - ts2.tech
   - pr-inside.com
   - financialnewsmedia.com
-source_allow:
-  # AI
-  - stratechery.com
-  - theinformation.com
-  - semianalysis.com
-  - technologyreview.com
-  - arstechnica.com
-  - anthropic.com
-  - openai.com
-  - garymarcus.substack.com        # skeptic foil (LLM-hype critic)
-  # rockets & spacecraft
-  - spacenews.com
-  - payloadspace.com
-  - nasaspaceflight.com
-  # robotics
-  - spectrum.ieee.org
-  - therobotreport.com
-  - roboticsbusinessreview.com
-  # engineered biology
-  - endpts.com
-  - statnews.com
-  - biopharmadive.com
-  - nature.com
-  - synbiobeta.com
-  - science.org                    # In the Pipeline (Derek Lowe) skeptic foil
-  # quantum computing
-  - quantumcomputingreport.com
-  - ibm.com
-  - quantumai.google
-  - scottaaronson.blog             # skeptic foil (quantum-hype critic)
-  # nuclear
-  - world-nuclear-news.org
-  - fusionindustryassociation.org
-  # defense / rearmament
-  - breakingdefense.com
-  - defensenews.com
-  - janes.com
-  - warontherocks.com
-  - pogo.org                       # skeptic foil (defense-spending watchdog)
-  # general markets
-  - bloomberg.com
-  - reuters.com
-  - ft.com
-  - wsj.com
-  - sec.gov
-  - finance.yahoo.com
-  - zerohedge.com                  # contrarian macro; cross-check, not primary
 ---
 
 # News sources
