@@ -79,6 +79,46 @@ def _profile_source_lists() -> "tuple[set, list]":
     return block, allow
 
 
+def _preferred_source_domains() -> "set":
+    """Preferred-source domains parsed from news_sources.md's prose 'News sources' section (the
+    allow-list lives there, not in the front matter). First real consumer of the allow-list: the
+    backtest ranking upweights these authoritative desks. Returns bare domains (www. stripped).
+    Robust to prose edits — it just harvests every https URL below the front matter."""
+    import re
+    p = ROOT / "news_sources.md"
+    if not p.exists():
+        return set()
+    text = re.sub(r"^---\s*\n.*?\n---\s*\n", "", p.read_text(), count=1, flags=re.DOTALL)
+    doms = set()
+    for m in re.finditer(r"https?://([A-Za-z0-9.-]+)", text):
+        d = m.group(1).lower()
+        doms.add(d[4:] if d.startswith("www.") else d)
+    return doms
+
+
+PREFERRED_DOMAINS = _preferred_source_domains()   # specialty allow-list (top authority tier)
+
+
+def _major_source_domains() -> "set":
+    """Recognized wire / major-outlet domains from news_sources.md's `source_major` front-matter list.
+    The backtest ranker counts a story's salience over these plus the specialty allow-list, so viral-
+    but-obscure stories (carried only by content-farm-adjacent locals) don't dominate."""
+    import re
+    import yaml
+    p = ROOT / "news_sources.md"
+    if not p.exists():
+        return set()
+    m = re.match(r"^---\s*\n(.*?)\n---\s*\n", p.read_text(), re.DOTALL)
+    if not m:
+        return set()
+    data = yaml.safe_load(m.group(1)) or {}
+    return {str(s).lower() for s in (data.get("source_major") or [])}
+
+
+MAJOR_DOMAINS = _major_source_domains()                  # recognized wires / major outlets (mid tier)
+RECOGNIZED_DOMAINS = PREFERRED_DOMAINS | MAJOR_DOMAINS    # credible carriers: salience is counted here
+
+
 SOURCE_BLOCKLIST, SOURCE_ALLOWLIST = _profile_source_lists()   # content-farm domains / preferred desks
 _KW_WAVE = {kw.lower(): wave for wave, kws in WAVE_KEYWORDS.items() for kw in kws}
 

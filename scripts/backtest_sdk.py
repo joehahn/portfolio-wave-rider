@@ -23,6 +23,7 @@ from __future__ import annotations
 import argparse
 import collections
 import json
+import math
 import re
 import sys
 import time
@@ -55,27 +56,26 @@ def _anthropic():
 
 
 # ----------------------------------------------------------------- retrieval (article list)
-def build_article_pool(bq, as_of: date, news_lookback_days: int, cutoff: date,
-                       max_articles: int, run_dir: Path) -> list[dict]:
-    """Date-clean article list for the window (as_of - news_lookback, as_of], title + Wayback lede,
-    sampled evenly per-day (not top-by-recency, which collapses to the newest day). Cached by window."""
-    lo = as_of - timedelta(days=news_lookback_days)
-    cache = run_dir / "_cache" / f"arts-{lo}-{as_of}.json"
-    if cache.exists():
-        return json.loads(cache.read_text())
-    cache.parent.mkdir(parents=True, exist_ok=True)
+# INGESTION is decoupled from the curator's read window: the whole backtest period is pulled from GKG
+# ONCE into a per-day corpus (ingest_gkg_corpus), and each rebalance's pool is a pure SLICE of that
+# corpus (build_article_pool). So changing news_lookback_days never re-queries GKG — it just re-slices.
+CORPUS_INGEST_BUFFER = 95   # extra days pulled BEFORE the first rebalance so any news_lookback up to a
+                            # quarter is already in the corpus (no GKG re-pull when the window widens).
 
-    kw = g._keyword_regex()
-    sql = f"""SELECT {', '.join(g._FIELDS)} FROM `{g.TABLE}`
-      WHERE _PARTITIONTIME BETWEEN TIMESTAMP('{lo}') AND TIMESTAMP('{as_of}')
-        AND TranslationInfo IS NULL
-        AND (REGEXP_CONTAINS(DocumentIdentifier, r'{kw}') OR REGEXP_CONTAINS(Extras, r'{kw}'))"""
-    dry = bq.query(sql, job_config=bigquery.QueryJobConfig(dry_run=True))
-    if dry.total_bytes_processed / 1e9 > g.MAX_SCAN_GB:
-        sys.exit(f"cost guard: {dry.total_bytes_processed/1e9:.0f} GB")
-    rows = list(bq.query(sql).result())
 
-    seen, by_day = set(), collections.defaultdict(list)
+def _month_starts(start: date, end: date) -> list[date]:
+    """First-of-month dates spanning [start, end] inclusive (month chunks for the GKG scan)."""
+    out, d = [], date(start.year, start.month, 1)
+    while d <= end:
+        out.append(d)
+        d = date(d.year + (d.month == 12), (d.month % 12) + 1, 1)
+    return out
+
+
+def _filtered_articles(rows) -> list[dict]:
+    """Apply the source-block / spam / wave / subject-org filters to raw GKG rows -> article dicts
+    (no cross-day dedup here; the read layer dedups syndicated titles across its window)."""
+    arts = []
     for r in rows:
         url = r["DocumentIdentifier"] or ""
         src = (r["SourceCommonName"] or "").lower()
@@ -85,20 +85,132 @@ def build_article_pool(bq, as_of: date, news_lookback_days: int, cutoff: date,
         if g.SPAM_TITLE_RE.search(title) or not g._article_waves(f"{title} {url}") \
            or not g._subject_orgs(r["V2Organizations"]):
             continue
-        nt = re.sub(r"[^a-z0-9 ]", "", title.lower()).strip()
-        if nt in seen:
-            continue
-        seen.add(nt)
-        d = g._gkg_date(r["DATE"])
-        by_day[d].append({"title": title, "date": d, "source": r["SourceCommonName"] or "", "url": url})
+        arts.append({"title": title, "date": g._gkg_date(r["DATE"]),
+                     "source": r["SourceCommonName"] or "", "url": url})
+    return arts
 
-    # even per-day sampling up to max_articles
-    per_day = max(1, max_articles // max(len(by_day), 1))
-    arts = [a for d in sorted(by_day) for a in by_day[d][:per_day]][:max_articles]
-    # join Wayback ledes at the DECISION cutoff, CONCURRENTLY (6-worker pool) — CDX snapshot
-    # lookups are individually slow (7-22s) but archive.org isn't rate-limiting, so overlapping
-    # them turns ~3 ledes/min (serial) into ~40/min. Per-URL cache is shared, so re-runs are free.
-    ledes = w.wayback_ledes([a["url"] for a in arts], cutoff)
+
+def ingest_gkg_corpus(bq, start: date, end: date, run_dir: Path) -> None:
+    """Pull + filter the WHOLE GKG window ONCE into per-day caches (_corpus/gkg-<date>.json). The
+    per-rebalance pool is then a pure slice of these day-files, so widening news_lookback_days never
+    re-queries GKG. No ledes are fetched here (they are as_of-dependent, joined at read time); the
+    corpus is purely the date-honest article metadata. Idempotent: a month whose every day-file
+    already exists is skipped, so a re-run costs only the BigQuery scans for genuinely-new days."""
+    cdir = run_dir / "_corpus"
+    cdir.mkdir(parents=True, exist_ok=True)
+    kw = g._keyword_regex()
+    for ms in _month_starts(start, end):
+        me = date(ms.year + (ms.month == 12), (ms.month % 12) + 1, 1) - timedelta(days=1)
+        lo, hi = max(ms, start), min(me, end)
+        days = [lo + timedelta(days=i) for i in range((hi - lo).days + 1)]
+        if all((cdir / f"gkg-{d}.json").exists() for d in days):
+            continue
+        sql = f"""SELECT {', '.join(g._FIELDS)} FROM `{g.TABLE}`
+          WHERE _PARTITIONTIME BETWEEN TIMESTAMP('{lo}') AND TIMESTAMP('{hi} 23:59:59')
+            AND TranslationInfo IS NULL
+            AND (REGEXP_CONTAINS(DocumentIdentifier, r'{kw}') OR REGEXP_CONTAINS(Extras, r'{kw}'))"""
+        dry = bq.query(sql, job_config=bigquery.QueryJobConfig(dry_run=True))
+        if dry.total_bytes_processed / 1e9 > g.MAX_SCAN_GB:
+            sys.exit(f"cost guard: {dry.total_bytes_processed/1e9:.0f} GB for {lo}..{hi}")
+        by_day = collections.defaultdict(list)
+        for art in _filtered_articles(bq.query(sql).result()):
+            by_day[art["date"]].append(art)
+        for d in days:                                  # one file per day (empty list if no articles)
+            (cdir / f"gkg-{d}.json").write_text(json.dumps(by_day.get(str(d), [])))
+        print(f"  corpus {lo}..{hi}: {sum(len(v) for v in by_day.values())} articles", file=sys.stderr)
+
+
+def _authority(source: str) -> float:
+    """Source-authority multiplier for ranking, mimicking a search engine's authority bias:
+    specialty allow-list (2.0) > recognized major outlets (1.5) > long tail (1.0). Block-list
+    domains are already dropped upstream."""
+    src = (source or "").lower()
+    if any(dom in src for dom in g.PREFERRED_DOMAINS):
+        return 2.0
+    if any(dom in src for dom in g.MAJOR_DOMAINS):
+        return 1.5
+    return 1.0
+
+
+def build_article_pool(as_of: date, news_lookback_days: int,
+                       max_articles: int, run_dir: Path) -> list[dict]:
+    """Assemble one rebalance's pool by SLICING the pre-ingested corpus for (as_of - news_lookback,
+    as_of], then RANKING it like a search engine (so the curator's input resembles live WebSearch),
+    NOT sampling arbitrarily. No GKG query here — changing news_lookback_days only re-slices.
+
+    Ranking (all signals date-honest, so no PageRank-mooning):
+      1. Salience = distinct outlets that carried the story that window (contemporaneous coverage) —
+         syndicated copies are collapsed and COUNTED, not just deduped.
+      2. Authority = preferred-source multiplier (news_sources.md allow-list).
+      3. Per-wave allocation = top-K per wave beat (mimics one query per beat), then fill remaining
+         slots by overall score. This fills the whole max_articles budget (fixes the old undershoot).
+    Ledes are fetched ONLY for the selected top articles, at the as_of cutoff."""
+    cache = run_dir / "_cache" / f"pool-{as_of}-{news_lookback_days}d-{max_articles}.json"
+    if cache.exists():
+        return json.loads(cache.read_text())
+    cache.parent.mkdir(parents=True, exist_ok=True)
+    cdir = run_dir / "_corpus"
+
+    day_arts: list[dict] = []
+    d = as_of - timedelta(days=news_lookback_days)
+    while d <= as_of:
+        f = cdir / f"gkg-{d}.json"
+        if f.exists():
+            day_arts.extend(json.loads(f.read_text()))
+        d += timedelta(days=1)
+
+    # collapse syndicated copies into STORIES; salience = distinct RECOGNIZED outlets (credible
+    # contemporaneous coverage), so a viral story carried only by obscure locals doesn't win. Keep the
+    # highest-authority copy as the representative (so its URL is a well-archived outlet -> better lede).
+    stories: dict = {}
+    for art in day_arts:
+        nt = re.sub(r"[^a-z0-9 ]", "", art["title"].lower()).strip()
+        if not nt:
+            continue
+        s = stories.get(nt)
+        if s is None:
+            s = stories[nt] = {"rep": art, "sources": set(), "rec": set()}
+        src = (art["source"] or "").lower()
+        s["sources"].add(src)
+        if any(dom in src for dom in g.RECOGNIZED_DOMAINS):
+            s["rec"].add(src)
+        if _authority(art["source"]) > _authority(s["rep"]["source"]):
+            s["rep"] = art
+    for s in stories.values():
+        rep, rec = s["rep"], len(s["rec"])
+        # authority x credible-coverage; a story with NO recognized carrier gets a tiny floor score so
+        # it only fills leftover slots on a thin window, never outranks a credibly-covered story.
+        s["score"] = _authority(rep["source"]) * math.log1p(rec) if rec \
+            else 0.05 * math.log1p(len(s["sources"]))
+        s["waves"] = g._article_waves(f"{rep['title']} {rep['url']}") or ["general"]
+
+    # per-wave allocation, then fill remaining slots by overall score
+    by_wave: dict = collections.defaultdict(list)
+    for nt, s in stories.items():
+        for wv in s["waves"]:
+            by_wave[wv].append((nt, s))
+    for wv in by_wave:
+        by_wave[wv].sort(key=lambda kv: -kv[1]["score"])
+    budget = max(1, max_articles // max(len(by_wave), 1))
+    chosen: dict = {}
+    for lst in by_wave.values():
+        for nt, s in lst[:budget]:
+            chosen.setdefault(nt, s)
+    if len(chosen) < max_articles:
+        for nt, s in sorted(stories.items(), key=lambda kv: -kv[1]["score"]):
+            if len(chosen) >= max_articles:
+                break
+            chosen.setdefault(nt, s)
+    picked = sorted(chosen.values(), key=lambda s: -s["score"])[:max_articles]
+    arts = [dict(s["rep"], syndication=len(s["sources"]), recognized=len(s["rec"]),
+                 score=round(s["score"], 3)) for s in picked]
+
+    # Ledes use the as_of cutoff (look-ahead-clean, and gives archive.org the full window to have
+    # captured the URL). A stable per-article cutoff would fully decouple Wayback from the lookback,
+    # but it starves archival time and craters the hit-rate (a 7-day cutoff misses captures that land
+    # weeks after publication). GKG is already decoupled (the corpus); Wayback is pay-once-per-(url,
+    # as_of): widening the lookback fetches only the newly-included older articles' ledes, then caches.
+    ledes = w.wayback_ledes([a["url"] for a in arts], as_of)
     for a in arts:
         a["lede"] = ledes.get(a["url"], "")
     cache.write_text(json.dumps(arts))
@@ -192,10 +304,13 @@ def main(argv=None) -> int:
     sb_hold = run_dir / "_wf_holdings.csv"
     sb_hold.write_text("ticker,shares\n" + "".join(f"{t},0\n" for t in a.starter + anchors))
 
+    # Ingest the whole GKG corpus ONCE (buffered before the first rebalance so any news_lookback is
+    # covered). After this, each pool is a pure slice — changing news_lookback_days re-queries nothing.
+    ingest_gkg_corpus(bq, date.fromisoformat(a.start) - timedelta(days=CORPUS_INGEST_BUFFER),
+                      date.fromisoformat(a.end), run_dir)
     for d in dates:
         cur_wl = portfolio.reconstruct_watchlist_at(d, a.starter, str(hist))
-        arts = build_article_pool(bq, date.fromisoformat(d), news_lb, date.fromisoformat(d),
-                                  a.max_articles, run_dir)
+        arts = build_article_pool(date.fromisoformat(d), news_lb, a.max_articles, run_dir)
         (run_dir / f"{d}-pool.json").write_text(json.dumps(
             {"as_of_date": d, "news_lookback_days": news_lb, "source": "gkg-wayback-articles",
              "n_articles": len(arts), "hit_rate": round(sum(1 for x in arts if x.get("lede"))/max(len(arts),1), 2),

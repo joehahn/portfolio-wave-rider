@@ -350,12 +350,27 @@ def wayback_ledes(urls: list[str], target: date,
     archive.org isn't rate-limiting, so overlapping them is a ~Nx speedup over the serial loop.
     _wb_throttle (slot-reserved) keeps request STARTS <= ~40/min; per-URL caching is unchanged, so
     a re-run is all cache hits. Dedupes URLs. Misses / transient failures map to ''."""
-    uniq = list(dict.fromkeys(u for u in urls if u))
+    return wayback_ledes_dated([(u, target) for u in urls], workers)
+
+
+def wayback_ledes_dated(pairs: "list[tuple[str, date]]",
+                        workers: int = WAYBACK_ENRICH_WORKERS) -> dict[str, str]:
+    """Like wayback_ledes but every URL carries its OWN cutoff: pairs = [(url, cutoff_date), ...].
+    Lets a backtest give each article a STABLE per-article cutoff (e.g. article_date + lag) so an
+    older article's lede is cached at a decision-date-INDEPENDENT key and reused across every rebalance
+    and any news_lookback window — the join that decouples the Wayback pull from the lookback slice.
+    Concurrent (slot-throttled), dedupes by URL (first cutoff wins), returns {url: lede}."""
+    seen: set[str] = set()
+    uniq: list[tuple[str, date]] = []
+    for u, c in pairs:
+        if u and u not in seen:
+            seen.add(u)
+            uniq.append((u, c))
     out: dict[str, str] = {}
     _wb_bulk[0] = True            # cache exhausted-transients as misses (don't re-burn 60-80s/URL)
     try:
         with ThreadPoolExecutor(max_workers=workers) as ex:
-            futs = {ex.submit(wayback_lede, u, target): u for u in uniq}
+            futs = {ex.submit(wayback_lede, u, c): u for u, c in uniq}
             for fut in as_completed(futs):
                 u = futs[fut]
                 try:
