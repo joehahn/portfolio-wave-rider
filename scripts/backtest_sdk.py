@@ -133,8 +133,25 @@ def _authority(source: str) -> float:
     return 1.0
 
 
-def build_article_pool(as_of: date, news_lookback_days: int,
-                       max_articles: int, run_dir: Path) -> list[dict]:
+def _apply_live_fallback(arts: list[dict]) -> None:
+    """LOOK-AHEAD-BIASED lede recovery: for Wayback-MISSES, fetch the source URL as it exists TODAY and
+    extract its lede, writing it to a SEPARATE `lede_live` field (never `lede`) and tagging
+    `lede_source="live"`. Keeping the clean Wayback lede in `lede` untouched means the clean baseline
+    (which reads only `lede`) is unaffected — the two variants differ solely by whether the curator is
+    also shown `lede_live` (render_articles(use_live=...)). This lets one fetch pass serve BOTH the clean
+    (Wayback-only) and the fuller (Wayback+live) A/B runs. Misses that stay dead keep lede_source="none"."""
+    miss = [a["url"] for a in arts if not a.get("lede")]
+    if not miss:
+        return
+    live = w.live_ledes(miss)
+    for a in arts:
+        if not a.get("lede") and live.get(a["url"]):
+            a["lede_live"] = live[a["url"]]
+            a["lede_source"] = "live"
+
+
+def build_article_pool(as_of: date, news_lookback_days: int, max_articles: int,
+                       run_dir: Path, live_fallback: bool = False) -> list[dict]:
     """Assemble one rebalance's pool by SLICING the pre-ingested corpus for (as_of - news_lookback,
     as_of], then RANKING it like a search engine (so the curator's input resembles live WebSearch),
     NOT sampling arbitrarily. No GKG query here — changing news_lookback_days only re-slices.
@@ -148,7 +165,12 @@ def build_article_pool(as_of: date, news_lookback_days: int,
     Ledes are fetched ONLY for the selected top articles, at the as_of cutoff."""
     cache = run_dir / "_cache" / f"pool-{as_of}-{news_lookback_days}d-{max_articles}.json"
     if cache.exists():
-        return json.loads(cache.read_text())
+        arts = json.loads(cache.read_text())
+        if not live_fallback or all("lede_source" in a for a in arts):
+            return arts
+        _apply_live_fallback(arts)          # cache predates live-fallback: augment + rewrite (no re-query)
+        cache.write_text(json.dumps(arts))
+        return arts
     cache.parent.mkdir(parents=True, exist_ok=True)
     cdir = run_dir / "_corpus"
 
@@ -214,15 +236,22 @@ def build_article_pool(as_of: date, news_lookback_days: int,
     ledes = w.wayback_ledes([a["url"] for a in arts], as_of)
     for a in arts:
         a["lede"] = ledes.get(a["url"], "")
+        a["lede_source"] = "wayback" if a["lede"] else "none"   # tagged; live-fallback may upgrade "none"
+    if live_fallback:
+        _apply_live_fallback(arts)
     cache.write_text(json.dumps(arts))
     return arts
 
 
-def render_articles(arts: list[dict]) -> str:
+def render_articles(arts: list[dict], use_live: bool = False) -> str:
+    """Render the pool as the curator's news input. Clean mode (use_live=False) shows only look-ahead-clean
+    Wayback ledes (title-only for misses). Fuller mode (use_live=True) also shows the LOOK-AHEAD-BIASED
+    live-fallback ledes — the A/B variant for measuring how much those biased snippets move decisions."""
     lines = ["DATE-CLEAN NEWS ARTICLES (title + snippet). Discover the tickers; discard non-investable "
              "noise (war/weather events, private cos, foreign/OTC, keyword false-matches):"]
     for a in arts:
-        snip = (a.get("lede") or a["title"])[:220]
+        lede = a.get("lede") or (a.get("lede_live", "") if use_live else "")
+        snip = (lede or a["title"])[:220]
         lines.append(f"\n[{a['date']} | {a['source']}] {a['title'][:90]}\n   {snip} ({a['url']})")
     return "\n".join(lines)
 
@@ -231,9 +260,24 @@ def render_articles(arts: list[dict]) -> str:
 _CURATOR_SYSTEM = (ROOT / ".claude" / "agents" / "watchlist-curator.md").read_text()
 
 
+def _try_parse(txt: str) -> dict | None:
+    """Extract the curator's JSON object, tolerating a trailing-comma emission. Returns the dict, or None
+    if the text has no salvageable JSON object (side-effect-free so the caller can retry)."""
+    m = re.search(r"\{.*\}", txt, re.S)
+    if not m:
+        return None
+    block = m.group(0)
+    for cand in (block, re.sub(r",(\s*[}\]])", r"\1", block)):       # 2nd pass: strip trailing commas
+        try:
+            return json.loads(cand)
+        except json.JSONDecodeError:
+            continue
+    return None
+
+
 def call_curator(cli, model: str, as_of: str, watchlist: list[str], thesis: str, exclusions: str,
                  max_size: int, anchors: list[str], articles_text: str, cadence: str,
-                 log_path: Path | None) -> dict:
+                 log_path: Path | None, fail_dir: Path) -> dict:
     user = f"""Backtest, article-list mode (forward-resembling: a raw list of date-clean news ARTICLES with title + snippet, like live WebSearch results — you discover the tickers and filter the noise yourself).
 - as_of_date: {as_of}
 - current_watchlist: {watchlist}
@@ -248,15 +292,25 @@ news_pool (read it, discover US-listed wave tickers with real catalysts, DISCARD
 Only swap (add+remove together) if a clearly stronger rising wave vehicle appears vs a current holding, else no_changes. In rationale_overall, note what noise you filtered. Emit ONLY the JSON object per your output schema."""
     # max_tokens must cover the model's (default) thinking block PLUS the JSON output — 2000 was
     # entirely consumed by thinking, leaving no text and silently defaulting every call to no_changes.
-    r = cli.messages.create(model=model, max_tokens=8000, system=_CURATOR_SYSTEM,
-                            messages=[{"role": "user", "content": user}])
-    # concatenate all text blocks (the model may emit a ThinkingBlock before the TextBlock)
-    txt = "".join(getattr(b, "text", "") for b in r.content).strip()
-    if log_path:
-        log_path.write_text(json.dumps({"as_of": as_of, "model": model, "user": user, "response": txt,
-                                        "usage": {"in": r.usage.input_tokens, "out": r.usage.output_tokens}}, indent=2))
-    m = re.search(r"\{.*\}", txt, re.S)
-    return json.loads(m.group(0)) if m else {"as_of_date": as_of, "adds": [], "removes": [], "no_changes": True}
+    # The model very occasionally emits malformed JSON (a stray bracket _try_parse can't repair); retry
+    # once on a fresh sample before giving up, so a one-off glitch doesn't lose a genuine curation.
+    txt = ""
+    for attempt in range(2):
+        r = cli.messages.create(model=model, max_tokens=8000, system=_CURATOR_SYSTEM,
+                                messages=[{"role": "user", "content": user}])
+        # concatenate all text blocks (the model may emit a ThinkingBlock before the TextBlock)
+        txt = "".join(getattr(b, "text", "") for b in r.content).strip()
+        if log_path and attempt == 0:
+            log_path.write_text(json.dumps({"as_of": as_of, "model": model, "user": user, "response": txt,
+                                            "usage": {"in": r.usage.input_tokens, "out": r.usage.output_tokens}}, indent=2))
+        parsed = _try_parse(txt)
+        if parsed is not None:
+            return parsed
+        print(f"  WARN {as_of}: unparseable curator JSON (attempt {attempt+1}/2)", file=sys.stderr)
+    fail_dir.mkdir(parents=True, exist_ok=True)   # both attempts failed: save raw, no_changes for this date
+    (fail_dir / f"{as_of}.txt").write_text(txt)
+    print(f"  WARN {as_of}: giving up -> no_changes (raw saved to _parse_fail/)", file=sys.stderr)
+    return {"as_of_date": as_of, "adds": [], "removes": [], "no_changes": True}
 
 
 # ----------------------------------------------------------------- walk-forward
@@ -283,7 +337,16 @@ def main(argv=None) -> int:
     ap.add_argument("--run-dir", required=True)
     ap.add_argument("--log-llm", action="store_true")
     ap.add_argument("--pools-only", action="store_true", help="build article pools, skip curator + replay")
+    ap.add_argument("--live-fallback", action="store_true",
+                    help="for Wayback-misses, fetch the source URL live TODAY (LOOK-AHEAD-BIASED, stored "
+                         "in lede_live + tagged lede_source=live); fills the pool but does NOT feed the "
+                         "curator unless --use-live-ledes is also set")
+    ap.add_argument("--use-live-ledes", action="store_true",
+                    help="the fuller A/B variant: curator also reads the live-fallback ledes (implies "
+                         "--live-fallback). Default (off) = clean Wayback-only baseline")
     a = ap.parse_args(argv)
+    if a.use_live_ledes:
+        a.live_fallback = True            # can't show the curator live ledes we never fetched
 
     from src import portfolio
     fm = portfolio.load_financial_model()            # investor_profile.md is authoritative; CLI overrides
@@ -341,21 +404,27 @@ def main(argv=None) -> int:
     # curator). max_workers=1: pools build one at a time (each already parallelizes its own Wayback via a
     # 10-worker pool, and serial pool-builds avoid racing the module-global _wb_bulk flag in news_pool).
     pool_ex = ThreadPoolExecutor(max_workers=1)
-    pool_futs = {d: pool_ex.submit(build_article_pool, date.fromisoformat(d), news_lb, a.max_articles, run_dir)
+    pool_futs = {d: pool_ex.submit(build_article_pool, date.fromisoformat(d), news_lb,
+                                   a.max_articles, run_dir, a.live_fallback)
                  for d in dates}
     try:
         for d in dates:
             arts = pool_futs[d].result()          # blocks until this week's pool is built (usually ahead)
+            src_split = collections.Counter(x.get("lede_source", "wayback" if x.get("lede") else "none")
+                                            for x in arts)
             (run_dir / f"{d}-pool.json").write_text(json.dumps(
                 {"as_of_date": d, "news_lookback_days": news_lb, "source": "gkg-wayback-articles",
-                 "n_articles": len(arts), "hit_rate": round(sum(1 for x in arts if x.get("lede"))/max(len(arts),1), 2),
+                 "n_articles": len(arts),
+                 "hit_rate": round(src_split["wayback"] / max(len(arts), 1), 2),   # clean Wayback rate
+                 "lede_sources": dict(src_split),   # {wayback (clean), live (look-ahead-biased), none}
                  "articles": arts}, indent=2))
             if a.pools_only:
                 print(f"  {d}: {len(arts)} articles", file=sys.stderr); continue
             cur_wl = portfolio.reconstruct_watchlist_at(d, a.starter, str(hist))
             log = (run_dir / "_log" / f"{d}-curator.json") if a.log_llm else None
             cur = call_curator(cli, a.model, d, cur_wl, thesis, exclusions, a.max_watchlist_size,
-                               anchors, render_articles(arts), a.cadence, log)
+                               anchors, render_articles(arts, a.use_live_ledes), a.cadence, log,
+                               run_dir / "_parse_fail")
             cur["as_of_date"] = d
             (run_dir / f"{d}-curation.json").write_text(json.dumps(cur, indent=2))
             portfolio.apply_curator_decisions(cur, holdings_path=str(sb_hold), history_path=str(hist),

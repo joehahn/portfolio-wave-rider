@@ -342,6 +342,46 @@ def wayback_ledes_dated(pairs: "list[tuple[str, date]]",
     return out
 
 
+# ------------------------------------------------------------------ live fallback (LOOK-AHEAD-BIASED)
+LIVE_WORKERS = 25              # live fetches hit DIVERSE hosts (no single-host throttle like archive.org),
+LIVE_TIMEOUT = 8              # so run at high concurrency with a short timeout (dead links/paywalls fail fast)
+
+
+def live_lede(url: str) -> str:
+    """LOOK-AHEAD-BIASED fallback: fetch the source URL as it exists TODAY and extract its lede with
+    trafilatura. For a BACKTEST this is NOT look-ahead-clean (the live page may carry post-as_of edits),
+    so callers MUST tag it and keep it out of the clean baseline. Cached by URL. Returns '' on any
+    failure (dead link / paywall / timeout / bot-block / no extractable body)."""
+    hit = _cache_get("live", url)
+    if hit is not None:
+        return hit.get("lede", "")
+    lede = ""
+    try:
+        r = _wb_session().get(url, timeout=LIVE_TIMEOUT, allow_redirects=True,
+                              headers={"User-Agent": _UA})
+        if r.status_code < 400:
+            lede = _clean_lede(trafilatura.extract(r.text, favor_precision=True, include_comments=False))
+    except requests.exceptions.RequestException:
+        lede = ""
+    _cache_put("live", url, {"lede": lede})
+    return lede
+
+
+def live_ledes(urls: list[str], workers: int = LIVE_WORKERS) -> dict[str, str]:
+    """Concurrent batch of live_lede over unique URLs -> {url: lede}. High concurrency (diverse hosts)."""
+    uniq = list(dict.fromkeys(u for u in urls if u))
+    out: dict[str, str] = {}
+    with ThreadPoolExecutor(max_workers=workers) as ex:
+        futs = {ex.submit(live_lede, u): u for u in uniq}
+        for fut in as_completed(futs):
+            u = futs[fut]
+            try:
+                out[u] = fut.result()
+            except Exception:
+                out[u] = ""
+    return out
+
+
 # ------------------------------------------------------------------ ticker hints
 def find_ticker_hints(text: str) -> list[str]:
     hints = set()
