@@ -336,8 +336,21 @@ Only swap (add+remove together) if a clearly stronger rising wave vehicle appear
     # once on a fresh sample before giving up, so a one-off glitch doesn't lose a genuine curation.
     txt = ""
     for attempt in range(2):
-        r = cli.messages.create(model=model, max_tokens=8000, system=_CURATOR_SYSTEM,
-                                messages=[{"role": "user", "content": user}])
+        # Retry transient API errors (403 auth blips, 429 rate limits, 5xx, network) with backoff so one
+        # hiccup mid-run doesn't crash the whole walk-forward; give up to no_changes only after 6 tries.
+        r = None
+        for _t in range(6):
+            try:
+                r = cli.messages.create(model=model, max_tokens=8000, system=_CURATOR_SYSTEM,
+                                        messages=[{"role": "user", "content": user}])
+                break
+            except Exception as _e:  # noqa: BLE001
+                _w = min(90, 5 * 2 ** _t)
+                print(f"  API error {as_of} ({type(_e).__name__}): retry {_t + 1}/6 in {_w}s", file=sys.stderr)
+                time.sleep(_w)
+        if r is None:
+            print(f"  API down for {as_of} after 6 retries -> no_changes", file=sys.stderr)
+            break
         # concatenate all text blocks (the model may emit a ThinkingBlock before the TextBlock)
         txt = "".join(getattr(b, "text", "") for b in r.content).strip()
         if log_path and attempt == 0:
@@ -466,17 +479,23 @@ def main(argv=None) -> int:
                  "articles": arts}, indent=2))
             if a.pools_only:
                 print(f"  {d}: {len(arts)} articles", file=sys.stderr); continue
-            cur_wl = portfolio.reconstruct_watchlist_at(d, a.starter, str(hist))
-            log = (run_dir / "_log" / f"{d}-curator.json") if a.log_llm else None
-            cur = call_curator(cli, a.model, d, cur_wl, thesis, exclusions, a.max_watchlist_size,
-                               anchors, render_articles(arts, a.news_mode), a.cadence, log,
-                               run_dir / "_parse_fail")
-            cur["as_of_date"] = d
-            (run_dir / f"{d}-curation.json").write_text(json.dumps(cur, indent=2))
+            # Resume-friendly: reuse an existing curation (skip the LLM call) but still APPLY it so the
+            # walk-forward history rebuilds; only fire the curator for dates not yet curated.
+            cur_path = run_dir / f"{d}-curation.json"
+            if cur_path.exists():
+                cur = json.loads(cur_path.read_text())
+            else:
+                cur_wl = portfolio.reconstruct_watchlist_at(d, a.starter, str(hist))
+                log = (run_dir / "_log" / f"{d}-curator.json") if a.log_llm else None
+                cur = call_curator(cli, a.model, d, cur_wl, thesis, exclusions, a.max_watchlist_size,
+                                   anchors, render_articles(arts, a.news_mode), a.cadence, log,
+                                   run_dir / "_parse_fail")
+                cur["as_of_date"] = d
+                cur_path.write_text(json.dumps(cur, indent=2))
+                if log:
+                    lg = json.loads(log.read_text()); tok_in += lg["usage"]["in"]; tok_out += lg["usage"]["out"]
             portfolio.apply_curator_decisions(cur, holdings_path=str(sb_hold), history_path=str(hist),
                                               profile_path="investor_profile.md", listing_check=False, as_of_date=d)
-            if log:
-                lg = json.loads(log.read_text()); tok_in += lg["usage"]["in"]; tok_out += lg["usage"]["out"]
             print(f"  {d}: {len(arts)} arts | adds={[x['ticker'] for x in cur.get('adds',[])]} "
                   f"removes={[x['ticker'] for x in cur.get('removes',[])]}", file=sys.stderr)
     finally:

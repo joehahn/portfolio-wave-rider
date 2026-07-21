@@ -3538,6 +3538,15 @@ def build_curator_dashboard(
         rebalance_dates = _starter.get("as_of_dates", [])
         _cadence = _starter.get("rebalance_period", _cadence)
     periods, _ = _build_ticker_periods(runs_dir, starter_tickers, end)
+    periods = list(periods)
+    # always_include anchors (SPY/AGG/IAU) are permanently in the optimizer universe but sit OUTSIDE the
+    # curator's watchlist, so _build_ticker_periods misses them (except SPY, which is also a starter).
+    # Add them for the full window so the Gantt shows they're always available (solid overlay if funded).
+    _anchor_wb = {"SPY": "general_markets", "AGG": "cashlike", "IAU": "cashlike", "BIL": "cashlike"}
+    _have_tk = {p[0] for p in periods}
+    for _anc in load_financial_model().get("always_include", []):
+        if _anc not in _have_tk:
+            periods.append((_anc, start, end, _anchor_wb.get(_anc, "cashlike")))
 
     # Realized return numbers for the headline summary.
     final = float(totals.iloc[-1])
@@ -3557,7 +3566,7 @@ def build_curator_dashboard(
         row_heights=[0.22, 0.24, 0.13, 0.12, 0.17],
         subplot_titles=(
             "1. Realized portfolio value: curator vs baselines vs benchmark",
-            "2. Watchlist composition over time (color = wave bucket)",
+            "2. Watchlist composition over time — translucent = watchlisted, solid = funded by optimizer (color = wave bucket)",
             "3. Cumulative $ gain per holding",
             "4. Cumulative $ gain per wave bucket",
             "5. Actual portfolio $ by wave over time",
@@ -3630,10 +3639,24 @@ def build_curator_dashboard(
     seen.reverse()  # so top of chart is first-added
     y_index = {tk: i for i, tk in enumerate(seen)}
 
-    # Each ticker's Gantt bar uses its wave's base color exactly so the
-    # bar hue matches the legend swatch one-for-one. (Previous version
-    # spread lightness across each wave's tickers to disambiguate
-    # adjacent same-wave rows; that's traded for legend-color fidelity.)
+    # FUNDED intervals per ticker: snapshot dates where the optimizer actually gave it weight
+    # (value > 0). Grouped into contiguous runs so we can draw a solid inner bar over the translucent
+    # watchlist span — the optimizer often funds only 1-2 of the (up to 5) watchlisted names.
+    _all_dates = sorted(snaps["date"].unique())
+    _didx = {d: i for i, d in enumerate(_all_dates)}
+    _funded: dict[str, list[tuple]] = {}
+    for _tk, _grp in snaps[snaps["value"] > 0].groupby("ticker"):
+        _ix = sorted({_didx[d] for d in _grp["date"]})
+        _runs: list[list[int]] = []
+        for _i in _ix:
+            if _runs and _i == _runs[-1][1] + 1:
+                _runs[-1][1] = _i
+            else:
+                _runs.append([_i, _i])
+        _funded[_tk] = [(_all_dates[a], _all_dates[b]) for a, b in _runs]
+
+    # Each ticker's Gantt bar uses its wave's base color exactly so the bar hue matches the legend
+    # swatch one-for-one. Watchlist membership = translucent width-14 bar; funded = solid width-7 inner.
     legend_seen: set[str] = set()
     for tk, p_start, p_end, wb in periods:
         color = WAVE_COLORS.get(wb, "#888888")
@@ -3641,16 +3664,25 @@ def build_curator_dashboard(
         legend_seen.add(wb)
         fig.add_trace(
             go.Scatter(
-                x=[p_start, p_end], y=[y_index[tk], y_index[tk]],
-                mode="lines",
-                line={"color": color, "width": 14},
-                name=wb, legendgroup=wb, showlegend=show_legend,
-                legend="legend5",
-                hovertemplate=f"<b>{tk}</b><br>{wb}<br>"
-                              f"%{{x|%Y-%m-%d}}<extra></extra>",
+                x=[p_start, p_end], y=[y_index[tk], y_index[tk]], mode="lines",
+                line={"color": color, "width": 14}, opacity=0.28,
+                name=wb, legendgroup=wb, showlegend=show_legend, legend="legend5",
+                hovertemplate=f"<b>{tk}</b> · watchlisted<br>{wb}<br>%{{x|%Y-%m-%d}}<extra></extra>",
             ),
             row=2, col=1,
         )
+        for _fs, _fe in _funded.get(tk, []):
+            _s0, _e0 = max(_fs, p_start), min(_fe, p_end)
+            if _s0 <= _e0:
+                fig.add_trace(
+                    go.Scatter(
+                        x=[_s0, _e0], y=[y_index[tk], y_index[tk]], mode="lines",
+                        line={"color": color, "width": 7}, opacity=1.0,
+                        legendgroup=wb, showlegend=False, legend="legend5",
+                        hovertemplate=f"<b>{tk}</b> · FUNDED<br>{wb}<br>%{{x|%Y-%m-%d}}<extra></extra>",
+                    ),
+                    row=2, col=1,
+                )
 
     fig.update_yaxes(
         tickmode="array", tickvals=list(range(len(seen))), ticktext=seen,
