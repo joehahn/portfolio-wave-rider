@@ -45,6 +45,10 @@ source_block:
   - globalxetfs.com          # ETF-issuer self-PR
   - tech-insider.org
   - thedefensenews.com        # copycat of the real defensenews.com
+  # added 2026-07-21 from curator-DB attribution review: PR-wire / syndication aggregators (tmcnet also
+  # recycles URLs, which broke our Wayback join); low-signal republishers, cited adds were ~breakeven
+  - tmcnet.com
+  - bignewsnetwork.com
 source_major:
   - reuters.com
   - apnews.com
@@ -78,6 +82,9 @@ source_major:
   - coindesk.com
   - nbcnews.com
   - aljazeera.com
+  # added 2026-07-21: DEMOTED from specialty (still listed in the General-markets prose below as a
+  # live-curator hint) to major — its own note flags mixed signal-to-noise; a cross-check, not a 2.0 desk
+  - zerohedge.com
 ---
 
 # Specialty news sources
