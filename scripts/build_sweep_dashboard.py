@@ -322,19 +322,22 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     import plotly.graph_objects as go
     _curved = [r for r in _llm if r.get("curve_x")]
     _ref = _curved[0] if _curved else None
-    _pal = ["#d97706", "#1f77b4", "#2ca02c", "#9467bd", "#8c564b"]
+    # LLM palette avoids blue/green (reserved for buy/hold + SPY, matching the curator DB's plot 1)
+    _pal = ["#d97706", "#9467bd", "#d62728", "#8c564b", "#e377c2"]
     _fig4 = go.Figure()
     for _i, r in enumerate(_curved):
         _fig4.add_trace(go.Scatter(x=r["curve_x"], y=r["curve_y"], mode="lines", name=r["label"].split(" (")[0],
-                                   line={"color": _pal[_i % len(_pal)], "width": 2}))
+                                   line={"color": _pal[_i % len(_pal)], "width": 2.2}))
     if _ref and _ref.get("bnh_x"):
-        _fig4.add_trace(go.Scatter(x=_ref["bnh_x"], y=_ref["bnh_y"], mode="lines", name="buy/hold (starter)",
-                                   line={"color": "#888", "width": 1.5, "dash": "dot"}))
+        _fig4.add_trace(go.Scatter(x=_ref["bnh_x"], y=_ref["bnh_y"], mode="lines", name="Buy-and-hold",
+                                   line={"color": "#3b82f6", "width": 1.8}))
     if _ref and _ref.get("spy_y"):
-        _fig4.add_trace(go.Scatter(x=_ref["curve_x"], y=_ref["spy_y"], mode="lines", name="SPY",
-                                   line={"color": "#c92a2a", "width": 1.5, "dash": "dash"}))
-    _fig4.update_layout(template="seaborn", height=460, margin={"t": 20, "l": 72, "r": 20},
-                        yaxis={"title": "portfolio value ($)", "tickformat": "$,.0f"}, hovermode="x unified")
+        _fig4.add_trace(go.Scatter(x=_ref["curve_x"], y=_ref["spy_y"], mode="lines", name="SPY benchmark",
+                                   line={"color": "#10b981", "width": 1.5, "dash": "dot"}))
+    _fig4.update_layout(template="seaborn", height=460, margin={"t": 20, "l": 72, "r": 20}, hovermode="x unified")
+    _fig4.update_yaxes(title_text="portfolio value ($)", type="log",
+                       tickvals=[10000, 30000, 100000, 300000, 1000000],
+                       ticktext=["$10K", "$30K", "$100K", "$300K", "$1M"])
     llm4_html = (('<h2>4. Portfolio value over time — by curator LLM (vs buy/hold and SPY)</h2>'
                   '<p style="color:#555;max-width:920px;">Each LLM\'s realized portfolio value on the same pools '
                   'and profile config, alongside the equal-weight buy/hold starter and SPY. Same idea as the '
