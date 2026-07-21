@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import html as _html
 import json
+import re
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -3552,15 +3553,14 @@ def build_curator_dashboard(
     bnh_return = (bnh_final / bnh_initial) - 1.0
 
     fig = make_subplots(
-        rows=6, cols=1, vertical_spacing=0.06,
-        row_heights=[0.22, 0.24, 0.13, 0.12, 0.17, 0.12],
+        rows=5, cols=1, vertical_spacing=0.06,
+        row_heights=[0.22, 0.24, 0.13, 0.12, 0.17],
         subplot_titles=(
             "1. Realized portfolio value: curator vs baselines vs benchmark",
             "2. Watchlist composition over time (color = wave bucket)",
             "3. Cumulative $ gain per holding",
             "4. Cumulative $ gain per wave bucket",
             "5. Actual portfolio $ by wave over time",
-            "6. Total portfolio value (log scale)",
         ),
     )
 
@@ -3761,35 +3761,6 @@ def build_curator_dashboard(
     fig.update_yaxes(title_text="$", tickformat="$,.0f", row=5, col=1)
     fig.update_xaxes(range=[start, end], row=5, col=1)
 
-    # Chart 6: total portfolio value vs date on a LOG y-axis. Same curator
-    # equity curve as chart 1's headline line, but alone and log-scaled so its
-    # multi-order-of-magnitude compounding reads as a roughly straight line
-    # (constant % growth) instead of a hockey stick. Single trace, no legend.
-    fig.add_trace(
-        go.Scatter(x=totals.index, y=totals.values, mode="lines",
-                   name="Total portfolio value", showlegend=False,
-                   line={"color": "#d97706", "width": 2.5},
-                   hovertemplate="%{x|%Y-%m-%d}<br>$%{y:,.0f}<extra></extra>"),
-        row=6, col=1,
-    )
-    # Orange squares marking each quarterly rebalance, same markers/hover as
-    # chart 1 (reusing _rebal_x/_rebal_y/_rebal_text: the y-values already sit
-    # on the total-value curve).
-    fig.add_trace(
-        go.Scatter(x=_rebal_x, y=_rebal_y, mode="markers", name="Rebalanced",
-                   showlegend=False, marker=_REBALANCE_MARKER,
-                   hovertext=_rebal_text,
-                   hoverlabel={"align": "left", "bgcolor": "white",
-                               "bordercolor": "#7c2d12"},
-                   hovertemplate="<b>Rebalanced %{x|%Y-%m-%d}</b>"
-                                 "<br>portfolio $%{y:,.0f}<br>%{hovertext}"
-                                 "<extra></extra>"),
-        row=6, col=1,
-    )
-    fig.update_yaxes(title_text="$", type="log", tickformat="$,.0f", row=6, col=1)
-    fig.update_xaxes(range=[start, end], row=6, col=1)
-
-
     fig.update_layout(
         template="seaborn",
         height=3700, margin={"t": 90, "b": 60, "l": 80, "r": 30},
@@ -3826,15 +3797,15 @@ def build_curator_dashboard(
         ),
     )
 
-    # --- Per-gap vertical spacing override (6-row layout) ---
+    # --- Per-gap vertical spacing override (5-row layout) ---
     # Plotly's make_subplots only supports a single uniform
     # vertical_spacing. Each chart-to-chart gap is shrunk to 50% of
     # plotly's default (111 px) except gap(4,5) which is shrunk only
     # 33% (149 px). Override each yaxis's domain and size the figure
     # in absolute pixels so individual subplot sizes are preserved
     # across edits.
-    ROW_PX = [393, 443, 246, 246, 320, 320]   # charts 1..6
-    GAP_PX = [111, 111, 111, 149, 111]         # 5 gaps; gap(4,5) wider
+    ROW_PX = [393, 443, 246, 246, 320]        # charts 1..5
+    GAP_PX = [111, 111, 111, 149]              # 4 gaps; gap(4,5) wider
     _new_fig_h = sum(ROW_PX) + sum(GAP_PX)
     _tops, _bots = [], []
     _y = 1.0
@@ -3845,12 +3816,12 @@ def build_curator_dashboard(
         if _i < len(GAP_PX):
             _y -= GAP_PX[_i] / _new_fig_h
     # Apply yaxis domains.
-    for _i in range(6):
+    for _i in range(5):
         _key = "yaxis" if _i == 0 else f"yaxis{_i + 1}"
         fig.layout[_key].domain = (max(0.0, _bots[_i]), min(1.0, _tops[_i]))
     # Reposition subplot-title annotations (~14px above each row top).
     _title_offset = 14 / _new_fig_h
-    for _i in range(min(6, len(fig.layout.annotations))):
+    for _i in range(min(5, len(fig.layout.annotations))):
         fig.layout.annotations[_i].update(y=_tops[_i] + _title_offset)
     # Reposition per-row legends to the new geometry.
     # Rows: 0 = equity curve, 1 = Gantt, 2 = $ gain/holding,
@@ -3907,30 +3878,57 @@ def build_curator_dashboard(
                 cj = json.loads(f.read_text())
             except Exception:  # noqa: BLE001 - skip malformed files
                 continue
-            terms = [str(t) for t in (cj.get("search_terms") or []) if str(t).strip()]
-            if not terms:
-                continue
             d = str(cj.get("as_of_date") or f.stem.replace("-curation", ""))
+            adds = cj.get("adds") or []
+            removes = cj.get("removes") or []
+            overall = str(cj.get("rationale_overall") or "").strip()
+            dec = []
+            if overall:
+                dec.append(f"<p style='margin:6px 0;color:#333;'><b>Rationale:</b> {_html.escape(overall)}</p>")
+            for x in adds:
+                ev = "".join(
+                    f"<li><a href='{_html.escape(str(e.get('url', '')))}' target='_blank' rel='noopener'>"
+                    f"{_html.escape(str(e.get('source', '') or e.get('url', '')))}</a>"
+                    f"{(' &mdash; ' + _html.escape(str(e.get('summary', '')))) if e.get('summary') else ''}"
+                    f"{(' (' + _html.escape(str(e.get('date', ''))) + ')') if e.get('date') else ''}</li>"
+                    for e in (x.get("news_evidence") or []) if e.get("url") or e.get("source")
+                )
+                dec.append(
+                    f"<div style='margin:5px 0;'><span style='color:#0a7a3a;font-weight:600;'>+ "
+                    f"{_html.escape(str(x.get('ticker', '')))}</span> {_html.escape(str(x.get('rationale', '')))}"
+                    + (f"<ul style='margin:3px 0 6px 1.2em;font-size:13px;color:#555;'>{ev}</ul>" if ev else "")
+                    + "</div>"
+                )
+            for x in removes:
+                dec.append(
+                    f"<div style='margin:5px 0;'><span style='color:#b91c1c;font-weight:600;'>&minus; "
+                    f"{_html.escape(str(x.get('ticker', '')))}</span> {_html.escape(str(x.get('rationale', '')))}</div>"
+                )
+            terms = [str(t) for t in (cj.get("search_terms") or []) if str(t).strip()]
+            if not dec and not terms:
+                continue
             chips = "".join(
                 "<span style='display:inline-block;background:#f0f3f7;"
                 "border:1px solid #dde;border-radius:12px;padding:2px 10px;"
-                f"margin:3px 4px 3px 0;font-size:13px;'>{_html.escape(t)}</span>"
+                f"margin:3px 4px 3px 0;font-size:12px;'>{_html.escape(t)}</span>"
                 for t in terms
             )
+            _tag = (f"+{len(adds)}/&minus;{len(removes)}" if (adds or removes) else "no changes")
             _st_blocks.append(
                 "<details style='margin:6px 0;max-width:900px;'>"
                 "<summary style='cursor:pointer;font-size:14px;font-weight:600;"
-                f"padding:4px 0;'>{_html.escape(d)} &mdash; {len(terms)} queries</summary>"
-                f"<div style='margin:6px 0 12px;'>{chips}</div></details>"
+                f"padding:4px 0;'>{_html.escape(d)} &mdash; {_tag} &middot; {len(terms)} queries</summary>"
+                f"<div style='margin:6px 0 12px;'>{''.join(dec)}"
+                "<div style='margin-top:8px;font-size:12px;color:#888;'>search terms:</div>"
+                f"{chips}</div></details>"
             )
     if _st_blocks:
         search_html = (
-            "<h2 style='margin-top:2em;'>Curator search terms</h2>"
-            f"<p style='color:#555;max-width:780px;'>The wave beats the curator "
-            f"worked at each {_html.escape(_cadence)} rebalance. In this run the "
-            "news pool is built upstream from GDELT&nbsp;GKG + Wayback (date-clean, "
-            "look-ahead-reduced); these are the wave keywords behind that pool. "
-            "Click a rebalance to expand.</p>"
+            "<h2 style='margin-top:2em;'>Curator decisions &amp; search terms</h2>"
+            f"<p style='color:#555;max-width:780px;'>One row per {_html.escape(_cadence)} rebalance. "
+            "Click to expand the curator's overall rationale, each add/remove with its reason, the cited "
+            "<code>news_evidence</code> links, and the wave keywords behind that rebalance's pool "
+            "(GDELT&nbsp;GKG + Wayback, date-clean).</p>"
             + "".join(_st_blocks)
         )
 
@@ -4043,7 +4041,228 @@ def build_curator_dashboard(
                 f"<tbody>{_rows}</tbody></table>{_pending}"
             )
 
+    # ---- summary metric cards (rendered just above Parameter settings) ----
+    import math as _math
+    _days = max((end - start).days, 1)
+    _ann = (final / initial) ** (365.25 / _days) - 1.0 if initial > 0 and final > 0 else 0.0
+    _maxdd = float((totals / totals.cummax() - 1.0).min())
+    _calmar = _ann / abs(_maxdd) if _maxdd < 0 else float("nan")
+    _ir = _tstat = _alpha = float("nan")
+    _spy_curve = bench_curves.get("SPY")
+    if _spy_curve is not None and len(totals) > 3:
+        _c = totals.pct_change().dropna()
+        _s = _spy_curve.reindex(totals.index).ffill().pct_change().reindex(_c.index)
+        _act = (_c - _s).dropna()
+        if len(_act) > 2 and _act.std() > 0:
+            _ppy = len(_act) / (_days / 365.25)
+            _ir = _act.mean() / _act.std() * _math.sqrt(_ppy)
+            _tstat = _act.mean() / _act.std() * _math.sqrt(len(_act))
+        _alpha = _ann - ((_spy_curve.iloc[-1] / _spy_curve.iloc[0]) ** (365.25 / _days) - 1.0)
+    # LLM cost from the run's _log token usage (SDK-harness runs only; sonnet-5 $2/$10 per M tok)
+    _tin = _tout = 0
+    _model = ""
+    _logdir = Path(runs_dir) / "_log"
+    for _lf in (sorted(_logdir.glob("*-curator.json")) if _logdir.exists() else []):
+        try:
+            _lg = json.loads(_lf.read_text())
+            _u = _lg.get("usage", {})
+            _tin += _u.get("in", 0)
+            _tout += _u.get("out", 0)
+            _model = _lg.get("model", _model)
+        except Exception:  # noqa: BLE001
+            pass
+    _cost = (_tin * 2 + _tout * 10) / 1e6 if (_tin or _tout) else None
+    _n_add = _n_rem = 0
+    if summary_path.exists():
+        for _ev in json.loads(summary_path.read_text()):
+            _n_add += len(_ev.get("adds") or [])
+            _n_rem += len(_ev.get("removes") or [])
+    _last_snap = snaps[snaps["date"] == snaps["date"].max()]
+    _final_pos = sorted(_last_snap[_last_snap["value"] > 0]["ticker"].tolist())
+
+    def _card(v, label):
+        return (f'<div style="display:inline-block;min-width:118px;margin:0 1.4em 0.8em 0">'
+                f'<b style="font-size:1.45em;color:#0b7285">{v}</b><br>'
+                f'<span style="font-size:.78em;color:#555">{_html.escape(label)}</span></div>')
+    _nn = lambda x: x == x  # noqa: E731 (not-NaN)
+    cards_html = (
+        '<h2 style="margin:1.4em 0 0.3em;">Summary</h2>'
+        '<div style="margin:0.4em 0 0.6em">'
+        + _card(f"{cur_return * 100:+.0f}%", "total return")
+        + _card(f"{_ann * 100:+.0f}%", "annualized")
+        + _card(f"{_maxdd * 100:.0f}%", "max drawdown")
+        + _card(f"{_calmar:.2f}" if _nn(_calmar) else "n/a", "Calmar (ann / |DD|)")
+        + _card(f"{_ir:+.2f}" if _nn(_ir) else "n/a", "Info Ratio vs SPY")
+        + _card(f"{_tstat:+.1f}" if _nn(_tstat) else "n/a", "IR t-stat")
+        + _card(f"{_alpha * 100:+.0f}%" if _nn(_alpha) else "n/a", "ann. alpha vs SPY")
+        + _card(f"{_n_add} / {_n_rem}", "adds / removes")
+        + _card(str(len(_final_pos)), "final positions")
+        + _card(f"${_cost:,.2f}" if _cost is not None else "n/a",
+                f"LLM cost ({_tin // 1000}K+{_tout // 1000}K tok)" if _cost is not None else "LLM cost")
+        + '</div>'
+    )
+
     chart_html = fig.to_html(full_html=False, include_plotlyjs="cdn", config={"displayModeBar": False})
+
+    # ================= extra figures (separate from the main grid) =================
+    _EXTRA_CFG = {"displayModeBar": False}
+
+    def _to_html(f):
+        return f.to_html(full_html=False, include_plotlyjs=False, config=_EXTRA_CFG)
+
+    # (a) Allocation over time: stacked-area of per-ticker weight %, cash fills to 100%.
+    _piv = snaps.pivot_table(index="date", columns="ticker", values="value", aggfunc="first").fillna(0.0)
+    _tot = _piv.sum(axis=1).replace(0, float("nan"))
+    _w = _piv.div(_tot, axis=0).fillna(0.0) * 100.0
+    _cash = (100.0 - _w.sum(axis=1)).clip(lower=0)
+    _order = _w.sum().sort_values(ascending=False).index.tolist()
+    _af = go.Figure()
+    for _t in _order:
+        _af.add_trace(go.Scatter(x=_w.index, y=_w[_t], name=str(_t), mode="lines",
+                                 stackgroup="a", line={"width": 0.4}))
+    if float(_cash.max()) > 0.1:
+        _af.add_trace(go.Scatter(x=_cash.index, y=_cash, name="cash", mode="lines",
+                                 stackgroup="a", line={"width": 0.4, "color": "#adb5bd"}))
+    _af.update_layout(template="seaborn", height=400, margin={"t": 20, "l": 60, "r": 30},
+                      yaxis={"title": "% of portfolio", "range": [0, 100]},
+                      xaxis={"range": [start, end]})
+
+    # (b) Gains vs news source / vs keyword: each add's forward price return (add -> next remove / end),
+    # bucketed by its news_evidence source and by the wave keyword that surfaced the evidence article.
+    _price = snaps.pivot_table(index="date", columns="ticker", values="price", aggfunc="first").sort_index()
+    _events = []
+    for _f in sorted(Path(runs_dir).glob("*-curation.json")):
+        try:
+            _cj = json.loads(_f.read_text())
+        except Exception:  # noqa: BLE001
+            continue
+        _dt = str(_cj.get("as_of_date") or _f.stem.replace("-curation", ""))
+        for _x in _cj.get("adds", []):
+            _events.append((_dt, _x.get("ticker"), "add", _x.get("news_evidence", [])))
+        for _x in _cj.get("removes", []):
+            _events.append((_dt, _x.get("ticker"), "remove", None))
+    _events.sort(key=lambda e: e[0])
+
+    def _fwd_ret(tkr, d0):
+        if tkr not in _price.columns:
+            return None
+        d1 = next((_d for (_d, _t, _ac, _) in _events if _t == tkr and _ac == "remove" and _d > d0), None)
+        p = _price[tkr].dropna()
+        p0 = p[p.index >= pd.Timestamp(d0)]
+        p1 = p[p.index <= (pd.Timestamp(d1) if d1 else end)]
+        if p0.empty or p1.empty:
+            return None
+        return float(p1.iloc[-1] / p0.iloc[0] - 1.0)
+
+    _kwmap = {}
+    try:
+        _cfg = json.loads((Path(__file__).resolve().parent.parent / "gkg_config.json").read_text())
+        for _wv, _ks in _cfg.get("wave_keywords", {}).items():
+            for _k in _ks:
+                _kwmap[_k.lower()] = _wv
+    except Exception:  # noqa: BLE001
+        pass
+    from collections import defaultdict as _ddict
+    # Bucket sources by the DOMAIN of each evidence `url` (authoritative + matches news_sources.md),
+    # NOT the free-text `source` the curator typed (which is inconsistent: "The Verge" vs "theverge.com").
+    def _url_domain(u):
+        m = re.search(r"https?://([^/]+)", u or "")
+        return re.sub(r"^www\.", "", m.group(1).lower()) if m else ""
+    _src_ret, _kw_ret = _ddict(list), _ddict(list)
+    for (_d, _t, _ac, _ev) in _events:
+        if _ac != "add":
+            continue
+        _r = _fwd_ret(_t, _d)
+        if _r is None:
+            continue
+        _srcs = set()
+        for _e in (_ev or []):
+            _dom = _url_domain(_e.get("url", "")) or re.sub(r"[^a-z0-9]", "", (_e.get("source") or "").lower())
+            if _dom:
+                _srcs.add(_dom)
+            _low = f"{_e.get('summary', '')} {_e.get('url', '')}".lower()
+            for _k in _kwmap:
+                if _k in _low:
+                    _kw_ret[_k].append(_r)
+        for _s in (_srcs or {"(no source)"}):
+            _src_ret[_s].append(_r)
+
+    def _attr_html(dct, xlab, labels=None):
+        rows = sorted(((k, sum(v) / len(v), len(v)) for k, v in dct.items()), key=lambda r: r[1])
+        if not rows:
+            return ""
+        _lab = lambda k: (labels or {}).get(k, k)  # noqa: E731
+        f = go.Figure(go.Bar(x=[r[1] * 100 for r in rows], y=[f"{_lab(r[0])} (n={r[2]})" for r in rows],
+                             orientation="h",
+                             marker_color=["#2b8a3e" if r[1] >= 0 else "#c92a2a" for r in rows]))
+        f.update_layout(template="seaborn", height=max(240, 26 * len(rows) + 120),
+                        margin={"t": 20, "l": 230, "r": 30}, xaxis={"title": xlab})
+        return _to_html(f)
+
+    _gain_src = _attr_html(_src_ret, "mean forward price return of adds (%)")
+    _gain_kw = _attr_html(_kw_ret, "mean forward price return of adds (%)")
+
+    # Gain PER ARTICLE vs source: normalize each source's TOTAL add-gain by how many articles it put into
+    # the pools (its pool footprint) -> signal density. Pool counts come from the run's *-pool.json (GKG).
+    _pool_src = {}   # source domain -> set of unique urls
+    for _pf in sorted(Path(runs_dir).glob("2*-pool.json")):
+        try:
+            _pj = json.loads(_pf.read_text())
+        except Exception:  # noqa: BLE001
+            continue
+        for _a in _pj.get("articles", []):
+            _sd = re.sub(r"^www\.", "", str(_a.get("source", "")).lower())
+            if _sd and _a.get("url"):
+                _pool_src.setdefault(_sd, set()).add(_a["url"])
+    # (b1) number of adds per source (how many adds cited each domain).
+    _nps = ""
+    _nrows = sorted(((s, len(rets)) for s, rets in _src_ret.items() if s != "(no source)"), key=lambda r: r[1])
+    if _nrows:
+        _fn = go.Figure(go.Bar(x=[r[1] for r in _nrows], y=[r[0] for r in _nrows], orientation="h",
+                               marker_color="#1f77b4"))
+        _fn.update_layout(template="seaborn", height=max(240, 26 * len(_nrows) + 120),
+                          margin={"t": 20, "l": 230, "r": 30},
+                          xaxis={"title": "number of adds citing this source"})
+        _nps = _to_html(_fn)
+
+    # (b2) gain PER ARTICLE: |value| on a LOG axis (sign shown by color, not position), so the wide
+    # spread of densities is readable; biggest losers sink to the bottom (ascending signed sort).
+    _gpa = {s: sum(rets) / len(_pool_src[s]) for s, rets in _src_ret.items() if len(_pool_src.get(s, ()))}
+    _gain_per_art = ""
+    if _gpa:
+        _rws = sorted(((k, v, len(_pool_src.get(k, ()))) for k, v in _gpa.items()), key=lambda r: r[1])
+        _mags = [abs(r[1]) * 100 for r in _rws]
+        _floor = (min([m for m in _mags if m > 0] or [0.01])) * 0.5   # keep log(0) safe
+        _f = go.Figure(go.Bar(x=[m if m > 0 else _floor for m in _mags],
+                              y=[f"{r[0]} ({r[2]} art.)" for r in _rws], orientation="h",
+                              marker_color=["#2b8a3e" if r[1] >= 0 else "#c92a2a" for r in _rws],
+                              customdata=[r[1] * 100 for r in _rws],
+                              hovertemplate="%{y}: %{customdata:.3f} signed<extra></extra>"))
+        _f.update_layout(template="seaborn", height=max(240, 26 * len(_rws) + 120),
+                         margin={"t": 20, "l": 230, "r": 30},
+                         xaxis={"title": "|gain per article| ×100 (log; green = +, red = &minus;)", "type": "log"})
+        _gain_per_art = _to_html(_f)
+
+    _attr_note = ('<p style="color:#555;max-width:820px;margin:0 0 .4em;">Each add\'s forward <b>price '
+                  'return</b> (from the add date until the ticker is removed, else window end), bucketed by '
+                  'the <code>news_evidence</code> source (by URL domain) and by the wave keyword that surfaced '
+                  'the cited article. Answers which desks / search terms produced winning picks. n = number of adds.</p>')
+    _gpa_note = ('<p style="color:#555;max-width:820px;margin:0 0 .4em;">Plot&nbsp;7\'s total gain per source '
+                 'divided by how many articles that source contributed to the pools (its footprint, shown as '
+                 '<code>N&nbsp;art.</code>). Signal <b>density</b>: high = a source that produced gains from '
+                 'few articles; near-zero/negative with many articles = low-signal, a block-list candidate.</p>')
+
+    extra_html = (
+        '<h2 style="margin:1.6em 0 0.2em;">6. Allocation over time</h2>'
+        '<p style="color:#555;max-width:820px;margin:0 0 .4em;">Capital committed per ticker as a share of '
+        'the portfolio; any remainder is cash.</p>' + _to_html(_af)
+        + (('<h2 style="margin:1.6em 0 0.2em;">7. Gains vs news source</h2>' + _attr_note + _gain_src) if _gain_src else '')
+        + (('<h2 style="margin:1.6em 0 0.2em;">8. Number of adds per source</h2>'
+            '<p style="color:#555;max-width:820px;margin:0 0 .4em;">How many adds cited each source '
+            '(by URL domain) as evidence &mdash; the raw <code>n</code> behind plots 7 and 9.</p>' + _nps) if _nps else '')
+        + (('<h2 style="margin:1.6em 0 0.2em;">9. Gain per article vs news source</h2>' + _gpa_note + _gain_per_art) if _gain_per_art else '')
+        + (('<h2 style="margin:1.6em 0 0.2em;">10. Gains vs search keyword</h2>' + _attr_note + _gain_kw) if _gain_kw else '')
+    )
     page = (
         '<!doctype html><html><head><meta charset="utf-8">'
         '<title>Portfolio Wave Rider — curator backtest</title>'
@@ -4056,6 +4275,7 @@ def build_curator_dashboard(
         + _nav_strip("", pages=[
             ("https://github.com/joehahn/portfolio-wave-rider/blob/main/README.md", "README"),
             ("retrieval_pwr.html", "retrieval DB"),
+            ("pool_browser.html", "pool browser"),
         ]) +
         f'<h1>Curator-driven backtest '
         f'<span style="font-size:0.55em;color:#666;font-weight:400;">'
@@ -4078,9 +4298,11 @@ def build_curator_dashboard(
         'equity ETFs (broad-market / dividend / utilities / staples); '
         '<code>cashlike</code> = bonds + cash-equivalents + precious metals '
         '(e.g., AGG, BIL, IAU).</p>'
+        + cards_html
         + params_html
         + forward_html
         + chart_html
+        + extra_html
         + log_html
         + search_html
         + '</body></html>'

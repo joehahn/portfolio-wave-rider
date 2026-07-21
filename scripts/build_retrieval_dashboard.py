@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import glob
 import json
+import re
 import sys
 from collections import Counter
 from datetime import date, timedelta
@@ -151,6 +152,19 @@ def build(run_rel, out):
             day_x.append(k); day_yg.append(day_g.get(k, 0)); day_yw.append(day_w.get(k, 0))
             x += timedelta(days=1)
 
+    # ---- monthly lede coverage (plot 6): aggregate each month's pools' clean/live/n ----
+    mon_led = {}   # 'YYYY-MM' -> [wayback, live, n]
+    for p in pools:
+        mo = p.get("as_of_date", "")[:7]
+        if not mo:
+            continue
+        ls = p.get("lede_sources", {})
+        acc = mon_led.setdefault(mo, [0, 0, 0])
+        acc[0] += ls.get("wayback", 0); acc[1] += ls.get("live", 0); acc[2] += p.get("n_articles", 0)
+    led_months = sorted(mon_led)
+    clean_rate_m = [mon_led[m][0] / max(mon_led[m][2], 1) for m in led_months]
+    total_rate_m = [(mon_led[m][0] + mon_led[m][1]) / max(mon_led[m][2], 1) for m in led_months]
+
     # ---- per-wave (unique articles; first wave from title+url, else "general") ----
     wave_c = Counter()
     for a in articles:
@@ -174,6 +188,35 @@ def build(run_rel, out):
                         if not g._domain_in(s, g.RECOGNIZED_DOMAINS)), key=lambda r: -r[1])[:N_GREY]
     src_rows = sorted(rec_rows + grey_rows, key=lambda r: r[1])   # ascending -> highest at top (h-bars)
 
+    # ---- articles per SEARCH KEYWORD (plot 8): the retriever's surfacing mechanism is gkg_config.json's
+    # wave_keywords, so each keyword IS a query term. Geopolitical is split into the profile's subwaves
+    # for display; profile waves/subwaves with NO keyword are appended at 0 (red) so the coverage GAPS
+    # are explicit (aging-population is a whole missing wave; geo tankers + reconstruction are missing
+    # subwaves — documented, left unfixed per user choice 2026-07-20). ----
+    KW_WAVE = g._KW_WAVE                                  # {keyword: wave}
+    GEO_SUB = {"geo-defense": {"hypersonic", "missile", "fighter jet", "warship", "munition", "defense contract"},
+               "geo-drones": {"loitering", "counter-drone", "drone swarm"}}
+    WAVE_COLOR = {"AI": "#1f77b4", "rockets_spacecraft": "#ff7f0e", "nuclear": "#2ca02c",
+                  "quantum": "#9467bd", "robotics": "#8c564b", "geo-defense": "#d62728", "geo-drones": "#e377c2"}
+
+    def _kw_group(kw, wave):
+        if wave == "geopolitical":
+            return next((s for s, ks in GEO_SUB.items() if kw in ks), "geo-other")
+        return wave
+    kw_cnt = Counter()
+    for a in articles:
+        text = f"{a['title']} {a['url']}".lower()
+        for kw in KW_WAVE:
+            if re.search(r"\b" + re.escape(kw) + r"\b", text):
+                kw_cnt[kw] += 1
+    kw_rows = [(f"[{_kw_group(kw, wave)}] {kw}", kw_cnt.get(kw, 0), WAVE_COLOR.get(_kw_group(kw, wave), GREY))
+               for kw, wave in KW_WAVE.items()]
+    kw_rows += [("[geo-tankers] — NO KEYWORDS (uncovered subwave)", 0, RED),
+                ("[geo-reconstruction] — NO KEYWORDS (uncovered subwave)", 0, RED),
+                ("[aging-population] — NO KEYWORDS (whole wave uncovered)", 0, RED)]
+    kw_rows.sort(key=lambda r: r[1])                     # ascending -> highest at top (h-bars)
+    n_kw_zero = sum(1 for _, c, _ in kw_rows if c == 0)
+
     # ---- figure (7 rows) ---- (pool-size-per-window plot dropped: it was flat at the 100-article
     # cap for all 53 windows; that one fact is now a stat card instead.)
     titles = (
@@ -186,17 +229,21 @@ def build(run_rel, out):
         "4. Unique articles by DAY OF WEEK<br><sub><i>publication cadence: weekend dip is normal news "
         "behavior, not a gap</i></sub>",
         "5. Unique articles by wave<br><sub><i>coverage by theme (first matched wave, else general)</i></sub>",
-        "6. Lede coverage over time — clean vs clean+live<br><sub><i>per-window lede yield: GREEN = "
+        "6. Lede coverage by MONTH — clean vs clean+live<br><sub><i>monthly lede yield: GREEN = "
         "clean Wayback join (look-ahead-safe), ORANGE = clean + live-fallback (the gap = the "
         "look-ahead-BIASED live ledes that fill Wayback-misses)</i></sub>",
         f"7. Source utilization — every configured desk (incl. {n_rec_zero} that GKG surfaced ZERO "
         f"times) + top {N_GREY} others<br><sub><i>green = specialty (2.0), blue = major wire (1.5), "
         "grey = other (1.0); zero-length bars = configured desks GKG never indexed (e.g. paywalled "
         f"wires). {n_src_total} distinct sources appeared overall.</i></sub>",
+        "8. Articles per SEARCH KEYWORD — the retriever's surfacing terms (gkg_config.json)<br><sub><i>"
+        "each keyword is a query term; colored by wave, geopolitical split into the profile's subwaves. "
+        f"RED = profile waves/subwaves with NO keyword ({n_kw_zero} zero-yield rows incl. aging-population, "
+        "geo-tankers, geo-reconstruction — coverage gaps)</i></sub>",
     )
-    # Plot 7 lists ~70 domains, so give its row much more vertical room than the others.
-    fig = make_subplots(rows=7, cols=1, vertical_spacing=0.03, subplot_titles=titles,
-                        row_heights=[1, 1, 1, 1, 1, 1, 3.6])
+    # Plots 7 & 8 list many rows, so give those rows much more vertical room than the others.
+    fig = make_subplots(rows=8, cols=1, vertical_spacing=0.025, subplot_titles=titles,
+                        row_heights=[1, 1, 1, 1, 1, 1, 3.6, 2.4])
 
     # 1. articles per month (GKG only)
     fig.add_trace(go.Bar(x=mo_keys, y=[mon_g[m] for m in mo_keys], marker_color=BLUE, name="GKG"), row=1, col=1)
@@ -209,12 +256,12 @@ def build(run_rel, out):
     # 5. per-wave horizontal bars
     fig.add_trace(go.Bar(x=[v for _, v in wv][::-1], y=[k for k, _ in wv][::-1],
                          orientation="h", marker_color=GREEN), row=5, col=1)
-    # 6. lede coverage over time: clean (Wayback) and clean+live (total). The band between them is the
-    # look-ahead-biased live-fallback contribution.
-    fig.add_trace(go.Scatter(x=as_of, y=total_rate, mode="lines+markers", name="clean + live",
-                             line={"color": ORANGE, "width": 2}, marker={"size": 5}), row=6, col=1)
-    fig.add_trace(go.Scatter(x=as_of, y=clean_rate, mode="lines+markers", name="clean (Wayback)",
-                             line={"color": GREEN, "width": 2}, marker={"size": 5}), row=6, col=1)
+    # 6. lede coverage BY MONTH: clean (Wayback) and clean+live (total). The band between them is the
+    # look-ahead-biased live-fallback contribution. Aggregated monthly (each month's pools pooled).
+    fig.add_trace(go.Scatter(x=led_months, y=total_rate_m, mode="lines+markers", name="clean + live",
+                             line={"color": ORANGE, "width": 2}, marker={"size": 6}), row=6, col=1)
+    fig.add_trace(go.Scatter(x=led_months, y=clean_rate_m, mode="lines+markers", name="clean (Wayback)",
+                             line={"color": GREEN, "width": 2}, marker={"size": 6}), row=6, col=1)
     # 7. source utilization horizontal, tier-colored (all recognized incl zeros + top other).
     # Log x-axis; a zero-contributor is plotted at 0.5 so it shows a tiny bar (log 0 is undefined).
     # The hover keeps the TRUE count so the 0.5 substitution isn't misleading.
@@ -222,13 +269,21 @@ def build(run_rel, out):
                          orientation="h", marker_color=[col for _, _, col in src_rows],
                          customdata=[c for _, c, _ in src_rows],
                          hovertemplate="%{y}: %{customdata} articles<extra></extra>"), row=7, col=1)
+    # 8. articles per SEARCH KEYWORD, wave-colored (geopolitical split into subwaves); log x, 0 -> 0.5.
+    fig.add_trace(go.Bar(x=[c if c > 0 else 0.5 for _, c, _ in kw_rows], y=[k for k, _, _ in kw_rows],
+                         orientation="h", marker_color=[col for _, _, col in kw_rows],
+                         customdata=[c for _, c, _ in kw_rows],
+                         hovertemplate="%{y}: %{customdata} articles<extra></extra>"), row=8, col=1)
 
     for r in (1, 2, 3, 4):
         fig.update_yaxes(title_text="articles", row=r, col=1)
     fig.update_xaxes(title_text="unique articles", row=5, col=1)
     fig.update_yaxes(title_text="lede rate (clean vs +live)", row=6, col=1)
     fig.update_xaxes(title_text="unique articles (log; 0 plotted at 0.5)", type="log", row=7, col=1)
-    fig.update_layout(template="seaborn", height=int(340 * 9.6), barmode="group", showlegend=False,
+    fig.update_yaxes(dtick=1, tickfont={"size": 9}, row=7, col=1)   # force EVERY source label (no every-other skip)
+    fig.update_xaxes(title_text="unique articles (log; 0 plotted at 0.5)", type="log", row=8, col=1)
+    fig.update_yaxes(dtick=1, tickfont={"size": 9}, row=8, col=1)   # force EVERY keyword label
+    fig.update_layout(template="seaborn", height=int(340 * 12.0), barmode="group", showlegend=False,
                       title={"text": "Portfolio Wave Rider — news retrieval dashboard (GKG + Wayback)",
                              "y": 0.999, "yanchor": "top"},
                       margin={"t": 70, "l": 200}, hovermode="closest")
@@ -260,7 +315,8 @@ def build(run_rel, out):
         '<nav style="font-size:14px;color:#555;margin:0 0 1em 0;padding-bottom:0.5em;'
         'border-bottom:1px solid #eee;">'
         '<a href="https://github.com/joehahn/portfolio-wave-rider/blob/main/README.md">README</a>'
-        ' · <a href="backtest_gkg_1yr_weekly.html">Curator DB</a>'
+        ' · <a href="pool_browser.html">Pool browser</a>'
+        ' · <a href="backtest_gkg_2yr_weekly.html">Curator DB</a>'
         '</nav>'
         '<h1>News retrieval dashboard — GKG + Wayback (upstream of the curator)</h1>'
         '<p style="color:#555">Judges the <b>news gathering</b>, not portfolio gains: completeness of the '
