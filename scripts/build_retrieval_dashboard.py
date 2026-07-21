@@ -317,6 +317,7 @@ def build(run_rel, out):
         '<a href="https://github.com/joehahn/portfolio-wave-rider/blob/main/README.md">README</a>'
         ' · <a href="pool_browser.html">Pool browser</a>'
         ' · <a href="backtest_gkg_2yr_weekly.html">Curator DB</a>'
+        ' · <a href="sweep_pwr.html">Sweep DB</a>'
         '</nav>'
         '<h1>News retrieval dashboard — GKG + Wayback (upstream of the curator)</h1>'
         '<p style="color:#555">Judges the <b>news gathering</b>, not portfolio gains: completeness of the '

@@ -4313,6 +4313,7 @@ def build_curator_dashboard(
             ("https://github.com/joehahn/portfolio-wave-rider/blob/main/README.md", "README"),
             ("retrieval_pwr.html", "retrieval DB"),
             ("pool_browser.html", "pool browser"),
+            ("sweep_pwr.html", "sweep DB"),
         ]) +
         f'<h1>Curator-driven backtest '
         f'<span style="font-size:0.55em;color:#666;font-weight:400;">'
