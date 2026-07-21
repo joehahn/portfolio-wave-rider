@@ -3837,12 +3837,16 @@ def build_curator_dashboard(
     if summary_path.exists():
         log = json.loads(summary_path.read_text())
         rows = []
+        _n_active = 0
         for ev in log:
+            _adds, _removes, _rej = ev.get("adds") or [], ev.get("removes") or [], ev.get("rejections", 0)
+            if not _adds and not _removes and not _rej:
+                continue                                  # only show rebalances that actually did something
+            _n_active += 1
             d = ev.get("date", "")
-            adds = ", ".join(ev.get("adds") or []) or "—"
-            removes = ", ".join(ev.get("removes") or []) or "—"
-            rej = ev.get("rejections", 0)
-            rej_cell = str(rej) if rej else "—"
+            adds = ", ".join(_adds) or "—"
+            removes = ", ".join(_removes) or "—"
+            rej_cell = str(_rej) if _rej else "—"
             rows.append(
                 f"<tr><td>{_html.escape(d)}</td>"
                 f"<td style='color:#0a7a3a;'>{_html.escape(adds)}</td>"
@@ -3850,10 +3854,10 @@ def build_curator_dashboard(
                 f"<td>{_html.escape(rej_cell)}</td></tr>"
             )
         log_html = (
-            "<h2 style='margin-top:2em;'>Curation log</h2>"
-            f"<p style='color:#555;'>Each row is one {_html.escape(_cadence)} curator call. "
-            "The <em>Rejections</em> column counts adds and removes the validator "
-            "dropped as invalid (see "
+            "<h2 style='margin-top:2em;'>11. Curation log</h2>"
+            f"<p style='color:#555;'>The {_n_active} of {len(log)} {_html.escape(_cadence)} curator calls "
+            "that made a change (no-change rebalances are hidden). The <em>Rejections</em> column counts "
+            "adds and removes the validator dropped as invalid (see "
             "<a href='https://github.com/joehahn/portfolio-wave-rider/blob/main/REFERENCE.md#cli-reference'>"
             "REFERENCE.md</a>).</p>"
             "<table style='border-collapse:collapse;width:100%;font-size:14px;'>"
@@ -4200,22 +4204,35 @@ def build_curator_dashboard(
     except Exception:  # noqa: BLE001
         pass
 
-    def _attr_html(dct, xlab, labels=None, universe=None):
+    def _zeros_details(names, noun):
+        if not names:
+            return ""
+        return (f"<details style='margin:2px 0 1em;'><summary style='cursor:pointer;color:#868e96;"
+                f"font-size:13px;'>+ {len(names)} {noun} with zero adds (configured but never cited)</summary>"
+                f"<div style='color:#868e96;font-size:12px;margin:6px 0 0;max-width:900px;'>"
+                f"{_html.escape(', '.join(sorted(names)))}</div></details>")
+
+    def _attr_html(dct, xlab, labels=None, universe=None, noun="sources"):
         keys = set(dct) | set(universe or ())
         rows = sorted(((k, (sum(dct[k]) / len(dct[k]) if dct.get(k) else 0.0), len(dct.get(k, ()))) for k in keys),
                       key=lambda r: r[1])
-        if not rows:
-            return ""
         _lab = lambda k: (labels or {}).get(k, k)  # noqa: E731
-        f = go.Figure(go.Bar(x=[r[1] * 100 for r in rows], y=[f"{_lab(r[0])} (n={r[2]})" for r in rows],
-                             orientation="h",
-                             marker_color=["#2b8a3e" if r[1] >= 0 else "#c92a2a" for r in rows]))
-        f.update_layout(template="seaborn", height=max(240, 24 * len(rows) + 120),
-                        margin={"t": 20, "l": 230, "r": 30}, xaxis={"title": xlab})
-        return _to_html(f)
+        nonzero = [r for r in rows if r[2] > 0]           # cited: shown as bars
+        zeros = [_lab(r[0]) for r in rows if r[2] == 0]   # never cited: collapsed
+        if not nonzero and not zeros:
+            return ""
+        out = ""
+        if nonzero:
+            f = go.Figure(go.Bar(x=[r[1] * 100 for r in nonzero], y=[f"{_lab(r[0])} (n={r[2]})" for r in nonzero],
+                                 orientation="h",
+                                 marker_color=["#2b8a3e" if r[1] >= 0 else "#c92a2a" for r in nonzero]))
+            f.update_layout(template="seaborn", height=max(200, 24 * len(nonzero) + 110),
+                            margin={"t": 20, "l": 230, "r": 30}, xaxis={"title": xlab})
+            out += _to_html(f)
+        return out + _zeros_details(zeros, noun)
 
-    _gain_src = _attr_html(_src_ret, "mean forward price return of adds (%)", universe=_recognized)
-    _gain_kw = _attr_html(_kw_ret, "mean forward price return of adds (%)", universe=set(_kwmap))
+    _gain_src = _attr_html(_src_ret, "mean forward price return of adds (%)", universe=_recognized, noun="sources")
+    _gain_kw = _attr_html(_kw_ret, "mean forward price return of adds (%)", universe=set(_kwmap), noun="keywords")
 
     # Gain PER ARTICLE vs source: normalize each source's TOTAL add-gain by how many articles it put into
     # the pools (its pool footprint) -> signal density. Pool counts come from the run's *-pool.json (GKG).
@@ -4229,17 +4246,21 @@ def build_curator_dashboard(
             _sd = re.sub(r"^www\.", "", str(_a.get("source", "")).lower())
             if _sd and _a.get("url"):
                 _pool_src.setdefault(_sd, set()).add(_a["url"])
-    # (b1) number of adds per source (how many adds cited each domain).
+    # (b1) number of adds per source (how many adds cited each domain); zero-add sources collapsed.
     _nps = ""
-    _nrows = sorted(((s, len(_src_ret.get(s, ()))) for s in (set(_src_ret) | _recognized) if s != "(no source)"),
-                    key=lambda r: r[1])
-    if _nrows:
-        _fn = go.Figure(go.Bar(x=[r[1] for r in _nrows], y=[r[0] for r in _nrows], orientation="h",
-                               marker_color="#1f77b4"))
-        _fn.update_layout(template="seaborn", height=max(240, 24 * len(_nrows) + 120),
-                          margin={"t": 20, "l": 230, "r": 30},
-                          xaxis={"title": "number of adds citing this source"})
-        _nps = _to_html(_fn)
+    _nall = sorted(((s, len(_src_ret.get(s, ()))) for s in (set(_src_ret) | _recognized) if s != "(no source)"),
+                   key=lambda r: r[1])
+    _nrows = [r for r in _nall if r[1] > 0]
+    _nzero = [r[0] for r in _nall if r[1] == 0]
+    if _nrows or _nzero:
+        if _nrows:
+            _fn = go.Figure(go.Bar(x=[r[1] for r in _nrows], y=[r[0] for r in _nrows], orientation="h",
+                                   marker_color="#1f77b4"))
+            _fn.update_layout(template="seaborn", height=max(200, 24 * len(_nrows) + 110),
+                              margin={"t": 20, "l": 230, "r": 30},
+                              xaxis={"title": "number of adds citing this source"})
+            _nps = _to_html(_fn)
+        _nps += _zeros_details(_nzero, "sources")
 
     # (b2) gain PER ARTICLE: |value| on a LOG axis (sign shown by color, not position), so the wide
     # spread of densities is readable; biggest losers sink to the bottom (ascending signed sort).
