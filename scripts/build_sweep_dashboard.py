@@ -10,6 +10,8 @@ flags whether the winner is a period artifact. Every row is an IN-SAMPLE hypothe
 Usage: python scripts/build_sweep_dashboard.py [--runs-dir data/curator_runs/gkg-2yr-weekly]
 """
 import argparse
+import json
+import os
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -129,6 +131,12 @@ def _llm_rows(cfg):
             except Exception:  # noqa: BLE001
                 pass
         r["cost"] = (((tin / nl) * pin + (tout / nl) * pout) / 1e6 * n) if nl else float("nan")  # avg/call x n
+        # curator wall time: median gap between consecutive curation writes x calls (median ignores the
+        # resume gap, so it estimates the true per-call latency even for a run that was resumed).
+        fs = sorted(glob.glob(str(rd / "2*-curation.json")), key=os.path.getmtime)
+        gaps = sorted(os.path.getmtime(fs[i + 1]) - os.path.getmtime(fs[i]) for i in range(len(fs) - 1)) if len(fs) >= 3 else []
+        r["secs_call"] = gaps[len(gaps) // 2] if gaps else float("nan")
+        r["time_min"] = (r["secs_call"] * len(fs) / 60.0) if gaps else float("nan")
         _out = f"/tmp/_llm/{label.replace('/', '_').replace(' ', '')}"
         res = portfolio.curator_backtest(runs_dir=str(rd), out_dir=_out, max_weight=cap, risk_aversion=lam,
                                          benchmarks=["SPY"], lookback_years_override=lb / 365.0, always_include=ANCHORS)
@@ -272,12 +280,13 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     for r in _llm_rows(CURRENT):
         if r.get("pending"):
             llm_trs += (f'<tr style="border-bottom:1px solid #eee;color:#999;"><td {_lc}>{r["label"]}</td>'
-                        f'<td {_lc}>{r["prov"]}</td><td {_lc} colspan="9"><i>run in progress…</i></td></tr>')
+                        f'<td {_lc}>{r["prov"]}</td><td {_lc} colspan="10"><i>run in progress…</i></td></tr>')
             continue
         bg = "background:#fff7e6;" if "reference" in r["label"] else ""
         llm_trs += (
             f'<tr style="{bg}border-bottom:1px solid #eee;"><td {_lc}><b>{r["label"]}</b></td><td {_lc}>{r["prov"]}</td>'
-            + _c2(r["cost"], "${:,.2f}") + _c2(r["json"] * 100, "{:.0f}%") + _c2(r["agree"] * 100, "{:.0f}%")
+            + _c2(r["cost"], "${:,.2f}") + _c2(r["time_min"], "{:.0f} min")
+            + _c2(r["json"] * 100, "{:.0f}%") + _c2(r["agree"] * 100, "{:.0f}%")
             + f'<td {_lc}>{r["nadd"]} / {r["nrem"]}</td>' + _c2(r["ret"] * 100, "{:+.0f}%")
             + _c2(r["ir"], "{:+.2f}") + _c2(r["sharpe"], "{:.2f}") + _c2(r["calmar"], "{:.2f}")
             + _c2(r["dd"] * 100, "{:.0f}%") + "</tr>")
@@ -287,10 +296,12 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         'the profile config (cap 0.8 / λ 2.0 / 30d); the only variable is the curator LLM. The decision '
         'columns are the ones that matter: <b>agree</b> = share of weeks the model made the identical '
         'add/remove call as the reference (top row), <b>valid-JSON</b> = share of calls that parsed, '
-        '<b>$/run</b> = cost of a full 157-week curate. Backtest columns are secondary (in-sample / leaky). '
-        'A cheap model that tracks the reference makes the whole non-zero-cost sweep affordable.</p>'
+        '<b>$/run</b> = curator LLM cost of a full 157-week curate, and <b>curator time</b> = wall-clock of '
+        'those 157 calls (≈ per-call latency × 157; excludes GKG ingest + optimizer replay). Backtest '
+        'columns are secondary (in-sample / leaky). A cheap model that tracks the reference makes the whole '
+        'non-zero-cost sweep affordable.</p>'
         f'<table><thead><tr><th style="text-align:left">model</th><th style="text-align:left">provider</th>'
-        f'<th {_lc}>$/run</th><th {_lc}>valid-JSON</th><th {_lc}>agree vs ref</th><th {_lc}>adds/removes</th>'
+        f'<th {_lc}>$/run</th><th {_lc}>curator time</th><th {_lc}>valid-JSON</th><th {_lc}>agree vs ref</th><th {_lc}>adds/removes</th>'
         f'<th {_lc}>total</th><th {_lc}>IR</th><th {_lc}>Sharpe</th><th {_lc}>Calmar</th><th {_lc}>maxDD</th>'
         f'</tr></thead><tbody>{llm_trs}</tbody></table>')
     ts = datetime.now().strftime("%Y-%m-%d %H:%M %Z").strip()
