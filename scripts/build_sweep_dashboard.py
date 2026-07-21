@@ -146,6 +146,17 @@ def _llm_rows(cfg):
         spy = portfolio._fetch_benchmark_curves(["SPY"], totals.index[0], totals.index[-1], float(totals.iloc[0]))["SPY"]
         r.update(ret=res["realized_return"], ann=res["annualized_return"], dd=res["max_drawdown"],
                  **_metrics(totals, spy, res["annualized_return"], res["max_drawdown"]))
+        r["curve_x"] = [d.strftime("%Y-%m-%d") for d in totals.index]
+        r["curve_y"] = [float(v) for v in totals.values]
+        if not out:  # first finished (reference) run carries the SHARED SPY + buy/hold curves for plot 4
+            r["spy_y"] = [float(v) for v in spy.reindex(totals.index).ffill().values]
+            try:
+                bl = pd.read_csv(Path(_out) / "baselines_totals.csv", parse_dates=["date"])
+                bnh = bl.set_index("date")["eq_total"].dropna()
+                r["bnh_x"] = [d.strftime("%Y-%m-%d") for d in bnh.index]
+                r["bnh_y"] = [float(v) for v in bnh.values]
+            except Exception:  # noqa: BLE001
+                r["bnh_x"] = r["bnh_y"] = None
         out.append(r)
     return out
 
@@ -277,8 +288,9 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     # section 3: per-LLM comparison (same pools + profile config; only the curator model varies)
     def _c2(v, fmt):
         return f'<td {_lc}>{fmt.format(v) if v == v else "n/a"}</td>'
+    _llm = _llm_rows(CURRENT)
     llm_trs = ""
-    for r in _llm_rows(CURRENT):
+    for r in _llm:
         if r.get("pending"):
             llm_trs += (f'<tr style="border-bottom:1px solid #eee;color:#999;"><td {_lc}>{r["label"]}</td>'
                         f'<td {_lc}>{r["prov"]}</td><td {_lc} colspan="10"><i>run in progress…</i></td></tr>')
@@ -305,6 +317,30 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         f'<th {_lc}>$/run</th><th {_lc}>curator time</th><th {_lc}>valid-JSON</th><th {_lc}>agree vs ref</th><th {_lc}>adds/removes</th>'
         f'<th {_lc}>total</th><th {_lc}>IR</th><th {_lc}>Sharpe</th><th {_lc}>Calmar</th><th {_lc}>maxDD</th>'
         f'</tr></thead><tbody>{llm_trs}</tbody></table>')
+
+    # plot 4: equity-curve race per LLM + buy/hold + SPY (no rebalance markers, per request)
+    import plotly.graph_objects as go
+    _curved = [r for r in _llm if r.get("curve_x")]
+    _ref = _curved[0] if _curved else None
+    _pal = ["#d97706", "#1f77b4", "#2ca02c", "#9467bd", "#8c564b"]
+    _fig4 = go.Figure()
+    for _i, r in enumerate(_curved):
+        _fig4.add_trace(go.Scatter(x=r["curve_x"], y=r["curve_y"], mode="lines", name=r["label"].split(" (")[0],
+                                   line={"color": _pal[_i % len(_pal)], "width": 2}))
+    if _ref and _ref.get("bnh_x"):
+        _fig4.add_trace(go.Scatter(x=_ref["bnh_x"], y=_ref["bnh_y"], mode="lines", name="buy/hold (starter)",
+                                   line={"color": "#888", "width": 1.5, "dash": "dot"}))
+    if _ref and _ref.get("spy_y"):
+        _fig4.add_trace(go.Scatter(x=_ref["curve_x"], y=_ref["spy_y"], mode="lines", name="SPY",
+                                   line={"color": "#c92a2a", "width": 1.5, "dash": "dash"}))
+    _fig4.update_layout(template="seaborn", height=460, margin={"t": 20, "l": 72, "r": 20},
+                        yaxis={"title": "portfolio value ($)", "tickformat": "$,.0f"}, hovermode="x unified")
+    llm4_html = (('<h2>4. Portfolio value over time — by curator LLM (vs buy/hold and SPY)</h2>'
+                  '<p style="color:#555;max-width:920px;">Each LLM\'s realized portfolio value on the same pools '
+                  'and profile config, alongside the equal-weight buy/hold starter and SPY. Same idea as the '
+                  'curator DB\'s plot 1, without the rebalance markers.</p>'
+                  + _fig4.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False}))
+                 if _curved else "")
     ts = datetime.now().strftime("%Y-%m-%d %H:%M %Z").strip()
     page = f"""<!doctype html><html><head><meta charset="utf-8"><title>PWR — parameter sweep</title>
 <style>body{{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;max-width:1180px;margin:0 auto;
@@ -343,6 +379,7 @@ both halves) before trusting any row.</p>
 <th>maxDD</th><th>total</th><th>hit-rate</th><th>ann CI [5,95]</th><th>H1/H2 stable</th></tr></thead>
 <tbody>{trs}</tbody></table>
 {llm_html}
+{llm4_html}
 </body></html>"""
     out.write_text(page)
     top = max(rows, key=lambda r: r["ir"] if r["ir"] == r["ir"] else -9e9)
