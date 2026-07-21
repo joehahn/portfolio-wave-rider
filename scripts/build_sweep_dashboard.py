@@ -21,9 +21,9 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 from src import portfolio  # noqa: E402
 
-CAPS = [0.5, 0.8, 0.9, 1.0]
-LAMBDAS = [0.5, 1.0, 2.0]
-LOOKBACKS = [30, 60, 90]          # calendar days
+CAPS = [0.5, 0.67, 0.8, 0.9, 1.0]
+LAMBDAS = [0.5, 0.75, 1.0, 1.5, 2.0]
+LOOKBACKS = [14, 30, 60, 90, 120, 150]          # calendar days
 ANCHORS = ["SPY", "AGG", "IAU"]
 CURRENT = (0.8, 2.0, 30)          # the live investor_profile.md config
 BLUE, GREEN, RED, GREY = "#1f77b4", "#2b8a3e", "#c92a2a", "#adb5bd"
@@ -36,7 +36,11 @@ def _metrics(totals: pd.Series, spy: pd.Series, ann_ret: float, max_dd: float) -
     r = totals.pct_change().dropna()
     s = spy.reindex(totals.index).ffill().pct_change().reindex(r.index)
     act = (r - s).dropna()
-    ir = tstat = float("nan")
+    ir = tstat = sharpe = float("nan")
+    if len(r) > 2 and r.std() > 0:
+        ppy = len(r) / (days / 365.25)
+        # Sharpe = (excess-over-risk-free return) / total volatility, annualized (risk-free 4%/yr)
+        sharpe = (r.mean() - 0.04 / ppy) / r.std() * np.sqrt(ppy)
     if len(act) > 2 and act.std() > 0:
         ppy = len(act) / (days / 365.25)
         ir = act.mean() / act.std() * np.sqrt(ppy)
@@ -73,7 +77,7 @@ def _metrics(totals: pd.Series, spy: pd.Series, ann_ret: float, max_dd: float) -
         return (a.mean() / a.std() * np.sqrt(len(a) / (max((hi - lo).days, 1) / 365.25))) if len(a) > 5 and a.std() > 0 else float("nan")
     ir_h1 = _ir_half(totals.index[0], mid)
     ir_h2 = _ir_half(mid, totals.index[-1])
-    return {"calmar": calmar, "ir": ir, "tstat": tstat, "alpha": alpha, "hit": hit,
+    return {"calmar": calmar, "ir": ir, "tstat": tstat, "sharpe": sharpe, "alpha": alpha, "hit": hit,
             "ci_lo": ci[0], "ci_hi": ci[1], "ir_h1": ir_h1, "ir_h2": ir_h2}
 
 
@@ -99,7 +103,7 @@ def build(runs_dir: str, out: Path) -> None:
 
     # best per metric (higher is better except dd where less-negative is better)
     best = {k: max(rows, key=lambda r: (r[k] if r[k] == r[k] else -9e9))
-            for k in ("ir", "calmar", "alpha", "ann", "hit")}
+            for k in ("ir", "calmar", "sharpe", "alpha", "ann", "hit")}
     best["dd"] = max(rows, key=lambda r: r["dd"])   # least-negative drawdown
 
     def star(r, k):
@@ -117,6 +121,7 @@ def build(runs_dir: str, out: Path) -> None:
             f"<td style='padding:5px 10px;white-space:nowrap;'>{cfg}</td>"
             f"{td(r['ir'], '{:+.2f}', 'font-weight:600;', star(r,'ir'))}"
             f"{td(r['tstat'], '{:+.1f}')}"
+            f"{td(r['sharpe'], '{:.2f}', '', star(r,'sharpe'))}"
             f"{td(r['calmar'], '{:.2f}', '', star(r,'calmar'))}"
             f"{td(r['alpha']*100, '{:+.0f}%', '', star(r,'alpha'))}"
             f"{td(r['ann']*100, '{:+.0f}%', '', star(r,'ann'))}"
@@ -183,11 +188,12 @@ both halves) before trusting any row.</p>
 {scatter}
 <h2>2. All configs (ranked by IR)</h2>
 <table><thead><tr>
-<th>cap / λ / lookback</th><th>IR</th><th>t-stat</th><th>Calmar</th><th>alpha</th><th>ann</th>
+<th>cap / λ / lookback</th><th>IR</th><th>t-stat</th><th>Sharpe</th><th>Calmar</th><th>alpha</th><th>ann</th>
 <th>maxDD</th><th>total</th><th>hit-rate</th><th>ann CI [5,95]</th><th>H1/H2 stable</th></tr></thead>
 <tbody>{trs}</tbody></table>
 <p style="color:#888;font-size:12px;margin-top:1em;">IR = ann active return / tracking error vs SPY ·
-Calmar = ann / |maxDD| · alpha = ann − SPY ann · hit-rate = share of rolling 6-mo windows beating SPY ·
+Sharpe = (ann return − 4% risk-free) / total volatility · Calmar = ann / |maxDD| · alpha = ann − SPY ann ·
+hit-rate = share of rolling 6-mo windows beating SPY ·
 CI = block-bootstrap 5–95% on annualized return · stable = IR &gt; 0 in both halves.</p>
 </body></html>"""
     out.write_text(page)
