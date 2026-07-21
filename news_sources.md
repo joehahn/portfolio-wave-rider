@@ -74,7 +74,9 @@ source_major:
   - bbc.co.uk
   - theguardian.com
   - npr.org
-  - yahoo.com                  # GKG records ALL Yahoo (incl. Yahoo Finance) under bare yahoo.com — the wave-keyword filter already keeps these topic-relevant, so accept the lump (finance.yahoo.com matched nothing)
+  # NOTE: yahoo.com was briefly promoted to major (2026-07-20) but that flooded the pool — as major it
+  # jumped from ~2% to ~35% of articles (it's a huge wire-reposting aggregator), crowding out specialty
+  # desks. Reverted to TAIL 2026-07-21: it still gathers + can be selected, just not privileged (1.0).
   # added 2026-07-20 from live-curator citation audit: reputable outlets/portals
   - morningstar.com
   - investing.com
