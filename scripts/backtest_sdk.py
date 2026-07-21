@@ -56,6 +56,9 @@ def _anthropic():
     return anthropic.Anthropic(api_key=k)
 
 
+NO_REASONING = False   # set by --no-reasoning; disables OpenRouter models' reasoning (kimi etc. run ~free of the slow thinking pass)
+
+
 def _llm_complete(model: str, system: str, user: str, max_tokens: int, anthropic_cli):
     """One completion, provider-agnostic. A `claude-*` model routes to the Anthropic SDK; a
     `vendor/model` id (e.g. `deepseek/deepseek-v4-flash`) routes to OpenRouter's OpenAI-compatible
@@ -69,12 +72,14 @@ def _llm_complete(model: str, system: str, user: str, max_tokens: int, anthropic
     key = _env("OPENROUTER_API_KEY")
     if not key:
         raise RuntimeError("OPENROUTER_API_KEY empty in .env")
+    body = {"model": model, "max_tokens": max_tokens,
+            "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}]}
+    if NO_REASONING:
+        body["reasoning"] = {"enabled": False}   # skip the reasoning pass (huge speed-up on reasoning models)
     resp = requests.post(
         "https://openrouter.ai/api/v1/chat/completions",
         headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
-        json={"model": model, "max_tokens": max_tokens,
-              "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}]},
-        timeout=120)
+        json=body, timeout=120)
     resp.raise_for_status()
     j = resp.json()
     txt = (j["choices"][0]["message"].get("content") or "").strip()
@@ -413,6 +418,8 @@ def main(argv=None) -> int:
     ap.add_argument("--starter", nargs="+", default=["AAPL", "MSFT", "GOOGL", "NVDA", "SPY"])
     ap.add_argument("--model", default=None, help="curator LLM; default: profile backtest.curator_model "
                     "(claude-* -> Anthropic, vendor/model -> OpenRouter)")
+    ap.add_argument("--no-reasoning", action="store_true",
+                    help="disable OpenRouter models' reasoning pass (much faster on reasoning models like kimi)")
     ap.add_argument("--run-dir", required=True)
     ap.add_argument("--log-llm", action="store_true")
     ap.add_argument("--pools-only", action="store_true", help="build article pools, skip curator + replay")
@@ -453,6 +460,8 @@ def main(argv=None) -> int:
         a.max_articles = int(fm.get("max_articles") or 100)
     if a.model is None:
         a.model = portfolio.load_backtest_config().get("curator_model") or "claude-sonnet-5"
+    global NO_REASONING
+    NO_REASONING = a.no_reasoning
 
     news_lb = a.news_lookback_days
     run_dir = ROOT / a.run_dir; run_dir.mkdir(parents=True, exist_ok=True)
