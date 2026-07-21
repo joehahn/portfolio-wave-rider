@@ -70,7 +70,7 @@ source_major:
   - bbc.co.uk
   - theguardian.com
   - npr.org
-  - finance.yahoo.com          # the finance aggregator specifically (bare yahoo.com would over-match Yahoo Sports/etc.)
+  - yahoo.com                  # GKG records ALL Yahoo (incl. Yahoo Finance) under bare yahoo.com — the wave-keyword filter already keeps these topic-relevant, so accept the lump (finance.yahoo.com matched nothing)
   # added 2026-07-20 from live-curator citation audit: reputable outlets/portals
   - morningstar.com
   - investing.com
