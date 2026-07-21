@@ -146,6 +146,21 @@ def build(runs_dir: str, out: Path) -> None:
            ' &middot; <a href="retrieval_pwr.html">retriever DB</a>'
            ' &middot; <a href="pool_browser.html">pool browser</a>'
            ' &middot; <a href="backtest_gkg_2yr_weekly.html">curator DB</a></nav>')
+    _fmt = lambda xs: ", ".join(str(x) for x in xs)  # noqa: E731
+    grid_html = (
+        '<h2>Parameter settings</h2>'
+        f'<p style="color:#555;max-width:860px;">The three swept knobs (every combination = {len(rows)} '
+        'configs) and the values considered. All other optimizer / backtest params are held at the '
+        '<code>investor_profile.md</code> values — these knobs only re-weight the <b>same</b> curations.</p>'
+        '<table style="font-size:13px;margin-bottom:.6em;"><thead><tr>'
+        '<th style="text-align:left">parameter</th><th style="text-align:left">values swept</th>'
+        '<th style="text-align:left">current (profile)</th></tr></thead><tbody>'
+        f'<tr><td style="text-align:left">concentration_cap</td><td style="text-align:left">{_fmt(CAPS)}</td><td style="text-align:left">{CURRENT[0]}</td></tr>'
+        f'<tr><td style="text-align:left">risk_aversion (λ)</td><td style="text-align:left">{_fmt(LAMBDAS)}</td><td style="text-align:left">{CURRENT[1]}</td></tr>'
+        f'<tr><td style="text-align:left">optimizer_lookback (days)</td><td style="text-align:left">{_fmt(LOOKBACKS)}</td><td style="text-align:left">{CURRENT[2]}</td></tr>'
+        '</tbody></table>'
+        '<p style="color:#888;font-size:12px;max-width:860px;">Held constant (from the profile): rebalance '
+        'weekly, max_watchlist_size 5, risk-free 4%, execution lag 1 trading day, anchors SPY/AGG/IAU.</p>')
     ts = datetime.now().strftime("%Y-%m-%d %H:%M %Z").strip()
     page = f"""<!doctype html><html><head><meta charset="utf-8"><title>PWR — parameter sweep</title>
 <style>body{{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;max-width:1180px;margin:0 auto;
@@ -163,9 +178,10 @@ benchmark). SPY returned {spy_ret*100:+.0f}% over the window. ★ = best in colu
 <b>forward-test</b>; they don't prove an optimum. Read the <b>IR t-stat</b> (|t|&gt;2 ≈ real vs luck),
 the bootstrap <b>CI</b> (error bar on annualized return), and <b>H1/H2 stable</b> (does the edge hold in
 both halves) before trusting any row.</p>
-<h2>Frontier — return vs drawdown (color = IR, red ring = current config)</h2>
+{grid_html}
+<h2>1. Frontier — return vs drawdown (color = IR, red ring = current config)</h2>
 {scatter}
-<h2>All configs (ranked by IR)</h2>
+<h2>2. All configs (ranked by IR)</h2>
 <table><thead><tr>
 <th>cap / λ / lookback</th><th>IR</th><th>t-stat</th><th>Calmar</th><th>alpha</th><th>ann</th>
 <th>maxDD</th><th>total</th><th>hit-rate</th><th>ann CI [5,95]</th><th>H1/H2 stable</th></tr></thead>
