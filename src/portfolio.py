@@ -4187,20 +4187,35 @@ def build_curator_dashboard(
         for _s in (_srcs or {"(no source)"}):
             _src_ret[_s].append(_r)
 
-    def _attr_html(dct, xlab, labels=None):
-        rows = sorted(((k, sum(v) / len(v), len(v)) for k, v in dct.items()), key=lambda r: r[1])
+    # universe padding: show configured items that produced ZERO with a 0 bar (like the retriever DB) —
+    # recognized desks (news_sources.md) for the source plots, all wave keywords for the keyword plot.
+    _recognized = set()
+    try:
+        import sys as _sys
+        _sp = str(Path(__file__).resolve().parent.parent / "scripts")
+        if _sp not in _sys.path:
+            _sys.path.insert(0, _sp)
+        import gkg_pool as _gp
+        _recognized = set(_gp.PREFERRED_DOMAINS) | set(_gp.MAJOR_DOMAINS)
+    except Exception:  # noqa: BLE001
+        pass
+
+    def _attr_html(dct, xlab, labels=None, universe=None):
+        keys = set(dct) | set(universe or ())
+        rows = sorted(((k, (sum(dct[k]) / len(dct[k]) if dct.get(k) else 0.0), len(dct.get(k, ()))) for k in keys),
+                      key=lambda r: r[1])
         if not rows:
             return ""
         _lab = lambda k: (labels or {}).get(k, k)  # noqa: E731
         f = go.Figure(go.Bar(x=[r[1] * 100 for r in rows], y=[f"{_lab(r[0])} (n={r[2]})" for r in rows],
                              orientation="h",
                              marker_color=["#2b8a3e" if r[1] >= 0 else "#c92a2a" for r in rows]))
-        f.update_layout(template="seaborn", height=max(240, 26 * len(rows) + 120),
+        f.update_layout(template="seaborn", height=max(240, 24 * len(rows) + 120),
                         margin={"t": 20, "l": 230, "r": 30}, xaxis={"title": xlab})
         return _to_html(f)
 
-    _gain_src = _attr_html(_src_ret, "mean forward price return of adds (%)")
-    _gain_kw = _attr_html(_kw_ret, "mean forward price return of adds (%)")
+    _gain_src = _attr_html(_src_ret, "mean forward price return of adds (%)", universe=_recognized)
+    _gain_kw = _attr_html(_kw_ret, "mean forward price return of adds (%)", universe=set(_kwmap))
 
     # Gain PER ARTICLE vs source: normalize each source's TOTAL add-gain by how many articles it put into
     # the pools (its pool footprint) -> signal density. Pool counts come from the run's *-pool.json (GKG).
@@ -4216,11 +4231,12 @@ def build_curator_dashboard(
                 _pool_src.setdefault(_sd, set()).add(_a["url"])
     # (b1) number of adds per source (how many adds cited each domain).
     _nps = ""
-    _nrows = sorted(((s, len(rets)) for s, rets in _src_ret.items() if s != "(no source)"), key=lambda r: r[1])
+    _nrows = sorted(((s, len(_src_ret.get(s, ()))) for s in (set(_src_ret) | _recognized) if s != "(no source)"),
+                    key=lambda r: r[1])
     if _nrows:
         _fn = go.Figure(go.Bar(x=[r[1] for r in _nrows], y=[r[0] for r in _nrows], orientation="h",
                                marker_color="#1f77b4"))
-        _fn.update_layout(template="seaborn", height=max(240, 26 * len(_nrows) + 120),
+        _fn.update_layout(template="seaborn", height=max(240, 24 * len(_nrows) + 120),
                           margin={"t": 20, "l": 230, "r": 30},
                           xaxis={"title": "number of adds citing this source"})
         _nps = _to_html(_fn)
