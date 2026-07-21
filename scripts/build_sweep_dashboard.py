@@ -11,6 +11,7 @@ Usage: python scripts/build_sweep_dashboard.py [--runs-dir data/curator_runs/gkg
 """
 import argparse
 import sys
+from datetime import datetime
 from pathlib import Path
 
 import numpy as np
@@ -145,11 +146,13 @@ def build(runs_dir: str, out: Path) -> None:
            ' &middot; <a href="retrieval_pwr.html">retriever DB</a>'
            ' &middot; <a href="pool_browser.html">pool browser</a>'
            ' &middot; <a href="backtest_gkg_2yr_weekly.html">curator DB</a></nav>')
+    ts = datetime.now().strftime("%Y-%m-%d %H:%M %Z").strip()
     page = f"""<!doctype html><html><head><meta charset="utf-8"><title>PWR — parameter sweep</title>
 <style>body{{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;max-width:1180px;margin:0 auto;
 padding:0 1.5em;color:#222;line-height:1.5}}h1,h2{{color:#111}}table{{border-collapse:collapse;font-size:13px;width:100%}}
 th{{text-align:right;padding:6px 10px;border-bottom:2px solid #ccc;white-space:nowrap}}th:first-child{{text-align:left}}
-</style></head><body>{nav}
+.built{{position:absolute;top:8px;right:16px;font-size:12px;color:#888}}
+</style></head><body><div class="built">dashboard built {ts}</div>{nav}
 <h1>Parameter sweep — zero-cost optimizer knobs</h1>
 <p style="color:#555;max-width:860px;">{len(rows)} configs = concentration_cap × risk_aversion (λ) × optimizer_lookback,
 replayed on the <b>fixed 2-year curation set</b> ({runs_dir.split('/')[-1]}). These knobs touch only the
