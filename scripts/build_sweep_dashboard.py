@@ -81,25 +81,43 @@ def _metrics(totals: pd.Series, spy: pd.Series, ann_ret: float, max_dd: float) -
             "ci_lo": ci[0], "ci_hi": ci[1], "ir_h1": ir_h1, "ir_h2": ir_h2}
 
 
-def build(runs_dir: str, out: Path) -> None:
-    rows, spy_curve = [], None
-    for cap in CAPS:
-        for lam in LAMBDAS:
-            for lb in LOOKBACKS:
-                res = portfolio.curator_backtest(
-                    runs_dir=runs_dir, out_dir=f"/tmp/_sweep/{cap}_{lam}_{lb}",
-                    max_weight=cap, risk_aversion=lam, benchmarks=["SPY"],
-                    lookback_years_override=lb / 365.0, always_include=ANCHORS)
-                snaps = pd.read_csv(Path(f"/tmp/_sweep/{cap}_{lam}_{lb}") / "snapshots.csv", parse_dates=["date"])
-                totals = snaps.groupby("date")["total_value"].first().sort_index()
-                if spy_curve is None:
-                    spy_curve = portfolio._fetch_benchmark_curves(["SPY"], totals.index[0], totals.index[-1],
-                                                                  float(totals.iloc[0]))["SPY"]
-                m = _metrics(totals, spy_curve, res["annualized_return"], res["max_drawdown"])
-                rows.append({"cap": cap, "lam": lam, "lb": lb, "ret": res["realized_return"],
-                             "ann": res["annualized_return"], "dd": res["max_drawdown"], **m,
-                             "cur": (cap, lam, lb) == CURRENT})
-    spy_ret = float(spy_curve.iloc[-1] / spy_curve.iloc[0] - 1.0)
+def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
+    # The 150 backtest replays are the slow part; the metrics are DETERMINISTIC for a given (grid, curation
+    # set), so cache them. A text/layout-only edit then re-renders instantly (--recompute forces a sweep).
+    import hashlib
+    import json as _json
+    cache_p = ROOT / "data" / "curator_runs" / "_sweep_cache.json"
+    key = hashlib.md5(_json.dumps([CAPS, LAMBDAS, LOOKBACKS, list(CURRENT), runs_dir]).encode()).hexdigest()
+    rows = spy_ret = None
+    if not recompute and cache_p.exists():
+        try:
+            c = _json.loads(cache_p.read_text())
+            if c.get("key") == key:
+                rows, spy_ret = c["rows"], c["spy_ret"]
+                print(f"  loaded {len(rows)} configs from cache (--recompute to re-sweep)")
+        except Exception:  # noqa: BLE001
+            pass
+    if rows is None:
+        rows, spy_curve = [], None
+        for cap in CAPS:
+            for lam in LAMBDAS:
+                for lb in LOOKBACKS:
+                    res = portfolio.curator_backtest(
+                        runs_dir=runs_dir, out_dir=f"/tmp/_sweep/{cap}_{lam}_{lb}",
+                        max_weight=cap, risk_aversion=lam, benchmarks=["SPY"],
+                        lookback_years_override=lb / 365.0, always_include=ANCHORS)
+                    snaps = pd.read_csv(Path(f"/tmp/_sweep/{cap}_{lam}_{lb}") / "snapshots.csv", parse_dates=["date"])
+                    totals = snaps.groupby("date")["total_value"].first().sort_index()
+                    if spy_curve is None:
+                        spy_curve = portfolio._fetch_benchmark_curves(["SPY"], totals.index[0], totals.index[-1],
+                                                                      float(totals.iloc[0]))["SPY"]
+                    m = _metrics(totals, spy_curve, res["annualized_return"], res["max_drawdown"])
+                    rows.append({"cap": cap, "lam": lam, "lb": lb, "ret": res["realized_return"],
+                                 "ann": res["annualized_return"], "dd": res["max_drawdown"], **m,
+                                 "cur": (cap, lam, lb) == CURRENT})
+        spy_ret = float(spy_curve.iloc[-1] / spy_curve.iloc[0] - 1.0)
+        cache_p.parent.mkdir(parents=True, exist_ok=True)
+        cache_p.write_text(_json.dumps({"key": key, "spy_ret": spy_ret, "rows": rows}))
 
     # best per metric (higher is better except dd where less-negative is better)
     best = {k: max(rows, key=lambda r: (r[k] if r[k] == r[k] else -9e9))
@@ -166,6 +184,26 @@ def build(runs_dir: str, out: Path) -> None:
         '</tbody></table>'
         '<p style="color:#888;font-size:12px;max-width:860px;">Held constant (from the profile): rebalance '
         'weekly, max_watchlist_size 5, risk-free 4%, execution lag 1 trading day, anchors SPY/AGG/IAU.</p>')
+
+    # recommended-settings table: the live config (keep) vs the best-in-sample (forward-test, don't chase)
+    _cur_row = next(r for r in rows if r["cur"])
+    _best_ir = best["ir"]
+    _cfg = lambda r: f"{r['cap']:.2f} / {r['lam']:.2f} / {r['lb']}d"  # noqa: E731
+    _lc = 'style="text-align:left"'
+    rec_html = (
+        '<h3 style="margin:.6em 0 .2em;">Recommended settings</h3>'
+        f'<table style="font-size:13px;margin-bottom:.6em;"><thead><tr><th {_lc}>config (cap/λ/lookback)</th>'
+        f'<th {_lc}>IR</th><th {_lc}>Sharpe</th><th {_lc}>maxDD</th><th {_lc}>recommendation</th></tr></thead><tbody>'
+        f'<tr><td {_lc}><b>{_cfg(_cur_row)}</b> — current / live</td><td {_lc}>{_cur_row["ir"]:+.2f}</td>'
+        f'<td {_lc}>{_cur_row["sharpe"]:.2f}</td><td {_lc}>{_cur_row["dd"]*100:.0f}%</td>'
+        f'<td {_lc}><b>Keep this.</b> Conservative cap + short momentum window; solid and H1/H2-stable. The '
+        'sweep&#39;s &ldquo;best&rdquo; keeps drifting to the longest lookback as the grid grows '
+        '(30&rarr;90&rarr;120d) = overfitting the in-sample path, so do NOT chase it. Change only on '
+        'forward evidence.</td></tr>'
+        f'<tr><td {_lc}>{_cfg(_best_ir)} — best in-sample IR</td><td {_lc}>{_best_ir["ir"]:+.2f}</td>'
+        f'<td {_lc}>{_best_ir["sharpe"]:.2f}</td><td {_lc}>{_best_ir["dd"]*100:.0f}%</td>'
+        f'<td {_lc}>Highest in-sample risk-adjusted return, but it sits at the lookback grid EDGE (a classic '
+        'overfit tell). A candidate to <b>forward-test</b>, not to adopt live yet.</td></tr></tbody></table>')
     ts = datetime.now().strftime("%Y-%m-%d %H:%M %Z").strip()
     page = f"""<!doctype html><html><head><meta charset="utf-8"><title>PWR — parameter sweep</title>
 <style>body{{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;max-width:1180px;margin:0 auto;
@@ -187,11 +225,8 @@ both halves) before trusting any row.</p>
 <h2>1. Frontier — return vs drawdown (color = IR, red ring = current config)</h2>
 {scatter}
 <h2>2. All configs (ranked by IR)</h2>
-<table><thead><tr>
-<th>cap / λ / lookback</th><th>IR</th><th>t-stat</th><th>Sharpe</th><th>Calmar</th><th>alpha</th><th>ann</th>
-<th>maxDD</th><th>total</th><th>hit-rate</th><th>ann CI [5,95]</th><th>H1/H2 stable</th></tr></thead>
-<tbody>{trs}</tbody></table>
-<p style="color:#666;font-size:12px;margin-top:.8em;max-width:920px;line-height:1.6;"><b>Column meanings:</b><br>
+{rec_html}
+<p style="color:#666;font-size:12px;margin:.4em 0 .6em;max-width:920px;line-height:1.6;"><b>Column meanings:</b><br>
 <b>cap / λ / lookback</b> — the config: concentration cap (max weight per position) · risk-aversion λ · optimizer lookback (days of prices used to estimate μ/Σ).<br>
 <b>IR</b> — Information Ratio = annualized active return ÷ tracking error vs SPY. Consistency of beating SPY; this is the ranking column.<br>
 <b>t-stat</b> — statistical significance of the IR (= IR·√years). |t|&gt;2 ≈ the edge is real rather than luck.<br>
@@ -202,6 +237,10 @@ both halves) before trusting any row.</p>
 <b>hit-rate</b> — share of rolling 6-month windows in which the config beat SPY.<br>
 <b>ann CI [5,95]</b> — block-bootstrap 5–95% confidence interval on the annualized return (the error bar).<br>
 <b>H1/H2 stable</b> — whether IR &gt; 0 in <i>both</i> halves of the window (a yes means the edge isn't a one-half artifact).</p>
+<table><thead><tr>
+<th>cap / λ / lookback</th><th>IR</th><th>t-stat</th><th>Sharpe</th><th>Calmar</th><th>alpha</th><th>ann</th>
+<th>maxDD</th><th>total</th><th>hit-rate</th><th>ann CI [5,95]</th><th>H1/H2 stable</th></tr></thead>
+<tbody>{trs}</tbody></table>
 </body></html>"""
     out.write_text(page)
     top = max(rows, key=lambda r: r["ir"] if r["ir"] == r["ir"] else -9e9)
@@ -217,5 +256,6 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--runs-dir", default="data/curator_runs/gkg-2yr-weekly")
     ap.add_argument("--out", default=str(ROOT / "docs" / "sweep_pwr.html"))
+    ap.add_argument("--recompute", action="store_true", help="re-run the 150 backtests (else use cache)")
     a = ap.parse_args()
-    build(a.runs_dir, Path(a.out))
+    build(a.runs_dir, Path(a.out), recompute=a.recompute)
