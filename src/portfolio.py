@@ -3928,7 +3928,7 @@ def build_curator_dashboard(
             )
     if _st_blocks:
         search_html = (
-            "<h2 style='margin-top:2em;'>Curator decisions &amp; search terms</h2>"
+            "<h2 style='margin-top:2em;'>12. Curator decisions &amp; search terms</h2>"
             f"<p style='color:#555;max-width:780px;'>One row per {_html.escape(_cadence)} rebalance. "
             "Click to expand the curator's overall rationale, each add/remove with its reason, the cited "
             "<code>news_evidence</code> links, and the wave keywords behind that rebalance's pool "
