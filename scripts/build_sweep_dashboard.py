@@ -191,10 +191,17 @@ both halves) before trusting any row.</p>
 <th>cap / λ / lookback</th><th>IR</th><th>t-stat</th><th>Sharpe</th><th>Calmar</th><th>alpha</th><th>ann</th>
 <th>maxDD</th><th>total</th><th>hit-rate</th><th>ann CI [5,95]</th><th>H1/H2 stable</th></tr></thead>
 <tbody>{trs}</tbody></table>
-<p style="color:#888;font-size:12px;margin-top:1em;">IR = ann active return / tracking error vs SPY ·
-Sharpe = (ann return − 4% risk-free) / total volatility · Calmar = ann / |maxDD| · alpha = ann − SPY ann ·
-hit-rate = share of rolling 6-mo windows beating SPY ·
-CI = block-bootstrap 5–95% on annualized return · stable = IR &gt; 0 in both halves.</p>
+<p style="color:#666;font-size:12px;margin-top:.8em;max-width:920px;line-height:1.6;"><b>Column meanings:</b><br>
+<b>cap / λ / lookback</b> — the config: concentration cap (max weight per position) · risk-aversion λ · optimizer lookback (days of prices used to estimate μ/Σ).<br>
+<b>IR</b> — Information Ratio = annualized active return ÷ tracking error vs SPY. Consistency of beating SPY; this is the ranking column.<br>
+<b>t-stat</b> — statistical significance of the IR (= IR·√years). |t|&gt;2 ≈ the edge is real rather than luck.<br>
+<b>Sharpe</b> — (annualized return − 4% risk-free) ÷ total volatility. Standalone risk-adjusted return (per unit of total risk).<br>
+<b>Calmar</b> — annualized return ÷ |max drawdown|. Return earned per unit of worst peak-to-trough loss.<br>
+<b>alpha</b> — annualized return − SPY's annualized return (excess over the benchmark).<br>
+<b>ann</b> — annualized return · <b>maxDD</b> — deepest peak-to-trough drawdown · <b>total</b> — total return over the whole window.<br>
+<b>hit-rate</b> — share of rolling 6-month windows in which the config beat SPY.<br>
+<b>ann CI [5,95]</b> — block-bootstrap 5–95% confidence interval on the annualized return (the error bar).<br>
+<b>H1/H2 stable</b> — whether IR &gt; 0 in <i>both</i> halves of the window (a yes means the edge isn't a one-half artifact).</p>
 </body></html>"""
     out.write_text(page)
     top = max(rows, key=lambda r: r["ir"] if r["ir"] == r["ir"] else -9e9)
