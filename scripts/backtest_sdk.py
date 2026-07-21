@@ -56,6 +56,32 @@ def _anthropic():
     return anthropic.Anthropic(api_key=k)
 
 
+def _llm_complete(model: str, system: str, user: str, max_tokens: int, anthropic_cli):
+    """One completion, provider-agnostic. A `claude-*` model routes to the Anthropic SDK; a
+    `vendor/model` id (e.g. `deepseek/deepseek-v4-flash`) routes to OpenRouter's OpenAI-compatible
+    chat/completions endpoint (raw requests, no extra dep). Returns (text, tokens_in, tokens_out)."""
+    if model.startswith("claude"):
+        r = anthropic_cli.messages.create(model=model, max_tokens=max_tokens, system=system,
+                                          messages=[{"role": "user", "content": user}])
+        txt = "".join(getattr(b, "text", "") for b in r.content).strip()
+        return txt, r.usage.input_tokens, r.usage.output_tokens
+    import requests
+    key = _env("OPENROUTER_API_KEY")
+    if not key:
+        raise RuntimeError("OPENROUTER_API_KEY empty in .env")
+    resp = requests.post(
+        "https://openrouter.ai/api/v1/chat/completions",
+        headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
+        json={"model": model, "max_tokens": max_tokens,
+              "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}]},
+        timeout=120)
+    resp.raise_for_status()
+    j = resp.json()
+    txt = (j["choices"][0]["message"].get("content") or "").strip()
+    u = j.get("usage", {})
+    return txt, u.get("prompt_tokens", 0), u.get("completion_tokens", 0)
+
+
 # ----------------------------------------------------------------- retrieval (article list)
 # INGESTION is decoupled from the curator's read window: the whole backtest period is pulled from GKG
 # ONCE into a per-day corpus (ingest_gkg_corpus), and each rebalance's pool is a pure SLICE of that
@@ -338,24 +364,23 @@ Only swap (add+remove together) if a clearly stronger rising wave vehicle appear
     for attempt in range(2):
         # Retry transient API errors (403 auth blips, 429 rate limits, 5xx, network) with backoff so one
         # hiccup mid-run doesn't crash the whole walk-forward; give up to no_changes only after 6 tries.
-        r = None
+        ok = False
+        _uin = _uout = 0
         for _t in range(6):
             try:
-                r = cli.messages.create(model=model, max_tokens=8000, system=_CURATOR_SYSTEM,
-                                        messages=[{"role": "user", "content": user}])
+                txt, _uin, _uout = _llm_complete(model, _CURATOR_SYSTEM, user, 8000, cli)
+                ok = True
                 break
             except Exception as _e:  # noqa: BLE001
                 _w = min(90, 5 * 2 ** _t)
                 print(f"  API error {as_of} ({type(_e).__name__}): retry {_t + 1}/6 in {_w}s", file=sys.stderr)
                 time.sleep(_w)
-        if r is None:
+        if not ok:
             print(f"  API down for {as_of} after 6 retries -> no_changes", file=sys.stderr)
             break
-        # concatenate all text blocks (the model may emit a ThinkingBlock before the TextBlock)
-        txt = "".join(getattr(b, "text", "") for b in r.content).strip()
         if log_path and attempt == 0:
             log_path.write_text(json.dumps({"as_of": as_of, "model": model, "user": user, "response": txt,
-                                            "usage": {"in": r.usage.input_tokens, "out": r.usage.output_tokens}}, indent=2))
+                                            "usage": {"in": _uin, "out": _uout}}, indent=2))
         parsed = _try_parse(txt)
         if parsed is not None:
             return parsed
@@ -386,7 +411,8 @@ def main(argv=None) -> int:
     ap.add_argument("--risk-aversion", type=float, default=None, help="default: profile risk_aversion")
     ap.add_argument("--max-articles", type=int, default=None, help="default: profile max_articles")
     ap.add_argument("--starter", nargs="+", default=["AAPL", "MSFT", "GOOGL", "NVDA", "SPY"])
-    ap.add_argument("--model", default="claude-sonnet-5")
+    ap.add_argument("--model", default=None, help="curator LLM; default: profile backtest.curator_model "
+                    "(claude-* -> Anthropic, vendor/model -> OpenRouter)")
     ap.add_argument("--run-dir", required=True)
     ap.add_argument("--log-llm", action="store_true")
     ap.add_argument("--pools-only", action="store_true", help="build article pools, skip curator + replay")
@@ -425,6 +451,8 @@ def main(argv=None) -> int:
         a.risk_aversion = float(fm["risk_aversion"])
     if a.max_articles is None:
         a.max_articles = int(fm.get("max_articles") or 100)
+    if a.model is None:
+        a.model = portfolio.load_backtest_config().get("curator_model") or "claude-sonnet-5"
 
     news_lb = a.news_lookback_days
     run_dir = ROOT / a.run_dir; run_dir.mkdir(parents=True, exist_ok=True)
@@ -433,7 +461,7 @@ def main(argv=None) -> int:
     print(f"{len(dates)} rebalances ({a.cadence}, news window {news_lb}d), {a.start}..{a.end}", file=sys.stderr)
 
     bq = g._client()
-    cli = None if a.pools_only else _anthropic()
+    cli = _anthropic() if (not a.pools_only and a.model.startswith("claude")) else None  # only for Anthropic models
     thesis = ("Ride durable waves to early exposure, trim before the crest. Current wave = AI. Next tech "
               "waves: rockets & spacecraft, robotics, quantum, nuclear (SMRs near-term, fusion long-term). "
               "Non-tech: geopolitical realignment (defense/rearmament, tankers/shipping, drones), aging demographics.")

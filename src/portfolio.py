@@ -156,6 +156,11 @@ _BACKTEST_DEFAULTS: dict[str, Any] = {
     # genuinely unknowable when decided) -- the honest overfitting check. None =>
     # no split shown. Reporting-only; never affects optimizer math or live recs.
     "forward_split_date": None,
+    # LLM that drives the backtest curator (scripts/backtest_sdk.py). "claude-*" ids route to the
+    # Anthropic API; anything with a "/" (e.g. "deepseek/deepseek-v4-flash") routes to OpenRouter. This
+    # is a BACKTEST-only choice — the forward /review-portfolio curator runs as a Claude Code subagent on
+    # the session model, so this key never touches live recommendations.
+    "curator_model": "claude-sonnet-5",
 }
 
 
