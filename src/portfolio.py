@@ -4167,7 +4167,7 @@ def build_curator_dashboard(
     # NOT the free-text `source` the curator typed (which is inconsistent: "The Verge" vs "theverge.com").
     def _url_domain(u):
         m = re.search(r"https?://([^/]+)", u or "")
-        return re.sub(r"^www\.", "", m.group(1).lower()) if m else ""
+        return re.sub(r":\d+$", "", re.sub(r"^www\.", "", m.group(1).lower())) if m else ""  # strip www + :port
     _src_ret, _kw_ret = _ddict(list), _ddict(list)
     for (_d, _t, _ac, _ev) in _events:
         if _ac != "add":
