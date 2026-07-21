@@ -33,6 +33,7 @@ ANCHORS = ["SPY", "AGG", "IAU"]
 LLM_RUNS = [
     ("claude-sonnet-5 (reference)", "data/curator_runs/gkg-2yr-weekly", "Anthropic", 2.0, 10.0),
     ("deepseek/deepseek-v4-flash", "data/curator_runs/gkg-3yr-deepseek", "OpenRouter", 0.09, 0.19),
+    ("meta-llama/llama-4-scout", "data/curator_runs/gkg-3yr-llama", "OpenRouter", 0.10, 0.30),
 ]
 CURRENT = (0.8, 2.0, 30)          # the live investor_profile.md config
 BLUE, GREEN, RED, GREY = "#1f77b4", "#2b8a3e", "#c92a2a", "#adb5bd"
