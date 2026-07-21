@@ -25,6 +25,13 @@ CAPS = [0.5, 0.67, 0.8, 0.9, 1.0]
 LAMBDAS = [0.5, 0.75, 1.0, 1.5, 2.0]
 LOOKBACKS = [14, 30, 60, 90, 120, 150]          # calendar days
 ANCHORS = ["SPY", "AGG", "IAU"]
+
+# LLM curator comparison (section 3): (label, run_dir, provider, $in/M, $out/M). Agreement is measured
+# against the reference (first row). Add a row per model run you want to compare.
+LLM_RUNS = [
+    ("claude-sonnet-5 (reference)", "data/curator_runs/gkg-2yr-weekly", "Anthropic", 2.0, 10.0),
+    ("deepseek/deepseek-v4-flash", "data/curator_runs/gkg-3yr-deepseek", "OpenRouter", 0.09, 0.19),
+]
 CURRENT = (0.8, 2.0, 30)          # the live investor_profile.md config
 BLUE, GREEN, RED, GREY = "#1f77b4", "#2b8a3e", "#c92a2a", "#adb5bd"
 
@@ -79,6 +86,59 @@ def _metrics(totals: pd.Series, spy: pd.Series, ann_ret: float, max_dd: float) -
     ir_h2 = _ir_half(mid, totals.index[-1])
     return {"calmar": calmar, "ir": ir, "tstat": tstat, "sharpe": sharpe, "alpha": alpha, "hit": hit,
             "ci_lo": ci[0], "ci_hi": ci[1], "ir_h1": ir_h1, "ir_h2": ir_h2}
+
+
+def _llm_rows(cfg):
+    """One metrics row per curator LLM in LLM_RUNS. cfg = (cap, λ, lookback_days) held constant so the
+    only variable is the LLM. Decision agreement + valid-JSON are the LLM-specific signals; the backtest
+    metrics use the same profile config for every model. Runs not yet finished are marked pending."""
+    import glob
+
+    def _decisions(d):
+        o = {}
+        for f in glob.glob(str(ROOT / d / "2*-curation.json")):
+            try:
+                c = json.loads(Path(f).read_text())
+            except Exception:  # noqa: BLE001
+                continue
+            o[Path(f).name[:10]] = (tuple(sorted(x.get("ticker", "") for x in c.get("adds", []))),
+                                    tuple(sorted(x.get("ticker", "") for x in c.get("removes", []))))
+        return o
+
+    ref = _decisions(LLM_RUNS[0][1])
+    cap, lam, lb = cfg
+    out = []
+    for label, d, prov, pin, pout in LLM_RUNS:
+        rd = ROOT / d
+        r = {"label": label, "prov": prov, "pending": not (rd / "_backtest" / "snapshots.csv").exists()}
+        if r["pending"]:
+            out.append(r)
+            continue
+        dec = _decisions(d)
+        n = len(dec) or 1
+        both = set(dec) & set(ref)
+        r["agree"] = (sum(1 for x in both if dec[x] == ref[x]) / len(both)) if both else float("nan")
+        r["nadd"] = sum(len(v[0]) for v in dec.values())
+        r["nrem"] = sum(len(v[1]) for v in dec.values())
+        r["json"] = (n - len(glob.glob(str(rd / "_parse_fail" / "*.txt")))) / n
+        tin = tout = nl = 0
+        for lf in glob.glob(str(rd / "_log" / "*-curator.json")):
+            try:
+                u = json.loads(Path(lf).read_text()).get("usage", {})
+                tin += u.get("in", 0); tout += u.get("out", 0); nl += 1
+            except Exception:  # noqa: BLE001
+                pass
+        r["cost"] = (((tin / nl) * pin + (tout / nl) * pout) / 1e6 * n) if nl else float("nan")  # avg/call x n
+        _out = f"/tmp/_llm/{label.replace('/', '_').replace(' ', '')}"
+        res = portfolio.curator_backtest(runs_dir=str(rd), out_dir=_out, max_weight=cap, risk_aversion=lam,
+                                         benchmarks=["SPY"], lookback_years_override=lb / 365.0, always_include=ANCHORS)
+        snaps = pd.read_csv(Path(_out) / "snapshots.csv", parse_dates=["date"])
+        totals = snaps.groupby("date")["total_value"].first().sort_index()
+        spy = portfolio._fetch_benchmark_curves(["SPY"], totals.index[0], totals.index[-1], float(totals.iloc[0]))["SPY"]
+        r.update(ret=res["realized_return"], ann=res["annualized_return"], dd=res["max_drawdown"],
+                 **_metrics(totals, spy, res["annualized_return"], res["max_drawdown"]))
+        out.append(r)
+    return out
 
 
 def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
@@ -204,6 +264,35 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         f'<td {_lc}>{_best_ir["sharpe"]:.2f}</td><td {_lc}>{_best_ir["dd"]*100:.0f}%</td>'
         f'<td {_lc}>Highest in-sample risk-adjusted return, but it sits at the lookback grid EDGE (a classic '
         'overfit tell). A candidate to <b>forward-test</b>, not to adopt live yet.</td></tr></tbody></table>')
+
+    # section 3: per-LLM comparison (same pools + profile config; only the curator model varies)
+    def _c2(v, fmt):
+        return f'<td {_lc}>{fmt.format(v) if v == v else "n/a"}</td>'
+    llm_trs = ""
+    for r in _llm_rows(CURRENT):
+        if r.get("pending"):
+            llm_trs += (f'<tr style="border-bottom:1px solid #eee;color:#999;"><td {_lc}>{r["label"]}</td>'
+                        f'<td {_lc}>{r["prov"]}</td><td {_lc} colspan="9"><i>run in progress…</i></td></tr>')
+            continue
+        bg = "background:#fff7e6;" if "reference" in r["label"] else ""
+        llm_trs += (
+            f'<tr style="{bg}border-bottom:1px solid #eee;"><td {_lc}><b>{r["label"]}</b></td><td {_lc}>{r["prov"]}</td>'
+            + _c2(r["cost"], "${:,.2f}") + _c2(r["json"] * 100, "{:.0f}%") + _c2(r["agree"] * 100, "{:.0f}%")
+            + f'<td {_lc}>{r["nadd"]} / {r["nrem"]}</td>' + _c2(r["ret"] * 100, "{:+.0f}%")
+            + _c2(r["ir"], "{:+.2f}") + _c2(r["sharpe"], "{:.2f}") + _c2(r["calmar"], "{:.2f}")
+            + _c2(r["dd"] * 100, "{:.0f}%") + "</tr>")
+    llm_html = (
+        '<h2>3. LLM comparison — curator model (same pools + profile config)</h2>'
+        '<p style="color:#555;max-width:920px;">Every model reads the <b>same</b> news pools and replays at '
+        'the profile config (cap 0.8 / λ 2.0 / 30d); the only variable is the curator LLM. The decision '
+        'columns are the ones that matter: <b>agree</b> = share of weeks the model made the identical '
+        'add/remove call as the reference (top row), <b>valid-JSON</b> = share of calls that parsed, '
+        '<b>$/run</b> = cost of a full 157-week curate. Backtest columns are secondary (in-sample / leaky). '
+        'A cheap model that tracks the reference makes the whole non-zero-cost sweep affordable.</p>'
+        f'<table><thead><tr><th style="text-align:left">model</th><th style="text-align:left">provider</th>'
+        f'<th {_lc}>$/run</th><th {_lc}>valid-JSON</th><th {_lc}>agree vs ref</th><th {_lc}>adds/removes</th>'
+        f'<th {_lc}>total</th><th {_lc}>IR</th><th {_lc}>Sharpe</th><th {_lc}>Calmar</th><th {_lc}>maxDD</th>'
+        f'</tr></thead><tbody>{llm_trs}</tbody></table>')
     ts = datetime.now().strftime("%Y-%m-%d %H:%M %Z").strip()
     page = f"""<!doctype html><html><head><meta charset="utf-8"><title>PWR — parameter sweep</title>
 <style>body{{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;max-width:1180px;margin:0 auto;
@@ -241,6 +330,7 @@ both halves) before trusting any row.</p>
 <th>cap / λ / lookback</th><th>IR</th><th>t-stat</th><th>Sharpe</th><th>Calmar</th><th>alpha</th><th>ann</th>
 <th>maxDD</th><th>total</th><th>hit-rate</th><th>ann CI [5,95]</th><th>H1/H2 stable</th></tr></thead>
 <tbody>{trs}</tbody></table>
+{llm_html}
 </body></html>"""
     out.write_text(page)
     top = max(rows, key=lambda r: r["ir"] if r["ir"] == r["ir"] else -9e9)
