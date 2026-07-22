@@ -12,7 +12,7 @@ from datetime import datetime
 
 FORWARD = [
     ("index.html", "Live portfolio"),
-    ("corpus_pwr.html", "News corpus"),
+    ("corpus_pwr.html", "Retriever (WebSearch)"),
     # future forward pages slot in here, e.g.:
     # ("forward_curator.html", "Curator"),
     # ("forward_sweep.html", "Sweep"),

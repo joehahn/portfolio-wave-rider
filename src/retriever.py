@@ -198,10 +198,15 @@ class GdeltBackfillRetriever:
     def __init__(self, days: int = 21, max_per_beat: int = 15):
         self.days = days
         self.cap = max_per_beat
+        self.blocked = blocked_domains()   # drop news_sources.md source_block domains, like the WebSearch pull
         import sys as _sys
         _sys.path.insert(0, str(ROOT / "scripts"))
         import news_pool
         self._np = news_pool
+
+    def _is_blocked(self, url: str, domain: str) -> bool:
+        host = (domain or urlsplit(url).hostname or "").lower().removeprefix("www.")
+        return any(b in host for b in self.blocked)
 
     def pull(self, pull_id: str, pulled_at: str) -> tuple[list[dict[str, Any]], dict[str, Any]]:
         from datetime import date, timedelta
@@ -219,7 +224,7 @@ class GdeltBackfillRetriever:
                 continue
             for rank, a in enumerate(arts):
                 url = a.get("url")
-                if not url:
+                if not url or self._is_blocked(url, a.get("domain", "")):
                     continue
                 cid = corpus.article_id(url)
                 if cid not in bodies:
