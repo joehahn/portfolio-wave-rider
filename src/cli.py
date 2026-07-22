@@ -254,9 +254,14 @@ def main(argv: list[str] | None = None) -> int:
                 if args.curator_model:
                     _fm = portfolio.load_financial_model()
                     config_note = (
-                        f"Curator model: {args.curator_model}  ·  optimizer: "
-                        f"cap {_fm['concentration_cap']:.2f} / λ {_fm['risk_aversion']:g} / "
-                        f"lookback {int(_fm.get('optimizer_lookback_days', 30))}d / {_fm['rebalance_period']}"
+                        f"curator_model: {args.curator_model}  ·  "
+                        f"concentration_cap: {_fm['concentration_cap']:.2f}  ·  "
+                        f"risk_aversion λ: {_fm['risk_aversion']:g}  ·  "
+                        f"optimizer_lookback_days: {int(_fm.get('optimizer_lookback_days', 30))}  ·  "
+                        f"news_lookback_days: {int(_fm.get('news_lookback_days', 21))}  ·  "
+                        f"min_trade_size_frac: {_fm.get('min_trade_size_frac', 0.1):g}  ·  "
+                        f"rebalance: {_fm['rebalance_period']}  ·  "
+                        f"max_watchlist_size: {int(_fm.get('max_watchlist_size', 5))}"
                     )
                 result = portfolio.build_curator_dashboard(
                     backtest_dir=args.curator_backtest_dir,

@@ -3803,18 +3803,13 @@ def build_curator_dashboard(
         template="seaborn",
         height=3700, margin={"t": 112 if config_note else 90, "b": 60, "l": 80, "r": 30},
         title={
+            # Only the parameter note sits above plot 1 (curator model + optimizer/curator config).
+            # Rendered only when the caller passes config_note, so a dashboard never mislabels the run
+            # that made it. The old return-summary stats line was removed — those numbers live in the
+            # plot 1 curves and the curation log below.
             "text": (
-                # optional parameter note (curator model + optimizer config) above plot 1 — only
-                # rendered when the caller passes it, so a dashboard never mislabels the run that made it.
-                (f"<span style='font-size:13px;color:#111;font-weight:600;'>{_html.escape(config_note)}</span><br>"
-                 if config_note else "")
-                + f"<span style='font-size:14px;color:#555;'>"
-                f"Curator-driven: {cur_return * 100:+.0f}%  "
-                f"·  Buy/hold: {bnh_return * 100:+.0f}%  "
-                f"·  (Curator - buy/hold): {(cur_return - bnh_return) * 100:+.0f}%  "
-                f"·  (Curator - buy/hold)/(buy/hold): "
-                f"{(cur_return - bnh_return) / bnh_return:.2f}"
-                f"</span>"
+                f"<span style='font-size:13px;color:#111;font-weight:600;'>{_html.escape(config_note)}</span>"
+                if config_note else ""
             ),
             "x": 0.5, "xanchor": "center",
         },
