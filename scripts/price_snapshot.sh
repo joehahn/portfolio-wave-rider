@@ -7,7 +7,9 @@ PROJ="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$PROJ"
 {
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] snapshot start"
-  .venv/bin/python -m src.cli snapshot
+  # --force so this post-close run OVERWRITES any earlier same-day row (e.g. an intraday manual snapshot)
+  # with the authoritative close, leaving exactly one row per date.
+  .venv/bin/python -m src.cli snapshot --force
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] dashboard start"
   .venv/bin/python -m src.cli dashboard
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] review (if due) start"
