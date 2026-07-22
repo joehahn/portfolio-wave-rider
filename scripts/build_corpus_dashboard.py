@@ -42,6 +42,17 @@ def _hfig(traces, xtitle, height=300, left=220):
     return fig
 
 
+def _blocked_count() -> int:
+    """How many source_block domains news_sources.md excludes from the forward pull (shown as a card)."""
+    import re
+    import yaml
+    p = ROOT / "news_sources.md"
+    if not p.exists():
+        return 0
+    m = re.match(r"^---\s*\n(.*?)\n---\s*\n", p.read_text(), re.DOTALL)
+    return len((yaml.safe_load(m.group(1)) or {}).get("source_block") or []) if m else 0
+
+
 def build():
     arts, pulls = _jsonl("articles.jsonl"), _jsonl("pulls.jsonl")
     n = len(arts)
@@ -117,19 +128,23 @@ def build():
                    + fig.to_html(full_html=False, include_plotlyjs="cdn" if i == 0 else False,
                                  config={"displayModeBar": False}))
 
-    rng = f"{dated[0]} to {dated[-1]}" if dated else "n/a"
-    summary = (
-        '<table style="font-size:14px;border-collapse:collapse;margin:.5em 0 1.5em;">'
-        f'<tr><td style="padding:2px 16px 2px 0;color:#666;">articles</td><td><b>{n}</b> '
-        f'({len(dated)} dated, {undated} undated)</td></tr>'
-        f'<tr><td style="padding:2px 16px 2px 0;color:#666;">published-date span</td><td>{rng}</td></tr>'
-        f'<tr><td style="padding:2px 16px 2px 0;color:#666;">full-text extracted</td><td>{100*ok//n if n else 0}% '
-        f'&middot; names a ticker {100*tick//n if n else 0}%</td></tr>'
-        f'<tr><td style="padding:2px 16px 2px 0;color:#666;">waves &middot; sources</td>'
-        f'<td>{len(wave)} waves &middot; {len(set(a.get("source_domain") for a in arts))} domains</td></tr>'
-        f'<tr><td style="padding:2px 16px 2px 0;color:#666;">a review today would read</td>'
-        f'<td><b>{in_window}</b> articles (trailing {LOOKBACK}d window, {win_lo} to {today})</td></tr>'
-        '</table>')
+    # ---- stat cards (top row, mirrors retrieval_pwr) ----
+    def _card(v, label, color="#0b7285"):
+        return (f'<div style="display:inline-block;margin:0 1.8em .8em 0;vertical-align:top">'
+                f'<b style="font-size:1.6em;color:{color}">{v}</b><br>'
+                f'<span style="font-size:.82em;color:#555">{label}</span></div>')
+    domains = len(set(a.get("source_domain") for a in arts))
+    n_app = len(_jsonl("appearances.jsonl"))
+    summary = ('<div style="margin:.8em 0 1.5em">'
+               + _card(f"{n:,}", "articles in corpus (unique)")
+               + _card(f"{n_app:,}", "sightings logged (appearances)")
+               + _card(len(pulls), "pulls run")
+               + _card(len(gaps), "missing days (gaps)", "#0a7a3a" if not gaps else "#b45309")
+               + _card(f"{100*ok//n if n else 0}%", "full-text extracted")
+               + _card(in_window, f"read by a review now ({LOOKBACK}d window)")
+               + _card(f"{len(wave)} / {domains}", "waves / source domains")
+               + _card(_blocked_count(), "blocked domains (source_block)")
+               + "</div>")
 
     page = f"""<!doctype html><html><head><meta charset="utf-8"><title>PWR — news corpus</title>
 <style>body{{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;max-width:1000px;margin:0 auto;
