@@ -30,9 +30,9 @@ ANCHORS = ["SPY", "AGG", "IAU"]
 
 # LLM curator comparison (section 3): (label, run_dir, provider, $in/M, $out/M). Agreement is measured
 # against the reference (first row). Add a row per model run you want to compare.
-LLM_RUNS = [
-    ("claude-sonnet-5 (reference)", "data/curator_runs/gkg-2yr-weekly", "Anthropic", 2.0, 10.0),
-    ("moonshotai/kimi-k2.5", "data/curator_runs/gkg-3yr-kimi", "OpenRouter", 0.57, 2.85),
+LLM_RUNS = [   # row 0 = the DEFAULT curator; the "agree vs default" column + plot-4 benchmark curves key off it
+    ("moonshotai/kimi-k2.5 (default)", "data/curator_runs/gkg-3yr-kimi", "OpenRouter", 0.57, 2.85),
+    ("claude-sonnet-5", "data/curator_runs/gkg-2yr-weekly", "Anthropic", 2.0, 10.0),
     ("deepseek/deepseek-v4-flash", "data/curator_runs/gkg-3yr-deepseek", "OpenRouter", 0.09, 0.19),
 ]
 CURRENT = (0.8, 2.0, 30)          # the live investor_profile.md config
@@ -308,13 +308,13 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         '<p style="color:#555;max-width:920px;">Every model reads the <b>same</b> news pools and replays at '
         'the profile config (cap 0.8 / λ 2.0 / 30d); the only variable is the curator LLM. The decision '
         'columns are the ones that matter: <b>agree</b> = share of weeks the model made the identical '
-        'add/remove call as the reference (top row), <b>valid-JSON</b> = share of calls that parsed, '
+        'add/remove call as the <b>default</b> model (top row, kimi), <b>valid-JSON</b> = share of calls that parsed, '
         '<b>$/run</b> = curator LLM cost of a full 157-week curate, and <b>curator time</b> = wall-clock of '
         'those 157 calls (≈ per-call latency × 157; excludes GKG ingest + optimizer replay). Backtest '
-        'columns are secondary (in-sample / leaky). A cheap model that tracks the reference makes the whole '
+        'columns are secondary (in-sample / leaky). A cheap model that tracks the default makes the whole '
         'non-zero-cost sweep affordable.</p>'
         f'<table><thead><tr><th style="text-align:left">model</th><th style="text-align:left">provider</th>'
-        f'<th {_lc}>$/run</th><th {_lc}>curator time</th><th {_lc}>valid-JSON</th><th {_lc}>agree vs ref</th><th {_lc}>adds/removes</th>'
+        f'<th {_lc}>$/run</th><th {_lc}>curator time</th><th {_lc}>valid-JSON</th><th {_lc}>agree vs default</th><th {_lc}>adds/removes</th>'
         f'<th {_lc}>total</th><th {_lc}>IR</th><th {_lc}>t-stat</th><th {_lc}>Sharpe</th><th {_lc}>Calmar</th><th {_lc}>maxDD</th>'
         f'</tr></thead><tbody>{llm_trs}</tbody></table>')
 
@@ -396,7 +396,7 @@ th{{text-align:right;padding:6px 10px;border-bottom:2px solid #ccc;white-space:n
 </style></head><body><div class="built">dashboard built {ts}</div>{nav}
 <h1>Parameter sweep — zero-cost optimizer knobs</h1>
 <p style="color:#555;max-width:860px;">{len(rows)} configs = concentration_cap × risk_aversion (λ) × optimizer_lookback,
-replayed on the <b>fixed 2-year curation set</b> ({runs_dir.split('/')[-1]}). These knobs touch only the
+replayed on the <b>fixed 3-year curation set of the default curator</b> ({runs_dir.split('/')[-1]}). These knobs touch only the
 mean-variance replay, not the curator, so the whole grid costs <b>$0</b> (no LLM). Ranked by
 <b>Information Ratio</b> (annualized active return ÷ tracking error vs SPY — consistency of beating the
 benchmark). SPY returned {spy_ret*100:+.0f}% over the window. ★ = best in column.</p>
@@ -440,7 +440,7 @@ both halves) before trusting any row.</p>
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("--runs-dir", default="data/curator_runs/gkg-2yr-weekly")
+    ap.add_argument("--runs-dir", default="data/curator_runs/gkg-3yr-kimi")  # the DEFAULT curator's curations (kimi)
     ap.add_argument("--out", default=str(ROOT / "docs" / "sweep_pwr.html"))
     ap.add_argument("--recompute", action="store_true", help="re-run the 150 backtests (else use cache)")
     a = ap.parse_args()
