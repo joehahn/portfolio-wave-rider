@@ -74,6 +74,46 @@ class Retriever(Protocol):
         ...
 
 
+def _extract_article(url: str, cid: str, res: dict, pulled_at: str, query: str, wave: str) -> dict[str, Any]:
+    """Fetch a live page and extract its body + metadata (title, AUTHOR byline, date, full text) via
+    trafilatura. Shared by every retriever, so author capture lives in ONE place. A dead/paywalled/JS
+    page yields a body-less record (title + url only). `res` may carry a fallback title/page_age."""
+    import hashlib
+    title, author, pub_date, language, snippet, full_text, image, publisher = (
+        res.get("title", ""), None, None, None, "", "", None, None)
+    ok = False
+    try:
+        html = trafilatura.fetch_url(url)
+        if html:
+            j = trafilatura.extract(html, output_format="json", with_metadata=True,
+                                    favor_precision=True, include_comments=False)
+            if j:
+                m = json.loads(j)
+                full_text = m.get("text") or ""
+                title = m.get("title") or title
+                author = m.get("author")
+                pub_date = m.get("date")
+                language = m.get("language")
+                snippet = (m.get("description") or full_text[:300]).strip()
+                image = m.get("image")
+                publisher = m.get("sitename")
+                ok = bool(full_text)
+    except Exception:  # noqa: BLE001 - a dead/paywalled/JS page just yields a body-less record
+        pass
+    host = (urlsplit(url).hostname or "").lower().removeprefix("www.")
+    blob = full_text or (title + url)
+    return {
+        "article_id": cid, "url": url, "canonical_url": corpus.canon_url(url),
+        "source_domain": host, "publisher": publisher or host, "title": title, "author": author,
+        "published_date": (pub_date or res.get("date") or "")[:10] or None, "language": language,
+        "snippet": snippet, "full_text": full_text, "extraction_ok": ok,
+        "content_hash": hashlib.sha1(blob.encode("utf-8")).hexdigest()[:16],
+        "image_url": image, "tickers_mentioned": _tickers(title + " " + full_text),
+        "first_pulled_at": pulled_at, "first_query": query, "first_wave": wave,
+        "page_age": res.get("page_age"),
+    }
+
+
 class WebSearchRetriever:
     def __init__(self, model: str, waves: dict[str, list[str]], max_results_per_query: int | None = None):
         self.model = model
@@ -111,43 +151,6 @@ class WebSearchRetriever:
                                     "page_age": getattr(it, "page_age", None)})
         return results[: self.cap] if self.cap else results
 
-    def _extract(self, url: str, cid: str, res: dict, pulled_at: str, query: str, wave: str) -> dict[str, Any]:
-        """Fetch + extract one article body at pull time (the as-of version)."""
-        import hashlib
-        title, author, pub_date, language, snippet, full_text, image, publisher = (
-            res.get("title", ""), None, None, None, "", "", None, None)
-        ok = False
-        try:
-            html = trafilatura.fetch_url(url)
-            if html:
-                j = trafilatura.extract(html, output_format="json", with_metadata=True,
-                                        favor_precision=True, include_comments=False)
-                if j:
-                    m = json.loads(j)
-                    full_text = m.get("text") or ""
-                    title = m.get("title") or title
-                    author = m.get("author")
-                    pub_date = m.get("date")
-                    language = m.get("language")
-                    snippet = (m.get("description") or full_text[:300]).strip()
-                    image = m.get("image")
-                    publisher = m.get("sitename")
-                    ok = bool(full_text)
-        except Exception:  # noqa: BLE001 - a dead/paywalled/JS page just yields a body-less record
-            pass
-        host = (urlsplit(url).hostname or "").lower().removeprefix("www.")
-        blob = full_text or (title + url)
-        return {
-            "article_id": cid, "url": url, "canonical_url": corpus.canon_url(url),
-            "source_domain": host, "publisher": publisher or host, "title": title, "author": author,
-            "published_date": (pub_date or "")[:10] or None, "language": language, "snippet": snippet,
-            "full_text": full_text, "extraction_ok": ok,
-            "content_hash": hashlib.sha1(blob.encode("utf-8")).hexdigest()[:16],
-            "image_url": image, "tickers_mentioned": _tickers(title + " " + full_text),
-            "first_pulled_at": pulled_at, "first_query": query, "first_wave": wave,
-            "page_age": res.get("page_age"),
-        }
-
     def pull(self, pull_id: str, pulled_at: str) -> tuple[list[dict[str, Any]], dict[str, Any]]:
         sightings: list[dict[str, Any]] = []
         query_stats: dict[str, Any] = {}
@@ -166,15 +169,63 @@ class WebSearchRetriever:
                     continue
                 cid = corpus.article_id(url)
                 if cid not in bodies:
-                    bodies[cid] = self._extract(url, cid, res, pulled_at, query, wave)
+                    bodies[cid] = _extract_article(url, cid, res, pulled_at, query, wave)
                 sightings.append({**bodies[cid], "pull_id": pull_id, "pulled_at": pulled_at,
                                   "query": query, "wave": wave, "result_rank": rank})
         return sightings, query_stats
 
 
-class GkgWaybackRetriever:
-    """Historical (backtest) retriever: date-honest GKG + Wayback. Wired in Stage 2 by wrapping the
-    existing scripts/gkg_pool.py + news_pool.py path so the backtest reuses this same interface."""
+# GDELT DOC-API beats for the recent-history backfill, one per wave (short queries; GDELT treats a
+# space as implicit AND, so keep each to 1-2 content words).
+_GDELT_BEATS = [
+    ("AI chip", "AI"),
+    ("space stocks", "rockets_spacecraft"),
+    ("nuclear reactor", "nuclear"),
+    ("quantum computing", "quantum"),
+    ("robotics automation", "robotics"),
+    ("defense contract", "geopolitical"),
+    ("senior housing REIT", "aging_demographics"),
+]
+
+
+class GdeltBackfillRetriever:
+    """Recent-history backfill: keyless GDELT DOC-API article discovery (date-honest) + LIVE page
+    extraction (full text + AUTHOR, via the shared _extract_article). For a <~30-day window the pages
+    are still up, so we fetch them live rather than Wayback (which lags on fresh pages). Run once to
+    seed the forward corpus with prior news so the curator has a full trailing window immediately.
+    (True OLD-history GKG+Wayback retrieval stays in scripts/backtest_sdk; this is the forward seed.)"""
+
+    def __init__(self, days: int = 21, max_per_beat: int = 15):
+        self.days = days
+        self.cap = max_per_beat
+        import sys as _sys
+        _sys.path.insert(0, str(ROOT / "scripts"))
+        import news_pool
+        self._np = news_pool
 
     def pull(self, pull_id: str, pulled_at: str) -> tuple[list[dict[str, Any]], dict[str, Any]]:
-        raise NotImplementedError("GkgWaybackRetriever lands in Stage 2 (backtest unification)")
+        from datetime import date, timedelta
+        end = date.today()
+        start = end - timedelta(days=self.days)
+        sightings: list[dict[str, Any]] = []
+        query_stats: dict[str, Any] = {}
+        bodies: dict[str, dict] = {}
+        for query, wave in _GDELT_BEATS:
+            try:
+                arts = self._np.gdelt_fetch(query, start, end)[: self.cap]
+                query_stats[query] = {"wave": wave, "results": len(arts)}
+            except Exception as e:  # noqa: BLE001 - one bad beat must not sink the backfill
+                query_stats[query] = {"wave": wave, "error": str(e)[:140]}
+                continue
+            for rank, a in enumerate(arts):
+                url = a.get("url")
+                if not url:
+                    continue
+                cid = corpus.article_id(url)
+                if cid not in bodies:
+                    d = self._np._parse_gdelt_date(a.get("seendate", ""))
+                    res = {"title": a.get("title", ""), "date": d.isoformat() if d else None}
+                    bodies[cid] = _extract_article(url, cid, res, pulled_at, query, wave)
+                sightings.append({**bodies[cid], "pull_id": pull_id, "pulled_at": pulled_at,
+                                  "query": query, "wave": wave, "result_rank": rank})
+        return sightings, query_stats

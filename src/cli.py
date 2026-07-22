@@ -216,6 +216,10 @@ def main(argv: list[str] | None = None) -> int:
                         help="only pull the first N waves (smoke test)")
     p_pull.add_argument("--max-results", type=int, default=None,
                         help="cap results kept per query (smoke test)")
+    p_pull.add_argument("--backfill", action="store_true",
+                        help="one-time cold-start seed: fill the corpus with prior news via GDELT "
+                             "discovery + live extraction (instead of a same-day WebSearch pull)")
+    p_pull.add_argument("--days", type=int, default=21, help="--backfill window in days (default 21)")
 
     p_rev = sub.add_parser("review",
                            help="FORWARD rebalance: curate the watchlist from the corpus news slice, "
@@ -242,16 +246,23 @@ def main(argv: list[str] | None = None) -> int:
             from datetime import datetime
             from . import corpus, retriever
             fw = portfolio.load_forward_config()
-            waves = json.loads(Path("gkg_config.json").read_text()).get("wave_keywords", {})
-            if args.limit_waves:
-                waves = dict(list(waves.items())[: args.limit_waves])
             pulled_at = datetime.now().isoformat(timespec="seconds")
             as_of = args.as_of or pulled_at[:10]
-            pull_id = f"pull-{pulled_at.replace(':', '').replace('-', '')}"
-            model = args.model or fw["retrieval_model"]
-            r = retriever.WebSearchRetriever(model, waves, max_results_per_query=args.max_results)
-            sightings, query_stats = r.pull(pull_id, pulled_at)
-            result = corpus.append_pull(pull_id, pulled_at, fw["retriever"], model, sightings, query_stats)
+            if args.backfill:
+                pull_id = f"backfill-{pulled_at.replace(':', '').replace('-', '')}"
+                r = retriever.GdeltBackfillRetriever(days=args.days, max_per_beat=args.max_results or 15)
+                sightings, query_stats = r.pull(pull_id, pulled_at)
+                result = corpus.append_pull(pull_id, pulled_at, "gdelt-backfill", f"{args.days}d",
+                                            sightings, query_stats)
+            else:
+                waves = json.loads(Path("gkg_config.json").read_text()).get("wave_keywords", {})
+                if args.limit_waves:
+                    waves = dict(list(waves.items())[: args.limit_waves])
+                pull_id = f"pull-{pulled_at.replace(':', '').replace('-', '')}"
+                model = args.model or fw["retrieval_model"]
+                r = retriever.WebSearchRetriever(model, waves, max_results_per_query=args.max_results)
+                sightings, query_stats = r.pull(pull_id, pulled_at)
+                result = corpus.append_pull(pull_id, pulled_at, fw["retriever"], model, sightings, query_stats)
             result["as_of"] = as_of
         elif args.cmd == "review":
             from datetime import datetime
