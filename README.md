@@ -64,16 +64,18 @@ Open your crontab:
 crontab -e
 ```
 
-and add these two lines, substituting your actual repository path for `/path/to/portfolio-wave-rider`:
+and add the following, editing the `PWR_path` line just once to your actual repository path:
 
 ```
-# PWR: Daily (7-day) forward news pull into the corpus, 16:00 local
-0 16 * * *  /path/to/portfolio-wave-rider/scripts/cron_pull.sh
-# PWR: Weekday price snapshot + dashboard + review (if due), Mon-Fri 16:30 local
-30 16 * * 1-5  /path/to/portfolio-wave-rider/scripts/cron_snapshot.sh
+# portfolio-wave-rider: set the repo path once; both jobs below reuse it
+PWR_path=/path/to/portfolio-wave-rider
+# Daily (7-day) forward news pull into the corpus, 16:00 local
+0 16 * * *  $PWR_path/scripts/cron_pull.sh
+# Weekday price snapshot + dashboard + review (if due), Mon-Fri 16:30 local
+30 16 * * 1-5  $PWR_path/scripts/cron_snapshot.sh
 ```
 
-Verify with `crontab -l`. Works the same on macOS and Linux, and leaves any other crontab entries untouched.
+Verify with `crontab -l`. Works the same on macOS and Linux, and leaves any other crontab entries untouched. cron makes the `PWR_path` variable available to every command below it, so it must appear before the two job lines. The scripts ship executable, so no `chmod` is needed.
 
 - **Daily at 16:00 local** (`cron_pull.sh`, every day including weekends): the forward news pull. It runs your wave queries through Anthropic web_search and appends the raw articles to the frozen corpus under `data/forward_corpus/`. Running every day freezes each article near its publication date, which keeps the corpus clean for later forward testing.
 - **Weekday at 16:30 local** (`cron_snapshot.sh`, Mon to Fri): the price snapshot, dashboard refresh, and a self-gating rebalance review. It snapshots per-ticker prices into `data/snapshots.csv`, regenerates `docs/index.html`, then runs `review --if-due`, which curates the watchlist and writes a fresh recommendation report to `data/reports/` only when a full `rebalance_period` has elapsed since the last review. The 30-minute gap after the pull means the review always reads a freshly-pulled corpus.
@@ -84,7 +86,7 @@ cron only fires while the machine is awake and does not replay missed runs. Back
 
 To publish a refreshed dashboard to GitHub Pages: `git add docs/index.html && git commit -m "Refresh live dashboard" && git push`, since cron does not auto-push.
 
-To uninstall: run `crontab -e` and delete the two lines ending in `cron_pull.sh` and `cron_snapshot.sh`.
+To uninstall: run `crontab -e` and delete the `PWR_path` line and the two `cron_pull.sh` / `cron_snapshot.sh` job lines.
 
 ## Runs
 
