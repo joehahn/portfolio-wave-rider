@@ -33,6 +33,42 @@ def _load_allocations(arg: str) -> dict[str, float]:
     return {str(k).upper(): float(v) for k, v in raw.items()}
 
 
+def _write_review_report(date, decision, apply_res, rec, n_articles, lookback, model):
+    """Recommendation-only forward review report -> data/reports/<date>-review-portfolio.md."""
+    L = [f"# Portfolio review — {date}", "",
+         f"_Curator: {model} · news window: {lookback}d ({n_articles} articles read) · "
+         f"recommendation only, no trades executed._", "", "## Watchlist changes"]
+    adds, removes = apply_res.get("applied_adds", []), apply_res.get("applied_removes", [])
+    rej = apply_res.get("rejections", [])
+    L.append(f"- **Adds:** {', '.join(adds) or '—'}")
+    L.append(f"- **Removes:** {', '.join(removes) or '—'}")
+    if rej:
+        L.append("- **Rejected:** " + "; ".join(
+            f"{r.get('ticker')} ({r.get('action')}: {r.get('reason')})" for r in rej))
+    if decision.get("rationale_overall"):
+        L += ["", decision["rationale_overall"]]
+    for a in decision.get("adds", []):
+        L.append(f"\n- **{a.get('ticker')}** [{a.get('wave_bucket', '')}]: {a.get('rationale', '')}")
+        for e in a.get("news_evidence", []):
+            L.append(f"  - {e.get('summary', '')} ({e.get('url', '')})")
+    L += ["", "## Recommended allocation (mean-variance optimizer)"]
+    weights = (rec or {}).get("weights") or {}
+    if weights:
+        L += ["| ticker | weight |", "|---|---|"]
+        for t, w in sorted(weights.items(), key=lambda kv: -kv[1]):
+            if w > 0.001:
+                L.append(f"| {t} | {w * 100:.1f}% |")
+        L.append(f"\nSharpe {rec.get('sharpe_ratio'):.2f} · E[r] {rec.get('expected_annual_return', 0) * 100:.1f}% · "
+                 f"vol {rec.get('annual_volatility', 0) * 100:.1f}%")
+    L += ["", "## Acting on this",
+          "This is a recommendation, not a trade. Execute in your brokerage, then edit `holdings.csv` "
+          "so the next daily snapshot reflects the new positions."]
+    path = Path("data/reports") / f"{date}-review-portfolio.md"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("\n".join(L))
+    return str(path)
+
+
 def main(argv: list[str] | None = None) -> int:
     # Load profile-driven defaults for the optimizer-related flags. Missing
     # profile / missing financial_model section -> hard-coded defaults so
@@ -181,6 +217,19 @@ def main(argv: list[str] | None = None) -> int:
     p_pull.add_argument("--max-results", type=int, default=None,
                         help="cap results kept per query (smoke test)")
 
+    p_rev = sub.add_parser("review",
+                           help="FORWARD rebalance: curate the watchlist from the corpus news slice, "
+                                "re-optimize, and write a recommendation-only report. No trades executed.")
+    p_rev.add_argument("--as-of", default=None, help="rebalance date (default: today)")
+    p_rev.add_argument("--model", default=None, help="curator model; default: forward.curator_model")
+    p_rev.add_argument("--news-lookback", type=int, default=None,
+                       help="trailing news days the curator reads; default: forward.news_lookback_days")
+    p_rev.add_argument("--dry-run", action="store_true",
+                       help="curate only: print the decision, do NOT apply to holdings.csv or recommend")
+    p_rev.add_argument("--if-due", action="store_true",
+                       help="only run if a full rebalance_period has elapsed since the last review "
+                            "(self-gating: safe to call daily from cron; handles catch-up + idempotency)")
+
     args = parser.parse_args(argv)
 
     try:
@@ -204,6 +253,53 @@ def main(argv: list[str] | None = None) -> int:
             sightings, query_stats = r.pull(pull_id, pulled_at)
             result = corpus.append_pull(pull_id, pulled_at, fw["retriever"], model, sightings, query_stats)
             result["as_of"] = as_of
+        elif args.cmd == "review":
+            from datetime import datetime
+            import pandas as pd
+            from . import corpus, curator
+            fw = portfolio.load_forward_config()
+            as_of = args.as_of or datetime.now().strftime("%Y-%m-%d")
+            if args.if_due:   # self-gate: skip unless a full rebalance_period elapsed since the last review
+                import glob
+                from datetime import date
+                _pd = {"weekly": 7, "biweekly": 14, "monthly": 30, "quarterly": 91}.get(fm["rebalance_period"], 7)
+                _prior = sorted(glob.glob("data/curator_runs/live/2*-curation.json"))
+                _last = _prior[-1].split("/")[-1][:10] if _prior else None
+                if _last and (date.fromisoformat(as_of) - date.fromisoformat(_last)).days < _pd:
+                    print(json.dumps({"as_of": as_of, "skipped": f"not due (last review {_last}, "
+                                      f"{fm['rebalance_period']} cadence, need {_pd}d)"}))
+                    return 0
+            anchors = fm.get("always_include", [])
+            all_tk = pd.read_csv("holdings.csv")["ticker"].astype(str).str.upper().tolist()
+            watchlist = [t for t in all_tk if t not in anchors]      # anchors sit outside max_watchlist_size
+            lookback = args.news_lookback or fw["news_lookback_days"]
+            pool = corpus.read_slice(as_of, lookback)
+            model = args.model or fw["curator_model"]
+            live = Path("data/curator_runs/live")
+            cli_a = curator.anthropic_client() if model.startswith("claude") else None
+            decision = curator.curate(
+                curator.format_pool(pool), watchlist, as_of=as_of, model=model, anthropic_cli=cli_a,
+                max_size=int(fm["max_watchlist_size"]), anchors=anchors, cadence=fm["rebalance_period"],
+                intro=curator.LIVE_INTRO, no_reasoning=True,
+                log_path=live / f"{as_of}-curator.json", fail_dir=live / "_parse_fail")
+            live.mkdir(parents=True, exist_ok=True)
+            (live / f"{as_of}-curation.json").write_text(json.dumps(decision, indent=2))
+            if args.dry_run:
+                result = {"as_of": as_of, "articles_read": len(pool), "dry_run": True, "decision": decision}
+            else:
+                # Recommendation-only: apply updates the WATCHLIST (shares=0 adds; the validator blocks
+                # removing a ticker with shares>0), never real share counts. Then re-optimize + report.
+                apply_res = portfolio.apply_curator_decisions(decision, listing_check=True, as_of_date=as_of)
+                rec = portfolio.recommend_portfolio(
+                    period=fm["lookback_period"], max_weight=fm["concentration_cap"],
+                    risk_free_rate=fm["risk_free_rate"], objective="mean_variance",
+                    risk_aversion=fm["risk_aversion"], date=as_of, force=True)
+                report = _write_review_report(as_of, decision, apply_res, rec, len(pool), lookback, model)
+                result = {"as_of": as_of, "articles_read": len(pool),
+                          "applied_adds": apply_res.get("applied_adds"),
+                          "applied_removes": apply_res.get("applied_removes"),
+                          "rejections": apply_res.get("rejections"),
+                          "recommended_weights": rec.get("weights"), "report": report}
         elif args.cmd == "backtest":
             if args.curator_runs_dir:
                 # Backtest-only optimizer overrides from investor_profile.md's

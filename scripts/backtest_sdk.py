@@ -32,9 +32,11 @@ from datetime import date, timedelta
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))   # repo root, for `from src import ...`
 import gkg_pool as g            # GKG query + filters (reused)
 import news_pool as w           # wayback_lede (GHR-grade, reused)
 from google.cloud import bigquery
+from src import curator          # SHARED curator (prompt + SDK call + parse); forward uses it too
 
 ROOT = g.ROOT
 CADENCE_DAYS = {"weekly": 7, "biweekly": 14, "monthly": 30, "quarterly": 91}
@@ -349,51 +351,13 @@ def _try_parse(txt: str) -> dict | None:
 def call_curator(cli, model: str, as_of: str, watchlist: list[str], thesis: str, exclusions: str,
                  max_size: int, anchors: list[str], articles_text: str, cadence: str,
                  log_path: Path | None, fail_dir: Path) -> dict:
-    user = f"""Backtest, article-list mode (forward-resembling: a raw list of date-clean news ARTICLES with title + snippet, like live WebSearch results — you discover the tickers and filter the noise yourself).
-- as_of_date: {as_of}
-- current_watchlist: {watchlist}
-- max_watchlist_size: {max_size} (managed slots; {anchors} are always_include anchors, off-limits, don't count). Any ADD needs a paired REMOVE, or no_changes.
-- rebalance_period: {cadence} (you are re-run every {cadence} — calibrate churn to this cadence; most {cadence} windows warrant no_changes, act only on a genuine catalyst)
-- profile_wave_thesis: {thesis}
-- exclusions: {exclusions}
-
-news_pool (read it, discover US-listed wave tickers with real catalysts, DISCARD the noise):
-{articles_text}
-
-Only swap (add+remove together) if a clearly stronger rising wave vehicle appears vs a current holding, else no_changes. In rationale_overall, note what noise you filtered. Emit ONLY the JSON object per your output schema."""
-    # max_tokens must cover the model's (default) thinking block PLUS the JSON output — 2000 was
-    # entirely consumed by thinking, leaving no text and silently defaulting every call to no_changes.
-    # The model very occasionally emits malformed JSON (a stray bracket _try_parse can't repair); retry
-    # once on a fresh sample before giving up, so a one-off glitch doesn't lose a genuine curation.
-    txt = ""
-    for attempt in range(2):
-        # Retry transient API errors (403 auth blips, 429 rate limits, 5xx, network) with backoff so one
-        # hiccup mid-run doesn't crash the whole walk-forward; give up to no_changes only after 6 tries.
-        ok = False
-        _uin = _uout = 0
-        for _t in range(6):
-            try:
-                txt, _uin, _uout = _llm_complete(model, _CURATOR_SYSTEM, user, 8000, cli)
-                ok = True
-                break
-            except Exception as _e:  # noqa: BLE001
-                _w = min(90, 5 * 2 ** _t)
-                print(f"  API error {as_of} ({type(_e).__name__}): retry {_t + 1}/6 in {_w}s", file=sys.stderr)
-                time.sleep(_w)
-        if not ok:
-            print(f"  API down for {as_of} after 6 retries -> no_changes", file=sys.stderr)
-            break
-        if log_path and attempt == 0:
-            log_path.write_text(json.dumps({"as_of": as_of, "model": model, "user": user, "response": txt,
-                                            "usage": {"in": _uin, "out": _uout}}, indent=2))
-        parsed = _try_parse(txt)
-        if parsed is not None:
-            return parsed
-        print(f"  WARN {as_of}: unparseable curator JSON (attempt {attempt+1}/2)", file=sys.stderr)
-    fail_dir.mkdir(parents=True, exist_ok=True)   # both attempts failed: save raw, no_changes for this date
-    (fail_dir / f"{as_of}.txt").write_text(txt)
-    print(f"  WARN {as_of}: giving up -> no_changes (raw saved to _parse_fail/)", file=sys.stderr)
-    return {"as_of_date": as_of, "adds": [], "removes": [], "no_changes": True}
+    # Delegates to the SHARED curator (src/curator.py) so the backtest and the forward loop run one
+    # prompt + parse + retry path. intro=_BT_INTRO keeps the backtest's exact wording (byte-identical
+    # prompt), and NO_REASONING preserves the --no-reasoning speed setting.
+    return curator.curate(articles_text, watchlist, as_of=as_of, model=model, anthropic_cli=cli,
+                          thesis=thesis, exclusions=exclusions, max_size=max_size, anchors=anchors,
+                          cadence=cadence, intro=curator._BT_INTRO, no_reasoning=NO_REASONING,
+                          log_path=log_path, fail_dir=fail_dir)
 
 
 # ----------------------------------------------------------------- walk-forward
