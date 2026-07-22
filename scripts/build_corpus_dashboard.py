@@ -86,14 +86,17 @@ def build():
         _fig([go.Bar(x=[d for d in sorted(pull_day)], y=[new_by_day[d] for d in sorted(pull_day)],
                      marker_color="#3b82f6")], "", "new articles / day")))
 
-    # 2. Articles by published date (histogram, just below the pull-history panel)
+    # 2. Articles by published date (histogram, just below the pull-history panel).
+    # Categorical x-axis: otherwise a couple of stale-dated hub pages (2010, 2020, ...) stretch a
+    # continuous time axis across 16 years and squash the recent cluster to invisible slivers.
     dc = Counter(dated)
     dk = sorted(dc)
+    _f2 = _fig([go.Bar(x=dk, y=[dc[d] for d in dk], marker_color="#0ea5e9")], "", "articles")
+    _f2.update_xaxes(type="category", tickangle=-45)
     figs.append((
         "2. Articles by published date",
         (f"when the stored articles were published; the curator only reads the trailing {LOOKBACK}-day "
-         "window, so the older outliers (evergreen / hub pages with stale dates) never reach it"),
-        _fig([go.Bar(x=dk, y=[dc[d] for d in dk], marker_color="#0ea5e9")], "", "articles")))
+         "window, so the older outliers (evergreen / hub pages with stale dates) never reach it"), _f2))
 
     # 3. Articles by wave — horizontal (mirrors retrieval_pwr plot 5)
     wave = Counter(a.get("first_wave", "?") for a in arts)
