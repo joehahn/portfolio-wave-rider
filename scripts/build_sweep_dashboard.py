@@ -374,14 +374,16 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                 name=f"{r['label'].split(' (')[0]} vs {_ref['label'].split(' (')[0]}",
                 line={"color": _pal[(_i + 1) % len(_pal)], "width": 2}))
         _fig5.update_layout(template="seaborn", height=380, margin=_MARG,
-                            yaxis={"title": "portfolio overlap (Σ min weight)", "range": [0, 1.02]},
+                            yaxis={"title": "overlap = Σ min(w, w_ref)", "range": [0, 1.02]},
                             hovermode="x unified", legend=_LEG)
         _fig5.update_xaxes(range=_xr)
         llm5_html = ('<h2>5. Portfolio similarity over time — overlap vs the reference curator</h2>'
-                     '<p style="color:#555;max-width:920px;">Per-date portfolio <b>overlap coefficient</b> '
-                     '&Sigma; min(weight) between each LLM\'s holdings and the reference (Sonnet): 1.0 = '
-                     'identical holdings &amp; weights, 0 = disjoint. Shows WHEN a cheap model\'s portfolio '
-                     'diverges (vs the single agreement % in table 3).</p>'
+                     '<p style="color:#555;max-width:920px;">Per-date portfolio <b>overlap</b>: for each '
+                     'ticker take the <i>smaller</i> of this LLM\'s weight and the reference\'s (Sonnet) '
+                     'weight, then sum over tickers &mdash; <b>&Sigma;<sub>i</sub> min(w<sub>i,this</sub>, '
+                     'w<sub>i,Sonnet</sub>)</b>. That\'s the fraction of the portfolio held <i>identically</i>: '
+                     '1.0 = same holdings &amp; weights, 0 = fully disjoint. Shows WHEN a cheap model\'s '
+                     'portfolio diverges (vs the single agreement % in table 3).</p>'
                      + _fig5.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False}))
     ts = datetime.now().strftime("%Y-%m-%d %H:%M %Z").strip()
     page = f"""<!doctype html><html><head><meta charset="utf-8"><title>PWR — parameter sweep</title>
