@@ -1,40 +1,51 @@
 #!/usr/bin/env bash
 # One-shot cron installer for portfolio-wave-rider. Works on macOS and Linux.
 #
-# Appends a single line to the user's crontab pointing at
-# scripts/cron_snapshot.sh (which in turn runs snapshot + dashboard daily
-# Mon-Fri 16:30 local). Idempotent: re-running detects an existing entry
-# and exits cleanly. Preserves any other entries already in your crontab.
+# Installs TWO entries, preserving any other crontab lines you have:
+#   1. Daily (7-day)     16:00  scripts/cron_pull.sh      -> forward news pull into the frozen corpus
+#   2. Weekday (Mon-Fri) 16:30  scripts/cron_snapshot.sh -> price snapshot + dashboard + review (if due)
+# The pull runs 30 min before the snapshot so the review reads a freshly-pulled corpus. Idempotent:
+# re-running only adds whichever entry is missing.
 #
-# cron only fires while the machine is awake; missed runs do not auto-replay.
-# Use `--date YYYY-MM-DD` on `snapshot` to backfill a missed day.
+# cron only fires while the machine is awake; missed runs do not auto-replay. A missed news pull cannot
+# be cleanly backfilled (re-querying WebSearch about a past day reintroduces hindsight), so a persistently-
+# asleep laptop leaves gaps in the corpus. Backfill a missed price snapshot with `snapshot --date YYYY-MM-DD`.
 #
-# To uninstall: run `crontab -e` and delete the line containing
-# cron_snapshot.sh.
+# To uninstall: run `crontab -e` and delete the two lines ending in cron_pull.sh / cron_snapshot.sh.
 set -euo pipefail
 
 PROJ="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SCRIPT="$PROJ/scripts/cron_snapshot.sh"
-LINE="30 16 * * 1-5  $SCRIPT"
+PULL="$PROJ/scripts/cron_pull.sh"
+SNAP="$PROJ/scripts/cron_snapshot.sh"
+PULL_LINE=$'# PWR: Daily (7-day) forward news pull into the corpus, 16:00 local\n'"0 16 * * *  $PULL"
+SNAP_LINE=$'# PWR: Weekday price snapshot + dashboard + review (if due), Mon-Fri 16:30 local\n'"30 16 * * 1-5  $SNAP"
 
-if [[ ! -x "$SCRIPT" ]]; then
-  echo "error: $SCRIPT is not executable. Run 'chmod +x $SCRIPT' first." >&2
-  exit 1
-fi
+command -v crontab >/dev/null 2>&1 || { echo "error: crontab not found. Install it via your package manager." >&2; exit 1; }
+for s in "$PULL" "$SNAP"; do
+  [[ -x "$s" ]] || { echo "error: $s is not executable. Run 'chmod +x $s' first." >&2; exit 1; }
+done
 
-if ! command -v crontab >/dev/null 2>&1; then
-  echo "error: crontab not found. Install it via your package manager." >&2
-  exit 1
-fi
+CUR="$(crontab -l 2>/dev/null || true)"
+NEW="$CUR"
+changed=0
+add_line() {  # add crontab line "$2" unless a line already references script path "$1"
+  if ! grep -Fq "$1" <<<"$NEW"; then
+    NEW="${NEW:+$NEW$'\n'}$2"
+    changed=1
+  fi
+}
+add_line "$PULL" "$PULL_LINE"
+add_line "$SNAP" "$SNAP_LINE"
 
-if crontab -l 2>/dev/null | grep -Fq "$SCRIPT"; then
-  echo "Already installed. Current crontab line referencing the helper:"
-  crontab -l | grep -F "$SCRIPT"
+if [[ $changed -eq 0 ]]; then
+  echo "Already installed. Current PWR crontab lines:"
+  crontab -l | grep -F "$PROJ/scripts/"
   exit 0
 fi
 
-(crontab -l 2>/dev/null; echo "$LINE") | crontab -
-echo "Installed: $LINE"
+printf '%s\n' "$NEW" | crontab -
+echo "Installed / updated. PWR crontab lines now:"
+crontab -l | grep -F "$PROJ/scripts/"
 echo
-echo "Verify with: crontab -l"
-echo "Uninstall: run 'crontab -e' and delete the line above."
+echo "Verify all entries with: crontab -l"
+echo "Uninstall: run 'crontab -e' and delete the cron_pull.sh / cron_snapshot.sh lines."

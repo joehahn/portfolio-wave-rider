@@ -56,19 +56,24 @@ cp holdings.example.csv holdings.csv
 
 Run `/initialize-portfolio` in Claude Code. This converts your wave thesis and starter watchlist into a concrete day-0 dollar allocation per ticker (beliefs in dollar form, no optimizer yet) and saves it as the baseline that every future review will compare against. A narrative report of the allocation reasoning is produced alongside.
 
-### 4. Install the daily cron job (required)
+### 4. Install the cron jobs (required)
 
 ```bash
 ./scripts/install_cron.sh
 ```
 
-Appends one crontab line (works on macOS and Linux) that fires `scripts/cron_snapshot.sh` Mon-Fri at 16:30 local. The script snapshots today's per-ticker prices into `data/snapshots.csv` and regenerates `docs/index.html`. Output goes to `data/snapshot.log` with timestamps.
+This adds two crontab entries (works on macOS and Linux) and preserves any other entries you already have. It is idempotent, so re-running only adds whichever entry is missing. Verify with `crontab -l`.
 
-cron doesn't replay missed runs, so if your desktop was off at 16:30, run `./scripts/cron_snapshot.sh` manually to fill in the missing day.
+- **Daily at 16:00 local** (`cron_pull.sh`, every day including weekends): the forward news pull. It runs your wave queries through Anthropic web_search and appends the raw articles to the frozen corpus under `data/forward_corpus/`. Running every day freezes each article near its publication date, which keeps the corpus clean for later forward testing.
+- **Weekday at 16:30 local** (`cron_snapshot.sh`, Mon to Fri): the price snapshot, dashboard refresh, and a self-gating rebalance review. It snapshots per-ticker prices into `data/snapshots.csv`, regenerates `docs/index.html`, then runs `review --if-due`, which curates the watchlist and writes a fresh recommendation report to `data/reports/` only when a full `rebalance_period` has elapsed since the last review. The 30-minute gap after the pull means the review always reads a freshly-pulled corpus.
 
-To publish a refreshed dashboard to GitHub Pages: `git add docs/index.html && git commit -m "Refresh live dashboard" && git push` since cron doesn't auto-push.
+Both jobs append timestamped output to `data/snapshot.log`, and both tolerate failures so a web_search hiccup never blocks the price snapshot.
 
-To uninstall this project's cron entry later: run `crontab -e` and delete the line ending in `cron_snapshot.sh`.
+cron only fires while the machine is awake and does not replay missed runs. Backfill a missed price snapshot with `.venv/bin/python -m src.cli snapshot --date YYYY-MM-DD`. A missed news pull cannot be cleanly backfilled, because re-querying web_search about a past day reintroduces hindsight, so a laptop that sleeps through 16:00 leaves a gap in the corpus (recorded in the manifest at `data/forward_corpus/pulls.jsonl`).
+
+To publish a refreshed dashboard to GitHub Pages: `git add docs/index.html && git commit -m "Refresh live dashboard" && git push`, since cron does not auto-push.
+
+To uninstall: run `crontab -e` and delete the two lines ending in `cron_pull.sh` and `cron_snapshot.sh`.
 
 ## Runs
 
