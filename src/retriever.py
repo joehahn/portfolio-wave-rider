@@ -52,6 +52,21 @@ def _env(key: str) -> str:
     return ""
 
 
+def blocked_domains() -> list[str]:
+    """Domains to exclude from the forward pull, from news_sources.md's `source_block` front matter
+    (the same low-signal / PR-mill list the backtest GKG path drops). Missing file/section -> []."""
+    import re
+    import yaml
+    p = ROOT / "news_sources.md"
+    if not p.exists():
+        return []
+    m = re.match(r"^---\s*\n(.*?)\n---\s*\n", p.read_text(), re.DOTALL)
+    if not m:
+        return []
+    data = yaml.safe_load(m.group(1)) or {}
+    return [str(d).strip() for d in (data.get("source_block") or []) if str(d).strip()]
+
+
 class Retriever(Protocol):
     def pull(self, pull_id: str, pulled_at: str) -> tuple[list[dict[str, Any]], dict[str, Any]]:
         """Return (sightings, query_stats). Each sighting is a flat dict carrying both the article
@@ -64,6 +79,7 @@ class WebSearchRetriever:
         self.model = model
         self.waves = waves
         self.cap = max_results_per_query
+        self.blocked = blocked_domains()   # news_sources.md source_block -> web_search blocked_domains
         import anthropic
         k = _env("ANTHROPIC_API_KEY")
         if not k:
@@ -72,9 +88,12 @@ class WebSearchRetriever:
 
     def _search(self, query: str) -> list[dict[str, Any]]:
         """Run one web_search and return ALL results (url, title, page_age)."""
+        tool = {"type": "web_search_20250305", "name": "web_search", "max_uses": 1}
+        if self.blocked:
+            tool["blocked_domains"] = self.blocked   # drop news_sources.md source_block junk domains
         resp = self._cli.messages.create(
             model=self.model, max_tokens=1024,
-            tools=[{"type": "web_search_20250305", "name": "web_search", "max_uses": 1}],
+            tools=[tool],
             messages=[{"role": "user", "content":
                        f'Use the web_search tool exactly once, with this exact query and no modification: '
                        f'"{query}". After the results return, reply with only the word done.'}],

@@ -97,7 +97,7 @@ def build():
     src = Counter(a.get("source_domain", "?") for a in arts).most_common(15)[::-1]
     figs.append((
         "4. Top sources",
-        "domains contributing the most articles &mdash; open WebSearch, no source tiers applied (see note below)",
+        "domains contributing the most articles &mdash; the news_sources.md source_block list is excluded (see note)",
         _hfig([go.Bar(x=[c for _, c in src], y=[s for s, _ in src], orientation="h",
                       marker_color="#14b8a6")], "articles", height=400, left=200)))
 
@@ -148,10 +148,11 @@ genuinely new articles. This is the forward analog of the backtest
 <a href="../data/forward_corpus/pulls.jsonl">pulls.jsonl</a></p>
 {charts}
 <p style="color:#666;font-size:13px;max-width:820px;margin-top:1.5em;"><b>Note on sources:</b> the forward
-pull runs open Anthropic WebSearch on the wave keywords and does <b>not</b> yet apply the source tiers in
-<code>news_sources.md</code> (the allow / block lists the backtest GKG path uses). Wiring
-<code>source_block</code> into web_search's <code>blocked_domains</code>, and <code>source_allow</code> into a
-preference, is a straightforward addition.</p>
+pull runs Anthropic WebSearch on the wave keywords with the <code>news_sources.md</code>
+<code>source_block</code> list passed as web_search <code>blocked_domains</code>, so the low-signal /
+PR-mill domains the backtest also drops are excluded here too. It does <b>not</b> apply
+<code>source_major</code> / specialty as an allow-list, because <code>allowed_domains</code> is a hard
+whitelist that would gut recall (and the file itself calls those "a preferred list, not an exclusive one").</p>
 </body></html>"""
     OUT.write_text(page)
     print(f"wrote {OUT}  ({n} articles, {len(pulls)} pulls, {len(gaps)} gap-days)")
