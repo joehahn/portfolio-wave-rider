@@ -49,6 +49,9 @@ source_block:
   # recycles URLs, which broke our Wayback join); low-signal republishers, cited adds were ~breakeven
   - tmcnet.com
   - bignewsnetwork.com
+  # added 2026-07-22 from forward-corpus review: German financial portals republishing English wire / PR
+  - ad-hoc-news.de
+  - finanznachrichten.de
 source_major:
   - reuters.com
   - apnews.com
