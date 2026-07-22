@@ -170,6 +170,17 @@ def main(argv: list[str] | None = None) -> int:
                              "actually curated the run (do NOT pass the profile default for a run curated by "
                              "another model).")
 
+    p_pull = sub.add_parser("pull-news",
+                            help="FORWARD news pull: run the profile's wave queries through Anthropic "
+                                 "web_search and append the raw articles to the frozen corpus (data/forward_corpus/).")
+    p_pull.add_argument("--as-of", default=None, help="logical date for this pull (default: today)")
+    p_pull.add_argument("--model", default=None,
+                        help="retrieval executor model; default: forward.retrieval_model in the profile")
+    p_pull.add_argument("--limit-waves", type=int, default=None,
+                        help="only pull the first N waves (smoke test)")
+    p_pull.add_argument("--max-results", type=int, default=None,
+                        help="cap results kept per query (smoke test)")
+
     args = parser.parse_args(argv)
 
     try:
@@ -178,6 +189,21 @@ def main(argv: list[str] | None = None) -> int:
             prices_df = portfolio.fetch_prices(list(allocations.keys()), period="7d")
             last_prices = {t: float(prices_df[t].iloc[-1]) for t in prices_df.columns}
             result = portfolio.initialize_holdings(allocations, last_prices, holdings_path=args.out)
+        elif args.cmd == "pull-news":
+            from datetime import datetime
+            from . import corpus, retriever
+            fw = portfolio.load_forward_config()
+            waves = json.loads(Path("gkg_config.json").read_text()).get("wave_keywords", {})
+            if args.limit_waves:
+                waves = dict(list(waves.items())[: args.limit_waves])
+            pulled_at = datetime.now().isoformat(timespec="seconds")
+            as_of = args.as_of or pulled_at[:10]
+            pull_id = f"pull-{pulled_at.replace(':', '').replace('-', '')}"
+            model = args.model or fw["retrieval_model"]
+            r = retriever.WebSearchRetriever(model, waves, max_results_per_query=args.max_results)
+            sightings, query_stats = r.pull(pull_id, pulled_at)
+            result = corpus.append_pull(pull_id, pulled_at, fw["retriever"], model, sightings, query_stats)
+            result["as_of"] = as_of
         elif args.cmd == "backtest":
             if args.curator_runs_dir:
                 # Backtest-only optimizer overrides from investor_profile.md's

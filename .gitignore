@@ -15,6 +15,7 @@ data_cache/
 data/reports/
 data/wave_history.csv
 data/news/
+data/forward_corpus/
 data/backtest/
 data/curator_latest.json
 data/curation_history.csv

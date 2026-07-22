@@ -194,6 +194,42 @@ def load_backtest_config(profile_path: str = "investor_profile.md") -> dict[str,
     return out
 
 
+# Forward-usage (live) defaults. The `forward` section of investor_profile.md configures the
+# forward loop: the daily WebSearch news pull and the periodic curate+recommend. Kept SEPARATE
+# from `backtest` so the two paths can diverge deliberately (e.g. a different curator model)
+# while sharing one prompt / validator / optimizer / dashboard. `news_lookback_days` falls back
+# to the financial_model value when unset here.
+_FORWARD_DEFAULTS: dict[str, Any] = {
+    "curator_model": "moonshotai/kimi-k2.5",       # LLM that curates the watchlist (OpenRouter or claude-*)
+    "retrieval_model": "claude-haiku-4-5-20251001",  # cheap model that DRIVES the WebSearch pull (fixed queries)
+    "retriever": "websearch",                       # forward news source: "websearch" (Anthropic web_search tool)
+    "news_lookback_days": None,                     # trailing news window the curator reads; None => financial_model
+}
+
+
+def load_forward_config(profile_path: str = "investor_profile.md") -> dict[str, Any]:
+    """Read the `forward` section from investor_profile.md's YAML front matter.
+
+    Configures the live/forward loop (daily news pull + periodic curate). Missing section or
+    fields fall back to `_FORWARD_DEFAULTS`; `news_lookback_days` of None resolves to the
+    financial_model's value so there is a single default for that window.
+    """
+    import re
+    import yaml
+
+    out = dict(_FORWARD_DEFAULTS)
+    p = Path(profile_path)
+    if p.exists():
+        m = re.match(r"^---\s*\n(.*?)\n---\s*\n", p.read_text(), re.DOTALL)
+        if m:
+            data = yaml.safe_load(m.group(1)) or {}
+            fw = data.get("forward") or {}
+            out.update({k: fw[k] for k in _FORWARD_DEFAULTS if k in fw})
+    if out["news_lookback_days"] is None:
+        out["news_lookback_days"] = int(load_financial_model(profile_path).get("news_lookback_days", 21))
+    return out
+
+
 # Default constant-rate reference curves drawn on dashboard plot 1, in
 # percent-per-week. Pure cosmetic yardstick -- never touches the optimizer.
 _DASHBOARD_GROWTH_GUIDES_PCT_PER_WEEK = [0.5, 1.0, 1.5]

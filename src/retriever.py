@@ -1,0 +1,161 @@
+"""Pluggable news retrievers for the curator.
+
+The curator itself is retriever-agnostic: it reads a pool of articles. Two implementations feed it:
+
+- ``WebSearchRetriever`` (FORWARD): drives Anthropic's ``web_search`` server tool with FIXED per-wave
+  queries (a cheap model like Haiku, low agency, so the pull is reproducible), collects the RAW result
+  list (store broad, not just what the model cited), then fetches + trafilatura-extracts each article's
+  full text at pull time. Used forward at as_of=today, where WebSearch carries no look-ahead bias.
+- ``GkgWaybackRetriever`` (HISTORICAL, Stage 2): wraps the date-honest GKG + Wayback path for backtesting
+  the past, where live WebSearch would leak the future. Stub here.
+
+Retrieval is DECOUPLED from curation: a kimi curator (OpenRouter) cannot call Anthropic's web_search, so
+the pull is its own step that produces article records; the curator later reads them from the corpus.
+"""
+from __future__ import annotations
+
+import json
+import re
+from pathlib import Path
+from typing import Any, Protocol
+from urllib.parse import urlsplit
+
+import trafilatura
+
+from . import corpus
+
+ROOT = Path(__file__).resolve().parent.parent
+
+# Fixed per-wave query template. Low agency on purpose: the executor model just runs this string through
+# web_search, so the corpus is reproducible and the model's "cleverness" never steers what gets collected.
+def _wave_query(keywords: list[str]) -> str:
+    return "recent business and stock-market news about " + ", ".join(keywords[:6])
+
+# light ticker detector (a hint for coverage analysis; the curator does the real extraction)
+_TICKER_RE = re.compile(r"\((?:NYSE|NASDAQ|NYSE ?American|NYSEARCA|OTC|Nasdaq|CBOE)[:\s]+([A-Z]{1,5})\)|\$([A-Z]{1,5})\b")
+_NOT_TICKER = {"CEO", "CFO", "AI", "US", "USA", "GDP", "IPO", "SEC", "FDA", "ETF", "EV", "UK", "EU"}
+
+
+def _tickers(text: str) -> list[str]:
+    out = []
+    for a, b in _TICKER_RE.findall(text or ""):
+        t = a or b
+        if t and t not in _NOT_TICKER and t not in out:
+            out.append(t)
+    return out
+
+
+def _env(key: str) -> str:
+    for line in (ROOT / ".env").read_text().splitlines():
+        if line.startswith(f"{key}=") and not line.startswith("#"):
+            return line.split("=", 1)[1].strip()
+    return ""
+
+
+class Retriever(Protocol):
+    def pull(self, pull_id: str, pulled_at: str) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+        """Return (sightings, query_stats). Each sighting is a flat dict carrying both the article
+        body fields and the sighting fields (query, wave, result_rank, pull_id, pulled_at)."""
+        ...
+
+
+class WebSearchRetriever:
+    def __init__(self, model: str, waves: dict[str, list[str]], max_results_per_query: int | None = None):
+        self.model = model
+        self.waves = waves
+        self.cap = max_results_per_query
+        import anthropic
+        k = _env("ANTHROPIC_API_KEY")
+        if not k:
+            raise SystemExit("ANTHROPIC_API_KEY empty in .env")
+        self._cli = anthropic.Anthropic(api_key=k)
+
+    def _search(self, query: str) -> list[dict[str, Any]]:
+        """Run one web_search and return ALL results (url, title, page_age)."""
+        resp = self._cli.messages.create(
+            model=self.model, max_tokens=1024,
+            tools=[{"type": "web_search_20250305", "name": "web_search", "max_uses": 1}],
+            messages=[{"role": "user", "content":
+                       f'Use the web_search tool exactly once, with this exact query and no modification: '
+                       f'"{query}". After the results return, reply with only the word done.'}],
+        )
+        results: list[dict[str, Any]] = []
+        for block in resp.content:
+            if getattr(block, "type", "") != "web_search_tool_result":
+                continue
+            items = getattr(block, "content", None)
+            if not isinstance(items, list):     # web_search_tool_result_error -> no results this query
+                raise RuntimeError(getattr(items, "error_code", "web_search_error"))
+            for it in items:
+                if getattr(it, "type", "") == "web_search_result":
+                    results.append({"url": getattr(it, "url", ""), "title": getattr(it, "title", ""),
+                                    "page_age": getattr(it, "page_age", None)})
+        return results[: self.cap] if self.cap else results
+
+    def _extract(self, url: str, cid: str, res: dict, pulled_at: str, query: str, wave: str) -> dict[str, Any]:
+        """Fetch + extract one article body at pull time (the as-of version)."""
+        import hashlib
+        title, author, pub_date, language, snippet, full_text, image, publisher = (
+            res.get("title", ""), None, None, None, "", "", None, None)
+        ok = False
+        try:
+            html = trafilatura.fetch_url(url)
+            if html:
+                j = trafilatura.extract(html, output_format="json", with_metadata=True,
+                                        favor_precision=True, include_comments=False)
+                if j:
+                    m = json.loads(j)
+                    full_text = m.get("text") or ""
+                    title = m.get("title") or title
+                    author = m.get("author")
+                    pub_date = m.get("date")
+                    language = m.get("language")
+                    snippet = (m.get("description") or full_text[:300]).strip()
+                    image = m.get("image")
+                    publisher = m.get("sitename")
+                    ok = bool(full_text)
+        except Exception:  # noqa: BLE001 - a dead/paywalled/JS page just yields a body-less record
+            pass
+        host = (urlsplit(url).hostname or "").lower().removeprefix("www.")
+        blob = full_text or (title + url)
+        return {
+            "article_id": cid, "url": url, "canonical_url": corpus.canon_url(url),
+            "source_domain": host, "publisher": publisher or host, "title": title, "author": author,
+            "published_date": (pub_date or "")[:10] or None, "language": language, "snippet": snippet,
+            "full_text": full_text, "extraction_ok": ok,
+            "content_hash": hashlib.sha1(blob.encode("utf-8")).hexdigest()[:16],
+            "image_url": image, "tickers_mentioned": _tickers(title + " " + full_text),
+            "first_pulled_at": pulled_at, "first_query": query, "first_wave": wave,
+            "page_age": res.get("page_age"),
+        }
+
+    def pull(self, pull_id: str, pulled_at: str) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+        sightings: list[dict[str, Any]] = []
+        query_stats: dict[str, Any] = {}
+        bodies: dict[str, dict] = {}   # fetch each unique article once per pull, log every sighting
+        for wave, keywords in self.waves.items():
+            query = _wave_query(keywords)
+            try:
+                results = self._search(query)
+                query_stats[query] = {"wave": wave, "results": len(results)}
+            except Exception as e:  # noqa: BLE001 - one bad query must not sink the pull; record the gap
+                query_stats[query] = {"wave": wave, "error": str(e)[:140]}
+                continue
+            for rank, res in enumerate(results):
+                url = res.get("url")
+                if not url:
+                    continue
+                cid = corpus.article_id(url)
+                if cid not in bodies:
+                    bodies[cid] = self._extract(url, cid, res, pulled_at, query, wave)
+                sightings.append({**bodies[cid], "pull_id": pull_id, "pulled_at": pulled_at,
+                                  "query": query, "wave": wave, "result_rank": rank})
+        return sightings, query_stats
+
+
+class GkgWaybackRetriever:
+    """Historical (backtest) retriever: date-honest GKG + Wayback. Wired in Stage 2 by wrapping the
+    existing scripts/gkg_pool.py + news_pool.py path so the backtest reuses this same interface."""
+
+    def pull(self, pull_id: str, pulled_at: str) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+        raise NotImplementedError("GkgWaybackRetriever lands in Stage 2 (backtest unification)")

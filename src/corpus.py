@@ -1,0 +1,131 @@
+"""Frozen forward news corpus: append-only, deduped, one-shot-safe.
+
+Forward WebSearch pulls are UNREPEATABLE (results aren't re-queryable; articles get edited,
+paywalled, or deleted), so we capture broad and raw at pull time and never mutate. Three files
+under ``data/forward_corpus/``:
+
+- ``articles.jsonl``  one record per UNIQUE article (deduped by article_id). Holds the immutable
+                      body: title, url, full_text, author, date, source, etc. Written once.
+- ``appearances.jsonl`` one row per SIGHTING (article x pull x query). This is what preserves
+                      "store broad, rank at selection": every time an article surfaces we log the
+                      query, wave, rank, and pull, plus its content_hash so a later edit is visible.
+- ``pulls.jsonl``     one row per pull run (manifest): timestamp, retriever, per-query counts, and
+                      errors/empties, so GAPS are first-class and queryable (a missed/empty pull is
+                      recorded, not silent).
+
+article_id = sha1 of the canonicalized URL (drop scheme/www/tracking-params/fragment), so the same
+URL across days and across wave queries dedups to one body. The published date lives as a field, not
+in the id (a wobbling reported date must not fragment dedup); content_hash detects edits instead.
+"""
+from __future__ import annotations
+
+import hashlib
+import json
+import re
+from pathlib import Path
+from typing import Any
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
+
+ROOT = Path(__file__).resolve().parent.parent
+CORPUS_DIR = ROOT / "data" / "forward_corpus"
+ARTICLES = CORPUS_DIR / "articles.jsonl"
+APPEARANCES = CORPUS_DIR / "appearances.jsonl"
+PULLS = CORPUS_DIR / "pulls.jsonl"
+
+# tracking / share params to strip when canonicalizing (mirrors scripts/news_pool.py's _TRACK)
+_TRACK = re.compile(r"^(utm_|fbclid|gclid|mc_|ref$|ref_|referrer|cmpid|ncid|mkt_tok|igshid|_hsenc|_hsmi|"
+                    r"spm|s_cid|cid$|ei$|oc$|smid|guccounter|guce_)", re.IGNORECASE)
+
+# body fields copied to articles.jsonl (the immutable, deduped record). Everything else on a pull
+# record is sighting-specific and goes to appearances.jsonl.
+_BODY_FIELDS = ("article_id", "url", "canonical_url", "source_domain", "publisher", "title", "author",
+                "published_date", "language", "snippet", "full_text", "extraction_ok", "content_hash",
+                "image_url", "tickers_mentioned", "first_pulled_at", "first_query", "first_wave")
+_APPEARANCE_FIELDS = ("article_id", "pull_id", "pulled_at", "query", "wave", "result_rank", "content_hash")
+
+
+def canon_url(url: str) -> str:
+    """Canonical form for dedup: lowercase host, drop www., strip tracking params, drop fragment."""
+    try:
+        s = urlsplit(url.strip())
+    except Exception:  # noqa: BLE001
+        return url.strip()
+    host = (s.hostname or "").lower()
+    if host.startswith("www."):
+        host = host[4:]
+    q = sorted((k, v) for k, v in parse_qsl(s.query, keep_blank_values=True) if not _TRACK.match(k))
+    return urlunsplit(("https", host, (s.path or "/").rstrip("/") or "/", urlencode(q), ""))
+
+
+def article_id(url: str) -> str:
+    return hashlib.sha1(canon_url(url).encode("utf-8")).hexdigest()[:16]
+
+
+def _append_jsonl(path: Path, rows: list[dict]) -> None:
+    if not rows:
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as f:
+        for r in rows:
+            f.write(json.dumps(r, ensure_ascii=False) + "\n")
+
+
+def _seen_ids() -> set[str]:
+    """article_ids already in the corpus (so a re-sighted article's body is stored once)."""
+    if not ARTICLES.exists():
+        return set()
+    ids = set()
+    for line in ARTICLES.read_text(encoding="utf-8").splitlines():
+        if line.strip():
+            try:
+                ids.add(json.loads(line)["article_id"])
+            except Exception:  # noqa: BLE001
+                continue
+    return ids
+
+
+def append_pull(pull_id: str, pulled_at: str, retriever: str, retrieval_model: str,
+                sightings: list[dict[str, Any]], query_stats: dict[str, Any]) -> dict[str, Any]:
+    """Persist one pull. `sightings` = one dict per (result) sighting carrying both body and
+    sighting fields (built by the retriever). Dedups bodies by article_id, logs every appearance,
+    and writes a manifest row. Returns a summary dict."""
+    seen = _seen_ids()
+    new_bodies, appearances = [], []
+    n_new = 0
+    for s in sightings:
+        aid = s["article_id"]
+        appearances.append({k: s.get(k) for k in _APPEARANCE_FIELDS})
+        if aid not in seen:
+            new_bodies.append({k: s.get(k) for k in _BODY_FIELDS})
+            seen.add(aid)
+            n_new += 1
+    _append_jsonl(ARTICLES, new_bodies)
+    _append_jsonl(APPEARANCES, appearances)
+    manifest = {"pull_id": pull_id, "pulled_at": pulled_at, "retriever": retriever,
+                "retrieval_model": retrieval_model, "n_sightings": len(sightings),
+                "n_new_articles": n_new, "query_stats": query_stats}
+    _append_jsonl(PULLS, [manifest])
+    return {"pull_id": pull_id, "sightings": len(sightings), "new_articles": n_new,
+            "queries": len(query_stats), "corpus_articles": len(seen)}
+
+
+def read_slice(as_of: str, lookback_days: int) -> list[dict[str, Any]]:
+    """Article bodies whose published_date falls in (as_of - lookback_days, as_of]. Used by the
+    forward curator (Stage 2) to read the trailing news window. Undated articles are skipped."""
+    from datetime import date, timedelta
+    if not ARTICLES.exists():
+        return []
+    end = date.fromisoformat(as_of)
+    start = end - timedelta(days=lookback_days)
+    out = []
+    for line in ARTICLES.read_text(encoding="utf-8").splitlines():
+        if not line.strip():
+            continue
+        try:
+            a = json.loads(line)
+            d = date.fromisoformat((a.get("published_date") or "")[:10])
+        except Exception:  # noqa: BLE001
+            continue
+        if start < d <= end:
+            out.append(a)
+    return out

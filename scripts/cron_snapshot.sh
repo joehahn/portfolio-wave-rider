@@ -10,5 +10,8 @@ cd "$PROJ"
   .venv/bin/python -m src.cli snapshot
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] dashboard start"
   .venv/bin/python -m src.cli dashboard
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] news pull start"
+  # Forward corpus ingest. Tolerated on failure so a WebSearch hiccup never blocks the snapshot/dashboard.
+  .venv/bin/python -m src.cli pull-news || echo "[$(date '+%Y-%m-%d %H:%M:%S')] pull-news failed (tolerated)"
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] done"
 } >> data/snapshot.log 2>&1
