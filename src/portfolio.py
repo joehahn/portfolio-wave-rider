@@ -1548,7 +1548,8 @@ def curator_backtest(
                             "date": str(k.date()),
                             "adds": result["applied_adds"],
                             "removes": result["applied_removes"],
-                            "rejections": len(result["rejections"]),
+                            "rejections": len(result["rejections"]),        # count (back-compat)
+                            "rejections_detail": result["rejections"],      # [{ticker, action, reason}, ...]
                         })
                     except Exception as e:  # noqa: BLE001
                         curation_summary.append({
@@ -3554,6 +3555,28 @@ def build_curator_dashboard(
         if _anc not in _have_tk:
             periods.append((_anc, start, end, _anchor_wb.get(_anc, "cashlike")))
 
+    # Per-(ticker, date) wave-bucket resolver built from the curation periods above. Charts 3/4/5 use
+    # this so dollars are attributed to the wave the CURATOR assigned at that time (matching the plot-2
+    # Gantt), not a static ticker->wave map. A re-added ticker (e.g. GOOGL: AI, then quantum after its
+    # 2024-12 re-add) therefore credits each wave for the window it was held under that thesis.
+    _periods_by_tk: dict[str, list[tuple[pd.Timestamp, pd.Timestamp, str]]] = {}
+    for _tk, _s, _e, _wb in periods:
+        _periods_by_tk.setdefault(_tk, []).append((_s, _e, _wb))
+    for _v in _periods_by_tk.values():
+        _v.sort(key=lambda x: x[0])
+
+    def _bucket_at(tk: str, dt: pd.Timestamp) -> str:
+        """Wave bucket active for `tk` on `dt` (curator's per-period label); static-map fallback."""
+        for _s, _e, _wb in _periods_by_tk.get(tk, ()):
+            if _s <= dt <= _e:
+                return _wb
+        return TICKER_WAVE.get(tk, "general_markets")
+
+    def _most_recent_bucket(tk: str) -> str:
+        """Bucket of `tk`'s latest period — the single color for its per-ticker bar in chart 3."""
+        ps = _periods_by_tk.get(tk)
+        return max(ps, key=lambda x: x[0])[2] if ps else TICKER_WAVE.get(tk, "general_markets")
+
     # Realized return numbers for the headline summary.
     final = float(totals.iloc[-1])
     cur_return = (final / initial) - 1.0
@@ -3703,15 +3726,28 @@ def build_curator_dashboard(
     # charts 2/4/5) so a reader can see which waves drove the P&L.
     snaps_sorted = snaps.sort_values(["ticker", "date"])
     _gain_by_ticker: dict[str, float] = {}
+    _gain_by_wave: dict[str, float] = {}          # chart 4: time-aware, built alongside per-ticker gains
     for _tk, _sub in snaps_sorted.groupby("ticker"):
         _sub = _sub.sort_values("date").reset_index(drop=True)
         _pc = _sub["price"].diff()
         _ps = _sub["shares"].shift(1)
-        _gain_by_ticker[_tk] = float((_ps * _pc).fillna(0.0).sum())
+        _daily = (_ps * _pc).fillna(0.0)
+        _gain_by_ticker[_tk] = float(_daily.sum())
+        # Chart 4 attribution: split this ticker's daily P&L across the wave bucket(s) it was held
+        # under over time (curator's per-period label). Cash/bond/metal/crypto asset classes collapse
+        # to "cashlike" regardless of wave, matching chart 5's display_bucket split.
+        _ac = ASSET_CLASS_BUCKET.get(TICKER_ASSET_CLASS.get(_tk, "equity"), "equities")
+        if _ac in ("bonds", "cash", "precious metals", "crypto"):
+            _gain_by_wave["cashlike"] = _gain_by_wave.get("cashlike", 0.0) + float(_daily.sum())
+        else:
+            for _dt, _g in zip(_sub["date"], _daily):
+                _wb = _bucket_at(_tk, _dt)
+                _gain_by_wave[_wb] = _gain_by_wave.get(_wb, 0.0) + float(_g)
     _gain_items = sorted(_gain_by_ticker.items(), key=lambda kv: kv[1], reverse=True)
     _gain_tickers = [t for t, _ in _gain_items]
     _gain_values = [v for _, v in _gain_items]
-    _bar_colors = [WAVE_COLORS.get(TICKER_WAVE.get(t, "general_markets"), "#888888")
+    # Color each ticker bar by its MOST-RECENT curator bucket (so GOOGL reads quantum, its latest thesis).
+    _bar_colors = [WAVE_COLORS.get(_most_recent_bucket(t), "#888888")
                    for t in _gain_tickers]
     fig.add_trace(
         go.Bar(x=_gain_tickers, y=_gain_values, marker_color=_bar_colors,
@@ -3730,18 +3766,10 @@ def build_curator_dashboard(
                      zeroline=True, zerolinewidth=1, zerolinecolor="#888",
                      row=3, col=1)
 
-    # Chart 4: cumulative $ gain per wave bucket. Same daily-P&L attribution
-    # as chart 3, re-aggregated from ticker to wave bucket. Buckets use the
-    # same display_bucket split as chart 5 (cash/bonds/metals/crypto pulled
-    # into "cashlike") so the bars and the stacked-area bands line up, and
-    # each bar is colored with its wave's color. Sorted by gain descending.
-    _gain_by_wave: dict[str, float] = {}
-    for _tk, _g in _gain_by_ticker.items():
-        _ac = ASSET_CLASS_BUCKET.get(TICKER_ASSET_CLASS.get(_tk, "equity"), "equities")
-        _wb = TICKER_WAVE.get(_tk, "general_markets")
-        if _ac in ("bonds", "cash", "precious metals", "crypto"):
-            _wb = "cashlike"
-        _gain_by_wave[_wb] = _gain_by_wave.get(_wb, 0.0) + _g
+    # Chart 4: cumulative $ gain per wave bucket. `_gain_by_wave` was accumulated in the per-ticker loop
+    # above with TIME-AWARE attribution (each day's P&L credited to the wave the curator held it under),
+    # so a re-bucketed ticker splits across waves. Cash/bonds/metals/crypto collapse to "cashlike" so the
+    # bars line up with chart 5's bands. Sorted by gain descending.
     _wave_items = sorted(_gain_by_wave.items(), key=lambda kv: kv[1], reverse=True)
     _wave_keys = [w for w, _ in _wave_items]
     _wave_vals = [v for _, v in _wave_items]
@@ -3770,9 +3798,10 @@ def build_curator_dashboard(
     snaps_full["asset_bucket"] = snaps_full["ticker"].map(
         lambda t: ASSET_CLASS_BUCKET.get(TICKER_ASSET_CLASS.get(t, "equity"), "equities")
     )
-    snaps_full["wave_bucket"] = snaps_full["ticker"].map(
-        lambda t: TICKER_WAVE.get(t, "general_markets")
-    )
+    # time-aware wave attribution (curator's per-period label at each date), matching charts 2 and 4
+    snaps_full["wave_bucket"] = [
+        _bucket_at(t, d) for t, d in zip(snaps_full["ticker"], snaps_full["date"])
+    ]
     # Split cash/bonds/precious-metals/crypto out of general_markets into
     # a separate "cashlike" band so general_markets shows only defensive
     # equities (SPY/VIG/DVY/XLU/XLP), not ballast.
@@ -3883,18 +3912,31 @@ def build_curator_dashboard(
             d = ev.get("date", "")
             adds = ", ".join(_adds) or "—"
             removes = ", ".join(_removes) or "—"
-            rej_cell = str(_rej) if _rej else "—"
+            # Rejections: show each dropped ticker + whether it was an add or a remove, with the
+            # validator's reason as a hover tooltip. Falls back to the bare count for older summaries
+            # that predate the rejections_detail field.
+            _rej_detail = ev.get("rejections_detail") or []
+            if _rej_detail:
+                rej_cell = "<br>".join(
+                    f"<span title='{_html.escape(str(r.get('reason', '')))}'>"
+                    f"{_html.escape(str(r.get('ticker', '?')))} "
+                    f"({_html.escape(str(r.get('action', '?')))})</span>"
+                    for r in _rej_detail
+                )
+            else:
+                rej_cell = str(_rej) if _rej else "—"
             rows.append(
                 f"<tr><td>{_html.escape(d)}</td>"
                 f"<td style='color:#0a7a3a;'>{_html.escape(adds)}</td>"
                 f"<td style='color:#b91c1c;'>{_html.escape(removes)}</td>"
-                f"<td>{_html.escape(rej_cell)}</td></tr>"
+                f"<td style='color:#9a6a00;'>{rej_cell}</td></tr>"
             )
         log_html = (
             "<h2 style='margin-top:2em;'>11. Curation log</h2>"
             f"<p style='color:#555;'>The {_n_active} of {len(log)} {_html.escape(_cadence)} curator calls "
-            "that made a change (no-change rebalances are hidden). The <em>Rejections</em> column counts "
-            "adds and removes the validator dropped as invalid (see "
+            "that made a change (no-change rebalances are hidden). The <em>Rejections</em> column lists each "
+            "add/remove the validator dropped as invalid, as <code>TICKER (action)</code> — hover for the "
+            "reason (see "
             "<a href='https://github.com/joehahn/portfolio-wave-rider/blob/main/REFERENCE.md#cli-reference'>"
             "REFERENCE.md</a>).</p>"
             "<table style='border-collapse:collapse;width:100%;font-size:14px;'>"
