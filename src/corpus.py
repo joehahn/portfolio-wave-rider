@@ -61,6 +61,35 @@ def article_id(url: str) -> str:
     return hashlib.sha1(canon_url(url).encode("utf-8")).hexdigest()[:16]
 
 
+# Non-person bylines trafilatura pulls from author/meta fields: PR wires, site brands, newsroom/staff
+# labels. Blanked so the author field (and the gains-per-author view) tracks real writers, not publishers.
+_PSEUDO_AUTHORS = {
+    "business wire", "pr newswire", "prnewswire", "globe newswire", "globenewswire", "accesswire",
+    "access newswire", "newsfile corp", "cision", "stock titan", "marketbeat", "market beat",
+    "zacks equity research", "zacks", "motley fool transcribing", "the motley fool",
+}
+_PSEUDO_SUBSTR = ("staff", "newsroom", "editorial", "redakt", "redaction", "transcribing",
+                  "research team", "press release", "newswire", "correspondent")
+
+
+def clean_author(author: "str | None", publisher: "str | None" = None) -> "str | None":
+    """Return the byline if it looks like a real person, else None. Drops PR-wire / site-brand /
+    newsroom-staff pseudo-authors and site-name-as-byline (author == publisher)."""
+    if not author:
+        return None
+    a = " ".join(str(author).split())
+    al = a.lower()
+    if publisher and al == str(publisher).strip().lower():
+        return None
+    if al in _PSEUDO_AUTHORS:
+        return None
+    if any(s in al for s in _PSEUDO_SUBSTR):
+        return None
+    if al.startswith("news;") or ("author" in al and ";" in a):   # garbage extractions
+        return None
+    return a
+
+
 def _append_jsonl(path: Path, rows: list[dict]) -> None:
     if not rows:
         return

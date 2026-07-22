@@ -54,6 +54,9 @@ def _blocked_count() -> int:
 
 
 def build():
+    import sys as _sys
+    _sys.path.insert(0, str(ROOT))
+    from src import corpus as _corpus   # clean_author: drop PR-wire / site-brand / staff pseudo-authors
     arts, pulls = _jsonl("articles.jsonl"), _jsonl("pulls.jsonl")
     n = len(arts)
     dated = sorted(a["published_date"][:10] for a in arts if a.get("published_date"))
@@ -127,7 +130,8 @@ def build():
                       marker_color="#a855f7")], "articles", height=340, left=330)))
 
     # 6. Articles per author — horizontal (byline attribution; raw material for gains-per-author later)
-    au = Counter((a.get("author") or "").strip() for a in arts if (a.get("author") or "").strip())
+    _authors = [_corpus.clean_author(a.get("author"), a.get("publisher")) for a in arts]
+    au = Counter(x for x in _authors if x)   # real bylines only (pseudo-authors dropped)
     ai = sorted(au.items(), key=lambda kv: kv[1])[-15:]   # top 15, largest bar at top
     figs.append((
         "6. Articles per author",
@@ -150,7 +154,7 @@ def build():
                 f'<span style="font-size:.82em;color:#555">{label}</span></div>')
     domains = len(set(a.get("source_domain") for a in arts))
     n_app = len(_jsonl("appearances.jsonl"))
-    with_author = sum(1 for a in arts if a.get("author"))
+    with_author = sum(1 for x in _authors if x)   # real bylines (pseudo-authors already dropped)
     summary = ('<div style="margin:.8em 0 1.5em">'
                + _card(f"{n:,}", "articles in corpus (unique)")
                + _card(f"{n_app:,}", "sightings logged (appearances)")

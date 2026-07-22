@@ -102,6 +102,7 @@ def _extract_article(url: str, cid: str, res: dict, pulled_at: str, query: str, 
         pass
     host = (urlsplit(url).hostname or "").lower().removeprefix("www.")
     blob = full_text or (title + url)
+    author = corpus.clean_author(author, publisher)   # drop PR-wire / site-brand / staff pseudo-authors
     return {
         "article_id": cid, "url": url, "canonical_url": corpus.canon_url(url),
         "source_domain": host, "publisher": publisher or host, "title": title, "author": author,

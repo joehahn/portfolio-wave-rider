@@ -52,6 +52,7 @@ source_block:
   # added 2026-07-22 from forward-corpus review: German financial portals republishing English wire / PR
   - ad-hoc-news.de
   - finanznachrichten.de
+  - stocktitan.net            # "X Stocks 2026: N+ Companies" listicle mill (also fakes a "Stock Titan" byline)
 source_major:
   - reuters.com
   - apnews.com
