@@ -7,14 +7,27 @@
 
 This Claude Code project uses AI to manage a curated watchlist of tickers. You declare your goals, constraints, and an investment thesis (namely what you think will drive future returns), then initialize a starter watchlist of tickers that you want exposure to. At each periodic rebalance the curator agent reads recent news against your thesis and evolves the watchlist by proposing adds and removes. A standard mean-variance optimizer then recommends portfolio weights across the resulting watchlist. The result accumulates into a static Plotly dashboard so you can watch the watchlist composition, the recommended weights, and the realized portfolio value evolve over time. In our experiments, this coupling of AI-driven watchlist curation with standard portfolio optimization significantly outperforms the optimizer on its own.
 
-**Who this helps.** An investor who has a thesis about where markets are going but not enough time to track market news, or who needs help optimizing their portfolio. This demo helps such an investor pivot from a less-optimal static buy-and-hold portfolio to one that's lightly but effectively managed by AI. In the post-COVID backtest detailed below (2022–2025), the AI-managed portfolio lifted realized return by about **41.1 percentage points per year annualized** over a buy-and-hold of the starter watchlist. The curator's job is to compound a thesis you already hold, not to replace one you don't have.
+**Who this helps.** An investor who has a thesis about where markets are going but not enough time to track the news, or who wants help optimizing a portfolio. This demo helps that investor move from a static buy-and-hold portfolio to one that is lightly but effectively managed by AI. In the 3-year backtest below (2023 to 2026) the AI-managed portfolio returned about **+957%** against **+217%** for a buy-and-hold of the starter watchlist, roughly **3.4x** the buy-and-hold gain. Read that as one favorable wave the curator caught and held rather than a broad edge: most of the lift sits in a single position, and the whole result is in-sample. The caveats section is honest about both. The curator's job is to compound a thesis you already hold, not to invent one you don't.
 
-Two dashboards are served from GitHub Pages:
+Four dashboards are served from GitHub Pages:
 
-- **[Live dashboard](https://joehahn.github.io/portfolio-wave-rider/)** — today's portfolio: realized value over time, latest recommended weights, asset-class and wave-bucket breakdowns.
-- **[Curator backtest](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html)** — tests whether the curator's quarterly watchlist decisions across a post-COVID historical window (2022–2025) yield better returns than the buy-and-hold investor.
+- **[Live dashboard](https://joehahn.github.io/portfolio-wave-rider/)**: today's portfolio, its value over time, the latest recommended weights, and the asset-class and wave-bucket breakdowns.
+- **[News retriever](https://joehahn.github.io/portfolio-wave-rider/retrieval_pwr.html)**: the date-clean GDELT-GKG plus Wayback news corpus that the backtest curator reads, with coverage, sources, and per-window article counts. Mechanical, no LLM.
+- **[Curator backtest](https://joehahn.github.io/portfolio-wave-rider/backtest_gkg_3yr_kimi.html)**: the curator's weekly watchlist decisions replayed over 2023 to 2026, portfolio value against buy-and-hold and SPY, the watchlist Gantt, and per-wave profit and loss.
+- **[Parameter sweep](https://joehahn.github.io/portfolio-wave-rider/sweep_pwr.html)**: a zero-cost sweep of the optimizer knobs (cap, `λ`, lookback), a curator-LLM comparison, and a blind, leak-free judge that scores each curator's reasoning with the market outcome hidden.
 
 See [GLOSSARY.md](GLOSSARY.md) for the meanings of the finance terms used below (`σ`, `μ`, `Σ`, Sharpe ratio, risk aversion `λ`, mean-variance optimization, etc.) and [REFERENCE.md](REFERENCE.md) for project details (repo layout, code, input and output files, architecture overview, and testing instructions).
+
+## Recent revisions
+
+The project has evolved since its first release, and the dashboards above reflect the current design.
+
+- **Clean news retrieval.** The backtest curator no longer reads news via live WebSearch, which leaks present-day knowledge into historical queries (a 2023 rebalance would surface 2026 "best stocks to buy" lists). It now reads a date-honest **GDELT-GKG plus Wayback** corpus: server-enforced date bounds and archived same-date article ledes, so each rebalance only sees news that existed at that time. This removes the *retrieval* leak. It does not remove the model's training-memorization leak, so only forward testing can settle that (more in the caveats).
+- **A cheap, disciplined default curator.** Every backtest return is in-sample and cannot rank one curator LLM against another, so a **blind, leak-free rationale judge** scores the reasoning instead: an independent Opus grader rates each add and remove with the market outcome hidden. It found **kimi-k2.5** ties Sonnet on reasoning quality while running about 8x cheaper and 3x faster, so kimi is now the default backtest curator.
+- **One unified sweep.** The four separate sweep pages are retired in favor of a single [parameter-sweep dashboard](https://joehahn.github.io/portfolio-wave-rider/sweep_pwr.html): the zero-cost optimizer-knob frontier, the curator-LLM comparison, and the blind judge, side by side.
+- **Coming next, forward usage.** The Claude-Code *skills* are moving to plain Python that calls the Anthropic and OpenRouter SDKs directly, so routine runs use an API key and Claude-Code tokens are spent only during development. The aim is a single curator prompt, retriever, validator, and optimizer shared by both the backtest and the forward path, so a lesson learned on either side lands on the other.
+
+The granular numbers (exact config, per-wave attribution, the full bias accounting) live in [REFERENCE.md](REFERENCE.md); this page keeps the visitor-level tour.
 
 ## Setup
 
@@ -73,31 +86,23 @@ Cron captures today's per-ticker shares and close price into `data/snapshots.csv
 
 Run `/review-portfolio` in Claude Code. The cadence is declared in `investor_profile.md` under `financial_model.rebalance_period` (`monthly` / `quarterly` / `semi_annual` / `annual`); how often you actually invoke the skill is up to you. The `rebalance_period` setting also determines the curator's news-lookback window on each call. Each call's window is anchored on that day's date, so running more often than the declared cadence (e.g. running daily under `monthly`) gives you a rolling 30-day window that overlaps heavily between consecutive runs. Each run: the curator reads recent news against your wave thesis and proposes adds and removes against the current watchlist; the optimizer then recomputes weights across the updated watchlist; the resulting report is written to `data/reports/<date>-review-portfolio.md`. Read the report to see the curator's adds and removes this period and any conflicts where the optimizer wanted something your profile forbids.
 
-Note that recommendations do not execute trades — they only append optimizer output to `data/recommendations.csv`. To act on a recommendation, execute trades in your brokerage and then edit `holdings.csv` so the next daily snapshot picks up the new share counts.
+Note that recommendations do not execute trades, they only append optimizer output to `data/recommendations.csv`. To act on a recommendation, execute trades in your brokerage and then edit `holdings.csv` so the next daily snapshot picks up the new share counts.
 
 ### 4. run the curator backtest (anytime)
 
-Run `/run-backtest` in Claude Code. This skill collects any missing historical news, evolves the watchlist quarter-by-quarter against your wave thesis, optimizes the portfolio at each rebalance, measures the resulting lift relative to a buy-and-hold investment strategy, and regenerates the backtest dashboard at `docs/backtest_curator.html` (open it locally in a browser to see your run).
+Run the curator backtest (`scripts/backtest_sdk.py`, invoked today by the `/run-backtest` skill and being migrated to a plain CLI call). It builds the date-clean GKG plus Wayback news pool for each missing rebalance, evolves the watchlist week by week against your wave thesis via the curator LLM, optimizes the portfolio at each rebalance, measures the lift over a buy-and-hold strategy, and regenerates the dashboard at `docs/backtest_gkg_3yr_kimi.html`.
 
-At each quarterly rebalance the curator reads news as of the rebalance date and proposes adds and removes to the watchlist; the optimizer then recomputes portfolio weights for whatever watchlist results, repeated across the window. Then compare results of your backtest to ours at [our backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html), +41.1pp/yr annualized when compared to the buy-and-hold investor's gains.
+At each weekly rebalance the curator reads the date-bounded news pool as of that date and proposes adds and removes, then the optimizer recomputes weights for whatever watchlist results, repeated across the window. Compare your run to ours at [our curator backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_gkg_3yr_kimi.html): about **+957%** over the 3-year window against **+217%** buy-and-hold, roughly **3.4x**, with the honest caveats spelled out below.
 
-### 5. sweep optimizer parameters (anytime)
+### 5. sweep the settings (anytime)
 
-```bash
-./scripts/run_sweeps.sh
-```
+The four old per-parameter sweep pages are retired. Everything now lives on one [parameter-sweep dashboard](https://joehahn.github.io/portfolio-wave-rider/sweep_pwr.html), built by `scripts/build_sweep_dashboard.py`. It has three parts:
 
-Reruns the backtest under different settings for `risk_aversion`, `lookback_period`, and `concentration_cap` to determine the optimal value of each.
+- **Optimizer-knob frontier.** The optimizer settings (`concentration_cap`, risk aversion `λ`, and the price lookback) only touch the mean-variance replay, not the curator, so the entire grid is a **zero-cost** local re-solve on a fixed set of curations. No LLM tokens, no news re-fetch. The dashboard ranks every config by Information Ratio and flags the current one.
+- **Curator-LLM comparison.** Each candidate model reads the same news pools at the same config, so the only variable is the curator. This is where the cheap-workhorse choice (kimi) was made.
+- **Blind rationale judge.** The leak-free scoring described in Recent revisions.
 
-Three overlay pages are written and published to GitHub Pages:
-
-- **[`risk_aversion` `λ`](https://joehahn.github.io/portfolio-wave-rider/sweep_risk_aversion.html)** — default `0.5`. Small `λ` produces a portfolio concentrated in volatile but higher-reward equities; large `λ` shifts the portfolio toward cash and bonds.
-- **[`lookback_period`](https://joehahn.github.io/portfolio-wave-rider/sweep_lookback.html)** — default `0.5y`. The length of the price-history window used to estimate `μ` and `Σ`. Short lookbacks chase recent momentum and react quickly to regime changes but are noisy; long lookbacks average across more market conditions and produce steadier estimates but lag turning points.
-- **[`concentration_cap`](https://joehahn.github.io/portfolio-wave-rider/sweep_concentration_cap.html)** — default `0.90`. The maximum weight any single ticker can carry. Small caps force diversification across the full watchlist, smoothing returns but diluting conviction; large caps let the optimizer pile into its top picks, raising both upside and drawdown risk.
-
-All three defaults are set in `investor_profile.md` and can be edited there.
-
-A fourth sweep, **[max_watchlist_size](https://joehahn.github.io/portfolio-wave-rider/sweep_max_watchlist_size.html)**, is fired separately via the `/sweep-max-watchlist-size` skill. The `max_watchlist_size` parameter caps how many tickers the curator may hold in the active watchlist at one time. Every add the curator proposes past the cap is rejected unless paired with a remove, so the cap directly shapes which themes the portfolio can pursue at each rebalance. Small values force the curator to pick a few high-conviction tickers per wave bucket and rotate aggressively (sharper but more concentrated bets); large values let the watchlist grow broad enough to cover every named wave with multiple tickers each (more diversified but slower to react, and the optimizer may dilute its top picks across redundant exposures). max_watchlist_size=5 is the project default. Unlike the earlier sweeps, this one must execute as a Claude skill because the cap shapes the curator's *decisions*, so each cap requires its own quarterly portfolio-curator calls. Runtime is dominated by curator latency rather than local compute, so the wall clock (~15 min at 4-parallel batching) is roughly the same on any modern laptop.
+`max_watchlist_size` is swept separately (via the `/sweep-max-watchlist-size` skill) because it shapes the curator's *decisions*, so each value needs its own set of curator calls rather than a free re-solve. See [REFERENCE.md](REFERENCE.md) for what each knob does and how the sweep is run.
 
 ## Acting on a recommendation
 
@@ -116,7 +121,7 @@ You can also do nothing and let the next `/review-portfolio` produce a fresh rec
 
 - **Optimizer eligibility.** The optimizer cannot assign weight to a ticker that isn't in the file.
 - **`shares = 0` is meaningful.** A row with zero shares puts the ticker on the watchlist, which allows the optimizer to assign nonzero weights and the dashboards to track that ticker's price without requiring ownership that position.
-- **Curator-driven adds and removes.** At each `/review-portfolio`, the curator can append new rows (always at `shares=0`) and delete rows for tickers it wants to drop. The validator blocks removes for tickers with `shares > 0` — you must liquidate the live position in your brokerage first and zero out the row, then a future `/review-portfolio` can complete the remove. The full audit trail of applied changes lives in `data/curation_history.csv`.
+- **Curator-driven adds and removes.** At each `/review-portfolio`, the curator can append new rows (always at `shares=0`) and delete rows for tickers it wants to drop. The validator blocks removes for tickers with `shares > 0`, so you must liquidate the live position in your brokerage first and zero out the row, then a future `/review-portfolio` can complete the remove. The full audit trail of applied changes lives in `data/curation_history.csv`.
 - **Manual edits still work.** Append `<TICKER>,0` to add by hand; delete a row to remove by hand (subject to the same liquidate-first rule for live positions).
 
 ## How this project utilizes Claude Skills and Subagents
@@ -161,33 +166,23 @@ This is the standard Markowitz mean-variance formulation (Markowitz 1952, *Portf
 
 ## Main findings
 
-This project builds an AI assistant that reads business news against a user's stated investment thesis, derives a curated watchlist of tickers from it, and then hands that watchlist to a standard mean-variance optimizer for weighting at each rebalance. The AI's job is watchlist composition only, while a simple but effective financial model then turns the watchlist into portfolio weights. The published backtest covers a **post-COVID, normal-regime window (2022-03-31 → 2025-10-31, ~3.6 years)** — it deliberately drops the distorted 2020–2021 stimulus melt-up and ends just before the late-2025 Iran-war runup, so it reads as a credible "normal markets" window. The dashboard renders the same single optimizer config the live portfolio uses (λ=0.5, lookback 0.5y, cap=0.90, max_watchlist_size=5). To measure the AI's lift, we compare its track record against a tech-minded investor whose initial portfolio is equal amounts of `[AAPL, MSFT, GOOGL, NVDA, SPY]`, a buy-and-hold investor too busy to monitor news and revise their portfolio. We know such investors exist because the author of this project is one.
+This project reads business news against a user's stated investment thesis, derives a curated watchlist from it, and hands that watchlist to a standard mean-variance optimizer for weighting at each rebalance. The AI's job is watchlist composition only, and the financial model turns the watchlist into weights. The published backtest runs weekly from May 2023 to May 2026 (about 3 years, 157 rebalances), starting from an equal-weight `[AAPL, MSFT, GOOGL, NVDA, SPY]` buy-and-hold investor who is too busy to track the news and revise the portfolio. We know such investors exist because the author is one.
 
-NVDA is in the starter from day 0, so both the AI-managed portfolio and the buy-and-hold baseline ride it and the curator earns no credit there. The divergence comes from the curator's thematic adds and the optimizer's quarterly re-weighting. The clearest example is the rockets/spacecraft wave: the curator added Rocket Lab (RKLB) at the window's start in 2022 and held it through a multi-year, several-fold run; by 2025 the optimizer had concentrated heavily in RKLB, up to its 80% cap. The curator also rotated the watchlist as theses matured: it added defense (ITA) and robotics (BOTZ) early, opened the nuclear slot with single-name NuScale (SMR) and then swapped it for the diversified nuclear ETF (NUKZ) once NuScale's flagship project collapsed, played quantum first via IonQ (IONQ) and then trimmed it "before the crest" after the late-2024 run-up, rotated the nuclear slot on to Constellation Energy (CEG), and dropped the broad AAPL/MSFT/GOOGL names on dated catalysts (Apple's revenue slump, Microsoft's AI-margin compression), finally opening the demographics slot with the senior-housing REIT Welltower (WELL). Final watchlist: BOTZ, CEG, GOOGL, ITA, NVDA, RKLB, WELL, plus the three permanent safe-haven anchors SPY, AGG, IAU.
+The curator here is kimi-k2.5 reading the date-clean GKG pool, and it is disciplined. Over 157 weeks it made just four swaps, every ticker real and US-listed, and it held the line the rest of the time. It kept NVDA through the AI boom, added Rocket Lab (RKLB) on a mid-2024 Space Force catalyst and rode it, opened a nuclear slot with Constellation Energy (CEG) on the Microsoft / Three Mile Island restart, played defense with Lockheed (LMT), and re-added Google as a quantum name on the Willow-chip breakthrough. The optimizer then concentrated into whatever was running, and the book ends **RKLB 60% / NVDA 40%**.
 
-**Total realized return over the window (2022–2025, ~3.6 years):**
+**Total return over the window (May 2023 to May 2026, about 3 years):**
 
-| Strategy | Return | Annualized |
-|---|---|---|
-| Curator (λ=0.5, lookback 0.5y, cap=0.90, max_watchlist_size=5) | **+2124.8%** | **+137.4%** |
-| Buy-and-hold (equal-weight starter, includes NVDA) | +187.3% | +34.2% |
-| SPY benchmark | +58.7% | +13.7% |
-
-This is the single config the live portfolio uses; the dashboard renders the same one. It ends ~90% RKLB / 10% QTUM (RKLB pinned at the 0.90 cap), so most of the lift rests on the one RKLB position (see the robustness caveat below).
-
-**Safe-haven anchors.** The optimizer's universe always includes three permanent anchors (`SPY` broad equity, `AGG` bonds, `IAU` gold), set via the profile's `always_include` key. They sit outside the curator's `max_watchlist_size` budget: the curator never adds or removes them, and they give mean-variance a low-volatility diversified default to pivot into. Honest caveat: at this return-hungry config (λ=0.5, cap=0.90) the optimizer assigns the anchors ~0% weight both live and across the whole backtest, so they leave the max drawdown (−48.9%) essentially unchanged and affect the headline only marginally. Universe membership is an option the optimizer declines to use; a forced minimum weight, a lower cap, or a higher λ would be required to make the anchors an actual downside buffer.
-
-**The AI Curator's lift over buy-and-hold:**
-
-| Measure | Value |
+| Strategy | Total return |
 |---|---|
-| Absolute (curator − buy/hold), total | +463pp |
-| Absolute, annualized | +41.1pp/yr |
-| Relative (curator − buy/hold) / (buy/hold) | 2.47 |
+| Curator (kimi; cap 0.8, `λ` 2.0, 30-day lookback, weekly) | **+957%** (about +120%/yr, 29% max drawdown) |
+| Buy-and-hold (equal-weight starter, includes NVDA) | +217% |
+| SPY benchmark | +85% |
 
-**A caveat on robustness.** Under the current config the curator actually leads buy-and-hold most of the time: it was ahead of B&H on ~74% of trading days, its worst shortfall versus B&H was only about −8%, and it moved permanently ahead from October 2024. (The short 0.5y lookback drives this — the longer 1.5y lookback led on only ~26% of days with a −39% worst shortfall.) That said, the final lift still concentrates in a single position — the optimizer rode Rocket Lab near its 80% cap as RKLB ran in 2024–2025 — so read the magnitude as one favorable wave the curator caught and held, not a broad-based edge. Read it as one favorable wave the curator caught and held, not proof of a durable edge; a single winning bet (n=1) cannot separate skill from luck. There is also a look-ahead-bias / data-leakage caveat: the curator is an LLM whose training postdates the window, and live WebSearch ranks results by present-day fame, so the backtest is a **hindsight-tinted upper bound, not a clean out-of-sample result**. The way to test for overfitting is **forward testing** — hold this config fixed and measure realized performance on quarters that postdate the model's training cutoff. See [REFERENCE.md](REFERENCE.md#the-curator-backtest-post-covid-window) for the full bias accounting and the forward-testing plan.
+The curator beat the buy-and-hold investor by about **+740 percentage points**, or **3.4x** its gain.
 
-See the [curator backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_curator.html) and the full report in `data/backtest_curator_postcovid/report.md`. Reproduce locally with the on-demand backtest from the Runs section above.
+**Where the return comes from, and why to distrust it.** Rocket Lab alone is roughly 71% of the gain. That is the headline and the caveat at once: this is one favorable wave the curator caught and held, not a broad-based edge, and a single winning bet (n=1) cannot separate skill from luck. Worse, the whole result is in-sample. The clean GKG plus Wayback retriever removes the *retrieval* leak, so the curator only ever saw period-correct news, but the curator is an LLM whose training postdates the window, so it may simply remember which 2023-to-2026 names won. The backtest is therefore a hindsight-tinted upper bound, not a clean out-of-sample result. The only honest test is **forward testing**: hold the config fixed and measure realized performance on quarters that postdate the model's training cutoff. That is the next phase of this project.
+
+See the [curator backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_gkg_3yr_kimi.html) for the full picture, and [REFERENCE.md](REFERENCE.md) for the exact config, the per-wave attribution, the safe-haven-anchor accounting, and the full bias discussion.
 
 ## Notes
 
