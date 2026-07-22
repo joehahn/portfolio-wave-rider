@@ -111,13 +111,16 @@ def build():
         _hfig([go.Bar(x=[v for _, v in wv], y=[k for k, _ in wv], orientation="h",
                       marker_color="#22c55e")], "articles")))
 
-    # 4. Top sources — horizontal (mirrors retrieval_pwr plot 7)
+    # 4. Top sources — horizontal, colored by authority tier (mirrors retrieval_pwr plot 7)
+    _TIERCOL = {"specialty": "#22c55e", "major": "#3b82f6", "other": "#9ca3af"}
     src = Counter(a.get("source_domain", "?") for a in arts).most_common(15)[::-1]
+    _scol = [_TIERCOL[_corpus.source_tier(s)] for s, _ in src]
     figs.append((
-        "4. Top sources",
-        "domains contributing the most articles &mdash; the news_sources.md source_block list is excluded (see note)",
+        "4. Top sources (color = authority tier)",
+        "green = specialty desk (news_sources.md prose, weight 2.0), blue = major wire (source_major, 1.5), "
+        "grey = other. source_block junk already excluded upstream",
         _hfig([go.Bar(x=[c for _, c in src], y=[s for s, _ in src], orientation="h",
-                      marker_color="#14b8a6")], "articles", height=400, left=200)))
+                      marker_color=_scol)], "articles", height=400, left=200)))
 
     # 5. Articles per search term — horizontal (mirrors retrieval_pwr plot 8)
     _pfx = "recent business and stock-market news about "
@@ -155,6 +158,7 @@ def build():
     domains = len(set(a.get("source_domain") for a in arts))
     n_app = len(_jsonl("appearances.jsonl"))
     with_author = sum(1 for x in _authors if x)   # real bylines (pseudo-authors already dropped)
+    recog = sum(1 for a in arts if _corpus.source_tier(a.get("source_domain", "")) in ("specialty", "major"))
     summary = ('<div style="margin:.8em 0 1.5em">'
                + _card(f"{n:,}", "articles in corpus (unique)")
                + _card(f"{n_app:,}", "sightings logged (appearances)")
@@ -162,6 +166,7 @@ def build():
                + _card(len(gaps), "missing days (gaps)", "#0a7a3a" if not gaps else "#b45309")
                + _card(f"{100*ok//n if n else 0}%", "full-text extracted")
                + _card(f"{100*with_author//n if n else 0}%", "with a byline (author)")
+               + _card(f"{100*recog//n if n else 0}%", "recognized desks (specialty+major)")
                + _card(in_window, f"read by a review now ({LOOKBACK}d window)")
                + _card(f"{len(wave)} / {domains}", "waves / source domains")
                + _card(_blocked_count(), "blocked domains (source_block)")
@@ -184,11 +189,12 @@ genuinely new articles. This is the forward analog of the backtest
 <a href="../data/forward_corpus/pulls.jsonl">pulls.jsonl</a></p>
 {charts}
 <p style="color:#666;font-size:13px;max-width:820px;margin-top:1.5em;"><b>Note on sources:</b> the forward
-pull runs Anthropic WebSearch on the wave keywords with the <code>news_sources.md</code>
-<code>source_block</code> list passed as web_search <code>blocked_domains</code>, so the low-signal /
-PR-mill domains the backtest also drops are excluded here too. It does <b>not</b> apply
-<code>source_major</code> / specialty as an allow-list, because <code>allowed_domains</code> is a hard
-whitelist that would gut recall (and the file itself calls those "a preferred list, not an exclusive one").</p>
+pull honors all three <code>news_sources.md</code> tiers, reaching parity with the backtest's source
+handling. It excludes <code>source_block</code> domains (as web_search <code>blocked_domains</code>);
+runs a per-wave <b>specialty sweep</b> restricted to the preferred prose desks (as
+<code>allowed_domains</code>) so their deep coverage isn't buried by open ranking; and tags every article
+by authority tier &mdash; <b>specialty</b> (prose desks, 2.0), <b>major</b> (<code>source_major</code> wires,
+1.5), or <b>other</b> (1.0) &mdash; shown as the colors in plot 4.</p>
 </body></html>"""
     OUT.write_text(page)
     print(f"wrote {OUT}  ({n} articles, {len(pulls)} pulls, {len(gaps)} gap-days)")

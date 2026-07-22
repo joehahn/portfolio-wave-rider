@@ -72,6 +72,56 @@ _PSEUDO_SUBSTR = ("staff", "newsroom", "editorial", "redakt", "redaction", "tran
                   "research team", "press release", "newswire", "correspondent")
 
 
+def _load_tiers():
+    """(major_domains, specialty_domains) from news_sources.md — mirrors gkg_pool's parsing so forward
+    and backtest agree on authority tiers. specialty = every https URL in the prose, MINUS major (major
+    wins the overlap). Empty on missing file."""
+    import yaml
+    p = ROOT / "news_sources.md"
+    if not p.exists():
+        return set(), set()
+    txt = p.read_text()
+    m = re.match(r"^---\s*\n(.*?)\n---\s*\n", txt, re.DOTALL)
+    major = {str(s).lower() for s in ((yaml.safe_load(m.group(1)) or {}).get("source_major") or [])} if m else set()
+    prose = re.sub(r"^---\s*\n.*?\n---\s*\n", "", txt, count=1, flags=re.DOTALL)
+    spec = set()
+    for mm in re.finditer(r"https?://([A-Za-z0-9.-]+)", prose):
+        d = mm.group(1).lower()
+        spec.add(d[4:] if d.startswith("www.") else d)
+    return major, spec - major
+
+
+_TIERS = None
+
+
+def _domain_in(domain: str, domains: set) -> bool:
+    d = (domain or "").lower()
+    return any(d == x or d.endswith("." + x) for x in domains)
+
+
+def source_tier(domain: str) -> str:
+    """Authority tier of a source domain per news_sources.md: 'specialty' (top), 'major' (wire), or
+    'other'. Boundary-aware (finance.yahoo.com matches yahoo.com; proactiveinvestors.com does not
+    match investors.com)."""
+    global _TIERS
+    if _TIERS is None:
+        _TIERS = _load_tiers()
+    major, spec = _TIERS
+    if _domain_in(domain, spec):
+        return "specialty"
+    if _domain_in(domain, major):
+        return "major"
+    return "other"
+
+
+def specialty_domains() -> list[str]:
+    """Flat list of specialty-desk domains (for a web_search allowed_domains specialty sweep)."""
+    global _TIERS
+    if _TIERS is None:
+        _TIERS = _load_tiers()
+    return sorted(_TIERS[1])
+
+
 def clean_author(author: "str | None", publisher: "str | None" = None) -> "str | None":
     """Return the byline if it looks like a real person, else None. Drops PR-wire / site-brand /
     newsroom-staff pseudo-authors and site-name-as-byline (author == publisher)."""

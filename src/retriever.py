@@ -105,7 +105,8 @@ def _extract_article(url: str, cid: str, res: dict, pulled_at: str, query: str, 
     author = corpus.clean_author(author, publisher)   # drop PR-wire / site-brand / staff pseudo-authors
     return {
         "article_id": cid, "url": url, "canonical_url": corpus.canon_url(url),
-        "source_domain": host, "publisher": publisher or host, "title": title, "author": author,
+        "source_domain": host, "source_tier": corpus.source_tier(host),
+        "publisher": publisher or host, "title": title, "author": author,
         "published_date": (pub_date or res.get("date") or "")[:10] or None, "language": language,
         "snippet": snippet, "full_text": full_text, "extraction_ok": ok,
         "content_hash": hashlib.sha1(blob.encode("utf-8")).hexdigest()[:16],
@@ -121,17 +122,21 @@ class WebSearchRetriever:
         self.waves = waves
         self.cap = max_results_per_query
         self.blocked = blocked_domains()   # news_sources.md source_block -> web_search blocked_domains
+        self.specialty = corpus.specialty_domains()   # preferred desks -> a per-wave allowed_domains sweep
         import anthropic
         k = _env("ANTHROPIC_API_KEY")
         if not k:
             raise SystemExit("ANTHROPIC_API_KEY empty in .env")
         self._cli = anthropic.Anthropic(api_key=k)
 
-    def _search(self, query: str) -> list[dict[str, Any]]:
-        """Run one web_search and return ALL results (url, title, page_age)."""
+    def _search(self, query: str, allowed: "list[str] | None" = None) -> list[dict[str, Any]]:
+        """Run one web_search and return ALL results (url, title, page_age). With `allowed`, restrict to
+        those domains (the specialty sweep); otherwise an open search excluding source_block domains."""
         tool = {"type": "web_search_20250305", "name": "web_search", "max_uses": 1}
-        if self.blocked:
-            tool["blocked_domains"] = self.blocked   # drop news_sources.md source_block junk domains
+        if allowed:
+            tool["allowed_domains"] = allowed        # specialty sweep: restrict to preferred desks
+        elif self.blocked:
+            tool["blocked_domains"] = self.blocked   # open pull: drop source_block junk domains
         resp = self._cli.messages.create(
             model=self.model, max_tokens=1024,
             tools=[tool],
@@ -158,21 +163,28 @@ class WebSearchRetriever:
         bodies: dict[str, dict] = {}   # fetch each unique article once per pull, log every sighting
         for wave, keywords in self.waves.items():
             query = _wave_query(keywords)
-            try:
-                results = self._search(query)
-                query_stats[query] = {"wave": wave, "results": len(results)}
-            except Exception as e:  # noqa: BLE001 - one bad query must not sink the pull; record the gap
-                query_stats[query] = {"wave": wave, "error": str(e)[:140]}
-                continue
-            for rank, res in enumerate(results):
-                url = res.get("url")
-                if not url:
+            # Per wave: an OPEN search (source_block excluded), plus a SPECIALTY sweep restricted to the
+            # preferred desks (news_sources.md prose) so their deep coverage isn't buried by open ranking.
+            passes = [(query, None)]
+            if self.specialty:
+                passes.append((query, self.specialty))
+            for qtext, allowed in passes:
+                qkey = qtext + (" [specialty]" if allowed else "")
+                try:
+                    results = self._search(qtext, allowed=allowed)
+                    query_stats[qkey] = {"wave": wave, "results": len(results)}
+                except Exception as e:  # noqa: BLE001 - one bad query must not sink the pull; log the gap
+                    query_stats[qkey] = {"wave": wave, "error": str(e)[:140]}
                     continue
-                cid = corpus.article_id(url)
-                if cid not in bodies:
-                    bodies[cid] = _extract_article(url, cid, res, pulled_at, query, wave)
-                sightings.append({**bodies[cid], "pull_id": pull_id, "pulled_at": pulled_at,
-                                  "query": query, "wave": wave, "result_rank": rank})
+                for rank, res in enumerate(results):
+                    url = res.get("url")
+                    if not url:
+                        continue
+                    cid = corpus.article_id(url)
+                    if cid not in bodies:
+                        bodies[cid] = _extract_article(url, cid, res, pulled_at, query, wave)
+                    sightings.append({**bodies[cid], "pull_id": pull_id, "pulled_at": pulled_at,
+                                      "query": qkey, "wave": wave, "result_rank": rank})
         return sightings, query_stats
 
 
