@@ -34,6 +34,14 @@ def _fig(traces, title, ytitle, height=300):
     return fig
 
 
+def _hfig(traces, xtitle, height=300, left=220):
+    """Horizontal-bar figure (categories on y), mirroring retrieval_pwr's plots 5/7/8."""
+    fig = go.Figure(traces)
+    fig.update_layout(template="seaborn", height=height, margin={"t": 10, "l": left, "r": 20, "b": 40},
+                      xaxis_title=xtitle, showlegend=False)
+    return fig
+
+
 def build():
     arts, pulls = _jsonl("articles.jsonl"), _jsonl("pulls.jsonl")
     n = len(arts)
@@ -67,18 +75,41 @@ def build():
         _fig([go.Bar(x=[d for d in sorted(pull_day)], y=[new_by_day[d] for d in sorted(pull_day)],
                      marker_color="#3b82f6")], "", "new articles / day")))
 
-    # 2. Per-wave coverage
-    wave = Counter(a.get("first_wave", "?") for a in arts)
+    # 2. Articles by published date (histogram, just below the pull-history panel)
+    dc = Counter(dated)
+    dk = sorted(dc)
     figs.append((
-        "2. Coverage by wave", "unique articles whose first sighting was under each wave query",
-        _fig([go.Bar(x=list(wave.keys()), y=list(wave.values()), marker_color="#8b5cf6")], "", "articles")))
+        "2. Articles by published date",
+        (f"when the stored articles were published; the curator only reads the trailing {LOOKBACK}-day "
+         "window, so the older outliers (evergreen / hub pages with stale dates) never reach it"),
+        _fig([go.Bar(x=dk, y=[dc[d] for d in dk], marker_color="#0ea5e9")], "", "articles")))
 
-    # 3. Top sources
-    src = Counter(a.get("source_domain", "?") for a in arts).most_common(15)
+    # 3. Articles by wave — horizontal (mirrors retrieval_pwr plot 5)
+    wave = Counter(a.get("first_wave", "?") for a in arts)
+    wv = sorted(wave.items(), key=lambda kv: kv[1])            # ascending -> largest bar at top
     figs.append((
-        "3. Top sources", "domains contributing the most articles",
-        _fig([go.Bar(x=[s for s, _ in src], y=[c for _, c in src], marker_color="#10b981")], "", "articles",
-             height=320)))
+        "3. Articles by wave",
+        "coverage by theme (the wave query whose result first surfaced each article)",
+        _hfig([go.Bar(x=[v for _, v in wv], y=[k for k, _ in wv], orientation="h",
+                      marker_color="#22c55e")], "articles")))
+
+    # 4. Top sources — horizontal (mirrors retrieval_pwr plot 7)
+    src = Counter(a.get("source_domain", "?") for a in arts).most_common(15)[::-1]
+    figs.append((
+        "4. Top sources",
+        "domains contributing the most articles &mdash; open WebSearch, no source tiers applied (see note below)",
+        _hfig([go.Bar(x=[c for _, c in src], y=[s for s, _ in src], orientation="h",
+                      marker_color="#14b8a6")], "articles", height=400, left=200)))
+
+    # 5. Articles per search term — horizontal (mirrors retrieval_pwr plot 8)
+    _pfx = "recent business and stock-market news about "
+    q = Counter((a.get("first_query") or "?").replace(_pfx, "") for a in arts)
+    qi = sorted(q.items(), key=lambda kv: kv[1])
+    figs.append((
+        "5. Articles per search term",
+        "the retriever's surfacing queries (one per wave, built from gkg_config.json keywords)",
+        _hfig([go.Bar(x=[v for _, v in qi], y=[k[:58] for k, _ in qi], orientation="h",
+                      marker_color="#a855f7")], "articles", height=340, left=330)))
 
     charts = ""
     for i, (title, sub, fig) in enumerate(figs):
@@ -111,7 +142,16 @@ padding:0 1.5em 3em;color:#222;line-height:1.5}}h1,h2{{color:#111}}h2{{margin-to
 genuinely new articles. This is the forward analog of the backtest
 <a href="retrieval_pwr.html">Retriever DB</a>; the curator reads a trailing {LOOKBACK}-day slice of it at each review.</p>
 {summary}
+<p style="color:#555;font-size:13px;margin-top:-.6em;">Raw data (local files):
+<a href="../data/forward_corpus/articles.jsonl">articles.jsonl</a> &middot;
+<a href="../data/forward_corpus/appearances.jsonl">appearances.jsonl</a> &middot;
+<a href="../data/forward_corpus/pulls.jsonl">pulls.jsonl</a></p>
 {charts}
+<p style="color:#666;font-size:13px;max-width:820px;margin-top:1.5em;"><b>Note on sources:</b> the forward
+pull runs open Anthropic WebSearch on the wave keywords and does <b>not</b> yet apply the source tiers in
+<code>news_sources.md</code> (the allow / block lists the backtest GKG path uses). Wiring
+<code>source_block</code> into web_search's <code>blocked_domains</code>, and <code>source_allow</code> into a
+preference, is a straightforward addition.</p>
 </body></html>"""
     OUT.write_text(page)
     print(f"wrote {OUT}  ({n} articles, {len(pulls)} pulls, {len(gaps)} gap-days)")
