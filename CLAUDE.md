@@ -81,7 +81,7 @@ These are the user's history. Don't break their schemas. If you must extend them
 
 ## Automation (cron, cross-platform)
 
-One cron entry handles daily price snapshots. Install with `./scripts/install_cron.sh`, which appends one line to the user's crontab pointing at `scripts/cron_snapshot.sh` (which in turn resolves its own location and runs snapshot + dashboard, appending timestamped output to `data/snapshot.log`). Both scripts are pure-bash and idempotent. Works the same on macOS and Linux.
+Two cron scripts drive the forward loop: `scripts/news_pull.sh` (daily at 18:30 local, incl. weekends) pulls news into `data/forward_corpus/`, and `scripts/price_snapshot.sh` (weekday at 16:30 local) runs the price snapshot + dashboard + self-gating `review --if-due`. Users install them by pasting two lines into `crontab -e` (README §4 has the block, using a `PWR_path` variable); `scripts/install_cron.sh` is an optional helper that adds both idempotently. All scripts resolve their own location, are pure-bash, log to `data/snapshot.log`, and work on macOS and Linux.
 
 cron only fires while the machine is awake; missed runs do not auto-replay. Use `--date YYYY-MM-DD` on `snapshot` to backfill.
 

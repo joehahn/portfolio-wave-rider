@@ -98,7 +98,7 @@ portfolio-wave-rider/
 │   ├── sweep_watchlist_size.py # aggregates per-cap _backtest dirs into the cap-sweep page
 │   ├── walk_forward.py         # robustness check: are sweep winners stable across halves of the window?
 │   ├── run_sweeps.sh           # convenience runner for the three replay sweeps
-│   ├── cron_snapshot.sh        # cron entry: snapshot + dashboard, logs to data/snapshot.log
+│   ├── price_snapshot.sh        # cron entry: snapshot + dashboard, logs to data/snapshot.log
 │   ├── install_cron.sh         # idempotent installer for the cron entry
 │   └── autopush_docs.sh        # auto-pushes docs/ when cron updates docs/index.html
 ├── tests/
@@ -247,7 +247,7 @@ One cron entry handles daily price snapshots and dashboard refresh. Install with
 ./scripts/install_cron.sh
 ```
 
-The helper appends one line to your crontab (preserving anything else there) that fires `scripts/cron_snapshot.sh` Mon-Fri at 16:30 local. Works the same on macOS and Linux. Both scripts resolve their own location, so there's no `PROJ` variable to maintain. `install_cron.sh` is idempotent (re-running is safe). To uninstall: `crontab -e` and delete the matching line.
+The helper appends one line to your crontab (preserving anything else there) that fires `scripts/price_snapshot.sh` Mon-Fri at 16:30 local. Works the same on macOS and Linux. Both scripts resolve their own location, so there's no `PROJ` variable to maintain. `install_cron.sh` is idempotent (re-running is safe). To uninstall: `crontab -e` and delete the matching line.
 
 Each fire runs `snapshot` then `dashboard`, appending timestamped output to `data/snapshot.log`. cron only fires while the machine is awake; missed runs do not auto-replay. Use `--date YYYY-MM-DD` on `snapshot` to backfill a missed day.
 
