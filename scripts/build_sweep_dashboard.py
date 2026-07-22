@@ -336,6 +336,9 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     import plotly.graph_objects as go
     _curved = [r for r in _llm if r.get("curve_x")]
     _ref = _curved[0] if _curved else None
+    _xr = [_curved[0]["curve_x"][0], _curved[0]["curve_x"][-1]] if _curved else None  # shared x-range for 4 & 5
+    _MARG = {"t": 20, "l": 72, "r": 135}   # identical margins so plots 4 & 5 line up; r leaves room for legend
+    _LEG = {"x": 1.02, "xanchor": "left", "y": 1, "yanchor": "top"}
     # LLM palette avoids blue/green (reserved for buy/hold + SPY, matching the curator DB's plot 1)
     _pal = ["#d97706", "#9467bd", "#d62728", "#8c564b", "#e377c2"]
     _fig4 = go.Figure()
@@ -348,7 +351,8 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     if _ref and _ref.get("spy_y"):
         _fig4.add_trace(go.Scatter(x=_ref["curve_x"], y=_ref["spy_y"], mode="lines", name="SPY benchmark",
                                    line={"color": "#10b981", "width": 1.5, "dash": "dot"}))
-    _fig4.update_layout(template="seaborn", height=460, margin={"t": 20, "l": 72, "r": 20}, hovermode="x unified")
+    _fig4.update_layout(template="seaborn", height=460, margin=_MARG, hovermode="x unified", legend=_LEG)
+    _fig4.update_xaxes(range=_xr)
     _fig4.update_yaxes(title_text="portfolio value ($)", type="log",
                        tickvals=[10000, 30000, 100000, 300000, 1000000],
                        ticktext=["$10K", "$30K", "$100K", "$300K", "$1M"])
@@ -369,9 +373,10 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                 x=r["sim_x"], y=r["sim_y"], mode="lines",
                 name=f"{r['label'].split(' (')[0]} vs {_ref['label'].split(' (')[0]}",
                 line={"color": _pal[(_i + 1) % len(_pal)], "width": 2}))
-        _fig5.update_layout(template="seaborn", height=380, margin={"t": 20, "l": 60, "r": 20},
+        _fig5.update_layout(template="seaborn", height=380, margin=_MARG,
                             yaxis={"title": "portfolio overlap (Σ min weight)", "range": [0, 1.02]},
-                            hovermode="x unified")
+                            hovermode="x unified", legend=_LEG)
+        _fig5.update_xaxes(range=_xr)
         llm5_html = ('<h2>5. Portfolio similarity over time — overlap vs the reference curator</h2>'
                      '<p style="color:#555;max-width:920px;">Per-date portfolio <b>overlap coefficient</b> '
                      '&Sigma; min(weight) between each LLM\'s holdings and the reference (Sonnet): 1.0 = '
