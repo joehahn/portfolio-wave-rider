@@ -125,6 +125,17 @@ def build():
         _hfig([go.Bar(x=[v for _, v in qi], y=[k[:58] for k, _ in qi], orientation="h",
                       marker_color="#a855f7")], "articles", height=340, left=330)))
 
+    # 6. Articles per author — horizontal (byline attribution; raw material for gains-per-author later)
+    au = Counter((a.get("author") or "").strip() for a in arts if (a.get("author") or "").strip())
+    ai = sorted(au.items(), key=lambda kv: kv[1])[-15:]   # top 15, largest bar at top
+    figs.append((
+        "6. Articles per author",
+        "byline attribution (trafilatura). Partial by nature &mdash; wire services (Reuters/AP) omit authors "
+        "and paywalled/JS pages block extraction. This is the raw material for a future gains-per-author "
+        "view, once forward price outcomes accrue and ticker attribution is tightened",
+        _hfig([go.Bar(x=[v for _, v in ai], y=[k[:50] for k, _ in ai], orientation="h",
+                      marker_color="#f59e0b")], "articles", height=380, left=240)))
+
     charts = ""
     for i, (title, sub, fig) in enumerate(figs):
         charts += (f'<h2>{title}</h2><p style="color:#666;margin:.2em 0 .4em;">{sub}</p>'
@@ -138,12 +149,14 @@ def build():
                 f'<span style="font-size:.82em;color:#555">{label}</span></div>')
     domains = len(set(a.get("source_domain") for a in arts))
     n_app = len(_jsonl("appearances.jsonl"))
+    with_author = sum(1 for a in arts if a.get("author"))
     summary = ('<div style="margin:.8em 0 1.5em">'
                + _card(f"{n:,}", "articles in corpus (unique)")
                + _card(f"{n_app:,}", "sightings logged (appearances)")
                + _card(len(pulls), "pulls run")
                + _card(len(gaps), "missing days (gaps)", "#0a7a3a" if not gaps else "#b45309")
                + _card(f"{100*ok//n if n else 0}%", "full-text extracted")
+               + _card(f"{100*with_author//n if n else 0}%", "with a byline (author)")
                + _card(in_window, f"read by a review now ({LOOKBACK}d window)")
                + _card(f"{len(wave)} / {domains}", "waves / source domains")
                + _card(_blocked_count(), "blocked domains (source_block)")
