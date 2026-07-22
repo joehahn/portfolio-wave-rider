@@ -148,20 +148,6 @@ def _llm_rows(cfg):
                  **_metrics(totals, spy, res["annualized_return"], res["max_drawdown"]))
         r["curve_x"] = [d.strftime("%Y-%m-%d") for d in totals.index]
         r["curve_y"] = [float(v) for v in totals.values]
-        # per-date weight vector (value / total) for the portfolio-similarity plot
-        _wm = snaps.pivot_table(index="date", columns="ticker", values="value", aggfunc="first").fillna(0.0)
-        _wm = _wm.div(_wm.sum(axis=1).replace(0, 1.0), axis=0)
-        if not out:
-            r["_wm"] = _wm                                   # reference weights (kept for comparison)
-        else:
-            _ref_wm = out[0].get("_wm")
-            if _ref_wm is not None:
-                _cd = _wm.index.intersection(_ref_wm.index)
-                _cols = _wm.columns.union(_ref_wm.columns)
-                _a = _wm.reindex(index=_cd, columns=_cols, fill_value=0.0).values
-                _b = _ref_wm.reindex(index=_cd, columns=_cols, fill_value=0.0).values
-                r["sim_x"] = [d.strftime("%Y-%m-%d") for d in _cd]
-                r["sim_y"] = [float(v) for v in np.minimum(_a, _b).sum(axis=1)]
         if not out:  # first finished (reference) run carries the SHARED SPY + buy/hold curves for plot 4
             r["spy_y"] = [float(v) for v in spy.reindex(totals.index).ffill().values]
             try:
@@ -362,29 +348,6 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                   'curator DB\'s plot 1, without the rebalance markers.</p>'
                   + _fig4.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False}))
                  if _curved else "")
-
-    # plot 5: portfolio similarity over time (overlap coefficient vs the reference LLM)
-    _simmed = [r for r in _llm if r.get("sim_x")]
-    llm5_html = ""
-    if _simmed and _ref:
-        _fig5 = go.Figure()
-        for _i, r in enumerate(_simmed):
-            _fig5.add_trace(go.Scatter(
-                x=r["sim_x"], y=r["sim_y"], mode="lines",
-                name=f"{r['label'].split(' (')[0]} vs {_ref['label'].split(' (')[0]}",
-                line={"color": _pal[(_i + 1) % len(_pal)], "width": 2}))
-        _fig5.update_layout(template="seaborn", height=380, margin=_MARG,
-                            yaxis={"title": "overlap = Σ min(w, w_ref)", "range": [0, 1.02]},
-                            hovermode="x unified", legend=_LEG)
-        _fig5.update_xaxes(range=_xr)
-        llm5_html = ('<h2>5. Portfolio similarity over time — overlap vs the reference curator</h2>'
-                     '<p style="color:#555;max-width:920px;">Per-date portfolio <b>overlap</b>: for each '
-                     'ticker take the <i>smaller</i> of this LLM\'s weight and the reference\'s (Sonnet) '
-                     'weight, then sum over tickers &mdash; <b>&Sigma;<sub>i</sub> min(w<sub>i,this</sub>, '
-                     'w<sub>i,Sonnet</sub>)</b>. That\'s the fraction of the portfolio held <i>identically</i>: '
-                     '1.0 = same holdings &amp; weights, 0 = fully disjoint. Shows WHEN a cheap model\'s '
-                     'portfolio diverges (vs the single agreement % in table 3).</p>'
-                     + _fig5.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False}))
     ts = datetime.now().strftime("%Y-%m-%d %H:%M %Z").strip()
     page = f"""<!doctype html><html><head><meta charset="utf-8"><title>PWR — parameter sweep</title>
 <style>body{{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;max-width:1180px;margin:0 auto;
@@ -424,7 +387,6 @@ both halves) before trusting any row.</p>
 <tbody>{trs}</tbody></table>
 {llm_html}
 {llm4_html}
-{llm5_html}
 </body></html>"""
     out.write_text(page)
     top = max(rows, key=lambda r: r["ir"] if r["ir"] == r["ir"] else -9e9)
