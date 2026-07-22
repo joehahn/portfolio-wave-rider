@@ -67,7 +67,7 @@ th{{position:sticky;top:0;background:#fff;border-bottom:2px solid #ddd;cursor:de
 </style></head><body>
 <nav><a href="https://github.com/joehahn/portfolio-wave-rider/blob/main/README.md">README</a>
  &middot; <a href="retrieval_pwr.html">Retriever DB</a>
- &middot; <a href="backtest_gkg_2yr_weekly.html">Curator DB</a>
+ &middot; <a href="backtest_gkg_3yr_kimi.html">Curator DB</a>
  &middot; <a href="sweep_pwr.html">Sweep DB</a></nav>
 <h1>Curator pool browser</h1>
 <p class="summ">Exactly what the curator receives each rebalance: the ranked article list (title, source,

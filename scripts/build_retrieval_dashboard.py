@@ -316,7 +316,7 @@ def build(run_rel, out):
         'border-bottom:1px solid #eee;">'
         '<a href="https://github.com/joehahn/portfolio-wave-rider/blob/main/README.md">README</a>'
         ' · <a href="pool_browser.html">Pool browser</a>'
-        ' · <a href="backtest_gkg_2yr_weekly.html">Curator DB</a>'
+        ' · <a href="backtest_gkg_3yr_kimi.html">Curator DB</a>'
         ' · <a href="sweep_pwr.html">Sweep DB</a>'
         '</nav>'
         '<h1>News retrieval dashboard — GKG + Wayback (upstream of the curator)</h1>'

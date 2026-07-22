@@ -248,7 +248,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
            '<a href="https://github.com/joehahn/portfolio-wave-rider/blob/main/README.md">README</a>'
            ' &middot; <a href="retrieval_pwr.html">retriever DB</a>'
            ' &middot; <a href="pool_browser.html">pool browser</a>'
-           ' &middot; <a href="backtest_gkg_2yr_weekly.html">curator DB</a></nav>')
+           ' &middot; <a href="backtest_gkg_3yr_kimi.html">Curator DB</a></nav>')
     _fmt = lambda xs: ", ".join(str(x) for x in xs)  # noqa: E731
     grid_html = (
         '<h2>Parameter settings</h2>'
