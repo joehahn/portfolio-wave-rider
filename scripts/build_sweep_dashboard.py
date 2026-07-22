@@ -366,11 +366,6 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                       + _c2(s["mean_overall"], "{:.2f}") + f'<td {_lc}>{s["n"]}</td>'
                       + _c2(s["add_mean"], "{:.2f}") + _c2(s["rem_mean"], "{:.2f}")
                       + "".join(_c2((s[k] or 0) * 100, "{:.0f}%") for k in _cr) + "</tr>")
-        _exrows = "".join(
-            f'<tr style="border-bottom:1px solid #f0f0f0;"><td {_lc}>{e["model"].split("/")[-1]}</td>'
-            f'<td {_lc}>{e["date"]}</td><td {_lc}>{e["action"]} {e["ticker"]}</td>'
-            f'<td {_lc}><b>{e["overall"]}</b></td><td style="text-align:left;padding:6px 10px;">{e["reason"]}</td></tr>'
-            for e in J.get("examples", [])[:8])
         llm5_html = (
             '<h2>5. Rationale-soundness — blind judge (leak-free)</h2>'
             '<p style="color:#555;max-width:920px;">Every backtest column above (return, IR, Sharpe, Calmar, '
@@ -391,12 +386,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
             'five % columns = share of that curator\'s decisions passing each criterion: <b>on-thesis</b> (maps '
             'to a named wave), <b>evidence</b> (cited news actually supports the claim), <b>catalyst</b> '
             '(concrete milestone, not noise), <b>discipline</b> (buildup-not-crest; a remove is justified, not '
-            'churn), <b>valid-ticker</b> (real investable US listing, not a name/delisted/false-match).</p>'
-            + (f'<p style="color:#555;margin:.6em 0 .2em;"><b>Lowest-scoring decisions the judge flagged</b> '
-               '(illustrates what the score penalizes):</p>'
-               f'<table><thead><tr><th style="text-align:left">curator</th><th {_lc}>date</th>'
-               f'<th {_lc}>decision</th><th {_lc}>score</th><th style="text-align:left">judge&rsquo;s reason</th>'
-               f'</tr></thead><tbody>{_exrows}</tbody></table>' if _exrows else ""))
+            'churn), <b>valid-ticker</b> (real investable US listing, not a name/delisted/false-match).</p>')
     ts = datetime.now().strftime("%Y-%m-%d %H:%M %Z").strip()
     page = f"""<!doctype html><html><head><meta charset="utf-8"><title>PWR — parameter sweep</title>
 <style>body{{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;max-width:1180px;margin:0 auto;
