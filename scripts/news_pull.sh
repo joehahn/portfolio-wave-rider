@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Daily (7-day, incl. weekends) forward news pull into the frozen corpus (data/forward_corpus/).
-# Runs every day so news is frozen NEAR publication; a weekday-only pull would capture weekend news
+# Forward news pull into the frozen corpus (data/forward_corpus/). Runs EVERY day (incl. weekends).
+# Each run fetches recent news via WebSearch (not a fixed window) and dedups; only genuinely new articles
+# are stored. Running every day so news is frozen NEAR publication; a weekday-only pull would capture weekend news
 # 1-2 days late. Independent of the weekday snapshot job. Tolerant on failure, appends to snapshot.log.
 # Installed by scripts/install_cron.sh; resolves its own location so no path interpolation is needed.
 set -euo pipefail

@@ -69,7 +69,7 @@ and add the following, editing the `PWR_path` line just once to your actual repo
 ```
 # portfolio-wave-rider: set the repo path once; both jobs below reuse it
 PWR_path=/path/to/portfolio-wave-rider
-# Daily (7-day) forward news pull into the corpus, 18:30 local (evening, after the US close)
+# Forward news pull into the corpus, every day incl. weekends, 18:30 local (evening, after the US close)
 30 18 * * *  $PWR_path/scripts/news_pull.sh
 # Weekday price snapshot + dashboard + review (if due), Mon-Fri 16:30 local
 30 16 * * 1-5  $PWR_path/scripts/price_snapshot.sh

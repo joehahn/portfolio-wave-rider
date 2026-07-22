@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Weekday (Mon-Fri 16:30 local) price snapshot + dashboard + self-gating rebalance review.
-# The daily 7-day news pull is a SEPARATE job (scripts/news_pull.sh, evening 18:30). The review here
+# The news pull is a SEPARATE job (scripts/news_pull.sh, every day 18:30). The review here
 # reads a trailing news window, so it does not depend on today's pull. Resolves its own location.
 set -euo pipefail
 PROJ="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
