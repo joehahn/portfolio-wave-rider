@@ -19,6 +19,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+import dash_nav  # shared cross-page nav (Forward | Backtest groups)
+
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 from src import portfolio  # noqa: E402
@@ -244,11 +246,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                       xaxis={"title": "max drawdown (|%|) — risk →"}, yaxis={"title": "annualized return %"})
     scatter = fig.to_html(full_html=False, include_plotlyjs="cdn", config={"displayModeBar": False})
 
-    nav = ('<nav style="font-size:14px;color:#555;margin:0 0 1em;padding-bottom:.5em;border-bottom:1px solid #eee;">'
-           '<a href="https://github.com/joehahn/portfolio-wave-rider/blob/main/README.md">README</a>'
-           ' &middot; <a href="retrieval_pwr.html">retriever DB</a>'
-           ' &middot; <a href="pool_browser.html">pool browser</a>'
-           ' &middot; <a href="backtest_gkg_3yr_kimi.html">Curator DB</a></nav>')
+    nav = dash_nav.render("sweep_pwr.html")
     _fmt = lambda xs: ", ".join(str(x) for x in xs)  # noqa: E731
     grid_html = (
         '<h2>Parameter settings</h2>'

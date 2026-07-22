@@ -34,6 +34,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 sys.path.insert(0, "scripts")
+import dash_nav  # shared cross-page nav (Forward | Backtest groups)  # noqa: E402
 import gkg_pool as g  # noqa: E402  (wave/domain-tier classifiers; needs the repo's scripts/ on path)
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -310,15 +311,7 @@ def build(run_rel, out):
         'max-width:1180px;margin:0 auto;padding:0 1.5em;color:#222;line-height:1.5}h1,h2{color:#111}'
         '.built{position:absolute;top:8px;right:16px;font-size:12px;color:#888}</style></head><body>'
         f'<div class="built">dashboard built {ts}</div>'
-        # Minimal cross-page nav: only the README and the sibling Curator DB, since the GKG design
-        # has no other published pages yet (mirrors the curator dashboard's nav).
-        '<nav style="font-size:14px;color:#555;margin:0 0 1em 0;padding-bottom:0.5em;'
-        'border-bottom:1px solid #eee;">'
-        '<a href="https://github.com/joehahn/portfolio-wave-rider/blob/main/README.md">README</a>'
-        ' · <a href="pool_browser.html">Pool browser</a>'
-        ' · <a href="backtest_gkg_3yr_kimi.html">Curator DB</a>'
-        ' · <a href="sweep_pwr.html">Sweep DB</a>'
-        '</nav>'
+        + dash_nav.render("retrieval_pwr.html", built=False) +
         '<h1>News retrieval dashboard — GKG + Wayback (upstream of the curator)</h1>'
         '<p style="color:#555">Judges the <b>news gathering</b>, not portfolio gains: completeness of the '
         'historical pull and whether the calendar has gaps, upstream of the curator and free of '
