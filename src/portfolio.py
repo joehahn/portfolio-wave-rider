@@ -3495,6 +3495,7 @@ def build_curator_dashboard(
     runs_dir: str = "data/curator_runs/5y-quarterly",
     out_path: str = "docs/backtest_curator.html",
     benchmarks: list[str] | None = None,
+    config_note: str | None = None,
 ) -> dict[str, Any]:
     """Render a single static HTML dashboard for one curator-backtest run.
 
@@ -3800,10 +3801,14 @@ def build_curator_dashboard(
 
     fig.update_layout(
         template="seaborn",
-        height=3700, margin={"t": 90, "b": 60, "l": 80, "r": 30},
+        height=3700, margin={"t": 112 if config_note else 90, "b": 60, "l": 80, "r": 30},
         title={
             "text": (
-                f"<span style='font-size:14px;color:#555;'>"
+                # optional parameter note (curator model + optimizer config) above plot 1 — only
+                # rendered when the caller passes it, so a dashboard never mislabels the run that made it.
+                (f"<span style='font-size:13px;color:#111;font-weight:600;'>{_html.escape(config_note)}</span><br>"
+                 if config_note else "")
+                + f"<span style='font-size:14px;color:#555;'>"
                 f"Curator-driven: {cur_return * 100:+.0f}%  "
                 f"·  Buy/hold: {bnh_return * 100:+.0f}%  "
                 f"·  (Curator - buy/hold): {(cur_return - bnh_return) * 100:+.0f}%  "

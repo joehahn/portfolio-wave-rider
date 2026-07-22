@@ -164,6 +164,11 @@ def main(argv: list[str] | None = None) -> int:
                         help="only used with --curator-backtest-dir. Path to the runs dir "
                              "(contains _starter.json + dated *-curation.json files) so "
                              "the Gantt chart can color tickers by wave_bucket.")
+    p_dash.add_argument("--curator-model", default=None,
+                        help="only used with --curator-backtest-dir. The LLM that produced this run's "
+                             "curations; shown in a parameter note above plot 1. MUST match the model that "
+                             "actually curated the run (do NOT pass the profile default for a run curated by "
+                             "another model).")
 
     args = parser.parse_args(argv)
 
@@ -243,11 +248,22 @@ def main(argv: list[str] | None = None) -> int:
                 out_path = args.out
                 if out_path == "docs/index.html":
                     out_path = "docs/backtest_curator.html"
+                # Optional parameter note above plot 1: the run's curator LLM + the optimizer config
+                # (read from the profile, the single source of truth for the replay knobs).
+                config_note = None
+                if args.curator_model:
+                    _fm = portfolio.load_financial_model()
+                    config_note = (
+                        f"Curator model: {args.curator_model}  ·  optimizer: "
+                        f"cap {_fm['concentration_cap']:.2f} / λ {_fm['risk_aversion']:g} / "
+                        f"lookback {int(_fm.get('optimizer_lookback_days', 30))}d / {_fm['rebalance_period']}"
+                    )
                 result = portfolio.build_curator_dashboard(
                     backtest_dir=args.curator_backtest_dir,
                     runs_dir=args.curator_runs_dir or "",
                     out_path=out_path,
                     benchmarks=args.benchmarks,
+                    config_note=config_note,
                 )
             else:
                 result = portfolio.build_dashboard(
