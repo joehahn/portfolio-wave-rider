@@ -58,13 +58,7 @@ Run `/initialize-portfolio` in Claude Code. This converts your wave thesis and s
 
 ### 4. Install the cron jobs (required)
 
-First make the two job scripts executable:
-
-```bash
-chmod +x scripts/cron_pull.sh scripts/cron_snapshot.sh
-```
-
-Then open your crontab:
+Open your crontab:
 
 ```bash
 crontab -e
