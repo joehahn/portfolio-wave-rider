@@ -348,6 +348,55 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                   'curator DB\'s plot 1, without the rebalance markers.</p>'
                   + _fig4.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False}))
                  if _curved else "")
+
+    # section 5: blind rationale-soundness judge (leak-free). Reads data/curator_runs/_judge_scores.json
+    # produced by scripts/judge_curations.py; if absent, the section is simply omitted.
+    llm5_html = ""
+    _jf = ROOT / "data" / "curator_runs" / "_judge_scores.json"
+    if _jf.exists():
+        J = json.loads(_jf.read_text())
+        _cr = J["criteria"]
+        _crlabel = {"on_thesis": "on-thesis", "evidence_supports": "evidence", "real_catalyst": "catalyst",
+                    "disciplined": "discipline", "valid_ticker": "valid-ticker"}
+        _mods = sorted(J["models"].items(), key=lambda kv: -(kv[1]["mean_overall"] or 0))  # best reasoning first
+        _jtrs = ""
+        for i, (label, s) in enumerate(_mods):
+            bg = "background:#eef7ee;" if i == 0 else ("background:#fafafa;" if i % 2 else "")
+            _jtrs += (f'<tr style="{bg}border-bottom:1px solid #eee;"><td {_lc}><b>{label.split("/")[-1]}</b></td>'
+                      + _c2(s["mean_overall"], "{:.2f}") + f'<td {_lc}>{s["n"]}</td>'
+                      + _c2(s["add_mean"], "{:.2f}") + _c2(s["rem_mean"], "{:.2f}")
+                      + "".join(_c2((s[k] or 0) * 100, "{:.0f}%") for k in _cr) + "</tr>")
+        _exrows = "".join(
+            f'<tr style="border-bottom:1px solid #f0f0f0;"><td {_lc}>{e["model"].split("/")[-1]}</td>'
+            f'<td {_lc}>{e["date"]}</td><td {_lc}>{e["action"]} {e["ticker"]}</td>'
+            f'<td {_lc}><b>{e["overall"]}</b></td><td style="text-align:left;padding:6px 10px;">{e["reason"]}</td></tr>'
+            for e in J.get("examples", [])[:8])
+        llm5_html = (
+            '<h2>5. Rationale-soundness — blind judge (leak-free)</h2>'
+            '<p style="color:#555;max-width:920px;">Every backtest column above (return, IR, Sharpe, Calmar, '
+            't-stat) is <b>in-sample</b> &mdash; the curator could have memorized which 2023&ndash;2026 names '
+            'later won, so those numbers can\'t honestly rank <i>reasoning</i>. This section does: an '
+            f'independent judge (<b>{J["judge_model"]}</b>, not one of the curators) reads each add/remove '
+            '<b>blind</b> &mdash; model identity stripped, decisions shuffled, and the ticker\'s later price '
+            '<b>never shown</b> &mdash; and grades only whether the stated rationale + cited news justified the '
+            'call at the time. Five criteria (each pass/fail) + a holistic <b>overall</b> 1&ndash;5. '
+            f'{J["n_decisions"]} decisions judged, ~${J["cost_usd"]:.2f}. Ranked by mean overall &mdash; this is '
+            'the one ranking here that owes nothing to hindsight.</p>'
+            f'<table><thead><tr><th style="text-align:left">curator</th><th {_lc}>overall (1-5)</th>'
+            f'<th {_lc}>n</th><th {_lc}>add</th><th {_lc}>remove</th>'
+            + "".join(f'<th {_lc}>{_crlabel[k]}</th>' for k in _cr)
+            + f'</tr></thead><tbody>{_jtrs}</tbody></table>'
+            '<p style="color:#666;font-size:12px;max-width:920px;line-height:1.6;margin:.5em 0 .3em;">'
+            '<b>overall</b> = mean 1&ndash;5 soundness · <b>add/remove</b> = mean overall split by action · the '
+            'five % columns = share of that curator\'s decisions passing each criterion: <b>on-thesis</b> (maps '
+            'to a named wave), <b>evidence</b> (cited news actually supports the claim), <b>catalyst</b> '
+            '(concrete milestone, not noise), <b>discipline</b> (buildup-not-crest; a remove is justified, not '
+            'churn), <b>valid-ticker</b> (real investable US listing, not a name/delisted/false-match).</p>'
+            + (f'<p style="color:#555;margin:.6em 0 .2em;"><b>Lowest-scoring decisions the judge flagged</b> '
+               '(illustrates what the score penalizes):</p>'
+               f'<table><thead><tr><th style="text-align:left">curator</th><th {_lc}>date</th>'
+               f'<th {_lc}>decision</th><th {_lc}>score</th><th style="text-align:left">judge&rsquo;s reason</th>'
+               f'</tr></thead><tbody>{_exrows}</tbody></table>' if _exrows else ""))
     ts = datetime.now().strftime("%Y-%m-%d %H:%M %Z").strip()
     page = f"""<!doctype html><html><head><meta charset="utf-8"><title>PWR — parameter sweep</title>
 <style>body{{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;max-width:1180px;margin:0 auto;
@@ -387,6 +436,7 @@ both halves) before trusting any row.</p>
 <tbody>{trs}</tbody></table>
 {llm_html}
 {llm4_html}
+{llm5_html}
 </body></html>"""
     out.write_text(page)
     top = max(rows, key=lambda r: r["ir"] if r["ir"] == r["ir"] else -9e9)
