@@ -32,8 +32,8 @@ ANCHORS = ["SPY", "AGG", "IAU"]
 # against the reference (first row). Add a row per model run you want to compare.
 LLM_RUNS = [
     ("claude-sonnet-5 (reference)", "data/curator_runs/gkg-2yr-weekly", "Anthropic", 2.0, 10.0),
-    ("deepseek/deepseek-v4-flash", "data/curator_runs/gkg-3yr-deepseek", "OpenRouter", 0.09, 0.19),
     ("moonshotai/kimi-k2.5", "data/curator_runs/gkg-3yr-kimi", "OpenRouter", 0.57, 2.85),
+    ("deepseek/deepseek-v4-flash", "data/curator_runs/gkg-3yr-deepseek", "OpenRouter", 0.09, 0.19),
 ]
 CURRENT = (0.8, 2.0, 30)          # the live investor_profile.md config
 BLUE, GREEN, RED, GREY = "#1f77b4", "#2b8a3e", "#c92a2a", "#adb5bd"
@@ -307,7 +307,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     for r in _llm:
         if r.get("pending"):
             llm_trs += (f'<tr style="border-bottom:1px solid #eee;color:#999;"><td {_lc}>{r["label"]}</td>'
-                        f'<td {_lc}>{r["prov"]}</td><td {_lc} colspan="10"><i>run in progress…</i></td></tr>')
+                        f'<td {_lc}>{r["prov"]}</td><td {_lc} colspan="11"><i>run in progress…</i></td></tr>')
             continue
         bg = "background:#fff7e6;" if "reference" in r["label"] else ""
         llm_trs += (
@@ -315,8 +315,8 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
             + _c2(r["cost"], "${:,.2f}") + _c2(r["time_min"], "{:.0f} min")
             + _c2(r["json"] * 100, "{:.0f}%") + _c2(r["agree"] * 100, "{:.0f}%")
             + f'<td {_lc}>{r["nadd"]} / {r["nrem"]}</td>' + _c2(r["ret"] * 100, "{:+.0f}%")
-            + _c2(r["ir"], "{:+.2f}") + _c2(r["sharpe"], "{:.2f}") + _c2(r["calmar"], "{:.2f}")
-            + _c2(r["dd"] * 100, "{:.0f}%") + "</tr>")
+            + _c2(r["ir"], "{:+.2f}") + _c2(r["tstat"], "{:+.1f}") + _c2(r["sharpe"], "{:.2f}")
+            + _c2(r["calmar"], "{:.2f}") + _c2(r["dd"] * 100, "{:.0f}%") + "</tr>")
     llm_html = (
         '<h2>3. LLM comparison — curator model (same pools + profile config)</h2>'
         '<p style="color:#555;max-width:920px;">Every model reads the <b>same</b> news pools and replays at '
@@ -329,7 +329,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         'non-zero-cost sweep affordable.</p>'
         f'<table><thead><tr><th style="text-align:left">model</th><th style="text-align:left">provider</th>'
         f'<th {_lc}>$/run</th><th {_lc}>curator time</th><th {_lc}>valid-JSON</th><th {_lc}>agree vs ref</th><th {_lc}>adds/removes</th>'
-        f'<th {_lc}>total</th><th {_lc}>IR</th><th {_lc}>Sharpe</th><th {_lc}>Calmar</th><th {_lc}>maxDD</th>'
+        f'<th {_lc}>total</th><th {_lc}>IR</th><th {_lc}>t-stat</th><th {_lc}>Sharpe</th><th {_lc}>Calmar</th><th {_lc}>maxDD</th>'
         f'</tr></thead><tbody>{llm_trs}</tbody></table>')
 
     # plot 4: equity-curve race per LLM + buy/hold + SPY (no rebalance markers, per request)
