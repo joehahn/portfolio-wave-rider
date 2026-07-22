@@ -58,11 +58,28 @@ Run `/initialize-portfolio` in Claude Code. This converts your wave thesis and s
 
 ### 4. Install the cron jobs (required)
 
+First make the two job scripts executable:
+
 ```bash
-./scripts/install_cron.sh
+chmod +x scripts/cron_pull.sh scripts/cron_snapshot.sh
 ```
 
-This adds two crontab entries (works on macOS and Linux) and preserves any other entries you already have. It is idempotent, so re-running only adds whichever entry is missing. Verify with `crontab -l`.
+Then open your crontab:
+
+```bash
+crontab -e
+```
+
+and add these two lines, substituting your actual repository path for `/path/to/portfolio-wave-rider`:
+
+```
+# PWR: Daily (7-day) forward news pull into the corpus, 16:00 local
+0 16 * * *  /path/to/portfolio-wave-rider/scripts/cron_pull.sh
+# PWR: Weekday price snapshot + dashboard + review (if due), Mon-Fri 16:30 local
+30 16 * * 1-5  /path/to/portfolio-wave-rider/scripts/cron_snapshot.sh
+```
+
+Verify with `crontab -l`. Works the same on macOS and Linux, and leaves any other crontab entries untouched.
 
 - **Daily at 16:00 local** (`cron_pull.sh`, every day including weekends): the forward news pull. It runs your wave queries through Anthropic web_search and appends the raw articles to the frozen corpus under `data/forward_corpus/`. Running every day freezes each article near its publication date, which keeps the corpus clean for later forward testing.
 - **Weekday at 16:30 local** (`cron_snapshot.sh`, Mon to Fri): the price snapshot, dashboard refresh, and a self-gating rebalance review. It snapshots per-ticker prices into `data/snapshots.csv`, regenerates `docs/index.html`, then runs `review --if-due`, which curates the watchlist and writes a fresh recommendation report to `data/reports/` only when a full `rebalance_period` has elapsed since the last review. The 30-minute gap after the pull means the review always reads a freshly-pulled corpus.
