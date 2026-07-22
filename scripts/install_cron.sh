@@ -2,9 +2,10 @@
 # One-shot cron installer for portfolio-wave-rider. Works on macOS and Linux.
 #
 # Installs TWO entries, preserving any other crontab lines you have:
-#   1. Daily (7-day)     16:00  scripts/cron_pull.sh      -> forward news pull into the frozen corpus
+#   1. Daily (7-day)     18:30  scripts/cron_pull.sh      -> forward news pull into the frozen corpus
 #   2. Weekday (Mon-Fri) 16:30  scripts/cron_snapshot.sh -> price snapshot + dashboard + review (if due)
-# The pull runs 30 min before the snapshot so the review reads a freshly-pulled corpus. Idempotent:
+# The pull runs in the evening (after the US close + after-hours) to capture the full day's news; the
+# weekday review reads a trailing news window, so it does not depend on the same day's pull. Idempotent:
 # re-running only adds whichever entry is missing.
 #
 # cron only fires while the machine is awake; missed runs do not auto-replay. A missed news pull cannot
@@ -17,7 +18,7 @@ set -euo pipefail
 PROJ="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PULL="$PROJ/scripts/cron_pull.sh"
 SNAP="$PROJ/scripts/cron_snapshot.sh"
-PULL_LINE=$'# PWR: Daily (7-day) forward news pull into the corpus, 16:00 local\n'"0 16 * * *  $PULL"
+PULL_LINE=$'# PWR: Daily (7-day) forward news pull into the corpus, 18:30 local\n'"30 18 * * *  $PULL"
 SNAP_LINE=$'# PWR: Weekday price snapshot + dashboard + review (if due), Mon-Fri 16:30 local\n'"30 16 * * 1-5  $SNAP"
 
 command -v crontab >/dev/null 2>&1 || { echo "error: crontab not found. Install it via your package manager." >&2; exit 1; }

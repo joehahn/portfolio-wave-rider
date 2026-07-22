@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Weekday (Mon-Fri 16:30 local) price snapshot + dashboard + self-gating rebalance review.
-# The daily 7-day news pull is a SEPARATE job (scripts/cron_pull.sh at 16:00) so the corpus is fresh
-# by the time the review runs here. Resolves its own location; no path interpolation required.
+# The daily 7-day news pull is a SEPARATE job (scripts/cron_pull.sh, evening 18:30). The review here
+# reads a trailing news window, so it does not depend on today's pull. Resolves its own location.
 set -euo pipefail
 PROJ="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$PROJ"

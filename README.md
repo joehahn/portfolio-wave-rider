@@ -69,20 +69,20 @@ and add the following, editing the `PWR_path` line just once to your actual repo
 ```
 # portfolio-wave-rider: set the repo path once; both jobs below reuse it
 PWR_path=/path/to/portfolio-wave-rider
-# Daily (7-day) forward news pull into the corpus, 16:00 local
-0 16 * * *  $PWR_path/scripts/cron_pull.sh
+# Daily (7-day) forward news pull into the corpus, 18:30 local (evening, after the US close)
+30 18 * * *  $PWR_path/scripts/cron_pull.sh
 # Weekday price snapshot + dashboard + review (if due), Mon-Fri 16:30 local
 30 16 * * 1-5  $PWR_path/scripts/cron_snapshot.sh
 ```
 
 Verify with `crontab -l`. Works the same on macOS and Linux, and leaves any other crontab entries untouched. cron makes the `PWR_path` variable available to every command below it, so it must appear before the two job lines. The scripts ship executable, so no `chmod` is needed.
 
-- **Daily at 16:00 local** (`cron_pull.sh`, every day including weekends): the forward news pull. It runs your wave queries through Anthropic web_search and appends the raw articles to the frozen corpus under `data/forward_corpus/`. Running every day freezes each article near its publication date, which keeps the corpus clean for later forward testing.
-- **Weekday at 16:30 local** (`cron_snapshot.sh`, Mon to Fri): the price snapshot, dashboard refresh, and a self-gating rebalance review. It snapshots per-ticker prices into `data/snapshots.csv`, regenerates `docs/index.html`, then runs `review --if-due`, which curates the watchlist and writes a fresh recommendation report to `data/reports/` only when a full `rebalance_period` has elapsed since the last review. The 30-minute gap after the pull means the review always reads a freshly-pulled corpus.
+- **Daily at 18:30 local** (`cron_pull.sh`, every day including weekends): the forward news pull. It runs your wave queries through Anthropic web_search and appends the raw articles to the frozen corpus under `data/forward_corpus/`. The evening slot (a few hours after the US close) captures the full day including after-hours earnings and evening coverage, freezing each article near its publication date, which keeps the corpus clean for later forward testing.
+- **Weekday at 16:30 local** (`cron_snapshot.sh`, Mon to Fri): the price snapshot, dashboard refresh, and a self-gating rebalance review. It snapshots per-ticker prices into `data/snapshots.csv` (well after the 16:00 ET close, so the daily close is final), regenerates `docs/index.html`, then runs `review --if-due`, which curates the watchlist and writes a fresh recommendation report to `data/reports/` only when a full `rebalance_period` has elapsed since the last review. The review reads a trailing `news_lookback_days` slice of the corpus, so it does not depend on the same day's pull having run yet.
 
 Both jobs append timestamped output to `data/snapshot.log`, and both tolerate failures so a web_search hiccup never blocks the price snapshot.
 
-cron only fires while the machine is awake and does not replay missed runs. Backfill a missed price snapshot with `.venv/bin/python -m src.cli snapshot --date YYYY-MM-DD`. A missed news pull cannot be cleanly backfilled, because re-querying web_search about a past day reintroduces hindsight, so a laptop that sleeps through 16:00 leaves a gap in the corpus (recorded in the manifest at `data/forward_corpus/pulls.jsonl`).
+cron only fires while the machine is awake and does not replay missed runs. Backfill a missed price snapshot with `.venv/bin/python -m src.cli snapshot --date YYYY-MM-DD`. A missed news pull cannot be cleanly backfilled, because re-querying web_search about a past day reintroduces hindsight, so a laptop that sleeps through 18:30 leaves a gap in the corpus (recorded in the manifest at `data/forward_corpus/pulls.jsonl`).
 
 To publish a refreshed dashboard to GitHub Pages: `git add docs/index.html && git commit -m "Refresh live dashboard" && git push`, since cron does not auto-push.
 
