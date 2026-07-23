@@ -53,6 +53,9 @@ source_block:
   - ad-hoc-news.de
   - finanznachrichten.de
   - stocktitan.net            # "X Stocks 2026: N+ Companies" listicle mill (also fakes a "Stock Titan" byline)
+  # added 2026-07-23 from forward-corpus review: off-topic (scholarships/opportunities aggregator, not
+  # business news; slipped into the quantum wave via a research-grant listing; byline "OFA" = its own acronym)
+  - opportunitiesforafricans.com
 source_major:
   - reuters.com
   - apnews.com
