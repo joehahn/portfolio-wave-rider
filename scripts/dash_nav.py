@@ -13,8 +13,8 @@ from datetime import datetime
 FORWARD = [
     ("index.html", "Live portfolio"),
     ("corpus_pwr.html", "Retriever (WebSearch)"),
+    ("forward_test.html", "Forward test"),   # out-of-sample curator replay on the live corpus
     # future forward pages slot in here, e.g.:
-    # ("forward_curator.html", "Curator"),
     # ("forward_sweep.html", "Sweep"),
 ]
 BACKTEST = [
