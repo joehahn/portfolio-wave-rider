@@ -189,10 +189,11 @@ class WebSearchRetriever:
 
 
 def _gkg_sighting(a: dict, pull_id: str, pulled_at: str, rank: int) -> dict[str, Any]:
-    """Map one GKG+Wayback article (title/date/source/url + lede) to a forward-corpus sighting. The
-    lede (clean Wayback lede, else the title-gated live-fallback `lede_live`) is the deepest text this
-    pipeline yields, so it serves as both snippet and body. No `author`: the GKG+Wayback pipeline never
-    extracts bylines (only the daily WebSearch pull does), so this field stays null for backfill rows."""
+    """Map one GKG+Wayback article (title/date/source/url + lede + author) to a forward-corpus sighting.
+    The lede (clean Wayback lede, else the title-gated live-fallback `lede_live`) is the deepest text this
+    pipeline yields, so it serves as both snippet and body. `author` is the byline the lede fetch parsed
+    from the (archived or live) page metadata, cleaned of PR-wire / site-brand pseudo-authors; None when
+    the page carried no byline (wires, paywalled/JS pages) or the fetch missed."""
     import hashlib
     url = a["url"]
     host = (urlsplit(url).hostname or "").lower().removeprefix("www.")
@@ -202,7 +203,8 @@ def _gkg_sighting(a: dict, pull_id: str, pulled_at: str, rank: int) -> dict[str,
     body = {
         "article_id": corpus.article_id(url), "url": url, "canonical_url": corpus.canon_url(url),
         "source_domain": host, "source_tier": corpus.source_tier(host),
-        "publisher": a.get("source") or host, "title": a["title"], "author": None,
+        "publisher": a.get("source") or host, "title": a["title"],
+        "author": corpus.clean_author(a.get("author"), a.get("source")),
         "published_date": (a.get("date") or "")[:10] or None, "language": "en",   # GKG: English-origin
         "snippet": lede, "full_text": lede, "extraction_ok": bool(lede),
         "content_hash": hashlib.sha1((lede or (a["title"] + url)).encode("utf-8")).hexdigest()[:16],
@@ -249,6 +251,11 @@ class GkgWaybackRetriever:
             a["lede_source"] = "wayback" if a["lede"] else "none"
         # 3. title-gated LIVE fetch fills Wayback misses (sets lede_live, promotes lede_source none->live)
         self._sdk._apply_live_fallback(arts)
+        # 3b. byline captured by whichever lede fetch succeeded (cache read, no extra network)
+        for a in arts:
+            ls = a.get("lede_source")
+            a["author"] = (self._w.wayback_author(a["url"], end) if ls == "wayback"
+                           else self._w.live_author(a["url"]) if ls == "live" else "")
         # 4. map to corpus sightings + per-wave stats
         sightings = [_gkg_sighting(a, pull_id, pulled_at, rank) for rank, a in enumerate(arts)]
         src = {"wayback": 0, "live": 0, "none": 0}

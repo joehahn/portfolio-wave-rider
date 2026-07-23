@@ -255,6 +255,21 @@ def _clean_lede(text: "str | None") -> str:
     return t[:_MAX_LEDE] if len(t) >= _MIN_LEDE else ""
 
 
+def _extract_author(html: str) -> str:
+    """Author byline from a page's metadata via trafilatura (with_metadata). '' if none. Runs a SECOND,
+    metadata-mode extract on the same html, deliberately separate from the lede extract above so the
+    lede text stays byte-identical (the backtest's cached ledes are unaffected). Wayback + live fetch
+    the html anyway, so this only adds a cheap re-parse, no extra network."""
+    try:
+        j = trafilatura.extract(html, output_format="json", with_metadata=True,
+                                favor_precision=True, include_comments=False)
+        if j:
+            return json.loads(j).get("author") or ""
+    except Exception:  # noqa: BLE001 - a metadata miss just means no byline
+        return ""
+    return ""
+
+
 def _avail_snapshot(url: str, target: date) -> "str | None":
     """archive.org availability API: 14-digit timestamp of the closest snapshot, iff it is AT-OR-BEFORE
     target (look-ahead-clean); else None. Raises requests exceptions on a transient network blip."""
@@ -293,9 +308,9 @@ def wayback_lede(url: str, target: date) -> tuple[str, bool]:
                                   timeout=15, headers={"User-Agent": _UA})
             lede = _clean_lede(trafilatura.extract(r.text, favor_precision=True, include_comments=False))
             if lede:
-                _cache_put("wayback", key, {"lede": lede, "hit": True})
+                _cache_put("wayback", key, {"lede": lede, "author": _extract_author(r.text), "hit": True})
                 return lede, True
-        _cache_put("wayback", key, {"lede": "", "hit": False})   # no snapshot / no extractable lede
+        _cache_put("wayback", key, {"lede": "", "author": "", "hit": False})  # no snapshot / no lede
         return "", False
     except requests.exceptions.RequestException:
         _WB_STAT["timeout"] += 1
@@ -355,15 +370,16 @@ def live_lede(url: str) -> str:
     hit = _cache_get("live", url)
     if hit is not None:
         return hit.get("lede", "")
-    lede = ""
+    lede, author = "", ""
     try:
         r = _wb_session().get(url, timeout=LIVE_TIMEOUT, allow_redirects=True,
                               headers={"User-Agent": _UA})
         if r.status_code < 400:
             lede = _clean_lede(trafilatura.extract(r.text, favor_precision=True, include_comments=False))
+            author = _extract_author(r.text)
     except requests.exceptions.RequestException:
         lede = ""
-    _cache_put("live", url, {"lede": lede})
+    _cache_put("live", url, {"lede": lede, "author": author})
     return lede
 
 
@@ -380,6 +396,20 @@ def live_ledes(urls: list[str], workers: int = LIVE_WORKERS) -> dict[str, str]:
             except Exception:
                 out[u] = ""
     return out
+
+
+def wayback_author(url: str, target: date) -> str:
+    """Author byline that wayback_lede captured for (url, target), read from cache (no network). ''
+    if the fetch hasn't run, the archived page carried no byline, or it was a miss."""
+    hit = _cache_get("wayback", f"{url}|{target}")
+    return (hit or {}).get("author", "")
+
+
+def live_author(url: str) -> str:
+    """Author byline that live_lede captured for url, read from cache (no network). '' if not fetched
+    or no byline on the page."""
+    hit = _cache_get("live", url)
+    return (hit or {}).get("author", "")
 
 
 # ------------------------------------------------------------------ ticker hints
