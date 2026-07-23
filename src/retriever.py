@@ -191,7 +191,7 @@ class WebSearchRetriever:
 # GDELT DOC-API beats for the recent-history backfill, one per wave (short queries; GDELT treats a
 # space as implicit AND, so keep each to 1-2 content words).
 _GDELT_BEATS = [
-    ("AI chip", "AI"),
+    ("artificial intelligence", "AI"),   # NOT "AI chip": GDELT chokes on the 2-char "AI" token
     ("space stocks", "rockets_spacecraft"),
     ("nuclear reactor", "nuclear"),
     ("quantum computing", "quantum"),
