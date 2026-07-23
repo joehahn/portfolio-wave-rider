@@ -133,9 +133,9 @@ def main() -> int:
     # provenance on the gains-per-source/keyword panels, etc. -- this grows into a full dedicated renderer.)
     html = DASH.read_text()
     for _old, _new in (("Curator-driven backtest", "Curator-driven forward test"),
-                       ("curator backtest", "curator forward test"),
+                       ("Portfolio Wave Rider — curator backtest", "Portfolio Wave Rider — curator forward test"),
                        ("Backtest window", "Forward-test window")):
-        html = html.replace(_old, _new)
+        html = html.replace(_old, _new)   # targeted: must NOT hit the "curator backtest" nav link label
     DASH.write_text(html)
 
     print(f"\nforward test: {len(dates)} weekly rebalances {dates[0]}..{dates[-1]} "

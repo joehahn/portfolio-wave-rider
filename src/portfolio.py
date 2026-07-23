@@ -2152,6 +2152,7 @@ def _effective_ticker_wave(
 # the bare filenames (no path) of the published GitHub Pages files.
 _NAV_PAGES: list[tuple[str, str]] = [
     ("index.html", "live dashboard"),
+    ("forward_test.html", "forward test"),          # out-of-sample curator replay on the live corpus
     ("backtest_gkg_3yr_kimi.html", "Curator DB"),   # default curator (kimi); Sonnet DBs retired from nav
     ("sweep_risk_aversion.html", "sweep: risk_aversion"),
     ("sweep_lookback.html", "sweep: lookback"),
@@ -4436,11 +4437,14 @@ def build_curator_dashboard(
         'table{margin-top:0.5em;}'
         'th,td{border-bottom:1px solid #eee;}'
         '</style></head><body>'
-        + _nav_strip("", pages=[
-            ("https://github.com/joehahn/portfolio-wave-rider/blob/main/README.md", "README"),
-            ("retrieval_pwr.html", "retrieval DB"),
+        + _nav_strip(Path(out_path).name, pages=[
+            ("index.html", "live dashboard"),
+            ("corpus_pwr.html", "retriever (WebSearch)"),
+            ("retrieval_pwr.html", "retriever (GKG+Wayback)"),
+            ("forward_test.html", "forward test"),
+            ("backtest_gkg_3yr_kimi.html", "curator backtest"),
+            ("sweep_pwr.html", "sweep"),
             ("pool_browser.html", "pool browser"),
-            ("sweep_pwr.html", "sweep DB"),
         ]) +
         f'<h1>Curator-driven backtest '
         f'<span style="font-size:0.55em;color:#666;font-weight:400;">'
