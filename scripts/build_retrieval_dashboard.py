@@ -290,6 +290,27 @@ def build(run_rel, out):
                       margin={"t": 70, "l": 200}, hovermode="closest")
     chart_html = fig.to_html(full_html=False, include_plotlyjs="cdn", config={"displayModeBar": False})
 
+    # ---- 9. Articles per author (bylines from the post-run live author-refetch: run_rel/_authors.json) ----
+    author_html = ""
+    _authored_n = 0
+    _af_path = ROOT / run_rel / "_authors.json"
+    if _af_path.exists():
+        _authors = json.loads(_af_path.read_text())       # {url: byline} for the authored pool articles
+        _authored_n = len(_authors)
+        _top = Counter(_authors.values()).most_common(20)[::-1]   # ascending -> largest bar on top
+        _afig = go.Figure(go.Bar(x=[c for _, c in _top], y=[a[:48] for a, _ in _top],
+                                 orientation="h", marker_color="#f59e0b"))
+        _afig.update_layout(template="seaborn", height=560, margin={"t": 10, "l": 250, "r": 20, "b": 40},
+                            xaxis_title="unique articles", showlegend=False)
+        author_html = (
+            '<h2 style="margin:1.8em 0 0.2em;">9. Articles per author</h2>'
+            f'<p style="color:#555;max-width:820px;">Byline attribution for the pooled articles &mdash; '
+            f'<b>{len(_authors):,}</b> carry a real byline (the rest are wire copy or paywalled/JS pages). '
+            f'Bylines were fetched live after the run (a byline is stable even when a page is later edited, '
+            f'unlike the lede), so this is look-ahead-safe for authorship. The space/defense desks dominate, '
+            f'mirroring the wave picks. Raw material for a future gains-per-author view.</p>'
+            + _afig.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False}))
+
     # ---- stat cards ----
     def card(v, label):
         return (f'<div style="display:inline-block;margin:0 1.6em 0.6em 0">'
@@ -297,8 +318,9 @@ def build(run_rel, out):
                 f'<span style="font-size:.8em;color:#555">{label}</span></div>')
     n_full = sum(1 for n in pool_n if n >= 100)
     cards = (card(f"{corpus_total:,}", "articles gathered (full corpus)")
-             + card(len(pools), "pools / weekly rebalances")
+             + card(len(pools), "pools / rebalances")
              + card(f"{n_uniq:,}", "unique articles shown to curator")
+             + card(f"{100*_authored_n//max(n_uniq,1)}%", "articles with a byline (plot 9)")
              + card(f"{avg_clean:.0f}%", "avg CLEAN Wayback lede / window (plot 6, green)")
              + card(f"{avg_total:.0f}%", "avg CLEAN+LIVE coverage / window (plot 6, orange)")
              + card(f"{n_rec_zero}/{len(rec_rows)}", "configured desks GKG surfaced 0x (plot 7)")
@@ -313,6 +335,8 @@ def build(run_rel, out):
         f'<div class="built">dashboard built {ts}</div>'
         + dash_nav.render("retrieval_pwr.html", built=False) +
         '<h1>Retriever Backtest</h1>'
+        f'<p style="color:#666;margin:-.4em 0 .7em;font-size:15px;">{as_of[0]} to {as_of[-1]} '
+        f'&middot; {len(pools)} rebalances, each reading a trailing 21-day news window</p>'
         '<p style="color:#555">Judges the <b>news gathering</b>, not portfolio gains: completeness of the '
         'historical pull and whether the calendar has gaps, upstream of the curator and free of '
         'PageRank-mooning. The pool the curator actually receives is the <b>ranked top-100</b> '
@@ -320,12 +344,12 @@ def build(run_rel, out):
         'not a raw dump. Each article carries a <b>lede</b>: first a look-ahead-<b>clean</b> Wayback '
         'snapshot (≤ as_of); where Wayback has no capture, a <b>live-fallback</b> fetches today’s '
         'page (LOOK-AHEAD-BIASED, tagged separately). Plot 6 tracks both: the clean join-rate and the '
-        f'clean+live coverage. {len(pools)} weekly 21-day windows.</p>'
+        f'clean+live coverage. {len(pools)} rebalances over 21-day windows.</p>'
         f'<p style="color:#555">Raw data (inspect any file): <a href="../{run_rel}/"><code>{run_rel}/</code></a> — '
         f'per-window <code>&lt;date&gt;-pool.json</code> (ranked article list; <code>lede</code> = clean '
         f'Wayback join, <code>lede_live</code> = biased live-fallback, <code>lede_sources</code> = the '
         f'clean/live/none split), plus <code>_corpus/</code> (full gathering, one file per day).</p>'
-        + f'<div style="margin:1em 0 1.5em">{cards}</div>' + chart_html + '</body></html>'
+        + f'<div style="margin:1em 0 1.5em">{cards}</div>' + chart_html + author_html + '</body></html>'
     )
     out.write_text(page)
     print(f"wrote {out}")

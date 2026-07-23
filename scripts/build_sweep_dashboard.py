@@ -32,10 +32,10 @@ ANCHORS = ["SPY", "AGG", "IAU"]
 
 # LLM curator comparison (section 3): (label, run_dir, provider, $in/M, $out/M). Agreement is measured
 # against the reference (first row). Add a row per model run you want to compare.
-LLM_RUNS = [   # row 0 = the DEFAULT curator; the "agree vs default" column + plot-4 benchmark curves key off it
-    ("moonshotai/kimi-k2.5 (default)", "data/curator_runs/gkg-3yr-kimi", "OpenRouter", 0.57, 2.85),
-    ("claude-sonnet-5", "data/curator_runs/gkg-2yr-weekly", "Anthropic", 2.0, 10.0),
-    ("deepseek/deepseek-v4-flash", "data/curator_runs/gkg-3yr-deepseek", "OpenRouter", 0.09, 0.19),
+LLM_RUNS = [   # row 0 = the DEFAULT curator. The multi-LLM comparison (Sonnet gkg-2yr-weekly + deepseek
+               # gkg-3yr-deepseek) is preserved in archived/sweep_pwr-with-LLM-comparison.html; those runs
+               # were retired from local storage. Re-add rows + re-run to refresh the comparison on this window.
+    ("moonshotai/kimi-k2.5 (default)", "data/curator_runs/gkg-3yr-final", "OpenRouter", 0.57, 2.85),
 ]
 CURRENT = (0.8, 2.0, 30)          # the live investor_profile.md config
 BLUE, GREEN, RED, GREY = "#1f77b4", "#2b8a3e", "#c92a2a", "#adb5bd"
@@ -438,7 +438,7 @@ both halves) before trusting any row.</p>
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("--runs-dir", default="data/curator_runs/gkg-3yr-kimi")  # the DEFAULT curator's curations (kimi)
+    ap.add_argument("--runs-dir", default="data/curator_runs/gkg-3yr-final")  # the DEFAULT curator's curations (kimi)
     ap.add_argument("--out", default=str(ROOT / "docs" / "sweep_pwr.html"))
     ap.add_argument("--recompute", action="store_true", help="re-run the 150 backtests (else use cache)")
     a = ap.parse_args()

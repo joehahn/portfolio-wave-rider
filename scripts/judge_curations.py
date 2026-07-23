@@ -37,7 +37,7 @@ ROOT = Path(__file__).resolve().parent.parent
 # curators under judgement: (display label, run dir). Order is irrelevant — decisions are pooled + shuffled.
 RUNS = [
     ("claude-sonnet-5", "data/curator_runs/gkg-2yr-weekly"),
-    ("moonshotai/kimi-k2.5", "data/curator_runs/gkg-3yr-kimi"),
+    ("moonshotai/kimi-k2.5", "data/curator_runs/gkg-3yr-final"),
     ("deepseek/deepseek-v4-flash", "data/curator_runs/gkg-3yr-deepseek"),
 ]
 JUDGE_DEFAULT = "claude-opus-4-8"
