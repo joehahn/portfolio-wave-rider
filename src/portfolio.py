@@ -75,6 +75,11 @@ _FINANCIAL_MODEL_DEFAULTS: dict[str, Any] = {
     # max_watchlist_size budget: the curator never manages them, cannot remove
     # them, and they do not count toward the cap. Top-level profile key.
     "always_include": [],
+    # initial_investment_usd: total dollars allocated on day 0 (top-level profile key).
+    "initial_investment_usd": 50000.0,
+    # starter_watchlist: the inception holdings, equal-weight (top-level profile key). Managed names
+    # only; always_include anchors come on top and are outside max_watchlist_size.
+    "starter_watchlist": [],
 }
 
 
@@ -124,6 +129,11 @@ def load_financial_model(profile_path: str = "investor_profile.md") -> dict[str,
     if "always_include" in data:
         out["always_include"] = [str(t).upper().strip()
                                  for t in (data["always_include"] or [])]
+    # initial_investment_usd + starter_watchlist are top-level keys too (portfolio inception).
+    if "initial_investment_usd" in data:
+        out["initial_investment_usd"] = float(data["initial_investment_usd"])
+    if "starter_watchlist" in data:
+        out["starter_watchlist"] = [str(t).upper().strip() for t in (data["starter_watchlist"] or [])]
     # Back-compat: if the profile uses the day-denominated optimizer_lookback_days,
     # derive the legacy fractional-year ``lookback_period`` string from it so every
     # existing reader (CLI --period default, dashboard labels) keeps working off a
@@ -204,6 +214,7 @@ _FORWARD_DEFAULTS: dict[str, Any] = {
     "retrieval_model": "claude-haiku-4-5-20251001",  # cheap model that DRIVES the WebSearch pull (fixed queries)
     "retriever": "websearch",                       # forward news source: "websearch" (Anthropic web_search tool)
     "news_lookback_days": None,                     # trailing news window the curator reads; None => financial_model
+    "inception_date": "2026-07-01",                 # nominal date forward news ingestion began (out-of-sample start)
 }
 
 
@@ -227,6 +238,7 @@ def load_forward_config(profile_path: str = "investor_profile.md") -> dict[str, 
             out.update({k: fw[k] for k in _FORWARD_DEFAULTS if k in fw})
     if out["news_lookback_days"] is None:
         out["news_lookback_days"] = int(load_financial_model(profile_path).get("news_lookback_days", 21))
+    out["inception_date"] = str(out["inception_date"])   # PyYAML parses a bare date to datetime.date
     return out
 
 

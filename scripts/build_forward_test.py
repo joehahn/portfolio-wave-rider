@@ -33,20 +33,19 @@ from src import corpus, curator, portfolio   # noqa: E402
 RUN_DIR = ROOT / "data" / "curator_runs" / "forward-test"
 OUT_DIR = ROOT / "data" / "forward_test"
 DASH = ROOT / "docs" / "forward_test.html"
-STARTER = ["AAPL", "MSFT", "GOOGL", "NVDA", "SPY"]   # same seed watchlist as the backtest, for comparability
-WINDOW_DAYS = 21                                     # trailing window; the seed is ~this wide
-INITIAL_USD = 50000.0
 
 
-def _weekly_dates(end: date, window_days: int) -> list[date]:
-    """Weekly rebalance dates inside the trailing window, oldest first (ending today)."""
+def _weekly_dates(inception: date, end: date) -> list[date]:
+    """Weekly rebalance dates on a fixed grid anchored at `inception`, up to `end`. Anchored (not
+    end - 7k) so the grid is STABLE across daily cron runs -> cached curations are reused and only a
+    genuinely new week costs a curator call. GROWING window: dates accumulate from inception, so the
+    forward-test performance builds a real track record rather than scrolling old rebalances off."""
     ds = []
-    d = end
-    start = end - timedelta(days=window_days)
-    while d >= start:
+    d = inception
+    while d <= end:
         ds.append(d)
-        d -= timedelta(days=7)
-    return sorted(ds)
+        d += timedelta(days=7)
+    return ds
 
 
 def _evolve(watchlist: list[str], decision: dict, max_size: int) -> list[str]:
@@ -67,22 +66,24 @@ def _evolve(watchlist: list[str], decision: dict, max_size: int) -> list[str]:
 def main() -> int:
     fw = portfolio.load_forward_config()
     fm = portfolio.load_financial_model()
+    starter = fm["starter_watchlist"]
+    initial_usd = fm["initial_investment_usd"]
     anchors = [t.upper() for t in fm.get("always_include", [])]
     max_size = int(fm["max_watchlist_size"])
     model = fw["curator_model"]
     news_lb = int(fw["news_lookback_days"])
     end = date.today()
-    dates = _weekly_dates(end, WINDOW_DAYS)
+    dates = _weekly_dates(date.fromisoformat(fw["inception_date"]), end)
 
     RUN_DIR.mkdir(parents=True, exist_ok=True)
     # _starter.json: the run config curator_backtest replays against (rolling trailing window).
     (RUN_DIR / "_starter.json").write_text(json.dumps({
-        "starter_watchlist": STARTER,
+        "starter_watchlist": starter,
         "as_of_dates": [d.isoformat() for d in dates],
         "start_date": dates[0].isoformat(),
         "end_date": end.isoformat(),
         "rebalance_period": fm["rebalance_period"],
-        "initial_usd": INITIAL_USD,
+        "initial_usd": initial_usd,
         "lookback_years": fm["optimizer_lookback_days"] / 365.0,
         "max_watchlist_size": max_size,
         "news_lookback_days": news_lb,
@@ -90,7 +91,7 @@ def main() -> int:
 
     # Curate each rebalance over the forward corpus (idempotent: skip dates already curated).
     cli_a = curator.anthropic_client() if model.startswith("claude") else None
-    watchlist = [t for t in STARTER if t not in anchors]
+    watchlist = [t for t in starter if t not in anchors]
     n_curated = 0
     for d in dates:
         as_of = d.isoformat()
