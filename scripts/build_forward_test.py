@@ -126,6 +126,18 @@ def main() -> int:
         backtest_dir=str(OUT_DIR), runs_dir=str(RUN_DIR), out_path=str(DASH),
         benchmarks=["SPY"], config_note=config_note)
 
+    # Relabel the shared (backtest-flavored) renderer output for the forward context. The renderer itself
+    # stays backtest-only -- NO forward/backtest switch inside it; all forward-specific wording lives HERE,
+    # in the dedicated forward builder. Portfolio value already runs from the July-1 inception, and the
+    # rightmost date advances to `end` on each refresh. (As the forward DB diverges -- seed-vs-WebSearch
+    # provenance on the gains-per-source/keyword panels, etc. -- this grows into a full dedicated renderer.)
+    html = DASH.read_text()
+    for _old, _new in (("Curator-driven backtest", "Curator-driven forward test"),
+                       ("curator backtest", "curator forward test"),
+                       ("Backtest window", "Forward-test window")):
+        html = html.replace(_old, _new)
+    DASH.write_text(html)
+
     print(f"\nforward test: {len(dates)} weekly rebalances {dates[0]}..{dates[-1]} "
           f"({n_curated} newly curated)  |  realized {res['realized_return']*100:+.1f}% "
           f"vs SPY {res['benchmark_returns']['SPY']*100:+.1f}%  |  final {res['final_watchlist']}")
