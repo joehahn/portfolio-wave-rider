@@ -42,6 +42,35 @@ def _hfig(traces, xtitle, height=300, left=220):
     return fig
 
 
+# ---- provenance: which feed an article came from (the daily WebSearch pull vs the one-time GKG+Wayback
+# seed). first_query on a backfill article starts "gkg wave:"; a WebSearch article starts "recent business…".
+_PROVCOL = {"websearch": "#3b82f6", "backfill": "#f59e0b"}   # blue = WebSearch, amber = GKG+Wayback seed
+_PROVLBL = {"websearch": "WebSearch (daily)", "backfill": "GKG+Wayback (seed)"}
+_PROV_ORDER = ("websearch", "backfill")
+
+
+def _prov(a) -> str:
+    return "backfill" if (a.get("first_query") or "").startswith("gkg") else "websearch"
+
+
+def _legfig(traces, ytitle, height=300):
+    """Vertical stacked-bar figure WITH a provenance legend (plots 1-2)."""
+    fig = go.Figure(traces)
+    fig.update_layout(template="seaborn", height=height, margin={"t": 10, "l": 60, "r": 20, "b": 80},
+                      yaxis_title=ytitle, barmode="stack",
+                      legend={"orientation": "h", "y": 1.02, "x": 1, "xanchor": "right", "yanchor": "bottom"})
+    return fig
+
+
+def _leghfig(traces, xtitle, height=300, left=220):
+    """Horizontal stacked-bar figure WITH a provenance legend (plots 3, 5)."""
+    fig = go.Figure(traces)
+    fig.update_layout(template="seaborn", height=height, margin={"t": 30, "l": left, "r": 20, "b": 40},
+                      xaxis_title=xtitle, barmode="stack",
+                      legend={"orientation": "h", "y": 1.02, "x": 1, "xanchor": "right", "yanchor": "bottom"})
+    return fig
+
+
 def _blocked_count() -> int:
     """How many source_block domains news_sources.md excludes from the forward pull (shown as a card)."""
     import re
@@ -69,11 +98,12 @@ def build():
 
     figs = []   # (title, subtitle, figure)
 
-    # 1. Pull history + gaps (the monitoring panel)
+    # 1. Pull history + gaps (the monitoring panel), split by provenance (each pull is one feed)
     pull_day = Counter(p["pulled_at"][:10] for p in pulls)
-    new_by_day = Counter()
+    new_by_prov = {"websearch": Counter(), "backfill": Counter()}
     for p in pulls:
-        new_by_day[p["pulled_at"][:10]] += p.get("n_new_articles", 0)
+        pv = "backfill" if p["pull_id"].startswith("backfill-") else "websearch"
+        new_by_prov[pv][p["pulled_at"][:10]] += p.get("n_new_articles", 0)
     pdays = sorted(pull_day)
     gaps = []
     if pdays:
@@ -85,31 +115,43 @@ def build():
         (f"{len(pulls)} pulls across {len(pdays)} day(s). "
          + (f'<b style="color:#b45309;">{len(gaps)} missing day(s): {", ".join(gaps[:10])}'
             f'{"…" if len(gaps) > 10 else ""}</b> (a missed pull can\'t be cleanly backfilled)'
-            if gaps else '<b style="color:#0a7a3a;">no missing days</b> since the corpus started')),
-        _fig([go.Bar(x=[d for d in sorted(pull_day)], y=[new_by_day[d] for d in sorted(pull_day)],
-                     marker_color="#3b82f6")], "", "new articles / day")))
+            if gaps else '<b style="color:#0a7a3a;">no missing days</b> since the corpus started')
+         + ". Colored by feed: the one-time <b style=\"color:#f59e0b;\">GKG+Wayback seed</b> vs the daily "
+           "<b style=\"color:#3b82f6;\">WebSearch</b> pulls."),
+        _legfig([go.Bar(name=_PROVLBL[pv], x=pdays, y=[new_by_prov[pv][d] for d in pdays],
+                        marker_color=_PROVCOL[pv]) for pv in _PROV_ORDER], "new articles / day")))
 
     # 2. Articles by published date (histogram). Floored at PLOT2_MIN_DATE to hide the mis-dated
     # hub/evergreen outliers (2010-2024) so the real recent corpus is visible. Categorical x-axis.
     _min2 = "2026-07-01"
-    dc = Counter(d for d in dated if d >= _min2)
-    dk = sorted(dc)
+    dcp = {"websearch": Counter(), "backfill": Counter()}
+    for a in arts:
+        d = (a.get("published_date") or "")[:10]
+        if d and d >= _min2:
+            dcp[_prov(a)][d] += 1
+    dk = sorted(set(d for pv in dcp for d in dcp[pv]))
     _n_hidden = sum(1 for d in dated if d < _min2)
-    _f2 = _fig([go.Bar(x=dk, y=[dc[d] for d in dk], marker_color="#0ea5e9")], "", "articles")
+    _f2 = _legfig([go.Bar(name=_PROVLBL[pv], x=dk, y=[dcp[pv][d] for d in dk], marker_color=_PROVCOL[pv])
+                   for pv in _PROV_ORDER], "articles")
     _f2.update_xaxes(type="category", tickangle=-45)
     figs.append((
         "2. Articles by published date",
-        (f"published on or after {_min2} ({_n_hidden} older mis-dated hub/evergreen pages hidden). "
-         f"The curator reads a trailing {LOOKBACK}-day slice of this."), _f2))
+        (f"published on or after {_min2} ({_n_hidden} older mis-dated hub/evergreen pages hidden), colored by "
+         f"feed. The <b style=\"color:#f59e0b;\">GKG+Wayback seed</b> backfills the older days; the daily "
+         f"<b style=\"color:#3b82f6;\">WebSearch</b> pulls add the recent edge. The curator reads a trailing "
+         f"{LOOKBACK}-day slice of this."), _f2))
 
-    # 3. Articles by wave — horizontal (mirrors retrieval_pwr plot 5)
-    wave = Counter(a.get("first_wave", "?") for a in arts)
-    wv = sorted(wave.items(), key=lambda kv: kv[1])            # ascending -> largest bar at top
+    # 3. Articles by wave — horizontal, split by provenance (mirrors retrieval_pwr plot 5)
+    wave_p = {"websearch": Counter(), "backfill": Counter()}
+    for a in arts:
+        wave_p[_prov(a)][a.get("first_wave", "?")] += 1
+    allw = sorted(set(w for pv in wave_p for w in wave_p[pv]),
+                  key=lambda w: wave_p["websearch"][w] + wave_p["backfill"][w])   # ascending total -> top
     figs.append((
         "3. Articles by wave",
-        "coverage by theme (the wave query whose result first surfaced each article)",
-        _hfig([go.Bar(x=[v for _, v in wv], y=[k for k, _ in wv], orientation="h",
-                      marker_color="#22c55e")], "articles")))
+        "coverage by theme (the wave query whose result first surfaced each article), split by feed",
+        _leghfig([go.Bar(name=_PROVLBL[pv], x=[wave_p[pv][w] for w in allw], y=allw, orientation="h",
+                         marker_color=_PROVCOL[pv]) for pv in _PROV_ORDER], "articles")))
 
     # 4. Top sources — horizontal, colored by authority tier (mirrors retrieval_pwr plot 7)
     _TIERCOL = {"specialty": "#22c55e", "major": "#3b82f6", "other": "#9ca3af"}
@@ -118,19 +160,25 @@ def build():
     figs.append((
         "4. Top sources (color = authority tier)",
         "green = specialty desk (news_sources.md prose, weight 2.0), blue = major wire (source_major, 1.5), "
-        "grey = other. source_block junk already excluded upstream",
+        "grey = other. source_block junk already excluded upstream. (Kept on tier color, not feed: the "
+        "GKG+Wayback seed is authority-ranked so it skews to recognized desks; the daily WebSearch feed adds the rest.)",
         _hfig([go.Bar(x=[c for _, c in src], y=[s for s, _ in src], orientation="h",
                       marker_color=_scol)], "articles", height=400, left=200)))
 
-    # 5. Articles per search term — horizontal (mirrors retrieval_pwr plot 8)
+    # 5. Articles per search term — horizontal, colored by feed (mirrors retrieval_pwr plot 8)
     _pfx = "recent business and stock-market news about "
-    q = Counter((a.get("first_query") or "?").replace(_pfx, "") for a in arts)
-    qi = sorted(q.items(), key=lambda kv: kv[1])
+    q = Counter((a.get("first_query") or "?") for a in arts)
+    qi = sorted(q.items(), key=lambda kv: kv[1])              # ascending -> largest bar at top
+    _qp = lambda k: "backfill" if k.startswith("gkg") else "websearch"
+    _lbl = lambda k: (k if k.startswith("gkg") else k.replace(_pfx, ""))[:58]
+    _f5 = _leghfig([go.Bar(name=_PROVLBL[pv], x=[v for k, v in qi if _qp(k) == pv],
+                           y=[_lbl(k) for k, v in qi if _qp(k) == pv], orientation="h",
+                           marker_color=_PROVCOL[pv]) for pv in _PROV_ORDER], "articles", height=360, left=330)
+    _f5.update_yaxes(categoryorder="array", categoryarray=[_lbl(k) for k, _ in qi])
     figs.append((
         "5. Articles per search term",
-        "the retriever's surfacing queries (one per wave, built from gkg_config.json keywords)",
-        _hfig([go.Bar(x=[v for _, v in qi], y=[k[:58] for k, _ in qi], orientation="h",
-                      marker_color="#a855f7")], "articles", height=340, left=330)))
+        "surfacing queries, one per wave per feed: the daily WebSearch phrases vs the GKG discovery keywords "
+        "(shown as <code>gkg wave: …</code>), colored by feed", _f5))
 
     # 6. Articles per author — horizontal (byline attribution; raw material for gains-per-author later)
     _authors = [_corpus.clean_author(a.get("author"), a.get("publisher")) for a in arts]
@@ -138,9 +186,10 @@ def build():
     ai = sorted(au.items(), key=lambda kv: kv[1])[-15:]   # top 15, largest bar at top
     figs.append((
         "6. Articles per author",
-        "byline attribution (trafilatura). Partial by nature &mdash; wire services (Reuters/AP) omit authors "
-        "and paywalled/JS pages block extraction. This is the raw material for a future gains-per-author "
-        "view, once forward price outcomes accrue and ticker attribution is tightened",
+        "byline attribution (trafilatura). <b>WebSearch feed only</b> &mdash; the GKG+Wayback seed extracts "
+        "title + lede but no author, so it contributes nothing here. Partial even so: wire services "
+        "(Reuters/AP) omit authors and paywalled/JS pages block extraction. Raw material for a future "
+        "gains-per-author view, once forward price outcomes accrue and ticker attribution is tightened",
         _hfig([go.Bar(x=[v for _, v in ai], y=[k[:50] for k, _ in ai], orientation="h",
                       marker_color="#f59e0b")], "articles", height=380, left=240)))
 
@@ -156,11 +205,15 @@ def build():
                 f'<b style="font-size:1.6em;color:{color}">{v}</b><br>'
                 f'<span style="font-size:.82em;color:#555">{label}</span></div>')
     domains = len(set(a.get("source_domain") for a in arts))
+    n_waves = len(set(a.get("first_wave", "?") for a in arts))
     n_app = len(_jsonl("appearances.jsonl"))
     with_author = sum(1 for x in _authors if x)   # real bylines (pseudo-authors already dropped)
     recog = sum(1 for a in arts if _corpus.source_tier(a.get("source_domain", "")) in ("specialty", "major"))
+    n_bf = sum(1 for a in arts if _prov(a) == "backfill")
+    n_ws = n - n_bf
     summary = ('<div style="margin:.8em 0 1.5em">'
                + _card(f"{n:,}", "articles in corpus (unique)")
+               + _card(f"{n_bf} / {n_ws}", "GKG+Wayback seed / WebSearch daily", "#f59e0b")
                + _card(f"{n_app:,}", "sightings logged (appearances)")
                + _card(len(pulls), "pulls run")
                + _card(len(gaps), "missing days (gaps)", "#0a7a3a" if not gaps else "#b45309")
@@ -168,7 +221,7 @@ def build():
                + _card(f"{100*with_author//n if n else 0}%", "with a byline (author)")
                + _card(f"{100*recog//n if n else 0}%", "recognized desks (specialty+major)")
                + _card(in_window, f"read by a review now ({LOOKBACK}d window)")
-               + _card(f"{len(wave)} / {domains}", "waves / source domains")
+               + _card(f"{n_waves} / {domains}", "waves / source domains")
                + _card(_blocked_count(), "blocked domains (source_block)")
                + "</div>")
 
