@@ -177,11 +177,14 @@ def build():
 padding:0 1.5em 3em;color:#222;line-height:1.5}}h1,h2{{color:#111}}h2{{margin-top:1.6em}}a{{color:#2563eb}}</style>
 </head><body>
 {dash_nav.render("corpus_pwr.html")}
-<h1>Forward news retriever &mdash; WebSearch corpus</h1>
-<p style="color:#555;max-width:820px;">The frozen live-news archive (<code>data/forward_corpus/</code>) that
-<code>news_pull.sh</code> fills each evening via WebSearch. Store-broad and deduped: each pull appends only
-genuinely new articles. This is the forward analog of the backtest
-<a href="retrieval_pwr.html">Retriever DB</a>; the curator reads a trailing {LOOKBACK}-day slice of it at each review.</p>
+<h1>Forward news retriever</h1>
+<p style="color:#555;max-width:820px;">The frozen live-news archive (<code>data/forward_corpus/</code>). Two feeds
+fill it: a daily <b>WebSearch</b> pull (<code>news_pull.sh</code> each evening) plus a one-time
+<b>GKG+Wayback</b> cold-start seed &mdash; the very same BigQuery-GKG discovery + Wayback-lede (+ title-gated
+live fallback) pipeline the <a href="retrieval_pwr.html">backtest Retriever DB</a> uses, pointed at the last
+few weeks so the curator has a full trailing window on day one. Store-broad and deduped: each pull appends
+only genuinely new articles. This is the forward analog of that backtest DB; the curator reads a trailing
+{LOOKBACK}-day slice of it at each review.</p>
 {summary}
 <p style="color:#555;font-size:13px;margin-top:-.6em;">Raw data (local files):
 <a href="../data/forward_corpus/articles.jsonl">articles.jsonl</a> &middot;

@@ -17,7 +17,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import re
 import sys
 from datetime import date
 from pathlib import Path
@@ -25,68 +24,17 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import gkg_pool as g
 import news_pool as w
-from google.cloud import bigquery
 
 OUT_DIR = g.ROOT / "data" / "curator_runs" / "gkg-wayback-proto"
 
 
-def _norm_title(t: str) -> str:
-    return re.sub(r"[^a-z0-9 ]", "", (t or "").lower()).strip()
-
-
-def gkg_month(client, start: str, end: str) -> list[dict]:
-    """One GKG pull over an arbitrary [start,end] date range (not the 90-day as-of window)."""
-    kw = g._keyword_regex()
-    sql = f"""
-    SELECT {', '.join(g._FIELDS)}
-    FROM `{g.TABLE}`
-    WHERE _PARTITIONTIME BETWEEN TIMESTAMP('{start}') AND TIMESTAMP('{end}')
-      AND TranslationInfo IS NULL
-      AND (REGEXP_CONTAINS(DocumentIdentifier, r'{kw}') OR REGEXP_CONTAINS(Extras, r'{kw}'))
-    """
-    dry = client.query(sql, job_config=bigquery.QueryJobConfig(dry_run=True))
-    gb = dry.total_bytes_processed / 1e9
-    if gb > g.MAX_SCAN_GB:
-        sys.exit(f"cost guard: {gb:.1f} GB > {g.MAX_SCAN_GB}")
-    print(f"scanning {gb:.1f} GB for {start}..{end} ...", file=sys.stderr)
-    return [{f: r[f] for f in g._FIELDS} for r in client.query(sql).result()]
-
-
 def build(start: str, end: str, max_articles: int, cutoff: str):
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    cache = OUT_DIR / f"_rows-{start}-{end}.json"
-    if cache.exists():
-        rows = json.loads(cache.read_text())
-    else:
-        rows = gkg_month(g._client(), start, end)
-        cache.write_text(json.dumps(rows))
-    print(f"raw rows: {len(rows)}")
-
-    # same filters as the discovery pool, but keep ARTICLES (not a company aggregate)
-    seen_title, arts = set(), []
-    for r in rows:
-        url = r["DocumentIdentifier"] or ""
-        if not url:
-            continue
-        src = (r["SourceCommonName"] or "").lower()
-        if g._domain_in(src, g.SOURCE_BLOCKLIST):
-            continue
-        title = g._page_title(r["Extras"]) or g._slug_title(url)
-        if g.SPAM_TITLE_RE.search(title):
-            continue
-        if not g._article_waves(f"{title} {url}"):
-            continue
-        if not g._subject_orgs(r["V2Organizations"]):      # keep only articles ABOUT a company
-            continue
-        nt = _norm_title(title)
-        if nt in seen_title:                                # dedupe syndicated republications
-            continue
-        seen_title.add(nt)
-        arts.append({"title": title, "date": g._gkg_date(r["DATE"]),
-                     "source": r["SourceCommonName"] or "", "url": url})
-    arts.sort(key=lambda a: a["date"], reverse=True)
-    arts = arts[:max_articles]
-    print(f"kept articles (deduped, top {max_articles}): {len(arts)}")
+    # GKG discovery (shared source_block/spam/wave/subject-org filters) -> collapse syndication + rank
+    # (salience x authority, per-wave top-K). Both functions live in gkg_pool, the single source of
+    # truth shared with the backtest ranker AND the forward GKG+Wayback backfill.
+    arts = g.rank_stories(g.article_list(g._client(), start, end, OUT_DIR), max_articles)
+    print(f"kept articles (ranked, top {max_articles}): {len(arts)}")
 
     # join Wayback ledes (the snippet). CUTOFF is the DECISION/as-of date, NOT each article's
     # publish date — GHR's key trick: archive.org captures a URL a few days AFTER publication, so

@@ -154,16 +154,7 @@ def ingest_gkg_corpus(bq, start: date, end: date, run_dir: Path) -> None:
         print(f"  corpus {lo}..{hi}: {sum(len(v) for v in by_day.values())} articles", file=sys.stderr)
 
 
-def _authority(source: str) -> float:
-    """Source-authority multiplier for ranking, mimicking a search engine's authority bias:
-    specialty allow-list (2.0) > recognized major outlets (1.5) > long tail (1.0). Block-list
-    domains are already dropped upstream."""
-    src = (source or "").lower()
-    if g._domain_in(src, g.PREFERRED_DOMAINS):
-        return 2.0
-    if g._domain_in(src, g.MAJOR_DOMAINS):
-        return 1.5
-    return 1.0
+_authority = g.authority   # source-authority multiplier; moved to gkg_pool, shared with the forward path
 
 
 _TITLE_STOP = {"the", "and", "for", "with", "that", "this", "from", "have", "will", "been", "are",
@@ -248,51 +239,9 @@ def build_article_pool(as_of: date, news_lookback_days: int, max_articles: int,
             day_arts.extend(json.loads(f.read_text()))
         d += timedelta(days=1)
 
-    # collapse syndicated copies into STORIES; salience = distinct RECOGNIZED outlets (credible
-    # contemporaneous coverage), so a viral story carried only by obscure locals doesn't win. Keep the
-    # highest-authority copy as the representative (so its URL is a well-archived outlet -> better lede).
-    stories: dict = {}
-    for art in day_arts:
-        nt = re.sub(r"[^a-z0-9 ]", "", art["title"].lower()).strip()
-        if not nt:
-            continue
-        s = stories.get(nt)
-        if s is None:
-            s = stories[nt] = {"rep": art, "sources": set(), "rec": set()}
-        src = (art["source"] or "").lower()
-        s["sources"].add(src)
-        if g._domain_in(src, g.RECOGNIZED_DOMAINS):
-            s["rec"].add(src)
-        if _authority(art["source"]) > _authority(s["rep"]["source"]):
-            s["rep"] = art
-    for s in stories.values():
-        rep, rec = s["rep"], len(s["rec"])
-        # authority x credible-coverage; a story with NO recognized carrier gets a tiny floor score so
-        # it only fills leftover slots on a thin window, never outranks a credibly-covered story.
-        s["score"] = _authority(rep["source"]) * math.log1p(rec) if rec \
-            else 0.05 * math.log1p(len(s["sources"]))
-        s["waves"] = g._article_waves(f"{rep['title']} {rep['url']}") or ["general"]
-
-    # per-wave allocation, then fill remaining slots by overall score
-    by_wave: dict = collections.defaultdict(list)
-    for nt, s in stories.items():
-        for wv in s["waves"]:
-            by_wave[wv].append((nt, s))
-    for wv in by_wave:
-        by_wave[wv].sort(key=lambda kv: -kv[1]["score"])
-    budget = max(1, max_articles // max(len(by_wave), 1))
-    chosen: dict = {}
-    for lst in by_wave.values():
-        for nt, s in lst[:budget]:
-            chosen.setdefault(nt, s)
-    if len(chosen) < max_articles:
-        for nt, s in sorted(stories.items(), key=lambda kv: -kv[1]["score"]):
-            if len(chosen) >= max_articles:
-                break
-            chosen.setdefault(nt, s)
-    picked = sorted(chosen.values(), key=lambda s: -s["score"])[:max_articles]
-    arts = [dict(s["rep"], syndication=len(s["sources"]), recognized=len(s["rec"]),
-                 score=round(s["score"], 3)) for s in picked]
+    # collapse syndication into stories + rank like a search engine (salience x authority, per-wave
+    # top-K). Shared with the forward GKG+Wayback backfill so the two select identically.
+    arts = g.rank_stories(day_arts, max_articles)
 
     # Ledes use the as_of cutoff (look-ahead-clean, and gives archive.org the full window to have
     # captured the URL). A stable per-article cutoff would fully decouple Wayback from the lookback,

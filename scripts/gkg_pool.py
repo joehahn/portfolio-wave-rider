@@ -28,6 +28,7 @@ import argparse
 import collections
 import hashlib
 import json
+import math
 import re
 import sys
 from datetime import date, datetime, timedelta
@@ -353,6 +354,117 @@ def build_pool(client: bigquery.Client, as_of_str: str, write: bool = True) -> d
         (RUN_DIR / "_log" / f"{as_of_str}-filter-audit.json").write_text(json.dumps(audit, indent=2))
     return {"as_of": as_of_str, "rows": len(rows), "wave_articles": kept,
             "companies": len(agg), "top": companies, "audit": audit}
+
+
+# ---------------------------------------------------------------------- article list (shared)
+def article_list(client: bigquery.Client, start: str, end: str, cache_dir: Path) -> list[dict]:
+    """FILTERED GKG article rows over [start, end]: discovery (title/date/source/url) passed through the
+    SAME source_block / spam-title / wave-keyword / subject-org filters as build_pool. NOT collapsed,
+    ranked, or capped — hand the result to rank_stories to collapse syndication and select. Raw rows
+    cached under cache_dir (keyed by window + beats-hash) so a re-run doesn't re-scan BigQuery. Shared
+    by the backtest article-list prototype and the forward GKG+Wayback backfill, so the two agree on
+    discovery byte-for-byte."""
+    kw = _keyword_regex()
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    bhash = hashlib.md5(kw.encode()).hexdigest()[:8]
+    cache = cache_dir / f"_rows-{start}-{end}-{bhash}.json"
+    if cache.exists():
+        rows = json.loads(cache.read_text())
+    else:
+        sql = f"""
+        SELECT {', '.join(_FIELDS)}
+        FROM `{TABLE}`
+        WHERE _PARTITIONTIME BETWEEN TIMESTAMP('{start}') AND TIMESTAMP('{end}')
+          AND TranslationInfo IS NULL
+          AND (REGEXP_CONTAINS(DocumentIdentifier, r'{kw}') OR REGEXP_CONTAINS(Extras, r'{kw}'))
+        """
+        dry = client.query(sql, job_config=bigquery.QueryJobConfig(dry_run=True))
+        gb = dry.total_bytes_processed / 1e9
+        if gb > MAX_SCAN_GB:
+            sys.exit(f"cost guard: query would scan {gb:.1f} GB > {MAX_SCAN_GB} GB; aborting")
+        print(f"  [article_list] scanning {gb:.1f} GB for {start}..{end} ...", file=sys.stderr)
+        rows = [{f: r[f] for f in _FIELDS} for r in client.query(sql).result()]
+        cache.write_text(json.dumps(rows))
+
+    arts = []
+    for r in rows:
+        url = r["DocumentIdentifier"] or ""
+        if not url:
+            continue
+        if _domain_in((r["SourceCommonName"] or "").lower(), SOURCE_BLOCKLIST):
+            continue
+        title = _page_title(r["Extras"]) or _slug_title(url)
+        if SPAM_TITLE_RE.search(title):
+            continue
+        if not _article_waves(f"{title} {url}"):         # keyword only matched embedded links etc.
+            continue
+        if not _subject_orgs(r["V2Organizations"]):      # keep only articles ABOUT a company
+            continue
+        arts.append({"title": title, "date": _gkg_date(r["DATE"]),
+                     "source": r["SourceCommonName"] or "", "url": url})
+    return arts
+
+
+def authority(source: str) -> float:
+    """Source-authority multiplier for ranking (search-engine-style authority bias): specialty
+    allow-list (2.0) > recognized major outlets (1.5) > long tail (1.0). Block-list domains are
+    already dropped upstream. Shared by the backtest ranker and the forward GKG+Wayback backfill."""
+    src = (source or "").lower()
+    if _domain_in(src, PREFERRED_DOMAINS):
+        return 2.0
+    if _domain_in(src, MAJOR_DOMAINS):
+        return 1.5
+    return 1.0
+
+
+def rank_stories(arts: list[dict], max_articles: int) -> list[dict]:
+    """Collapse syndicated copies into STORIES and rank like a search engine, returning up to
+    max_articles representative articles (each with syndication=#sources, recognized=#recognized
+    outlets, score). salience = distinct RECOGNIZED outlets that carried the story (credible
+    contemporaneous coverage), so a viral story on obscure locals alone can't win; the highest-
+    AUTHORITY copy is kept as the representative (well-archived URL -> better lede). Per-wave top-K
+    allocation, then fill remaining slots by overall score. Shared by the backtest's build_article_pool
+    and the forward GKG+Wayback backfill so both select identically. (build_article_pool mirrors this.)"""
+    stories: dict = {}
+    for art in arts:
+        nt = re.sub(r"[^a-z0-9 ]", "", (art["title"] or "").lower()).strip()
+        if not nt:
+            continue
+        s = stories.get(nt)
+        if s is None:
+            s = stories[nt] = {"rep": art, "sources": set(), "rec": set()}
+        src = (art["source"] or "").lower()
+        s["sources"].add(src)
+        if _domain_in(src, RECOGNIZED_DOMAINS):
+            s["rec"].add(src)
+        if authority(art["source"]) > authority(s["rep"]["source"]):
+            s["rep"] = art
+    for s in stories.values():
+        rep, rec = s["rep"], len(s["rec"])
+        # authority x credible-coverage; a story with NO recognized carrier gets a tiny floor score so
+        # it only fills leftover slots on a thin window, never outranks a credibly-covered story.
+        s["score"] = authority(rep["source"]) * math.log1p(rec) if rec \
+            else 0.05 * math.log1p(len(s["sources"]))
+        s["waves"] = _article_waves(f"{rep['title']} {rep['url']}") or ["general"]
+    by_wave: dict = collections.defaultdict(list)
+    for nt, s in stories.items():
+        for wv in s["waves"]:
+            by_wave[wv].append((nt, s))
+    for wv in by_wave:
+        by_wave[wv].sort(key=lambda kv: -kv[1]["score"])
+    budget = max(1, max_articles // max(len(by_wave), 1))
+    chosen: dict = {}
+    for lst in by_wave.values():
+        for nt, s in lst[:budget]:
+            chosen.setdefault(nt, s)
+    if len(chosen) < max_articles:
+        for nt, s in sorted(stories.items(), key=lambda kv: -kv[1]["score"]):
+            if len(chosen) >= max_articles:
+                break
+            chosen.setdefault(nt, s)
+    picked = sorted(chosen.values(), key=lambda s: -s["score"])[:max_articles]
+    return [dict(s["rep"], syndication=len(s["sources"]), recognized=len(s["rec"]),
+                 score=round(s["score"], 3)) for s in picked]
 
 
 # ---------------------------------------------------------------------- prompt rendering

@@ -217,8 +217,9 @@ def main(argv: list[str] | None = None) -> int:
     p_pull.add_argument("--max-results", type=int, default=None,
                         help="cap results kept per query (smoke test)")
     p_pull.add_argument("--backfill", action="store_true",
-                        help="one-time cold-start seed: fill the corpus with prior news via GDELT "
-                             "discovery + live extraction (instead of a same-day WebSearch pull)")
+                        help="one-time cold-start seed: fill the corpus with prior news via the GKG+Wayback "
+                             "pipeline (BigQuery GKG discovery + Wayback lede + title-gated live fallback), "
+                             "instead of a same-day WebSearch pull")
     p_pull.add_argument("--days", type=int, default=21, help="--backfill window in days (default 21)")
 
     p_rev = sub.add_parser("review",
@@ -250,9 +251,9 @@ def main(argv: list[str] | None = None) -> int:
             as_of = args.as_of or pulled_at[:10]
             if args.backfill:
                 pull_id = f"backfill-{pulled_at.replace(':', '').replace('-', '')}"
-                r = retriever.GdeltBackfillRetriever(days=args.days, max_per_beat=args.max_results or 15)
+                r = retriever.GkgWaybackRetriever(days=args.days, max_articles=args.max_results or 160)
                 sightings, query_stats = r.pull(pull_id, pulled_at)
-                result = corpus.append_pull(pull_id, pulled_at, "gdelt-backfill", f"{args.days}d",
+                result = corpus.append_pull(pull_id, pulled_at, "gkg-wayback-backfill", f"{args.days}d",
                                             sightings, query_stats)
             else:
                 waves = json.loads(Path("gkg_config.json").read_text()).get("wave_keywords", {})

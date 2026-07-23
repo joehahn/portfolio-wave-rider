@@ -188,72 +188,76 @@ class WebSearchRetriever:
         return sightings, query_stats
 
 
-# GDELT DOC-API beats for the recent-history backfill, one per wave (short queries; GDELT treats a
-# space as implicit AND, so keep each to 1-2 content words).
-_GDELT_BEATS = [
-    ("artificial intelligence", "AI"),   # NOT "AI chip": GDELT chokes on the 2-char "AI" token
-    ("space stocks", "rockets_spacecraft"),
-    ("nuclear reactor", "nuclear"),
-    ("quantum computing", "quantum"),
-    ("robotics automation", "robotics"),
-    ("defense contract", "geopolitical"),
-    ("senior housing REIT", "aging_demographics"),
-]
+def _gkg_sighting(a: dict, pull_id: str, pulled_at: str, rank: int) -> dict[str, Any]:
+    """Map one GKG+Wayback article (title/date/source/url + lede) to a forward-corpus sighting. The
+    lede (clean Wayback lede, else the title-gated live-fallback `lede_live`) is the deepest text this
+    pipeline yields, so it serves as both snippet and body. No `author`: the GKG+Wayback pipeline never
+    extracts bylines (only the daily WebSearch pull does), so this field stays null for backfill rows."""
+    import hashlib
+    url = a["url"]
+    host = (urlsplit(url).hostname or "").lower().removeprefix("www.")
+    wave = (a.get("waves") or ["?"])[0]
+    lede = a.get("lede") or a.get("lede_live") or ""
+    query = f"gkg wave: {wave}"
+    body = {
+        "article_id": corpus.article_id(url), "url": url, "canonical_url": corpus.canon_url(url),
+        "source_domain": host, "source_tier": corpus.source_tier(host),
+        "publisher": a.get("source") or host, "title": a["title"], "author": None,
+        "published_date": (a.get("date") or "")[:10] or None, "language": "en",   # GKG: English-origin
+        "snippet": lede, "full_text": lede, "extraction_ok": bool(lede),
+        "content_hash": hashlib.sha1((lede or (a["title"] + url)).encode("utf-8")).hexdigest()[:16],
+        "image_url": None, "tickers_mentioned": _tickers(a["title"] + " " + lede),
+        "first_pulled_at": pulled_at, "first_query": query, "first_wave": wave, "page_age": None,
+    }
+    return {**body, "pull_id": pull_id, "pulled_at": pulled_at,
+            "query": query, "wave": wave, "result_rank": rank}
 
 
-class GdeltBackfillRetriever:
-    """Recent-history backfill: keyless GDELT DOC-API article discovery (date-honest) + LIVE page
-    extraction (full text + AUTHOR, via the shared _extract_article). For a <~30-day window the pages
-    are still up, so we fetch them live rather than Wayback (which lags on fresh pages). Run once to
-    seed the forward corpus with prior news so the curator has a full trailing window immediately.
-    (True OLD-history GKG+Wayback retrieval stays in scripts/backtest_sdk; this is the forward seed.)"""
+class GkgWaybackRetriever:
+    """Cold-start backfill via the BACKTEST's GKG+Wayback pipeline, reused wholesale (no new retrieval
+    code): BigQuery GKG discovers the date-honest article list (title/date/source/url, run through the
+    same source_block/spam/wave/subject-org filters as the backtest) via gkg_pool.article_list; Wayback
+    supplies each article's as-of lede via news_pool.wayback_ledes; and a title-gated LIVE fetch fills
+    the Wayback misses via backtest_sdk._apply_live_fallback. Run once to seed the forward corpus with a
+    full trailing window. Same three-stage pipeline the GKG+Wayback backtest validated, pointed forward."""
 
-    def __init__(self, days: int = 21, max_per_beat: int = 15):
+    def __init__(self, days: int = 21, max_articles: int = 160):
         self.days = days
-        self.cap = max_per_beat
-        self.blocked = blocked_domains()   # drop news_sources.md source_block domains, like the WebSearch pull
+        self.max_articles = max_articles
         import sys as _sys
         _sys.path.insert(0, str(ROOT / "scripts"))
+        import backtest_sdk
+        import gkg_pool
         import news_pool
-        self._np = news_pool
-
-    def _is_blocked(self, url: str, domain: str) -> bool:
-        host = (domain or urlsplit(url).hostname or "").lower().removeprefix("www.")
-        return any(b in host for b in self.blocked)
+        self._g, self._w, self._sdk = gkg_pool, news_pool, backtest_sdk
+        self._cache_dir = ROOT / "data" / "forward_corpus" / "_gkg_cache"
 
     def pull(self, pull_id: str, pulled_at: str) -> tuple[list[dict[str, Any]], dict[str, Any]]:
         from datetime import date, timedelta
         end = date.today()
         start = end - timedelta(days=self.days)
-        sightings: list[dict[str, Any]] = []
+        # 1. GKG discovery (source_block/spam/wave/subject-org filtered) -> collapse syndication + rank
+        #    (salience x authority, per-wave top-K). Same two shared gkg_pool functions the backtest uses.
+        raw = self._g.article_list(self._g._client(), start.isoformat(), end.isoformat(), self._cache_dir)
+        arts = self._g.rank_stories(raw, self.max_articles)
+        for a in arts:   # attach the representative's wave (rank_stories drops it; _gkg_sighting needs it)
+            a["waves"] = self._g._article_waves(f"{a['title']} {a['url']}") or ["general"]
+        # 2. Wayback lede per article at today's decision cutoff (clean archived snippet)
+        ledes = self._w.wayback_ledes([a["url"] for a in arts], end)
+        for a in arts:
+            a["lede"] = ledes.get(a["url"], "")
+            a["lede_source"] = "wayback" if a["lede"] else "none"
+        # 3. title-gated LIVE fetch fills Wayback misses (sets lede_live, promotes lede_source none->live)
+        self._sdk._apply_live_fallback(arts)
+        # 4. map to corpus sightings + per-wave stats
+        sightings = [_gkg_sighting(a, pull_id, pulled_at, rank) for rank, a in enumerate(arts)]
+        src = {"wayback": 0, "live": 0, "none": 0}
         query_stats: dict[str, Any] = {}
-        bodies: dict[str, dict] = {}
-
-        def _do(query: str, wave: str) -> bool:
-            """Fetch + process one beat. Returns True if it returned any articles (a rate-limit miss
-            returns [] and is NOT cached by gdelt_fetch, so a later retry re-queries it)."""
-            try:
-                arts = self._np.gdelt_fetch(query, start, end)[: self.cap]
-            except Exception as e:  # noqa: BLE001 - one bad beat must not sink the backfill
-                query_stats[query] = {"wave": wave, "error": str(e)[:140]}
-                return False
-            query_stats[query] = {"wave": wave, "results": len(arts)}
-            for rank, a in enumerate(arts):
-                url = a.get("url")
-                if not url or self._is_blocked(url, a.get("domain", "")):
-                    continue
-                cid = corpus.article_id(url)
-                if cid not in bodies:
-                    d = self._np._parse_gdelt_date(a.get("seendate", ""))
-                    res = {"title": a.get("title", ""), "date": d.isoformat() if d else None}
-                    bodies[cid] = _extract_article(url, cid, res, pulled_at, query, wave)
-                sightings.append({**bodies[cid], "pull_id": pull_id, "pulled_at": pulled_at,
-                                  "query": query, "wave": wave, "result_rank": rank})
-            return bool(arts)
-
-        # GDELT rate-limits the FIRST 1-2 requests after any idle gap, so the earliest beats miss. Do a
-        # first pass, then RETRY the missed beats once — by now GDELT is warm and they get through.
-        missed = [(q, w) for q, w in _GDELT_BEATS if not _do(q, w)]
-        for q, w in missed:
-            _do(q, w)
+        for a in arts:
+            wave = (a.get("waves") or ["?"])[0]
+            q = f"gkg wave: {wave}"
+            query_stats.setdefault(q, {"wave": wave, "results": 0})
+            query_stats[q]["results"] += 1
+            src[a.get("lede_source", "none")] = src.get(a.get("lede_source", "none"), 0) + 1
+        query_stats["_lede_sources"] = src   # wayback/live/title-only split, for the pull manifest
         return sightings, query_stats
