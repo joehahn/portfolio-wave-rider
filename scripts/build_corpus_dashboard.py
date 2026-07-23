@@ -169,28 +169,30 @@ def build():
         _leghfig([go.Bar(name=_PROVLBL[pv], x=[src_p[pv][d] for d in _sorder], y=_sorder, orientation="h",
                          marker_color=_PROVCOL[pv]) for pv in _PROV_ORDER], "articles", height=420, left=200)))
 
-    # 5. Articles per search term — horizontal, colored by feed (mirrors retrieval_pwr plot 8). Each bar is
-    # prefixed by its WAVE so the two feeds line up: without this, a WebSearch wave hides under its keyword
-    # phrase ("hypersonic, missile…") and looks absent next to the seed's "gkg wave: geopolitical".
+    # 5. Articles per search term — horizontal, STACKED by wave (one bar per wave, orange+blue segments per
+    # feed). The literal surfacing query lives in each segment's hover, so the wave-merged view stays legible
+    # without a wall of keyword text on the axis.
     _pfx = "recent business and stock-market news about "
-    q = Counter((a.get("first_query") or "?") for a in arts)
-    qwave = {(a.get("first_query") or "?"): a.get("first_wave", "?") for a in arts}
-    qi = sorted(q.items(), key=lambda kv: kv[1])              # ascending -> largest bar at top
-    _qp = lambda k: "backfill" if k.startswith("gkg") else "websearch"
-    _lbl = lambda k: (k if k.startswith("gkg") else f"{qwave.get(k, '?')}: {k.replace(_pfx, '')}")[:60]
-    _f5 = _leghfig([go.Bar(name=_PROVLBL[pv], x=[v for k, v in qi if _qp(k) == pv],
-                           y=[_lbl(k) for k, v in qi if _qp(k) == pv], orientation="h",
-                           marker_color=_PROVCOL[pv]) for pv in _PROV_ORDER], "articles", height=360, left=340)
-    _f5.update_yaxes(categoryorder="array", categoryarray=[_lbl(k) for k, _ in qi])
-    figs.append((
-        "5. Articles per search term",
-        "the literal surfacing query, one per wave per feed, each prefixed by its wave so the feeds line up: "
-        "WebSearch shows its keyword phrase, the GKG+Wayback seed shows <code>gkg wave: …</code>. Both feeds "
-        "cover all seven waves &mdash; e.g. geopolitical is <i>hypersonic, missile, fighter jet…</i> on the "
-        "WebSearch side. (For a clean per-wave count, see plot 3.)", _f5))
+    wq = {"websearch": {}, "backfill": {}}   # feed -> {wave: {"n": count, "q": literal query text}}
+    for a in arts:
+        fq = a.get("first_query") or "?"
+        pv = "backfill" if fq.startswith("gkg") else "websearch"
+        wave = a.get("first_wave", "?")
+        d = wq[pv].setdefault(wave, {"n": 0, "q": (fq if fq.startswith("gkg") else fq.replace(_pfx, ""))})
+        d["n"] += 1
+    allw = sorted(set(w for pv in wq for w in wq[pv]),
+                  key=lambda w: sum(wq[pv].get(w, {}).get("n", 0) for pv in wq))   # ascending total -> top
+    _f5 = _leghfig([go.Bar(name=_PROVLBL[pv], y=allw, orientation="h", marker_color=_PROVCOL[pv],
+                           x=[wq[pv].get(w, {}).get("n", 0) for w in allw],
+                           customdata=[wq[pv].get(w, {}).get("q", "(not queried)") for w in allw],
+                           hovertemplate="%{y}: %{x} articles<br>query: %{customdata}<extra>"
+                                         + _PROVLBL[pv] + "</extra>")
+                    for pv in _PROV_ORDER], "articles", height=340, left=200)
+    figs.append(("5. Articles per search term", "", _f5))
 
-    # 6. Articles per author — horizontal, split by feed. The GKG+Wayback seed has NO bylines, so its
-    # orange bars are absent by construction: an all-blue plot that visually confirms "seed adds no authors".
+    # 6. Articles per author — horizontal, split by feed (both feeds now carry bylines; the seed's come from
+    # the Wayback/live page metadata). Byline coverage is partial: wires (Reuters/AP) omit authors and
+    # paywalled/JS pages block extraction. Raw material for a future gains-per-author view.
     _authors = [_corpus.clean_author(a.get("author"), a.get("publisher")) for a in arts]
     au_p = {"websearch": Counter(), "backfill": Counter()}
     for a in arts:
@@ -202,18 +204,15 @@ def build():
         _atot.update(au_p[pv])
     _aorder = [k for k, _ in sorted(_atot.items(), key=lambda kv: kv[1])[-15:]]   # top 15, largest at top
     figs.append((
-        "6. Articles per author",
-        "byline attribution (trafilatura), split by feed &mdash; note the <b style=\"color:#f59e0b;\">"
-        "GKG+Wayback seed</b> is absent: it extracts title + lede but no author, so every byline here is from "
-        "the daily <b style=\"color:#3b82f6;\">WebSearch</b> feed. Partial even so: wire services (Reuters/AP) "
-        "omit authors and paywalled/JS pages block extraction. Raw material for a future gains-per-author view.",
+        "6. Articles per author", "",
         _leghfig([go.Bar(name=_PROVLBL[pv], x=[au_p[pv][k] for k in _aorder], y=[k[:50] for k in _aorder],
                          orientation="h", marker_color=_PROVCOL[pv]) for pv in _PROV_ORDER],
                  "articles", height=400, left=240)))
 
     charts = ""
     for i, (title, sub, fig) in enumerate(figs):
-        charts += (f'<h2>{title}</h2><p style="color:#666;margin:.2em 0 .4em;">{sub}</p>'
+        subhtml = f'<p style="color:#666;margin:.2em 0 .4em;">{sub}</p>' if sub else ''
+        charts += (f'<h2>{title}</h2>{subhtml}'
                    + fig.to_html(full_html=False, include_plotlyjs="cdn" if i == 0 else False,
                                  config={"displayModeBar": False}))
 
@@ -262,13 +261,6 @@ only genuinely new articles. This is the forward analog of that backtest DB; the
 <a href="../data/forward_corpus/appearances.jsonl">appearances.jsonl</a> &middot;
 <a href="../data/forward_corpus/pulls.jsonl">pulls.jsonl</a></p>
 {charts}
-<p style="color:#666;font-size:13px;max-width:820px;margin-top:1.5em;"><b>Note on sources:</b> the forward
-pull honors all three <code>news_sources.md</code> tiers, reaching parity with the backtest's source
-handling. It excludes <code>source_block</code> domains (as web_search <code>blocked_domains</code>);
-runs a per-wave <b>specialty sweep</b> restricted to the preferred prose desks (as
-<code>allowed_domains</code>) so their deep coverage isn't buried by open ranking; and tags every article
-by authority tier &mdash; <b>specialty</b> (prose desks, 2.0), <b>major</b> (<code>source_major</code> wires,
-1.5), or <b>other</b> (1.0) &mdash; shown as the colors in plot 4.</p>
 </body></html>"""
     OUT.write_text(page)
     print(f"wrote {OUT}  ({n} articles, {len(pulls)} pulls, {len(gaps)} gap-days)")
