@@ -319,7 +319,8 @@ def _rebalance_dates(start: str, end: str, cadence_days: int) -> list[str]:
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="SDK GKG+Wayback backtest harness.")
-    ap.add_argument("--start", required=True); ap.add_argument("--end", required=True)
+    ap.add_argument("--start", default=None, help="default: investor_profile.md backtest.start_date")
+    ap.add_argument("--end", default=None, help="default: investor_profile.md backtest.end_date")
     # These default to investor_profile.md (the source of truth); a CLI flag overrides per invocation.
     ap.add_argument("--cadence", default=None, help="default: profile rebalance_period")
     ap.add_argument("--news-lookback-days", type=int, default=None, help="default: profile news_lookback_days")
@@ -328,7 +329,8 @@ def main(argv=None) -> int:
     ap.add_argument("--max-weight", type=float, default=None, help="default: profile concentration_cap")
     ap.add_argument("--risk-aversion", type=float, default=None, help="default: profile risk_aversion")
     ap.add_argument("--max-articles", type=int, default=None, help="default: profile max_articles")
-    ap.add_argument("--starter", nargs="+", default=["AAPL", "MSFT", "GOOGL", "NVDA", "SPY"])
+    ap.add_argument("--starter", nargs="+", default=None,
+                    help="default: investor_profile.md starter_watchlist (the buy-and-hold baseline)")
     ap.add_argument("--model", default=None, help="curator LLM; default: profile backtest.curator_model "
                     "(claude-* -> Anthropic, vendor/model -> OpenRouter)")
     ap.add_argument("--no-reasoning", action="store_true",
@@ -355,6 +357,17 @@ def main(argv=None) -> int:
 
     from src import portfolio
     fm = portfolio.load_financial_model()            # investor_profile.md is authoritative; CLI overrides
+    bt = portfolio.load_backtest_config()            # backtest window (start/end) also lives in the profile
+    if a.start is None:
+        a.start = bt["start_date"]
+    if a.end is None:
+        a.end = bt["end_date"]
+    if a.starter is None:
+        a.starter = fm["starter_watchlist"]   # buy-and-hold baseline == investor_profile.md starter_watchlist
+    if not a.starter:
+        sys.exit("no starter: pass --starter or set starter_watchlist in investor_profile.md")
+    if not a.start or not a.end:
+        sys.exit("no window: pass --start/--end or set backtest.start_date/end_date in investor_profile.md")
     if a.cadence is None:
         a.cadence = fm["rebalance_period"]
     if a.cadence not in CADENCE_DAYS:
