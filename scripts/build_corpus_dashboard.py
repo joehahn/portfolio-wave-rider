@@ -184,18 +184,27 @@ def build():
         "surfacing queries, one per wave per feed: the daily WebSearch phrases vs the GKG discovery keywords "
         "(shown as <code>gkg wave: …</code>), colored by feed", _f5))
 
-    # 6. Articles per author — horizontal (byline attribution; raw material for gains-per-author later)
+    # 6. Articles per author — horizontal, split by feed. The GKG+Wayback seed has NO bylines, so its
+    # orange bars are absent by construction: an all-blue plot that visually confirms "seed adds no authors".
     _authors = [_corpus.clean_author(a.get("author"), a.get("publisher")) for a in arts]
-    au = Counter(x for x in _authors if x)   # real bylines only (pseudo-authors dropped)
-    ai = sorted(au.items(), key=lambda kv: kv[1])[-15:]   # top 15, largest bar at top
+    au_p = {"websearch": Counter(), "backfill": Counter()}
+    for a in arts:
+        au = _corpus.clean_author(a.get("author"), a.get("publisher"))
+        if au:
+            au_p[_prov(a)][au] += 1
+    _atot = Counter()
+    for pv in _PROV_ORDER:
+        _atot.update(au_p[pv])
+    _aorder = [k for k, _ in sorted(_atot.items(), key=lambda kv: kv[1])[-15:]]   # top 15, largest at top
     figs.append((
         "6. Articles per author",
-        "byline attribution (trafilatura). <b>WebSearch feed only</b> &mdash; the GKG+Wayback seed extracts "
-        "title + lede but no author, so it contributes nothing here. Partial even so: wire services "
-        "(Reuters/AP) omit authors and paywalled/JS pages block extraction. Raw material for a future "
-        "gains-per-author view, once forward price outcomes accrue and ticker attribution is tightened",
-        _hfig([go.Bar(x=[v for _, v in ai], y=[k[:50] for k, _ in ai], orientation="h",
-                      marker_color="#f59e0b")], "articles", height=380, left=240)))
+        "byline attribution (trafilatura), split by feed &mdash; note the <b style=\"color:#f59e0b;\">"
+        "GKG+Wayback seed</b> is absent: it extracts title + lede but no author, so every byline here is from "
+        "the daily <b style=\"color:#3b82f6;\">WebSearch</b> feed. Partial even so: wire services (Reuters/AP) "
+        "omit authors and paywalled/JS pages block extraction. Raw material for a future gains-per-author view.",
+        _leghfig([go.Bar(name=_PROVLBL[pv], x=[au_p[pv][k] for k in _aorder], y=[k[:50] for k in _aorder],
+                         orientation="h", marker_color=_PROVCOL[pv]) for pv in _PROV_ORDER],
+                 "articles", height=400, left=240)))
 
     charts = ""
     for i, (title, sub, fig) in enumerate(figs):
