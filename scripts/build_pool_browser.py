@@ -51,7 +51,7 @@ def build(run_rel: str, out: Path) -> None:
     total = sum(len(v) for v in weeks.values())
 
     page = f"""<!doctype html><html><head><meta charset="utf-8">
-<title>PWR — curator pool browser</title>
+<title>Curator pool browser</title>
 <style>
 body{{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;max-width:1180px;margin:0 auto;
 padding:0 1.5em;color:#222;line-height:1.45}}h1{{color:#111}}

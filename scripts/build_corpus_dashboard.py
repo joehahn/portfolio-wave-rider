@@ -242,12 +242,12 @@ def build():
                + _card(_blocked_count(), "blocked domains (source_block)")
                + "</div>")
 
-    page = f"""<!doctype html><html><head><meta charset="utf-8"><title>PWR — forward retriever</title>
+    page = f"""<!doctype html><html><head><meta charset="utf-8"><title>Retriever Forwardtest</title>
 <style>body{{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;max-width:1000px;margin:0 auto;
 padding:0 1.5em 3em;color:#222;line-height:1.5}}h1,h2{{color:#111}}h2{{margin-top:1.6em}}a{{color:#2563eb}}</style>
 </head><body>
 {dash_nav.render("corpus_pwr.html")}
-<h1>Forward news retriever</h1>
+<h1>Retriever Forwardtest</h1>
 <p style="color:#555;max-width:820px;">The frozen live-news archive (<code>data/forward_corpus/</code>). Two feeds
 fill it: a daily <b>WebSearch</b> pull (<code>news_pull.sh</code> each evening) plus a one-time
 <b>GKG+Wayback</b> cold-start seed &mdash; the very same BigQuery-GKG discovery + Wayback-lede (+ title-gated

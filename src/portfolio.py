@@ -3461,7 +3461,7 @@ def build_dashboard(
 
     page = (
         '<!doctype html><html><head><meta charset="utf-8">'
-        '<title>Portfolio Wave Rider — live dashboard</title>'
+        '<title>Live dashboard</title>'
         '<style>body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;'
         'max-width:1280px;margin:0 auto;padding:1em 1.5em;color:#222;}'
         'th,td{border-bottom:1px solid #eee;}</style>'
@@ -4452,7 +4452,7 @@ def build_curator_dashboard(
     )
     page = (
         '<!doctype html><html><head><meta charset="utf-8">'
-        '<title>Portfolio Wave Rider — Curator Backtest</title>'
+        '<title>Curator Backtest</title>'
         '<style>body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;'
         'max-width:1180px;margin:0 auto;padding:0 1.5em;color:#222;line-height:1.5;}'
         'h1,h2{color:#111;}'

@@ -131,8 +131,8 @@ def main() -> int:
     # provenance on the gains-per-source/keyword panels, etc. -- this grows into a full dedicated renderer.)
     html = DASH.read_text()
     for _old, _new in (
-            ("<h1>Curator Backtest ", "<h1>Curator-driven forward test "),
-            ("Portfolio Wave Rider — Curator Backtest", "Portfolio Wave Rider — curator forward test"),
+            ("<h1>Curator Backtest ", "<h1>Curator Forwardtest "),
+            ("<title>Curator Backtest</title>", "<title>Curator Forwardtest</title>"),
             ("Backtest window", "Forward-test window"),
             # pool browser is a backtest-only artifact -> drop its intro-paragraph link on the forward page.
             ("; browse them in the <a href=\"pool_browser.html\">pool browser</a>", "")):
