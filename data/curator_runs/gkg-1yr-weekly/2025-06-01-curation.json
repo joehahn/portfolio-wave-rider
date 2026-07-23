@@ -1,9 +1,0 @@
-{
-  "as_of_date": "2025-06-01",
-  "rebalance_period": "weekly",
-  "adds": [],
-  "removes": [],
-  "no_changes": true,
-  "rationale_overall": "This week's pool is mostly noise for our purposes: generic drone/missile war coverage (Russia-Ukraine), youth/school robotics programs, private-company milestones with no listed ticker (SpaceX Starship flights/Starbase zoning, EnduroSat funding), keyword false-matches (AHL hockey 'Rocket', high-school track 'Rocket', a Dallas bagel shop called Starship), and small-cap/OTC uranium juniors (GoviEx, Homeland Uranium) that fail the liquidity floor. Two names did surface with real catalysts - Rocket Lab (RKLB) acquiring Geost and joining the Golden Dome missile-defense program, and NuScale (SMR) getting a bullish UBS note tied to Trump's nuclear/data-center push - but neither clears the bar for a swap this week: RKLB and SMR are not held, and adding either would require displacing AAPL, GOOGL, MSFT, or NVDA, none of which show any thesis breach or peak-exhaustion signal this week (NVDA's China Blackwell chip news is a mild positive, not a reason to trim). Nothing here is a genuinely stronger rising-wave vehicle versus a current holding, so no_changes is the correct call for this weekly window; RKLB and SMR remain on watch for a future rebalance if the catalysts persist.",
-  "search_terms": []
-}

@@ -326,6 +326,14 @@ def build(run_rel, out):
              + card(f"{n_rec_zero}/{len(rec_rows)}", "configured desks GKG surfaced 0x (plot 7)")
              + card("$0", "BigQuery cost (free tier)"))
     ts = datetime.now().strftime("%Y-%m-%d %H:%M %Z").strip()
+    # Title date range: read the same snapshots.csv the Curator Backtest uses, so all three DBs show an
+    # identical "start to end". Fall back to the pool as_of span if the replay output isn't present.
+    _snap = ROOT / run_rel / "_backtest" / "snapshots.csv"
+    if _snap.exists():
+        _sd = sorted({ln.split(",", 1)[0] for ln in _snap.read_text().splitlines()[1:] if ln})
+        _start, _end = (_sd[0], _sd[-1]) if _sd else (as_of[0], as_of[-1])
+    else:
+        _start, _end = as_of[0], as_of[-1]
 
     page = (
         '<!doctype html><html><head><meta charset="utf-8"><title>Retriever Backtest</title>'
@@ -334,9 +342,10 @@ def build(run_rel, out):
         '.built{position:absolute;top:8px;right:16px;font-size:12px;color:#888}</style></head><body>'
         f'<div class="built">dashboard built {ts}</div>'
         + dash_nav.render("retrieval_pwr.html", built=False) +
-        '<h1>Retriever Backtest</h1>'
-        f'<p style="color:#666;margin:-.4em 0 .7em;font-size:15px;">{as_of[0]} to {as_of[-1]} '
-        f'&middot; {len(pools)} rebalances, each reading a trailing 21-day news window</p>'
+        f'<h1>Retriever Backtest <span style="font-size:0.55em;color:#666;font-weight:400;">'
+        f'&mdash; {_start} to {_end}</span></h1>'
+        f'<p style="color:#666;margin:-.4em 0 .7em;font-size:14px;">{len(pools)} rebalances, each reading '
+        f'a trailing 21-day news window</p>'
         '<p style="color:#555">Judges the <b>news gathering</b>, not portfolio gains: completeness of the '
         'historical pull and whether the calendar has gaps, upstream of the curator and free of '
         'PageRank-mooning. The pool the curator actually receives is the <b>ranked top-100</b> '

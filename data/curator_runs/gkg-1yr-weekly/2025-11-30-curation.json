@@ -1,8 +1,0 @@
-{
-  "as_of_date": "2025-11-30",
-  "rebalance_period": "weekly",
-  "adds": [],
-  "removes": [],
-  "no_changes": true,
-  "rationale_overall": "Filtered out heavy noise: private/foreign space programs (Blue Origin, ISRO, Nuri rocket, China satellite IoT), pure geopolitical/defense event coverage without a clean US-listed ticker (Golden Dome contracts unnamed, Tamir missile JV, Sudan/India military items, Su-57E), uranium groundwater health story (not a market catalyst), a Rocket Lab keyword false-match (Nintendo 'Little Rocket Lab' gaming feature, iHeart's '96.1 The Rocket' station), and generic listicle/opinion pieces ('2 AI stocks to buy', 'Buffett vs Burry'). Real signal this week largely reaffirms existing holdings rather than surfacing a new investable name: RKLB hit an annual launch-cadence record (bullish confirmation, already held), SMR (NuScale) posted a single-day price pop on no fundamental catalyst (noise, already held), NVDA/GOOGL AI-chip competition and Gemini 3 coverage reinforces the current AI wave (both already held). Candidates surfaced but rejected for lack of a genuine catalyst or thesis fit: QUBT (quantum, but piece is a speculative 'where will it be in 5 years' listicle, not a catalyst), SERV (Serve Robotics, a modest 1.7% pop with no news driver), and Boeing's Starliner (negative catalyst, not held). None of these clear the bar for a swap against a current holding, so the watchlist is unchanged this week."
-}

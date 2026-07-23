@@ -386,13 +386,18 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
             '(concrete milestone, not noise), <b>discipline</b> (buildup-not-crest; a remove is justified, not '
             'churn), <b>valid-ticker</b> (real investable US listing, not a name/delisted/false-match).</p>')
     ts = datetime.now().strftime("%Y-%m-%d %H:%M %Z").strip()
+    # Title date range: same snapshots.csv the Curator Backtest reads, so all three DBs show one range.
+    _snap = ROOT / runs_dir / "_backtest" / "snapshots.csv"
+    _sd = sorted({ln.split(",", 1)[0] for ln in _snap.read_text().splitlines()[1:] if ln}) if _snap.exists() else []
+    _range = (f' <span style="font-size:0.55em;color:#666;font-weight:400;">&mdash; {_sd[0]} to {_sd[-1]}</span>'
+              if _sd else "")
     page = f"""<!doctype html><html><head><meta charset="utf-8"><title>Backtest parameter sweeps</title>
 <style>body{{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;max-width:1180px;margin:0 auto;
 padding:0 1.5em;color:#222;line-height:1.5}}h1,h2{{color:#111}}table{{border-collapse:collapse;font-size:13px;width:100%}}
 th{{text-align:right;padding:6px 10px;border-bottom:2px solid #ccc;white-space:nowrap}}th:first-child{{text-align:left}}
 .built{{position:absolute;top:8px;right:16px;font-size:12px;color:#888}}
 </style></head><body><div class="built">dashboard built {ts}</div>{nav}
-<h1>Backtest parameter sweeps</h1>
+<h1>Backtest parameter sweeps{_range}</h1>
 <p style="color:#555;max-width:860px;">{len(rows)} configs = concentration_cap × risk_aversion (λ) × optimizer_lookback,
 replayed on the <b>fixed 3-year curation set of the default curator</b> ({runs_dir.split('/')[-1]}). These knobs touch only the
 mean-variance replay, not the curator, so the whole grid costs <b>$0</b> (no LLM). Ranked by

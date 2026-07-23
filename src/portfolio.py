@@ -3553,7 +3553,7 @@ def _build_ticker_periods(
 
 
 def build_curator_dashboard(
-    backtest_dir: str = "data/backtest_curator_5y",
+    backtest_dir: str = "data/curator_runs/gkg-3yr-final/_backtest",
     runs_dir: str = "data/curator_runs/5y-quarterly",
     out_path: str = "docs/backtest_curator.html",
     benchmarks: list[str] | None = None,
