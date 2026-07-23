@@ -312,7 +312,7 @@ def build(run_rel, out):
         '.built{position:absolute;top:8px;right:16px;font-size:12px;color:#888}</style></head><body>'
         f'<div class="built">dashboard built {ts}</div>'
         + dash_nav.render("retrieval_pwr.html", built=False) +
-        '<h1>Retriever Backtest — GKG + Wayback (upstream of the curator)</h1>'
+        '<h1>Retriever Backtest</h1>'
         '<p style="color:#555">Judges the <b>news gathering</b>, not portfolio gains: completeness of the '
         'historical pull and whether the calendar has gaps, upstream of the curator and free of '
         'PageRank-mooning. The pool the curator actually receives is the <b>ranked top-100</b> '

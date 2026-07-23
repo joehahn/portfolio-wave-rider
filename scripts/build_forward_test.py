@@ -129,11 +129,14 @@ def main() -> int:
     # in the dedicated forward builder. Portfolio value already runs from the July-1 inception, and the
     # rightmost date advances to `end` on each refresh. (As the forward DB diverges -- seed-vs-WebSearch
     # provenance on the gains-per-source/keyword panels, etc. -- this grows into a full dedicated renderer.)
+    import re as _re
     html = DASH.read_text()
     for _old, _new in (("<h1>Curator Backtest ", "<h1>Curator-driven forward test "),
                        ("Portfolio Wave Rider — Curator Backtest", "Portfolio Wave Rider — curator forward test"),
                        ("Backtest window", "Forward-test window")):
         html = html.replace(_old, _new)   # targeted (h1 tag / full title) so the nav-link labels stay intact
+    # pool browser is reachable ONLY from the Curator Backtest DB -> drop its nav link (+ separator) here.
+    html = _re.sub(r'\s*(?:·|&middot;|&#183;)\s*<a href="pool_browser\.html">[^<]*</a>', '', html)
     DASH.write_text(html)
 
     print(f"\nforward test: {len(dates)} weekly rebalances {dates[0]}..{dates[-1]} "

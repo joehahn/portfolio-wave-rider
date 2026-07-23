@@ -392,7 +392,7 @@ padding:0 1.5em;color:#222;line-height:1.5}}h1,h2{{color:#111}}table{{border-col
 th{{text-align:right;padding:6px 10px;border-bottom:2px solid #ccc;white-space:nowrap}}th:first-child{{text-align:left}}
 .built{{position:absolute;top:8px;right:16px;font-size:12px;color:#888}}
 </style></head><body><div class="built">dashboard built {ts}</div>{nav}
-<h1>Backtest parameter sweeps — zero-cost optimizer knobs</h1>
+<h1>Backtest parameter sweeps</h1>
 <p style="color:#555;max-width:860px;">{len(rows)} configs = concentration_cap × risk_aversion (λ) × optimizer_lookback,
 replayed on the <b>fixed 3-year curation set of the default curator</b> ({runs_dir.split('/')[-1]}). These knobs touch only the
 mean-variance replay, not the curator, so the whole grid costs <b>$0</b> (no LLM). Ranked by

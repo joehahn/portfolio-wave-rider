@@ -21,7 +21,7 @@ BACKTEST = [
     ("retrieval_pwr.html", "Retriever (GKG+Wayback)"),
     ("backtest_gkg_3yr_kimi.html", "Curator"),
     ("sweep_pwr.html", "Sweep + LLM judge"),
-    ("pool_browser.html", "Pool browser"),
+    # pool_browser is intentionally NOT here: it's reachable only from the Curator Backtest DB.
 ]
 
 
