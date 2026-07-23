@@ -169,20 +169,25 @@ def build():
         _leghfig([go.Bar(name=_PROVLBL[pv], x=[src_p[pv][d] for d in _sorder], y=_sorder, orientation="h",
                          marker_color=_PROVCOL[pv]) for pv in _PROV_ORDER], "articles", height=420, left=200)))
 
-    # 5. Articles per search term — horizontal, colored by feed (mirrors retrieval_pwr plot 8)
+    # 5. Articles per search term — horizontal, colored by feed (mirrors retrieval_pwr plot 8). Each bar is
+    # prefixed by its WAVE so the two feeds line up: without this, a WebSearch wave hides under its keyword
+    # phrase ("hypersonic, missile…") and looks absent next to the seed's "gkg wave: geopolitical".
     _pfx = "recent business and stock-market news about "
     q = Counter((a.get("first_query") or "?") for a in arts)
+    qwave = {(a.get("first_query") or "?"): a.get("first_wave", "?") for a in arts}
     qi = sorted(q.items(), key=lambda kv: kv[1])              # ascending -> largest bar at top
     _qp = lambda k: "backfill" if k.startswith("gkg") else "websearch"
-    _lbl = lambda k: (k if k.startswith("gkg") else k.replace(_pfx, ""))[:58]
+    _lbl = lambda k: (k if k.startswith("gkg") else f"{qwave.get(k, '?')}: {k.replace(_pfx, '')}")[:60]
     _f5 = _leghfig([go.Bar(name=_PROVLBL[pv], x=[v for k, v in qi if _qp(k) == pv],
                            y=[_lbl(k) for k, v in qi if _qp(k) == pv], orientation="h",
-                           marker_color=_PROVCOL[pv]) for pv in _PROV_ORDER], "articles", height=360, left=330)
+                           marker_color=_PROVCOL[pv]) for pv in _PROV_ORDER], "articles", height=360, left=340)
     _f5.update_yaxes(categoryorder="array", categoryarray=[_lbl(k) for k, _ in qi])
     figs.append((
         "5. Articles per search term",
-        "surfacing queries, one per wave per feed: the daily WebSearch phrases vs the GKG discovery keywords "
-        "(shown as <code>gkg wave: …</code>), colored by feed", _f5))
+        "the literal surfacing query, one per wave per feed, each prefixed by its wave so the feeds line up: "
+        "WebSearch shows its keyword phrase, the GKG+Wayback seed shows <code>gkg wave: …</code>. Both feeds "
+        "cover all seven waves &mdash; e.g. geopolitical is <i>hypersonic, missile, fighter jet…</i> on the "
+        "WebSearch side. (For a clean per-wave count, see plot 3.)", _f5))
 
     # 6. Articles per author — horizontal, split by feed. The GKG+Wayback seed has NO bylines, so its
     # orange bars are absent by construction: an all-blue plot that visually confirms "seed adds no authors".
