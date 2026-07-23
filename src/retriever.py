@@ -228,13 +228,16 @@ class GdeltBackfillRetriever:
         sightings: list[dict[str, Any]] = []
         query_stats: dict[str, Any] = {}
         bodies: dict[str, dict] = {}
-        for query, wave in _GDELT_BEATS:
+
+        def _do(query: str, wave: str) -> bool:
+            """Fetch + process one beat. Returns True if it returned any articles (a rate-limit miss
+            returns [] and is NOT cached by gdelt_fetch, so a later retry re-queries it)."""
             try:
                 arts = self._np.gdelt_fetch(query, start, end)[: self.cap]
-                query_stats[query] = {"wave": wave, "results": len(arts)}
             except Exception as e:  # noqa: BLE001 - one bad beat must not sink the backfill
                 query_stats[query] = {"wave": wave, "error": str(e)[:140]}
-                continue
+                return False
+            query_stats[query] = {"wave": wave, "results": len(arts)}
             for rank, a in enumerate(arts):
                 url = a.get("url")
                 if not url or self._is_blocked(url, a.get("domain", "")):
@@ -246,4 +249,11 @@ class GdeltBackfillRetriever:
                     bodies[cid] = _extract_article(url, cid, res, pulled_at, query, wave)
                 sightings.append({**bodies[cid], "pull_id": pull_id, "pulled_at": pulled_at,
                                   "query": query, "wave": wave, "result_rank": rank})
+            return bool(arts)
+
+        # GDELT rate-limits the FIRST 1-2 requests after any idle gap, so the earliest beats miss. Do a
+        # first pass, then RETRY the missed beats once — by now GDELT is warm and they get through.
+        missed = [(q, w) for q, w in _GDELT_BEATS if not _do(q, w)]
+        for q, w in missed:
+            _do(q, w)
         return sightings, query_stats
