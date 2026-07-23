@@ -128,6 +128,15 @@ def clean_author(author: "str | None", publisher: "str | None" = None) -> "str |
     if not author:
         return None
     a = " ".join(str(author).split())
+    # Multi-part byline ("James Halley; The Motley Fool", "Name; Zacks Equity Research"): keep only the
+    # real-person segments, dropping any wire/brand/staff segment. Skip the garbage "author;" form (caught
+    # below), and only rewrite when a segment was actually dropped (so co-author lists pass through intact).
+    if ";" in a and "author" not in a.lower():
+        parts = [p.strip() for p in a.split(";") if p.strip()]
+        real = [p for p in parts
+                if p.lower() not in _PSEUDO_AUTHORS and not any(s in p.lower() for s in _PSEUDO_SUBSTR)]
+        if real and len(real) < len(parts):
+            a = "; ".join(real)
     al = a.lower()
     if publisher and al == str(publisher).strip().lower():
         return None
