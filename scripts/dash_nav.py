@@ -1,46 +1,46 @@
-"""Shared cross-page nav for the PWR dashboards.
+"""Shared cross-page nav for the PWR dashboards -- the SINGLE source of truth, rendered by EVERY
+dashboard (the scripts/ builders import this module directly; src/portfolio.py's build_dashboard and
+build_curator_dashboard import it via portfolio._nav). One README link plus two grouped families:
 
-The dashboard set is growing (a forward family + a backtest family), so instead of ad-hoc per-page
-links, every dashboard renders THIS one grouped strip. Adding a new dashboard = one line in the
-relevant group below, and it appears in every page's nav.
+  - Backtest    : the historical GKG + Wayback replay -- Retriever -> Curator -> parameter Sweeps.
+  - Forwardtest : the live out-of-sample test -- Retriever (WebSearch corpus) -> Curator.
 
-Two families:
-  - FORWARD  : the live loop (real prices, WebSearch corpus) -> the truth going forward.
-  - BACKTEST : the historical GKG + Wayback replay -> the (in-sample) evidence it was built on.
+Adding a dashboard = one line in the relevant group; it appears in every page's nav. (pool_browser is
+intentionally absent: it's reachable only from the Curator Backtest DB's intro paragraph. The live
+portfolio index.html is the site landing page and is not itself a nav entry.)
 """
 from datetime import datetime
 
-FORWARD = [
-    ("index.html", "Live portfolio"),
-    ("corpus_pwr.html", "Retriever (WebSearch)"),
-    ("forward_test.html", "Forward test"),   # out-of-sample curator replay on the live corpus
-    # future forward pages slot in here, e.g.:
-    # ("forward_sweep.html", "Sweep"),
-]
+README = ("https://github.com/joehahn/portfolio-wave-rider/blob/main/README.md", "README")
 BACKTEST = [
-    ("retrieval_pwr.html", "Retriever (GKG+Wayback)"),
+    ("retrieval_pwr.html", "Retriever"),
     ("backtest_gkg_3yr_kimi.html", "Curator"),
-    ("sweep_pwr.html", "Sweep + LLM judge"),
-    # pool_browser is intentionally NOT here: it's reachable only from the Curator Backtest DB.
+    ("sweep_pwr.html", "Sweeps"),
+]
+FORWARDTEST = [
+    ("corpus_pwr.html", "Retriever"),
+    ("forward_test.html", "Curator"),
 ]
 
 
-def _links(pages, current):
-    out = []
-    for href, name in pages:
-        out.append(f"<b>{name}</b>" if href == current else f'<a href="{href}">{name}</a>')
-    return " &middot; ".join(out)
+def _link(href, name, current):
+    return f"<b>{name}</b>" if href == current else f'<a href="{href}">{name}</a>'
 
 
-def render(current: str, built: bool = True) -> str:
-    """An HTML <nav> with the Forward and Backtest groups; the current page is bold, not a link."""
+def _group(pages, current):
+    return " &middot; ".join(_link(h, n, current) for h, n in pages)
+
+
+def render(current: str = "", built: bool = True) -> str:
+    """An HTML <nav>: README, then the Backtest and Forwardtest groups. The page whose bare filename
+    matches `current` is bold, not a link (so a reader sees which page they're on)."""
     ts = (f'<span style="float:right;color:#aaa;font-weight:normal;">built '
           f'{datetime.now().strftime("%Y-%m-%d %H:%M")}</span>') if built else ""
+    sep = '&nbsp;&nbsp;&nbsp;<span style="color:#ccc;">|</span>&nbsp;&nbsp;&nbsp;'
     return (
         '<nav style="font-size:13px;color:#555;margin:0 0 1.2em;padding-bottom:.5em;'
         'border-bottom:1px solid #eee;">'
-        f'{ts}'
-        f'<span style="color:#999;">FORWARD</span> &nbsp;{_links(FORWARD, current)}'
-        '&nbsp;&nbsp;&nbsp;<span style="color:#ccc;">|</span>&nbsp;&nbsp;&nbsp;'
-        f'<span style="color:#999;">BACKTEST</span> &nbsp;{_links(BACKTEST, current)}'
+        f'{ts}{_link(*README, current)}{sep}'
+        f'<span style="color:#999;">Backtest</span> &nbsp;{_group(BACKTEST, current)}{sep}'
+        f'<span style="color:#999;">Forwardtest</span> &nbsp;{_group(FORWARDTEST, current)}'
         '</nav>')

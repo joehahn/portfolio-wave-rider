@@ -2161,8 +2161,20 @@ _NAV_PAGES: list[tuple[str, str]] = [
 ]
 
 
+def _nav(current: str) -> str:
+    """Render the shared dashboard nav. scripts/dash_nav.py is the SINGLE source of truth for the nav
+    (README + Backtest + Forwardtest groups), imported here so every dashboard -- the scripts/ builders
+    and these portfolio dashboards -- renders the identical strip."""
+    import sys as _sys
+    _sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
+    import dash_nav
+    return dash_nav.render(current)
+
+
 def _nav_strip(current: str, pages: "list[tuple[str, str]] | None" = None) -> str:
-    """Return an HTML <nav> with links to published pages.
+    """Legacy per-page nav (superseded by _nav / dash_nav). Kept only so any un-migrated caller still
+    renders; the live dashboards all use _nav now.
+    Return an HTML <nav> with links to published pages.
     The entry whose filename matches ``current`` is rendered as bold text
     instead of a link, so a reader can see which page they're on. The strip
     also carries a right-aligned "generated <local time>" stamp — the moment
@@ -3454,7 +3466,7 @@ def build_dashboard(
         'max-width:1280px;margin:0 auto;padding:1em 1.5em;color:#222;}'
         'th,td{border-bottom:1px solid #eee;}</style>'
         '</head><body>'
-        + _nav_strip("index.html")
+        + _nav("index.html")
         + live_params_html
         + chart_html
         + ticker_links
@@ -4447,15 +4459,7 @@ def build_curator_dashboard(
         'table{margin-top:0.5em;}'
         'th,td{border-bottom:1px solid #eee;}'
         '</style></head><body>'
-        + _nav_strip(Path(out_path).name, pages=[
-            ("index.html", "live dashboard"),
-            ("corpus_pwr.html", "retriever (WebSearch)"),
-            ("retrieval_pwr.html", "retriever (GKG+Wayback)"),
-            ("forward_test.html", "forward test"),
-            ("backtest_gkg_3yr_kimi.html", "curator backtest"),
-            ("sweep_pwr.html", "sweep"),
-            # pool browser is linked from the first paragraph below, not the navbar.
-        ]) +
+        + _nav(Path(out_path).name) +
         f'<h1>Curator Backtest '
         f'<span style="font-size:0.55em;color:#666;font-weight:400;">'
         f'— {start.date()} to {end.date()}</span></h1>'

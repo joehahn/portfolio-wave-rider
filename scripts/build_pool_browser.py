@@ -17,6 +17,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
+import dash_nav  # noqa: E402
 import gkg_pool as g  # noqa: E402
 
 
@@ -65,11 +66,7 @@ th{{position:sticky;top:0;background:#fff;border-bottom:2px solid #ddd;cursor:de
 .tier{{font-size:11px;color:#868e96}}.lede{{color:#495057}}
 .summ{{color:#555;font-size:13px;margin:.3em 0 1em}}
 </style></head><body>
-<nav><a href="https://github.com/joehahn/portfolio-wave-rider/blob/main/README.md">README</a>
- &middot; <a href="retrieval_pwr.html">Retriever DB</a>
- &middot; <a href="backtest_gkg_3yr_kimi.html">Curator DB</a>
- &middot; <a href="forward_test.html">Forward test</a>
- &middot; <a href="sweep_pwr.html">Sweep DB</a></nav>
+{dash_nav.render("pool_browser.html")}
 <h1>Curator pool browser</h1>
 <p class="summ">Exactly what the curator receives each rebalance: the ranked article list (title, source,
 effective lede, and where the lede came from). <b>Effective lede</b> = clean Wayback snapshot if present,
