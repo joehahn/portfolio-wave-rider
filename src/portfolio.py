@@ -4242,19 +4242,29 @@ def build_curator_dashboard(
     def _to_html(f):
         return f.to_html(full_html=False, include_plotlyjs=False, config=_EXTRA_CFG)
 
-    # (a) Allocation over time: stacked-area of per-ticker weight %, cash fills to 100%.
+    # (a) Allocation over time: stacked-area of per-ticker weight %. The always_include safe-haven
+    # anchors (SPY/AGG/IAU) are COLLAPSED into one band so the wave-pick vs defensive split is legible;
+    # cash (unallocated) fills to 100%.
     _piv = snaps.pivot_table(index="date", columns="ticker", values="value", aggfunc="first").fillna(0.0)
     _tot = _piv.sum(axis=1).replace(0, float("nan"))
     _w = _piv.div(_tot, axis=0).fillna(0.0) * 100.0
     _cash = (100.0 - _w.sum(axis=1)).clip(lower=0)
-    _order = _w.sum().sort_values(ascending=False).index.tolist()
+    _anchors = [a for a in (load_financial_model().get("always_include") or []) if a in _w.columns]
+    _picks = [c for c in _w.columns if c not in _anchors]
+    _order = _w[_picks].sum().sort_values(ascending=False).index.tolist() if _picks else []
     _af = go.Figure()
     for _t in _order:
         _af.add_trace(go.Scatter(x=_w.index, y=_w[_t], name=str(_t), mode="lines",
                                  stackgroup="a", line={"width": 0.4}))
+    if _anchors:
+        _anchor_w = _w[_anchors].sum(axis=1)
+        if float(_anchor_w.max()) > 0.1:
+            _af.add_trace(go.Scatter(x=_w.index, y=_anchor_w, mode="lines", stackgroup="a",
+                                     name="safe-haven anchors (" + "·".join(_anchors) + ")",
+                                     line={"width": 0.4, "color": "#9aa5b1"}))
     if float(_cash.max()) > 0.1:
         _af.add_trace(go.Scatter(x=_cash.index, y=_cash, name="cash", mode="lines",
-                                 stackgroup="a", line={"width": 0.4, "color": "#adb5bd"}))
+                                 stackgroup="a", line={"width": 0.4, "color": "#ced4da"}))
     _af.update_layout(template="seaborn", height=400, margin={"t": 20, "l": 60, "r": 30},
                       yaxis={"title": "% of portfolio", "range": [0, 100]},
                       xaxis={"range": [start, end]})
@@ -4430,7 +4440,7 @@ def build_curator_dashboard(
     )
     page = (
         '<!doctype html><html><head><meta charset="utf-8">'
-        '<title>Portfolio Wave Rider — curator backtest</title>'
+        '<title>Portfolio Wave Rider — Curator Backtest</title>'
         '<style>body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;'
         'max-width:1180px;margin:0 auto;padding:0 1.5em;color:#222;line-height:1.5;}'
         'h1,h2{color:#111;}'
@@ -4446,7 +4456,7 @@ def build_curator_dashboard(
             ("sweep_pwr.html", "sweep"),
             ("pool_browser.html", "pool browser"),
         ]) +
-        f'<h1>Curator-driven backtest '
+        f'<h1>Curator Backtest '
         f'<span style="font-size:0.55em;color:#666;font-weight:400;">'
         f'— {start.date()} to {end.date()}</span></h1>'
         f'<p style="color:#555;max-width:780px;">The watchlist-curator agent was called '

@@ -306,13 +306,13 @@ def build(run_rel, out):
     ts = datetime.now().strftime("%Y-%m-%d %H:%M %Z").strip()
 
     page = (
-        '<!doctype html><html><head><meta charset="utf-8"><title>PWR — news retrieval dashboard</title>'
+        '<!doctype html><html><head><meta charset="utf-8"><title>Retriever Backtest</title>'
         '<style>body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;'
         'max-width:1180px;margin:0 auto;padding:0 1.5em;color:#222;line-height:1.5}h1,h2{color:#111}'
         '.built{position:absolute;top:8px;right:16px;font-size:12px;color:#888}</style></head><body>'
         f'<div class="built">dashboard built {ts}</div>'
         + dash_nav.render("retrieval_pwr.html", built=False) +
-        '<h1>News retrieval dashboard — GKG + Wayback (upstream of the curator)</h1>'
+        '<h1>Retriever Backtest — GKG + Wayback (upstream of the curator)</h1>'
         '<p style="color:#555">Judges the <b>news gathering</b>, not portfolio gains: completeness of the '
         'historical pull and whether the calendar has gaps, upstream of the curator and free of '
         'PageRank-mooning. The pool the curator actually receives is the <b>ranked top-100</b> '

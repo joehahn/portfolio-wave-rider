@@ -117,11 +117,9 @@ def main() -> int:
         runs_dir=str(RUN_DIR), out_dir=str(OUT_DIR), max_weight=fm["concentration_cap"],
         risk_aversion=fm["risk_aversion"], risk_free_rate=fm["risk_free_rate"], benchmarks=["SPY"],
         lookback_years_override=fm["optimizer_lookback_days"] / 365.0, always_include=anchors)
-    config_note = (
-        f"curator_model: {model}  ·  FORWARD (out-of-sample) test on the live corpus  ·  "
-        f"concentration_cap: {fm['concentration_cap']:.2f}  ·  risk_aversion λ: {fm['risk_aversion']:g}  ·  "
-        f"optimizer_lookback_days: {int(fm['optimizer_lookback_days'])}  ·  news_lookback_days: {news_lb}  ·  "
-        f"rebalance: {fm['rebalance_period']}  ·  max_watchlist_size: {max_size}")
+    # Just framing (NOT the parameter list -- those are in the Parameter-settings table above plot 1).
+    config_note = ("FORWARD (out-of-sample) test on the live corpus: a curator replay on genuinely-"
+                   "unknowable news. Thin over ~3 weeks; meaningful only as months accrue.")
     portfolio.build_curator_dashboard(
         backtest_dir=str(OUT_DIR), runs_dir=str(RUN_DIR), out_path=str(DASH),
         benchmarks=["SPY"], config_note=config_note)
@@ -132,10 +130,10 @@ def main() -> int:
     # rightmost date advances to `end` on each refresh. (As the forward DB diverges -- seed-vs-WebSearch
     # provenance on the gains-per-source/keyword panels, etc. -- this grows into a full dedicated renderer.)
     html = DASH.read_text()
-    for _old, _new in (("Curator-driven backtest", "Curator-driven forward test"),
-                       ("Portfolio Wave Rider — curator backtest", "Portfolio Wave Rider — curator forward test"),
+    for _old, _new in (("<h1>Curator Backtest ", "<h1>Curator-driven forward test "),
+                       ("Portfolio Wave Rider — Curator Backtest", "Portfolio Wave Rider — curator forward test"),
                        ("Backtest window", "Forward-test window")):
-        html = html.replace(_old, _new)   # targeted: must NOT hit the "curator backtest" nav link label
+        html = html.replace(_old, _new)   # targeted (h1 tag / full title) so the nav-link labels stay intact
     DASH.write_text(html)
 
     print(f"\nforward test: {len(dates)} weekly rebalances {dates[0]}..{dates[-1]} "
