@@ -153,17 +153,21 @@ def build():
         _leghfig([go.Bar(name=_PROVLBL[pv], x=[wave_p[pv][w] for w in allw], y=allw, orientation="h",
                          marker_color=_PROVCOL[pv]) for pv in _PROV_ORDER], "articles")))
 
-    # 4. Top sources — horizontal, colored by authority tier (mirrors retrieval_pwr plot 7)
-    _TIERCOL = {"specialty": "#22c55e", "major": "#3b82f6", "other": "#9ca3af"}
-    src = Counter(a.get("source_domain", "?") for a in arts).most_common(15)[::-1]
-    _scol = [_TIERCOL[_corpus.source_tier(s)] for s, _ in src]
+    # 4. Top sources — horizontal, split by feed (orange = GKG+Wayback seed contribution)
+    _topsrc = [s for s, _ in Counter(a.get("source_domain", "?") for a in arts).most_common(15)]
+    src_p = {"websearch": Counter(), "backfill": Counter()}
+    for a in arts:
+        d = a.get("source_domain", "?")
+        if d in _topsrc:
+            src_p[_prov(a)][d] += 1
+    _sorder = sorted(_topsrc, key=lambda d: src_p["websearch"][d] + src_p["backfill"][d])   # ascending -> top
     figs.append((
-        "4. Top sources (color = authority tier)",
-        "green = specialty desk (news_sources.md prose, weight 2.0), blue = major wire (source_major, 1.5), "
-        "grey = other. source_block junk already excluded upstream. (Kept on tier color, not feed: the "
-        "GKG+Wayback seed is authority-ranked so it skews to recognized desks; the daily WebSearch feed adds the rest.)",
-        _hfig([go.Bar(x=[c for _, c in src], y=[s for s, _ in src], orientation="h",
-                      marker_color=_scol)], "articles", height=400, left=200)))
+        "4. Top sources (color = feed)",
+        "top source domains by article count, split by feed: the <b style=\"color:#f59e0b;\">GKG+Wayback "
+        "seed</b> contribution (authority-ranked, so it skews to recognized desks) vs the daily "
+        "<b style=\"color:#3b82f6;\">WebSearch</b> pulls. source_block junk excluded upstream",
+        _leghfig([go.Bar(name=_PROVLBL[pv], x=[src_p[pv][d] for d in _sorder], y=_sorder, orientation="h",
+                         marker_color=_PROVCOL[pv]) for pv in _PROV_ORDER], "articles", height=420, left=200)))
 
     # 5. Articles per search term — horizontal, colored by feed (mirrors retrieval_pwr plot 8)
     _pfx = "recent business and stock-market news about "
