@@ -1,9 +1,0 @@
-{
-  "as_of_date": "2025-09-30",
-  "rebalance_period": "quarterly",
-  "adds": [],
-  "removes": [],
-  "no_changes": true,
-  "rationale_overall": "Pass-1 across every named wave turned up no clean, dated, guardrail-compliant candidate: quantum/nuclear-developer hits (IonQ, NuScale) were full-year 2025/2026 stats postdating 2025-09-30; Middle East reconstruction beneficiaries (Daewoo E&C, Samsung E&A, GS E&C) are Korean listings failing the US-listed guardrail; eldercare REIT results were dated after the as-of. Pass-2 confirms the incumbents intact: MSFT's FY25 Q4 (Jul 30) Azure +39% with FY26 capex over $30B/quarter; NVDA's Q2 FY26 (Aug 27) data-center $41.1B +56% YoY; CEG's Q2 plus a Sep 10 rally reaffirmed AI-datacenter power demand feeding nuclear. No dated signal clears a swap at cap=3. Hold MSFT/NVDA/CEG.",
-  "search_terms": ["AI stocks news after:2025-07-01 before:2025-10-01", "space stocks rocket launch stocks after:2025-07-01 before:2025-10-01", "robotics stocks humanoid robot stocks after:2025-07-01 before:2025-10-01", "quantum computing stocks after:2025-07-01 before:2025-10-01", "nuclear stocks SMR stocks after:2025-07-01 before:2025-10-01", "defense stocks defense ETF rearmament after:2025-07-01 before:2025-10-01", "tanker stocks shipping stocks oil after:2025-07-01 before:2025-10-01", "Middle East reconstruction stocks ceasefire after:2025-07-01 before:2025-10-01", "healthcare stocks eldercare REIT aging population demographics stocks after:2025-07-01 before:2025-10-01", "Microsoft MSFT news after:2025-07-01 before:2025-10-01", "Nvidia NVDA news after:2025-07-01 before:2025-10-01", "Constellation Energy CEG news after:2025-07-01 before:2025-10-01"]
-}

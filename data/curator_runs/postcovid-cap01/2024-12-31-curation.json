@@ -1,9 +1,0 @@
-{
-  "as_of_date": "2024-12-31",
-  "rebalance_period": "quarterly",
-  "adds": [],
-  "removes": [],
-  "no_changes": true,
-  "rationale_overall": "Single-slot watchlist (cap=1) stays NVDA. Q4 2024 evidence shows continuation, not a crest: Nvidia's Q3 FY25 call reported Blackwell and Hopper shipping into Q4 with demand outstripping supply, and Blackwell volume was on track to scale in December. I weighed swapping into a nuclear name on the Oct hyperscaler SMR wave (Alphabet-Kairos Oct 14, Amazon-X-energy Oct 16, AWS-Talen PPA) and the post-election nuclear rally, but every nuclear name targets commissioning in the early 2030s — a multi-year runway versus NVDA's monetizing-today Blackwell ramp. A pre-revenue SMR swap in a one-ticker slot is a downgrade in exposure quality. Hold NVDA.",
-  "search_terms": ["AI stocks news after:2024-10-01 before:2025-01-01", "nuclear stocks SMR news after:2024-10-01 before:2025-01-01", "space stocks rocket launch news after:2024-10-01 before:2025-01-01", "robotics stocks humanoid robot news after:2024-10-01 before:2025-01-01", "quantum computing stocks news after:2024-10-01 before:2025-01-01", "defense stocks defense ETF news after:2024-10-01 before:2025-01-01", "geopolitics tanker shipping stocks after:2024-10-01 before:2025-01-01", "healthcare eldercare REIT aging population stocks after:2024-10-01 before:2025-01-01", "NVDA Nvidia Blackwell shipping news after:2024-10-01 before:2025-01-01", "AWS Talen Amazon X-energy nuclear SMR October 2024"]
-}

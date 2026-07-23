@@ -38,7 +38,7 @@ import dash_nav  # shared cross-page nav (Forward | Backtest groups)  # noqa: E4
 import gkg_pool as g  # noqa: E402  (wave/domain-tier classifiers; needs the repo's scripts/ on path)
 
 ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_RUN_REL = "data/curator_runs/gkg-2yr-weekly"   # data folder (relative to repo root)
+DEFAULT_RUN_REL = "data/curator_runs/gkg-3yr-final"   # the canonical backtest run (relative to repo root)
 
 BLUE, GREEN, ORANGE, RED, GREY = "#1f77b4", "#2ca02c", "#ff7f0e", "#e03131", "#adb5bd"
 DOW = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]

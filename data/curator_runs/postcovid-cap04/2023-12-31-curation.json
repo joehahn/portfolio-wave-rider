@@ -1,9 +1,0 @@
-{
-  "as_of_date": "2023-12-31",
-  "rebalance_period": "quarterly",
-  "adds": [],
-  "removes": [],
-  "no_changes": true,
-  "rationale_overall": "All four holdings show thesis-reinforcing news: MSFT's Copilot for M365 went GA Nov 1 with marquee adopters (Visa, BP, Honda, Pfizer); GOOGL shipped Gemini 1.0 on Dec 6 (its first frontier-model answer to GPT-4); NVDA remains the AI-chip bottleneck; STNG's tanker thesis strengthened on the Oct 7 war and Houthi Red Sea disruptions lengthening voyages and tightening capacity. Pass-1 flagged SHLD (Global X Defense Tech ETF, launched Sep 2023, listing-clean) on a genuine Oct-7 defense pop, but at cap=4 an add needs a paired remove and none of the four shows a breach or peak-overpricing signal. Hold MSFT/GOOGL/NVDA/STNG; SHLD stays a watch item.",
-  "search_terms": ["AI stocks after:2023-10-01 before:2024-01-01", "space stocks after:2023-10-01 before:2024-01-01", "rocket launch stocks after:2023-10-01 before:2024-01-01", "robotics stocks after:2023-10-01 before:2024-01-01", "quantum computing stocks after:2023-10-01 before:2024-01-01", "nuclear stocks SMR after:2023-10-01 before:2024-01-01", "shipping tanker stocks after:2023-10-01 before:2024-01-01", "defense stocks defense ETF after:2023-10-01 before:2024-01-01", "healthcare eldercare REIT stocks aging population after:2023-10-01 before:2024-01-01", "Red Sea shipping tariffs geopolitics after:2023-10-01 before:2024-01-01", "Global X Defense Tech ETF SHLD launch date before:2024-01-01", "GOOGL Google Gemini launch after:2023-10-01 before:2024-01-01", "STNG Scorpio Tankers news after:2023-10-01 before:2024-01-01", "Microsoft Copilot launch November 2023 after:2023-10-01 before:2024-01-01"]
-}

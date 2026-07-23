@@ -1,9 +1,0 @@
-{
-  "as_of_date": "2025-09-30",
-  "rebalance_period": "quarterly",
-  "adds": [],
-  "removes": [],
-  "no_changes": true,
-  "rationale_overall": "Single-slot watchlist (cap=1) remains NVDA. Pass-1 across every named wave surfaced no dated pre-2025-10-01 signal strong enough to displace the AI wave's clearest large-cap exposure. Candidates that surfaced (Firefly, Voyager — mid-2025 IPOs; KOID robotics ETF, June 2025) carry too little history to responsibly become a sole full-portfolio position. Pass-2 found no in-window negative catalyst for NVDA (Q2 hyperscaler capex prints carried some overbuilding-risk commentary but nothing dated before 2025-10-01 rose to a thesis breach). Hold NVDA.",
-  "search_terms": ["AI stocks news after:2025-07-01 before:2025-10-01", "space stocks rocket launch stocks news after:2025-07-01 before:2025-10-01", "robotics stocks humanoid robot stocks news after:2025-07-01 before:2025-10-01", "quantum computing stocks news after:2025-07-01 before:2025-10-01", "nuclear stocks SMR stocks news after:2025-07-01 before:2025-10-01", "tanker stocks shipping stocks freight news after:2025-07-01 before:2025-10-01", "defense stocks defense ETF rearmament news after:2025-07-01 before:2025-10-01", "Middle East reconstruction stocks ceasefire news after:2025-07-01 before:2025-10-01", "healthcare stocks eldercare REIT aging population stocks news after:2025-07-01 before:2025-10-01", "NVDA Nvidia news after:2025-07-01 before:2025-10-01", "hyperscaler capex overbuilding risk AI data center after:2025-07-01 before:2025-10-01"]
-}

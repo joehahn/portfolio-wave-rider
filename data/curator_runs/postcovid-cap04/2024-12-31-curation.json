@@ -1,9 +1,0 @@
-{
-  "as_of_date": "2024-12-31",
-  "rebalance_period": "quarterly",
-  "adds": [],
-  "removes": [],
-  "no_changes": true,
-  "rationale_overall": "Pass-1 surfaced legitimate buildup candidates across every next-wave (RKLB in rockets; IONQ/QBTS/RGTI riding the quantum rally after GOOGL's Dec 9 Willow chip; the new EUAD European defense ETF; healthcare REITs on demographics), but at cap=4 an add requires displacing a holding, and Pass-2 found no breach or peak signal against MSFT/GOOGL/NVDA/CEG: MSFT and NVDA ride Blackwell adoption, GOOGL extended its AI lead into quantum with Willow (incidental quantum exposure), and CEG's nuclear-for-AI-datacenter PPA thesis remains intact (Talen-AWS precedent). The Nov 5 election produced a broad rally, not a targeted catalyst. Hold MSFT/GOOGL/NVDA/CEG.",
-  "search_terms": ["AI stocks after:2024-10-01 before:2025-01-01", "space stocks rocket launch after:2024-10-01 before:2025-01-01", "robotics stocks humanoid robot after:2024-10-01 before:2025-01-01", "quantum computing stocks after:2024-10-01 before:2025-01-01", "nuclear stocks SMR after:2024-10-01 before:2025-01-01", "tanker stocks shipping freight geopolitics after:2024-10-01 before:2025-01-01", "defense stocks defense ETF rearmament after:2024-10-01 before:2025-01-01", "eldercare REIT healthcare aging population stocks after:2024-10-01 before:2025-01-01", "MSFT Microsoft news after:2024-10-01 before:2025-01-01", "GOOGL Alphabet Willow quantum chip after:2024-10-01 before:2025-01-01", "NVDA Nvidia Blackwell news after:2024-10-01 before:2025-01-01", "CEG Constellation Energy nuclear PPA news after:2024-10-01 before:2025-01-01", "IONQ QBTS RGTI quantum computing stock surge December 2024"]
-}

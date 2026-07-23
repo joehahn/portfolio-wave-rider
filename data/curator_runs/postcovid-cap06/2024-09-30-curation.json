@@ -1,9 +1,0 @@
-{
-  "as_of_date": "2024-09-30",
-  "rebalance_period": "quarterly",
-  "adds": [],
-  "removes": [],
-  "no_changes": true,
-  "rationale_overall": "Every holding cleared diligence with fresh in-window catalysts: the Sep 20 Microsoft-Constellation Three Mile Island PPA directly validates the SMR/fission nuclear wave and strongly supports OKLO; NVDA's Aug 28 Q2 FY25 (record $30.0B revenue, $26.3B data-center, $50B buyback) shows AI still in buildup; RKLB's Aug 8 Q2 (record $106M revenue +71% YoY) plus the Archimedes hot-fire and LC-3 completion confirm Neutron progress; IONQ's Sep 25 $54.5M AFRL quantum-networking award (largest 2024 US quantum contract) reinforces quantum; ITA's defense thesis holds amid Sep Israel-Hezbollah escalation. A tanker candidate (FRO) surfaced on Red Sea rerouting but at cap=6 no incumbent showed a breach to fund it. Hold unchanged; FRO carried forward.",
-  "search_terms": ["AI stocks news after:2024-07-01 before:2024-10-01", "space stocks rocket launch news after:2024-07-01 before:2024-10-01", "robotics stocks humanoid robot news after:2024-07-01 before:2024-10-01", "quantum computing stocks news after:2024-07-01 before:2024-10-01", "nuclear stocks SMR news after:2024-07-01 before:2024-10-01", "defense stocks defense ETF news after:2024-07-01 before:2024-10-01", "tanker stocks shipping oil freight news after:2024-07-01 before:2024-10-01", "eldercare REIT healthcare stocks aging population news after:2024-07-01 before:2024-10-01", "Microsoft Constellation Three Mile Island nuclear PPA September 2024", "IONQ IonQ AFRL quantum networking contract September 2024", "RKLB Rocket Lab Q2 2024 earnings Neutron Archimedes August 2024", "NVDA Nvidia earnings August 2024 after:2024-07-01 before:2024-10-01", "OKLO Oklo stock news Q3 2024 after:2024-07-01 before:2024-10-01", "ITA aerospace defense ETF Israel Hezbollah September 2024"]
-}

@@ -1,9 +1,0 @@
-{
-  "as_of_date": "2024-03-31",
-  "rebalance_period": "quarterly",
-  "adds": [],
-  "removes": [],
-  "no_changes": true,
-  "rationale_overall": "All four holdings show dated in-window evidence reinforcing their thesis: NVDA's Feb 21 FY24 Q4 (data-center +409% YoY, GB200/Blackwell previewed), MSFT's Jan 30 FY24 Q2 (Azure +30%, $30/seat Copilot add-on), GOOGL's Jan 30 Q4 (Cloud strength plus Gemini 1.0/1.5 rollout), and STNG's Feb 13-14 Q4 (raised dividend on Red Sea/Houthi tanker-rate strength). Pass-1 surfaced credible next-wave candidates (LUNR/ASTS, NuScale/BWX, NHI/CTRE, RGTI/IONQ) but at cap=4 none clears the bar for a paired swap against a thesis-intact incumbent. Hold MSFT/GOOGL/NVDA/STNG.",
-  "search_terms": ["AI stocks after:2024-01-01 before:2024-04-01", "space stocks after:2024-01-01 before:2024-04-01", "robotics stocks after:2024-01-01 before:2024-04-01", "quantum computing stocks after:2024-01-01 before:2024-04-01", "nuclear SMR stocks after:2024-01-01 before:2024-04-01", "tanker stocks Red Sea Houthi after:2024-01-01 before:2024-04-01", "defense stocks ETF after:2024-01-01 before:2024-04-01", "eldercare REIT stocks after:2024-01-01 before:2024-04-01", "MSFT news after:2024-01-01 before:2024-04-01", "GOOGL news Gemini after:2024-01-01 before:2024-04-01", "NVDA news GB200 after:2024-01-01 before:2024-04-01", "STNG Scorpio Tankers news after:2024-01-01 before:2024-04-01", "Nvidia Q4 fiscal 2024 earnings February 21 2024 data center revenue", "Scorpio Tankers Q4 2023 earnings February 2024 dividend"]
-}

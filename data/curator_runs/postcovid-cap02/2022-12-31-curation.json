@@ -1,9 +1,0 @@
-{
-  "as_of_date": "2022-12-31",
-  "rebalance_period": "quarterly",
-  "adds": [],
-  "removes": [],
-  "no_changes": true,
-  "rationale_overall": "At a hard cap of 2, both holdings screen as strong dated AI-wave exposure into Q1 2023: ChatGPT launched 2022-11-30 and drove viral adoption, reinforcing Microsoft as the cleanest large-cap AI-platform proxy via its OpenAI partnership, while Nvidia's Q3 FY2023 print showed AI-driven demand commentary even as the broader chip cycle cooled. Pass-1 across the other named waves turned up only routine, non-catalytic items (NuScale Q3, defense order flow already priced, tightening tanker rates) — none strong enough to displace MSFT or NVDA at a 2-slot cap. Post-date material (Microsoft-OpenAI $10B, Jan 2023) was correctly discarded. No swap; watchlist stays MSFT/NVDA.",
-  "search_terms": ["ChatGPT Microsoft OpenAI investment news after:2022-10-01 before:2023-01-01", "Nvidia stock news Q4 2022 after:2022-10-01 before:2023-01-01", "space stocks rocket launch stocks news after:2022-10-01 before:2023-01-01", "robotics stocks news after:2022-10-01 before:2023-01-01", "quantum computing stocks news after:2022-10-01 before:2023-01-01", "nuclear stocks SMR news after:2022-10-01 before:2023-01-01", "defense stocks rearmament Ukraine war news after:2022-10-01 before:2023-01-01", "tanker freight shipping stocks oil reserves news after:2022-10-01 before:2023-01-01", "healthcare eldercare REIT aging population stocks news after:2022-10-01 before:2023-01-01", "best performing etf this month after:2022-10-01 before:2023-01-01", "Microsoft stock news December 2022 after:2022-10-01 before:2023-01-01", "Nvidia stock outlook AI demand December 2022 after:2022-10-01 before:2023-01-01"]
-}

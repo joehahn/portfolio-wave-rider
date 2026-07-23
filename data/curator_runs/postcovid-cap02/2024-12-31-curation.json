@@ -1,9 +1,0 @@
-{
-  "as_of_date": "2024-12-31",
-  "rebalance_period": "quarterly",
-  "adds": [],
-  "removes": [],
-  "no_changes": true,
-  "rationale_overall": "At cap=2, the watchlist holds the two clearest AI 'ride' exposures (MSFT, NVDA). Pass-1 across every named wave surfaced no ticker with a clean dated pre-2025 milestone strong enough to displace either; many search results were dated 2025-2026 and discarded per as-of discipline. The in-window signals (Trump's Nov 5 re-election, Blackwell shipping at scale in December) support holding NVDA (direct beneficiary) and MSFT (largest Azure AI-compute buyer) rather than a swap; no crest-trim trigger for AI has appeared. Hold MSFT/NVDA.",
-  "search_terms": ["AI stocks after:2024-10-01 before:2025-01-01", "space stocks rocket launch stocks after:2024-10-01 before:2025-01-01", "robotics stocks humanoid robot stocks after:2024-10-01 before:2025-01-01", "quantum computing stocks after:2024-10-01 before:2025-01-01", "nuclear stocks SMR stocks after:2024-10-01 before:2025-01-01", "defense stocks defense ETF after:2024-10-01 before:2025-01-01", "tanker stocks shipping stocks geopolitics after:2024-10-01 before:2025-01-01", "healthcare stocks eldercare REIT aging population demographics stocks after:2024-10-01 before:2025-01-01", "NVDA Nvidia news Blackwell after:2024-10-01 before:2025-01-01", "MSFT Microsoft news Azure AI after:2024-10-01 before:2025-01-01", "Oklo OKLO news Meta nuclear after:2024-10-01 before:2025-01-01"]
-}

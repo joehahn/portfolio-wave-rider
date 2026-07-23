@@ -1,9 +1,0 @@
-{
-  "as_of_date": "2022-12-31",
-  "rebalance_period": "quarterly",
-  "adds": [],
-  "removes": [],
-  "no_changes": true,
-  "rationale_overall": "The trailing 90-day window confirms rather than breaches the thesis. ChatGPT's Nov 30 2022 launch is the period's dominant AI catalyst and validates the existing MSFT/GOOGL/NVDA exposure rather than pointing outside it. STNG's Q3 2022 results (net income $266.2M vs a prior-year loss), new multi-year time charters at strong day rates, a debt-reducing tanker purchase, and a declared dividend all confirm the tanker/geopolitical thesis amid continued Russia-sanctions-driven tightness. Pass-1 across every other named wave surfaced no ticker with a dated in-window milestone strong enough to clear the add bar; the one nuclear item (NuScale's CFPP cancellation Nov 8 2022) is a negative, not a buildup, signal. With no add clearing the bar there is no basis to force a swap. Hold MSFT/GOOGL/NVDA/STNG.",
-  "search_terms": ["AI stocks after:2022-10-01 before:2023-01-01", "space stocks rocket launch after:2022-10-01 before:2023-01-01", "robotics stocks after:2022-10-01 before:2023-01-01", "quantum computing stocks after:2022-10-01 before:2023-01-01", "nuclear stocks SMR after:2022-10-01 before:2023-01-01", "geopolitics tanker shipping stocks after:2022-10-01 before:2023-01-01", "defense stocks defense ETF after:2022-10-01 before:2023-01-01", "healthcare eldercare REIT aging population demographics stocks after:2022-10-01 before:2023-01-01", "best performing etf this month after:2022-10-01 before:2023-01-01", "NuScale Power SMR news after:2022-10-01 before:2023-01-01", "MSFT Microsoft recent news after:2022-10-01 before:2023-01-01", "GOOGL Alphabet recent news after:2022-10-01 before:2023-01-01", "NVDA Nvidia recent news after:2022-10-01 before:2023-01-01", "STNG Scorpio Tankers recent news after:2022-10-01 before:2023-01-01"]
-}

@@ -1,9 +1,0 @@
-{
-  "as_of_date": "2024-03-31",
-  "rebalance_period": "quarterly",
-  "adds": [],
-  "removes": [],
-  "no_changes": true,
-  "rationale_overall": "At cap=2 the bar for a swap is a dated breach/peak on an incumbent plus a specific alternative in buildup with commercial evidence. Neither holds: NVDA delivered a Feb 21 Q4 FY24 print (revenue $22.1B +265% YoY; data-center $18.4B +409% YoY) and unveiled Blackwell/GB200 at GTC Mar 18, both mid-surge not peak; MSFT's Jan 30 FQ2 showed Azure accelerating (Intelligent Cloud $25.9B +20%) with AI monetization ramping, no breach. Pass-1 across every next-wave surfaced only diffuse non-dated-catalyst chatter this quarter, nothing strong enough to displace either incumbent at a 2-slot cap. Hold MSFT/NVDA.",
-  "search_terms": ["AI stocks news after:2024-01-01 before:2024-04-01", "space stocks rocket launch stocks after:2024-01-01 before:2024-04-01", "robotics stocks humanoid robot after:2024-01-01 before:2024-04-01", "quantum computing stocks after:2024-01-01 before:2024-04-01", "nuclear stocks SMR stocks after:2024-01-01 before:2024-04-01", "tanker stocks shipping stocks freight rates after:2024-01-01 before:2024-04-01", "defense stocks defense ETF rearmament after:2024-01-01 before:2024-04-01", "healthcare stocks eldercare REIT aging population after:2024-01-01 before:2024-04-01", "NVDA Nvidia news Q4 earnings GTC GB200 after:2024-01-01 before:2024-04-01", "MSFT Microsoft news Copilot OpenAI after:2024-01-01 before:2024-04-01", "Microsoft Azure earnings January 2024 fiscal Q2 2024 results"]
-}

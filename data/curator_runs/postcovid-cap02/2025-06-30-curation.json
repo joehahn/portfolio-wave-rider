@@ -1,9 +1,0 @@
-{
-  "as_of_date": "2025-06-30",
-  "rebalance_period": "quarterly",
-  "adds": [],
-  "removes": [],
-  "no_changes": true,
-  "rationale_overall": "At cap=2, the watchlist holds one ticker per the two most active in-window theses: NVDA for AI (Q1 print guided Q2 toward ~$91B; a recovery/continuation of the buildout after the April tariff shock, not a crest) and RTX for defense (a ~$1.11B Navy contract modification in June, plus the late-June Israel-Iran conflict spiking missile-defense/interceptor demand). Neither shows a dated breach or peak signal, and no other-wave candidate cleared a cleanly-dated buildup bar stronger than these. Hold NVDA/RTX.",
-  "search_terms": ["AI stocks news after:2025-04-01 before:2025-07-01", "space stocks rocket launch news after:2025-04-01 before:2025-07-01", "robotics stocks humanoid robot news after:2025-04-01 before:2025-07-01", "quantum computing stocks news after:2025-04-01 before:2025-07-01", "nuclear SMR stocks news after:2025-04-01 before:2025-07-01", "defense stocks ETF news after:2025-04-01 before:2025-07-01", "tanker shipping stocks oil news after:2025-04-01 before:2025-07-01", "healthcare eldercare REIT stocks aging population news after:2025-04-01 before:2025-07-01", "NVDA Nvidia news after:2025-04-01 before:2025-07-01", "RTX Raytheon news Navy contract Israel Iran after:2025-04-01 before:2025-07-01"]
-}

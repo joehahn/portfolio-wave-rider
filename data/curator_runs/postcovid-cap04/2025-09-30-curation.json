@@ -1,9 +1,0 @@
-{
-  "as_of_date": "2025-09-30",
-  "rebalance_period": "quarterly",
-  "adds": [],
-  "removes": [],
-  "no_changes": true,
-  "rationale_overall": "All four names posted in-window evidence of continued strength: MSFT's FY25 Q4 (Jul 30) Azure +39%, GOOGL's Q2 (Jul 23) cloud +32% with capex raised to $85B, NVDA's Q2 FY26 (Aug 27) data-center +56% YoY to $41.1B — AI buildout still accelerating into capex. SHLD's top holdings (RTX Jul 22 Q2: sales +9%, backlog $236B, raised guide) and the NATO/EU spending ramp (new 5% target) support defense-tech. Pass-1 surfaced space/nuclear/quantum candidates but none with a verifiable dated in-window catalyst strong enough to drop one of the four at cap=4. Hold MSFT/GOOGL/NVDA/SHLD.",
-  "search_terms": ["AI stocks news after:2025-07-01 before:2025-10-01", "space stocks rocket launch news after:2025-07-01 before:2025-10-01", "robotics stocks humanoid robot news after:2025-07-01 before:2025-10-01", "quantum computing stocks news after:2025-07-01 before:2025-10-01", "nuclear stocks SMR news after:2025-07-01 before:2025-10-01", "defense stocks defense ETF news after:2025-07-01 before:2025-10-01", "Nvidia Q2 fiscal 2026 earnings August 2025 data center revenue", "Alphabet Google Cloud Q2 2025 earnings July 2025 AI capex", "Global X Defense Tech ETF SHLD August September 2025", "European defense spending NATO September 2025", "Microsoft Azure AI capex Q4 fiscal 2025 earnings July 2025", "tanker shipping stocks oil reserves news 2025"]
-}

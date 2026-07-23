@@ -1,9 +1,0 @@
-{
-  "as_of_date": "2024-03-31",
-  "rebalance_period": "quarterly",
-  "adds": [],
-  "removes": [],
-  "no_changes": true,
-  "rationale_overall": "Watchlist at cap 3 (MSFT/NVDA AI, LMT defense). Pass-1 across every named wave found no thesis breach, peak signal, or obsolescence in the three holdings. NVDA's Feb 21 Q4 and GB200/Blackwell rollout confirm AI is still in buildup, no trim signal. LMT's in-window Terran Orbital acquisition bid shows the position is itself gaining space exposure, not a stale defense-only holding. RKLB generated two dated milestones (Jan 8 SDA $515M Tranche 2 award; Feb 21 Varda Winnebago-1 re-entry landing) that would support an add, but at cap=3 an add needs a remove and none of the three clears removal. Hold unchanged; RKLB a live candidate.",
-  "search_terms": ["space stocks rocket launch news after:2024-01-01 before:2024-04-01", "nuclear SMR stocks news after:2024-01-01 before:2024-04-01", "robotics stocks humanoid robot news after:2024-01-01 before:2024-04-01", "quantum computing stocks news after:2024-01-01 before:2024-04-01", "defense stocks defense ETF news after:2024-01-01 before:2024-04-01", "tanker freight shipping stocks oil reserves news after:2024-01-01 before:2024-04-01", "eldercare REIT healthcare aging population stocks news after:2024-01-01 before:2024-04-01", "NVDA Nvidia news Q4 earnings GB200 after:2024-01-01 before:2024-04-01", "MSFT Microsoft news Copilot AI after:2024-01-01 before:2024-04-01", "LMT Lockheed Martin news contract after:2024-01-01 before:2024-04-01", "Rocket Lab Space Development Agency Tranche 2 contract 2024", "Rocket Lab Varda spacecraft return Earth mission February 2024"]
-}

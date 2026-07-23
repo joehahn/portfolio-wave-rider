@@ -1,9 +1,0 @@
-{
-  "as_of_date": "2023-09-30",
-  "rebalance_period": "quarterly",
-  "adds": [],
-  "removes": [],
-  "no_changes": true,
-  "rationale_overall": "No dated Q3-2023 signal rises to a thesis breach or a new buildup story strong enough to bump one of four occupied slots. NVDA's Aug 23 FY24-Q2 beat (record $13.51B revenue, $16B next-quarter guide) reinforces the AI wave; MSFT's Sept 21 Copilot launch extends the same wave; GOOGL's AI-across-Search/YouTube/Cloud framing keeps its exposure intact (Q3 print date falls after this as-of, excluded); STNG's tanker thesis remains supported in-window (stable asset prices, healthy tonne-mile demand, record-low orderbook), its Q3 print likewise post-date and excluded. Pass-1 across robotics/quantum/nuclear/defense/eldercare surfaced only steady-state or out-of-window items. Hold MSFT/GOOGL/NVDA/STNG.",
-  "search_terms": ["space stocks rocket launch news after:2023-07-01 before:2023-10-01", "robotics stocks news after:2023-07-01 before:2023-10-01", "quantum computing stocks news after:2023-07-01 before:2023-10-01", "nuclear SMR stocks news after:2023-07-01 before:2023-10-01", "tanker freight shipping stocks news after:2023-07-01 before:2023-10-01", "defense stocks defense ETF rearmament news after:2023-07-01 before:2023-10-01", "healthcare eldercare REIT aging population stocks news after:2023-07-01 before:2023-10-01", "NVDA Nvidia Q2 2023 earnings August 23 2023 revenue guidance", "MSFT Microsoft news September 2023 AI Copilot", "GOOGL Google Alphabet news September 2023", "Scorpio Tankers STNG stock news Q3 2023 September"]
-}

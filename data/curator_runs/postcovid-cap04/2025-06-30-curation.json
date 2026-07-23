@@ -1,9 +1,0 @@
-{
-  "as_of_date": "2025-06-30",
-  "rebalance_period": "quarterly",
-  "adds": [],
-  "removes": [],
-  "no_changes": true,
-  "rationale_overall": "Watchlist stays MSFT/GOOGL/NVDA/SHLD. Pass-1 across every named wave turned up nothing clearing the guardrails cleanly in-window: the concrete catalyst — Israel's June 13 airstrikes on Iran, lifting Brent and VLCC rates — already flows through the held SHLD defense-tech ETF, so a fresh tanker-ETF add would duplicate that exposure without a distinct commercial catalyst. Rockets (a new space IPO) and nuclear candidates lacked sufficient trading history or datable in-window figures. No breach for MSFT/GOOGL/NVDA — AI news was incremental, not peak or obsolescence. Keep all four.",
-  "search_terms": ["space stocks rocket launch news after:2025-04-01 before:2025-07-01", "robotics stocks humanoid robot news after:2025-04-01 before:2025-07-01", "quantum computing stocks news after:2025-04-01 before:2025-07-01", "nuclear SMR stocks news after:2025-04-01 before:2025-07-01", "defense stocks ETF news after:2025-04-01 before:2025-07-01", "tanker shipping stocks oil geopolitics news after:2025-04-01 before:2025-07-01", "healthcare eldercare REIT aging population stocks news after:2025-04-01 before:2025-07-01", "Israel Iran conflict June 2025 tanker rates oil shipping after:2025-06-01 before:2025-07-01", "SHLD Global X defense ETF stock news after:2025-04-01 before:2025-07-01", "MSFT Microsoft stock news after:2025-04-01 before:2025-07-01", "GOOGL Alphabet stock news after:2025-04-01 before:2025-07-01", "NVDA Nvidia stock news after:2025-04-01 before:2025-07-01"]
-}

@@ -1,9 +1,0 @@
-{
-  "as_of_date": "2023-12-31",
-  "rebalance_period": "quarterly",
-  "adds": [],
-  "removes": [],
-  "no_changes": true,
-  "rationale_overall": "At cap=3 the watchlist covers the quarter's most material signals: NVDA's Q3 FY24 print (Nov 21, record $18.12B, data-center +279% YoY) confirms AI is still in surge; MSFT's Copilot rollout keeps the second AI seat justified; and LMT's defense thesis was reinforced by the Oct 7 Israel-Hamas war (an immediate ~7-8% pop in defense primes) on top of a healthy Q3 print ($16.9B sales, $156.0B backlog, Oct 17). Pass-1 across the other named waves surfaced only thematic color, not a dated milestone strong enough to clear the add guardrails (NuScale hit an all-time low — a negative, not buildup). No breach or peak signal for MSFT/NVDA. Hold unchanged.",
-  "search_terms": ["AI stocks after:2023-10-01 before:2024-01-01", "space stocks rocket launch stocks after:2023-10-01 before:2024-01-01", "robotics stocks humanoid robot stocks after:2023-10-01 before:2024-01-01", "quantum computing stocks after:2023-10-01 before:2024-01-01", "nuclear stocks SMR stocks after:2023-10-01 before:2024-01-01", "tanker stocks shipping stocks geopolitics after:2023-10-01 before:2024-01-01", "defense stocks defense ETF Israel Hamas war after:2023-10-01 before:2024-01-01", "healthcare stocks eldercare aging population demographics after:2023-10-01 before:2024-01-01", "Microsoft MSFT news Copilot AI after:2023-10-01 before:2024-01-01", "Nvidia NVDA news earnings after:2023-10-01 before:2024-01-01", "Lockheed Martin LMT news contract earnings after:2023-10-01 before:2024-01-01", "Lockheed Martin Q3 2023 earnings October 2023 backlog"]
-}

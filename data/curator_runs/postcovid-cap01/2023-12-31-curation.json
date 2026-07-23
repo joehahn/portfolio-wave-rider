@@ -1,9 +1,0 @@
-{
-  "as_of_date": "2023-12-31",
-  "rebalance_period": "quarterly",
-  "adds": [],
-  "removes": [],
-  "no_changes": true,
-  "rationale_overall": "At cap=1 the bar to displace the sole holding is extremely high, and nothing this quarter clears it. NVDA's Q3 FY2024 print (Nov 21 2023) showed record revenue of $18.12B (+206% YoY) and record data-center revenue of $14.51B (+279% YoY), confirming the AI wave is still in buildup/surge despite the Oct 17 tightening of US AI-chip export controls to China (already digested by quarter-end). Pass-1 across every named wave surfaced no single ticker with a Q4-dated catalyst strong enough to justify a sole-exposure swap (NuScale carried negative dated news; IBM's Condor quantum chip is real but IBM is a diversified value name). Hold NVDA.",
-  "search_terms": ["AI stocks news after:2023-10-01 before:2024-01-01", "space stocks rocket launch stocks news after:2023-10-01 before:2024-01-01", "robotics stocks humanoid robot stocks news after:2023-10-01 before:2024-01-01", "quantum computing stocks news after:2023-10-01 before:2024-01-01", "nuclear stocks SMR stocks news after:2023-10-01 before:2024-01-01", "tanker stocks shipping stocks geopolitics news after:2023-10-01 before:2024-01-01", "defense stocks defense ETF rearmament news after:2023-10-01 before:2024-01-01", "healthcare stocks eldercare REIT aging population demographics stocks after:2023-10-01 before:2024-01-01", "NVDA Nvidia news after:2023-10-01 before:2024-01-01", "Nvidia Q3 fiscal 2024 earnings November 21 2023 data center revenue", "Nvidia China export restrictions October 2023 new chip rules"]
-}

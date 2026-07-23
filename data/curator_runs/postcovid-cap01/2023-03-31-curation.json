@@ -1,9 +1,0 @@
-{
-  "as_of_date": "2023-03-31",
-  "rebalance_period": "quarterly",
-  "adds": [],
-  "removes": [],
-  "no_changes": true,
-  "rationale_overall": "Single-slot watchlist (cap=1) holds NVDA, the dominant exposure to the AI ride-now wave. Nvidia's Q4 FY23 results (Feb 22 2023) had CEO Huang describe AI as 'at an inflection point', and GTC 2023 (Mar 20-23) doubled down on generative-AI positioning; contemporaneous March press framed chip names as the way to play the ChatGPT/GPT-4 wave, with H100 demand climbing. Pass-1 across every other named wave found no in-window dated milestone strong enough to displace NVDA at cap=1 (tanker names gave back Jan-Feb gains by late March; broad defense-ETF launches postdate the window). Hold NVDA.",
-  "search_terms": ["AI stocks ChatGPT GPT-4 after:2023-01-01 before:2023-04-01", "space stocks rocket launch stocks after:2023-01-01 before:2023-04-01", "robotics stocks after:2023-01-01 before:2023-04-01", "quantum computing stocks after:2023-01-01 before:2023-04-01", "nuclear stocks SMR stocks after:2023-01-01 before:2023-04-01", "defense stocks defense ETF geopolitics after:2023-01-01 before:2023-04-01", "tanker stocks shipping stocks after:2023-01-01 before:2023-04-01", "healthcare stocks eldercare REIT aging population demographics stocks after:2023-01-01 before:2023-04-01", "best performing etf this month after:2023-01-01 before:2023-04-01", "NVDA Nvidia news March 2023 after:2023-01-01 before:2023-04-01", "Nvidia GPT-4 AI chips demand after:2023-03-01 before:2023-04-01", "Nvidia H100 GPU shortage demand ChatGPT February 2023"]
-}

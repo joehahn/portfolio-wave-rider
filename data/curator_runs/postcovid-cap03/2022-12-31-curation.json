@@ -1,9 +1,0 @@
-{
-  "as_of_date": "2022-12-31",
-  "rebalance_period": "quarterly",
-  "adds": [],
-  "removes": [],
-  "no_changes": true,
-  "rationale_overall": "All three positions still earn their slot. MSFT and GOOGL are the AI proxies for the dominant wave, and the quarter's dated evidence (ChatGPT's Nov 30 2022 launch; Google's reported 'code red' Dec 21 2022) confirms the AI wave is still in early buildup, not at a crest — 2022 was a down year for AI equities, so there is no peak signal to trim on. LMT strengthened on dated contracts (a $521M HIMARS-replenishment award Nov 2022; an Oct 2022 production-capacity award), directly tied to the Ukraine rearmament thesis. A tanker candidate surfaced (Baltic VLCC/Suezmax rates at multi-year highs) but at cap=3 any add needs a paired remove, and none of MSFT/GOOGL/LMT showed a dated breach; logged as a watch item. Hold unchanged.",
-  "search_terms": ["AI stocks after:2022-10-01 before:2023-01-01", "space stocks rocket launch after:2022-10-01 before:2023-01-01", "robotics stocks after:2022-10-01 before:2023-01-01", "quantum computing stocks after:2022-10-01 before:2023-01-01", "nuclear stocks SMR after:2022-10-01 before:2023-01-01", "tanker stocks shipping freight rates after:2022-10-01 before:2023-01-01", "defense stocks defense ETF rearmament after:2022-10-01 before:2023-01-01", "healthcare eldercare REIT aging population stocks after:2022-10-01 before:2023-01-01", "best performing etf this month after:2022-10-01 before:2023-01-01", "MSFT Microsoft news after:2022-10-01 before:2023-01-01", "GOOGL Alphabet Google news after:2022-10-01 before:2023-01-01", "LMT Lockheed Martin news after:2022-10-01 before:2023-01-01", "Google code red ChatGPT response December 2022", "Lockheed Martin Ukraine HIMARS contract Q4 2022", "crude tanker rates November 2022 VLCC Suezmax multi-year highs"]
-}
