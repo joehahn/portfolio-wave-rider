@@ -4454,7 +4454,7 @@ def build_curator_dashboard(
             ("forward_test.html", "forward test"),
             ("backtest_gkg_3yr_kimi.html", "curator backtest"),
             ("sweep_pwr.html", "sweep"),
-            ("pool_browser.html", "pool browser"),
+            # pool browser is linked from the first paragraph below, not the navbar.
         ]) +
         f'<h1>Curator Backtest '
         f'<span style="font-size:0.55em;color:#666;font-weight:400;">'
@@ -4463,7 +4463,7 @@ def build_curator_dashboard(
         f'{_html.escape(_cadence)} over the {start.date()} to {end.date()} window. '
         f'At each rebalance it read a date-clean news pool for the preceding '
         f'{_html.escape(_cadence)} window (built upstream from GDELT&nbsp;GKG + Wayback, '
-        f'look-ahead-reduced) and proposed '
+        f'look-ahead-reduced; browse them in the <a href="pool_browser.html">pool browser</a>) and proposed '
         'adds and removes against the active watchlist; the optimizer then ran '
         'mean-variance on the revised watchlist. Each rebalance is marked by an '
         'orange square on the curator curve in chart 1 — hover over one to see '
