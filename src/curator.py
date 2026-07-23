@@ -109,10 +109,23 @@ def format_pool(articles: list[dict]) -> str:
 
 def build_user_prompt(as_of: str, watchlist: list[str], thesis: str, exclusions: str, max_size: int,
                       anchors: list[str], pool_text: str, cadence: str, intro: str = _BT_INTRO) -> str:
+    # Slot rule depends on how many managed slots are FREE. A blanket "any add needs a paired remove"
+    # is only true at capacity; with free slots the curator may add outright (else it never grows a
+    # sub-full watchlist toward max_size).
+    free = max_size - len(watchlist)
+    if free > 0:
+        slot_rule = (f"{free} of the {max_size} managed slots are FREE: you may ADD up to {free} name(s) "
+                     f"with NO paired remove; once full, a further add needs a paired remove.")
+        action_rule = ("Fill a free slot with a clearly rising wave vehicle when the pool shows one, or swap "
+                       "a weaker current holding for a stronger name; else no_changes.")
+    else:
+        slot_rule = "The watchlist is FULL: any ADD needs a paired REMOVE, or no_changes."
+        action_rule = ("Only swap (add+remove together) if a clearly stronger rising wave vehicle appears vs a "
+                       "current holding, else no_changes.")
     return f"""{intro}
 - as_of_date: {as_of}
 - current_watchlist: {watchlist}
-- max_watchlist_size: {max_size} (managed slots; {anchors} are always_include anchors, off-limits, don't count). Any ADD needs a paired REMOVE, or no_changes.
+- max_watchlist_size: {max_size} (managed slots; {anchors} are always_include anchors, off-limits, don't count). {slot_rule}
 - rebalance_period: {cadence} (you are re-run every {cadence} — calibrate churn to this cadence; most {cadence} windows warrant no_changes, act only on a genuine catalyst)
 - profile_wave_thesis: {thesis}
 - exclusions: {exclusions}
@@ -120,7 +133,7 @@ def build_user_prompt(as_of: str, watchlist: list[str], thesis: str, exclusions:
 news_pool (read it, discover US-listed wave tickers with real catalysts, DISCARD the noise):
 {pool_text}
 
-Only swap (add+remove together) if a clearly stronger rising wave vehicle appears vs a current holding, else no_changes. In rationale_overall, note what noise you filtered. Emit ONLY the JSON object per your output schema."""
+{action_rule} In rationale_overall, note what noise you filtered. Emit ONLY the JSON object per your output schema."""
 
 
 def curate(pool_text: str, watchlist: list[str], *, as_of: str, model: str, anthropic_cli=None,
