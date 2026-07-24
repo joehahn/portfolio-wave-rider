@@ -10,13 +10,20 @@ authors = [
 license = { text = "MIT" }
 
 dependencies = [
+    # core: profile parsing, optimizer math, price data, dashboards
     "yfinance>=0.2.40",
     "pandas>=2.2.0",
     "numpy>=1.26.0",
     "scipy>=1.13.0",
     "plotly>=5.0",
     "pyyaml>=6.0",
-    "trafilatura>=2.1.0",       # GKG-backtest: archived-article body extraction (availability API + this)
+    # GKG backtest (shipped feature): GDELT GKG ingest on BigQuery, Wayback/live lede fetch + extraction,
+    # and the OpenRouter/Anthropic curator LLM. See src/portfolio.curator_backtest + scripts/backtest_sdk.py.
+    "google-cloud-bigquery>=3.20",   # GKG (GDELT) ingest on BigQuery
+    "google-auth>=2.30",             # service-account creds for the BigQuery client (google.oauth2)
+    "requests>=2.31",                # Wayback / GDELT / OpenRouter HTTP
+    "trafilatura>=2.1.0",            # archived-article body extraction (Wayback availability API + this)
+    "anthropic>=0.40",               # Claude SDK (backtest curator + judge)
 ]
 
 [project.optional-dependencies]
