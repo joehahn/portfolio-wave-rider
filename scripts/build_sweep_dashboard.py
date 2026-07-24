@@ -246,7 +246,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                       xaxis={"title": "max drawdown (|%|) — risk →"}, yaxis={"title": "annualized return %"})
     scatter = fig.to_html(full_html=False, include_plotlyjs="cdn", config={"displayModeBar": False})
 
-    nav = dash_nav.render("sweep_pwr.html")
+    nav = dash_nav.render("sweep_pwr.html", built=False)   # this page renders its own "dashboard built" stamp
     _fmt = lambda xs: ", ".join(str(x) for x in xs)  # noqa: E731
     grid_html = (
         '<h2>Parameter settings</h2>'
