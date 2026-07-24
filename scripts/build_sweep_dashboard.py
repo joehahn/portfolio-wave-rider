@@ -343,12 +343,15 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         f'<tr><td style="text-align:left">concentration_cap</td><td style="text-align:left">{_fmt(CAPS)}</td><td style="text-align:left">{CURRENT[0]}</td></tr>'
         f'<tr><td style="text-align:left">risk_aversion (λ)</td><td style="text-align:left">{_fmt(LAMBDAS)}</td><td style="text-align:left">{CURRENT[1]}</td></tr>'
         f'<tr><td style="text-align:left">optimizer_lookback (days)</td><td style="text-align:left">{_fmt(LOOKBACKS)}</td><td style="text-align:left">{CURRENT[2]}</td></tr>'
+        f'<tr><td style="text-align:left">max_watchlist_size <span style="color:#9a6a00;">(re-curation, §9)</span></td>'
+        f'<td style="text-align:left">{_fmt([c for c, _ in MWS_SWEEP])}</td><td style="text-align:left">{_mws_fixed}</td></tr>'
         '</tbody></table>'
-        '<p style="color:#888;font-size:12px;max-width:860px;">Held constant (from the profile): rebalance '
-        f'weekly, <b>max_watchlist_size {_mws_fixed}</b>, risk-free 4%, execution lag 1 trading day, anchors '
-        'SPY/AGG/IAU. <b>max_watchlist_size is swept separately in section 8</b> across '
-        f'{_fmt([c for c, _ in MWS_SWEEP])} (a non-zero-cost re-curation, since it changes the curator, not '
-        'just the replay).</p>')
+        f'<p style="color:#888;font-size:12px;max-width:860px;">The first three (cap / λ / lookback) are FREE '
+        f'math-replay knobs — every combination = {len(rows)} configs on the <b>same</b> curations (plots 1-4). '
+        '<b>max_watchlist_size is different</b>: it changes the CURATOR\'s decisions, so each value is a separate '
+        'non-zero-cost RE-CURATION (section 9 + plot 5), not a replay. Held constant elsewhere (from the '
+        f'profile): rebalance weekly, max_watchlist_size {_mws_fixed}, risk-free 4%, execution lag 1 trading '
+        'day, anchors SPY/AGG/IAU.</p>')
 
     # recommended-settings table: the live config (keep) vs the best-in-sample (forward-test, don't chase)
     _cur_row = next(r for r in rows if r["cur"])
@@ -569,9 +572,9 @@ benchmark). SPY returned {spy_ret*100:+.0f}% over the window. ★ = best in colu
 the bootstrap <b>CI</b> (error bar on annualized return), and <b>H1/H2 stable</b> (does the edge hold in
 both halves) before trusting any row.</p>
 {grid_html}
-<h2>1. Frontier — return vs drawdown (color = IR, red ring = current config)</h2>
+<h2>1. Return vs drawdown (color = IR, red ring = current config)</h2>
 {scatter}
-<h2>2. Frontier — return vs L1 churn / turnover (color = IR, red ring = current config)</h2>
+<h2>2. Return vs L1 churn</h2>
 <p style="color:#555;max-width:920px;">Same configs, risk axis replaced by <b>L1 churn = annualized one-way
 turnover (%/yr)</b>: how much of the portfolio is traded per year (Σ|Δweight| from share changes; drift
 between rebalances is not a trade). 100%/yr = the whole book turned over once a year. This is the
@@ -579,7 +582,7 @@ between rebalances is not a trade). 100%/yr = the whole book turned over once a 
 <b>stability/robustness</b>, not cost: lower churn = less noise-chasing / less overfit, so
 <b>upper-left (high return, low churn) is the sweet spot</b>. Current config: {_cur_l1:.0f}%/yr.</p>
 {l1_scatter}
-<h2>3. Frontier — return vs L2 course-correction (color = IR, red ring = current config)</h2>
+<h2>3. Return vs L2 course correction</h2>
 <p style="color:#555;max-width:920px;">Same idea, but churn is the <b>L2 (Euclidean) path length</b> the
 portfolio was dragged along through weight-space (√Σ&nbsp;Δweight² per rebalance, summed &amp;
 annualized) — your &ldquo;total course-correction&rdquo;. Vs L1, it weights <b>concentrated single-name
