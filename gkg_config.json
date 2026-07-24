@@ -30,7 +30,10 @@
       "quantum computing",
       "quantum chip",
       "quantum processor",
-      "qubit"
+      "qubit",
+      "quantum error correction",
+      "quantum sensing",
+      "quantum networking"
     ],
     "robotics": [
       "humanoid robot",
