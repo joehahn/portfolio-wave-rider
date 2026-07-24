@@ -284,7 +284,7 @@ def build(run_rel, out):
     fig.update_yaxes(dtick=1, tickfont={"size": 9}, row=7, col=1)   # force EVERY source label (no every-other skip)
     fig.update_xaxes(title_text="unique articles (log; 0 plotted at 0.5)", type="log", row=8, col=1)
     fig.update_yaxes(dtick=1, tickfont={"size": 9}, row=8, col=1)   # force EVERY keyword label
-    fig.update_layout(template="seaborn", height=int(340 * 12.0), barmode="group", showlegend=False,
+    fig.update_layout(template="seaborn", height=int(400 * 12.0), barmode="group", showlegend=False,
                       margin={"t": 55, "l": 200}, hovermode="closest")
     chart_html = fig.to_html(full_html=False, include_plotlyjs="cdn", config={"displayModeBar": False})
 
@@ -335,16 +335,25 @@ def build(run_rel, out):
     # Parameter settings (retrieval knobs), read from the run's _starter.json — shown just above plot 1.
     _stp = ROOT / run_rel / "_starter.json"
     _st = json.loads(_stp.read_text()) if _stp.exists() else {}
+    def _prow(label, value):   # one parameter per row, mirroring the Curator Backtest's table
+        return (f"<tr><td style='padding:5px 14px 5px 0;color:#555;white-space:nowrap;'>{label}</td>"
+                f"<td style='padding:5px 0;font-weight:600;'>{value}</td></tr>")
     _params = (
         '<h2 style="margin:1.6em 0 0.3em;">Parameter settings</h2>'
-        '<p style="color:#555;max-width:940px;font-size:13px;">The retrieval knobs upstream of the curator '
-        '(the optimizer knobs live in the Sweeps DB). &nbsp;'
-        f'window <b>{_start} to {_end}</b> &middot; cadence <b>{_st.get("rebalance_period", "?")}</b> '
-        f'({len(pools)} rebalances) &middot; news_lookback <b>{_st.get("news_lookback_days", "?")}d</b> '
-        f'&middot; pool = ranked <b>top-{max(pool_n) if pool_n else 100}</b> articles/rebalance '
-        '(salience &times; authority, per-wave top-K) &middot; lede: look-ahead-clean Wayback &rarr; '
-        'title-gated live-fallback (<b>fuller</b>) &middot; curator <b>kimi-k2.5</b> &middot; source filters '
-        'from <code>news_sources.md</code> (block / major / specialty).</p>')
+        '<p style="color:#555;max-width:820px;margin:0 0 0.6em;font-size:13px;">The retrieval knobs upstream '
+        'of the curator (the optimizer knobs live in the Sweeps DB), read from the run and '
+        '<code>investor_profile.md</code>.</p>'
+        "<table style='border-collapse:collapse;font-size:14px;margin-bottom:1.2em;'><tbody>"
+        + _prow("Retrieval window", f"{_start} &rarr; {_end}")
+        + _prow("Rebalance cadence", f"{_st.get('rebalance_period', '?')} ({len(pools)} rebalances)")
+        + _prow("News lookback", f"{_st.get('news_lookback_days', '?')} days")
+        + _prow("Pool size", f"ranked top-{max(pool_n) if pool_n else 100} / rebalance "
+                             "(salience &times; authority, per-wave top-K)")
+        + _prow("Lede source", "look-ahead-clean Wayback &rarr; title-gated live-fallback (fuller)")
+        + _prow("Discovery", "GDELT GKG on BigQuery (keyword regex, English-origin)")
+        + _prow("Source filters", "news_sources.md (block / major / specialty)")
+        + _prow("Curator model", "moonshotai/kimi-k2.5")
+        + "</tbody></table>")
 
     page = (
         '<!doctype html><html><head><meta charset="utf-8"><title>Retriever Backtest</title>'
