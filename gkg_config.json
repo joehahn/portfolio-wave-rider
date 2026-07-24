@@ -1,6 +1,6 @@
 {
   "description": "GKG-BACKTEST retrieval config. The backtest engine is GKG (historical, look-ahead-clean); the live/forward engine is Anthropic WebSearch (a separate daily-cron path with its OWN config). These are different news engines, so their optimal parameters legitimately differ - do NOT try to keep this in sync with the forward config; the backtest gives starting ESTIMATES that forward re-optimization refines. Iterate HERE; no code change. `wave_keywords` are matched case-insensitively (a space allows a hyphen, for URL slugs) against each article's URL and page title; NO company/ticker names - the curator discovers the tickers. `org_stoplist` is substring-matched to drop non-company ENTITIES (engine mechanics). The SOURCE lists (source_block / source_major, domain substrings) now live in news_sources.md as the single source of truth - gkg_pool reads them from there.",
-  "_wave_maintenance_note": "WHEN THE USER ADDS A WAVE (or subwave) TO investor_profile.md: the FORWARD (live WebSearch) path picks it up automatically - the curator runs a Pass-1 discovery query for every wave named in the profile (a hard requirement in watchlist-curator.md), so its beats evolve with the thesis; optionally add a wave section to news_sources.md for curated specialty desks. The BACKTEST (GKG) path does NOT auto-adapt: you MUST add matching wave_keywords below, then RE-INGEST (the keyword regex changes, so BigQuery is re-queried) + re-rank + re-curate. Known uncovered as of 2026-07-21 (documented on the retrieval dashboard, left unfixed by user choice): the geopolitical 'energy/tankers' and 'Middle East reconstruction' subwaves. (The aging_demographics wave was ADDED 2026-07-21 and BROADENED 2026-07-24 from 4 senior-housing-REIT-only keywords - two of which, 'senior living reit' and 'senior housing operator', matched 0 corpus articles - to 28 aging-economy terms spanning eldercare, longevity/silver economy, gerontology, and geriatric care; takes effect on the next GKG re-ingest.)",
+  "_wave_maintenance_note": "WHEN THE USER ADDS A WAVE (or subwave) TO investor_profile.md: the FORWARD (live WebSearch) path picks it up automatically - the curator runs a Pass-1 discovery query for every wave named in the profile (a hard requirement in watchlist-curator.md), so its beats evolve with the thesis; optionally add a wave section to news_sources.md for curated specialty desks. The BACKTEST (GKG) path does NOT auto-adapt: you MUST add matching wave_keywords below, then RE-INGEST (the keyword regex changes, so BigQuery is re-queried) + re-rank + re-curate. Known uncovered as of 2026-07-21 (documented on the retrieval dashboard, left unfixed by user choice): the geopolitical 'energy/tankers' and 'Middle East reconstruction' subwaves. (The aging_demographics wave was ADDED 2026-07-21 and BROADENED 2026-07-24 from 4 senior-housing-REIT-only keywords - two of which, 'senior living reit' and 'senior housing operator', matched 0 corpus articles - to 28 aging-economy terms, then TRIMMED 2026-07-24 to 16 high-precision terms - dropped the low-precision/human-interest terms (senior care, anti-aging, home health, hospice, healthy aging, aging in place, caregiving, mobility aid, aging population) plus redundant substrings (elder care, longevity economy) that add noise without investable signal; takes effect on the next GKG re-ingest.)",
   "engine": {
     "ontopic_offset": 500,
     "max_scan_gb": 60.0
@@ -59,31 +59,19 @@
       "healthcare reit",
       "senior housing",
       "senior living",
-      "senior care",
       "assisted living",
       "nursing home",
       "skilled nursing",
-      "eldercare",
-      "elder care",
-      "geriatric",
-      "aging population",
-      "longevity",
-      "anti-aging",
       "memory care",
       "dementia care",
       "retirement community",
-      "home health",
-      "hospice",
-      "medicare advantage",
-      "healthy aging",
-      "silver economy",
-      "longevity economy",
+      "eldercare",
+      "geriatric",
       "gerontology",
-      "aging in place",
-      "life settlement",
-      "caregiving",
+      "silver economy",
+      "longevity",
       "alzheimer",
-      "mobility aid"
+      "medicare advantage"
     ]
   },
   "org_stoplist": [
