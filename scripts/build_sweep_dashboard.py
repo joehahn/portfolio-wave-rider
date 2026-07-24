@@ -549,6 +549,8 @@ Current config: {_cur_l2:.0f}/yr.</p>
 {l2_scatter}
 <h2>4. All configs (ranked by IR)</h2>
 {rec_html}
+<details style="margin:.4em 0 .8em;"><summary style="cursor:pointer;color:#0b7285;font-weight:600;">
+Show the full ranked table ({len(rows)} configs) + column definitions</summary>
 <p style="color:#666;font-size:12px;margin:.4em 0 .6em;max-width:920px;line-height:1.6;"><b>Column meanings:</b><br>
 <b>cap / λ / lookback</b> — the config: concentration cap (max weight per position) · risk-aversion λ · optimizer lookback (days of prices used to estimate μ/Σ).<br>
 <b>IR</b> — Information Ratio = annualized active return ÷ tracking error vs SPY. Consistency of beating SPY; this is the ranking column.<br>
@@ -564,6 +566,7 @@ Current config: {_cur_l2:.0f}/yr.</p>
 <th>cap / λ / lookback</th><th>IR</th><th>t-stat</th><th>Sharpe</th><th>Calmar</th><th>alpha</th><th>ann</th>
 <th>maxDD</th><th>total</th><th>hit-rate</th><th>ann CI [5,95]</th><th>H1/H2 stable</th></tr></thead>
 <tbody>{trs}</tbody></table>
+</details>
 {llm_html}
 {llm4_html}
 {llm5_html}
