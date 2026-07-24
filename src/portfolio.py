@@ -4300,7 +4300,7 @@ def build_curator_dashboard(
         _anchor_w = _w[_anchors].sum(axis=1)
         if float(_anchor_w.max()) > 0.1:
             _af.add_trace(go.Scatter(x=_w.index, y=_anchor_w, mode="lines", stackgroup="a",
-                                     name="safe-haven anchors (" + "·".join(_anchors) + ")",
+                                     name="safe-haven (" + ".".join(_anchors) + ")",
                                      line={"width": 0.4, "color": "#9aa5b1"}))
     if float(_cash.max()) > 0.1:
         _af.add_trace(go.Scatter(x=_cash.index, y=_cash, name="cash", mode="lines",
