@@ -64,17 +64,18 @@ def _mws_rows():
         sn = pd.read_csv(bt, parse_dates=["date"])
         tot = sn.groupby("date")["total_value"].first()
         ret = float(tot.iloc[-1] / tot.iloc[0] - 1.0)
-        wl = list(starter); nvda = False; nchg = 0
-        for f in curs:
-            cj = json.loads(Path(f).read_text())
-            adds = [a["ticker"] for a in cj.get("adds", [])]; rems = [r["ticker"] for r in cj.get("removes", [])]
-            if adds or rems: nchg += 1
-            if "NVDA" in adds: nvda = True
-            for t in adds: wl.append(t)
-            for t in rems:
-                if t in wl: wl.remove(t)
-        picks = [t for t in sorted(set(wl)) if t not in anchors]
-        rows.append({"cap": cap, "pending": False, "ret": ret, "nchg": nchg, "nvda": nvda, "wl": picks})
+        # The ACTUAL watchlist is what the validated backtest tracked (snapshots include every watchlist
+        # ticker, even at 0 shares) — NOT a naive replay of proposed adds/removes, which double-counts
+        # cap-rejected / unpaired proposals. Per-date ticker set (minus anchors) = the true watchlist.
+        by_date = sn.groupby("date")["ticker"].apply(lambda s: frozenset(s) - anchors)
+        nvda = any("NVDA" in wl for wl in by_date)           # NVDA actually ENTERED the watchlist (not just proposed)
+        nchg = int((by_date != by_date.shift()).sum()) - 1   # times the actual watchlist changed
+        picks = sorted(by_date.iloc[-1])                     # final validated watchlist (managed picks)
+        # also surface NVDA that was proposed but rejected (never entered): a softer "curator wanted it" signal
+        nvda_proposed = any("NVDA" in [a["ticker"] for a in json.loads(Path(f).read_text()).get("adds", [])]
+                            for f in curs)
+        rows.append({"cap": cap, "pending": False, "ret": ret, "nchg": nchg,
+                     "nvda": nvda, "nvda_proposed": nvda_proposed, "wl": picks})
     return rows
 
 
@@ -292,13 +293,15 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
 
     # frontier scatter: ann return vs |max drawdown|, colored by IR, current config ringed
     import plotly.graph_objects as go
+    _mws_fixed = int(portfolio.load_financial_model().get("max_watchlist_size", 5))  # held constant in plots 1-3
     fig = go.Figure()
     fig.add_trace(go.Scatter(
         x=[abs(r["dd"]) * 100 for r in rows], y=[r["ann"] * 100 for r in rows], mode="markers",
         marker={"size": [16 if r["cur"] else 10 for r in rows],
                 "color": [r["ir"] for r in rows], "colorscale": "Viridis", "showscale": True,
                 "colorbar": {"title": "IR"}, "line": {"width": [3 if r["cur"] else 0 for r in rows], "color": "#e03131"}},
-        text=[f"cap {r['cap']} / λ {r['lam']} / {r['lb']}d<br>IR {r['ir']:+.2f}, Calmar {r['calmar']:.2f}" for r in rows],
+        text=[f"cap {r['cap']} / λ {r['lam']} / {r['lb']}d · watchlist {_mws_fixed}"
+              f"<br>IR {r['ir']:+.2f}, Calmar {r['calmar']:.2f}" for r in rows],
         hovertemplate="%{text}<br>ann %{y:.0f}%, maxDD -%{x:.0f}%<extra></extra>"))
     fig.update_layout(template="seaborn", height=440, margin={"t": 20, "l": 60, "r": 20},
                       xaxis={"title": "max drawdown (|%|) — risk →"}, yaxis={"title": "annualized return %"})
@@ -314,7 +317,8 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
             marker={"size": [16 if r["cur"] else 10 for r in rows],
                     "color": [r["ir"] for r in rows], "colorscale": "Viridis", "showscale": True,
                     "colorbar": {"title": "IR"}, "line": {"width": [3 if r["cur"] else 0 for r in rows], "color": "#e03131"}},
-            text=[f"cap {r['cap']} / λ {r['lam']} / {r['lb']}d<br>IR {r['ir']:+.2f}, {field.upper()} {r[field]:.0f}" for r in rows],
+            text=[f"cap {r['cap']} / λ {r['lam']} / {r['lb']}d · watchlist {_mws_fixed}"
+                  f"<br>IR {r['ir']:+.2f}, {field.upper()} {r[field]:.0f}" for r in rows],
             hovertemplate="%{text}<br>ann %{y:.0f}%, " + field.upper() + " %{x:.0f}<extra></extra>"))
         f.update_layout(template="seaborn", height=440, margin={"t": 20, "l": 60, "r": 20},
                         xaxis={"title": xtitle}, yaxis={"title": "annualized return %"})
@@ -341,7 +345,10 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         f'<tr><td style="text-align:left">optimizer_lookback (days)</td><td style="text-align:left">{_fmt(LOOKBACKS)}</td><td style="text-align:left">{CURRENT[2]}</td></tr>'
         '</tbody></table>'
         '<p style="color:#888;font-size:12px;max-width:860px;">Held constant (from the profile): rebalance '
-        'weekly, max_watchlist_size 5, risk-free 4%, execution lag 1 trading day, anchors SPY/AGG/IAU.</p>')
+        f'weekly, <b>max_watchlist_size {_mws_fixed}</b>, risk-free 4%, execution lag 1 trading day, anchors '
+        'SPY/AGG/IAU. <b>max_watchlist_size is swept separately in section 8</b> across '
+        f'{_fmt([c for c, _ in MWS_SWEEP])} (a non-zero-cost re-curation, since it changes the curator, not '
+        'just the replay).</p>')
 
     # recommended-settings table: the live config (keep) vs the best-in-sample (forward-test, don't chase)
     _cur_row = next(r for r in rows if r["cur"])
@@ -488,7 +495,8 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
             _mtr += (f'<tr style="color:#999;"><td {_lc}>{r["cap"]}</td>'
                      f'<td {_lc} colspan="4"><i>re-curation in progress…</i></td></tr>')
             continue
-        _nv = ('<b style="color:#c92a2a;">yes</b>' if r["nvda"] else 'no')
+        _nv = ('<b style="color:#c92a2a;">yes</b>' if r["nvda"]
+               else ('<span style="color:#9a6a00;">proposed, rejected</span>' if r.get("nvda_proposed") else 'no'))
         _star = " (current)" if r["cap"] == 5 else ""
         _mtr += (f'<tr style="border-bottom:1px solid #eee;"><td {_lc}><b>{r["cap"]}</b>{_star}</td>'
                  f'<td>{r["ret"] * 100:+.0f}%</td><td>{r["nchg"]}</td><td {_lc}>{_nv}</td>'
