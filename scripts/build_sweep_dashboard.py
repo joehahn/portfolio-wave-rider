@@ -389,7 +389,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
             + _c2(r["ir"], "{:+.2f}") + _c2(r["tstat"], "{:+.1f}") + _c2(r["sharpe"], "{:.2f}")
             + _c2(r["calmar"], "{:.2f}") + _c2(r["dd"] * 100, "{:.0f}%") + "</tr>")
     llm_html = (
-        '<h2>5. LLM comparison — curator model (same pools + profile config)</h2>'
+        '<h2>6. LLM comparison — curator model (same pools + profile config)</h2>'
         '<p style="color:#555;max-width:920px;">Every model reads the <b>same</b> news pools and replays at '
         'the profile config (cap 0.8 / λ 2.0 / 30d); the only variable is the curator LLM. The decision '
         'columns are the ones that matter: <b>agree</b> = share of weeks the model made the identical '
@@ -427,12 +427,44 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     _fig4.update_yaxes(title_text="portfolio value ($)", type="log",
                        tickvals=[10000, 30000, 100000, 300000, 1000000],
                        ticktext=["$10K", "$30K", "$100K", "$300K", "$1M"])
-    llm4_html = (('<h2>6. Portfolio value over time — by curator LLM (vs buy/hold and SPY)</h2>'
+    llm4_html = (('<h2>7. Portfolio value over time — by curator LLM (vs buy/hold and SPY)</h2>'
                   '<p style="color:#555;max-width:920px;">Each LLM\'s realized portfolio value on the same pools '
                   'and profile config, alongside the equal-weight buy/hold starter and SPY. Same idea as the '
                   'curator DB\'s plot 1, without the rebalance markers.</p>'
                   + _fig4.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False}))
                  if _curved else "")
+
+    # plot 5 (new): equity-curve race by max_watchlist_size (one curve per re-curated cap) + buy/hold + SPY.
+    _mws_pal = ["#d97706", "#9467bd", "#d62728", "#8c564b", "#e377c2", "#17becf"]
+    _mwsfig = go.Figure()
+    _mws_curves = 0
+    for _i, (cap, rd) in enumerate(MWS_SWEEP):
+        _sp = ROOT / rd / "_backtest" / "snapshots.csv"
+        if not _sp.exists():
+            continue
+        _tt = pd.read_csv(_sp, parse_dates=["date"]).groupby("date")["total_value"].first().sort_index()
+        _mwsfig.add_trace(go.Scatter(x=[d.strftime("%Y-%m-%d") for d in _tt.index], y=list(_tt.values),
+                                     mode="lines", name=f"size {cap}" + (" (current)" if cap == _mws_fixed else ""),
+                                     line={"color": _mws_pal[_i % len(_mws_pal)], "width": 2.2}))
+        _mws_curves += 1
+    if _ref and _ref.get("bnh_x"):
+        _mwsfig.add_trace(go.Scatter(x=_ref["bnh_x"], y=_ref["bnh_y"], mode="lines", name="Buy-and-hold",
+                                     line={"color": "#3b82f6", "width": 1.8}))
+    if _ref and _ref.get("spy_y"):
+        _mwsfig.add_trace(go.Scatter(x=_ref["curve_x"], y=_ref["spy_y"], mode="lines", name="SPY benchmark",
+                                     line={"color": "#10b981", "width": 1.5, "dash": "dot"}))
+    _mwsfig.update_layout(template="seaborn", height=460, margin=_MARG, hovermode="x unified", legend=_LEG)
+    _mwsfig.update_xaxes(range=_xr)
+    _mwsfig.update_yaxes(title_text="portfolio value ($)", type="log",
+                         tickvals=[10000, 30000, 100000, 300000, 1000000],
+                         ticktext=["$10K", "$30K", "$100K", "$300K", "$1M"])
+    mws_equity_html = (('<h2>5. Portfolio value over time — by max_watchlist_size (vs buy/hold and SPY)</h2>'
+                        '<p style="color:#555;max-width:920px;">Each re-curated watchlist cap\'s realized '
+                        'portfolio value on the same pools and starter — the equity-curve view of the '
+                        'section-9 sweep. Tighter (smaller) watchlists concentrate into the top picks; wider '
+                        'ones dilute across more next-wave names.</p>'
+                        + _mwsfig.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False}))
+                       if _mws_curves else "")
 
     # section 5: blind rationale-soundness judge (leak-free). Reads data/curator_runs/_judge_scores.json
     # produced by scripts/judge_curations.py; if absent, the section is simply omitted.
@@ -452,7 +484,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                       + _c2(s["add_mean"], "{:.2f}") + _c2(s["rem_mean"], "{:.2f}")
                       + "".join(_c2((s[k] or 0) * 100, "{:.0f}%") for k in _cr) + "</tr>")
         llm5_html = (
-            '<h2>7. Rationale-soundness — blind judge (leak-free)</h2>'
+            '<h2>8. Rationale-soundness — blind judge (leak-free)</h2>'
             '<p style="color:#555;max-width:920px;">Every backtest column above (return, IR, Sharpe, Calmar, '
             't-stat) is <b>in-sample</b> &mdash; the curator could have memorized which 2023&ndash;2026 names '
             'later won, so those numbers can\'t honestly rank <i>reasoning</i>. This section does: an '
@@ -502,7 +534,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                  f'<td>{r["ret"] * 100:+.0f}%</td><td>{r["nchg"]}</td><td {_lc}>{_nv}</td>'
                  f'<td {_lc}>{", ".join(r["wl"])}</td></tr>')
     mws_html = (
-        '<h2>8. max_watchlist_size sweep — does more room let the curator add NVDA?</h2>'
+        '<h2>9. max_watchlist_size sweep — does more room let the curator add NVDA?</h2>'
         '<p style="color:#555;max-width:920px;">Unlike the cap/&lambda;/lookback knobs above (free math '
         'replays on one curation set), <b>max_watchlist_size changes the curator\'s decisions</b>, so each '
         'cap is a separate re-curation (~$0.40 LLM each) on the same news pools and AAPL/GOOGL/AMZN starter. '
@@ -575,6 +607,7 @@ Show the full ranked table ({len(rows)} configs) + column definitions</summary>
 <th>maxDD</th><th>total</th><th>hit-rate</th><th>ann CI [5,95]</th><th>H1/H2 stable</th></tr></thead>
 <tbody>{trs}</tbody></table>
 </details>
+{mws_equity_html}
 {llm_html}
 {llm4_html}
 {llm5_html}
