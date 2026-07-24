@@ -38,6 +38,8 @@ import dash_nav  # shared cross-page nav (Forward | Backtest groups)  # noqa: E4
 import gkg_pool as g  # noqa: E402  (wave/domain-tier classifiers; needs the repo's scripts/ on path)
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+from src import portfolio as _pf  # noqa: E402  (load_financial_model -> the param-settings table)
 DEFAULT_RUN_REL = "data/curator_runs/gkg-3yr-final"   # the canonical backtest run (relative to repo root)
 
 BLUE, GREEN, ORANGE, RED, GREY = "#1f77b4", "#2ca02c", "#ff7f0e", "#e03131", "#adb5bd"
@@ -332,27 +334,22 @@ def build(run_rel, out):
         _start, _end = (_sd[0], _sd[-1]) if _sd else (as_of[0], as_of[-1])
     else:
         _start, _end = as_of[0], as_of[-1]
-    # Parameter settings (retrieval knobs), read from the run's _starter.json — shown just above plot 1.
-    _stp = ROOT / run_rel / "_starter.json"
-    _st = json.loads(_stp.read_text()) if _stp.exists() else {}
-    def _prow(label, value):   # one parameter per row, mirroring the Curator Backtest's table
+    # Parameter settings: only the user-set investor_profile.md knobs relevant to RETRIEVAL (mirrors the
+    # Curator Backtest's table; the optimizer knobs live there + in the Sweeps DB).
+    _fm = _pf.load_financial_model(str(ROOT / "investor_profile.md"))
+    def _prow(label, value):   # one parameter per row, matching the Curator Backtest's table
         return (f"<tr><td style='padding:5px 14px 5px 0;color:#555;white-space:nowrap;'>{label}</td>"
                 f"<td style='padding:5px 0;font-weight:600;'>{value}</td></tr>")
     _params = (
         '<h2 style="margin:1.6em 0 0.3em;">Parameter settings</h2>'
-        '<p style="color:#555;max-width:820px;margin:0 0 0.6em;font-size:13px;">The retrieval knobs upstream '
-        'of the curator (the optimizer knobs live in the Sweeps DB), read from the run and '
-        '<code>investor_profile.md</code>.</p>'
+        '<p style="color:#555;max-width:820px;margin:0 0 0.6em;font-size:13px;">The user-set '
+        '<code>investor_profile.md</code> knobs relevant to news retrieval (the optimizer knobs are in the '
+        'Curator Backtest + Sweeps DBs).</p>'
         "<table style='border-collapse:collapse;font-size:14px;margin-bottom:1.2em;'><tbody>"
-        + _prow("Retrieval window", f"{_start} &rarr; {_end}")
-        + _prow("Rebalance cadence", f"{_st.get('rebalance_period', '?')} ({len(pools)} rebalances)")
-        + _prow("News lookback", f"{_st.get('news_lookback_days', '?')} days")
-        + _prow("Pool size", f"ranked top-{max(pool_n) if pool_n else 100} / rebalance "
-                             "(salience &times; authority, per-wave top-K)")
-        + _prow("Lede source", "look-ahead-clean Wayback &rarr; title-gated live-fallback (fuller)")
-        + _prow("Discovery", "GDELT GKG on BigQuery (keyword regex, English-origin)")
-        + _prow("Source filters", "news_sources.md (block / major / specialty)")
-        + _prow("Curator model", "moonshotai/kimi-k2.5")
+        + _prow("Backtest window", f"{_start} &rarr; {_end}")
+        + _prow("Rebalance cadence", f"{_fm['rebalance_period']}")
+        + _prow("News lookback", f"{int(_fm['news_lookback_days'])} days")
+        + _prow("Max articles / pool", f"{int(_fm['max_articles'])}")
         + "</tbody></table>")
 
     page = (
