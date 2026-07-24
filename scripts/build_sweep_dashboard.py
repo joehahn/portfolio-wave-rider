@@ -40,6 +40,43 @@ LLM_RUNS = [   # row 0 = the DEFAULT curator. The multi-LLM comparison (Sonnet g
 CURRENT = (0.8, 2.0, 30)          # the live investor_profile.md config
 BLUE, GREEN, RED, GREY = "#1f77b4", "#2b8a3e", "#c92a2a", "#adb5bd"
 
+# max_watchlist_size sweep (section 6): unlike cap/lambda/lookback, this knob changes the CURATOR's
+# decisions, so each cap is a separate RE-CURATION (LLM cost), not a free replay. cap 5 = the canonical
+# run; the rest are re-curated into gkg-3yr-mws{cap}. Tests whether more slots let the curator add NVDA.
+MWS_SWEEP = [(3, "data/curator_runs/gkg-3yr-mws3"), (5, "data/curator_runs/gkg-3yr-final"),
+             (8, "data/curator_runs/gkg-3yr-mws8"), (10, "data/curator_runs/gkg-3yr-mws10"),
+             (12, "data/curator_runs/gkg-3yr-mws12"), (16, "data/curator_runs/gkg-3yr-mws16")]
+
+
+def _mws_rows():
+    """Per-cap: total return, #watchlist-changes, whether NVDA was ever added, and the final watchlist.
+    Reads each cap run dir; caps whose run is missing/incomplete are marked pending."""
+    import glob
+    _fm = portfolio.load_financial_model()
+    starter = list(_fm.get("starter_watchlist") or [])
+    anchors = set(_fm.get("always_include") or [])
+    rows = []
+    for cap, rd in MWS_SWEEP:
+        curs = sorted(glob.glob(str(ROOT / rd / "2*-curation.json")))
+        bt = ROOT / rd / "_backtest" / "snapshots.csv"
+        if len(curs) < 79 or not bt.exists():
+            rows.append({"cap": cap, "pending": True}); continue
+        sn = pd.read_csv(bt, parse_dates=["date"])
+        tot = sn.groupby("date")["total_value"].first()
+        ret = float(tot.iloc[-1] / tot.iloc[0] - 1.0)
+        wl = list(starter); nvda = False; nchg = 0
+        for f in curs:
+            cj = json.loads(Path(f).read_text())
+            adds = [a["ticker"] for a in cj.get("adds", [])]; rems = [r["ticker"] for r in cj.get("removes", [])]
+            if adds or rems: nchg += 1
+            if "NVDA" in adds: nvda = True
+            for t in adds: wl.append(t)
+            for t in rems:
+                if t in wl: wl.remove(t)
+        picks = [t for t in sorted(set(wl)) if t not in anchors]
+        rows.append({"cap": cap, "pending": False, "ret": ret, "nchg": nchg, "nvda": nvda, "wl": picks})
+    return rows
+
 
 def _metrics(totals: pd.Series, spy: pd.Series, ann_ret: float, max_dd: float) -> dict:
     """Risk-adjusted, benchmark-relative metrics from a config's equity curve + the SPY curve."""
@@ -385,6 +422,47 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
             'to a named wave), <b>evidence</b> (cited news actually supports the claim), <b>catalyst</b> '
             '(concrete milestone, not noise), <b>discipline</b> (buildup-not-crest; a remove is justified, not '
             'churn), <b>valid-ticker</b> (real investable US listing, not a name/delisted/false-match).</p>')
+    # section 6: max_watchlist_size sweep (non-zero-cost: each cap is a re-curation). Does more room let
+    # the curator add NVDA? Table (cap / return / #changes / NVDA? / final watchlist) + a return-vs-cap bar.
+    _mws = _mws_rows()
+    _done = [r for r in _mws if not r.get("pending")]
+    if _done:
+        import plotly.graph_objects as _mgo
+        _mfig = _mgo.Figure(_mgo.Bar(
+            x=[r["cap"] for r in _done], y=[r["ret"] * 100 for r in _done],
+            marker_color=[RED if r["nvda"] else BLUE for r in _done],
+            text=["NVDA added" if r["nvda"] else "" for r in _done], textposition="outside",
+            hovertemplate="cap %{x}: %{y:+.0f}%<extra></extra>"))
+        _mfig.update_layout(template="seaborn", height=360, margin={"t": 20, "l": 60, "r": 20},
+                            xaxis={"title": "max_watchlist_size", "dtick": 1},
+                            yaxis={"title": "curator total return %"})
+        _mbar = _mfig.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False})
+    else:
+        _mbar = ""
+    _mtr = ""
+    for r in _mws:
+        if r.get("pending"):
+            _mtr += (f'<tr style="color:#999;"><td {_lc}>{r["cap"]}</td>'
+                     f'<td {_lc} colspan="4"><i>re-curation in progress…</i></td></tr>')
+            continue
+        _nv = ('<b style="color:#c92a2a;">yes</b>' if r["nvda"] else 'no')
+        _star = " (current)" if r["cap"] == 5 else ""
+        _mtr += (f'<tr style="border-bottom:1px solid #eee;"><td {_lc}><b>{r["cap"]}</b>{_star}</td>'
+                 f'<td>{r["ret"] * 100:+.0f}%</td><td>{r["nchg"]}</td><td {_lc}>{_nv}</td>'
+                 f'<td {_lc}>{", ".join(r["wl"])}</td></tr>')
+    mws_html = (
+        '<h2>6. max_watchlist_size sweep — does more room let the curator add NVDA?</h2>'
+        '<p style="color:#555;max-width:920px;">Unlike the cap/&lambda;/lookback knobs above (free math '
+        'replays on one curation set), <b>max_watchlist_size changes the curator\'s decisions</b>, so each '
+        'cap is a separate re-curation (~$0.40 LLM each) on the same news pools and AAPL/GOOGL/AMZN starter. '
+        'The question: with the 5-slot cap loosened, does the curator ever add NVDA, or does it keep '
+        'diversifying into next-waves regardless of room? <b>Red bar = NVDA entered the watchlist.</b></p>'
+        + _mbar
+        + '<table style="margin-top:.6em;"><thead><tr>'
+        f'<th {_lc}>max_watchlist_size</th><th>curator return</th><th>watchlist changes</th>'
+        f'<th {_lc}>NVDA added?</th><th {_lc}>final watchlist (managed picks)</th>'
+        f'</tr></thead><tbody>{_mtr}</tbody></table>')
+
     ts = datetime.now().strftime("%Y-%m-%d %H:%M %Z").strip()
     # Title date range: same snapshots.csv the Curator Backtest reads, so all three DBs show one range.
     _snap = ROOT / runs_dir / "_backtest" / "snapshots.csv"
@@ -430,6 +508,7 @@ both halves) before trusting any row.</p>
 {llm_html}
 {llm4_html}
 {llm5_html}
+{mws_html}
 </body></html>"""
     out.write_text(page)
     top = max(rows, key=lambda r: r["ir"] if r["ir"] == r["ir"] else -9e9)
