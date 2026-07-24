@@ -4021,7 +4021,7 @@ def build_curator_dashboard(
                 f"<td style='color:#9a6a00;'>{rej_cell}</td></tr>"
             )
         log_html = (
-            "<h2 style='margin-top:2em;'>13. Curation log</h2>"
+            "<h2 style='margin-top:2em;'>6. Curation log</h2>"
             f"<p style='color:#555;'>The {_n_active} of {len(log)} {_html.escape(_cadence)} curator calls "
             "that made a change (no-change rebalances are hidden). The <em>Rejections</em> column lists each "
             "add/remove the validator dropped as invalid, as <code>TICKER (action)</code> — hover for the "
@@ -4454,7 +4454,7 @@ def build_curator_dashboard(
     _gain_src = _attr_html(_src_ret, "mean forward price return of adds (%)", universe=_recognized, noun="sources")
     _gain_kw = _attr_html(_kw_ret, "mean forward price return of adds (%)", universe=set(_kwmap), noun="keywords")
     _gain_author = _attr_html(_author_ret, "mean forward price return of adds (%)", noun="authors")
-    # Number of adds per author: raw n behind plot 8 (co-authors each counted; byline-less adds under "(no author)").
+    # Number of adds per author: raw n behind plot 9 (co-authors each counted; byline-less adds under "(no author)").
     _npa = ""
     _naa = sorted(((a, len(v)) for a, v in _author_ret.items() if v), key=lambda r: r[1])
     if _naa:
@@ -4515,32 +4515,32 @@ def build_curator_dashboard(
                   'return</b> (from the add date until the ticker is removed, else window end), bucketed by '
                   'the <code>news_evidence</code> source (by URL domain) and by the wave keyword that surfaced '
                   'the cited article. Answers which desks / search terms produced winning picks. n = number of adds.</p>')
-    _gpa_note = ('<p style="color:#555;max-width:820px;margin:0 0 .4em;">Plot&nbsp;7\'s total gain per source '
+    _gpa_note = ('<p style="color:#555;max-width:820px;margin:0 0 .4em;">Plot&nbsp;8\'s total gain per source '
                  'divided by how many articles that source contributed to the pools (its footprint, shown as '
                  '<code>N&nbsp;art.</code>). Signal <b>density</b>: high = a source that produced gains from '
                  'few articles; near-zero/negative with many articles = low-signal, a block-list candidate.</p>')
-    _author_note = ('<p style="color:#555;max-width:820px;margin:0 0 .4em;">Plot&nbsp;7\'s forward price return, '
+    _author_note = ('<p style="color:#555;max-width:820px;margin:0 0 .4em;">Plot&nbsp;8\'s forward price return, '
                     'but bucketed by the article <b>author</b> (byline extracted from each cited evidence URL) '
                     'instead of the source domain. Which reporters surfaced winning picks. n = number of adds; a '
                     'co-authored article credits each byline. Adds whose evidence URL has no captured byline are omitted.</p>')
 
     extra_html = (
-        '<h2 style="margin:1.6em 0 0.2em;">6. Allocation over time</h2>' + _to_html(_af)
-        + (('<h2 style="margin:1.6em 0 0.2em;">7. Gains vs news source</h2>' + _attr_note + _gain_src) if _gain_src else '')
-        + (('<h2 style="margin:1.6em 0 0.2em;">8. Gains vs author</h2>' + _author_note + _gain_author) if _gain_author else '')
-        + (('<h2 style="margin:1.6em 0 0.2em;">9. Gain per article vs news source</h2>' + _gpa_note + _gain_per_art) if _gain_per_art else '')
-        + (('<h2 style="margin:1.6em 0 0.2em;">10. Gains vs search keyword</h2>' + _attr_note + _gain_kw) if _gain_kw else '')
+        '<h2 style="margin:1.6em 0 0.2em;">7. Allocation over time</h2>' + _to_html(_af)
+        + (('<h2 style="margin:1.6em 0 0.2em;">8. Gains vs news source</h2>' + _attr_note + _gain_src) if _gain_src else '')
+        + (('<h2 style="margin:1.6em 0 0.2em;">9. Gains vs author</h2>' + _author_note + _gain_author) if _gain_author else '')
+        + (('<h2 style="margin:1.6em 0 0.2em;">10. Gain per article vs news source</h2>' + _gpa_note + _gain_per_art) if _gain_per_art else '')
+        + (('<h2 style="margin:1.6em 0 0.2em;">11. Gains vs search keyword</h2>' + _attr_note + _gain_kw) if _gain_kw else '')
     )
-    # 11. Number of adds per source — moved to sit just above the Curation log (below the gain plots).
-    _nps_html = (('<h2 style="margin:1.6em 0 0.2em;">11. Number of adds per source</h2>'
+    # 12. Number of adds per source — the raw n behind the source-gain plots.
+    _nps_html = (('<h2 style="margin:1.6em 0 0.2em;">12. Number of adds per source</h2>'
                   '<p style="color:#555;max-width:820px;margin:0 0 .4em;">How many adds cited each source '
-                  '(by URL domain) as evidence &mdash; the raw <code>n</code> behind plots 7 and 9.</p>'
+                  '(by URL domain) as evidence &mdash; the raw <code>n</code> behind plots 8 and 10.</p>'
                   + _nps) if _nps else '')
-    # 12. Number of adds per author — raw n behind plot 8 (sits just below plot 11).
-    _npa_html = (('<h2 style="margin:1.6em 0 0.2em;">12. Number of adds per author</h2>'
+    # 13. Number of adds per author — raw n behind plot 9 (sits just below plot 12).
+    _npa_html = (('<h2 style="margin:1.6em 0 0.2em;">13. Number of adds per author</h2>'
                   '<p style="color:#555;max-width:820px;margin:0 0 .4em;">How many adds each byline is credited '
                   'on (co-authors each counted; adds whose evidence URL carries no captured byline bucket into '
-                  '<code>(no author)</code>) &mdash; the raw <code>n</code> behind plot 8.</p>'
+                  '<code>(no author)</code>) &mdash; the raw <code>n</code> behind plot 9.</p>'
                   + _npa) if _npa else '')
     page = (
         '<!doctype html><html><head><meta charset="utf-8">'
@@ -4577,10 +4577,10 @@ def build_curator_dashboard(
         + params_html
         + forward_html
         + chart_html
+        + log_html
         + extra_html
         + _nps_html
         + _npa_html
-        + log_html
         + search_html
         + '</body></html>'
     )
