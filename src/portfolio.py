@@ -3655,11 +3655,11 @@ def build_curator_dashboard(
         rows=5, cols=1, vertical_spacing=0.06,
         row_heights=[0.22, 0.24, 0.13, 0.12, 0.17],
         subplot_titles=(
-            "1. Realized portfolio value: curator vs baselines vs benchmark",
-            "2. Watchlist composition over time — translucent = watchlisted, solid = funded by optimizer (color = wave bucket)",
-            "3. Cumulative $ gain per holding",
-            "4. Cumulative $ gain per wave bucket",
-            "5. Actual portfolio $ by wave over time",
+            "2. Realized portfolio value: curator vs baselines vs benchmark",
+            "3. Watchlist composition over time — translucent = watchlisted, solid = funded by optimizer (color = wave bucket)",
+            "4. Cumulative $ gain per holding",
+            "5. Cumulative $ gain per wave bucket",
+            "6. Actual portfolio $ by wave over time",
         ),
     )
 
@@ -4021,7 +4021,7 @@ def build_curator_dashboard(
                 f"<td style='color:#9a6a00;'>{rej_cell}</td></tr>"
             )
         log_html = (
-            "<h2 style='margin-top:2em;'>6. Curation log</h2>"
+            "<h2 style='margin-top:2em;'>1. Curation log</h2>"
             f"<p style='color:#555;'>The {_n_active} of {len(log)} {_html.escape(_cadence)} curator calls "
             "that made a change (no-change rebalances are hidden). The <em>Rejections</em> column lists each "
             "add/remove the validator dropped as invalid, as <code>TICKER (action)</code> — hover for the "
@@ -4562,7 +4562,7 @@ def build_curator_dashboard(
         f'look-ahead-reduced; browse them in the <a href="pool_browser.html">pool browser</a>) and proposed '
         'adds and removes against the active watchlist; the optimizer then ran '
         'mean-variance on the revised watchlist. Each rebalance is marked by an '
-        'orange square on the curator curve in chart 1 — hover over one to see '
+        'orange square on the curator curve in chart 2 — hover over one to see '
         'that rebalance\'s adds, removes, and the curator\'s rationale. '
         'The buy-and-hold curve below is '
         'the value of the initial portfolio (which never gets rebalanced or '
@@ -4576,8 +4576,8 @@ def build_curator_dashboard(
         + cards_html
         + params_html
         + forward_html
-        + chart_html
         + log_html
+        + chart_html
         + extra_html
         + _nps_html
         + _npa_html
