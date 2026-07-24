@@ -78,6 +78,22 @@ def _mws_rows():
     return rows
 
 
+def _turnover(snaps: pd.DataFrame) -> float:
+    """Annualized ONE-WAY portfolio turnover (%/yr) = churn. A trade shows up as a change in a ticker's
+    SHARE count between consecutive snapshot dates; dollars traded that day = sum_i |dshares_i| * price_i.
+    Turnover_t = dollars traded / portfolio value; we sum over the window, halve (one-way: a swap counts a
+    sell + a buy = 2, so /2 = one portfolio turned over), and annualize. 0%/yr = never trades; 100%/yr =
+    trades the whole portfolio once a year on average. Weight drift between rebalances is NOT a trade (shares
+    unchanged) so it correctly contributes nothing."""
+    sh = snaps.pivot_table(index="date", columns="ticker", values="shares", fill_value=0.0).sort_index()
+    px = snaps.pivot_table(index="date", columns="ticker", values="price", fill_value=0.0).sort_index()
+    tot = snaps.groupby("date")["total_value"].first().sort_index()
+    traded = (sh.diff().abs() * px).sum(axis=1)              # $ traded each date (0 on non-trade days)
+    frac_2way = float((traded / tot.replace(0, np.nan)).fillna(0.0).sum())   # two-way turnover, whole window
+    years = max((tot.index[-1] - tot.index[0]).days / 365.25, 1e-9)
+    return 100.0 * (frac_2way / 2.0) / years                # one-way %/yr
+
+
 def _metrics(totals: pd.Series, spy: pd.Series, ann_ret: float, max_dd: float) -> dict:
     """Risk-adjusted, benchmark-relative metrics from a config's equity curve + the SPY curve."""
     days = max((totals.index[-1] - totals.index[0]).days, 1)
@@ -206,7 +222,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     import hashlib
     import json as _json
     cache_p = ROOT / "data" / "curator_runs" / "_sweep_cache.json"
-    key = hashlib.md5(_json.dumps([CAPS, LAMBDAS, LOOKBACKS, list(CURRENT), runs_dir]).encode()).hexdigest()
+    key = hashlib.md5(_json.dumps([CAPS, LAMBDAS, LOOKBACKS, list(CURRENT), runs_dir, "churn-v1"]).encode()).hexdigest()
     rows = spy_ret = None
     if not recompute and cache_p.exists():
         try:
@@ -232,7 +248,8 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                                                                       float(totals.iloc[0]))["SPY"]
                     m = _metrics(totals, spy_curve, res["annualized_return"], res["max_drawdown"])
                     rows.append({"cap": cap, "lam": lam, "lb": lb, "ret": res["realized_return"],
-                                 "ann": res["annualized_return"], "dd": res["max_drawdown"], **m,
+                                 "ann": res["annualized_return"], "dd": res["max_drawdown"],
+                                 "churn": _turnover(snaps), **m,
                                  "cur": (cap, lam, lb) == CURRENT})
         spy_ret = float(spy_curve.iloc[-1] / spy_curve.iloc[0] - 1.0)
         cache_p.parent.mkdir(parents=True, exist_ok=True)
@@ -282,6 +299,22 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     fig.update_layout(template="seaborn", height=440, margin={"t": 20, "l": 60, "r": 20},
                       xaxis={"title": "max drawdown (|%|) — risk →"}, yaxis={"title": "annualized return %"})
     scatter = fig.to_html(full_html=False, include_plotlyjs="cdn", config={"displayModeBar": False})
+
+    # plot 1b: return vs CHURN (annualized one-way turnover). Same configs as plot 1; UPPER-LEFT = high
+    # return at low churn = the low-churn ideal (stable, less noise-chasing — even at zero trading cost).
+    _cfig = go.Figure()
+    _cfig.add_trace(go.Scatter(
+        x=[r["churn"] for r in rows], y=[r["ann"] * 100 for r in rows], mode="markers",
+        marker={"size": [16 if r["cur"] else 10 for r in rows],
+                "color": [r["ir"] for r in rows], "colorscale": "Viridis", "showscale": True,
+                "colorbar": {"title": "IR"}, "line": {"width": [3 if r["cur"] else 0 for r in rows], "color": "#e03131"}},
+        text=[f"cap {r['cap']} / λ {r['lam']} / {r['lb']}d<br>IR {r['ir']:+.2f}, churn {r['churn']:.0f}%/yr" for r in rows],
+        hovertemplate="%{text}<br>ann %{y:.0f}%, churn %{x:.0f}%/yr<extra></extra>"))
+    _cfig.update_layout(template="seaborn", height=440, margin={"t": 20, "l": 60, "r": 20},
+                        xaxis={"title": "churn — annualized one-way turnover (%/yr) → more trading"},
+                        yaxis={"title": "annualized return %"})
+    churn_scatter = _cfig.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False})
+    _cur_churn = next((r["churn"] for r in rows if r["cur"]), float("nan"))
 
     nav = dash_nav.render("sweep_pwr.html", built=False)   # this page renders its own "dashboard built" stamp
     _fmt = lambda xs: ", ".join(str(x) for x in xs)  # noqa: E731
@@ -488,6 +521,15 @@ both halves) before trusting any row.</p>
 {grid_html}
 <h2>1. Frontier — return vs drawdown (color = IR, red ring = current config)</h2>
 {scatter}
+<h2>1b. Frontier — return vs churn (color = IR, red ring = current config)</h2>
+<p style="color:#555;max-width:920px;">Same configs, but the risk axis is replaced by <b>churn</b> = annualized
+one-way <b>turnover</b> (%/yr): how much of the portfolio gets traded per year. A trade = a change in a
+position's share count between rebalances; drift between rebalances is not a trade. 100%/yr = the whole
+book is turned over once a year on average. Trading is <b>free in an IRA</b>, so this isn't a cost axis —
+it's a <b>stability / robustness</b> read: lower-churn configs chase noise less and tend to be less
+overfit, so <b>upper-left (high return at low churn) is the sweet spot</b>. The current config sits at
+{_cur_churn:.0f}%/yr.</p>
+{churn_scatter}
 <h2>2. All configs (ranked by IR)</h2>
 {rec_html}
 <p style="color:#666;font-size:12px;margin:.4em 0 .6em;max-width:920px;line-height:1.6;"><b>Column meanings:</b><br>
