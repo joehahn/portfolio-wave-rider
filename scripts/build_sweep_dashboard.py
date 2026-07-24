@@ -78,20 +78,23 @@ def _mws_rows():
     return rows
 
 
-def _turnover(snaps: pd.DataFrame) -> float:
-    """Annualized ONE-WAY portfolio turnover (%/yr) = churn. A trade shows up as a change in a ticker's
-    SHARE count between consecutive snapshot dates; dollars traded that day = sum_i |dshares_i| * price_i.
-    Turnover_t = dollars traded / portfolio value; we sum over the window, halve (one-way: a swap counts a
-    sell + a buy = 2, so /2 = one portfolio turned over), and annualize. 0%/yr = never trades; 100%/yr =
-    trades the whole portfolio once a year on average. Weight drift between rebalances is NOT a trade (shares
-    unchanged) so it correctly contributes nothing."""
+def _churn_metrics(snaps: pd.DataFrame):
+    """Two annualized measures of how much a config reshuffles the portfolio. A trade = a change in a
+    ticker's SHARE count between snapshots (weight DRIFT between rebalances isn't a trade). Per rebalance,
+    the signed weight-change vector from trades is dw_i = (dshares_i * price_i) / total_value. Then:
+      L1 (turnover): sum_i |dw_i| per rebalance, halved (one-way), annualized -> %/yr. Industry standard.
+      L2 (course-correction): sqrt(sum_i dw_i^2) per rebalance (Euclidean step length in weight-space),
+         annualized -> the total path length the portfolio was dragged along per year. Emphasizes
+         CONCENTRATED single-name rotations more than L1 does.
+    Returns (L1_ann_pct, L2_ann_pct)."""
     sh = snaps.pivot_table(index="date", columns="ticker", values="shares", fill_value=0.0).sort_index()
     px = snaps.pivot_table(index="date", columns="ticker", values="price", fill_value=0.0).sort_index()
     tot = snaps.groupby("date")["total_value"].first().sort_index()
-    traded = (sh.diff().abs() * px).sum(axis=1)              # $ traded each date (0 on non-trade days)
-    frac_2way = float((traded / tot.replace(0, np.nan)).fillna(0.0).sum())   # two-way turnover, whole window
+    dw = (sh.diff() * px).div(tot.replace(0, np.nan), axis=0).fillna(0.0)     # signed dweight per ticker/date
+    l1 = float(dw.abs().sum(axis=1).sum())                  # sum |dw|, whole window (two-way)
+    l2 = float(np.sqrt((dw ** 2).sum(axis=1)).sum())        # sum of Euclidean step lengths (L2 path length)
     years = max((tot.index[-1] - tot.index[0]).days / 365.25, 1e-9)
-    return 100.0 * (frac_2way / 2.0) / years                # one-way %/yr
+    return 100.0 * (l1 / 2.0) / years, 100.0 * l2 / years   # L1 one-way %/yr, L2 path-length /yr (x100)
 
 
 def _metrics(totals: pd.Series, spy: pd.Series, ann_ret: float, max_dd: float) -> dict:
@@ -222,7 +225,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     import hashlib
     import json as _json
     cache_p = ROOT / "data" / "curator_runs" / "_sweep_cache.json"
-    key = hashlib.md5(_json.dumps([CAPS, LAMBDAS, LOOKBACKS, list(CURRENT), runs_dir, "churn-v1"]).encode()).hexdigest()
+    key = hashlib.md5(_json.dumps([CAPS, LAMBDAS, LOOKBACKS, list(CURRENT), runs_dir, "churn-v2-l1l2"]).encode()).hexdigest()
     rows = spy_ret = None
     if not recompute and cache_p.exists():
         try:
@@ -247,9 +250,10 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                         spy_curve = portfolio._fetch_benchmark_curves(["SPY"], totals.index[0], totals.index[-1],
                                                                       float(totals.iloc[0]))["SPY"]
                     m = _metrics(totals, spy_curve, res["annualized_return"], res["max_drawdown"])
+                    _l1, _l2 = _churn_metrics(snaps)
                     rows.append({"cap": cap, "lam": lam, "lb": lb, "ret": res["realized_return"],
                                  "ann": res["annualized_return"], "dd": res["max_drawdown"],
-                                 "churn": _turnover(snaps), **m,
+                                 "l1": _l1, "l2": _l2, **m,
                                  "cur": (cap, lam, lb) == CURRENT})
         spy_ret = float(spy_curve.iloc[-1] / spy_curve.iloc[0] - 1.0)
         cache_p.parent.mkdir(parents=True, exist_ok=True)
@@ -300,21 +304,27 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                       xaxis={"title": "max drawdown (|%|) — risk →"}, yaxis={"title": "annualized return %"})
     scatter = fig.to_html(full_html=False, include_plotlyjs="cdn", config={"displayModeBar": False})
 
-    # plot 1b: return vs CHURN (annualized one-way turnover). Same configs as plot 1; UPPER-LEFT = high
-    # return at low churn = the low-churn ideal (stable, less noise-chasing — even at zero trading cost).
-    _cfig = go.Figure()
-    _cfig.add_trace(go.Scatter(
-        x=[r["churn"] for r in rows], y=[r["ann"] * 100 for r in rows], mode="markers",
-        marker={"size": [16 if r["cur"] else 10 for r in rows],
-                "color": [r["ir"] for r in rows], "colorscale": "Viridis", "showscale": True,
-                "colorbar": {"title": "IR"}, "line": {"width": [3 if r["cur"] else 0 for r in rows], "color": "#e03131"}},
-        text=[f"cap {r['cap']} / λ {r['lam']} / {r['lb']}d<br>IR {r['ir']:+.2f}, churn {r['churn']:.0f}%/yr" for r in rows],
-        hovertemplate="%{text}<br>ann %{y:.0f}%, churn %{x:.0f}%/yr<extra></extra>"))
-    _cfig.update_layout(template="seaborn", height=440, margin={"t": 20, "l": 60, "r": 20},
-                        xaxis={"title": "churn — annualized one-way turnover (%/yr) → more trading"},
-                        yaxis={"title": "annualized return %"})
-    churn_scatter = _cfig.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False})
-    _cur_churn = next((r["churn"] for r in rows if r["cur"]), float("nan"))
+    # plots 2 & 3: return vs churn, two norms. Same configs as plot 1; UPPER-LEFT (high return, low churn)
+    # = the stable, less-overfit ideal. L1 = turnover (industry standard); L2 = course-correction (Euclidean
+    # path length through weight-space, emphasizes concentrated rotations).
+    def _churn_scatter(field, xtitle):
+        f = go.Figure()
+        f.add_trace(go.Scatter(
+            x=[r[field] for r in rows], y=[r["ann"] * 100 for r in rows], mode="markers",
+            marker={"size": [16 if r["cur"] else 10 for r in rows],
+                    "color": [r["ir"] for r in rows], "colorscale": "Viridis", "showscale": True,
+                    "colorbar": {"title": "IR"}, "line": {"width": [3 if r["cur"] else 0 for r in rows], "color": "#e03131"}},
+            text=[f"cap {r['cap']} / λ {r['lam']} / {r['lb']}d<br>IR {r['ir']:+.2f}, {field.upper()} {r[field]:.0f}" for r in rows],
+            hovertemplate="%{text}<br>ann %{y:.0f}%, " + field.upper() + " %{x:.0f}<extra></extra>"))
+        f.update_layout(template="seaborn", height=440, margin={"t": 20, "l": 60, "r": 20},
+                        xaxis={"title": xtitle}, yaxis={"title": "annualized return %"})
+        return f.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False})
+    l1_scatter = _churn_scatter("l1", "L1 churn — annualized one-way turnover (%/yr) → more trading")
+    l2_scatter = _churn_scatter("l2", "L2 course-correction — annualized weight-space path length → more rotation")
+    _cur_l1 = next((r["l1"] for r in rows if r["cur"]), float("nan"))
+    _cur_l2 = next((r["l2"] for r in rows if r["cur"]), float("nan"))
+    import numpy as _np2
+    _l1l2_corr = float(_np2.corrcoef([r["l1"] for r in rows], [r["l2"] for r in rows])[0, 1])
 
     nav = dash_nav.render("sweep_pwr.html", built=False)   # this page renders its own "dashboard built" stamp
     _fmt = lambda xs: ", ".join(str(x) for x in xs)  # noqa: E731
@@ -372,7 +382,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
             + _c2(r["ir"], "{:+.2f}") + _c2(r["tstat"], "{:+.1f}") + _c2(r["sharpe"], "{:.2f}")
             + _c2(r["calmar"], "{:.2f}") + _c2(r["dd"] * 100, "{:.0f}%") + "</tr>")
     llm_html = (
-        '<h2>3. LLM comparison — curator model (same pools + profile config)</h2>'
+        '<h2>5. LLM comparison — curator model (same pools + profile config)</h2>'
         '<p style="color:#555;max-width:920px;">Every model reads the <b>same</b> news pools and replays at '
         'the profile config (cap 0.8 / λ 2.0 / 30d); the only variable is the curator LLM. The decision '
         'columns are the ones that matter: <b>agree</b> = share of weeks the model made the identical '
@@ -410,7 +420,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     _fig4.update_yaxes(title_text="portfolio value ($)", type="log",
                        tickvals=[10000, 30000, 100000, 300000, 1000000],
                        ticktext=["$10K", "$30K", "$100K", "$300K", "$1M"])
-    llm4_html = (('<h2>4. Portfolio value over time — by curator LLM (vs buy/hold and SPY)</h2>'
+    llm4_html = (('<h2>6. Portfolio value over time — by curator LLM (vs buy/hold and SPY)</h2>'
                   '<p style="color:#555;max-width:920px;">Each LLM\'s realized portfolio value on the same pools '
                   'and profile config, alongside the equal-weight buy/hold starter and SPY. Same idea as the '
                   'curator DB\'s plot 1, without the rebalance markers.</p>'
@@ -435,7 +445,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                       + _c2(s["add_mean"], "{:.2f}") + _c2(s["rem_mean"], "{:.2f}")
                       + "".join(_c2((s[k] or 0) * 100, "{:.0f}%") for k in _cr) + "</tr>")
         llm5_html = (
-            '<h2>5. Rationale-soundness — blind judge (leak-free)</h2>'
+            '<h2>7. Rationale-soundness — blind judge (leak-free)</h2>'
             '<p style="color:#555;max-width:920px;">Every backtest column above (return, IR, Sharpe, Calmar, '
             't-stat) is <b>in-sample</b> &mdash; the curator could have memorized which 2023&ndash;2026 names '
             'later won, so those numbers can\'t honestly rank <i>reasoning</i>. This section does: an '
@@ -484,7 +494,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                  f'<td>{r["ret"] * 100:+.0f}%</td><td>{r["nchg"]}</td><td {_lc}>{_nv}</td>'
                  f'<td {_lc}>{", ".join(r["wl"])}</td></tr>')
     mws_html = (
-        '<h2>6. max_watchlist_size sweep — does more room let the curator add NVDA?</h2>'
+        '<h2>8. max_watchlist_size sweep — does more room let the curator add NVDA?</h2>'
         '<p style="color:#555;max-width:920px;">Unlike the cap/&lambda;/lookback knobs above (free math '
         'replays on one curation set), <b>max_watchlist_size changes the curator\'s decisions</b>, so each '
         'cap is a separate re-curation (~$0.40 LLM each) on the same news pools and AAPL/GOOGL/AMZN starter. '
@@ -521,16 +531,23 @@ both halves) before trusting any row.</p>
 {grid_html}
 <h2>1. Frontier — return vs drawdown (color = IR, red ring = current config)</h2>
 {scatter}
-<h2>1b. Frontier — return vs churn (color = IR, red ring = current config)</h2>
-<p style="color:#555;max-width:920px;">Same configs, but the risk axis is replaced by <b>churn</b> = annualized
-one-way <b>turnover</b> (%/yr): how much of the portfolio gets traded per year. A trade = a change in a
-position's share count between rebalances; drift between rebalances is not a trade. 100%/yr = the whole
-book is turned over once a year on average. Trading is <b>free in an IRA</b>, so this isn't a cost axis —
-it's a <b>stability / robustness</b> read: lower-churn configs chase noise less and tend to be less
-overfit, so <b>upper-left (high return at low churn) is the sweet spot</b>. The current config sits at
-{_cur_churn:.0f}%/yr.</p>
-{churn_scatter}
-<h2>2. All configs (ranked by IR)</h2>
+<h2>2. Frontier — return vs L1 churn / turnover (color = IR, red ring = current config)</h2>
+<p style="color:#555;max-width:920px;">Same configs, risk axis replaced by <b>L1 churn = annualized one-way
+turnover (%/yr)</b>: how much of the portfolio is traded per year (Σ|Δweight| from share changes; drift
+between rebalances is not a trade). 100%/yr = the whole book turned over once a year. This is the
+<b>industry-standard</b> churn measure. Trading is <b>free in an IRA</b>, so read it as
+<b>stability/robustness</b>, not cost: lower churn = less noise-chasing / less overfit, so
+<b>upper-left (high return, low churn) is the sweet spot</b>. Current config: {_cur_l1:.0f}%/yr.</p>
+{l1_scatter}
+<h2>3. Frontier — return vs L2 course-correction (color = IR, red ring = current config)</h2>
+<p style="color:#555;max-width:920px;">Same idea, but churn is the <b>L2 (Euclidean) path length</b> the
+portfolio was dragged along through weight-space (√Σ&nbsp;Δweight² per rebalance, summed &amp;
+annualized) — your &ldquo;total course-correction&rdquo;. Vs L1, it weights <b>concentrated single-name
+rotations</b> more heavily. It ranks these configs almost identically to L1 (correlation
+{_l1l2_corr:.2f}), which is the useful takeaway: the two norms agree, so the churn ordering is robust.
+Current config: {_cur_l2:.0f}/yr.</p>
+{l2_scatter}
+<h2>4. All configs (ranked by IR)</h2>
 {rec_html}
 <p style="color:#666;font-size:12px;margin:.4em 0 .6em;max-width:920px;line-height:1.6;"><b>Column meanings:</b><br>
 <b>cap / λ / lookback</b> — the config: concentration cap (max weight per position) · risk-aversion λ · optimizer lookback (days of prices used to estimate μ/Σ).<br>
