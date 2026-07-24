@@ -3685,11 +3685,20 @@ def build_curator_dashboard(
     _chg_x, _chg_y, _chg_text = [], [], []           # watchlist changed
     for _d in rebalance_dates:
         _ts = pd.Timestamp(_d)
-        if _ts < start or _ts > end:
+        if _ts > end:
             continue
-        _val = totals.asof(_ts)
+        # NB: do NOT exclude _ts < start here. The day-0 rebalance can fall a day or two BEFORE the first
+        # snapshot (weekend + the t_update_days execution lag), and start = totals.index[0] is that first
+        # snapshot; excluding it would drop the opening rebalance's marker (often a watchlist change).
+        _val = totals.asof(_ts)                          # last value at/before the rebalance date
         if pd.isna(_val):
-            continue
+            # Date precedes the first snapshot (e.g. the day-0 rebalance on a Fri/Sat, before the
+            # t_update_days execution lag lands the first trade) -> anchor to the first value instead,
+            # so the opening rebalance's marker (often a watchlist change) still renders.
+            _after = totals[totals.index >= _ts]
+            if _after.empty:
+                continue
+            _val = float(_after.iloc[0])
         _cj_path = Path(runs_dir) / f"{_d}-curation.json"
         _changed = False
         try:
