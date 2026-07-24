@@ -3727,6 +3727,10 @@ def build_curator_dashboard(
     for tk, _s, _e, _wb in periods:
         if tk not in seen: seen.append(tk)
     seen.reverse()  # so top of chart is first-added
+    # always_include anchors (SPY/AGG/IAU) sink to the BOTTOM rows (highest y-index on the reversed axis),
+    # so the curator's wave picks read at the top and the permanent safe-havens sit beneath them.
+    _anchors = set(load_financial_model().get("always_include", []))
+    seen = [t for t in seen if t not in _anchors] + [t for t in seen if t in _anchors]
     y_index = {tk: i for i, tk in enumerate(seen)}
 
     # FUNDED intervals per ticker: snapshot dates where the optimizer actually gave it weight
@@ -3993,7 +3997,7 @@ def build_curator_dashboard(
                 f"<td style='color:#9a6a00;'>{rej_cell}</td></tr>"
             )
         log_html = (
-            "<h2 style='margin-top:2em;'>11. Curation log</h2>"
+            "<h2 style='margin-top:2em;'>12. Curation log</h2>"
             f"<p style='color:#555;'>The {_n_active} of {len(log)} {_html.escape(_cadence)} curator calls "
             "that made a change (no-change rebalances are hidden). The <em>Rejections</em> column lists each "
             "add/remove the validator dropped as invalid, as <code>TICKER (action)</code> — hover for the "
@@ -4068,7 +4072,7 @@ def build_curator_dashboard(
             )
     if _st_blocks:
         search_html = (
-            "<h2 style='margin-top:2em;'>12. Curator decisions &amp; search terms</h2>"
+            "<h2 style='margin-top:2em;'>13. Curator decisions &amp; search terms</h2>"
             f"<p style='color:#555;max-width:780px;'>One row per {_html.escape(_cadence)} rebalance. "
             "Click to expand the curator's overall rationale, each add/remove with its reason, the cited "
             "<code>news_evidence</code> links, and the wave keywords behind that rebalance's pool "
@@ -4322,24 +4326,41 @@ def build_curator_dashboard(
     def _url_domain(u):
         m = re.search(r"https?://([^/]+)", u or "")
         return re.sub(r":\d+$", "", re.sub(r"^www\.", "", m.group(1).lower())) if m else ""  # strip www + :port
-    _src_ret, _kw_ret = _ddict(list), _ddict(list)
+    # Author lookup: _authors.json maps evidence URL -> byline (";"-separated co-authors), captured by the
+    # post-run author refetch. Key it scheme/www-insensitively so https evidence URLs match http cache keys.
+    def _url_key(u):
+        return re.sub(r"^https?://(www\.)?", "", (u or "").lower()).rstrip("/")
+    _author_by_key = {}
+    try:
+        for _k, _v in json.loads((Path(runs_dir) / "_authors.json").read_text()).items():
+            if _v:
+                _author_by_key[_url_key(_k)] = _v
+    except Exception:  # noqa: BLE001
+        pass
+    _src_ret, _kw_ret, _author_ret = _ddict(list), _ddict(list), _ddict(list)
     for (_d, _t, _ac, _ev) in _events:
         if _ac != "add":
             continue
         _r = _fwd_ret(_t, _d)
         if _r is None:
             continue
-        _srcs = set()
+        _srcs, _auths = set(), set()
         for _e in (_ev or []):
             _dom = _url_domain(_e.get("url", "")) or re.sub(r"[^a-z0-9]", "", (_e.get("source") or "").lower())
             if _dom:
                 _srcs.add(_dom)
+            _byline = _author_by_key.get(_url_key(_e.get("url", "")))
+            for _one in re.split(r"\s*;\s*", _byline or ""):
+                if _one.strip():
+                    _auths.add(_one.strip())
             _low = f"{_e.get('summary', '')} {_e.get('url', '')}".lower()
             for _k in _kwmap:
                 if _k in _low:
                     _kw_ret[_k].append(_r)
         for _s in (_srcs or {"(no source)"}):
             _src_ret[_s].append(_r)
+        for _a1 in _auths:               # dedupe co-authors per add (mirrors the per-add source dedupe)
+            _author_ret[_a1].append(_r)
 
     # universe padding: show configured items that produced ZERO with a 0 bar (like the retriever DB) —
     # recognized desks (news_sources.md) for the source plots, all wave keywords for the keyword plot.
@@ -4383,6 +4404,7 @@ def build_curator_dashboard(
 
     _gain_src = _attr_html(_src_ret, "mean forward price return of adds (%)", universe=_recognized, noun="sources")
     _gain_kw = _attr_html(_kw_ret, "mean forward price return of adds (%)", universe=set(_kwmap), noun="keywords")
+    _gain_author = _attr_html(_author_ret, "mean forward price return of adds (%)", noun="authors")
 
     # Gain PER ARTICLE vs source: normalize each source's TOTAL add-gain by how many articles it put into
     # the pools (its pool footprint) -> signal density. Pool counts come from the run's *-pool.json (GKG).
@@ -4438,18 +4460,25 @@ def build_curator_dashboard(
                  'divided by how many articles that source contributed to the pools (its footprint, shown as '
                  '<code>N&nbsp;art.</code>). Signal <b>density</b>: high = a source that produced gains from '
                  'few articles; near-zero/negative with many articles = low-signal, a block-list candidate.</p>')
+    _author_note = ('<p style="color:#555;max-width:820px;margin:0 0 .4em;">Plot&nbsp;7\'s forward price return, '
+                    'but bucketed by the article <b>author</b> (byline extracted from each cited evidence URL) '
+                    'instead of the source domain. Which reporters surfaced winning picks. n = number of adds; a '
+                    'co-authored article credits each byline. Adds whose evidence URL has no captured byline are omitted.</p>')
 
     extra_html = (
         '<h2 style="margin:1.6em 0 0.2em;">6. Allocation over time</h2>'
         '<p style="color:#555;max-width:820px;margin:0 0 .4em;">Capital committed per ticker as a share of '
         'the portfolio; any remainder is cash.</p>' + _to_html(_af)
         + (('<h2 style="margin:1.6em 0 0.2em;">7. Gains vs news source</h2>' + _attr_note + _gain_src) if _gain_src else '')
-        + (('<h2 style="margin:1.6em 0 0.2em;">8. Number of adds per source</h2>'
-            '<p style="color:#555;max-width:820px;margin:0 0 .4em;">How many adds cited each source '
-            '(by URL domain) as evidence &mdash; the raw <code>n</code> behind plots 7 and 9.</p>' + _nps) if _nps else '')
+        + (('<h2 style="margin:1.6em 0 0.2em;">8. Gains vs author</h2>' + _author_note + _gain_author) if _gain_author else '')
         + (('<h2 style="margin:1.6em 0 0.2em;">9. Gain per article vs news source</h2>' + _gpa_note + _gain_per_art) if _gain_per_art else '')
         + (('<h2 style="margin:1.6em 0 0.2em;">10. Gains vs search keyword</h2>' + _attr_note + _gain_kw) if _gain_kw else '')
     )
+    # 11. Number of adds per source — moved to sit just above the Curation log (below the gain plots).
+    _nps_html = (('<h2 style="margin:1.6em 0 0.2em;">11. Number of adds per source</h2>'
+                  '<p style="color:#555;max-width:820px;margin:0 0 .4em;">How many adds cited each source '
+                  '(by URL domain) as evidence &mdash; the raw <code>n</code> behind plots 7 and 9.</p>'
+                  + _nps) if _nps else '')
     page = (
         '<!doctype html><html><head><meta charset="utf-8">'
         '<title>Curator Backtest</title>'
@@ -4486,6 +4515,7 @@ def build_curator_dashboard(
         + forward_html
         + chart_html
         + extra_html
+        + _nps_html
         + log_html
         + search_html
         + '</body></html>'

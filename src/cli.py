@@ -382,21 +382,9 @@ def main(argv: list[str] | None = None) -> int:
                 out_path = args.out
                 if out_path == "docs/index.html":
                     out_path = "docs/backtest_curator.html"
-                # Optional parameter note above plot 1: the run's curator LLM + the optimizer config
-                # (read from the profile, the single source of truth for the replay knobs).
+                # No parameter note above plot 1: the Parameter-settings table below already lists these
+                # knobs (read from the profile), so a duplicate line would just be redundant.
                 config_note = None
-                if args.curator_model:
-                    _fm = portfolio.load_financial_model()
-                    config_note = (
-                        f"curator_model: {args.curator_model}  ·  "
-                        f"concentration_cap: {_fm['concentration_cap']:.2f}  ·  "
-                        f"risk_aversion λ: {_fm['risk_aversion']:g}  ·  "
-                        f"optimizer_lookback_days: {int(_fm.get('optimizer_lookback_days', 30))}  ·  "
-                        f"news_lookback_days: {int(_fm.get('news_lookback_days', 21))}  ·  "
-                        f"min_trade_size_frac: {_fm.get('min_trade_size_frac', 0.1):g}  ·  "
-                        f"rebalance: {_fm['rebalance_period']}  ·  "
-                        f"max_watchlist_size: {int(_fm.get('max_watchlist_size', 5))}"
-                    )
                 result = portfolio.build_curator_dashboard(
                     backtest_dir=args.curator_backtest_dir,
                     runs_dir=args.curator_runs_dir or "",
