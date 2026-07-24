@@ -285,9 +285,7 @@ def build(run_rel, out):
     fig.update_xaxes(title_text="unique articles (log; 0 plotted at 0.5)", type="log", row=8, col=1)
     fig.update_yaxes(dtick=1, tickfont={"size": 9}, row=8, col=1)   # force EVERY keyword label
     fig.update_layout(template="seaborn", height=int(340 * 12.0), barmode="group", showlegend=False,
-                      title={"text": "Portfolio Wave Rider — news retrieval dashboard (GKG + Wayback)",
-                             "y": 0.999, "yanchor": "top"},
-                      margin={"t": 70, "l": 200}, hovermode="closest")
+                      margin={"t": 55, "l": 200}, hovermode="closest")
     chart_html = fig.to_html(full_html=False, include_plotlyjs="cdn", config={"displayModeBar": False})
 
     # ---- 9. Articles per author (bylines from the post-run live author-refetch: run_rel/_authors.json) ----
@@ -334,6 +332,19 @@ def build(run_rel, out):
         _start, _end = (_sd[0], _sd[-1]) if _sd else (as_of[0], as_of[-1])
     else:
         _start, _end = as_of[0], as_of[-1]
+    # Parameter settings (retrieval knobs), read from the run's _starter.json — shown just above plot 1.
+    _stp = ROOT / run_rel / "_starter.json"
+    _st = json.loads(_stp.read_text()) if _stp.exists() else {}
+    _params = (
+        '<h2 style="margin:1.6em 0 0.3em;">Parameter settings</h2>'
+        '<p style="color:#555;max-width:940px;font-size:13px;">The retrieval knobs upstream of the curator '
+        '(the optimizer knobs live in the Sweeps DB). &nbsp;'
+        f'window <b>{_start} to {_end}</b> &middot; cadence <b>{_st.get("rebalance_period", "?")}</b> '
+        f'({len(pools)} rebalances) &middot; news_lookback <b>{_st.get("news_lookback_days", "?")}d</b> '
+        f'&middot; pool = ranked <b>top-{max(pool_n) if pool_n else 100}</b> articles/rebalance '
+        '(salience &times; authority, per-wave top-K) &middot; lede: look-ahead-clean Wayback &rarr; '
+        'title-gated live-fallback (<b>fuller</b>) &middot; curator <b>kimi-k2.5</b> &middot; source filters '
+        'from <code>news_sources.md</code> (block / major / specialty).</p>')
 
     page = (
         '<!doctype html><html><head><meta charset="utf-8"><title>Retriever Backtest</title>'
@@ -358,7 +369,7 @@ def build(run_rel, out):
         f'per-window <code>&lt;date&gt;-pool.json</code> (ranked article list; <code>lede</code> = clean '
         f'Wayback join, <code>lede_live</code> = biased live-fallback, <code>lede_sources</code> = the '
         f'clean/live/none split), plus <code>_corpus/</code> (full gathering, one file per day).</p>'
-        + f'<div style="margin:1em 0 1.5em">{cards}</div>' + chart_html + author_html + '</body></html>'
+        + f'<div style="margin:1em 0 1.5em">{cards}</div>' + _params + chart_html + author_html + '</body></html>'
     )
     out.write_text(page)
     print(f"wrote {out}")

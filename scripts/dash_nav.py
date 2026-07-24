@@ -36,11 +36,11 @@ def render(current: str = "", built: bool = True) -> str:
     matches `current` is bold, not a link (so a reader sees which page they're on)."""
     ts = (f'<span style="float:right;color:#aaa;font-weight:normal;">built '
           f'{datetime.now().strftime("%Y-%m-%d %H:%M")}</span>') if built else ""
-    sep = '&nbsp;&nbsp;&nbsp;<span style="color:#ccc;">|</span>&nbsp;&nbsp;&nbsp;'
     return (
         '<nav style="font-size:13px;color:#555;margin:0 0 1.2em;padding-bottom:.5em;'
-        'border-bottom:1px solid #eee;">'
-        f'{ts}{_link(*README, current)}{sep}'
-        f'<span style="color:#999;">Backtest</span> &nbsp;{_group(BACKTEST, current)}{sep}'
-        f'<span style="color:#999;">Forwardtest</span> &nbsp;{_group(FORWARDTEST, current)}'
+        'border-bottom:1px solid #eee;line-height:1.9;">'
+        f'{ts}'
+        f'<div>{_link(*README, current)}</div>'
+        f'<div><span style="color:#999;">Backtest</span> &nbsp;&nbsp;{_group(BACKTEST, current)}</div>'
+        f'<div><span style="color:#999;">Forwardtest</span> &nbsp;&nbsp;{_group(FORWARDTEST, current)}</div>'
         '</nav>')
