@@ -72,7 +72,9 @@ source_major:
   - fortune.com
   - investors.com
   - seekingalpha.com
-  - benzinga.com
+  # benzinga.com demoted from major-wire 2026-07-24: 99% of its stories were benzinga-only (no other
+  #   recognized desk carried them), a high-volume PR/aggregator firehose that padded pool volume. Removed
+  #   from source_major so it drops to the long-tail (1.0) tier and no longer counts toward story salience.
   - theverge.com
   - techcrunch.com
   - axios.com
