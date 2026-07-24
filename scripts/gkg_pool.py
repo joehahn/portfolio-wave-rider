@@ -47,11 +47,14 @@ CONFIG_FILE = ROOT / "gkg_config.json"   # ALL GKG solution params, shared backt
 
 _cfg = json.loads(CONFIG_FILE.read_text())
 _eng = _cfg["engine"]
-LOOKBACK_DAYS = _eng["lookback_days"]     # trailing news window (scales with rebalance cadence)
-ONTOPIC_OFFSET = _eng["ontopic_offset"]   # org counts as SUBJECT only within first N chars
-TOP_COMPANIES = _eng["top_companies"]     # cap the discovered-company ranking fed to the curator
-SAMPLE_HEADLINES = _eng["sample_headlines"]
-MAX_SCAN_GB = _eng["max_scan_gb"]         # dry-run cost guard
+ONTOPIC_OFFSET = _eng["ontopic_offset"]   # org counts as SUBJECT only within first N chars (live-backtest ingest)
+MAX_SCAN_GB = _eng["max_scan_gb"]         # BigQuery dry-run cost guard (live-backtest ingest)
+# Discovery-mode-only constants (used solely by build_pool, the older company-discovery path behind the
+# run-backtest-gkg skill; the current article-based backtest in backtest_sdk.py does NOT use them). Kept
+# as literals here rather than in gkg_config.json so the shared config lists only the live-pipeline knobs.
+LOOKBACK_DAYS = 90        # discovery trailing-news window (days)
+TOP_COMPANIES = 60        # cap on the discovered-company ranking fed to the curator
+SAMPLE_HEADLINES = 3      # example headlines per discovered company in the prompt
 WAVE_KEYWORDS = _cfg["wave_keywords"]                       # {wave: [keyword, ...]}
 ORG_STOPLIST = {s.lower() for s in _cfg["org_stoplist"]}   # non-company ENTITIES (engine mechanics)
 

@@ -155,18 +155,14 @@ def build(run_rel, out):
             day_x.append(k); day_yg.append(day_g.get(k, 0)); day_yw.append(day_w.get(k, 0))
             x += timedelta(days=1)
 
-    # ---- monthly lede coverage (plot 6): aggregate each month's pools' clean/live/n ----
-    mon_led = {}   # 'YYYY-MM' -> [wayback, live, n]
-    for p in pools:
-        mo = p.get("as_of_date", "")[:7]
-        if not mo:
-            continue
-        ls = p.get("lede_sources", {})
-        acc = mon_led.setdefault(mo, [0, 0, 0])
-        acc[0] += ls.get("wayback", 0); acc[1] += ls.get("live", 0); acc[2] += p.get("n_articles", 0)
-    led_months = sorted(mon_led)
-    clean_rate_m = [mon_led[m][0] / max(mon_led[m][2], 1) for m in led_months]
-    total_rate_m = [(mon_led[m][0] + mon_led[m][1]) / max(mon_led[m][2], 1) for m in led_months]
+    # ---- per-POOL (biweekly) lede coverage (plot 6): one point per rebalance pool at the finest
+    # granularity, so a single Wayback-miss pool shows as its own drop rather than being averaged into a
+    # coarser monthly bucket (where a healthy sibling pool would mask it). ----
+    _bw = sorted(((p.get("as_of_date", ""), p.get("lede_sources", {}), max(p.get("n_articles", 1), 1))
+                  for p in pools if p.get("as_of_date")), key=lambda r: r[0])
+    bw_x = [d for d, _, _ in _bw]
+    bw_clean = [ls.get("wayback", 0) / n for _, ls, n in _bw]
+    bw_total = [(ls.get("wayback", 0) + ls.get("live", 0)) / n for _, ls, n in _bw]
 
     # ---- per-wave (unique articles; first wave from title+url, else "general") ----
     wave_c = Counter()
@@ -232,9 +228,11 @@ def build(run_rel, out):
         "4. Unique articles by DAY OF WEEK<br><sub><i>publication cadence: weekend dip is normal news "
         "behavior, not a gap</i></sub>",
         "5. Unique articles by wave<br><sub><i>coverage by theme (first matched wave, else general)</i></sub>",
-        "6. Lede coverage by MONTH — clean vs clean+live<br><sub><i>monthly lede yield: GREEN = "
-        "clean Wayback join (look-ahead-safe), ORANGE = clean + live-fallback (the gap = the "
-        "look-ahead-BIASED live ledes that fill Wayback-misses)</i></sub>",
+        "6. Lede coverage by POOL (per biweekly rebalance) — clean vs clean+live<br><sub><i>per-rebalance "
+        "lede yield at the FINEST granularity (one point per pool, not monthly-averaged, so a single "
+        "Wayback-miss pool is visible as its own drop): GREEN = clean Wayback join (look-ahead-safe), "
+        "ORANGE = clean + live-fallback (the gap = the look-ahead-BIASED live ledes that fill "
+        "Wayback-misses)</i></sub>",
         f"7. Source utilization — every configured desk (incl. {n_rec_zero} that GKG surfaced ZERO "
         f"times) + top {N_GREY} others<br><sub><i>green = specialty (2.0), blue = major wire (1.5), "
         "grey = other (1.0); zero-length bars = configured desks GKG never indexed (e.g. paywalled "
@@ -259,12 +257,13 @@ def build(run_rel, out):
     # 5. per-wave horizontal bars
     fig.add_trace(go.Bar(x=[v for _, v in wv][::-1], y=[k for k, _ in wv][::-1],
                          orientation="h", marker_color=GREEN), row=5, col=1)
-    # 6. lede coverage BY MONTH: clean (Wayback) and clean+live (total). The band between them is the
-    # look-ahead-biased live-fallback contribution. Aggregated monthly (each month's pools pooled).
-    fig.add_trace(go.Scatter(x=led_months, y=total_rate_m, mode="lines+markers", name="clean + live",
-                             line={"color": ORANGE, "width": 2}, marker={"size": 6}), row=6, col=1)
-    fig.add_trace(go.Scatter(x=led_months, y=clean_rate_m, mode="lines+markers", name="clean (Wayback)",
-                             line={"color": GREEN, "width": 2}, marker={"size": 6}), row=6, col=1)
+    # 6. lede coverage BY POOL (per biweekly rebalance): clean (Wayback) and clean+live (total), one point
+    # per pool at the finest granularity. The band between them is the look-ahead-biased live-fallback
+    # contribution; a single Wayback-miss pool shows as its own drop rather than being averaged into a month.
+    fig.add_trace(go.Scatter(x=bw_x, y=bw_total, mode="lines+markers", name="clean + live",
+                             line={"color": ORANGE, "width": 1.6}, marker={"size": 5}), row=6, col=1)
+    fig.add_trace(go.Scatter(x=bw_x, y=bw_clean, mode="lines+markers", name="clean (Wayback)",
+                             line={"color": GREEN, "width": 1.6}, marker={"size": 5}), row=6, col=1)
     # 7. source utilization horizontal, tier-colored (all recognized incl zeros + top other).
     # Log x-axis; a zero-contributor is plotted at 0.5 so it shows a tiny bar (log 0 is undefined).
     # The hover keeps the TRUE count so the 0.5 substitution isn't misleading.
@@ -289,6 +288,13 @@ def build(run_rel, out):
     fig.update_layout(template="seaborn", height=int(400 * 12.0), barmode="group", showlegend=False,
                       margin={"t": 55, "l": 200}, hovermode="closest")
     chart_html = fig.to_html(full_html=False, include_plotlyjs="cdn", config={"displayModeBar": False})
+
+    # Link to the full keyword config just below the keyword plot (plot 9), so a reader can see the
+    # complete per-wave search-term lists that drive retrieval (gkg_config.json is git-tracked / public).
+    cfg_link = ('<p style="color:#555;max-width:820px;margin:.2em 0 0;">The full per-wave search-term '
+                'lists behind plot 9 live in <a href="https://github.com/joehahn/portfolio-wave-rider/'
+                'blob/main/gkg_config.json"><code>gkg_config.json</code></a> '
+                '(<code>wave_keywords</code>).</p>')
 
     # ---- 9. Articles per author (bylines from the post-run live author-refetch: run_rel/_authors.json) ----
     author_html = ""
@@ -337,6 +343,7 @@ def build(run_rel, out):
     # Parameter settings: only the user-set investor_profile.md knobs relevant to RETRIEVAL (mirrors the
     # Curator Backtest's table; the optimizer knobs live there + in the Sweeps DB).
     _fm = _pf.load_financial_model(str(ROOT / "investor_profile.md"))
+    _bt = _pf.load_backtest_config(str(ROOT / "investor_profile.md"))   # max_articles lives here now
     def _prow(label, value):   # one parameter per row, matching the Curator Backtest's table
         return (f"<tr><td style='padding:5px 14px 5px 0;color:#555;white-space:nowrap;'>{label}</td>"
                 f"<td style='padding:5px 0;font-weight:600;'>{value}</td></tr>")
@@ -349,7 +356,7 @@ def build(run_rel, out):
         + _prow("Backtest window", f"{_start} &rarr; {_end}")
         + _prow("Rebalance cadence", f"{_fm['rebalance_period']}")
         + _prow("News lookback", f"{int(_fm['news_lookback_days'])} days")
-        + _prow("Max articles / pool", f"{int(_fm['max_articles'])}")
+        + _prow("Max articles / pool", f"{int(_bt['max_articles'])}")
         + "</tbody></table>")
 
     page = (
@@ -375,7 +382,7 @@ def build(run_rel, out):
         f'per-window <code>&lt;date&gt;-pool.json</code> (ranked article list; <code>lede</code> = clean '
         f'Wayback join, <code>lede_live</code> = biased live-fallback, <code>lede_sources</code> = the '
         f'clean/live/none split), plus <code>_corpus/</code> (full gathering, one file per day).</p>'
-        + f'<div style="margin:1em 0 1.5em">{cards}</div>' + _params + chart_html + author_html + '</body></html>'
+        + f'<div style="margin:1em 0 1.5em">{cards}</div>' + _params + chart_html + cfg_link + author_html + '</body></html>'
     )
     out.write_text(page)
     print(f"wrote {out}")

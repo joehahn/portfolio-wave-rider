@@ -383,7 +383,7 @@ def main(argv=None) -> int:
     if a.risk_aversion is None:
         a.risk_aversion = float(fm["risk_aversion"])
     if a.max_articles is None:
-        a.max_articles = int(fm.get("max_articles") or 100)
+        a.max_articles = int(bt.get("max_articles") or 100)   # backtest-section knob (moved out of financial_model)
     if a.model is None:
         a.model = portfolio.load_backtest_config().get("curator_model") or "claude-sonnet-5"
     global NO_REASONING

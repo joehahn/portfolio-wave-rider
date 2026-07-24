@@ -52,10 +52,6 @@ _FINANCIAL_MODEL_DEFAULTS: dict[str, Any] = {
     # rebalance (typically == the rebalance cadence in days).
     "optimizer_lookback_days": None,
     "news_lookback_days": None,
-    # max_articles: GKG-backtest retrieval knob — max ranked articles fed to the curator per rebalance.
-    # Backtest-only (live WebSearch sets its own per-query result count); kept here next to
-    # news_lookback_days so the two "how much news the curator reads" knobs live together.
-    "max_articles": 100,
     "rebalance_period": "monthly",
     "max_watchlist_size": 12,
     # concentration_cap is the optimizer's per-position max weight (the
@@ -151,6 +147,10 @@ _BACKTEST_DEFAULTS: dict[str, Any] = {
     # Trading-day lag from a rebalance signal (decided on the rebalance date's
     # close) to the trade actually landing. 1 = next session. Backtest-only.
     "t_update_days": 1,
+    # max_articles: retrieval knob — max ranked articles fed to the curator per rebalance pool.
+    # Backtest-only (the live/forward retriever sets its own per-query result count), so it lives in
+    # the backtest section next to the other backtest-only knobs rather than in financial_model.
+    "max_articles": 100,
     # Optional BACKTEST-ONLY optimizer overrides. None => use the live
     # financial_model / concentration_cap values. Set these to run the backtest
     # with different optimizer knobs than the live recommend path (e.g. a
