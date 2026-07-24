@@ -188,15 +188,21 @@ def build(run_rel, out):
     src_rows = sorted(rec_rows + grey_rows, key=lambda r: r[1])   # ascending -> highest at top (h-bars)
 
     # ---- articles per SEARCH KEYWORD (plot 8): the retriever's surfacing mechanism is gkg_config.json's
-    # wave_keywords, so each keyword IS a query term. Geopolitical is split into the profile's subwaves
-    # for display; profile waves/subwaves with NO keyword are appended at 0 (red) so the coverage GAPS
-    # are explicit (aging-population is a whole missing wave; geo tankers + reconstruction are missing
-    # subwaves — documented, left unfixed per user choice 2026-07-20). ----
+    # wave_keywords, so each keyword IS a query term. Geopolitical is split into its four profile subwaves
+    # for display (defense, drones, tankers, reconstruction). All profile waves/subwaves now carry keywords
+    # (the tanker/reconstruction/aging gaps were filled 2026-07-24); rows for the newly-added terms read low
+    # until the next GKG re-ingest, since the current corpus predates them. ----
     KW_WAVE = g._KW_WAVE                                  # {keyword: wave}
     GEO_SUB = {"geo-defense": {"hypersonic", "missile", "fighter jet", "warship", "munition", "defense contract"},
-               "geo-drones": {"loitering", "counter-drone", "drone swarm"}}
+               "geo-drones": {"loitering", "counter-drone", "drone swarm"},
+               "geo-tankers": {"oil tanker", "crude tanker", "product tanker", "tanker rates", "vlcc",
+                               "strait of hormuz", "tanker demand"},
+               "geo-reconstruction": {"gaza reconstruction", "syria reconstruction", "lebanon reconstruction",
+                                      "iran reconstruction", "middle east reconstruction", "reconstruction contract",
+                                      "vision 2030", "megaproject", "engineering and construction"}}
     WAVE_COLOR = {"AI": "#1f77b4", "rockets_spacecraft": "#ff7f0e", "nuclear": "#2ca02c",
-                  "quantum": "#9467bd", "robotics": "#8c564b", "geo-defense": "#d62728", "geo-drones": "#e377c2"}
+                  "quantum": "#9467bd", "robotics": "#8c564b", "geo-defense": "#d62728", "geo-drones": "#e377c2",
+                  "geo-tankers": "#17becf", "geo-reconstruction": "#bcbd22", "aging_demographics": "#7f7f7f"}
 
     def _kw_group(kw, wave):
         if wave == "geopolitical":
@@ -208,11 +214,11 @@ def build(run_rel, out):
         for kw in KW_WAVE:
             if re.search(r"\b" + re.escape(kw) + r"\b", text):
                 kw_cnt[kw] += 1
+    # Every configured keyword is a row (all four geopolitical subwaves + aging now have keywords, so the
+    # old hard-coded "NO KEYWORDS" red rows are gone). Counts reflect the CURRENT corpus, which predates
+    # the tanker/reconstruction/aging keywords, so those rows read low until the next GKG re-ingest.
     kw_rows = [(f"[{_kw_group(kw, wave)}] {kw}", kw_cnt.get(kw, 0), WAVE_COLOR.get(_kw_group(kw, wave), GREY))
                for kw, wave in KW_WAVE.items()]
-    kw_rows += [("[geo-tankers] — NO KEYWORDS (uncovered subwave)", 0, RED),
-                ("[geo-reconstruction] — NO KEYWORDS (uncovered subwave)", 0, RED),
-                ("[aging-population] — NO KEYWORDS (whole wave uncovered)", 0, RED)]
     kw_rows.sort(key=lambda r: r[1])                     # ascending -> highest at top (h-bars)
     n_kw_zero = sum(1 for _, c, _ in kw_rows if c == 0)
 
@@ -238,9 +244,10 @@ def build(run_rel, out):
         "grey = other (1.0); zero-length bars = configured desks GKG never indexed (e.g. paywalled "
         f"wires). {n_src_total} distinct sources appeared overall.</i></sub>",
         "8. Articles per SEARCH KEYWORD — the retriever's surfacing terms (gkg_config.json)<br><sub><i>"
-        "each keyword is a query term; colored by wave, geopolitical split into the profile's subwaves. "
-        f"RED = profile waves/subwaves with NO keyword ({n_kw_zero} zero-yield rows incl. aging-population, "
-        "geo-tankers, geo-reconstruction — coverage gaps)</i></sub>",
+        "each keyword is a query term; colored by wave, geopolitical split into its four profile subwaves "
+        "(defense, drones, tankers, reconstruction). All profile waves/subwaves now carry keywords; the "
+        f"{n_kw_zero} zero/low-count rows are terms the CURRENT corpus predates (tanker/reconstruction/aging, "
+        "added 2026-07-24) — they populate on the next GKG re-ingest</i></sub>",
     )
     # Plots 7 & 8 list many rows, so give those rows much more vertical room than the others.
     fig = make_subplots(rows=8, cols=1, vertical_spacing=0.025, subplot_titles=titles,
