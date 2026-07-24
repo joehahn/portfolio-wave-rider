@@ -3678,7 +3678,11 @@ def build_curator_dashboard(
     # what the curator changed (adds/removes) and a one-sentence "why" from
     # that quarter's curation JSON. asof() places each marker on the nearest
     # snapshot at/before the quarter-end.
-    _rebal_x, _rebal_y, _rebal_text = [], [], []
+    # Split rebalance markers: watchlist CHANGED (non-empty adds/removes) -> a bigger RED square that
+    # stands out; a no-change rebalance -> the small orange square. So the eye lands on the dates that
+    # actually rotated the watchlist.
+    _rebal_x, _rebal_y, _rebal_text = [], [], []     # no-change rebalances
+    _chg_x, _chg_y, _chg_text = [], [], []           # watchlist changed
     for _d in rebalance_dates:
         _ts = pd.Timestamp(_d)
         if _ts < start or _ts > end:
@@ -3686,16 +3690,36 @@ def build_curator_dashboard(
         _val = totals.asof(_ts)
         if pd.isna(_val):
             continue
-        _rebal_x.append(_ts)
-        _rebal_y.append(float(_val))
-        _rebal_text.append(_rebalance_popup(Path(runs_dir) / f"{_d}-curation.json"))
+        _cj_path = Path(runs_dir) / f"{_d}-curation.json"
+        _changed = False
+        try:
+            _cj = json.loads(_cj_path.read_text())
+            _changed = bool(_cj.get("adds") or _cj.get("removes"))
+        except Exception:  # noqa: BLE001
+            pass
+        _popup = _rebalance_popup(_cj_path)
+        if _changed:
+            _chg_x.append(_ts); _chg_y.append(float(_val)); _chg_text.append(_popup)
+        else:
+            _rebal_x.append(_ts); _rebal_y.append(float(_val)); _rebal_text.append(_popup)
     fig.add_trace(
-        go.Scatter(x=_rebal_x, y=_rebal_y, mode="markers", name="Rebalanced",
+        go.Scatter(x=_rebal_x, y=_rebal_y, mode="markers", name="Rebalanced (no change)",
                    marker=_REBALANCE_MARKER,
                    hovertext=_rebal_text,
                    hoverlabel={"align": "left", "bgcolor": "white",
                                "bordercolor": "#7c2d12"},
                    hovertemplate="<b>Rebalanced %{x|%Y-%m-%d}</b>"
+                                 "<br>portfolio $%{y:,.0f}<br>%{hovertext}"
+                                 "<extra></extra>"),
+        row=1, col=1,
+    )
+    fig.add_trace(
+        go.Scatter(x=_chg_x, y=_chg_y, mode="markers", name="Watchlist changed",
+                   marker={"symbol": "square", "size": 16, "color": "#dc2626",
+                           "line": {"width": 1.5, "color": "white"}},
+                   hovertext=_chg_text,
+                   hoverlabel={"align": "left", "bgcolor": "white", "bordercolor": "#7f1d1d"},
+                   hovertemplate="<b>Watchlist changed %{x|%Y-%m-%d}</b>"
                                  "<br>portfolio $%{y:,.0f}<br>%{hovertext}"
                                  "<extra></extra>"),
         row=1, col=1,
@@ -4403,11 +4427,19 @@ def build_curator_dashboard(
             return ""
         out = ""
         if nonzero:
-            f = go.Figure(go.Bar(x=[r[1] * 100 for r in nonzero], y=[f"{_lab(r[0])} (n={r[2]})" for r in nonzero],
-                                 orientation="h",
-                                 marker_color=["#2b8a3e" if r[1] >= 0 else "#c92a2a" for r in nonzero]))
+            # LOG x-axis: bars can be negative (a losing pick), and log can't show <=0, so plot |value| on
+            # a log axis with the sign carried by color (green +, red -), and hover the true signed value.
+            # A zero-return row sinks to a small floor so log() stays defined. Mirrors plot 9.
+            _mags = [abs(r[1]) * 100 for r in nonzero]
+            _floor = (min([m for m in _mags if m > 0] or [0.01])) * 0.5
+            f = go.Figure(go.Bar(x=[m if m > 0 else _floor for m in _mags],
+                                 y=[f"{_lab(r[0])} (n={r[2]})" for r in nonzero], orientation="h",
+                                 marker_color=["#2b8a3e" if r[1] >= 0 else "#c92a2a" for r in nonzero],
+                                 customdata=[r[1] * 100 for r in nonzero],
+                                 hovertemplate="%{y}: %{customdata:.1f}% signed<extra></extra>"))
             f.update_layout(template="seaborn", height=max(200, 24 * len(nonzero) + 110),
-                            margin={"t": 20, "l": 230, "r": 30}, xaxis={"title": xlab})
+                            margin={"t": 20, "l": 230, "r": 30},
+                            xaxis={"title": f"|{xlab}| (log; green = +, red = &minus;)", "type": "log"})
             out += _to_html(f)
         return out + _zeros_details(zeros, noun)
 
