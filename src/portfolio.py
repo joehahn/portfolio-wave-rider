@@ -4274,6 +4274,14 @@ def build_curator_dashboard(
         + '</div>'
     )
 
+    # Make the plots 1-5 subplot titles match the h2 section headers below (plots 6+): bold, left-justified,
+    # instead of Plotly's default unbold-centered. The subplot titles are the annotations whose text starts
+    # with a digit ("1." .. "5."); left-anchor them at the plot's left edge and bold via <b>.
+    for _ann in fig.layout.annotations:
+        if _ann.text and _ann.text[0].isdigit() and "<b>" not in _ann.text:
+            _ann.update(x=0.0, xanchor="left", align="left",
+                        text=f"<b>{_ann.text}</b>", font={"size": 14, "color": "#111"})
+
     chart_html = fig.to_html(full_html=False, include_plotlyjs="cdn", config={"displayModeBar": False})
 
     # ================= extra figures (separate from the main grid) =================
