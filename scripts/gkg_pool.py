@@ -420,6 +420,35 @@ def authority(source: str) -> float:
     return 1.0
 
 
+# Wire / brand names that show up in bylines but are NOT people; substring-matched (case-insensitive).
+_AUTHOR_WIRE_SUBS = ("reuters", "associated press", "bloomberg", "cnbc", "motley fool", "seeking alpha",
+                     "benzinga", "yahoo", "guardian", "forbes", "marketwatch", "business insider",
+                     "zerohedge", "the fool", "globenewswire", "pr newswire", "businesswire", "accesswire")
+_AUTHOR_BAD_TOKENS = ("staff", "newsroom", "editorial", "news desk", "wire", "press release",
+                      "contributor", " team", ".com", "editor")
+
+
+def is_source_name(name: str, source_domains=()) -> bool:
+    """True when a byline is really a SOURCE / wire / site-brand name (e.g. "Reuters", "The Associated
+    Press", "Breaking Defense", "Market BusinessInsider") rather than a person, so author views can drop
+    it. Filters via: the ORG_STOPLIST, a wire-name substring list, staff/editorial tokens, AND a general
+    domain-brand cross-reference -- each pool source domain (breakingdefense.com, markets.businessinsider.com)
+    is reduced to a brand token (breakingdefense, businessinsider) and matched against the name's alnum form,
+    so new site brands are caught without hand-listing them."""
+    n = (name or "").strip().lower()
+    if not n or len(n) < 3 or n in ORG_STOPLIST:
+        return True
+    if any(t in n for t in _AUTHOR_BAD_TOKENS) or any(w in n for w in _AUTHOR_WIRE_SUBS):
+        return True
+    norm = re.sub(r"[^a-z0-9]", "", n)                       # "Market BusinessInsider" -> "marketbusinessinsider"
+    brands = set()
+    for d in set(source_domains) | RECOGNIZED_DOMAINS:      # breakingdefense.com -> "breakingdefense"
+        b = re.sub(r"\.[a-z]{2,}$", "", str(d).lower()).replace(".", "")
+        if len(b) >= 6:
+            brands.add(b)
+    return any(b in norm for b in brands)
+
+
 def rank_stories(arts: list[dict], max_articles: int) -> list[dict]:
     """Collapse syndicated copies into STORIES and rank like a search engine, returning up to
     max_articles representative articles (each with syndication=#sources, recognized=#recognized

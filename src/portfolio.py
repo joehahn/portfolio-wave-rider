@@ -4337,6 +4337,14 @@ def build_curator_dashboard(
                 _author_by_key[_url_key(_k)] = _v
     except Exception:  # noqa: BLE001
         pass
+    try:                                                  # gkg_pool.is_source_name for byline filtering
+        import sys as _sys
+        _sp = str(Path(__file__).resolve().parent.parent / "scripts")
+        if _sp not in _sys.path:
+            _sys.path.insert(0, _sp)
+        import gkg_pool as _gp
+    except Exception:  # noqa: BLE001
+        _gp = None
     _src_ret, _kw_ret, _author_ret = _ddict(list), _ddict(list), _ddict(list)
     for (_d, _t, _ac, _ev) in _events:
         if _ac != "add":
@@ -4351,8 +4359,9 @@ def build_curator_dashboard(
                 _srcs.add(_dom)
             _byline = _author_by_key.get(_url_key(_e.get("url", "")))
             for _one in re.split(r"\s*;\s*", _byline or ""):
-                if _one.strip():
-                    _auths.add(_one.strip())
+                _o = _one.strip()
+                if _o and not (_gp and _gp.is_source_name(_o, _srcs)):   # drop source/wire/brand names
+                    _auths.add(_o)
             _low = f"{_e.get('summary', '')} {_e.get('url', '')}".lower()
             for _k in _kwmap:
                 if _k in _low:

@@ -294,26 +294,11 @@ def build(run_rel, out):
     _af_path = ROOT / run_rel / "_authors.json"
     if _af_path.exists():
         _authors_raw = json.loads(_af_path.read_text())   # {url: byline}
-        # Drop source/wire names masquerading as authors (Reuters, AP, Bloomberg, ...): reuse the GKG
-        # org_stoplist plus site/staff tokens, so plot 9 shows only real people.
-        _bad = set()
-        try:
-            _bad = {s.lower() for s in json.loads((ROOT / "gkg_config.json").read_text()).get("org_stoplist", [])}
-        except Exception:  # noqa: BLE001
-            pass
-        _bad_tokens = ("staff", "newsroom", "editorial", "news desk", "wire", "press release",
-                       "contributor", " team", ".com", "editor")
-        # Wire / brand names substring-matched (catches "The Associated Press", "Reuters Staff", etc.).
-        _wire_subs = ("reuters", "associated press", "bloomberg", "cnbc", "motley fool", "seeking alpha",
-                      "benzinga", "yahoo", "guardian", "forbes", "marketwatch", "business insider",
-                      "zerohedge", "the fool", "globenewswire", "pr newswire", "businesswire", "accesswire")
-
-        def _is_real_author(name):
-            n = (name or "").strip().lower()
-            if not n or len(n) < 3 or n in _bad:
-                return False
-            return not any(t in n for t in _bad_tokens) and not any(w in n for w in _wire_subs)
-        _authors = {u: a for u, a in _authors_raw.items() if _is_real_author(a)}
+        # Drop source/wire/site-brand names masquerading as authors (Reuters, Breaking Defense,
+        # Market BusinessInsider, ...) via the shared gkg_pool filter, keyed on the pool's own source
+        # domains so new brands are caught without hand-listing them.
+        _src_domains = set(src_c)
+        _authors = {u: a for u, a in _authors_raw.items() if not g.is_source_name(a, _src_domains)}
         _authored_n = len(_authors)
         _top = Counter(_authors.values()).most_common(20)[::-1]   # ascending -> largest bar on top
         _afig = go.Figure(go.Bar(x=[c for _, c in _top], y=[a[:48] for a, _ in _top],
