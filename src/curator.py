@@ -119,9 +119,14 @@ def build_user_prompt(as_of: str, watchlist: list[str], thesis: str, exclusions:
         action_rule = ("Fill a free slot with a clearly rising wave vehicle when the pool shows one, or swap "
                        "a weaker current holding for a stronger name; else no_changes.")
     else:
-        slot_rule = "The watchlist is FULL: any ADD needs a paired REMOVE, or no_changes."
-        action_rule = ("Only swap (add+remove together) if a clearly stronger rising wave vehicle appears vs a "
-                       "current holding, else no_changes.")
+        slot_rule = (f"The watchlist is FULL ({max_size}/{max_size} managed slots used). A bare ADD (with no "
+                     f"paired REMOVE) is INVALID and will be REJECTED and wasted — the new name will NOT enter "
+                     f"the watchlist. To bring in a new name you MUST remove one current holding in the SAME "
+                     f"response (add + remove = a swap). If nothing is worth displacing a holding, emit no_changes.")
+        action_rule = ("Because the watchlist is FULL: to add a stronger rising-wave vehicle you MUST pair it with "
+                       "the REMOVE of your weakest-conviction current holding (add + remove together). NEVER emit "
+                       "an add without a paired remove here — decide explicitly whether the new name beats your "
+                       "weakest holding; if yes, swap them; if no, no_changes.")
     return f"""{intro}
 - as_of_date: {as_of}
 - current_watchlist: {watchlist}
