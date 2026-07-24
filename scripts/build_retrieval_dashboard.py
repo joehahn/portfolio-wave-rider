@@ -225,29 +225,14 @@ def build(run_rel, out):
     # ---- figure (7 rows) ---- (pool-size-per-window plot dropped: it was flat at the 100-article
     # cap for all 53 windows; that one fact is now a stat card instead.)
     titles = (
-        "1. Unique articles per MONTH<br><sub><i>completeness (coarse): distinct articles shown to the "
-        "curator that month</i></sub>",
-        "2. Unique articles per WEEK<br><sub><i>gap check (finer), Monday-anchored: the two empty weeks "
-        "(mid-June 2025) are a real GDELT/GKG outage, not a pipeline gap</i></sub>",
-        "3. Unique articles per DAY<br><sub><i>gap check (finest): zero days break the line "
-        "(mid-June-2025 GKG outage)</i></sub>",
-        "4. Unique articles by DAY OF WEEK<br><sub><i>publication cadence: weekend dip is normal news "
-        "behavior, not a gap</i></sub>",
-        "5. Unique articles by wave<br><sub><i>coverage by theme (first matched wave, else general)</i></sub>",
-        "6. Lede coverage by POOL (per biweekly rebalance) — clean vs clean+live<br><sub><i>per-rebalance "
-        "lede yield at the FINEST granularity (one point per pool, not monthly-averaged, so a single "
-        "Wayback-miss pool is visible as its own drop): GREEN = clean Wayback join (look-ahead-safe), "
-        "ORANGE = clean + live-fallback (the gap = the look-ahead-BIASED live ledes that fill "
-        "Wayback-misses)</i></sub>",
-        f"7. Source utilization — every configured desk (incl. {n_rec_zero} that GKG surfaced ZERO "
-        f"times) + top {N_GREY} others<br><sub><i>green = specialty (2.0), blue = major wire (1.5), "
-        "grey = other (1.0); zero-length bars = configured desks GKG never indexed (e.g. paywalled "
-        f"wires). {n_src_total} distinct sources appeared overall.</i></sub>",
-        "8. Articles per SEARCH KEYWORD — the retriever's surfacing terms (gkg_config.json)<br><sub><i>"
-        "each keyword is a query term; colored by wave, geopolitical split into its four profile subwaves "
-        "(defense, drones, tankers, reconstruction). All profile waves/subwaves now carry keywords; the "
-        f"{n_kw_zero} zero/low-count rows are terms the CURRENT corpus predates (tanker/reconstruction/aging, "
-        "added 2026-07-24) — they populate on the next GKG re-ingest</i></sub>",
+        "1. Unique articles per month",
+        "2. Unique articles per week",
+        "3. Unique articles per day",
+        "4. Unique articles by day of week",
+        "5. Unique articles by wave",
+        "6. Lede coverage by pool",
+        "7. Source utilization",
+        "8. Articles per search keyword",
     )
     # Plots 7 & 8 list many rows, so give those rows much more vertical room than the others.
     fig = make_subplots(rows=8, cols=1, vertical_spacing=0.025, subplot_titles=titles,
@@ -303,12 +288,32 @@ def build(run_rel, out):
                 'blob/main/gkg_config.json"><code>gkg_config.json</code></a> '
                 '(<code>wave_keywords</code>).</p>')
 
-    # ---- 9. Articles per author (bylines from the post-run live author-refetch: run_rel/_authors.json) ----
+    # ---- 9. Articles per author (bylines from run_rel/_authors.json) ----
     author_html = ""
     _authored_n = 0
     _af_path = ROOT / run_rel / "_authors.json"
     if _af_path.exists():
-        _authors = json.loads(_af_path.read_text())       # {url: byline} for the authored pool articles
+        _authors_raw = json.loads(_af_path.read_text())   # {url: byline}
+        # Drop source/wire names masquerading as authors (Reuters, AP, Bloomberg, ...): reuse the GKG
+        # org_stoplist plus site/staff tokens, so plot 9 shows only real people.
+        _bad = set()
+        try:
+            _bad = {s.lower() for s in json.loads((ROOT / "gkg_config.json").read_text()).get("org_stoplist", [])}
+        except Exception:  # noqa: BLE001
+            pass
+        _bad_tokens = ("staff", "newsroom", "editorial", "news desk", "wire", "press release",
+                       "contributor", " team", ".com", "editor")
+        # Wire / brand names substring-matched (catches "The Associated Press", "Reuters Staff", etc.).
+        _wire_subs = ("reuters", "associated press", "bloomberg", "cnbc", "motley fool", "seeking alpha",
+                      "benzinga", "yahoo", "guardian", "forbes", "marketwatch", "business insider",
+                      "zerohedge", "the fool", "globenewswire", "pr newswire", "businesswire", "accesswire")
+
+        def _is_real_author(name):
+            n = (name or "").strip().lower()
+            if not n or len(n) < 3 or n in _bad:
+                return False
+            return not any(t in n for t in _bad_tokens) and not any(w in n for w in _wire_subs)
+        _authors = {u: a for u, a in _authors_raw.items() if _is_real_author(a)}
         _authored_n = len(_authors)
         _top = Counter(_authors.values()).most_common(20)[::-1]   # ascending -> largest bar on top
         _afig = go.Figure(go.Bar(x=[c for _, c in _top], y=[a[:48] for a, _ in _top],
@@ -317,11 +322,8 @@ def build(run_rel, out):
                             xaxis_title="unique articles", showlegend=False)
         author_html = (
             '<h2 style="margin:1.8em 0 0.2em;">9. Articles per author</h2>'
-            f'<p style="color:#555;max-width:820px;">Byline attribution for the pooled articles &mdash; '
-            f'<b>{len(_authors):,}</b> carry a real byline (the rest are wire copy or paywalled/JS pages). '
-            f'Bylines were fetched live after the run (a byline is stable even when a page is later edited, '
-            f'unlike the lede), so this is look-ahead-safe for authorship. The space/defense desks dominate, '
-            f'mirroring the wave picks. Raw material for a future gains-per-author view.</p>'
+            f'<p style="color:#555;max-width:820px;"><b>{100 * _authored_n // max(n_uniq, 1)}%</b> of the '
+            f'{n_uniq:,} pooled articles ({_authored_n:,}) have a known author.</p>'
             + _afig.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False}))
 
     # ---- stat cards ----
