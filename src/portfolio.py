@@ -3997,7 +3997,7 @@ def build_curator_dashboard(
                 f"<td style='color:#9a6a00;'>{rej_cell}</td></tr>"
             )
         log_html = (
-            "<h2 style='margin-top:2em;'>12. Curation log</h2>"
+            "<h2 style='margin-top:2em;'>13. Curation log</h2>"
             f"<p style='color:#555;'>The {_n_active} of {len(log)} {_html.escape(_cadence)} curator calls "
             "that made a change (no-change rebalances are hidden). The <em>Rejections</em> column lists each "
             "add/remove the validator dropped as invalid, as <code>TICKER (action)</code> — hover for the "
@@ -4072,7 +4072,7 @@ def build_curator_dashboard(
             )
     if _st_blocks:
         search_html = (
-            "<h2 style='margin-top:2em;'>13. Curator decisions &amp; search terms</h2>"
+            "<h2 style='margin-top:2em;'>14. Curator decisions &amp; search terms</h2>"
             f"<p style='color:#555;max-width:780px;'>One row per {_html.escape(_cadence)} rebalance. "
             "Click to expand the curator's overall rationale, each add/remove with its reason, the cited "
             "<code>news_evidence</code> links, and the wave keywords behind that rebalance's pool "
@@ -4359,7 +4359,7 @@ def build_curator_dashboard(
                     _kw_ret[_k].append(_r)
         for _s in (_srcs or {"(no source)"}):
             _src_ret[_s].append(_r)
-        for _a1 in _auths:               # dedupe co-authors per add (mirrors the per-add source dedupe)
+        for _a1 in (_auths or {"(no author)"}):   # byline-less adds bucket into "(no author)" (co-authors deduped per add)
             _author_ret[_a1].append(_r)
 
     # universe padding: show configured items that produced ZERO with a 0 bar (like the retriever DB) —
@@ -4405,6 +4405,16 @@ def build_curator_dashboard(
     _gain_src = _attr_html(_src_ret, "mean forward price return of adds (%)", universe=_recognized, noun="sources")
     _gain_kw = _attr_html(_kw_ret, "mean forward price return of adds (%)", universe=set(_kwmap), noun="keywords")
     _gain_author = _attr_html(_author_ret, "mean forward price return of adds (%)", noun="authors")
+    # Number of adds per author: raw n behind plot 8 (co-authors each counted; byline-less adds under "(no author)").
+    _npa = ""
+    _naa = sorted(((a, len(v)) for a, v in _author_ret.items() if v), key=lambda r: r[1])
+    if _naa:
+        _fna = go.Figure(go.Bar(x=[r[1] for r in _naa], y=[r[0] for r in _naa], orientation="h",
+                                marker_color="#1f77b4"))
+        _fna.update_layout(template="seaborn", height=max(200, 24 * len(_naa) + 110),
+                           margin={"t": 20, "l": 230, "r": 30},
+                           xaxis={"title": "number of adds crediting this author"})
+        _npa = _to_html(_fna)
 
     # Gain PER ARTICLE vs source: normalize each source's TOTAL add-gain by how many articles it put into
     # the pools (its pool footprint) -> signal density. Pool counts come from the run's *-pool.json (GKG).
@@ -4466,9 +4476,7 @@ def build_curator_dashboard(
                     'co-authored article credits each byline. Adds whose evidence URL has no captured byline are omitted.</p>')
 
     extra_html = (
-        '<h2 style="margin:1.6em 0 0.2em;">6. Allocation over time</h2>'
-        '<p style="color:#555;max-width:820px;margin:0 0 .4em;">Capital committed per ticker as a share of '
-        'the portfolio; any remainder is cash.</p>' + _to_html(_af)
+        '<h2 style="margin:1.6em 0 0.2em;">6. Allocation over time</h2>' + _to_html(_af)
         + (('<h2 style="margin:1.6em 0 0.2em;">7. Gains vs news source</h2>' + _attr_note + _gain_src) if _gain_src else '')
         + (('<h2 style="margin:1.6em 0 0.2em;">8. Gains vs author</h2>' + _author_note + _gain_author) if _gain_author else '')
         + (('<h2 style="margin:1.6em 0 0.2em;">9. Gain per article vs news source</h2>' + _gpa_note + _gain_per_art) if _gain_per_art else '')
@@ -4479,6 +4487,12 @@ def build_curator_dashboard(
                   '<p style="color:#555;max-width:820px;margin:0 0 .4em;">How many adds cited each source '
                   '(by URL domain) as evidence &mdash; the raw <code>n</code> behind plots 7 and 9.</p>'
                   + _nps) if _nps else '')
+    # 12. Number of adds per author — raw n behind plot 8 (sits just below plot 11).
+    _npa_html = (('<h2 style="margin:1.6em 0 0.2em;">12. Number of adds per author</h2>'
+                  '<p style="color:#555;max-width:820px;margin:0 0 .4em;">How many adds each byline is credited '
+                  'on (co-authors each counted; adds whose evidence URL carries no captured byline bucket into '
+                  '<code>(no author)</code>) &mdash; the raw <code>n</code> behind plot 8.</p>'
+                  + _npa) if _npa else '')
     page = (
         '<!doctype html><html><head><meta charset="utf-8">'
         '<title>Curator Backtest</title>'
@@ -4516,6 +4530,7 @@ def build_curator_dashboard(
         + chart_html
         + extra_html
         + _nps_html
+        + _npa_html
         + log_html
         + search_html
         + '</body></html>'
