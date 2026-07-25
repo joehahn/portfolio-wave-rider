@@ -59,7 +59,10 @@ def _mws_rows():
     for cap, rd in MWS_SWEEP:
         curs = sorted(glob.glob(str(ROOT / rd / "2*-curation.json")))
         bt = ROOT / rd / "_backtest" / "snapshots.csv"
-        if len(curs) < 79 or not bt.exists():
+        # A run counts as complete only if it's on the CURRENT design (curations carry the _retries marker);
+        # a 79/79 run WITHOUT it is stale pre-retry data awaiting re-curation, so treat it as pending.
+        _fresh = bool(curs) and ("_retries" in json.loads(Path(curs[-1]).read_text()))
+        if len(curs) < 79 or not bt.exists() or not _fresh:
             rows.append({"cap": cap, "pending": True}); continue
         sn = pd.read_csv(bt, parse_dates=["date"])
         tot = sn.groupby("date")["total_value"].first()
