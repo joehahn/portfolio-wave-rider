@@ -26,7 +26,7 @@ sys.path.insert(0, str(ROOT))
 from src import portfolio  # noqa: E402
 
 CAPS = [0.5, 0.67, 0.8, 0.9, 1.0]
-LAMBDAS = [0.5, 0.75, 1.0, 1.5, 2.0]
+LAMBDAS = [0.5, 0.75, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0]
 LOOKBACKS = [14, 30, 60, 90, 120, 150]          # calendar days
 ANCHORS = ["SPY", "AGG", "IAU"]
 TRACK_TICKERS = ["QUBT", "RKLB", "NVDA"]     # section 6: flag whether each mws curation ever added these
@@ -594,10 +594,8 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     if _done:
         import plotly.graph_objects as _mgo
         _mfig = _mgo.Figure(_mgo.Bar(
-            x=[r["cap"] for r in _done], y=[r["ret"] * 100 for r in _done],
-            marker_color=[RED if r["nvda"] else BLUE for r in _done],
-            text=["NVDA added" if r["nvda"] else "" for r in _done], textposition="outside",
-            hovertemplate="cap %{x}: %{y:+.0f}%<extra></extra>"))
+            x=[r["cap"] for r in _done], y=[r["ret"] * 100 for r in _done], marker_color=BLUE,
+            hovertemplate="watchlist %{x}: %{y:+.0f}%<extra></extra>"))
         _mfig.update_layout(template="seaborn", height=360, margin={"t": 20, "l": 60, "r": 20},
                             xaxis={"title": "max_watchlist_size", "dtick": 1},
                             yaxis={"title": "curator total return %"})
@@ -626,10 +624,8 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         '<p style="color:#555;max-width:920px;">Unlike the cap/&lambda;/lookback knobs above (free math '
         'replays on one curation set), <b>max_watchlist_size changes the curator\'s decisions</b>, so each '
         'cap is a separate re-curation (~$0.40 LLM each) on the same news pools and AAPL/GOOGL/AMZN starter. '
-        'The question: as the watchlist cap loosens, does the curator reach for the big AI names or keep '
-        'diversifying into next-waves? The <b>QUBT / RKLB / NVDA</b> columns flag whether each curation ever '
-        'added those tickers (yes = entered the watchlist; proposed-rejected = tried but blocked). '
-        '<b>Red bar = NVDA entered the watchlist.</b></p>'
+        'The bar is each curation&#39;s total return; the <b>QUBT / RKLB / NVDA</b> columns flag whether that '
+        'curation ever added those tickers (yes = entered the watchlist; proposed-rejected = tried but blocked).</p>'
         + _mbar
         + '<table style="margin-top:.6em;"><thead><tr>'
         f'<th {_lc}>max_watchlist_size</th><th {_lc}>curator return</th><th {_lc}>adds</th><th {_lc}>removes</th>'
