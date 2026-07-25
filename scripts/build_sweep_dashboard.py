@@ -432,7 +432,6 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                  + [f'L2 {_cur_row["l2"]:.0f} &ge; {REC_MAX_L2:.0f}'] * (_cur_row["l2"] >= REC_MAX_L2))
     _cur_pass = not _cur_fail
     rec_html = (
-        '<h3 style="margin:.6em 0 .2em;">Recommended settings — the low-risk, low-churn frontier</h3>'
         f'<p style="color:#555;font-size:12px;max-width:940px;margin:.2em 0 .5em;">Read straight off plots 1-3: '
         f'keep only configs in the safe corner &mdash; <b>|maxDD| &lt; {REC_MAX_DD:.0f}% AND L1 &lt; {REC_MAX_L1:.0f} '
         f'AND L2 &lt; {REC_MAX_L2:.0f}</b> (shallow drawdown, low churn on both norms). '
