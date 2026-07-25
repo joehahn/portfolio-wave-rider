@@ -660,38 +660,32 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     _gems_p = ROOT / "data" / "curator_runs" / "_gems.json"
     _gems = _gjson.loads(_gems_p.read_text())[:20] if _gems_p.exists() else []
     if _gems:
-        import plotly.graph_objects as _ggo
-        _gy = [g["ticker"] for g in _gems][::-1]     # reverse: plotly puts index 0 at the bottom
-        _gx = [g["gain"] for g in _gems][::-1]
-        _gfig = _ggo.Figure(_ggo.Bar(x=_gx, y=_gy, orientation="h",
-                                     marker_color=[GREEN if v >= 0 else RED for v in _gx],
-                                     hovertemplate="%{y}: $%{x:,.0f}<extra></extra>"))
-        _gfig.update_layout(template="seaborn", height=max(380, 24 * len(_gems)),
-                            margin={"t": 20, "l": 70, "r": 20},
-                            xaxis={"title": "best $ gain (price P&amp;L) across all settings"}, yaxis={"title": ""})
-        _gbar = _gfig.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False})
+        _maxg = max((abs(g["gain"]) for g in _gems), default=1.0) or 1.0
         _grows = ""
         for _i, g in enumerate(_gems):
             _cur_hit = g["mws"] == _mws_fixed and (g["cap"], g["lam"], g["lb"]) == CURRENT
             _bg = "background:#fff7e6;" if _cur_hit else ""
+            _pct = abs(g["gain"]) / _maxg * 100.0                       # inline data-bar, scaled to the top gain
+            _bcol = GREEN if g["gain"] >= 0 else RED
+            _bar = (f'<td><div style="width:210px;background:#eee;border-radius:2px;">'
+                    f'<div style="background:{_bcol};height:13px;width:{_pct:.1f}%;border-radius:2px;"></div></div></td>')
             _grows += (f'<tr style="{_bg}border-bottom:1px solid #eee;"><td {_lc}>{_i + 1}</td>'
                        f'<td {_lc}><b>{g["ticker"]}</b></td><td {_lc}>${g["gain"]:,.0f}</td>'
-                       f'<td {_lc}>{g["price_ret"]*100:+.0f}%</td><td {_lc}>{g["days_held"]}</td>'
+                       f'<td {_lc}>{g["days_held"]}</td>'
                        f'<td {_lc}>ws{g["mws"]} &middot; cap{g["cap"]}/λ{g["lam"]}/{g["lb"]}d'
-                       + (" &larr; live" if _cur_hit else "") + '</td>'
-                       f'<td {_lc}>{g["span"][0]} &rarr; {g["span"][1]}</td></tr>')
+                       + (" &larr; live" if _cur_hit else "") + '</td>' + _bar + '</tr>')
         gems_html = (
             '<h2>7. Backtest gems</h2>'
             '<p style="color:#555;max-width:940px;">For every ticker the curator ever held, its best <b>$ gain</b> '
             '(price-driven P&amp;L on the position) across <b>all 1350 sweep settings</b>, and the setting that '
-            'produced it. These are the winners worth &ldquo;riding&rdquo;: a ticker&#39;s gain is maximized by the '
-            'config that weighted it most while it ran (usually high cap, low λ, short lookback, and whichever '
-            'watchlist size held it through the move). Anchors (SPY/AGG/IAU) are excluded. In-sample &mdash; a '
-            'gem list to build a low-churn strategy around, not a promise.</p>'
-            + _gbar
+            'produced it. A ticker&#39;s gain is maximized by the config that weighted it most while it ran (usually '
+            'high cap, low λ, short lookback). Note the $ figure is <b>compounding-weighted</b>: a late-window '
+            'winner rides an already-grown balance at up to 100% concentration, so it dwarfs early picks &mdash; '
+            'these are hindsight, in-sample <b>upper bounds</b>, a gem list to build a low-churn strategy around, '
+            'not a track record. Anchors (SPY/AGG/IAU) excluded.</p>'
             + '<table style="font-size:12.5px;margin-top:.5em;"><thead><tr>'
-            f'<th {_lc}>#</th><th {_lc}>ticker</th><th {_lc}>best $ gain</th><th {_lc}>price return</th>'
-            f'<th {_lc}>days held</th><th {_lc}>best setting (ws &middot; cap/λ/lookback)</th><th {_lc}>held span</th>'
+            f'<th {_lc}>#</th><th {_lc}>ticker</th><th {_lc}>best $ gain</th>'
+            f'<th {_lc}>days held</th><th {_lc}>best setting</th><th {_lc}>gain</th>'
             f'</tr></thead><tbody>{_grows}</tbody></table>')
     else:
         gems_html = ('<h2>7. Backtest gems</h2><p style="color:#999;">Gem scan not yet run '
