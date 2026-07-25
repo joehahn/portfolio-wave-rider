@@ -31,8 +31,8 @@ LOOKBACKS = [14, 30, 60, 90, 120, 150]          # calendar days
 ANCHORS = ["SPY", "AGG", "IAU"]
 
 # "Recommended settings" = the risk/churn-constrained frontier read off plots 1-3: keep only configs with
-# shallow drawdown AND low churn (both norms), then eyeball the survivors for the best return metrics.
-REC_MAX_DD, REC_MAX_L1, REC_MAX_L2 = 40.0, 1000.0, 1000.0   # |maxDD|% , L1 turnover , L2 path-length ceilings
+# shallow drawdown AND low churn on BOTH norms, then eyeball the survivors for the best return metrics.
+REC_MAX_DD, REC_MAX_L1, REC_MAX_L2 = 50.0, 1000.0, 1500.0   # |maxDD|% , L1 turnover , L2 path-length ceilings
 
 # LLM curator comparison (section 3): (label, run_dir, provider, $in/M, $out/M). Agreement is measured
 # against the reference (first row). Add a row per model run you want to compare.
@@ -47,9 +47,11 @@ BLUE, GREEN, RED, GREY = "#1f77b4", "#2b8a3e", "#c92a2a", "#adb5bd"
 # max_watchlist_size sweep (section 6): unlike cap/lambda/lookback, this knob changes the CURATOR's
 # decisions, so each cap is a separate RE-CURATION (LLM cost), not a free replay. cap 5 = the canonical
 # run; the rest are re-curated into gkg-3yr-mws{cap}. Tests whether more slots let the curator add NVDA.
-MWS_SWEEP = [(3, "data/curator_runs/gkg-3yr-mws3"), (5, "data/curator_runs/gkg-3yr-final"),
+MWS_SWEEP = [(2, "data/curator_runs/gkg-3yr-mws2"), (3, "data/curator_runs/gkg-3yr-mws3"),
+             (4, "data/curator_runs/gkg-3yr-mws4"), (5, "data/curator_runs/gkg-3yr-final"),
+             (6, "data/curator_runs/gkg-3yr-mws6"), (7, "data/curator_runs/gkg-3yr-mws7"),
              (8, "data/curator_runs/gkg-3yr-mws8"), (10, "data/curator_runs/gkg-3yr-mws10"),
-             (12, "data/curator_runs/gkg-3yr-mws12"), (16, "data/curator_runs/gkg-3yr-mws16")]
+             (12, "data/curator_runs/gkg-3yr-mws12")]   # mws16 dropped from consideration 2026-07-25
 
 
 def _mws_rows():
@@ -336,8 +338,9 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     # spread visible: cap/λ/lookback move a point WITHIN a cloud deterministically; jumping clouds also changes
     # the underlying curation, so cross-color separation mixes the mws effect with kimi draw noise.
     import plotly.graph_objects as go
-    # discrete, colorblind-friendly-ish palette keyed by watchlist size (grey fallback for any unlisted size)
-    MWS_COLORS = {3: "#1f77b4", 5: "#2b8a3e", 8: "#e8590c", 10: "#c92a2a", 12: "#9c36b5", 16: "#0c8599"}
+    # discrete, distinct palette keyed by watchlist size (grey fallback for any unlisted size); 5 = live = green
+    MWS_COLORS = {2: "#8c564b", 3: "#1f77b4", 4: "#17becf", 5: "#2b8a3e", 6: "#bcbd22",
+                  7: "#ff7f0e", 8: "#d62728", 10: "#9467bd", 12: "#e377c2"}
     _mws_present = sorted({r["mws"] for r in rows_all})
 
     def _mws_scatter(xfn, xtitle, xhover, first):
@@ -447,14 +450,15 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         '<h3 style="margin:.6em 0 .2em;">Recommended settings — the low-risk, low-churn frontier</h3>'
         f'<p style="color:#555;font-size:12px;max-width:940px;margin:.2em 0 .5em;">Read straight off plots 1-3: '
         f'keep only configs in the safe corner &mdash; <b>|maxDD| &lt; {REC_MAX_DD:.0f}% AND L1 &lt; {REC_MAX_L1:.0f} '
-        f'AND L2 &lt; {REC_MAX_L2:.0f}</b> (shallow drawdown, low turnover on both churn norms). '
+        f'AND L2 &lt; {REC_MAX_L2:.0f}</b> (shallow drawdown, low churn on both norms). '
         f'<b>{len(_passed)} of {len(rows_all)}</b> configs survive (by watchlist size &mdash; {_mws_survivors}), '
         'listed once, sorted by IR. ★ = best in that column among the survivors, so you can eyeball the top IR / '
         't-stat / Sharpe / Calmar / ann / shallowest-DD without re-sorting. These stay in-sample &mdash; a '
         'forward-test shortlist, not an auto-switch. Note the <b>live config</b> (ws&nbsp;'
-        f'{_cur_row["mws"]} {_cur_row["cap"]:.2f}/{_cur_row["lam"]:.1f}/{_cur_row["lb"]}d) is <b>excluded</b>: its '
-        f'drawdown is fine ({abs(_cur_row["dd"])*100:.0f}%) but it is too churny (L1&nbsp;{_cur_row["l1"]:.0f}, '
-        f'L2&nbsp;{_cur_row["l2"]:.0f}, both &gt;&nbsp;{REC_MAX_L1:.0f}).</p>'
+        f'{_cur_row["mws"]} {_cur_row["cap"]:.2f}/{_cur_row["lam"]:.1f}/{_cur_row["lb"]}d) is '
+        f'{"included" if (abs(_cur_row["dd"])*100 < REC_MAX_DD and _cur_row["l1"] < REC_MAX_L1 and _cur_row["l2"] < REC_MAX_L2) else "excluded"}: '
+        f'drawdown {abs(_cur_row["dd"])*100:.0f}% is fine but it is too churny (L1&nbsp;{_cur_row["l1"]:.0f} '
+        f'&gt;&nbsp;{REC_MAX_L1:.0f}, L2&nbsp;{_cur_row["l2"]:.0f} &gt;&nbsp;{REC_MAX_L2:.0f}).</p>'
         f'<table style="font-size:12.5px;margin-bottom:.4em;"><thead>{_hdr}</thead><tbody>{_body}</tbody></table>')
 
     # section 3: per-LLM comparison (same pools + profile config; only the curator model varies)
