@@ -299,14 +299,14 @@ def _try_parse(txt: str) -> dict | None:
 
 def call_curator(cli, model: str, as_of: str, watchlist: list[str], thesis: str, exclusions: str,
                  max_size: int, anchors: list[str], articles_text: str, cadence: str,
-                 log_path: Path | None, fail_dir: Path) -> dict:
+                 log_path: Path | None, fail_dir: Path, retry_feedback: str = "") -> dict:
     # Delegates to the SHARED curator (src/curator.py) so the backtest and the forward loop run one
     # prompt + parse + retry path. intro=_BT_INTRO keeps the backtest's exact wording (byte-identical
     # prompt), and NO_REASONING preserves the --no-reasoning speed setting.
     return curator.curate(articles_text, watchlist, as_of=as_of, model=model, anthropic_cli=cli,
                           thesis=thesis, exclusions=exclusions, max_size=max_size, anchors=anchors,
                           cadence=cadence, intro=curator._BT_INTRO, no_reasoning=NO_REASONING,
-                          log_path=log_path, fail_dir=fail_dir)
+                          log_path=log_path, fail_dir=fail_dir, retry_feedback=retry_feedback)
 
 
 # ----------------------------------------------------------------- walk-forward
@@ -450,9 +450,22 @@ def main(argv=None) -> int:
             else:
                 cur_wl = portfolio.reconstruct_watchlist_at(d, a.starter, str(hist))
                 log = (run_dir / "_log" / f"{d}-curator.json") if a.log_llm else None
+                _atext = render_articles(arts, a.news_mode)
                 cur = call_curator(cli, a.model, d, cur_wl, thesis, exclusions, a.max_watchlist_size,
-                                   anchors, render_articles(arts, a.news_mode), a.cadence, log,
-                                   run_dir / "_parse_fail")
+                                   anchors, _atext, a.cadence, log, run_dir / "_parse_fail")
+                # reject-and-retry: if the validator would reject any proposal, tell the curator WHY and let
+                # it revise (e.g. pair a full-watchlist add with a remove). Up to 2 retries, then take what
+                # validates. Keeps the curator's intent from being silently dropped.
+                for _ret in range(2):
+                    _chk = portfolio.apply_curator_decisions(
+                        cur, holdings_path=str(sb_hold), history_path=str(hist), profile_path="investor_profile.md",
+                        listing_check=False, as_of_date=d, max_watchlist_size=a.max_watchlist_size, dry_run=True)
+                    _rej = _chk.get("rejections") or []
+                    if not _rej:
+                        break
+                    _fb = "\n".join(f"- {x.get('ticker')} ({x.get('action')}): {x.get('reason')}" for x in _rej)
+                    cur = call_curator(cli, a.model, d, cur_wl, thesis, exclusions, a.max_watchlist_size,
+                                       anchors, _atext, a.cadence, log, run_dir / "_parse_fail", retry_feedback=_fb)
                 cur["as_of_date"] = d
                 cur_path.write_text(json.dumps(cur, indent=2))
                 if log:

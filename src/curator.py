@@ -108,7 +108,8 @@ def format_pool(articles: list[dict]) -> str:
 
 
 def build_user_prompt(as_of: str, watchlist: list[str], thesis: str, exclusions: str, max_size: int,
-                      anchors: list[str], pool_text: str, cadence: str, intro: str = _BT_INTRO) -> str:
+                      anchors: list[str], pool_text: str, cadence: str, intro: str = _BT_INTRO,
+                      retry_feedback: str = "") -> str:
     # Slot rule depends on how many managed slots are FREE. A blanket "any add needs a paired remove"
     # is only true at capacity; with free slots the curator may add outright (else it never grows a
     # sub-full watchlist toward max_size).
@@ -127,7 +128,11 @@ def build_user_prompt(as_of: str, watchlist: list[str], thesis: str, exclusions:
                        "the REMOVE of your weakest-conviction current holding (add + remove together). NEVER emit "
                        "an add without a paired remove here — decide explicitly whether the new name beats your "
                        "weakest holding; if yes, swap them; if no, no_changes.")
-    return f"""{intro}
+    _retry = (f"RETRY — your previous proposal was partly REJECTED by the validator:\n{retry_feedback}\n"
+              f"Revise so nothing is rejected: to keep a rejected ADD, pair it with a REMOVE of a "
+              f"lower-conviction current holding (a swap); drop any add/remove you can't justify; else "
+              f"emit no_changes. Re-emit the FULL corrected JSON.\n\n") if retry_feedback else ""
+    return f"""{_retry}{intro}
 - as_of_date: {as_of}
 - current_watchlist: {watchlist}
 - max_watchlist_size: {max_size} (managed slots; {anchors} are always_include anchors, off-limits, don't count). {slot_rule}
@@ -145,11 +150,13 @@ def curate(pool_text: str, watchlist: list[str], *, as_of: str, model: str, anth
            thesis: str = DEFAULT_THESIS, exclusions: str = DEFAULT_EXCLUSIONS,
            max_size: int = 5, anchors: "list[str] | None" = None, cadence: str = "weekly",
            intro: str = _BT_INTRO, no_reasoning: bool = True,
-           log_path: "Path | None" = None, fail_dir: "Path | None" = None) -> dict:
+           log_path: "Path | None" = None, fail_dir: "Path | None" = None, retry_feedback: str = "") -> dict:
     """Run the curator once. Returns the parsed decision dict, or a no_changes fallback after retries.
-    Identical retry/parse logic for forward and backtest. `anthropic_cli` is required for claude-* models."""
+    Identical retry/parse logic for forward and backtest. `anthropic_cli` is required for claude-* models.
+    `retry_feedback` (optional) prepends validator-rejection reasons so the model can re-propose a valid set."""
     anchors = anchors if anchors is not None else DEFAULT_ANCHORS
-    user = build_user_prompt(as_of, watchlist, thesis, exclusions, max_size, anchors, pool_text, cadence, intro)
+    user = build_user_prompt(as_of, watchlist, thesis, exclusions, max_size, anchors, pool_text, cadence, intro,
+                             retry_feedback)
     txt = ""
     for attempt in range(2):
         ok, _uin, _uout = False, 0, 0

@@ -822,6 +822,7 @@ def apply_curator_decisions(
     listing_check: bool = True,
     as_of_date: str | None = None,
     max_watchlist_size: int | None = None,
+    dry_run: bool = False,
 ) -> dict[str, Any]:
     """Validate a watchlist-curator payload and apply it to holdings.csv.
 
@@ -903,7 +904,8 @@ def apply_curator_decisions(
         rm_set = {r["ticker"] for r in valid_removes}
         holdings = holdings[~holdings["ticker"].isin(rm_set)].reset_index(drop=True)
 
-    holdings.to_csv(h_path, index=False)
+    if not dry_run:                          # dry_run: validate + return applied/rejected, but DON'T persist
+        holdings.to_csv(h_path, index=False)
 
     # Append to curation_history.csv. One row per applied change.
     history_p = Path(history_path)
@@ -933,7 +935,7 @@ def apply_curator_decisions(
             "news_evidence_urls": urls,
         })
 
-    if rows:
+    if rows and not dry_run:
         new_history = pd.DataFrame(rows)
         if history_p.exists():
             existing = pd.read_csv(history_p)
