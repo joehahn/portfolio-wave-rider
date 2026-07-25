@@ -41,7 +41,7 @@ LLM_RUNS = [   # row 0 = the DEFAULT curator. The multi-LLM comparison (Sonnet g
                # were retired from local storage. Re-add rows + re-run to refresh the comparison on this window.
     ("moonshotai/kimi-k2.5 (default)", "data/curator_runs/gkg-3yr-final", "OpenRouter", 0.57, 2.85),
 ]
-CURRENT = (0.8, 2.0, 30)          # the live investor_profile.md config
+CURRENT = (0.8, 0.5, 150)         # the live investor_profile.md config (cap / λ / lookback-days)
 BLUE, GREEN, RED, GREY = "#1f77b4", "#2b8a3e", "#c92a2a", "#adb5bd"
 
 # max_watchlist_size sweep (section 6): unlike cap/lambda/lookback, this knob changes the CURATOR's
@@ -257,8 +257,10 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     READY_MWS = [(m, d) for (m, d) in MWS_SWEEP
                  if _n_canon > 0 and len(_glob.glob(str(ROOT / d / "2*-curation.json"))) == _n_canon]
     cache_p = ROOT / "data" / "curator_runs" / "_sweep_cache.json"
-    key = hashlib.md5(_json.dumps([CAPS, LAMBDAS, LOOKBACKS, list(CURRENT), runs_dir,
-                                   [m for m, _ in READY_MWS], "churn-v2-l1l2-mws"]).encode()).hexdigest()
+    # CURRENT / _mws_fixed are DELIBERATELY excluded from the key: the grid metrics (ir/ret/dd/l1/l2) are
+    # config-independent, so a live-config change reuses the cache and only re-flags `cur` (set post-load below).
+    key = hashlib.md5(_json.dumps([CAPS, LAMBDAS, LOOKBACKS, runs_dir,
+                                   [m for m, _ in READY_MWS], "churn-v3-l1l2-mws"]).encode()).hexdigest()
     rows_all = spy_ret = None
     if not recompute and cache_p.exists():
         try:
@@ -293,45 +295,14 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         spy_ret = float(spy_curve.iloc[-1] / spy_curve.iloc[0] - 1.0)
         cache_p.parent.mkdir(parents=True, exist_ok=True)
         cache_p.write_text(_json.dumps({"key": key, "spy_ret": spy_ret, "rows": rows_all}))
+    # `cur` marks the live-config point. It is a DISPLAY flag, not grid data (which is config-independent
+    # and cached), so set it here — this reflects the current profile / CURRENT even on a cache hit.
+    for r in rows_all:
+        r["cur"] = (r["cap"], r["lam"], r["lb"]) == CURRENT and r["mws"] == _mws_fixed
     # The ranking table / recommended-settings / plots 4+ stay on the CANONICAL watchlist (mws == _mws_fixed);
     # only plots 1-3 use the full rows_all overlay across every ready max_watchlist_size.
     rows = [r for r in rows_all if r["mws"] == _mws_fixed]
 
-    # best per metric across ALL points (every watchlist size), higher is better except dd (less-negative).
-    # This is what the full 900-row table stars and what the champion picks below draw from.
-    best = {k: max(rows_all, key=lambda r: (r[k] if r[k] == r[k] else -9e9))
-            for k in ("ir", "tstat", "calmar", "sharpe", "alpha", "ann", "hit")}
-    best["dd"] = max(rows_all, key=lambda r: r["dd"])   # least-negative drawdown
-
-    def star(r, k):
-        return " ★" if best.get(k) is r else ""
-
-    def td(v, fmt, cls="", extra=""):
-        return f"<td style='padding:5px 10px;text-align:right;{cls}'>{extra}{fmt.format(v) if v == v else 'n/a'}</td>"
-
-    def _tr(r):
-        bg = "background:#fff7e6;" if r["cur"] else ""
-        cfg = f"{r['cap']:.2f} / {r['lam']:.1f} / {r['lb']}d" + (" ← current" if r["cur"] else "")
-        stable = "yes" if (r["ir_h1"] == r["ir_h1"] and r["ir_h2"] == r["ir_h2"] and r["ir_h1"] > 0 and r["ir_h2"] > 0) else "no"
-        return (
-            f"<tr style='{bg}border-bottom:1px solid #eee;'>"
-            f"<td style='padding:5px 10px;text-align:center;'>{r['mws']}</td>"
-            f"<td style='padding:5px 10px;white-space:nowrap;'>{cfg}</td>"
-            f"{td(r['ir'], '{:+.2f}', 'font-weight:600;', star(r,'ir'))}"
-            f"{td(r['tstat'], '{:+.1f}')}"
-            f"{td(r['sharpe'], '{:.2f}', '', star(r,'sharpe'))}"
-            f"{td(r['calmar'], '{:.2f}', '', star(r,'calmar'))}"
-            f"{td(r['alpha']*100, '{:+.0f}%', '', star(r,'alpha'))}"
-            f"{td(r['ann']*100, '{:+.0f}%', '', star(r,'ann'))}"
-            f"{td(r['dd']*100, '{:.0f}%', '', star(r,'dd'))}"
-            f"{td(r['ret']*100, '{:+.0f}%')}"
-            f"{td(r['hit']*100, '{:.0f}%', '', star(r,'hit'))}"
-            f"<td style='padding:5px 10px;text-align:right;color:#888;'>[{r['ci_lo']*100:+.0f}, {r['ci_hi']*100:+.0f}]%</td>"
-            f"<td style='padding:5px 10px;text-align:center;color:{GREEN if stable=='yes' else RED};'>{stable}</td>"
-            "</tr>")
-
-    # Full table (behind the expander): EVERY point across all watchlist sizes, IR-ordered.
-    trs = "".join(_tr(r) for r in sorted(rows_all, key=lambda r: -(r["ir"] if r["ir"] == r["ir"] else -9e9)))
 
     # plots 1-3: ann return vs (drawdown | L1 | L2), one colored cloud PER max_watchlist_size (each its own
     # 150-config free-grid replay), current config red-ringed. Coloring by mws (not IR) makes the curation-draw
@@ -397,9 +368,9 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         '<b>max_watchlist_size is different</b>: it changes the CURATOR\'s decisions, so each value is a separate '
         'non-zero-cost RE-CURATION (section 6 + plot 5), not a replay. <b>Plots 1-3 overlay the '
         f'{len(rows)}-config free grid on EACH ready max_watchlist_size ({_fmt([m for m in _mws_present])} = '
-        f'{len(rows_all)} points, colored clouds)</b> so the curation-draw spread is visible. Section 4 ranks '
-        f'those same {len(rows_all)} points and its champions can come from any watchlist size (the live config is '
-        f'{_mws_fixed}). Held constant elsewhere (from the '
+        f'{len(rows_all)} points, colored clouds)</b> so the curation-draw spread is visible. Section 4 filters '
+        f'those same {len(rows_all)} points to the low-risk / low-churn survivors (any watchlist size; the live '
+        f'config is {_mws_fixed}). Held constant elsewhere (from the '
         f'profile): rebalance weekly, max_watchlist_size {_mws_fixed}, risk-free 4%, execution lag 1 trading '
         'day, anchors SPY/AGG/IAU.</p>')
 
@@ -446,6 +417,10 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                   f'<td {_lc}>{r["l1"]:.0f}</td><td {_lc}>{r["l2"]:.0f}</td></tr>')
     _mws_survivors = ", ".join(f"{_m}:{sum(1 for r in _passed if r['mws'] == _m)}"
                                for _m in sorted({r["mws"] for r in _passed})) if _passed else "none"
+    _cur_fail = ([f'maxDD {abs(_cur_row["dd"])*100:.0f}% &ge; {REC_MAX_DD:.0f}'] * (abs(_cur_row["dd"]) * 100 >= REC_MAX_DD)
+                 + [f'L1 {_cur_row["l1"]:.0f} &ge; {REC_MAX_L1:.0f}'] * (_cur_row["l1"] >= REC_MAX_L1)
+                 + [f'L2 {_cur_row["l2"]:.0f} &ge; {REC_MAX_L2:.0f}'] * (_cur_row["l2"] >= REC_MAX_L2))
+    _cur_pass = not _cur_fail
     rec_html = (
         '<h3 style="margin:.6em 0 .2em;">Recommended settings — the low-risk, low-churn frontier</h3>'
         f'<p style="color:#555;font-size:12px;max-width:940px;margin:.2em 0 .5em;">Read straight off plots 1-3: '
@@ -455,11 +430,14 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         'listed once, sorted by IR. ★ = best in that column among the survivors, so you can eyeball the top IR / '
         't-stat / Sharpe / Calmar / ann / shallowest-DD without re-sorting. These stay in-sample &mdash; a '
         'forward-test shortlist, not an auto-switch. Note the <b>live config</b> (ws&nbsp;'
-        f'{_cur_row["mws"]} {_cur_row["cap"]:.2f}/{_cur_row["lam"]:.1f}/{_cur_row["lb"]}d) is '
-        f'{"included" if (abs(_cur_row["dd"])*100 < REC_MAX_DD and _cur_row["l1"] < REC_MAX_L1 and _cur_row["l2"] < REC_MAX_L2) else "excluded"}: '
-        f'drawdown {abs(_cur_row["dd"])*100:.0f}% is fine but it is too churny (L1&nbsp;{_cur_row["l1"]:.0f} '
-        f'&gt;&nbsp;{REC_MAX_L1:.0f}, L2&nbsp;{_cur_row["l2"]:.0f} &gt;&nbsp;{REC_MAX_L2:.0f}).</p>'
-        f'<table style="font-size:12.5px;margin-bottom:.4em;"><thead>{_hdr}</thead><tbody>{_body}</tbody></table>')
+        f'{_cur_row["mws"]} {_cur_row["cap"]:.2f}/{_cur_row["lam"]:.1f}/{_cur_row["lb"]}d, dd '
+        f'{abs(_cur_row["dd"])*100:.0f}% / L1&nbsp;{_cur_row["l1"]:.0f} / L2&nbsp;{_cur_row["l2"]:.0f}) '
+        + ("<b>passes</b> and is listed below (highlighted)." if _cur_pass
+           else f'is <b>excluded</b> &mdash; fails {", ".join(_cur_fail)}.') + '</p>'
+        '<details style="margin:.2em 0 .6em;"><summary style="cursor:pointer;color:#0b7285;font-weight:600;">'
+        f'Show the recommended-settings table ({len(_passed)} configs)</summary>'
+        f'<table style="font-size:12.5px;margin:.3em 0 .4em;"><thead>{_hdr}</thead><tbody>{_body}</tbody></table>'
+        '</details>')
 
     # section 3: per-LLM comparison (same pools + profile config; only the curator model varies)
     def _c2(v, fmt):
@@ -480,7 +458,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
             + _c2(r["ir"], "{:+.2f}") + _c2(r["tstat"], "{:+.1f}") + _c2(r["sharpe"], "{:.2f}")
             + _c2(r["calmar"], "{:.2f}") + _c2(r["dd"] * 100, "{:.0f}%") + "</tr>")
     llm_html = (
-        '<h2>7. LLM comparison — curator model (same pools + profile config)</h2>'
+        '<h2>8. LLM comparison — curator model (same pools + profile config)</h2>'
         '<p style="color:#555;max-width:920px;">Every model reads the <b>same</b> news pools and replays at '
         'the profile config (cap 0.8 / λ 2.0 / 30d); the only variable is the curator LLM. The decision '
         'columns are the ones that matter: <b>agree</b> = share of weeks the model made the identical '
@@ -518,7 +496,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     _fig4.update_yaxes(title_text="portfolio value ($)", type="log",
                        tickvals=[10000, 30000, 100000, 300000, 1000000],
                        ticktext=["$10K", "$30K", "$100K", "$300K", "$1M"])
-    llm4_html = (('<h2>8. Portfolio value over time — by curator LLM (vs buy/hold and SPY)</h2>'
+    llm4_html = (('<h2>9. Portfolio value over time — by curator LLM (vs buy/hold and SPY)</h2>'
                   '<p style="color:#555;max-width:920px;">Each LLM\'s realized portfolio value on the same pools '
                   'and profile config, alongside the equal-weight buy/hold starter and SPY. Same idea as the '
                   'curator DB\'s plot 1, without the rebalance markers.</p>'
@@ -575,7 +553,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                       + _c2(s["add_mean"], "{:.2f}") + _c2(s["rem_mean"], "{:.2f}")
                       + "".join(_c2((s[k] or 0) * 100, "{:.0f}%") for k in _cr) + "</tr>")
         llm5_html = (
-            '<h2>9. Rationale-soundness — blind judge (leak-free)</h2>'
+            '<h2>10. Rationale-soundness — blind judge (leak-free)</h2>'
             '<p style="color:#555;max-width:920px;">Every backtest column above (return, IR, Sharpe, Calmar, '
             't-stat) is <b>in-sample</b> &mdash; the curator could have memorized which 2023&ndash;2026 names '
             'later won, so those numbers can\'t honestly rank <i>reasoning</i>. This section does: an '
@@ -620,7 +598,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
             continue
         _nv = ('<b style="color:#c92a2a;">yes</b>' if r["nvda"]
                else ('<span style="color:#9a6a00;">proposed, rejected</span>' if r.get("nvda_proposed") else 'no'))
-        _star = " (current)" if r["cap"] == 5 else ""
+        _star = " (current)" if r["cap"] == _mws_fixed else ""
         # flag a nonzero reject count in amber — healthy runs should have ~0 (the cap-bug symptom)
         _rej = (f'<span style="color:#9a6a00;">{r["n_rej"]}</span>' if r["n_rej"] > 2 else str(r["n_rej"]))
         _mtr += (f'<tr style="border-bottom:1px solid #eee;"><td {_lc}><b>{r["cap"]}</b>{_star}</td>'
@@ -644,6 +622,28 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         'fired (the validator told the curator why a proposal was rejected and it re-proposed). Rejects should '
         'be ~0; retries shows how much correction that took. A large reject count means decisions are being '
         'silently blocked (the symptom that exposed the max_watchlist_size cap-override bug).</p>')
+
+    # section 7: total return vs optimizer lookback at the live config (FREE replay: same curation, vary lookback)
+    import plotly.graph_objects as _lgo
+    _lbrows = {r["lb"]: r for r in rows_all
+               if r["mws"] == _mws_fixed and r["cap"] == CURRENT[0] and r["lam"] == CURRENT[1]}
+    _lbx = [lb for lb in LOOKBACKS if lb in _lbrows]
+    _lfig = _lgo.Figure(_lgo.Bar(
+        x=[str(lb) for lb in _lbx], y=[_lbrows[lb]["ret"] * 100 for lb in _lbx],
+        marker_color=[GREEN if lb == CURRENT[2] else BLUE for lb in _lbx],
+        text=["live" if lb == CURRENT[2] else "" for lb in _lbx], textposition="outside",
+        hovertemplate="lookback %{x}d: %{y:+.0f}%<extra></extra>"))
+    _lfig.update_layout(template="seaborn", height=360, margin={"t": 20, "l": 60, "r": 20},
+                        xaxis={"title": "optimizer_lookback (days)", "type": "category"},
+                        yaxis={"title": "total return %"})
+    _lbar = _lfig.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False})
+    lb_html = (
+        '<h2>7. Total return vs optimizer lookback (live config)</h2>'
+        '<p style="color:#555;max-width:920px;">A FREE math-replay slice (no re-curation): hold the live '
+        f'watchlist size ({_mws_fixed}), cap ({CURRENT[0]}) and &lambda; ({CURRENT[1]}) fixed and vary only the '
+        'optimizer lookback (trailing days of prices used to estimate μ/Σ). Shows how sensitive the live '
+        f'config&#39;s total return is to that window; the <b style="color:#2b8a3e;">green</b> bar is the live '
+        f'setting ({CURRENT[2]}d).</p>' + _lbar)
 
     ts = datetime.now().strftime("%Y-%m-%d %H:%M %Z").strip()
     # Title date range: same snapshots.csv the Curator Backtest reads, so all three DBs show one range.
@@ -692,33 +692,11 @@ rotations</b> more heavily. It ranks these configs almost identically to L1 (cor
 {_l1l2_corr:.2f}), which is the useful takeaway: the two norms agree, so the churn ordering is robust.
 Current config: {_cur_l2:.0f}/yr.</p>
 {l2_scatter}
-<h2>4. Recommended settings + full grid</h2>
+<h2>4. Recommended settings</h2>
 {rec_html}
-<details style="margin:.4em 0 .8em;"><summary style="cursor:pointer;color:#0b7285;font-weight:600;">
-Show the full ranked table (all {len(rows_all)} configs, every watchlist size, ranked by IR) + column definitions</summary>
-<p style="color:#666;font-size:12px;margin:.4em 0 .6em;max-width:920px;">Every cap/λ/lookback config for every
-re-curated <b>watchlist size (ws)</b>, IR-ranked. ★ marks the global best on that metric. Cross-ws rows aren&#39;t
-apples-to-apples: each ws is a different curation draw, so a high row may just be a lucky draw &mdash; read within
-one ws for a clean free-param comparison.</p>
-<p style="color:#666;font-size:12px;margin:.4em 0 .6em;max-width:920px;line-height:1.6;"><b>Column meanings:</b><br>
-<b>ws</b> — max_watchlist_size: the number of curator-managed slots for THIS row's curation (a separate re-curation per size).<br>
-<b>cap / λ / lookback</b> — the config: concentration cap (max weight per position) · risk-aversion λ · optimizer lookback (days of prices used to estimate μ/Σ).<br>
-<b>IR</b> — Information Ratio = annualized active return ÷ tracking error vs SPY. Consistency of beating SPY; this is the ranking column.<br>
-<b>t-stat</b> — statistical significance of the IR (= IR·√years). |t|&gt;2 ≈ the edge is real rather than luck.<br>
-<b>Sharpe</b> — (annualized return − 4% risk-free) ÷ total volatility. Standalone risk-adjusted return (per unit of total risk).<br>
-<b>Calmar</b> — annualized return ÷ |max drawdown|. Return earned per unit of worst peak-to-trough loss.<br>
-<b>alpha</b> — annualized return − SPY's annualized return (excess over the benchmark).<br>
-<b>ann</b> — annualized return · <b>maxDD</b> — deepest peak-to-trough drawdown · <b>total</b> — total return over the whole window.<br>
-<b>hit-rate</b> — share of rolling 6-month windows in which the config beat SPY.<br>
-<b>ann CI [5,95]</b> — block-bootstrap 5–95% confidence interval on the annualized return (the error bar).<br>
-<b>H1/H2 stable</b> — whether IR &gt; 0 in <i>both</i> halves of the window (a yes means the edge isn't a one-half artifact).</p>
-<table><thead><tr>
-<th>ws</th><th>cap / λ / lookback</th><th>IR</th><th>t-stat</th><th>Sharpe</th><th>Calmar</th><th>alpha</th><th>ann</th>
-<th>maxDD</th><th>total</th><th>hit-rate</th><th>ann CI [5,95]</th><th>H1/H2 stable</th></tr></thead>
-<tbody>{trs}</tbody></table>
-</details>
 {mws_equity_html}
 {mws_html}
+{lb_html}
 {llm_html}
 {llm4_html}
 {llm5_html}
