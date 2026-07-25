@@ -467,7 +467,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
             + _c2(r["ir"], "{:+.2f}") + _c2(r["tstat"], "{:+.1f}") + _c2(r["sharpe"], "{:.2f}")
             + _c2(r["calmar"], "{:.2f}") + _c2(r["dd"] * 100, "{:.0f}%") + "</tr>")
     llm_html = (
-        '<h2>8. LLM comparison — curator model (same pools + profile config)</h2>'
+        '<h2>9. LLM comparison — curator model (same pools + profile config)</h2>'
         '<p style="color:#555;max-width:920px;">Every model reads the <b>same</b> news pools and replays at '
         'the profile config (cap 0.8 / λ 2.0 / 30d); the only variable is the curator LLM. The decision '
         'columns are the ones that matter: <b>agree</b> = share of weeks the model made the identical '
@@ -505,7 +505,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     _fig4.update_yaxes(title_text="portfolio value ($)", type="log",
                        tickvals=[10000, 30000, 100000, 300000, 1000000],
                        ticktext=["$10K", "$30K", "$100K", "$300K", "$1M"])
-    llm4_html = (('<h2>9. Portfolio value over time — by curator LLM (vs buy/hold and SPY)</h2>'
+    llm4_html = (('<h2>10. Portfolio value over time — by curator LLM (vs buy/hold and SPY)</h2>'
                   '<p style="color:#555;max-width:920px;">Each LLM\'s realized portfolio value on the same pools '
                   'and profile config, alongside the equal-weight buy/hold starter and SPY. Same idea as the '
                   'curator DB\'s plot 1, without the rebalance markers.</p>'
@@ -562,7 +562,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                       + _c2(s["add_mean"], "{:.2f}") + _c2(s["rem_mean"], "{:.2f}")
                       + "".join(_c2((s[k] or 0) * 100, "{:.0f}%") for k in _cr) + "</tr>")
         llm5_html = (
-            '<h2>10. Rationale-soundness — blind judge (leak-free)</h2>'
+            '<h2>11. Rationale-soundness — blind judge (leak-free)</h2>'
             '<p style="color:#555;max-width:920px;">Every backtest column above (return, IR, Sharpe, Calmar, '
             't-stat) is <b>in-sample</b> &mdash; the curator could have memorized which 2023&ndash;2026 names '
             'later won, so those numbers can\'t honestly rank <i>reasoning</i>. This section does: an '
@@ -647,12 +647,55 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                         yaxis={"title": "total return %"})
     _lbar = _lfig.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False})
     lb_html = (
-        '<h2>7. Total return vs optimizer lookback (live config)</h2>'
+        '<h2>8. Total return vs optimizer lookback (live config)</h2>'
         '<p style="color:#555;max-width:920px;">A FREE math-replay slice (no re-curation): hold the live '
         f'watchlist size ({_mws_fixed}), cap ({CURRENT[0]}) and &lambda; ({CURRENT[1]}) fixed and vary only the '
         'optimizer lookback (trailing days of prices used to estimate μ/Σ). Shows how sensitive the live '
         f'config&#39;s total return is to that window; the <b style="color:#2b8a3e;">green</b> bar is the live '
         f'setting ({CURRENT[2]}d).</p>' + _lbar)
+
+    # section 7: backtest gems — for every ticker, the best $ P&L it achieved across ALL 1350 sweep settings,
+    # and the setting that produced it. Built from data/curator_runs/_gems.json (scripts/gems_scan.py).
+    import json as _gjson
+    _gems_p = ROOT / "data" / "curator_runs" / "_gems.json"
+    _gems = _gjson.loads(_gems_p.read_text())[:20] if _gems_p.exists() else []
+    if _gems:
+        import plotly.graph_objects as _ggo
+        _gy = [g["ticker"] for g in _gems][::-1]     # reverse: plotly puts index 0 at the bottom
+        _gx = [g["gain"] for g in _gems][::-1]
+        _gfig = _ggo.Figure(_ggo.Bar(x=_gx, y=_gy, orientation="h",
+                                     marker_color=[GREEN if v >= 0 else RED for v in _gx],
+                                     hovertemplate="%{y}: $%{x:,.0f}<extra></extra>"))
+        _gfig.update_layout(template="seaborn", height=max(380, 24 * len(_gems)),
+                            margin={"t": 20, "l": 70, "r": 20},
+                            xaxis={"title": "best $ gain (price P&amp;L) across all settings"}, yaxis={"title": ""})
+        _gbar = _gfig.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False})
+        _grows = ""
+        for _i, g in enumerate(_gems):
+            _cur_hit = g["mws"] == _mws_fixed and (g["cap"], g["lam"], g["lb"]) == CURRENT
+            _bg = "background:#fff7e6;" if _cur_hit else ""
+            _grows += (f'<tr style="{_bg}border-bottom:1px solid #eee;"><td {_lc}>{_i + 1}</td>'
+                       f'<td {_lc}><b>{g["ticker"]}</b></td><td {_lc}>${g["gain"]:,.0f}</td>'
+                       f'<td {_lc}>{g["price_ret"]*100:+.0f}%</td><td {_lc}>{g["days_held"]}</td>'
+                       f'<td {_lc}>ws{g["mws"]} &middot; cap{g["cap"]}/λ{g["lam"]}/{g["lb"]}d'
+                       + (" &larr; live" if _cur_hit else "") + '</td>'
+                       f'<td {_lc}>{g["span"][0]} &rarr; {g["span"][1]}</td></tr>')
+        gems_html = (
+            '<h2>7. Backtest gems</h2>'
+            '<p style="color:#555;max-width:940px;">For every ticker the curator ever held, its best <b>$ gain</b> '
+            '(price-driven P&amp;L on the position) across <b>all 1350 sweep settings</b>, and the setting that '
+            'produced it. These are the winners worth &ldquo;riding&rdquo;: a ticker&#39;s gain is maximized by the '
+            'config that weighted it most while it ran (usually high cap, low λ, short lookback, and whichever '
+            'watchlist size held it through the move). Anchors (SPY/AGG/IAU) are excluded. In-sample &mdash; a '
+            'gem list to build a low-churn strategy around, not a promise.</p>'
+            + _gbar
+            + '<table style="font-size:12.5px;margin-top:.5em;"><thead><tr>'
+            f'<th {_lc}>#</th><th {_lc}>ticker</th><th {_lc}>best $ gain</th><th {_lc}>price return</th>'
+            f'<th {_lc}>days held</th><th {_lc}>best setting (ws &middot; cap/λ/lookback)</th><th {_lc}>held span</th>'
+            f'</tr></thead><tbody>{_grows}</tbody></table>')
+    else:
+        gems_html = ('<h2>7. Backtest gems</h2><p style="color:#999;">Gem scan not yet run '
+                     '(<code>scripts/gems_scan.py</code> writes <code>data/curator_runs/_gems.json</code>).</p>')
 
     ts = datetime.now().strftime("%Y-%m-%d %H:%M %Z").strip()
     # Title date range: same snapshots.csv the Curator Backtest reads, so all three DBs show one range.
@@ -705,6 +748,7 @@ Current config: {_cur_l2:.0f}/yr.</p>
 {rec_html}
 {mws_equity_html}
 {mws_html}
+{gems_html}
 {lb_html}
 {llm_html}
 {llm4_html}
