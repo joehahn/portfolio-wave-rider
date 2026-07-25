@@ -32,7 +32,7 @@ ANCHORS = ["SPY", "AGG", "IAU"]
 
 # "Recommended settings" = the risk/churn-constrained frontier read off plots 1-3: keep only configs with
 # shallow drawdown AND low churn on BOTH norms, then eyeball the survivors for the best return metrics.
-REC_MAX_DD, REC_MAX_L1, REC_MAX_L2 = 45.0, 750.0, 1000.0   # |maxDD|% , L1 turnover , L2 path-length ceilings
+REC_MAX_DD, REC_MAX_L1, REC_MAX_L2 = 50.0, 800.0, 1200.0   # |maxDD|% , L1 turnover , L2 path-length ceilings
 
 # LLM curator comparison (section 3): (label, run_dir, provider, $in/M, $out/M). Agreement is measured
 # against the reference (first row). Add a row per model run you want to compare.
@@ -674,6 +674,36 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                        f'<td {_lc}>{g["days_held"]}</td>'
                        f'<td {_lc}>ws{g["mws"]} &middot; cap{g["cap"]}/λ{g["lam"]}/{g["lb"]}d'
                        + (" &larr; live" if _cur_hit else "") + '</td>' + _bar + '</tr>')
+        # gem/wave-diversity table (below the gems table): low-churn frontier configs ranked by how many gems
+        # (across how many WAVES) they profit from — the criterion behind the canonical pick. From
+        # scripts/gem_diversity_scan.py -> data/curator_runs/_gem_diversity.json.
+        _divp = ROOT / "data" / "curator_runs" / "_gem_diversity.json"
+        _div = _gjson.loads(_divp.read_text()) if _divp.exists() else []
+        _div_html = ""
+        if _div:
+            _drows = ""
+            for _i, x in enumerate(_div):
+                _hit = x["mws"] == _mws_fixed and (x["cap"], x["lam"], x["lb"]) == CURRENT
+                _dbg = "background:#fff7e6;" if _hit else ""
+                _wv = " &middot; ".join(f'{k} +{v:.0f}' for k, v in x["waves"].items())
+                _drows += (f'<tr style="{_dbg}border-bottom:1px solid #eee;"><td {_lc}>{_i + 1}</td>'
+                           f'<td {_lc}>ws{x["mws"]} &middot; cap{x["cap"]}/λ{x["lam"]}/{x["lb"]}d'
+                           + (" &larr; live" if _hit else "") + '</td>'
+                           f'<td {_lc}>{x["ret"] * 100:+.0f}%</td><td {_lc}>{x["dd"] * 100:.0f}%</td>'
+                           f'<td {_lc}>{x["l1"]:.0f}</td><td {_lc}>{x["l2"]:.0f}</td>'
+                           f'<td {_lc}>{x["n_pos"]}</td><td {_lc}>{x["n_waves"]}</td>'
+                           f'<td {_lc}>{_wv}</td></tr>')
+            _div_html = (
+                '<h3 style="margin:1.3em 0 .2em;">Low-churn settings by gem &amp; wave diversity</h3>'
+                f'<p style="color:#555;max-width:940px;">Within the low-churn box (|maxDD| &lt; {REC_MAX_DD:.0f}% '
+                f'AND L1 &lt; {REC_MAX_L1:.0f} AND L2 &lt; {REC_MAX_L2:.0f}), the settings whose gains come from the '
+                '<b>most gem tickers</b> &mdash; ranked by gem count, then return &mdash; with the <b>waves</b> '
+                'driving those gains. Broad wave coverage is more robust than a single-stock run; the top row is the '
+                'canonical live config. Wave figures are percentage points of total return.</p>'
+                + '<table style="font-size:12.5px;margin-top:.4em;"><thead><tr>'
+                f'<th {_lc}>#</th><th {_lc}>setting</th><th {_lc}>return</th><th {_lc}>maxDD</th>'
+                f'<th {_lc}>L1</th><th {_lc}>L2</th><th {_lc}>gems</th><th {_lc}>waves</th>'
+                f'<th {_lc}>waves generating the gains (pp)</th></tr></thead><tbody>' + _drows + '</tbody></table>')
         gems_html = (
             '<h2>7. Backtest gems</h2>'
             '<p style="color:#555;max-width:940px;">For every ticker the curator ever held, its best <b>$ gain</b> '
@@ -686,7 +716,8 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
             + '<table style="font-size:12.5px;margin-top:.5em;"><thead><tr>'
             f'<th {_lc}>#</th><th {_lc}>ticker</th><th {_lc}>best $ gain</th>'
             f'<th {_lc}>days held</th><th {_lc}>best setting</th><th {_lc}>gain</th>'
-            f'</tr></thead><tbody>{_grows}</tbody></table>')
+            f'</tr></thead><tbody>{_grows}</tbody></table>'
+            + _div_html)
     else:
         gems_html = ('<h2>7. Backtest gems</h2><p style="color:#999;">Gem scan not yet run '
                      '(<code>scripts/gems_scan.py</code> writes <code>data/curator_runs/_gems.json</code>).</p>')
