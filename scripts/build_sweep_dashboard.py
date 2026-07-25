@@ -563,8 +563,8 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         'diversifying into next-waves regardless of room? <b>Red bar = NVDA entered the watchlist.</b></p>'
         + _mbar
         + '<table style="margin-top:.6em;"><thead><tr>'
-        f'<th {_lc}>max_watchlist_size</th><th>curator return</th><th>adds</th><th>removes</th>'
-        f'<th>rejects</th><th>retries</th><th {_lc}>NVDA added?</th><th {_lc}>final watchlist (managed picks)</th>'
+        f'<th {_lc}>max_watchlist_size</th><th {_lc}>curator return</th><th {_lc}>adds</th><th {_lc}>removes</th>'
+        f'<th {_lc}>rejects</th><th {_lc}>retries</th><th {_lc}>NVDA added?</th><th {_lc}>final watchlist (managed picks)</th>'
         '</tr></thead><tbody>' + _mtr + '</tbody></table>'
         '<p style="color:#888;font-size:12px;max-width:920px;"><b>adds/removes</b> = the curator\'s proposals '
         'that the validator APPLIED; <b>rejects</b> = proposals still blocked after retries (double-add, add to '
