@@ -55,15 +55,14 @@ _FINANCIAL_MODEL_DEFAULTS: dict[str, Any] = {
     "rebalance_period": "monthly",
     "max_watchlist_size": 12,
     # concentration_cap is the optimizer's per-position max weight (the
-    # --max-weight default). Unlike the others it lives at the profile's top
-    # level, not inside the financial_model block; load_financial_model reads
-    # it from there so the cap has a single source of truth (investor_profile).
+    # --max-weight default). It lives INSIDE the financial_model block (with the
+    # other optimizer knobs); load_financial_model still honors a legacy
+    # top-level key as a fallback for older profiles.
     "concentration_cap": 0.25,
     # min_trade_size_frac is the smallest trade the optimizer will propose,
     # expressed as a FRACTION of current portfolio value (0.1 = 10%); proposed
     # trades below frac * portfolio_value are filtered out of the recommendation.
-    # Like concentration_cap it lives at the profile's top level, not inside the
-    # financial_model block.
+    # It lives at the profile's top level, not inside the financial_model block.
     "min_trade_size_frac": 0.1,
     # always_include: tickers permanently injected into the optimizer universe
     # as safe-haven / diversification anchors (e.g. SPY, AGG, IAU). They live
@@ -84,10 +83,12 @@ def load_financial_model(profile_path: str = "investor_profile.md") -> dict[str,
 
     Returns a dict with the `financial_model` fields (`risk_aversion`,
     `risk_free_rate`, `lookback_period`, `rebalance_period`,
-    `max_watchlist_size`) plus the top-level keys `concentration_cap`,
-    `min_trade_size_frac`, and `always_include`; any missing field falls back
-    to the hard-coded default. If the profile file doesn't exist or has no
-    front matter, all defaults are returned.
+    `max_watchlist_size`, `concentration_cap`) plus the top-level keys
+    `min_trade_size_frac` and `always_include`; any missing field falls back
+    to the hard-coded default. `concentration_cap` now lives inside
+    `financial_model`; a legacy top-level key is still honored as a fallback.
+    If the profile file doesn't exist or has no front matter, all defaults are
+    returned.
 
     Backtest-only knobs (window dates, execution lag) live in a separate
     `backtest` section and are read by ``load_backtest_config`` instead, since
@@ -113,8 +114,10 @@ def load_financial_model(profile_path: str = "investor_profile.md") -> dict[str,
     fm = data.get("financial_model") or {}
     out = dict(_FINANCIAL_MODEL_DEFAULTS)
     out.update(fm)
-    # concentration_cap is a top-level profile key, not part of financial_model.
-    if "concentration_cap" in data:
+    # concentration_cap is an optimizer constraint whose home is `financial_model` (picked up by the
+    # out.update(fm) above). A legacy TOP-LEVEL concentration_cap is still honored for older profiles,
+    # but only as a fallback — the financial_model value wins.
+    if "concentration_cap" not in fm and "concentration_cap" in data:
         out["concentration_cap"] = data["concentration_cap"]
     # min_trade_size_frac is also a top-level key (smallest proposed trade, as a
     # fraction of portfolio value). Accept the legacy min_trade_size_usd key too,
@@ -4475,7 +4478,7 @@ def build_curator_dashboard(
         if nonzero:
             # LOG x-axis: bars can be negative (a losing pick), and log can't show <=0, so plot |value| on
             # a log axis with the sign carried by color (green +, red -), and hover the true signed value.
-            # A zero-return row sinks to a small floor so log() stays defined. Mirrors plot 9.
+            # A zero-return row sinks to a small floor so log() stays defined. Mirrors the gains plots.
             _mags = [abs(r[1]) * 100 for r in nonzero]
             _floor = (min([m for m in _mags if m > 0] or [0.01])) * 0.5
             f = go.Figure(go.Bar(x=[m if m > 0 else _floor for m in _mags],
@@ -4492,7 +4495,7 @@ def build_curator_dashboard(
     _gain_src = _attr_html(_src_ret, "mean forward price return of adds (%)", universe=_recognized, noun="sources")
     _gain_kw = _attr_html(_kw_ret, "mean forward price return of adds (%)", universe=set(_kwmap), noun="keywords")
     _gain_author = _attr_html(_author_ret, "mean forward price return of adds (%)", noun="authors")
-    # Number of adds per author: raw n behind plot 9 (co-authors each counted; byline-less adds under "(no author)").
+    # Number of adds per author: raw n behind plot 8 (co-authors each counted; byline-less adds under "(no author)").
     _npa = ""
     _naa = sorted(((a, len(v)) for a, v in _author_ret.items() if v), key=lambda r: r[1])
     if _naa:
@@ -4564,21 +4567,21 @@ def build_curator_dashboard(
 
     extra_html = (
         '<h2 style="margin:1.6em 0 0.2em;">7. Allocation over time</h2>' + _to_html(_af)
-        + (('<h2 style="margin:1.6em 0 0.2em;">8. Gains vs news source</h2>' + _attr_note + _gain_src) if _gain_src else '')
-        + (('<h2 style="margin:1.6em 0 0.2em;">9. Gains vs author</h2>' + _author_note + _gain_author) if _gain_author else '')
+        + (('<h2 style="margin:1.6em 0 0.2em;">8. Gains vs author</h2>' + _author_note + _gain_author) if _gain_author else '')
+        + (('<h2 style="margin:1.6em 0 0.2em;">9. Gains vs news source</h2>' + _attr_note + _gain_src) if _gain_src else '')
         + (('<h2 style="margin:1.6em 0 0.2em;">10. Gain per article vs news source</h2>' + _gpa_note + _gain_per_art) if _gain_per_art else '')
         + (('<h2 style="margin:1.6em 0 0.2em;">11. Gains vs search keyword</h2>' + _attr_note + _gain_kw) if _gain_kw else '')
     )
     # 12. Number of adds per source — the raw n behind the source-gain plots.
     _nps_html = (('<h2 style="margin:1.6em 0 0.2em;">12. Number of adds per source</h2>'
                   '<p style="color:#555;max-width:820px;margin:0 0 .4em;">How many adds cited each source '
-                  '(by URL domain) as evidence &mdash; the raw <code>n</code> behind plots 8 and 10.</p>'
+                  '(by URL domain) as evidence &mdash; the raw <code>n</code> behind plots 9 and 10.</p>'
                   + _nps) if _nps else '')
-    # 13. Number of adds per author — raw n behind plot 9 (sits just below plot 12).
+    # 13. Number of adds per author — raw n behind plot 8 (sits just below plot 12).
     _npa_html = (('<h2 style="margin:1.6em 0 0.2em;">13. Number of adds per author</h2>'
                   '<p style="color:#555;max-width:820px;margin:0 0 .4em;">How many adds each byline is credited '
                   'on (co-authors each counted; adds whose evidence URL carries no captured byline bucket into '
-                  '<code>(no author)</code>) &mdash; the raw <code>n</code> behind plot 9.</p>'
+                  '<code>(no author)</code>) &mdash; the raw <code>n</code> behind plot 8.</p>'
                   + _npa) if _npa else '')
     page = (
         '<!doctype html><html><head><meta charset="utf-8">'
