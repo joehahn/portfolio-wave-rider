@@ -389,13 +389,13 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         f'<tr><td style="text-align:left">concentration_cap</td><td style="text-align:left">{_fmt(CAPS)}</td><td style="text-align:left">{CURRENT[0]}</td></tr>'
         f'<tr><td style="text-align:left">risk_aversion (λ)</td><td style="text-align:left">{_fmt(LAMBDAS)}</td><td style="text-align:left">{CURRENT[1]}</td></tr>'
         f'<tr><td style="text-align:left">optimizer_lookback (days)</td><td style="text-align:left">{_fmt(LOOKBACKS)}</td><td style="text-align:left">{CURRENT[2]}</td></tr>'
-        f'<tr><td style="text-align:left">max_watchlist_size <span style="color:#9a6a00;">(re-curation, §9)</span></td>'
+        f'<tr><td style="text-align:left">max_watchlist_size <span style="color:#9a6a00;">(re-curation, §6)</span></td>'
         f'<td style="text-align:left">{_fmt([c for c, _ in MWS_SWEEP])}</td><td style="text-align:left">{_mws_fixed}</td></tr>'
         '</tbody></table>'
         f'<p style="color:#888;font-size:12px;max-width:860px;">The first three (cap / λ / lookback) are FREE '
         f'math-replay knobs — every combination = {len(rows)} configs on the <b>same</b> curations. '
         '<b>max_watchlist_size is different</b>: it changes the CURATOR\'s decisions, so each value is a separate '
-        'non-zero-cost RE-CURATION (section 9 + plot 5), not a replay. <b>Plots 1-3 overlay the '
+        'non-zero-cost RE-CURATION (section 6 + plot 5), not a replay. <b>Plots 1-3 overlay the '
         f'{len(rows)}-config free grid on EACH ready max_watchlist_size ({_fmt([m for m in _mws_present])} = '
         f'{len(rows_all)} points, colored clouds)</b> so the curation-draw spread is visible. Section 4 ranks '
         f'those same {len(rows_all)} points and its champions can come from any watchlist size (the live config is '
@@ -480,7 +480,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
             + _c2(r["ir"], "{:+.2f}") + _c2(r["tstat"], "{:+.1f}") + _c2(r["sharpe"], "{:.2f}")
             + _c2(r["calmar"], "{:.2f}") + _c2(r["dd"] * 100, "{:.0f}%") + "</tr>")
     llm_html = (
-        '<h2>6. LLM comparison — curator model (same pools + profile config)</h2>'
+        '<h2>7. LLM comparison — curator model (same pools + profile config)</h2>'
         '<p style="color:#555;max-width:920px;">Every model reads the <b>same</b> news pools and replays at '
         'the profile config (cap 0.8 / λ 2.0 / 30d); the only variable is the curator LLM. The decision '
         'columns are the ones that matter: <b>agree</b> = share of weeks the model made the identical '
@@ -518,7 +518,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     _fig4.update_yaxes(title_text="portfolio value ($)", type="log",
                        tickvals=[10000, 30000, 100000, 300000, 1000000],
                        ticktext=["$10K", "$30K", "$100K", "$300K", "$1M"])
-    llm4_html = (('<h2>7. Portfolio value over time — by curator LLM (vs buy/hold and SPY)</h2>'
+    llm4_html = (('<h2>8. Portfolio value over time — by curator LLM (vs buy/hold and SPY)</h2>'
                   '<p style="color:#555;max-width:920px;">Each LLM\'s realized portfolio value on the same pools '
                   'and profile config, alongside the equal-weight buy/hold starter and SPY. Same idea as the '
                   'curator DB\'s plot 1, without the rebalance markers.</p>'
@@ -575,7 +575,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                       + _c2(s["add_mean"], "{:.2f}") + _c2(s["rem_mean"], "{:.2f}")
                       + "".join(_c2((s[k] or 0) * 100, "{:.0f}%") for k in _cr) + "</tr>")
         llm5_html = (
-            '<h2>8. Rationale-soundness — blind judge (leak-free)</h2>'
+            '<h2>9. Rationale-soundness — blind judge (leak-free)</h2>'
             '<p style="color:#555;max-width:920px;">Every backtest column above (return, IR, Sharpe, Calmar, '
             't-stat) is <b>in-sample</b> &mdash; the curator could have memorized which 2023&ndash;2026 names '
             'later won, so those numbers can\'t honestly rank <i>reasoning</i>. This section does: an '
@@ -627,7 +627,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                  f'<td>{r["ret"] * 100:+.0f}%</td><td>{r["n_add"]}</td><td>{r["n_rem"]}</td><td>{_rej}</td>'
                  f'<td>{r.get("n_ret", 0)}</td><td {_lc}>{_nv}</td><td {_lc}>{", ".join(r["wl"])}</td></tr>')
     mws_html = (
-        '<h2>9. max_watchlist_size sweep — does more room let the curator add NVDA?</h2>'
+        '<h2>6. max_watchlist_size sweep — does more room let the curator add NVDA?</h2>'
         '<p style="color:#555;max-width:920px;">Unlike the cap/&lambda;/lookback knobs above (free math '
         'replays on one curation set), <b>max_watchlist_size changes the curator\'s decisions</b>, so each '
         'cap is a separate re-curation (~$0.40 LLM each) on the same news pools and AAPL/GOOGL/AMZN starter. '
@@ -718,10 +718,10 @@ one ws for a clean free-param comparison.</p>
 <tbody>{trs}</tbody></table>
 </details>
 {mws_equity_html}
+{mws_html}
 {llm_html}
 {llm4_html}
 {llm5_html}
-{mws_html}
 </body></html>"""
     out.write_text(page)
     top = max(rows, key=lambda r: r["ir"] if r["ir"] == r["ir"] else -9e9)
