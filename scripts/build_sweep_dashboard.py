@@ -402,7 +402,6 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     # winners drawn from every watchlist size, so they typically ride a lucky curation draw -> forward-test, not live.
     _cur_row = next(r for r in rows_all if r["cur"])
     _lc = 'style="text-align:left"'
-    _cfg2 = lambda r: f"ws {r['mws']} &middot; {r['cap']:.2f}/{r['lam']:.1f}/{r['lb']}d"  # noqa: E731
     # (label, cell-format, value fn); maxDD ranks by least-negative (higher r['dd'] = shallower loss = better)
     _MET = [("IR", "{:+.2f}", lambda r: r["ir"]),
             ("t-stat", "{:+.1f}", lambda r: r["tstat"]),
@@ -421,14 +420,18 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
 
     def _grp_table(label, keyfn):
         top5 = sorted(rows_all, key=lambda r: -(keyfn(r) if keyfn(r) == keyfn(r) else -9e9))[:5]
-        hdr = (f'<tr><th {_lc}>#</th><th {_lc}>config (ws &middot; cap/λ/lookback)</th>'
+        # config exploded into its own columns: max_watchlist_size / concentration_cap / λ / lookback
+        hdr = (f'<tr><th {_lc}>#</th><th {_lc}>max_watchlist_size</th><th {_lc}>concentration_cap</th>'
+               f'<th {_lc}>λ</th><th {_lc}>lookback</th>'
                + "".join(f'<th {_lc}>{_m}</th>' for _m, _, _ in _MET) + '</tr>')
         body = ""
         for _i, r in enumerate(top5):
             _hl = "background:#fff7e6;" if r["cur"] else ""
-            _cfg = f'<b>{_cfg2(r)}</b>' + (" ★" if _i == 0 else "") + (" &larr; live" if r["cur"] else "")
-            body += (f'<tr style="{_hl}border-bottom:1px solid #eee;"><td {_lc}>{_i + 1}</td>'
-                     f'<td {_lc}>{_cfg}</td>{_cells(r, label)}</tr>')
+            _rank = f'{_i + 1}' + (" ★" if _i == 0 else "")
+            _live = " &larr; live" if r["cur"] else ""
+            body += (f'<tr style="{_hl}border-bottom:1px solid #eee;"><td {_lc}>{_rank}</td>'
+                     f'<td {_lc}>{r["mws"]}</td><td {_lc}>{r["cap"]:.2f}</td><td {_lc}>{r["lam"]:.1f}</td>'
+                     f'<td {_lc}>{r["lb"]}d{_live}</td>{_cells(r, label)}</tr>')
         return (f'<h4 style="margin:.7em 0 .15em;">Top 5 by {label}</h4>'
                 f'<table style="font-size:12.5px;margin-bottom:.3em;"><thead>{hdr}</thead><tbody>{body}</tbody></table>')
 
