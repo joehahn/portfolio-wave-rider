@@ -239,60 +239,91 @@ def _llm_rows(cfg):
 def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     # The 150 backtest replays are the slow part; the metrics are DETERMINISTIC for a given (grid, curation
     # set), so cache them. A text/layout-only edit then re-renders instantly (--recompute forces a sweep).
+    import glob as _glob
     import hashlib
     import json as _json
+    # Plots 1-3 overlay the free grid on EVERY re-curated max_watchlist_size (each a distinct curation draw),
+    # so each mws value = its own 150-config replay. cap/λ/lookback stay FREE math replays; mws is a curator
+    # param, so we only include a run dir once its re-curation is COMPLETE (same curation count as canonical) —
+    # an in-progress dir (e.g. cap 16 mid-sweep) is skipped until done, then folded in on the next rebuild.
+    _mws_fixed = int(portfolio.load_financial_model().get("max_watchlist_size", 5))  # canonical / live watchlist
+    _n_canon = len(_glob.glob(str(ROOT / runs_dir / "2*-curation.json")))
+    READY_MWS = [(m, d) for (m, d) in MWS_SWEEP
+                 if _n_canon > 0 and len(_glob.glob(str(ROOT / d / "2*-curation.json"))) == _n_canon]
     cache_p = ROOT / "data" / "curator_runs" / "_sweep_cache.json"
-    key = hashlib.md5(_json.dumps([CAPS, LAMBDAS, LOOKBACKS, list(CURRENT), runs_dir, "churn-v2-l1l2"]).encode()).hexdigest()
-    rows = spy_ret = None
+    key = hashlib.md5(_json.dumps([CAPS, LAMBDAS, LOOKBACKS, list(CURRENT), runs_dir,
+                                   [m for m, _ in READY_MWS], "churn-v2-l1l2-mws"]).encode()).hexdigest()
+    rows_all = spy_ret = None
     if not recompute and cache_p.exists():
         try:
             c = _json.loads(cache_p.read_text())
             if c.get("key") == key:
-                rows, spy_ret = c["rows"], c["spy_ret"]
-                print(f"  loaded {len(rows)} configs from cache (--recompute to re-sweep)")
+                rows_all, spy_ret = c["rows"], c["spy_ret"]
+                print(f"  loaded {len(rows_all)} configs from cache (--recompute to re-sweep)")
         except Exception:  # noqa: BLE001
             pass
-    if rows is None:
-        rows, spy_curve = [], None
-        for cap in CAPS:
-            for lam in LAMBDAS:
-                for lb in LOOKBACKS:
-                    res = portfolio.curator_backtest(
-                        runs_dir=runs_dir, out_dir=f"/tmp/_sweep/{cap}_{lam}_{lb}",
-                        max_weight=cap, risk_aversion=lam, benchmarks=["SPY"],
-                        lookback_years_override=lb / 365.0, always_include=ANCHORS)
-                    snaps = pd.read_csv(Path(f"/tmp/_sweep/{cap}_{lam}_{lb}") / "snapshots.csv", parse_dates=["date"])
-                    totals = snaps.groupby("date")["total_value"].first().sort_index()
-                    if spy_curve is None:
-                        spy_curve = portfolio._fetch_benchmark_curves(["SPY"], totals.index[0], totals.index[-1],
-                                                                      float(totals.iloc[0]))["SPY"]
-                    m = _metrics(totals, spy_curve, res["annualized_return"], res["max_drawdown"])
-                    _l1, _l2 = _churn_metrics(snaps)
-                    rows.append({"cap": cap, "lam": lam, "lb": lb, "ret": res["realized_return"],
-                                 "ann": res["annualized_return"], "dd": res["max_drawdown"],
-                                 "l1": _l1, "l2": _l2, **m,
-                                 "cur": (cap, lam, lb) == CURRENT})
+    if rows_all is None:
+        rows_all, spy_curve = [], None
+        for _m, _mdir in READY_MWS:
+            for cap in CAPS:
+                for lam in LAMBDAS:
+                    for lb in LOOKBACKS:
+                        _tag = f"{_m}_{cap}_{lam}_{lb}"
+                        res = portfolio.curator_backtest(
+                            runs_dir=_mdir, out_dir=f"/tmp/_sweep/{_tag}",
+                            max_weight=cap, risk_aversion=lam, benchmarks=["SPY"],
+                            lookback_years_override=lb / 365.0, always_include=ANCHORS)
+                        snaps = pd.read_csv(Path(f"/tmp/_sweep/{_tag}") / "snapshots.csv", parse_dates=["date"])
+                        totals = snaps.groupby("date")["total_value"].first().sort_index()
+                        if spy_curve is None:   # identical window across all mws dirs -> compute SPY once
+                            spy_curve = portfolio._fetch_benchmark_curves(["SPY"], totals.index[0], totals.index[-1],
+                                                                          float(totals.iloc[0]))["SPY"]
+                        m = _metrics(totals, spy_curve, res["annualized_return"], res["max_drawdown"])
+                        _l1, _l2 = _churn_metrics(snaps)
+                        rows_all.append({"mws": _m, "cap": cap, "lam": lam, "lb": lb, "ret": res["realized_return"],
+                                         "ann": res["annualized_return"], "dd": res["max_drawdown"],
+                                         "l1": _l1, "l2": _l2, **m,
+                                         "cur": (cap, lam, lb) == CURRENT and _m == _mws_fixed})
         spy_ret = float(spy_curve.iloc[-1] / spy_curve.iloc[0] - 1.0)
         cache_p.parent.mkdir(parents=True, exist_ok=True)
-        cache_p.write_text(_json.dumps({"key": key, "spy_ret": spy_ret, "rows": rows}))
+        cache_p.write_text(_json.dumps({"key": key, "spy_ret": spy_ret, "rows": rows_all}))
+    # The ranking table / recommended-settings / plots 4+ stay on the CANONICAL watchlist (mws == _mws_fixed);
+    # only plots 1-3 use the full rows_all overlay across every ready max_watchlist_size.
+    rows = [r for r in rows_all if r["mws"] == _mws_fixed]
 
-    # best per metric (higher is better except dd where less-negative is better)
-    best = {k: max(rows, key=lambda r: (r[k] if r[k] == r[k] else -9e9))
-            for k in ("ir", "calmar", "sharpe", "alpha", "ann", "hit")}
-    best["dd"] = max(rows, key=lambda r: r["dd"])   # least-negative drawdown
+    # best per metric across ALL points (every watchlist size), higher is better except dd (less-negative).
+    # This is what the full 900-row table stars and what the champion picks below draw from.
+    best = {k: max(rows_all, key=lambda r: (r[k] if r[k] == r[k] else -9e9))
+            for k in ("ir", "tstat", "calmar", "sharpe", "alpha", "ann", "hit")}
+    best["dd"] = max(rows_all, key=lambda r: r["dd"])   # least-negative drawdown
 
     def star(r, k):
         return " ★" if best.get(k) is r else ""
 
+    # Champion set for "Recommended settings": the winner on each of the 5 headline metrics the user picked
+    # (IR, t-stat, Sharpe, Calmar, annualized return). One config can win several, so dedup -> <=5 distinct
+    # rows, each tagged with the metric(s) it tops. Drawn from rows_all, so a champion can come from any mws.
+    CHAMP_METRICS = [("ir", "IR"), ("tstat", "t-stat"), ("sharpe", "Sharpe"), ("calmar", "Calmar"), ("ann", "ann. return")]
+    _champ_wins: dict[int, list[str]] = {}
+    _champ_order: list = []
+    for _k, _lab in CHAMP_METRICS:
+        _w = best[_k]
+        _id = id(_w)
+        if _id not in _champ_wins:
+            _champ_wins[_id] = []
+            _champ_order.append(_w)
+        _champ_wins[_id].append(_lab)
+
     def td(v, fmt, cls="", extra=""):
         return f"<td style='padding:5px 10px;text-align:right;{cls}'>{extra}{fmt.format(v) if v == v else 'n/a'}</td>"
-    trs = ""
-    for r in sorted(rows, key=lambda r: -(r["ir"] if r["ir"] == r["ir"] else -9e9)):
+
+    def _tr(r):
         bg = "background:#fff7e6;" if r["cur"] else ""
         cfg = f"{r['cap']:.2f} / {r['lam']:.1f} / {r['lb']}d" + (" ← current" if r["cur"] else "")
         stable = "yes" if (r["ir_h1"] == r["ir_h1"] and r["ir_h2"] == r["ir_h2"] and r["ir_h1"] > 0 and r["ir_h2"] > 0) else "no"
-        trs += (
+        return (
             f"<tr style='{bg}border-bottom:1px solid #eee;'>"
+            f"<td style='padding:5px 10px;text-align:center;'>{r['mws']}</td>"
             f"<td style='padding:5px 10px;white-space:nowrap;'>{cfg}</td>"
             f"{td(r['ir'], '{:+.2f}', 'font-weight:600;', star(r,'ir'))}"
             f"{td(r['tstat'], '{:+.1f}')}"
@@ -307,40 +338,46 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
             f"<td style='padding:5px 10px;text-align:center;color:{GREEN if stable=='yes' else RED};'>{stable}</td>"
             "</tr>")
 
-    # frontier scatter: ann return vs |max drawdown|, colored by IR, current config ringed
-    import plotly.graph_objects as go
-    _mws_fixed = int(portfolio.load_financial_model().get("max_watchlist_size", 5))  # held constant in plots 1-3
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(
-        x=[abs(r["dd"]) * 100 for r in rows], y=[r["ann"] * 100 for r in rows], mode="markers",
-        marker={"size": [16 if r["cur"] else 10 for r in rows],
-                "color": [r["ir"] for r in rows], "colorscale": "Viridis", "showscale": True,
-                "colorbar": {"title": "IR"}, "line": {"width": [3 if r["cur"] else 0 for r in rows], "color": "#e03131"}},
-        text=[f"cap {r['cap']} / λ {r['lam']} / {r['lb']}d · watchlist {_mws_fixed}"
-              f"<br>IR {r['ir']:+.2f}, Calmar {r['calmar']:.2f}" for r in rows],
-        hovertemplate="%{text}<br>ann %{y:.0f}%, maxDD -%{x:.0f}%<extra></extra>"))
-    fig.update_layout(template="seaborn", height=440, margin={"t": 20, "l": 60, "r": 20},
-                      xaxis={"title": "max drawdown (|%|) — risk →"}, yaxis={"title": "annualized return %"})
-    scatter = fig.to_html(full_html=False, include_plotlyjs="cdn", config={"displayModeBar": False})
+    # Full table (behind the expander): EVERY point across all watchlist sizes, IR-ordered.
+    trs = "".join(_tr(r) for r in sorted(rows_all, key=lambda r: -(r["ir"] if r["ir"] == r["ir"] else -9e9)))
 
-    # plots 2 & 3: return vs churn, two norms. Same configs as plot 1; UPPER-LEFT (high return, low churn)
-    # = the stable, less-overfit ideal. L1 = turnover (industry standard); L2 = course-correction (Euclidean
-    # path length through weight-space, emphasizes concentrated rotations).
-    def _churn_scatter(field, xtitle):
+    # plots 1-3: ann return vs (drawdown | L1 | L2), one colored cloud PER max_watchlist_size (each its own
+    # 150-config free-grid replay), current config red-ringed. Coloring by mws (not IR) makes the curation-draw
+    # spread visible: cap/λ/lookback move a point WITHIN a cloud deterministically; jumping clouds also changes
+    # the underlying curation, so cross-color separation mixes the mws effect with kimi draw noise.
+    import plotly.graph_objects as go
+    # discrete, colorblind-friendly-ish palette keyed by watchlist size (grey fallback for any unlisted size)
+    MWS_COLORS = {3: "#1f77b4", 5: "#2b8a3e", 8: "#e8590c", 10: "#c92a2a", 12: "#9c36b5", 16: "#0c8599"}
+    _mws_present = sorted({r["mws"] for r in rows_all})
+
+    def _mws_scatter(xfn, xtitle, xhover, first):
         f = go.Figure()
-        f.add_trace(go.Scatter(
-            x=[r[field] for r in rows], y=[r["ann"] * 100 for r in rows], mode="markers",
-            marker={"size": [16 if r["cur"] else 10 for r in rows],
-                    "color": [r["ir"] for r in rows], "colorscale": "Viridis", "showscale": True,
-                    "colorbar": {"title": "IR"}, "line": {"width": [3 if r["cur"] else 0 for r in rows], "color": "#e03131"}},
-            text=[f"cap {r['cap']} / λ {r['lam']} / {r['lb']}d · watchlist {_mws_fixed}"
-                  f"<br>IR {r['ir']:+.2f}, {field.upper()} {r[field]:.0f}" for r in rows],
-            hovertemplate="%{text}<br>ann %{y:.0f}%, " + field.upper() + " %{x:.0f}<extra></extra>"))
-        f.update_layout(template="seaborn", height=440, margin={"t": 20, "l": 60, "r": 20},
-                        xaxis={"title": xtitle}, yaxis={"title": "annualized return %"})
-        return f.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False})
-    l1_scatter = _churn_scatter("l1", "L1 churn — annualized one-way turnover (%/yr) → more trading")
-    l2_scatter = _churn_scatter("l2", "L2 course-correction — annualized weight-space path length → more rotation")
+        for _m in _mws_present:
+            sub = [r for r in rows_all if r["mws"] == _m]
+            f.add_trace(go.Scatter(
+                x=[xfn(r) for r in sub], y=[r["ann"] * 100 for r in sub], mode="markers",
+                name=f"{_m}" + (" ★" if _m == _mws_fixed else ""),
+                marker={"size": [16 if r["cur"] else 8 for r in sub],
+                        "color": MWS_COLORS.get(_m, "#adb5bd"), "opacity": 0.75,
+                        "line": {"width": [3 if r["cur"] else 0 for r in sub], "color": "#e03131"}},
+                text=[f"watchlist {_m} · cap {r['cap']} / λ {r['lam']} / {r['lb']}d"
+                      f"<br>IR {r['ir']:+.2f}, Calmar {r['calmar']:.2f}"
+                      + (" · CURRENT" if r["cur"] else "") for r in sub],
+                hovertemplate="%{text}<br>ann %{y:.0f}%, " + xhover + "<extra></extra>"))
+        f.update_layout(template="seaborn", height=460, margin={"t": 20, "l": 60, "r": 140},
+                        xaxis={"title": xtitle}, yaxis={"title": "annualized return %"},
+                        legend={"title": {"text": "watchlist<br>size (★=live)"}, "x": 1.02, "xanchor": "left",
+                                "y": 1, "yanchor": "top"})
+        return f.to_html(full_html=False, include_plotlyjs=("cdn" if first else False),
+                         config={"displayModeBar": False})
+    scatter = _mws_scatter(lambda r: abs(r["dd"]) * 100, "max drawdown (|%|) — risk →", "maxDD -%{x:.0f}%", True)
+    # plots 2 & 3: return vs churn, two norms. UPPER-LEFT (high return, low churn) = the stable, less-overfit
+    # ideal. L1 = turnover (industry standard); L2 = course-correction (Euclidean path length, emphasizes
+    # concentrated rotations).
+    l1_scatter = _mws_scatter(lambda r: r["l1"], "L1 churn — annualized one-way turnover (%/yr) → more trading",
+                              "L1 %{x:.0f}", False)
+    l2_scatter = _mws_scatter(lambda r: r["l2"], "L2 course-correction — annualized weight-space path length → more rotation",
+                              "L2 %{x:.0f}", False)
     _cur_l1 = next((r["l1"] for r in rows if r["cur"]), float("nan"))
     _cur_l2 = next((r["l2"] for r in rows if r["cur"]), float("nan"))
     import numpy as _np2
@@ -363,31 +400,52 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         f'<td style="text-align:left">{_fmt([c for c, _ in MWS_SWEEP])}</td><td style="text-align:left">{_mws_fixed}</td></tr>'
         '</tbody></table>'
         f'<p style="color:#888;font-size:12px;max-width:860px;">The first three (cap / λ / lookback) are FREE '
-        f'math-replay knobs — every combination = {len(rows)} configs on the <b>same</b> curations (plots 1-4). '
+        f'math-replay knobs — every combination = {len(rows)} configs on the <b>same</b> curations. '
         '<b>max_watchlist_size is different</b>: it changes the CURATOR\'s decisions, so each value is a separate '
-        'non-zero-cost RE-CURATION (section 9 + plot 5), not a replay. Held constant elsewhere (from the '
+        'non-zero-cost RE-CURATION (section 9 + plot 5), not a replay. <b>Plots 1-3 overlay the '
+        f'{len(rows)}-config free grid on EACH ready max_watchlist_size ({_fmt([m for m in _mws_present])} = '
+        f'{len(rows_all)} points, colored clouds)</b> so the curation-draw spread is visible. Section 4 ranks '
+        f'those same {len(rows_all)} points and its champions can come from any watchlist size (the live config is '
+        f'{_mws_fixed}). Held constant elsewhere (from the '
         f'profile): rebalance weekly, max_watchlist_size {_mws_fixed}, risk-free 4%, execution lag 1 trading '
         'day, anchors SPY/AGG/IAU.</p>')
 
-    # recommended-settings table: the live config (keep) vs the best-in-sample (forward-test, don't chase)
-    _cur_row = next(r for r in rows if r["cur"])
-    _best_ir = best["ir"]
-    _cfg = lambda r: f"{r['cap']:.2f} / {r['lam']:.2f} / {r['lb']}d"  # noqa: E731
+    # recommended-settings table: the live config (keep) + the per-metric CHAMPIONS across all watchlist sizes
+    # (<=5 rows, each the best on IR / t-stat / Sharpe / Calmar / ann). Champions are in-sample winners and,
+    # because they range over every mws re-curation, usually ride the luckiest curation draw -> forward-test
+    # candidates, NOT a live switch.
+    _cur_row = next(r for r in rows_all if r["cur"])
     _lc = 'style="text-align:left"'
+    _cfg2 = lambda r: f"ws {r['mws']} &middot; {r['cap']:.2f}/{r['lam']:.1f}/{r['lb']}d"  # noqa: E731
+
+    def _crow(r, badge, note, hl=False):
+        bgc = "background:#fff7e6;" if hl else ""
+        return (f'<tr style="{bgc}border-bottom:1px solid #eee;"><td {_lc}><b>{_cfg2(r)}</b>{badge}</td>'
+                f'<td {_lc}>{r["ir"]:+.2f}</td><td {_lc}>{r["tstat"]:+.1f}</td><td {_lc}>{r["sharpe"]:.2f}</td>'
+                f'<td {_lc}>{r["calmar"]:.2f}</td><td {_lc}>{r["ann"]*100:+.0f}%</td><td {_lc}>{r["dd"]*100:.0f}%</td>'
+                f'<td {_lc}>{note}</td></tr>')
+    _cur_wins = _champ_wins.get(id(_cur_row), [])
+    _cur_badge = " &mdash; <b>current / live</b>" + (f" (also best {'/'.join(_cur_wins)})" if _cur_wins else "")
+    _tr_rows = [_crow(_cur_row, _cur_badge,
+                      "<b>Keep this.</b> Conservative cap + short momentum window; solid and H1/H2-stable. The "
+                      "in-sample &ldquo;best&rdquo; below chase the longest lookback / luckiest curation draw = "
+                      "overfitting, so do NOT switch without forward evidence.", hl=True)]
+    for _w in _champ_order:
+        if _w is _cur_row:
+            continue   # already shown as the live anchor (its wins are noted in that row's badge)
+        _badge = f" &mdash; best {'/'.join(_champ_wins[id(_w)])}"
+        _tr_rows.append(_crow(_w, _badge,
+                              "Top in-sample on this metric; ranges over all watchlist sizes so it likely rides "
+                              "one lucky curation draw. A <b>forward-test</b> candidate, not a live switch."))
     rec_html = (
         '<h3 style="margin:.6em 0 .2em;">Recommended settings</h3>'
-        f'<table style="font-size:13px;margin-bottom:.6em;"><thead><tr><th {_lc}>config (cap/λ/lookback)</th>'
-        f'<th {_lc}>IR</th><th {_lc}>Sharpe</th><th {_lc}>maxDD</th><th {_lc}>recommendation</th></tr></thead><tbody>'
-        f'<tr><td {_lc}><b>{_cfg(_cur_row)}</b> — current / live</td><td {_lc}>{_cur_row["ir"]:+.2f}</td>'
-        f'<td {_lc}>{_cur_row["sharpe"]:.2f}</td><td {_lc}>{_cur_row["dd"]*100:.0f}%</td>'
-        f'<td {_lc}><b>Keep this.</b> Conservative cap + short momentum window; solid and H1/H2-stable. The '
-        'sweep&#39;s &ldquo;best&rdquo; keeps drifting to the longest lookback as the grid grows '
-        '(30&rarr;90&rarr;120d) = overfitting the in-sample path, so do NOT chase it. Change only on '
-        'forward evidence.</td></tr>'
-        f'<tr><td {_lc}>{_cfg(_best_ir)} — best in-sample IR</td><td {_lc}>{_best_ir["ir"]:+.2f}</td>'
-        f'<td {_lc}>{_best_ir["sharpe"]:.2f}</td><td {_lc}>{_best_ir["dd"]*100:.0f}%</td>'
-        f'<td {_lc}>Highest in-sample risk-adjusted return, but it sits at the lookback grid EDGE (a classic '
-        'overfit tell). A candidate to <b>forward-test</b>, not to adopt live yet.</td></tr></tbody></table>')
+        f'<p style="color:#888;font-size:12px;max-width:920px;margin:.2em 0 .5em;">The live config, then the '
+        f'<b>{len(_champ_order)} per-metric champions</b> (best IR / t-stat / Sharpe / Calmar / annualized return) '
+        f'picked across <b>all {len(rows_all)}</b> points (every watchlist size). These are in-sample winners that '
+        'usually sit on a lucky curation draw &mdash; forward-test them, don&#39;t chase them. Full grid below.</p>'
+        f'<table style="font-size:13px;margin-bottom:.6em;"><thead><tr><th {_lc}>config (ws &middot; cap/λ/lookback)</th>'
+        f'<th {_lc}>IR</th><th {_lc}>t-stat</th><th {_lc}>Sharpe</th><th {_lc}>Calmar</th><th {_lc}>ann</th>'
+        f'<th {_lc}>maxDD</th><th {_lc}>note</th></tr></thead><tbody>{"".join(_tr_rows)}</tbody></table>')
 
     # section 3: per-LLM comparison (same pools + profile config; only the curator model varies)
     def _c2(v, fmt):
@@ -596,10 +654,16 @@ benchmark). SPY returned {spy_ret*100:+.0f}% over the window. ★ = best in colu
 the bootstrap <b>CI</b> (error bar on annualized return), and <b>H1/H2 stable</b> (does the edge hold in
 both halves) before trusting any row.</p>
 {grid_html}
-<h2>1. Return vs drawdown (color = IR, red ring = current config)</h2>
+<h2>1. Return vs drawdown (color = watchlist size, red ring = current config)</h2>
+<p style="color:#555;max-width:920px;">Each point is one cap/λ/lookback config; <b>color = max_watchlist_size</b>
+({_fmt([m for m in _mws_present])} shown), so every watchlist size contributes its own {len(rows)}-config cloud
+(total {len(rows_all)} points). Within a cloud the free knobs move a point deterministically; jumping between
+colors ALSO swaps the underlying curation, and those kimi re-curations swing 2-5&times; on their own — so
+<b>read cross-color separation as parameter effect + curation-draw noise, not a clean mws response</b>. The
+canonical live watchlist ({_mws_fixed}, ★) carries the red-ringed current config.</p>
 {scatter}
 <h2>2. Return vs L1 churn</h2>
-<p style="color:#555;max-width:920px;">Same configs, risk axis replaced by <b>L1 churn = annualized one-way
+<p style="color:#555;max-width:920px;">Same points (all watchlist sizes), risk axis replaced by <b>L1 churn = annualized one-way
 turnover (%/yr)</b>: how much of the portfolio is traded per year (Σ|Δweight| from share changes; drift
 between rebalances is not a trade). 100%/yr = the whole book turned over once a year. This is the
 <b>industry-standard</b> churn measure. Trading is <b>free in an IRA</b>, so read it as
@@ -614,11 +678,16 @@ rotations</b> more heavily. It ranks these configs almost identically to L1 (cor
 {_l1l2_corr:.2f}), which is the useful takeaway: the two norms agree, so the churn ordering is robust.
 Current config: {_cur_l2:.0f}/yr.</p>
 {l2_scatter}
-<h2>4. All configs (ranked by IR)</h2>
+<h2>4. Recommended settings + full grid</h2>
 {rec_html}
 <details style="margin:.4em 0 .8em;"><summary style="cursor:pointer;color:#0b7285;font-weight:600;">
-Show the full ranked table ({len(rows)} configs) + column definitions</summary>
+Show the full ranked table (all {len(rows_all)} configs, every watchlist size, ranked by IR) + column definitions</summary>
+<p style="color:#666;font-size:12px;margin:.4em 0 .6em;max-width:920px;">Every cap/λ/lookback config for every
+re-curated <b>watchlist size (ws)</b>, IR-ranked. ★ marks the global best on that metric. Cross-ws rows aren&#39;t
+apples-to-apples: each ws is a different curation draw, so a high row may just be a lucky draw &mdash; read within
+one ws for a clean free-param comparison.</p>
 <p style="color:#666;font-size:12px;margin:.4em 0 .6em;max-width:920px;line-height:1.6;"><b>Column meanings:</b><br>
+<b>ws</b> — max_watchlist_size: the number of curator-managed slots for THIS row's curation (a separate re-curation per size).<br>
 <b>cap / λ / lookback</b> — the config: concentration cap (max weight per position) · risk-aversion λ · optimizer lookback (days of prices used to estimate μ/Σ).<br>
 <b>IR</b> — Information Ratio = annualized active return ÷ tracking error vs SPY. Consistency of beating SPY; this is the ranking column.<br>
 <b>t-stat</b> — statistical significance of the IR (= IR·√years). |t|&gt;2 ≈ the edge is real rather than luck.<br>
@@ -630,7 +699,7 @@ Show the full ranked table ({len(rows)} configs) + column definitions</summary>
 <b>ann CI [5,95]</b> — block-bootstrap 5–95% confidence interval on the annualized return (the error bar).<br>
 <b>H1/H2 stable</b> — whether IR &gt; 0 in <i>both</i> halves of the window (a yes means the edge isn't a one-half artifact).</p>
 <table><thead><tr>
-<th>cap / λ / lookback</th><th>IR</th><th>t-stat</th><th>Sharpe</th><th>Calmar</th><th>alpha</th><th>ann</th>
+<th>ws</th><th>cap / λ / lookback</th><th>IR</th><th>t-stat</th><th>Sharpe</th><th>Calmar</th><th>alpha</th><th>ann</th>
 <th>maxDD</th><th>total</th><th>hit-rate</th><th>ann CI [5,95]</th><th>H1/H2 stable</th></tr></thead>
 <tbody>{trs}</tbody></table>
 </details>
