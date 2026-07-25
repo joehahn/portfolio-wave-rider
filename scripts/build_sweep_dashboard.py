@@ -69,12 +69,24 @@ def _mws_rows():
         # cap-rejected / unpaired proposals. Per-date ticker set (minus anchors) = the true watchlist.
         by_date = sn.groupby("date")["ticker"].apply(lambda s: frozenset(s) - anchors)
         nvda = any("NVDA" in wl for wl in by_date)           # NVDA actually ENTERED the watchlist (not just proposed)
-        nchg = int((by_date != by_date.shift()).sum()) - 1   # times the actual watchlist changed
         picks = sorted(by_date.iloc[-1])                     # final validated watchlist (managed picks)
-        # also surface NVDA that was proposed but rejected (never entered): a softer "curator wanted it" signal
-        nvda_proposed = any("NVDA" in [a["ticker"] for a in json.loads(Path(f).read_text()).get("adds", [])]
-                            for f in curs)
-        rows.append({"cap": cap, "pending": False, "ret": ret, "nchg": nchg,
+        # Replay the proposals with THIS cap's validation to count applied vs rejected (a reject = a
+        # double-add, an add to a full watchlist with no room, or a stale remove). High rejects = the
+        # curator's decisions are being blocked (the symptom that exposed the cap-override bug).
+        wl_r = list(starter); n_add = n_rem = n_rej = 0
+        nvda_proposed = False
+        for f in curs:
+            cj = json.loads(Path(f).read_text())
+            adds = [a["ticker"] for a in cj.get("adds", [])]; rems = [r["ticker"] for r in cj.get("removes", [])]
+            if "NVDA" in adds:
+                nvda_proposed = True
+            for t in rems:
+                if t in wl_r: wl_r.remove(t); n_rem += 1
+                else: n_rej += 1
+            for t in adds:
+                if t not in wl_r and len(wl_r) < cap: wl_r.append(t); n_add += 1
+                else: n_rej += 1
+        rows.append({"cap": cap, "pending": False, "ret": ret, "n_add": n_add, "n_rem": n_rem, "n_rej": n_rej,
                      "nvda": nvda, "nvda_proposed": nvda_proposed, "wl": picks})
     return rows
 
@@ -528,14 +540,16 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     for r in _mws:
         if r.get("pending"):
             _mtr += (f'<tr style="color:#999;"><td {_lc}>{r["cap"]}</td>'
-                     f'<td {_lc} colspan="4"><i>re-curation in progress…</i></td></tr>')
+                     f'<td {_lc} colspan="6"><i>re-curation in progress…</i></td></tr>')
             continue
         _nv = ('<b style="color:#c92a2a;">yes</b>' if r["nvda"]
                else ('<span style="color:#9a6a00;">proposed, rejected</span>' if r.get("nvda_proposed") else 'no'))
         _star = " (current)" if r["cap"] == 5 else ""
+        # flag a nonzero reject count in amber — healthy runs should have ~0 (the cap-bug symptom)
+        _rej = (f'<span style="color:#9a6a00;">{r["n_rej"]}</span>' if r["n_rej"] > 2 else str(r["n_rej"]))
         _mtr += (f'<tr style="border-bottom:1px solid #eee;"><td {_lc}><b>{r["cap"]}</b>{_star}</td>'
-                 f'<td>{r["ret"] * 100:+.0f}%</td><td>{r["nchg"]}</td><td {_lc}>{_nv}</td>'
-                 f'<td {_lc}>{", ".join(r["wl"])}</td></tr>')
+                 f'<td>{r["ret"] * 100:+.0f}%</td><td>{r["n_add"]}</td><td>{r["n_rem"]}</td><td>{_rej}</td>'
+                 f'<td {_lc}>{_nv}</td><td {_lc}>{", ".join(r["wl"])}</td></tr>')
     mws_html = (
         '<h2>9. max_watchlist_size sweep — does more room let the curator add NVDA?</h2>'
         '<p style="color:#555;max-width:920px;">Unlike the cap/&lambda;/lookback knobs above (free math '
@@ -545,9 +559,14 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         'diversifying into next-waves regardless of room? <b>Red bar = NVDA entered the watchlist.</b></p>'
         + _mbar
         + '<table style="margin-top:.6em;"><thead><tr>'
-        f'<th {_lc}>max_watchlist_size</th><th>curator return</th><th>watchlist changes</th>'
-        f'<th {_lc}>NVDA added?</th><th {_lc}>final watchlist (managed picks)</th>'
-        f'</tr></thead><tbody>{_mtr}</tbody></table>')
+        f'<th {_lc}>max_watchlist_size</th><th>curator return</th><th>adds</th><th>removes</th>'
+        f'<th>rejects</th><th {_lc}>NVDA added?</th><th {_lc}>final watchlist (managed picks)</th>'
+        '</tr></thead><tbody>' + _mtr + '</tbody></table>'
+        '<p style="color:#888;font-size:12px;max-width:920px;"><b>adds/removes</b> = the curator\'s proposals '
+        'that the validator APPLIED; <b>rejects</b> = proposals blocked (double-add, add to a full watchlist '
+        'with no paired remove, or a stale remove). Rejects should be near 0 in a healthy run — a large '
+        'reject count means the curator\'s decisions are being silently blocked (the symptom that exposed the '
+        'max_watchlist_size cap-override bug).</p>')
 
     ts = datetime.now().strftime("%Y-%m-%d %H:%M %Z").strip()
     # Title date range: same snapshots.csv the Curator Backtest reads, so all three DBs show one range.
