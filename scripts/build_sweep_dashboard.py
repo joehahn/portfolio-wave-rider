@@ -41,7 +41,7 @@ LLM_RUNS = [   # row 0 = the DEFAULT curator. The multi-LLM comparison (Sonnet g
                # were retired from local storage. Re-add rows + re-run to refresh the comparison on this window.
     ("moonshotai/kimi-k2.5 (default)", "data/curator_runs/gkg-3yr-final", "OpenRouter", 0.57, 2.85),
 ]
-CURRENT = (0.8, 0.5, 150)         # the live investor_profile.md config (cap / λ / lookback-days)
+CURRENT = (1.0, 2.0, 150)         # the live investor_profile.md config (cap / λ / lookback-days)
 BLUE, GREEN, RED, GREY = "#1f77b4", "#2b8a3e", "#c92a2a", "#adb5bd"
 
 # max_watchlist_size sweep (section 6): unlike cap/lambda/lookback, this knob changes the CURATOR's
