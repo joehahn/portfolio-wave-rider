@@ -328,6 +328,16 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                       f"<br>IR {r['ir']:+.2f}, Calmar {r['calmar']:.2f}"
                       + (" · CURRENT" if r["cur"] else "") for r in sub],
                 hovertemplate="%{text}<br>ann %{y:.0f}%, " + xhover + "<extra></extra>"))
+        # live-config overlay: a distinct black star drawn ON TOP so the current setting is unmistakable
+        # (a red ring on one point inside its cloud is invisible at this density).
+        _curr = next((r for r in rows_all if r["cur"]), None)
+        if _curr is not None:
+            f.add_trace(go.Scatter(
+                x=[xfn(_curr)], y=[_curr["ann"] * 100], mode="markers", name="live config",
+                marker={"symbol": "star", "size": 20, "color": "#111", "line": {"width": 1.5, "color": "#fff"}},
+                text=[f"LIVE CONFIG · ws {_curr['mws']} · cap {_curr['cap']} / λ {_curr['lam']} / {_curr['lb']}d"
+                      f"<br>IR {_curr['ir']:+.2f}, Calmar {_curr['calmar']:.2f}"],
+                hovertemplate="%{text}<br>ann %{y:.0f}%, " + xhover + "<extra></extra>"))
         f.update_layout(template="seaborn", height=460, margin={"t": 20, "l": 60, "r": 140},
                         xaxis={"title": xtitle}, yaxis={"title": "annualized return %"},
                         legend={"title": {"text": "watchlist<br>size (★=live)"}, "x": 1.02, "xanchor": "left",
@@ -668,7 +678,7 @@ benchmark). SPY returned {spy_ret*100:+.0f}% over the window. ★ = best in colu
 the bootstrap <b>CI</b> (error bar on annualized return), and <b>H1/H2 stable</b> (does the edge hold in
 both halves) before trusting any row.</p>
 {grid_html}
-<h2>1. Return vs drawdown (color = watchlist size, red ring = current config)</h2>
+<h2>1. Return vs drawdown</h2>
 <p style="color:#555;max-width:920px;">Each point is one cap/λ/lookback config; <b>color = max_watchlist_size</b>
 ({_fmt([m for m in _mws_present])} shown), so every watchlist size contributes its own {len(rows)}-config cloud
 (total {len(rows_all)} points). Within a cloud the free knobs move a point deterministically; jumping between
