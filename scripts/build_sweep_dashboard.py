@@ -300,20 +300,6 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     def star(r, k):
         return " ★" if best.get(k) is r else ""
 
-    # Champion set for "Recommended settings": the winner on each of the 5 headline metrics the user picked
-    # (IR, t-stat, Sharpe, Calmar, annualized return). One config can win several, so dedup -> <=5 distinct
-    # rows, each tagged with the metric(s) it tops. Drawn from rows_all, so a champion can come from any mws.
-    CHAMP_METRICS = [("ir", "IR"), ("tstat", "t-stat"), ("sharpe", "Sharpe"), ("calmar", "Calmar"), ("ann", "ann. return")]
-    _champ_wins: dict[int, list[str]] = {}
-    _champ_order: list = []
-    for _k, _lab in CHAMP_METRICS:
-        _w = best[_k]
-        _id = id(_w)
-        if _id not in _champ_wins:
-            _champ_wins[_id] = []
-            _champ_order.append(_w)
-        _champ_wins[_id].append(_lab)
-
     def td(v, fmt, cls="", extra=""):
         return f"<td style='padding:5px 10px;text-align:right;{cls}'>{extra}{fmt.format(v) if v == v else 'n/a'}</td>"
 
@@ -410,42 +396,51 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         f'profile): rebalance weekly, max_watchlist_size {_mws_fixed}, risk-free 4%, execution lag 1 trading '
         'day, anchors SPY/AGG/IAU.</p>')
 
-    # recommended-settings table: the live config (keep) + the per-metric CHAMPIONS across all watchlist sizes
-    # (<=5 rows, each the best on IR / t-stat / Sharpe / Calmar / ann). Champions are in-sample winners and,
-    # because they range over every mws re-curation, usually ride the luckiest curation draw -> forward-test
-    # candidates, NOT a live switch.
+    # recommended-settings: one "Top 5" table PER metric (IR, t-stat, Sharpe, Calmar, ann, maxDD). Each table
+    # ranks all rows_all by that metric and shows the 5 best; rank-1 (the metric's overall best) gets a ★. Every
+    # table shows all six metric columns so you can see the trade-offs of each top-5 config. These are in-sample
+    # winners drawn from every watchlist size, so they typically ride a lucky curation draw -> forward-test, not live.
     _cur_row = next(r for r in rows_all if r["cur"])
     _lc = 'style="text-align:left"'
     _cfg2 = lambda r: f"ws {r['mws']} &middot; {r['cap']:.2f}/{r['lam']:.1f}/{r['lb']}d"  # noqa: E731
+    # (label, cell-format, value fn); maxDD ranks by least-negative (higher r['dd'] = shallower loss = better)
+    _MET = [("IR", "{:+.2f}", lambda r: r["ir"]),
+            ("t-stat", "{:+.1f}", lambda r: r["tstat"]),
+            ("Sharpe", "{:.2f}", lambda r: r["sharpe"]),
+            ("Calmar", "{:.2f}", lambda r: r["calmar"]),
+            ("ann", "{:+.0f}%", lambda r: r["ann"] * 100),
+            ("maxDD", "{:.0f}%", lambda r: r["dd"] * 100)]
 
-    def _crow(r, badge, note, hl=False):
-        bgc = "background:#fff7e6;" if hl else ""
-        return (f'<tr style="{bgc}border-bottom:1px solid #eee;"><td {_lc}><b>{_cfg2(r)}</b>{badge}</td>'
-                f'<td {_lc}>{r["ir"]:+.2f}</td><td {_lc}>{r["tstat"]:+.1f}</td><td {_lc}>{r["sharpe"]:.2f}</td>'
-                f'<td {_lc}>{r["calmar"]:.2f}</td><td {_lc}>{r["ann"]*100:+.0f}%</td><td {_lc}>{r["dd"]*100:.0f}%</td>'
-                f'<td {_lc}>{note}</td></tr>')
-    _cur_wins = _champ_wins.get(id(_cur_row), [])
-    _cur_badge = " &mdash; <b>current / live</b>" + (f" (also best {'/'.join(_cur_wins)})" if _cur_wins else "")
-    _tr_rows = [_crow(_cur_row, _cur_badge,
-                      "<b>Keep this.</b> Conservative cap + short momentum window; solid and H1/H2-stable. The "
-                      "in-sample &ldquo;best&rdquo; below chase the longest lookback / luckiest curation draw = "
-                      "overfitting, so do NOT switch without forward evidence.", hl=True)]
-    for _w in _champ_order:
-        if _w is _cur_row:
-            continue   # already shown as the live anchor (its wins are noted in that row's badge)
-        _badge = f" &mdash; best {'/'.join(_champ_wins[id(_w)])}"
-        _tr_rows.append(_crow(_w, _badge,
-                              "Top in-sample on this metric; ranges over all watchlist sizes so it likely rides "
-                              "one lucky curation draw. A <b>forward-test</b> candidate, not a live switch."))
+    def _cells(r, groupname):
+        out = ""
+        for _m, _f, _fn in _MET:
+            _v = _fn(r)
+            _vs = _f.format(_v) if _v == _v else "n/a"
+            out += f'<td style="text-align:left;{"font-weight:700;" if _m == groupname else ""}">{_vs}</td>'
+        return out
+
+    def _grp_table(label, keyfn):
+        top5 = sorted(rows_all, key=lambda r: -(keyfn(r) if keyfn(r) == keyfn(r) else -9e9))[:5]
+        hdr = (f'<tr><th {_lc}>#</th><th {_lc}>config (ws &middot; cap/λ/lookback)</th>'
+               + "".join(f'<th {_lc}>{_m}</th>' for _m, _, _ in _MET) + '</tr>')
+        body = ""
+        for _i, r in enumerate(top5):
+            _hl = "background:#fff7e6;" if r["cur"] else ""
+            _cfg = f'<b>{_cfg2(r)}</b>' + (" ★" if _i == 0 else "") + (" &larr; live" if r["cur"] else "")
+            body += (f'<tr style="{_hl}border-bottom:1px solid #eee;"><td {_lc}>{_i + 1}</td>'
+                     f'<td {_lc}>{_cfg}</td>{_cells(r, label)}</tr>')
+        return (f'<h4 style="margin:.7em 0 .15em;">Top 5 by {label}</h4>'
+                f'<table style="font-size:12.5px;margin-bottom:.3em;"><thead>{hdr}</thead><tbody>{body}</tbody></table>')
+
     rec_html = (
         '<h3 style="margin:.6em 0 .2em;">Recommended settings</h3>'
-        f'<p style="color:#888;font-size:12px;max-width:920px;margin:.2em 0 .5em;">The live config, then the '
-        f'<b>{len(_champ_order)} per-metric champions</b> (best IR / t-stat / Sharpe / Calmar / annualized return) '
-        f'picked across <b>all {len(rows_all)}</b> points (every watchlist size). These are in-sample winners that '
-        'usually sit on a lucky curation draw &mdash; forward-test them, don&#39;t chase them. Full grid below.</p>'
-        f'<table style="font-size:13px;margin-bottom:.6em;"><thead><tr><th {_lc}>config (ws &middot; cap/λ/lookback)</th>'
-        f'<th {_lc}>IR</th><th {_lc}>t-stat</th><th {_lc}>Sharpe</th><th {_lc}>Calmar</th><th {_lc}>ann</th>'
-        f'<th {_lc}>maxDD</th><th {_lc}>note</th></tr></thead><tbody>{"".join(_tr_rows)}</tbody></table>')
+        f'<p style="color:#888;font-size:12px;max-width:920px;margin:.2em 0 .5em;">For each metric, the '
+        f'<b>5 best configs</b> across all {len(rows_all)} points (every watchlist size), with the overall best '
+        'marked&nbsp;★. The bold column is the one being ranked; the others show that config&#39;s trade-offs. '
+        f'These are in-sample winners spanning every re-curation, so they usually ride a lucky curation draw '
+        f'&mdash; forward-test them, don&#39;t chase. The live config is ws&nbsp;{_cur_row["mws"]} '
+        f'{_cur_row["cap"]:.2f}/{_cur_row["lam"]:.1f}/{_cur_row["lb"]}d (highlighted where it lands in a top&nbsp;5).</p>'
+        + "".join(_grp_table(_m, _fn) for _m, _, _fn in _MET))
 
     # section 3: per-LLM comparison (same pools + profile config; only the curator model varies)
     def _c2(v, fmt):
