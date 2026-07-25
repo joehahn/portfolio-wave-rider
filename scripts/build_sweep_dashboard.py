@@ -30,6 +30,10 @@ LAMBDAS = [0.5, 0.75, 1.0, 1.5, 2.0]
 LOOKBACKS = [14, 30, 60, 90, 120, 150]          # calendar days
 ANCHORS = ["SPY", "AGG", "IAU"]
 
+# "Recommended settings" = the risk/churn-constrained frontier read off plots 1-3: keep only configs with
+# shallow drawdown AND low churn (both norms), then eyeball the survivors for the best return metrics.
+REC_MAX_DD, REC_MAX_L1, REC_MAX_L2 = 40.0, 1000.0, 1000.0   # |maxDD|% , L1 turnover , L2 path-length ceilings
+
 # LLM curator comparison (section 3): (label, run_dir, provider, $in/M, $out/M). Agreement is measured
 # against the reference (first row). Add a row per model run you want to compare.
 LLM_RUNS = [   # row 0 = the DEFAULT curator. The multi-LLM comparison (Sonnet gkg-2yr-weekly + deepseek
@@ -396,10 +400,10 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         f'profile): rebalance weekly, max_watchlist_size {_mws_fixed}, risk-free 4%, execution lag 1 trading '
         'day, anchors SPY/AGG/IAU.</p>')
 
-    # recommended-settings: one "Top 5" table PER metric (IR, t-stat, Sharpe, Calmar, ann, maxDD). Each table
-    # ranks all rows_all by that metric and shows the 5 best; rank-1 (the metric's overall best) gets a ★. Every
-    # table shows all six metric columns so you can see the trade-offs of each top-5 config. These are in-sample
-    # winners drawn from every watchlist size, so they typically ride a lucky curation draw -> forward-test, not live.
+    # recommended-settings: the risk/churn-constrained frontier from plots 1-3. Keep only configs with shallow
+    # drawdown AND low churn on BOTH norms (|maxDD| < REC_MAX_DD, L1 < REC_MAX_L1, L2 < REC_MAX_L2), then list the
+    # survivors in ONE table sorted by IR so the best return metrics rise to the top. ★ marks the best value in
+    # each performance column AMONG the survivors (eyeball aid), not a separate ranking per metric.
     _cur_row = next(r for r in rows_all if r["cur"])
     _lc = 'style="text-align:left"'
     # (label, cell-format, value fn); maxDD ranks by least-negative (higher r['dd'] = shallower loss = better)
@@ -409,41 +413,49 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
             ("Calmar", "{:.2f}", lambda r: r["calmar"]),
             ("ann", "{:+.0f}%", lambda r: r["ann"] * 100),
             ("maxDD", "{:.0f}%", lambda r: r["dd"] * 100)]
+    _passed = [r for r in rows_all
+               if abs(r["dd"]) * 100 < REC_MAX_DD and r["l1"] < REC_MAX_L1 and r["l2"] < REC_MAX_L2]
+    _passed.sort(key=lambda r: -(r["ir"] if r["ir"] == r["ir"] else -9e9))
+    # best-in-column among survivors (all six value fns are "higher = better", maxDD included), for the ★
+    _colbest = {_m: max(_passed, key=lambda r, fn=_fn: (fn(r) if fn(r) == fn(r) else -9e9))
+                for _m, _, _fn in _MET} if _passed else {}
 
-    def _cells(r, groupname):
+    def _cells(r):
         out = ""
         for _m, _f, _fn in _MET:
             _v = _fn(r)
             _vs = _f.format(_v) if _v == _v else "n/a"
-            out += f'<td style="text-align:left;{"font-weight:700;" if _m == groupname else ""}">{_vs}</td>'
+            _st = " ★" if _colbest.get(_m) is r else ""
+            out += f'<td {_lc}>{_vs}{_st}</td>'
         return out
 
-    def _grp_table(label, keyfn):
-        top5 = sorted(rows_all, key=lambda r: -(keyfn(r) if keyfn(r) == keyfn(r) else -9e9))[:5]
-        # config exploded into its own columns: max_watchlist_size / concentration_cap / λ / lookback
-        hdr = (f'<tr><th {_lc}>#</th><th {_lc}>max_watchlist_size</th><th {_lc}>concentration_cap</th>'
-               f'<th {_lc}>λ</th><th {_lc}>lookback</th>'
-               + "".join(f'<th {_lc}>{_m}</th>' for _m, _, _ in _MET) + '</tr>')
-        body = ""
-        for _i, r in enumerate(top5):
-            _hl = "background:#fff7e6;" if r["cur"] else ""
-            _rank = f'{_i + 1}' + (" ★" if _i == 0 else "")
-            _live = " &larr; live" if r["cur"] else ""
-            body += (f'<tr style="{_hl}border-bottom:1px solid #eee;"><td {_lc}>{_rank}</td>'
-                     f'<td {_lc}>{r["mws"]}</td><td {_lc}>{r["cap"]:.2f}</td><td {_lc}>{r["lam"]:.1f}</td>'
-                     f'<td {_lc}>{r["lb"]}d{_live}</td>{_cells(r, label)}</tr>')
-        return (f'<h4 style="margin:.7em 0 .15em;">Top 5 by {label}</h4>'
-                f'<table style="font-size:12.5px;margin-bottom:.3em;"><thead>{hdr}</thead><tbody>{body}</tbody></table>')
-
+    _hdr = (f'<tr><th {_lc}>#</th><th {_lc}>max_watchlist_size</th><th {_lc}>concentration_cap</th>'
+            f'<th {_lc}>λ</th><th {_lc}>lookback</th>'
+            + "".join(f'<th {_lc}>{_m}</th>' for _m, _, _ in _MET)
+            + f'<th {_lc}>L1</th><th {_lc}>L2</th></tr>')
+    _body = ""
+    for _i, r in enumerate(_passed):
+        _hl = "background:#fff7e6;" if r["cur"] else ""
+        _live = " &larr; live" if r["cur"] else ""
+        _body += (f'<tr style="{_hl}border-bottom:1px solid #eee;"><td {_lc}>{_i + 1}</td>'
+                  f'<td {_lc}>{r["mws"]}</td><td {_lc}>{r["cap"]:.2f}</td><td {_lc}>{r["lam"]:.1f}</td>'
+                  f'<td {_lc}>{r["lb"]}d{_live}</td>{_cells(r)}'
+                  f'<td {_lc}>{r["l1"]:.0f}</td><td {_lc}>{r["l2"]:.0f}</td></tr>')
+    _mws_survivors = ", ".join(f"{_m}:{sum(1 for r in _passed if r['mws'] == _m)}"
+                               for _m in sorted({r["mws"] for r in _passed})) if _passed else "none"
     rec_html = (
-        '<h3 style="margin:.6em 0 .2em;">Recommended settings</h3>'
-        f'<p style="color:#888;font-size:12px;max-width:920px;margin:.2em 0 .5em;">For each metric, the '
-        f'<b>5 best configs</b> across all {len(rows_all)} points (every watchlist size), with the overall best '
-        'marked&nbsp;★. The bold column is the one being ranked; the others show that config&#39;s trade-offs. '
-        f'These are in-sample winners spanning every re-curation, so they usually ride a lucky curation draw '
-        f'&mdash; forward-test them, don&#39;t chase. The live config is ws&nbsp;{_cur_row["mws"]} '
-        f'{_cur_row["cap"]:.2f}/{_cur_row["lam"]:.1f}/{_cur_row["lb"]}d (highlighted where it lands in a top&nbsp;5).</p>'
-        + "".join(_grp_table(_m, _fn) for _m, _, _fn in _MET))
+        '<h3 style="margin:.6em 0 .2em;">Recommended settings — the low-risk, low-churn frontier</h3>'
+        f'<p style="color:#555;font-size:12px;max-width:940px;margin:.2em 0 .5em;">Read straight off plots 1-3: '
+        f'keep only configs in the safe corner &mdash; <b>|maxDD| &lt; {REC_MAX_DD:.0f}% AND L1 &lt; {REC_MAX_L1:.0f} '
+        f'AND L2 &lt; {REC_MAX_L2:.0f}</b> (shallow drawdown, low turnover on both churn norms). '
+        f'<b>{len(_passed)} of {len(rows_all)}</b> configs survive (by watchlist size &mdash; {_mws_survivors}), '
+        'listed once, sorted by IR. ★ = best in that column among the survivors, so you can eyeball the top IR / '
+        't-stat / Sharpe / Calmar / ann / shallowest-DD without re-sorting. These stay in-sample &mdash; a '
+        'forward-test shortlist, not an auto-switch. Note the <b>live config</b> (ws&nbsp;'
+        f'{_cur_row["mws"]} {_cur_row["cap"]:.2f}/{_cur_row["lam"]:.1f}/{_cur_row["lb"]}d) is <b>excluded</b>: its '
+        f'drawdown is fine ({abs(_cur_row["dd"])*100:.0f}%) but it is too churny (L1&nbsp;{_cur_row["l1"]:.0f}, '
+        f'L2&nbsp;{_cur_row["l2"]:.0f}, both &gt;&nbsp;{REC_MAX_L1:.0f}).</p>'
+        f'<table style="font-size:12.5px;margin-bottom:.4em;"><thead>{_hdr}</thead><tbody>{_body}</tbody></table>')
 
     # section 3: per-LLM comparison (same pools + profile config; only the curator model varies)
     def _c2(v, fmt):
