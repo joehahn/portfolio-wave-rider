@@ -29,6 +29,7 @@ CAPS = [0.5, 0.67, 0.8, 0.9, 1.0]
 LAMBDAS = [0.5, 0.75, 1.0, 1.5, 2.0]
 LOOKBACKS = [14, 30, 60, 90, 120, 150]          # calendar days
 ANCHORS = ["SPY", "AGG", "IAU"]
+TRACK_TICKERS = ["QUBT", "RKLB", "NVDA"]     # section 6: flag whether each mws curation ever added these
 
 # "Recommended settings" = the risk/churn-constrained frontier read off plots 1-3: keep only configs with
 # shallow drawdown AND low churn on BOTH norms, then eyeball the survivors for the best return metrics.
@@ -77,19 +78,21 @@ def _mws_rows():
         # ticker, even at 0 shares) — NOT a naive replay of proposed adds/removes, which double-counts
         # cap-rejected / unpaired proposals. Per-date ticker set (minus anchors) = the true watchlist.
         by_date = sn.groupby("date")["ticker"].apply(lambda s: frozenset(s) - anchors)
-        nvda = any("NVDA" in wl for wl in by_date)           # NVDA actually ENTERED the watchlist (not just proposed)
+        # per tracked ticker: did it actually ENTER the validated watchlist (not just get proposed)?
+        entered = {t: any(t in wl for wl in by_date) for t in TRACK_TICKERS}
         picks = sorted(by_date.iloc[-1])                     # final validated watchlist (managed picks)
         # Replay the proposals with THIS cap's validation to count applied vs rejected (a reject = a
         # double-add, an add to a full watchlist with no room, or a stale remove). High rejects = the
         # curator's decisions are being blocked (the symptom that exposed the cap-override bug).
         wl_r = list(starter); n_add = n_rem = n_rej = n_ret = 0
-        nvda_proposed = False
+        proposed = {t: False for t in TRACK_TICKERS}
         for f in curs:
             cj = json.loads(Path(f).read_text())
             n_ret += int(cj.get("_retries", 0))              # reject-and-retry rounds the harness fired
             adds = [a["ticker"] for a in cj.get("adds", [])]; rems = [r["ticker"] for r in cj.get("removes", [])]
-            if "NVDA" in adds:
-                nvda_proposed = True
+            for t in TRACK_TICKERS:
+                if t in adds:
+                    proposed[t] = True
             for t in rems:
                 if t in wl_r: wl_r.remove(t); n_rem += 1
                 else: n_rej += 1
@@ -97,7 +100,9 @@ def _mws_rows():
                 if t not in wl_r and len(wl_r) < cap: wl_r.append(t); n_add += 1
                 else: n_rej += 1
         rows.append({"cap": cap, "pending": False, "ret": ret, "n_add": n_add, "n_rem": n_rem,
-                     "n_rej": n_rej, "n_ret": n_ret, "nvda": nvda, "nvda_proposed": nvda_proposed, "wl": picks})
+                     "n_rej": n_rej, "n_ret": n_ret, "nvda": entered["NVDA"],
+                     "flags": {t: {"entered": entered[t], "proposed": proposed[t]} for t in TRACK_TICKERS},
+                     "wl": picks})
     return rows
 
 
@@ -599,31 +604,38 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         _mbar = _mfig.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False})
     else:
         _mbar = ""
+    def _flag_cell(fl):                        # yes (entered) / proposed-rejected / no, per tracked ticker
+        if fl.get("entered"): return '<b style="color:#c92a2a;">yes</b>'
+        if fl.get("proposed"): return '<span style="color:#9a6a00;">proposed, rejected</span>'
+        return 'no'
     _mtr = ""
     for r in _mws:
         if r.get("pending"):
             _mtr += (f'<tr style="color:#999;"><td {_lc}>{r["cap"]}</td>'
-                     f'<td {_lc} colspan="7"><i>re-curation in progress…</i></td></tr>')
+                     f'<td {_lc} colspan="{6 + len(TRACK_TICKERS)}"><i>re-curation in progress…</i></td></tr>')
             continue
-        _nv = ('<b style="color:#c92a2a;">yes</b>' if r["nvda"]
-               else ('<span style="color:#9a6a00;">proposed, rejected</span>' if r.get("nvda_proposed") else 'no'))
+        _flags = "".join(f'<td {_lc}>{_flag_cell(r["flags"][t])}</td>' for t in TRACK_TICKERS)
         _star = " (current)" if r["cap"] == _mws_fixed else ""
         # flag a nonzero reject count in amber — healthy runs should have ~0 (the cap-bug symptom)
         _rej = (f'<span style="color:#9a6a00;">{r["n_rej"]}</span>' if r["n_rej"] > 2 else str(r["n_rej"]))
         _mtr += (f'<tr style="border-bottom:1px solid #eee;"><td {_lc}><b>{r["cap"]}</b>{_star}</td>'
                  f'<td>{r["ret"] * 100:+.0f}%</td><td>{r["n_add"]}</td><td>{r["n_rem"]}</td><td>{_rej}</td>'
-                 f'<td>{r.get("n_ret", 0)}</td><td {_lc}>{_nv}</td><td {_lc}>{", ".join(r["wl"])}</td></tr>')
+                 f'<td>{r.get("n_ret", 0)}</td>{_flags}<td {_lc}>{", ".join(r["wl"])}</td></tr>')
     mws_html = (
         '<h2>6. max_watchlist_size sweep</h2>'
         '<p style="color:#555;max-width:920px;">Unlike the cap/&lambda;/lookback knobs above (free math '
         'replays on one curation set), <b>max_watchlist_size changes the curator\'s decisions</b>, so each '
         'cap is a separate re-curation (~$0.40 LLM each) on the same news pools and AAPL/GOOGL/AMZN starter. '
-        'The question: with the 5-slot cap loosened, does the curator ever add NVDA, or does it keep '
-        'diversifying into next-waves regardless of room? <b>Red bar = NVDA entered the watchlist.</b></p>'
+        'The question: as the watchlist cap loosens, does the curator reach for the big AI names or keep '
+        'diversifying into next-waves? The <b>QUBT / RKLB / NVDA</b> columns flag whether each curation ever '
+        'added those tickers (yes = entered the watchlist; proposed-rejected = tried but blocked). '
+        '<b>Red bar = NVDA entered the watchlist.</b></p>'
         + _mbar
         + '<table style="margin-top:.6em;"><thead><tr>'
         f'<th {_lc}>max_watchlist_size</th><th {_lc}>curator return</th><th {_lc}>adds</th><th {_lc}>removes</th>'
-        f'<th {_lc}>rejects</th><th {_lc}>retries</th><th {_lc}>NVDA added?</th><th {_lc}>final watchlist (managed picks)</th>'
+        f'<th {_lc}>rejects</th><th {_lc}>retries</th>'
+        + "".join(f'<th {_lc}>{t}?</th>' for t in TRACK_TICKERS)
+        + f'<th {_lc}>final watchlist (managed picks)</th>'
         '</tr></thead><tbody>' + _mtr + '</tbody></table>'
         '<p style="color:#888;font-size:12px;max-width:920px;"><b>adds/removes</b> = the curator\'s proposals '
         'that the validator APPLIED; <b>rejects</b> = proposals still blocked after retries (double-add, add to '
