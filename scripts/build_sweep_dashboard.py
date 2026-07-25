@@ -605,7 +605,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                  f'<td>{r["ret"] * 100:+.0f}%</td><td>{r["n_add"]}</td><td>{r["n_rem"]}</td><td>{_rej}</td>'
                  f'<td>{r.get("n_ret", 0)}</td><td {_lc}>{_nv}</td><td {_lc}>{", ".join(r["wl"])}</td></tr>')
     mws_html = (
-        '<h2>6. max_watchlist_size sweep — does more room let the curator add NVDA?</h2>'
+        '<h2>6. max_watchlist_size sweep</h2>'
         '<p style="color:#555;max-width:920px;">Unlike the cap/&lambda;/lookback knobs above (free math '
         'replays on one curation set), <b>max_watchlist_size changes the curator\'s decisions</b>, so each '
         'cap is a separate re-curation (~$0.40 LLM each) on the same news pools and AAPL/GOOGL/AMZN starter. '
