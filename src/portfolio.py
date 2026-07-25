@@ -4006,6 +4006,15 @@ def build_curator_dashboard(
     log_html = ""
     if summary_path.exists():
         log = json.loads(summary_path.read_text())
+        # Retries per rebalance: the reject-and-retry rounds the harness fired, read from each date's
+        # curation JSON (_retries field; absent -> 0 for pre-retry runs). Loaded once, looked up by date.
+        _retries_by_date: dict[str, int] = {}
+        for _cf in Path(runs_dir).glob("2*-curation.json"):
+            try:
+                _cj = json.loads(_cf.read_text())
+                _retries_by_date[str(_cj.get("as_of_date", _cf.name[:10]))] = int(_cj.get("_retries", 0))
+            except Exception:  # noqa: BLE001
+                pass
         rows = []
         _n_active = 0
         for ev in log:
@@ -4029,11 +4038,13 @@ def build_curator_dashboard(
                 )
             else:
                 rej_cell = str(_rej) if _rej else "—"
+            _nret = _retries_by_date.get(str(d), 0)
             rows.append(
                 f"<tr><td>{_html.escape(d)}</td>"
                 f"<td style='color:#0a7a3a;'>{_html.escape(adds)}</td>"
                 f"<td style='color:#b91c1c;'>{_html.escape(removes)}</td>"
-                f"<td style='color:#9a6a00;'>{rej_cell}</td></tr>"
+                f"<td style='color:#9a6a00;'>{rej_cell}</td>"
+                f"<td>{_nret or '—'}</td></tr>"
             )
         log_html = (
             "<h2 style='margin-top:2em;'>1. Curation log</h2>"
@@ -4042,13 +4053,15 @@ def build_curator_dashboard(
             "add/remove the validator dropped as invalid, as <code>TICKER (action)</code> — hover for the "
             "reason (see "
             "<a href='https://github.com/joehahn/portfolio-wave-rider/blob/main/REFERENCE.md#cli-reference'>"
-            "REFERENCE.md</a>).</p>"
+            "REFERENCE.md</a>). <em>Retries</em> = reject-and-retry rounds fired that week (the validator "
+            "fed a rejection reason back and the curator re-proposed); blank = none.</p>"
             "<table style='border-collapse:collapse;width:100%;font-size:14px;'>"
             "<thead><tr style='border-bottom:2px solid #ccc;text-align:left;'>"
             "<th style='padding:6px;'>Date</th>"
             "<th style='padding:6px;'>Adds</th>"
             "<th style='padding:6px;'>Removes</th>"
-            "<th style='padding:6px;'>Rejections</th></tr></thead>"
+            "<th style='padding:6px;'>Rejections</th>"
+            "<th style='padding:6px;'>Retries</th></tr></thead>"
             f"<tbody>{''.join(rows)}</tbody></table>"
         )
 
