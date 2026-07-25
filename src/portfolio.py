@@ -730,10 +730,20 @@ def _validate_curator_payload(
     raw_removes = payload.get("removes") or []
     if not isinstance(raw_adds, list) or not isinstance(raw_removes, list):
         raise ValueError("adds and removes must be lists")
+    # Per-call churn throttle: at most 3 adds / 3 removes. An over-eager curator (common at large
+    # max_watchlist_size, where many slots are free) proposing more is not a malformed payload — keep
+    # its best 3 (the ones it listed first) and REJECT the excess so the reject-and-retry loop can feed
+    # the reason back. Raising here would crash the whole run on one greedy proposal.
     if len(raw_adds) > 3:
-        raise ValueError(f"at most 3 adds per call; got {len(raw_adds)}")
+        for extra in raw_adds[3:]:
+            rejections.append({"ticker": (extra.get("ticker") if isinstance(extra, dict) else str(extra)),
+                               "action": "add", "reason": "at most 3 adds per call; excess dropped"})
+        raw_adds = raw_adds[:3]
     if len(raw_removes) > 3:
-        raise ValueError(f"at most 3 removes per call; got {len(raw_removes)}")
+        for extra in raw_removes[3:]:
+            rejections.append({"ticker": (extra.get("ticker") if isinstance(extra, dict) else str(extra)),
+                               "action": "remove", "reason": "at most 3 removes per call; excess dropped"})
+        raw_removes = raw_removes[:3]
 
     add_tickers = {a.get("ticker") for a in raw_adds if isinstance(a, dict)}
     remove_tickers = {r.get("ticker") for r in raw_removes if isinstance(r, dict)}
