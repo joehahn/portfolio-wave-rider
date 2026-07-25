@@ -472,7 +472,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
             + _c2(r["ir"], "{:+.2f}") + _c2(r["tstat"], "{:+.1f}") + _c2(r["sharpe"], "{:.2f}")
             + _c2(r["calmar"], "{:.2f}") + _c2(r["dd"] * 100, "{:.0f}%") + "</tr>")
     llm_html = (
-        '<h2>9. LLM comparison — curator model (same pools + profile config)</h2>'
+        '<h2>11. LLM comparison — curator model (same pools + profile config)</h2>'
         '<p style="color:#555;max-width:920px;">Every model reads the <b>same</b> news pools and replays at '
         'the profile config (cap 0.8 / λ 2.0 / 30d); the only variable is the curator LLM. The decision '
         'columns are the ones that matter: <b>agree</b> = share of weeks the model made the identical '
@@ -510,7 +510,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     _fig4.update_yaxes(title_text="portfolio value ($)", type="log",
                        tickvals=[10000, 30000, 100000, 300000, 1000000],
                        ticktext=["$10K", "$30K", "$100K", "$300K", "$1M"])
-    llm4_html = (('<h2>10. Portfolio value over time — by curator LLM (vs buy/hold and SPY)</h2>'
+    llm4_html = (('<h2>12. Portfolio value over time — by curator LLM (vs buy/hold and SPY)</h2>'
                   '<p style="color:#555;max-width:920px;">Each LLM\'s realized portfolio value on the same pools '
                   'and profile config, alongside the equal-weight buy/hold starter and SPY. Same idea as the '
                   'curator DB\'s plot 1, without the rebalance markers.</p>'
@@ -567,7 +567,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                       + _c2(s["add_mean"], "{:.2f}") + _c2(s["rem_mean"], "{:.2f}")
                       + "".join(_c2((s[k] or 0) * 100, "{:.0f}%") for k in _cr) + "</tr>")
         llm5_html = (
-            '<h2>11. Rationale-soundness — blind judge (leak-free)</h2>'
+            '<h2>13. Rationale-soundness — blind judge (leak-free)</h2>'
             '<p style="color:#555;max-width:920px;">Every backtest column above (return, IR, Sharpe, Calmar, '
             't-stat) is <b>in-sample</b> &mdash; the curator could have memorized which 2023&ndash;2026 names '
             'later won, so those numbers can\'t honestly rank <i>reasoning</i>. This section does: an '
@@ -644,27 +644,44 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         'be ~0; retries shows how much correction that took. A large reject count means decisions are being '
         'silently blocked (the symptom that exposed the max_watchlist_size cap-override bug).</p>')
 
-    # section 7: total return vs optimizer lookback at the live config (FREE replay: same curation, vary lookback)
+    # sections 8-10: total return vs each FREE optimizer knob (lookback / cap / λ), holding the OTHER two + mws
+    # at the live config. All are $0 math-replay slices of the cached grid (no re-curation).
     import plotly.graph_objects as _lgo
-    _lbrows = {r["lb"]: r for r in rows_all
-               if r["mws"] == _mws_fixed and r["cap"] == CURRENT[0] and r["lam"] == CURRENT[1]}
-    _lbx = [lb for lb in LOOKBACKS if lb in _lbrows]
-    _lfig = _lgo.Figure(_lgo.Bar(
-        x=[str(lb) for lb in _lbx], y=[_lbrows[lb]["ret"] * 100 for lb in _lbx],
-        marker_color=[GREEN if lb == CURRENT[2] else BLUE for lb in _lbx],
-        text=["live" if lb == CURRENT[2] else "" for lb in _lbx], textposition="outside",
-        hovertemplate="lookback %{x}d: %{y:+.0f}%<extra></extra>"))
-    _lfig.update_layout(template="seaborn", height=360, margin={"t": 20, "l": 60, "r": 20},
-                        xaxis={"title": "optimizer_lookback (days)", "type": "category"},
-                        yaxis={"title": "total return %"})
-    _lbar = _lfig.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False})
+
+    def _free_bar(field, values, live_val, xtitle):
+        fixed = {"mws": _mws_fixed, "cap": CURRENT[0], "lam": CURRENT[1], "lb": CURRENT[2]}
+        del fixed[field]                       # `field` varies; the rest pinned to live
+        sub = {r[field]: r for r in rows_all if all(r[k] == v for k, v in fixed.items())}
+        xs = [v for v in values if v in sub]
+        f = _lgo.Figure(_lgo.Bar(
+            x=[str(v) for v in xs], y=[sub[v]["ret"] * 100 for v in xs],
+            marker_color=[GREEN if v == live_val else BLUE for v in xs],
+            text=["live" if v == live_val else "" for v in xs], textposition="outside",
+            hovertemplate="%{x}: %{y:+.0f}%<extra></extra>"))
+        f.update_layout(template="seaborn", height=360, margin={"t": 20, "l": 60, "r": 20},
+                        xaxis={"title": xtitle, "type": "category"}, yaxis={"title": "total return %"})
+        return f.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False})
+
+    _fixed_note = (f'watchlist size ({_mws_fixed})', f'cap ({CURRENT[0]})', f'&lambda; ({CURRENT[1]})',
+                   f'lookback ({CURRENT[2]}d)')
     lb_html = (
         '<h2>8. Total return vs optimizer lookback (live config)</h2>'
         '<p style="color:#555;max-width:920px;">A FREE math-replay slice (no re-curation): hold the live '
-        f'watchlist size ({_mws_fixed}), cap ({CURRENT[0]}) and &lambda; ({CURRENT[1]}) fixed and vary only the '
-        'optimizer lookback (trailing days of prices used to estimate μ/Σ). Shows how sensitive the live '
-        f'config&#39;s total return is to that window; the <b style="color:#2b8a3e;">green</b> bar is the live '
-        f'setting ({CURRENT[2]}d).</p>' + _lbar)
+        f'{_fixed_note[0]}, {_fixed_note[1]} and {_fixed_note[2]} fixed and vary only the optimizer lookback '
+        '(trailing days of prices used to estimate μ/Σ). The <b style="color:#2b8a3e;">green</b> bar is the live '
+        f'setting ({CURRENT[2]}d).</p>' + _free_bar("lb", LOOKBACKS, CURRENT[2], "optimizer_lookback (days)"))
+    cap_html = (
+        '<h2>9. Total return vs concentration_cap (live config)</h2>'
+        '<p style="color:#555;max-width:920px;">Same slice, holding the live '
+        f'{_fixed_note[0]}, {_fixed_note[2]} and {_fixed_note[3]} fixed and varying only the concentration_cap '
+        '(the per-position max weight). The <b style="color:#2b8a3e;">green</b> bar is the live setting '
+        f'({CURRENT[0]}).</p>' + _free_bar("cap", CAPS, CURRENT[0], "concentration_cap"))
+    lam_html = (
+        '<h2>10. Total return vs risk_aversion (live config)</h2>'
+        '<p style="color:#555;max-width:920px;">Same slice, holding the live '
+        f'{_fixed_note[0]}, {_fixed_note[1]} and {_fixed_note[3]} fixed and varying only the risk_aversion '
+        '&lambda; (higher λ = more risk-averse = less concentrated). The <b style="color:#2b8a3e;">green</b> bar '
+        f'is the live setting (λ&nbsp;{CURRENT[1]}).</p>' + _free_bar("lam", LAMBDAS, CURRENT[1], "risk_aversion (λ)"))
 
     # section 7: backtest gems — for every ticker, the best $ P&L it achieved across ALL 1350 sweep settings,
     # and the setting that produced it. Built from data/curator_runs/_gems.json (scripts/gems_scan.py).
@@ -787,6 +804,8 @@ Current config: {_cur_l2:.0f}/yr.</p>
 {mws_html}
 {gems_html}
 {lb_html}
+{cap_html}
+{lam_html}
 {llm_html}
 {llm4_html}
 {llm5_html}
