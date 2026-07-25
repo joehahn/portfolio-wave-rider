@@ -4136,13 +4136,18 @@ def build_curator_dashboard(
                 f"{chips}</div></details>"
             )
     if _st_blocks:
+        # The whole section collapses under a clickable triangle (summary styled like the h2 headings); the
+        # per-rebalance rows inside are their own nested <details>.
         search_html = (
-            "<h2 style='margin-top:2em;'>14. Curator decisions &amp; search terms</h2>"
+            "<details style='margin-top:2em;'>"
+            "<summary style='cursor:pointer;font-size:1.5em;font-weight:bold;color:#111;'>"
+            "14. Curator decisions &amp; search terms</summary>"
             f"<p style='color:#555;max-width:780px;'>One row per {_html.escape(_cadence)} rebalance. "
             "Click to expand the curator's overall rationale, each add/remove with its reason, the cited "
             "<code>news_evidence</code> links, and the wave keywords behind that rebalance's pool "
             "(GDELT&nbsp;GKG + Wayback, date-clean).</p>"
             + "".join(_st_blocks)
+            + "</details>"
         )
 
     # Parameter-settings table, rendered just above chart 1 so a reader can
