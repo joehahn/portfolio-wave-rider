@@ -821,6 +821,7 @@ def apply_curator_decisions(
     profile_path: str = "investor_profile.md",
     listing_check: bool = True,
     as_of_date: str | None = None,
+    max_watchlist_size: int | None = None,
 ) -> dict[str, Any]:
     """Validate a watchlist-curator payload and apply it to holdings.csv.
 
@@ -833,7 +834,10 @@ def apply_curator_decisions(
     watchlist.
     """
     fm = load_financial_model(profile_path)
-    max_size = int(fm.get("max_watchlist_size", 12))
+    # max_watchlist_size override lets a backtest/sweep run a cap different from the profile's; without it
+    # the validator would silently cap at the profile value and reject every add past it (freezing the
+    # watchlist and starving the curator's later picks). None => use the profile.
+    max_size = int(max_watchlist_size if max_watchlist_size is not None else fm.get("max_watchlist_size", 12))
     anchors = set(fm.get("always_include", []))
 
     h_path = Path(holdings_path)

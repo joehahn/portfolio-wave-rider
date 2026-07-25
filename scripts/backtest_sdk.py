@@ -458,7 +458,8 @@ def main(argv=None) -> int:
                 if log:
                     lg = json.loads(log.read_text()); tok_in += lg["usage"]["in"]; tok_out += lg["usage"]["out"]
             portfolio.apply_curator_decisions(cur, holdings_path=str(sb_hold), history_path=str(hist),
-                                              profile_path="investor_profile.md", listing_check=False, as_of_date=d)
+                                              profile_path="investor_profile.md", listing_check=False, as_of_date=d,
+                                              max_watchlist_size=a.max_watchlist_size)
             print(f"  {d}: {len(arts)} arts | adds={[x['ticker'] for x in cur.get('adds',[])]} "
                   f"removes={[x['ticker'] for x in cur.get('removes',[])]}", file=sys.stderr)
     finally:
