@@ -200,6 +200,8 @@ def _apply_live_fallback(arts: list[dict], all_urls: bool = False) -> None:
         if not lv or not _title_consistent(a["title"], lv):
             continue                      # dead link OR a topic-swapped URL-recycle we reject
         a["lede_live"] = lv
+        if not a.get("author"):
+            a["author"] = w.live_author(a["url"])   # byline from the live page (Wayback missed it)
         if not a.get("lede"):
             a["lede_source"] = "live"     # a Wayback-miss promoted; hits keep lede_source="wayback"
 
@@ -259,8 +261,9 @@ def build_article_pool(as_of: date, news_lookback_days: int, max_articles: int,
         for a in arts:
             a["lede"] = ledes.get(a["url"], "")
             a["lede_source"] = "wayback" if a["lede"] else "none"   # tagged; live-fallback may upgrade "none"
+            a["author"] = w.wayback_author(a["url"], as_of)         # byline the lede fetch already parsed
         if live_fallback or live_all:
-            _apply_live_fallback(arts, all_urls=live_all)
+            _apply_live_fallback(arts, all_urls=live_all)           # also fills a["author"] from live pages
     cache.write_text(json.dumps(arts))
     return arts
 
@@ -503,14 +506,16 @@ def main(argv=None) -> int:
           f"SPY {res['benchmark_returns']['SPY']*100:+.0f}% | final {res['final_watchlist']}")
     if a.log_llm:
         print(f"LLM cost: {tok_in:,} in + {tok_out:,} out tokens over {len(dates)} curator calls")
-    # Post-run author refetch: fetch the byline for each CITED evidence URL -> run_dir/_authors.json, so the
-    # CBT (plots 12-13) and RBT author views populate automatically on every backtest (no re-curation, ~1-2
-    # min for the handful of evidence URLs). Best-effort; a failure here never fails the backtest.
-    try:
-        import refetch_authors
-        refetch_authors.refetch(str(run_dir))
-    except Exception as _e:  # noqa: BLE001
-        print(f"  author refetch skipped: {type(_e).__name__}: {_e}", file=sys.stderr)
+    # Author byline is captured natively during the pool build (build_article_pool stores a["author"] from
+    # the same Wayback/live fetch that gets the lede — no extra network). Derive run_dir/_authors.json from
+    # the pools here for free, so the CBT (plots 12-13) and RBT author views populate on every backtest.
+    _authors = {}
+    for _pf in run_dir.glob("*-pool.json"):
+        for _a in json.loads(_pf.read_text()):
+            if isinstance(_a, dict) and _a.get("author"):
+                _authors.setdefault(_a["url"], _a["author"])
+    (run_dir / "_authors.json").write_text(json.dumps(_authors, indent=1))
+    print(f"  authors: {len(_authors)} pooled articles carry a byline -> _authors.json", file=sys.stderr)
     return 0
 
 

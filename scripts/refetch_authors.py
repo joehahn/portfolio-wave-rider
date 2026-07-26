@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""Post-run author refetch: write <run_dir>/_authors.json = {evidence_url: byline} by fetching the byline
-for each URL a curator cited as add-evidence (Wayback as-of the citation date, else live page). The CBT
-author plots (12-13) and the RBT author plot read this file. The backtest itself is UNTOUCHED (no
-re-curation) — this only fills in attribution the backtest pool build dropped.
+"""BACKFILL tool for runs whose pools PREDATE native author capture. New backtests capture the byline
+during the pool build (build_article_pool stores a["author"] from the same Wayback/live fetch that gets
+the lede) and derive _authors.json for free — no refetch needed. This script only exists to retrofit an
+OLDER run (e.g. gkg-3yr-canon14, built before the fix) by re-fetching the pages to recover bylines.
 
-Default: evidence URLs only (a handful per run — fast). --all also does every pooled article URL (slow:
-one Wayback/live fetch per URL, ~hours for a full 3-year run) for the RBT "articles per author" plot.
+Writes <run_dir>/_authors.json = {url: byline}. Default: the cited evidence URLs (fast, fixes the CBT
+author plots). --all: every pooled article URL (concurrent, ~1h for a 3-year run) for the RBT author views.
 
-Usage: python scripts/refetch_authors.py data/curator_runs/gkg-3yr-canon14 [--all]
+Usage: python scripts/refetch_authors.py data/curator_runs/<run> [--all]
 """
 import glob
 import json
@@ -55,16 +55,24 @@ def refetch(run_dir: str, do_all: bool = False) -> dict:
                 if isinstance(a, dict) and a.get("url"):
                     pairs.setdefault(a["url"], a.get("date", d)[:10])
 
-    authors = {}
-    for i, (u, d) in enumerate(pairs.items(), 1):
-        try:
-            au = _byline(u, date.fromisoformat(d[:10]))
-        except Exception:
-            au = ""
+    # CONCURRENT: batch the Wayback fetch (caches {lede, author}), read the cached bylines, then batch a
+    # live fetch for the Wayback-misses. wayback_ledes_dated / live_ledes both use 10-worker pools, so a
+    # full 3-year pool (~8k urls) is ~1 hour, not ~4 serial.
+    wb_pairs = [(u, date.fromisoformat(d[:10])) for u, d in pairs.items()]
+    w.wayback_ledes_dated(wb_pairs)                          # concurrent Wayback, caches authors
+    authors, misses = {}, []
+    for u, d in pairs.items():
+        au = w.wayback_author(u, date.fromisoformat(d[:10]))
         if au:
             authors[u] = au
-        if i % 200 == 0:
-            print(f"  {i}/{len(pairs)} fetched, {len(authors)} bylines", flush=True)
+        else:
+            misses.append(u)
+    if misses:
+        w.live_ledes(misses)                                # concurrent live fallback, caches authors
+        for u in misses:
+            au = w.live_author(u)
+            if au:
+                authors[u] = au
     (rd / "_authors.json").write_text(json.dumps(authors, indent=1))
     print(f"  {run_dir}: {len(pairs)} URLs -> {len(authors)} bylines "
           f"({len(authors) / max(len(pairs), 1) * 100:.0f}%) -> _authors.json")
