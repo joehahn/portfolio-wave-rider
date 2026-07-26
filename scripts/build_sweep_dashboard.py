@@ -427,6 +427,9 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         f'<tr><td style="text-align:left">optimizer_lookback (days)</td><td style="text-align:left">{_fmt(LOOKBACKS)}</td><td style="text-align:left">{CURRENT[2]}</td></tr>'
         f'<tr><td style="text-align:left">max_watchlist_size <span style="color:#9a6a00;">(re-curation, §6)</span></td>'
         f'<td style="text-align:left">{_fmt([c for c, _ in MWS_SWEEP])}</td><td style="text-align:left">{_mws_fixed}</td></tr>'
+        f'<tr><td style="text-align:left">news_lookback_days <span style="color:#9a6a00;">(re-curation, title-only, §7)</span></td>'
+        f'<td style="text-align:left">{_fmt([n for n, _ in NLB_SWEEP])}</td>'
+        f'<td style="text-align:left">{int(portfolio.load_financial_model().get("news_lookback_days", 21))}</td></tr>'
         '</tbody></table>')
 
     # recommended-settings: the risk/churn-constrained frontier from plots 1-3. Keep only configs with shallow
