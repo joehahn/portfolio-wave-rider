@@ -42,11 +42,14 @@ print(f"frontier configs (dd<{bsd.REC_MAX_DD}/L1<{bsd.REC_MAX_L1}/L2<{bsd.REC_MA
 out = []
 for r in front:
     tag = f"{r['mws']}_{r['cap']}_{r['lam']}_{r['lb']}"
-    snp = Path(f"/tmp/_gems/{tag}/snapshots.csv")
-    if not snp.exists():                      # regenerate if the gems-scan tmp is gone
+    # snapshots left on disk by the earlier scans: gems_scan -> /tmp/_gems, λ-extend -> /tmp/_lam
+    snp = next((p for p in (Path(f"/tmp/_gems/{tag}/snapshots.csv"), Path(f"/tmp/_lam/{tag}/snapshots.csv"))
+                if p.exists()), None)
+    if snp is None:                           # regenerate if neither tmp is present
         portfolio.curator_backtest(runs_dir=MWSDIR[r["mws"]], out_dir=f"/tmp/_gems/{tag}",
                                    max_weight=r["cap"], risk_aversion=r["lam"], benchmarks=[],
                                    lookback_years_override=r["lb"] / 365.0, always_include=ANCH)
+        snp = Path(f"/tmp/_gems/{tag}/snapshots.csv")
     sn = pd.read_csv(snp, parse_dates=["date"])
     tot = sn.groupby("date")["total_value"].first()
     per = {}

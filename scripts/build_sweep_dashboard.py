@@ -257,7 +257,9 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     # so each mws value = its own 150-config replay. cap/λ/lookback stay FREE math replays; mws is a curator
     # param, so we only include a run dir once its re-curation is COMPLETE (same curation count as canonical) —
     # an in-progress dir (e.g. cap 16 mid-sweep) is skipped until done, then folded in on the next rebuild.
-    _mws_fixed = int(portfolio.load_financial_model().get("max_watchlist_size", 5))  # canonical / live watchlist
+    _fm_live = portfolio.load_financial_model()
+    _mws_fixed = int(_fm_live.get("max_watchlist_size", 5))  # canonical / live watchlist
+    _cadence_live = str(_fm_live.get("rebalance_period", "biweekly"))  # for the held-constant note
     _n_canon = len(_glob.glob(str(ROOT / runs_dir / "2*-curation.json")))
     READY_MWS = [(m, d) for (m, d) in MWS_SWEEP
                  if _n_canon > 0 and len(_glob.glob(str(ROOT / d / "2*-curation.json"))) == _n_canon]
@@ -386,8 +388,8 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         f'{len(rows_all)} points, colored clouds)</b> so the curation-draw spread is visible. Section 4 filters '
         f'those same {len(rows_all)} points to the low-risk / low-churn survivors (any watchlist size; the live '
         f'config is {_mws_fixed}). Held constant elsewhere (from the '
-        f'profile): rebalance weekly, max_watchlist_size {_mws_fixed}, risk-free 4%, execution lag 1 trading '
-        'day, anchors SPY/AGG/IAU.</p>')
+        f'profile): rebalance {_cadence_live}, max_watchlist_size {_mws_fixed}, risk-free 4%, execution lag 1 '
+        'trading day, anchors SPY/AGG/IAU.</p>')
 
     # recommended-settings: the risk/churn-constrained frontier from plots 1-3. Keep only configs with shallow
     # drawdown AND low churn on BOTH norms (|maxDD| < REC_MAX_DD, L1 < REC_MAX_L1, L2 < REC_MAX_L2), then list the
