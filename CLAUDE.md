@@ -25,6 +25,8 @@ The backtest models a realistic next-session execution lag (`t_update_days=1`); 
 
 Keep everything as simple and explainable as possible. Fewest files, least code, fewest functions. Write simple code that is well commented and understood at a glance. This is a demo, not a production system.
 
+**Avoid hacks when doing it right is cheap.** When working around an issue, prefer the correct fix if it takes comparable effort to the workaround. Before adding a bolt-on (a post-hoc refetch, a patch script, a special case), check whether the data or capability is already available upstream and just being dropped — fixing it at the source is usually both cleaner and less code. (Example: author bylines were extracted during the pool's lede fetch and then discarded; the right fix was to keep them in `build_article_pool`, not to re-fetch every page afterward.) Flag a deliberate shortcut explicitly so it doesn't masquerade as the real thing.
+
 **Audience for any prose you generate** (READMEs, reports, code comments): data-science-savvy reader with modest finance and investing knowledge. When prose introduces a finance term, gloss it briefly in plain math or stats terms (e.g., "Sharpe ratio = `(E[r] − r_free) / σ`, signal-to-noise on returns"). The README has a glossary near the top; mirror that level when in doubt.
 
 ## The source of truth: `investor_profile.md`
