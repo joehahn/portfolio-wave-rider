@@ -54,6 +54,13 @@ MWS_SWEEP = [(2, "data/curator_runs/gkg-3yr-mws2"), (3, "data/curator_runs/gkg-3
              (8, "data/curator_runs/gkg-3yr-mws8"), (10, "data/curator_runs/gkg-3yr-mws10"),
              (12, "data/curator_runs/gkg-3yr-mws12")]   # mws16 dropped from consideration 2026-07-25
 
+# news_lookback_days sweep (section 7): also a CURATOR-param sweep (re-curation), but title-only (no Wayback/
+# live fetch) so it curates on the preserved GKG titles at zero network cost. Each window = a separate
+# re-curation into gkg-3yr-nlb{N}, all at the canonical mws=6 / cap1.0 / λ2.0 / 150d config.
+NLB_SWEEP = [(7, "data/curator_runs/gkg-3yr-nlb7"), (14, "data/curator_runs/gkg-3yr-nlb14"),
+             (21, "data/curator_runs/gkg-3yr-nlb21"), (28, "data/curator_runs/gkg-3yr-nlb28"),
+             (45, "data/curator_runs/gkg-3yr-nlb45"), (90, "data/curator_runs/gkg-3yr-nlb90")]
+
 
 def _mws_rows():
     """Per-cap: total return, #watchlist-changes, whether NVDA was ever added, and the final watchlist.
@@ -101,6 +108,49 @@ def _mws_rows():
                 else: n_rej += 1
         rows.append({"cap": cap, "pending": False, "ret": ret, "n_add": n_add, "n_rem": n_rem,
                      "n_rej": n_rej, "n_ret": n_ret, "nvda": entered["NVDA"],
+                     "flags": {t: {"entered": entered[t], "proposed": proposed[t]} for t in TRACK_TICKERS},
+                     "wl": picks})
+    return rows
+
+
+def _nlb_rows():
+    """Per news_lookback_days window: total return + which of the tracked tickers entered + curator churn.
+    All windows are title-only re-curations at the canonical mws=6 config (gkg-3yr-nlb{N})."""
+    import glob
+    _fm = portfolio.load_financial_model()
+    starter = list(_fm.get("starter_watchlist") or [])
+    anchors = set(_fm.get("always_include") or [])
+    cap = 6                                              # every nlb run is at the canonical watchlist size
+    rows = []
+    for nlb, rd in NLB_SWEEP:
+        curs = sorted(glob.glob(str(ROOT / rd / "2*-curation.json")))
+        bt = ROOT / rd / "_backtest" / "snapshots.csv"
+        _fresh = bool(curs) and ("_retries" in json.loads(Path(curs[-1]).read_text()))
+        if len(curs) < 79 or not bt.exists() or not _fresh:
+            rows.append({"nlb": nlb, "pending": True}); continue
+        sn = pd.read_csv(bt, parse_dates=["date"])
+        tot = sn.groupby("date")["total_value"].first()
+        ret = float(tot.iloc[-1] / tot.iloc[0] - 1.0)
+        by_date = sn.groupby("date")["ticker"].apply(lambda s: frozenset(s) - anchors)
+        entered = {t: any(t in wl for wl in by_date) for t in TRACK_TICKERS}
+        picks = sorted(by_date.iloc[-1])
+        wl_r = list(starter); n_add = n_rem = n_rej = n_ret = 0
+        proposed = {t: False for t in TRACK_TICKERS}
+        for f in curs:
+            cj = json.loads(Path(f).read_text())
+            n_ret += int(cj.get("_retries", 0))
+            adds = [a["ticker"] for a in cj.get("adds", [])]; rems = [r["ticker"] for r in cj.get("removes", [])]
+            for t in TRACK_TICKERS:
+                if t in adds:
+                    proposed[t] = True
+            for t in rems:
+                if t in wl_r: wl_r.remove(t); n_rem += 1
+                else: n_rej += 1
+            for t in adds:
+                if t not in wl_r and len(wl_r) < cap: wl_r.append(t); n_add += 1
+                else: n_rej += 1
+        rows.append({"nlb": nlb, "pending": False, "ret": ret, "n_add": n_add, "n_rem": n_rem,
+                     "n_rej": n_rej, "n_ret": n_ret,
                      "flags": {t: {"entered": entered[t], "proposed": proposed[t]} for t in TRACK_TICKERS},
                      "wl": picks})
     return rows
@@ -462,7 +512,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
             + _c2(r["ir"], "{:+.2f}") + _c2(r["tstat"], "{:+.1f}") + _c2(r["sharpe"], "{:.2f}")
             + _c2(r["calmar"], "{:.2f}") + _c2(r["dd"] * 100, "{:.0f}%") + "</tr>")
     llm_html = (
-        '<h2>11. LLM comparison — curator model (same pools + profile config)</h2>'
+        '<h2>12. LLM comparison — curator model (same pools + profile config)</h2>'
         '<p style="color:#555;max-width:920px;">Every model reads the <b>same</b> news pools and replays at '
         'the profile config (cap 0.8 / λ 2.0 / 30d); the only variable is the curator LLM. The decision '
         'columns are the ones that matter: <b>agree</b> = share of weeks the model made the identical '
@@ -500,7 +550,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     _fig4.update_yaxes(title_text="portfolio value ($)", type="log",
                        tickvals=[10000, 30000, 100000, 300000, 1000000],
                        ticktext=["$10K", "$30K", "$100K", "$300K", "$1M"])
-    llm4_html = (('<h2>12. Portfolio value over time — by curator LLM (vs buy/hold and SPY)</h2>'
+    llm4_html = (('<h2>13. Portfolio value over time — by curator LLM (vs buy/hold and SPY)</h2>'
                   '<p style="color:#555;max-width:920px;">Each LLM\'s realized portfolio value on the same pools '
                   'and profile config, alongside the equal-weight buy/hold starter and SPY. Same idea as the '
                   'curator DB\'s plot 1, without the rebalance markers.</p>'
@@ -557,7 +607,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                       + _c2(s["add_mean"], "{:.2f}") + _c2(s["rem_mean"], "{:.2f}")
                       + "".join(_c2((s[k] or 0) * 100, "{:.0f}%") for k in _cr) + "</tr>")
         llm5_html = (
-            '<h2>13. Rationale-soundness — blind judge (leak-free)</h2>'
+            '<h2>14. Rationale-soundness — blind judge (leak-free)</h2>'
             '<p style="color:#555;max-width:920px;">Every backtest column above (return, IR, Sharpe, Calmar, '
             't-stat) is <b>in-sample</b> &mdash; the curator could have memorized which 2023&ndash;2026 names '
             'later won, so those numbers can\'t honestly rank <i>reasoning</i>. This section does: an '
@@ -630,6 +680,51 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         'be ~0; retries shows how much correction that took. A large reject count means decisions are being '
         'silently blocked (the symptom that exposed the max_watchlist_size cap-override bug).</p>')
 
+    # section 7: news_lookback_days sweep — title-only re-curation (no Wayback/live), curates the preserved
+    # GKG titles at the canonical mws6/cap1.0/λ2.0/150d config. Bar = each window's return; ticker flags as §6.
+    _nlb = _nlb_rows()
+    _live_nlb = int(portfolio.load_financial_model().get("news_lookback_days", 21))
+    _ndone = [r for r in _nlb if not r.get("pending")]
+    if _ndone:
+        import plotly.graph_objects as _ngo
+        _nfig = _ngo.Figure(_ngo.Bar(
+            x=[str(r["nlb"]) for r in _ndone], y=[r["ret"] * 100 for r in _ndone],
+            marker_color=[GREEN if r["nlb"] == _live_nlb else BLUE for r in _ndone],
+            hovertemplate="news_lookback %{x}d: %{y:+.0f}%<extra></extra>"))
+        _nfig.update_layout(template="seaborn", height=360, margin={"t": 20, "l": 60, "r": 20},
+                            xaxis={"title": "news_lookback_days", "type": "category"},
+                            yaxis={"title": "curator total return %"})
+        _nbar = _nfig.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False})
+    else:
+        _nbar = ""
+    _ntr = ""
+    for r in _nlb:
+        if r.get("pending"):
+            _ntr += (f'<tr style="color:#999;"><td {_lc}>{r["nlb"]}</td>'
+                     f'<td {_lc} colspan="{6 + len(TRACK_TICKERS)}"><i>title-only re-curation in progress…</i></td></tr>')
+            continue
+        _flags = "".join(f'<td {_lc}>{_flag_cell(r["flags"][t])}</td>' for t in TRACK_TICKERS)
+        _star = " (live)" if r["nlb"] == _live_nlb else ""
+        _rej = (f'<span style="color:#9a6a00;">{r["n_rej"]}</span>' if r["n_rej"] > 2 else str(r["n_rej"]))
+        _ntr += (f'<tr style="border-bottom:1px solid #eee;"><td {_lc}><b>{r["nlb"]}</b>{_star}</td>'
+                 f'<td>{r["ret"] * 100:+.0f}%</td><td>{r["n_add"]}</td><td>{r["n_rem"]}</td><td>{_rej}</td>'
+                 f'<td>{r.get("n_ret", 0)}</td>{_flags}<td {_lc}>{", ".join(r["wl"])}</td></tr>')
+    nlb_html = (
+        '<h2>7. news_lookback_days sweep</h2>'
+        '<p style="color:#555;max-width:920px;">Another CURATOR-param sweep (re-curation), but <b>title-only</b> '
+        '&mdash; the curator reads the preserved GKG article <b>titles</b> only, with NO Wayback or live-fetch, so '
+        'each window is a zero-network re-curation on the same corpus at the canonical mws&nbsp;6 / cap&nbsp;1.0 / '
+        'λ&nbsp;2.0 / 150d config. The bar is each window&#39;s total return; the QUBT/RKLB/NVDA columns flag '
+        'whether that window&#39;s curation added those tickers. Wider windows surface more-established '
+        '(higher-coverage) stories; narrower ones favor fresh breakouts.</p>'
+        + _nbar
+        + '<table style="margin-top:.6em;"><thead><tr>'
+        f'<th {_lc}>news_lookback_days</th><th {_lc}>curator return</th><th {_lc}>adds</th><th {_lc}>removes</th>'
+        f'<th {_lc}>rejects</th><th {_lc}>retries</th>'
+        + "".join(f'<th {_lc}>{t}?</th>' for t in TRACK_TICKERS)
+        + f'<th {_lc}>final watchlist (managed picks)</th>'
+        '</tr></thead><tbody>' + _ntr + '</tbody></table>')
+
     # sections 8-10: total return vs each FREE optimizer knob (lookback / cap / λ), holding the OTHER two + mws
     # at the live config. All are $0 math-replay slices of the cached grid (no re-curation).
     import plotly.graph_objects as _lgo
@@ -651,19 +746,19 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     _fixed_note = (f'watchlist size ({_mws_fixed})', f'cap ({CURRENT[0]})', f'&lambda; ({CURRENT[1]})',
                    f'lookback ({CURRENT[2]}d)')
     lb_html = (
-        '<h2>8. Total return vs optimizer lookback (live config)</h2>'
+        '<h2>9. Total return vs optimizer lookback (live config)</h2>'
         '<p style="color:#555;max-width:920px;">A FREE math-replay slice (no re-curation): hold the live '
         f'{_fixed_note[0]}, {_fixed_note[1]} and {_fixed_note[2]} fixed and vary only the optimizer lookback '
         '(trailing days of prices used to estimate μ/Σ). The <b style="color:#2b8a3e;">green</b> bar is the live '
         f'setting ({CURRENT[2]}d).</p>' + _free_bar("lb", LOOKBACKS, CURRENT[2], "optimizer_lookback (days)"))
     cap_html = (
-        '<h2>9. Total return vs concentration_cap (live config)</h2>'
+        '<h2>10. Total return vs concentration_cap (live config)</h2>'
         '<p style="color:#555;max-width:920px;">Same slice, holding the live '
         f'{_fixed_note[0]}, {_fixed_note[2]} and {_fixed_note[3]} fixed and varying only the concentration_cap '
         '(the per-position max weight). The <b style="color:#2b8a3e;">green</b> bar is the live setting '
         f'({CURRENT[0]}).</p>' + _free_bar("cap", CAPS, CURRENT[0], "concentration_cap"))
     lam_html = (
-        '<h2>10. Total return vs risk_aversion (live config)</h2>'
+        '<h2>11. Total return vs risk_aversion (live config)</h2>'
         '<p style="color:#555;max-width:920px;">Same slice, holding the live '
         f'{_fixed_note[0]}, {_fixed_note[1]} and {_fixed_note[3]} fixed and varying only the risk_aversion '
         '&lambda; (higher λ = more risk-averse = less concentrated). The <b style="color:#2b8a3e;">green</b> bar '
@@ -720,7 +815,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                 f'<th {_lc}>L1</th><th {_lc}>L2</th><th {_lc}>gems</th><th {_lc}>waves</th>'
                 f'<th {_lc}>waves generating the gains (pp)</th></tr></thead><tbody>' + _drows + '</tbody></table>')
         gems_html = (
-            '<h2>7. Backtest gems</h2>'
+            '<h2>8. Backtest gems</h2>'
             '<p style="color:#555;max-width:940px;">For every ticker the curator ever held, its best <b>$ gain</b> '
             '(price-driven P&amp;L on the position) across <b>all 1350 sweep settings</b>, and the setting that '
             'produced it. A ticker&#39;s gain is maximized by the config that weighted it most while it ran (usually '
@@ -792,6 +887,7 @@ Current config: {_cur_l2:.0f}/yr.</p>
 {rec_html}
 {mws_equity_html}
 {mws_html}
+{nlb_html}
 {gems_html}
 {lb_html}
 {cap_html}

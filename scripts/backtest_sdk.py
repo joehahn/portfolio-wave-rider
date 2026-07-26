@@ -205,7 +205,8 @@ def _apply_live_fallback(arts: list[dict], all_urls: bool = False) -> None:
 
 
 def build_article_pool(as_of: date, news_lookback_days: int, max_articles: int,
-                       run_dir: Path, live_fallback: bool = False, live_all: bool = False) -> list[dict]:
+                       run_dir: Path, live_fallback: bool = False, live_all: bool = False,
+                       titles_only: bool = False) -> list[dict]:
     """Assemble one rebalance's pool by SLICING the pre-ingested corpus for (as_of - news_lookback,
     as_of], then RANKING it like a search engine (so the curator's input resembles live WebSearch),
     NOT sampling arbitrarily. No GKG query here — changing news_lookback_days only re-slices.
@@ -248,12 +249,18 @@ def build_article_pool(as_of: date, news_lookback_days: int, max_articles: int,
     # but it starves archival time and craters the hit-rate (a 7-day cutoff misses captures that land
     # weeks after publication). GKG is already decoupled (the corpus); Wayback is pay-once-per-(url,
     # as_of): widening the lookback fetches only the newly-included older articles' ledes, then caches.
-    ledes = w.wayback_ledes([a["url"] for a in arts], as_of)
-    for a in arts:
-        a["lede"] = ledes.get(a["url"], "")
-        a["lede_source"] = "wayback" if a["lede"] else "none"   # tagged; live-fallback may upgrade "none"
-    if live_fallback or live_all:
-        _apply_live_fallback(arts, all_urls=live_all)
+    if titles_only:
+        # title-only: NO network at all — curate on the preserved GKG titles/urls, no Wayback, no live.
+        for a in arts:
+            a["lede"] = ""
+            a["lede_source"] = "none"
+    else:
+        ledes = w.wayback_ledes([a["url"] for a in arts], as_of)
+        for a in arts:
+            a["lede"] = ledes.get(a["url"], "")
+            a["lede_source"] = "wayback" if a["lede"] else "none"   # tagged; live-fallback may upgrade "none"
+        if live_fallback or live_all:
+            _apply_live_fallback(arts, all_urls=live_all)
     cache.write_text(json.dumps(arts))
     return arts
 
@@ -267,7 +274,9 @@ def render_articles(arts: list[dict], mode: str = "clean") -> str:
     lines = ["DATE-CLEAN NEWS ARTICLES (title + snippet). Discover the tickers; discard non-investable "
              "noise (war/weather events, private cos, foreign/OTC, keyword false-matches):"]
     for a in arts:
-        if mode == "live_only":
+        if mode == "titles":
+            lede = ""                              # title-only: ignore every lede (no Wayback/live fetched)
+        elif mode == "live_only":
             lede = a.get("lede_live", "")
         elif mode == "fuller":
             lede = a.get("lede") or a.get("lede_live", "")
@@ -344,10 +353,12 @@ def main(argv=None) -> int:
     ap.add_argument("--live-all", action="store_true",
                     help="ALSO fetch live ledes for Wayback-HITS (attached as lede_live, clean field kept) "
                          "so the pool can serve the live_only arm; implied by --news-mode live_only")
-    ap.add_argument("--news-mode", choices=["clean", "fuller", "live_only"], default="clean",
+    ap.add_argument("--news-mode", choices=["clean", "fuller", "live_only", "titles"], default="clean",
                     help="which lede the curator reads: clean=Wayback-only (floor); fuller=Wayback+live "
-                         "fallback; live_only=live ledes for every url (ignores Wayback). Default clean")
+                         "fallback; live_only=live ledes for every url (ignores Wayback); titles=title-only, "
+                         "NO Wayback/live fetch (curate on preserved GKG titles). Default clean")
     a = ap.parse_args(argv)
+    a.titles_only = a.news_mode == "titles"   # skip all lede fetching (Wayback + live) at pool-build
     if a.news_mode == "fuller":
         a.live_fallback = True            # can't show live ledes we never fetched
     if a.news_mode == "live_only":
@@ -427,7 +438,7 @@ def main(argv=None) -> int:
     # 10-worker pool, and serial pool-builds avoid racing the module-global _wb_bulk flag in news_pool).
     pool_ex = ThreadPoolExecutor(max_workers=1)
     pool_futs = {d: pool_ex.submit(build_article_pool, date.fromisoformat(d), news_lb,
-                                   a.max_articles, run_dir, a.live_fallback, a.live_all)
+                                   a.max_articles, run_dir, a.live_fallback, a.live_all, a.titles_only)
                  for d in dates}
     try:
         for d in dates:
@@ -456,6 +467,7 @@ def main(argv=None) -> int:
                 # reject-and-retry: if the validator would reject any proposal, tell the curator WHY and let
                 # it revise (e.g. pair a full-watchlist add with a remove). Up to 2 retries, then take what
                 # validates. Keeps the curator's intent from being silently dropped.
+                _nret = 0
                 for _ret in range(2):
                     _chk = portfolio.apply_curator_decisions(
                         cur, holdings_path=str(sb_hold), history_path=str(hist), profile_path="investor_profile.md",
@@ -466,6 +478,8 @@ def main(argv=None) -> int:
                     _fb = "\n".join(f"- {x.get('ticker')} ({x.get('action')}): {x.get('reason')}" for x in _rej)
                     cur = call_curator(cli, a.model, d, cur_wl, thesis, exclusions, a.max_watchlist_size,
                                        anchors, _atext, a.cadence, log, run_dir / "_parse_fail", retry_feedback=_fb)
+                    _nret += 1
+                cur["_retries"] = _nret          # harness metadata: how many reject-and-retry rounds fired
                 cur["as_of_date"] = d
                 cur_path.write_text(json.dumps(cur, indent=2))
                 if log:
