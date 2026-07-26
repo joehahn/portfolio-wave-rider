@@ -503,6 +503,14 @@ def main(argv=None) -> int:
           f"SPY {res['benchmark_returns']['SPY']*100:+.0f}% | final {res['final_watchlist']}")
     if a.log_llm:
         print(f"LLM cost: {tok_in:,} in + {tok_out:,} out tokens over {len(dates)} curator calls")
+    # Post-run author refetch: fetch the byline for each CITED evidence URL -> run_dir/_authors.json, so the
+    # CBT (plots 12-13) and RBT author views populate automatically on every backtest (no re-curation, ~1-2
+    # min for the handful of evidence URLs). Best-effort; a failure here never fails the backtest.
+    try:
+        import refetch_authors
+        refetch_authors.refetch(str(run_dir))
+    except Exception as _e:  # noqa: BLE001
+        print(f"  author refetch skipped: {type(_e).__name__}: {_e}", file=sys.stderr)
     return 0
 
 
