@@ -114,14 +114,13 @@ def _mws_rows():
 
 
 def _nlb_rows():
-    """Per news_lookback_days window: total return + which of the tracked tickers entered + curator churn.
-    All windows are title-only re-curations at the canonical mws=6 config (gkg-3yr-nlb{N})."""
+    """Per news_lookback_days window (title-only re-curations at the canonical mws=6/cap1.0/λ2.0/150d config):
+    total return, IR (success), L1/L2 (churn), which tracked tickers entered, and the FULL list of tickers
+    funded over the 3 years (breadth/diversity). Marks the optimal window (highest IR)."""
     import glob
-    _fm = portfolio.load_financial_model()
-    starter = list(_fm.get("starter_watchlist") or [])
-    anchors = set(_fm.get("always_include") or [])
-    cap = 6                                              # every nlb run is at the canonical watchlist size
+    anchors = set((portfolio.load_financial_model().get("always_include") or []))
     rows = []
+    spy = None
     for nlb, rd in NLB_SWEEP:
         curs = sorted(glob.glob(str(ROOT / rd / "2*-curation.json")))
         bt = ROOT / rd / "_backtest" / "snapshots.csv"
@@ -129,30 +128,25 @@ def _nlb_rows():
         if len(curs) < 79 or not bt.exists() or not _fresh:
             rows.append({"nlb": nlb, "pending": True}); continue
         sn = pd.read_csv(bt, parse_dates=["date"])
-        tot = sn.groupby("date")["total_value"].first()
+        tot = sn.groupby("date")["total_value"].first().sort_index()
         ret = float(tot.iloc[-1] / tot.iloc[0] - 1.0)
+        if spy is None:
+            spy = portfolio._fetch_benchmark_curves(["SPY"], tot.index[0], tot.index[-1], float(tot.iloc[0]))["SPY"]
+        peak = tot.cummax(); dd = float(((tot - peak) / peak).min())
+        yrs = max((tot.index[-1] - tot.index[0]).days / 365.25, 1e-9); ann = (1 + ret) ** (1 / yrs) - 1
+        m = _metrics(tot, spy, ann, dd); l1, l2 = _churn_metrics(sn)
         by_date = sn.groupby("date")["ticker"].apply(lambda s: frozenset(s) - anchors)
         entered = {t: any(t in wl for wl in by_date) for t in TRACK_TICKERS}
-        picks = sorted(by_date.iloc[-1])
-        wl_r = list(starter); n_add = n_rem = n_rej = n_ret = 0
-        proposed = {t: False for t in TRACK_TICKERS}
-        for f in curs:
-            cj = json.loads(Path(f).read_text())
-            n_ret += int(cj.get("_retries", 0))
-            adds = [a["ticker"] for a in cj.get("adds", [])]; rems = [r["ticker"] for r in cj.get("removes", [])]
-            for t in TRACK_TICKERS:
-                if t in adds:
-                    proposed[t] = True
-            for t in rems:
-                if t in wl_r: wl_r.remove(t); n_rem += 1
-                else: n_rej += 1
-            for t in adds:
-                if t not in wl_r and len(wl_r) < cap: wl_r.append(t); n_add += 1
-                else: n_rej += 1
-        rows.append({"nlb": nlb, "pending": False, "ret": ret, "n_add": n_add, "n_rem": n_rem,
-                     "n_rej": n_rej, "n_ret": n_ret,
-                     "flags": {t: {"entered": entered[t], "proposed": proposed[t]} for t in TRACK_TICKERS},
-                     "wl": picks})
+        funded = sorted(set(sn[sn["shares"] > 0]["ticker"]) - anchors)   # every ticker ever funded, 3yr union
+        rows.append({"nlb": nlb, "pending": False, "ret": ret, "ir": m["ir"], "l1": l1, "l2": l2,
+                     "flags": {t: {"entered": entered[t]} for t in TRACK_TICKERS}, "funded": funded})
+    # optimal = highest IR among completed windows (best risk-adjusted return; for this data it also leads
+    # raw return and ticker breadth with near-lowest churn).
+    _done = [r for r in rows if not r.get("pending")]
+    if _done:
+        _best = max(_done, key=lambda r: r["ir"])
+        for r in _done:
+            r["optimal"] = (r is _best)
     return rows
 
 
@@ -688,11 +682,16 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     _nlb = _nlb_rows()
     _live_nlb = int(portfolio.load_financial_model().get("news_lookback_days", 21))
     _ndone = [r for r in _nlb if not r.get("pending")]
+    _opt_nlb = next((r["nlb"] for r in _ndone if r.get("optimal")), None)
     if _ndone:
         import plotly.graph_objects as _ngo
+        # green = optimal (best IR); the live window is red-outlined
         _nfig = _ngo.Figure(_ngo.Bar(
             x=[str(r["nlb"]) for r in _ndone], y=[r["ret"] * 100 for r in _ndone],
-            marker_color=[GREEN if r["nlb"] == _live_nlb else BLUE for r in _ndone],
+            marker={"color": [GREEN if r.get("optimal") else BLUE for r in _ndone],
+                    "line": {"width": [3 if r["nlb"] == _live_nlb else 0 for r in _ndone], "color": "#e03131"}},
+            text=["optimal" if r.get("optimal") else ("live" if r["nlb"] == _live_nlb else "") for r in _ndone],
+            textposition="outside",
             hovertemplate="news_lookback %{x}d: %{y:+.0f}%<extra></extra>"))
         _nfig.update_layout(template="seaborn", height=360, margin={"t": 20, "l": 60, "r": 20},
                             xaxis={"title": "news_lookback_days", "type": "category"},
@@ -704,28 +703,31 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     for r in _nlb:
         if r.get("pending"):
             _ntr += (f'<tr style="color:#999;"><td {_lc}>{r["nlb"]}</td>'
-                     f'<td {_lc} colspan="{6 + len(TRACK_TICKERS)}"><i>title-only re-curation in progress…</i></td></tr>')
+                     f'<td {_lc} colspan="{5 + len(TRACK_TICKERS)}"><i>title-only re-curation in progress…</i></td></tr>')
             continue
         _flags = "".join(f'<td {_lc}>{_flag_cell(r["flags"][t])}</td>' for t in TRACK_TICKERS)
-        _star = " (live)" if r["nlb"] == _live_nlb else ""
-        _rej = (f'<span style="color:#9a6a00;">{r["n_rej"]}</span>' if r["n_rej"] > 2 else str(r["n_rej"]))
-        _ntr += (f'<tr style="border-bottom:1px solid #eee;"><td {_lc}><b>{r["nlb"]}</b>{_star}</td>'
-                 f'<td>{r["ret"] * 100:+.0f}%</td><td>{r["n_add"]}</td><td>{r["n_rem"]}</td><td>{_rej}</td>'
-                 f'<td>{r.get("n_ret", 0)}</td>{_flags}<td {_lc}>{", ".join(r["wl"])}</td></tr>')
+        _tag = (" ★ optimal" if r.get("optimal") else "") + (" (live)" if r["nlb"] == _live_nlb else "")
+        _bg = "background:#eaf7ea;" if r.get("optimal") else ("background:#fff7e6;" if r["nlb"] == _live_nlb else "")
+        _ntr += (f'<tr style="{_bg}border-bottom:1px solid #eee;"><td {_lc}><b>{r["nlb"]}</b>{_tag}</td>'
+                 f'<td>{r["ret"] * 100:+.0f}%</td><td>{r["ir"]:+.2f}</td><td>{r["l1"]:.0f}</td><td>{r["l2"]:.0f}</td>'
+                 f'{_flags}<td {_lc}>{", ".join(r["funded"])}</td></tr>')
     nlb_html = (
         '<h2>7. news_lookback_days sweep</h2>'
-        '<p style="color:#555;max-width:920px;">Another CURATOR-param sweep (re-curation), but <b>title-only</b> '
+        '<p style="color:#555;max-width:940px;">Another CURATOR-param sweep (re-curation), but <b>title-only</b> '
         '&mdash; the curator reads the preserved GKG article <b>titles</b> only, with NO Wayback or live-fetch, so '
         'each window is a zero-network re-curation on the same corpus at the canonical mws&nbsp;6 / cap&nbsp;1.0 / '
-        'λ&nbsp;2.0 / 150d config. The bar is each window&#39;s total return; the QUBT/RKLB/NVDA columns flag '
-        'whether that window&#39;s curation added those tickers. Wider windows surface more-established '
-        '(higher-coverage) stories; narrower ones favor fresh breakouts.</p>'
+        'λ&nbsp;2.0 / 150d config. Columns: total return, <b>IR</b> (success = risk-adjusted return vs SPY), '
+        '<b>L1/L2</b> churn, whether QUBT/RKLB/NVDA were added, and every ticker <b>funded over the 3 years</b> '
+        '(breadth). The <b style="color:#2b8a3e;">green</b> bar / ★ row is the <b>optimal</b> window '
+        + (f'(<b>{_opt_nlb}d</b>): highest IR, which here also has the highest return and the widest ticker spread '
+           'at near-lowest churn. ' if _opt_nlb else '')
+        + 'The live window is red-outlined. In-sample, and title-only, so read it as relative signal on the news '
+        'window, not a reason to switch off the live 21d without forward evidence.</p>'
         + _nbar
         + '<table style="margin-top:.6em;"><thead><tr>'
-        f'<th {_lc}>news_lookback_days</th><th {_lc}>curator return</th><th {_lc}>adds</th><th {_lc}>removes</th>'
-        f'<th {_lc}>rejects</th><th {_lc}>retries</th>'
+        f'<th {_lc}>news_lookback_days</th><th {_lc}>return</th><th {_lc}>IR</th><th {_lc}>L1</th><th {_lc}>L2</th>'
         + "".join(f'<th {_lc}>{t}?</th>' for t in TRACK_TICKERS)
-        + f'<th {_lc}>final watchlist (managed picks)</th>'
+        + f'<th {_lc}>tickers funded (3-yr)</th>'
         '</tr></thead><tbody>' + _ntr + '</tbody></table>')
 
     # sections 8-10: total return vs each FREE optimizer knob (lookback / cap / λ), holding the OTHER two + mws
