@@ -762,12 +762,15 @@ the bootstrap <b>CI</b> (error bar on annualized return), and <b>H1/H2 stable</b
 both halves) before trusting any row.</p>
 {grid_html}
 <h2>1. Return vs drawdown</h2>
-<p style="color:#555;max-width:920px;">Each point is one cap/λ/lookback config; <b>color = max_watchlist_size</b>
+<p style="color:#555;max-width:920px;">The horizontal axis is <b>max drawdown</b> — the portfolio&#39;s biggest
+peak-to-trough loss as a fraction of its running peak (the single worst high-to-low decline over the window);
+further right = deeper loss. The vertical axis is annualized return, so <b>upper-left is best</b> (high return,
+shallow drawdown). Each point is one cap/λ/lookback config; <b>color = max_watchlist_size</b>
 ({_fmt([m for m in _mws_present])} shown), so every watchlist size contributes its own {len(rows)}-config cloud
 (total {len(rows_all)} points). Within a cloud the free knobs move a point deterministically; jumping between
 colors ALSO swaps the underlying curation, and those kimi re-curations swing 2-5&times; on their own — so
 <b>read cross-color separation as parameter effect + curation-draw noise, not a clean mws response</b>. The
-canonical live watchlist ({_mws_fixed}, ★) carries the red-ringed current config.</p>
+canonical live config (watchlist {_mws_fixed}) is the <b>black star</b>.</p>
 {scatter}
 <h2>2. Return vs L1 churn</h2>
 <p style="color:#555;max-width:920px;">Same points (all watchlist sizes), risk axis replaced by <b>L1 churn = annualized one-way
