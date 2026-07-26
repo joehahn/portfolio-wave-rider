@@ -257,9 +257,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     # so each mws value = its own 150-config replay. cap/λ/lookback stay FREE math replays; mws is a curator
     # param, so we only include a run dir once its re-curation is COMPLETE (same curation count as canonical) —
     # an in-progress dir (e.g. cap 16 mid-sweep) is skipped until done, then folded in on the next rebuild.
-    _fm_live = portfolio.load_financial_model()
-    _mws_fixed = int(_fm_live.get("max_watchlist_size", 5))  # canonical / live watchlist
-    _cadence_live = str(_fm_live.get("rebalance_period", "biweekly"))  # for the held-constant note
+    _mws_fixed = int(portfolio.load_financial_model().get("max_watchlist_size", 5))  # canonical / live watchlist
     _n_canon = len(_glob.glob(str(ROOT / runs_dir / "2*-curation.json")))
     READY_MWS = [(m, d) for (m, d) in MWS_SWEEP
                  if _n_canon > 0 and len(_glob.glob(str(ROOT / d / "2*-curation.json"))) == _n_canon]
@@ -379,17 +377,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         f'<tr><td style="text-align:left">optimizer_lookback (days)</td><td style="text-align:left">{_fmt(LOOKBACKS)}</td><td style="text-align:left">{CURRENT[2]}</td></tr>'
         f'<tr><td style="text-align:left">max_watchlist_size <span style="color:#9a6a00;">(re-curation, §6)</span></td>'
         f'<td style="text-align:left">{_fmt([c for c, _ in MWS_SWEEP])}</td><td style="text-align:left">{_mws_fixed}</td></tr>'
-        '</tbody></table>'
-        f'<p style="color:#888;font-size:12px;max-width:860px;">The first three (cap / λ / lookback) are FREE '
-        f'math-replay knobs — every combination = {len(rows)} configs on the <b>same</b> curations. '
-        '<b>max_watchlist_size is different</b>: it changes the CURATOR\'s decisions, so each value is a separate '
-        'non-zero-cost RE-CURATION (section 6 + plot 5), not a replay. <b>Plots 1-3 overlay the '
-        f'{len(rows)}-config free grid on EACH ready max_watchlist_size ({_fmt([m for m in _mws_present])} = '
-        f'{len(rows_all)} points, colored clouds)</b> so the curation-draw spread is visible. Section 4 filters '
-        f'those same {len(rows_all)} points to the low-risk / low-churn survivors (any watchlist size; the live '
-        f'config is {_mws_fixed}). Held constant elsewhere (from the '
-        f'profile): rebalance {_cadence_live}, max_watchlist_size {_mws_fixed}, risk-free 4%, execution lag 1 '
-        'trading day, anchors SPY/AGG/IAU.</p>')
+        '</tbody></table>')
 
     # recommended-settings: the risk/churn-constrained frontier from plots 1-3. Keep only configs with shallow
     # drawdown AND low churn on BOTH norms (|maxDD| < REC_MAX_DD, L1 < REC_MAX_L1, L2 < REC_MAX_L2), then list the
@@ -762,11 +750,12 @@ th{{text-align:right;padding:6px 10px;border-bottom:2px solid #ccc;white-space:n
 .built{{position:absolute;top:8px;right:16px;font-size:12px;color:#888}}
 </style></head><body><div class="built">dashboard built {ts}</div>{nav}
 <h1>Backtest parameter sweeps{_range}</h1>
-<p style="color:#555;max-width:860px;">{len(rows)} configs = concentration_cap × risk_aversion (λ) × optimizer_lookback,
-replayed on the <b>fixed 3-year curation set of the default curator</b> ({runs_dir.split('/')[-1]}). These knobs touch only the
-mean-variance replay, not the curator, so the whole grid costs <b>$0</b> (no LLM). Ranked by
-<b>Information Ratio</b> (annualized active return ÷ tracking error vs SPY — consistency of beating the
-benchmark). SPY returned {spy_ret*100:+.0f}% over the window. ★ = best in column.</p>
+<p style="color:#555;max-width:860px;">{len(rows_all)} configs = concentration_cap × risk_aversion (λ) × optimizer_lookback
+({len(rows)} combinations) replayed across all {len(_mws_present)} <b>max_watchlist_size</b> curation sets. These
+knobs touch only the mean-variance replay, not the curator, so the whole grid costs <b>$0</b> (no LLM — the
+curations already exist; only expanding max_watchlist_size itself, section 6, re-curates). Metrics are
+benchmark-relative: <b>Information Ratio</b> = annualized active return ÷ tracking error vs SPY (consistency of
+beating the benchmark). SPY returned {spy_ret*100:+.0f}% over the window. ★ = best in column.</p>
 <p style="color:#b45309;max-width:860px;"><b>All in-sample.</b> These rank candidate configs to
 <b>forward-test</b>; they don't prove an optimum. Read the <b>IR t-stat</b> (|t|&gt;2 ≈ real vs luck),
 the bootstrap <b>CI</b> (error bar on annualized return), and <b>H1/H2 stable</b> (does the edge hold in
