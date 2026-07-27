@@ -1,47 +1,59 @@
 #!/usr/bin/env python3
-"""Build docs/retrieval_bootstrap.html — the RETRIEVER view of the BOOTSTRAP dataset: the last ~3 months
-of the backtest (GKG-discovered, Wayback ledes) spliced onto the forward cron's daily WebSearch pulls.
-It is the news-coverage bridge across the backtest->forward handoff (2026-07-22).
+"""Build docs/retrieval_bootstrap.html — the "Retriever Bootstrap" dashboard: the news-coverage bridge
+across the backtest->forward handoff (2026-07-22). Splices the backtest's last ~3 months of top-100 pools
+(GKG discovery + Wayback ledes) onto the forward cron's daily WebSearch pulls (data/forward_corpus/).
 
-Two provenances, kept DISTINCT (unlike the backtest RBT, which only knows Wayback/live/none):
-  - Wayback     : backtest-tail ledes, archived-at-the-time (look-ahead-safe by construction)
+STANDALONE (a deliberate fork of build_retrieval_dashboard.py, not a call into it) so the bootstrap view can
+be customized freely without touching the backtest RBT. It recycles the RBT's plots / cards / param-table /
+style, but frames provenance for TWO clean sources instead of one:
+  - Wayback   : backtest-tail ledes, archived-at-the-time (look-ahead-safe)
+  - WebSearch : forward ledes from the daily cron (look-ahead-safe -- the news IS current)
   - live-fallback: backtest-tail ledes fetched from today's page (look-ahead-BIASED; backtest only)
-  - WebSearch   : forward ledes from the daily cron (look-ahead-safe -- the news IS current)
-Wayback + WebSearch are both clean; live-fallback is the only biased one and appears only in the tail.
-
-Reads data/curator_runs/bootstrap-retriever/{*-pool.json,_authors.json} (assembled from canon14's last-3mo
-pools + data/forward_corpus/articles.jsonl). Pure Plotly + seaborn to match the other PWR dashboards.
-Usage: python scripts/build_bootstrap_dashboard.py [--run-dir ...] [--out docs/retrieval_bootstrap.html]
+CLEAN = Wayback + WebSearch (both safe); the biased band is live-fallback only. Reads canon14's last-3mo
+pools + the forward corpus directly, so a re-run always reflects the latest cron pulls.
+Usage: python scripts/build_bootstrap_dashboard.py [--canon-dir ...] [--forward-corpus ...] [--since ...]
 """
+from __future__ import annotations
+
 import argparse
 import json
+import re
 import sys
-from collections import Counter
+from collections import Counter, defaultdict
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
-import dash_nav  # shared cross-page nav (Backtest | Forwardtest | Bootstrap groups)  # noqa: E402
-BT_SRC = "gkg-wayback-articles"        # backtest pool `source` tag
-FW_SRC = "forward-websearch"           # forward pool `source` tag
+sys.path.insert(0, str(ROOT))
+import dash_nav  # noqa: E402  shared cross-page nav (Backtest | Forwardtest | Bootstrap)
+import gkg_pool as g  # noqa: E402  wave/domain-tier classifiers (same as the RBT)
+from src import portfolio as _pf  # noqa: E402  load_financial_model -> the param-settings table
+
+BLUE, GREEN, ORANGE, RED, GREY = "#1f77b4", "#2ca02c", "#ff7f0e", "#e03131", "#adb5bd"
+GOLD = "#f59e0b"
+DOW = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+BT_SRC, FW_SRC = "gkg-wayback-articles", "forward-websearch"
+CLEAN_LS = ("wayback", "websearch")            # look-ahead-safe lede provenances
 
 
-def _fig_html(fig):
-    return fig.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False})
+def _iso(s):
+    try:
+        return date.fromisoformat((s or "")[:10])
+    except Exception:
+        return None
 
 
-def _load_pools(canon_dir: str, forward_corpus: str, since: str):
-    """Assemble the bootstrap pools directly from source (no intermediate run-dir), so a re-run always
-    reflects the latest cron pulls: (1) the backtest's own top-100 pools with as_of >= `since` (Wayback
-    ledes, kept verbatim), and (2) the forward cron's articles grouped into per-pull-day pools with a
-    `websearch` provenance. Returns (backtest_pools, forward_pools), each already in the pool-JSON shape."""
+def load_pools(canon_dir: str, forward_corpus: str, since: str):
+    """(backtest_pools, forward_pools) in pool-JSON shape. Backtest = canon14's own top-100 pools with
+    as_of >= `since` (Wayback ledes verbatim). Forward = the cron's articles grouped into per-pull-day
+    pools tagged with a `websearch` provenance."""
     bt = sorted((json.loads(f.read_text()) for f in (ROOT / canon_dir).glob("*-pool.json")),
                 key=lambda p: p["as_of_date"])
     bt = [p for p in bt if p["as_of_date"] >= since]
-
-    from collections import defaultdict
     byday = defaultdict(list)
     for line in (ROOT / forward_corpus / "articles.jsonl").read_text().splitlines():
         if not line.strip():
@@ -59,123 +71,234 @@ def _load_pools(canon_dir: str, forward_corpus: str, since: str):
     for day, items in sorted(byday.items()):
         src = Counter(x["lede_source"] for x in items)
         fw.append({"as_of_date": day, "source": FW_SRC, "n_articles": len(items),
+                   "hit_rate": round(src.get("websearch", 0) / max(len(items), 1), 2),
                    "lede_sources": dict(src), "articles": items})
     return bt, fw
 
 
 def build(canon_dir: str, forward_corpus: str, since: str, out: Path) -> None:
-    bt, fw = _load_pools(canon_dir, forward_corpus, since)
+    bt, fw = load_pools(canon_dir, forward_corpus, since)
     pools = sorted(bt + fw, key=lambda p: p["as_of_date"])
 
-    # ---- flatten to unique articles (dedupe by url; a url's first provenance wins) ----
-    prov_of = {}          # url -> provenance bucket
-    wave_of, src_of, auth_of = {}, {}, {}
+    def _rate(p, keys):
+        ls, n = p.get("lede_sources", {}), max(p.get("n_articles", 1), 1)
+        return sum(ls.get(k, 0) for k in keys) / n
+
+    # ---- unique articles across all pools (dedupe by url); keep best provenance seen ----
+    uniq = {}
     for p in pools:
         for a in p.get("articles", []):
-            u = a.get("url")
-            if not u or u in prov_of:
+            url = a.get("url")
+            if not url:
                 continue
             ls = a.get("lede_source", "none")
-            prov_of[u] = {"wayback": "Wayback", "live": "live-fallback",
-                          "websearch": "WebSearch"}.get(ls, "none (no lede)")
-            wave_of[u] = a.get("wave", "")
-            src_of[u] = a.get("source", "")
-            if a.get("author"):
-                auth_of[u] = a["author"]
-    n_uniq = len(prov_of)
-    prov_counts = Counter(prov_of.values())
-    covered = sum(v for k, v in prov_counts.items() if k != "none (no lede)")
+            clean, live = ls in CLEAN_LS, ls == "live"
+            if url not in uniq:
+                uniq[url] = {"date": a.get("date", ""), "source": a.get("source", ""),
+                             "title": a.get("title", ""), "url": url, "author": a.get("author", ""),
+                             "wave": a.get("wave", ""), "has_clean": clean, "has_live": live}
+            else:
+                uniq[url]["has_clean"] |= clean
+                uniq[url]["has_live"] |= live
+    articles = list(uniq.values())
+    n_uniq = len(articles)
+    n_clean = sum(1 for a in articles if a["has_clean"])
+    n_live = sum(1 for a in articles if a["has_live"] and not a["has_clean"])
+    pct_clean = 100.0 * n_clean / n_uniq if n_uniq else 0.0
+    pct_cov = 100.0 * (n_clean + n_live) / n_uniq if n_uniq else 0.0
 
-    # ---- 1. articles per pool over time, colored by side (backtest Wayback vs forward WebSearch) ----
-    f1 = go.Figure()
-    f1.add_bar(x=[p["as_of_date"] for p in bt], y=[p["n_articles"] for p in bt],
-               name="backtest tail (Wayback, biweekly)", marker_color="#1c7ed6")
-    f1.add_bar(x=[p["as_of_date"] for p in fw], y=[p["n_articles"] for p in fw],
-               name="forward cron (WebSearch, daily)", marker_color="#f59f00")
-    f1.add_vline(x="2026-07-22", line={"dash": "dot", "color": "#888"})
-    f1.update_layout(template="seaborn", height=380, barmode="group",
-                     margin={"t": 20, "l": 50, "r": 20, "b": 60},
-                     yaxis_title="articles in pool", legend={"orientation": "h", "y": 1.12},
-                     xaxis={"title": "pool date (dotted line = backtest->forward handoff)"})
+    # ---- time buckets over unique articles (green overlay = has a CLEAN lede) ----
+    mon_g, mon_w, wk_g, wk_w, day_g, day_w, dow_g, dow_w = (Counter() for _ in range(8))
+    for a in articles:
+        dt = _iso(a["date"])
+        if dt is None:
+            continue
+        hw, mo = a["has_clean"], a["date"][:7]
+        wk = (dt - timedelta(days=dt.weekday())).isoformat()
+        di, wd = dt.isoformat(), DOW[dt.weekday()]
+        mon_g[mo] += 1; mon_w[mo] += hw
+        wk_g[wk] += 1; wk_w[wk] += hw
+        day_g[di] += 1; day_w[di] += hw
+        dow_g[wd] += 1; dow_w[wd] += hw
+    mo_keys, wk_keys = sorted(mon_g), sorted(wk_g)
+    day_dates = [d for d in (_iso(a["date"]) for a in articles) if d]
+    day_x, day_yg = [], []
+    if day_dates:
+        x = min(day_dates)
+        while x <= max(day_dates):
+            k = x.isoformat(); day_x.append(k); day_yg.append(day_g.get(k, 0)); x += timedelta(days=1)
 
-    # ---- 2. lede provenance mix across the whole bootstrap ----
-    _order = ["Wayback", "WebSearch", "live-fallback", "none (no lede)"]
-    _col = {"Wayback": "#2b8a3e", "WebSearch": "#f59f00", "live-fallback": "#c92a2a",
-            "none (no lede)": "#adb5bd"}
-    rows = [(k, prov_counts.get(k, 0)) for k in _order if prov_counts.get(k, 0)]
-    f2 = go.Figure(go.Bar(x=[c for _, c in rows], y=[k for k, _ in rows], orientation="h",
-                          marker_color=[_col[k] for k, _ in rows],
-                          text=[f"{c} ({100*c//max(n_uniq,1)}%)" for _, c in rows], textposition="auto"))
-    f2.update_layout(template="seaborn", height=260, margin={"t": 20, "l": 130, "r": 40, "b": 40},
-                     xaxis_title="unique articles")
+    # ---- plot 6: per-pool lede coverage. CLEAN = Wayback + WebSearch (both safe); TOTAL adds the
+    # look-ahead-biased live-fallback (backtest tail only). Colored by side so the handoff is visible. ----
+    _bw = sorted(((p["as_of_date"], p.get("lede_sources", {}), max(p.get("n_articles", 1), 1),
+                   p.get("source")) for p in pools if p.get("as_of_date")), key=lambda r: r[0])
+    bw_x = [d for d, _, _, _ in _bw]
+    bw_clean = [(ls.get("wayback", 0) + ls.get("websearch", 0)) / n for _, ls, n, _ in _bw]
+    bw_total = [(ls.get("wayback", 0) + ls.get("websearch", 0) + ls.get("live", 0)) / n for _, ls, n, _ in _bw]
+    avg_clean = 100.0 * sum(bw_clean) / len(bw_clean) if bw_clean else 0.0
+    avg_total = 100.0 * sum(bw_total) / len(bw_total) if bw_total else 0.0
 
-    # ---- 3. forward waves (per-article wave tag exists only on the forward side) ----
-    fw_waves = Counter(w for u, w in wave_of.items() if w)
-    wr = fw_waves.most_common()
-    f3 = go.Figure(go.Bar(x=[c for _, c in wr], y=[w for w, _ in wr], orientation="h",
-                          marker_color="#7048e8"))
-    f3.update_layout(template="seaborn", height=300, margin={"t": 20, "l": 150, "r": 30, "b": 40},
-                     xaxis_title="forward articles (wave tag is forward-side only)")
+    # ---- per-wave (unique). Forward carries a wave tag; backtest doesn't, so infer via gkg_pool. ----
+    wave_c = Counter()
+    for a in articles:
+        w = a.get("wave") or (g._article_waves(f"{a['title']} {a['url']}") or ["general"])[0]
+        wave_c[w or "general"] += 1
+    wv = wave_c.most_common()
 
-    # ---- 4. top source domains (both sides) ----
-    sr = Counter(s for s in src_of.values() if s).most_common(15)[::-1]
-    f4 = go.Figure(go.Bar(x=[c for _, c in sr], y=[s for s, _ in sr], orientation="h",
-                          marker_color="#1098ad"))
-    f4.update_layout(template="seaborn", height=480, margin={"t": 20, "l": 190, "r": 30, "b": 40},
-                     xaxis_title="unique articles")
+    # ---- source utilization: recognized desks (incl zero-contributors) + top other, tier-colored ----
+    src_c = Counter(a["source"] for a in articles if a["source"])
 
-    # ---- 5. articles per author (top 20) ----
-    ar = Counter(auth_of.values()).most_common(20)[::-1]
-    f5 = go.Figure(go.Bar(x=[c for _, c in ar], y=[a[:46] for a, _ in ar], orientation="h",
-                          marker_color="#e8590c"))
-    f5.update_layout(template="seaborn", height=520, margin={"t": 20, "l": 250, "r": 30, "b": 40},
-                     xaxis_title="unique articles")
+    def _dom_count(dom):
+        return sum(c for s, c in src_c.items() if g._domain_in(s, {dom}))
+    rec_rows = [(d, _dom_count(d), GREEN if d in g.PREFERRED_DOMAINS else BLUE)
+                for d in sorted(g.PREFERRED_DOMAINS | g.MAJOR_DOMAINS)]
+    n_rec_zero = sum(1 for _, c, _ in rec_rows if c == 0)
+    grey_rows = sorted(((s, c, GREY) for s, c in src_c.items()
+                        if not g._domain_in(s, g.RECOGNIZED_DOMAINS)), key=lambda r: -r[1])[:12]
+    src_rows = sorted(rec_rows + grey_rows, key=lambda r: r[1])
 
-    span = f'{pools[0]["as_of_date"]} → {pools[-1]["as_of_date"]}'
+    # ---- articles per search keyword (gkg_config wave_keywords), geopolitical split into subwaves ----
+    KW_WAVE = g._KW_WAVE
+    GEO_SUB = {"geo-defense": {"hypersonic", "missile", "fighter jet", "warship", "munition", "defense contract"},
+               "geo-drones": {"loitering", "counter-drone", "drone swarm"},
+               "geo-tankers": {"oil tanker", "crude tanker", "product tanker", "tanker rates", "vlcc",
+                               "strait of hormuz", "tanker demand"},
+               "geo-reconstruction": {"gaza reconstruction", "syria reconstruction", "lebanon reconstruction",
+                                      "iran reconstruction", "middle east reconstruction", "reconstruction contract",
+                                      "vision 2030", "megaproject", "engineering and construction"}}
+    WAVE_COLOR = {"AI": "#1f77b4", "rockets_spacecraft": "#ff7f0e", "nuclear": "#2ca02c", "quantum": "#9467bd",
+                  "robotics": "#8c564b", "geo-defense": "#d62728", "geo-drones": "#e377c2", "geo-tankers": "#17becf",
+                  "geo-reconstruction": "#bcbd22", "aging_demographics": "#7f7f7f"}
 
+    def _kw_group(kw, wave):
+        return next((s for s, ks in GEO_SUB.items() if kw in ks), "geo-other") if wave == "geopolitical" else wave
+    kw_cnt = Counter()
+    for a in articles:
+        text = f"{a['title']} {a['url']}".lower()
+        for kw in KW_WAVE:
+            if re.search(r"\b" + re.escape(kw) + r"\b", text):
+                kw_cnt[kw] += 1
+    kw_rows = sorted(((f"[{_kw_group(kw, w)}] {kw}", kw_cnt.get(kw, 0), WAVE_COLOR.get(_kw_group(kw, w), GREY))
+                      for kw, w in KW_WAVE.items()), key=lambda r: r[1])
+
+    # ---- 8-row figure (mirrors the RBT) ----
+    titles = ("1. Unique articles per month", "2. Unique articles per week", "3. Unique articles per day",
+              "4. Unique articles by day of week", "5. Unique articles by wave", "6. Lede coverage by pool",
+              "7. Source utilization", "8. Articles per search keyword")
+    fig = make_subplots(rows=8, cols=1, vertical_spacing=0.025, subplot_titles=titles,
+                        row_heights=[1, 1, 1, 1, 1, 1, 3.6, 2.4])
+    fig.add_trace(go.Bar(x=mo_keys, y=[mon_g[m] for m in mo_keys], marker_color=BLUE), row=1, col=1)
+    fig.add_trace(go.Bar(x=wk_keys, y=[wk_g[w] for w in wk_keys], marker_color=BLUE), row=2, col=1)
+    fig.add_trace(go.Scatter(x=day_x, y=day_yg, mode="lines", line={"color": BLUE, "width": 1}), row=3, col=1)
+    fig.add_trace(go.Bar(x=DOW, y=[dow_g.get(d, 0) for d in DOW], marker_color=BLUE), row=4, col=1)
+    fig.add_trace(go.Bar(x=[v for _, v in wv][::-1], y=[k for k, _ in wv][::-1], orientation="h",
+                         marker_color=GREEN), row=5, col=1)
+    fig.add_trace(go.Scatter(x=bw_x, y=bw_total, mode="lines+markers", name="clean + live-fallback",
+                             line={"color": ORANGE, "width": 1.6}, marker={"size": 5}), row=6, col=1)
+    fig.add_trace(go.Scatter(x=bw_x, y=bw_clean, mode="lines+markers", name="clean (Wayback + WebSearch)",
+                             line={"color": GREEN, "width": 1.6}, marker={"size": 5}), row=6, col=1)
+    fig.add_vline(x="2026-07-22", line={"dash": "dot", "color": "#999"}, row=6, col=1)
+    fig.add_trace(go.Bar(x=[c if c > 0 else 0.5 for _, c, _ in src_rows], y=[s for s, _, _ in src_rows],
+                         orientation="h", marker_color=[col for _, _, col in src_rows],
+                         customdata=[c for _, c, _ in src_rows],
+                         hovertemplate="%{y}: %{customdata} articles<extra></extra>"), row=7, col=1)
+    fig.add_trace(go.Bar(x=[c if c > 0 else 0.5 for _, c, _ in kw_rows], y=[k for k, _, _ in kw_rows],
+                         orientation="h", marker_color=[col for _, _, col in kw_rows],
+                         customdata=[c for _, c, _ in kw_rows],
+                         hovertemplate="%{y}: %{customdata} articles<extra></extra>"), row=8, col=1)
+    for r in (1, 2, 3, 4):
+        fig.update_yaxes(title_text="articles", row=r, col=1)
+    fig.update_xaxes(title_text="unique articles", row=5, col=1)
+    fig.update_yaxes(title_text="lede rate (clean vs +live)", row=6, col=1)
+    fig.update_xaxes(title_text="unique articles (log; 0 plotted at 0.5)", type="log", row=7, col=1)
+    fig.update_yaxes(dtick=1, tickfont={"size": 9}, row=7, col=1)
+    fig.update_xaxes(title_text="unique articles (log; 0 plotted at 0.5)", type="log", row=8, col=1)
+    fig.update_yaxes(dtick=1, tickfont={"size": 9}, row=8, col=1)
+    fig.update_layout(template="seaborn", height=int(400 * 12.0), barmode="group", showlegend=False,
+                      margin={"t": 55, "l": 200}, hovermode="closest")
+    chart_html = fig.to_html(full_html=False, include_plotlyjs="cdn", config={"displayModeBar": False})
+
+    cfg_link = ('<p style="color:#555;max-width:820px;margin:.2em 0 0;">The full per-wave search-term lists '
+                'behind plot 8 live in <a href="https://github.com/joehahn/portfolio-wave-rider/blob/main/'
+                'gkg_config.json"><code>gkg_config.json</code></a> (<code>wave_keywords</code>). The forward '
+                'cron queries the same waves.</p>')
+
+    # ---- 9. articles per author ----
+    auth = {a["url"]: a["author"] for a in articles if a.get("author")}
+    _src_domains = set(src_c)
+    authors = {u: a for u, a in auth.items() if not g.is_source_name(a, _src_domains)}
+    _top = Counter(authors.values()).most_common(20)[::-1]
+    _afig = go.Figure(go.Bar(x=[c for _, c in _top], y=[a[:48] for a, _ in _top], orientation="h",
+                             marker_color=GOLD))
+    _afig.update_layout(template="seaborn", height=560, margin={"t": 10, "l": 250, "r": 20, "b": 40},
+                        xaxis_title="unique articles", showlegend=False)
+    author_html = ('<h2 style="margin:1.8em 0 0.2em;">9. Articles per author</h2>'
+                   f'<p style="color:#555;max-width:820px;"><b>{100*len(authors)//max(n_uniq,1)}%</b> of the '
+                   f'{n_uniq:,} unique articles ({len(authors):,}) carry a byline (native capture on both sides: '
+                   f'Wayback/live extraction on the backtest tail, the WebSearch pull on the forward side).</p>'
+                   + _afig.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False}))
+
+    # ---- cards ----
     def card(v, label):
         return (f'<div style="display:inline-block;margin:0 1.6em 0.6em 0">'
                 f'<b style="font-size:1.5em;color:#0b7285">{v}</b><br>'
                 f'<span style="font-size:.8em;color:#555">{label}</span></div>')
-    cards = (card(f"{n_uniq:,}", "unique articles")
-             + card(f"{len(bt)}+{len(fw)}", "backtest + forward pools")
-             + card(span, "coverage span")
-             + card(f"{100*covered//max(n_uniq,1)}%", "have a lede")
-             + card(f"{100*len(auth_of)//max(n_uniq,1)}%", "have a byline"))
+    cards = (card(f"{n_uniq:,}", "unique articles (deduped)")
+             + card(f"{len(bt)} + {len(fw)}", "backtest + forward pools")
+             + card(f"{pools[0]['as_of_date']} → {pools[-1]['as_of_date']}", "coverage span")
+             + card(f"{pct_clean:.0f}%", "CLEAN lede: Wayback + WebSearch (look-ahead-safe)")
+             + card(f"{pct_cov:.0f}%", "clean + live-fallback coverage")
+             + card(f"{100*len(authors)//max(n_uniq,1)}%", "unique articles with a byline (plot 9)")
+             + card(f"{n_rec_zero}/{len(rec_rows)}", "configured desks surfaced 0x (plot 7)"))
 
-    html = f"""{dash_nav.render("retrieval_bootstrap.html")}
-<h1 style="margin:0 0 .1em">PWR bootstrap retriever</h1>
-<p style="color:#555;max-width:900px;margin:.2em 0 1em">The news-coverage bridge across the backtest&rarr;forward
-handoff (2026-07-22): the last ~3 months of the backtest (GKG discovery + <b>Wayback</b> ledes, biweekly pools)
-spliced onto the forward cron&#39;s daily <b>WebSearch</b> pulls. Wayback and WebSearch ledes are both
-look-ahead-safe; the backtest-only <b>live-fallback</b> is the one biased provenance. Provenances are kept
-distinct here (the backtest RBT collapses them).</p>
-<div style="margin:0 0 1.2em">{cards}</div>
-<h2 style="margin:1.4em 0 .2em">1. Article volume over time &mdash; backtest tail vs forward cron</h2>
-<p style="color:#555;max-width:860px;margin:0 0 .4em">Biweekly backtest pools (top-100 ranked) then the daily
-forward pulls; the 2026-07-23 spike is the cron&#39;s initial backfill, settling to ~9 new/day.</p>{_fig_html(f1)}
-<h2 style="margin:1.6em 0 .2em">2. Lede provenance mix</h2>
-<p style="color:#555;max-width:860px;margin:0 0 .4em">Every unique article&#39;s lede source. Wayback = backtest
-tail (clean); WebSearch = forward (clean); live-fallback = backtest tail (look-ahead-biased).</p>{_fig_html(f2)}
-<h2 style="margin:1.6em 0 .2em">3. Forward coverage by wave</h2>
-<p style="color:#555;max-width:860px;margin:0 0 .4em">Per-article wave tags exist only on the forward side
-(the cron records each article&#39;s discovering wave query).</p>{_fig_html(f3)}
-<h2 style="margin:1.6em 0 .2em">4. Top source domains</h2>{_fig_html(f4)}
-<h2 style="margin:1.6em 0 .2em">5. Articles per author</h2>{_fig_html(f5)}
-"""
-    out.write_text(html)
+    # ---- parameter table (RETRIEVAL knobs, mirrors the RBT) ----
+    _fm = _pf.load_financial_model(str(ROOT / "investor_profile.md"))
+    _bt = _pf.load_backtest_config(str(ROOT / "investor_profile.md"))
+
+    def _prow(label, value):
+        return (f"<tr><td style='padding:5px 14px 5px 0;color:#555;white-space:nowrap;'>{label}</td>"
+                f"<td style='padding:5px 0;font-weight:600;'>{value}</td></tr>")
+    _params = ('<h2 style="margin:1.6em 0 0.3em;">Parameter settings</h2>'
+               '<p style="color:#555;max-width:820px;margin:0 0 0.6em;font-size:13px;">The user-set '
+               '<code>investor_profile.md</code> knobs relevant to news retrieval.</p>'
+               "<table style='border-collapse:collapse;font-size:14px;margin-bottom:1.2em;'><tbody>"
+               + _prow("Backtest-tail cadence", f"{_fm['rebalance_period']} (top-100 pools, Wayback ledes)")
+               + _prow("Forward cadence", "daily cron (WebSearch pulls)")
+               + _prow("News lookback (backtest)", f"{int(_fm['news_lookback_days'])} days")
+               + _prow("Max articles / backtest pool", f"{int(_bt['max_articles'])}")
+               + "</tbody></table>")
+
+    ts = datetime.now().strftime("%Y-%m-%d %H:%M %Z").strip()
+    span = f'{pools[0]["as_of_date"]} to {pools[-1]["as_of_date"]}'
+    page = (
+        '<!doctype html><html><head><meta charset="utf-8"><title>Retriever Bootstrap</title>'
+        '<style>body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;'
+        'max-width:1180px;margin:0 auto;padding:0 1.5em;color:#222;line-height:1.5}h1,h2{color:#111}'
+        '.built{position:absolute;top:8px;right:16px;font-size:12px;color:#888}</style></head><body>'
+        f'<div class="built">dashboard built {ts}</div>'
+        + dash_nav.render("retrieval_bootstrap.html", built=False) +
+        f'<h1>Retriever Bootstrap <span style="font-size:0.55em;color:#666;font-weight:400;">'
+        f'&mdash; {span}</span></h1>'
+        f'<p style="color:#666;margin:-.4em 0 .7em;font-size:14px;">{len(bt)} backtest-tail pools (biweekly) '
+        f'+ {len(fw)} forward cron pulls (daily)</p>'
+        '<p style="color:#555">The news-coverage <b>bridge</b> across the backtest&rarr;forward handoff '
+        '(2026-07-22): the backtest&#39;s last ~3 months of ranked <b>top-100</b> pools (GKG discovery + '
+        'look-ahead-clean <b>Wayback</b> ledes) spliced onto the forward cron&#39;s daily <b>WebSearch</b> '
+        'pulls. Both Wayback and WebSearch ledes are look-ahead-safe (WebSearch because the forward news is '
+        'genuinely current); the backtest-only <b>live-fallback</b> is the single look-ahead-biased provenance. '
+        'Plot 6 tracks the clean rate (Wayback + WebSearch) vs the clean+live coverage, with the handoff marked.</p>'
+        f'<div style="margin:1em 0 1.5em">{cards}</div>' + _params + chart_html + cfg_link + author_html
+        + '</body></html>')
+    out.write_text(page)
     print(f"wrote {out}  ({n_uniq} unique | {len(bt)} backtest + {len(fw)} forward pools | "
-          f"prov {dict(prov_counts)})")
+          f"clean {pct_clean:.0f}% + live {100.0*n_live/max(n_uniq,1):.0f}% = {pct_cov:.0f}% covered)")
 
 
 if __name__ == "__main__":
-    ap = argparse.ArgumentParser(description="Build the PWR bootstrap retriever dashboard.")
-    ap.add_argument("--canon-dir", default="data/curator_runs/gkg-3yr-canon14",
-                    help="backtest run dir whose last-3mo pools form the bootstrap's historical tail")
-    ap.add_argument("--forward-corpus", default="data/forward_corpus",
-                    help="forward cron corpus dir (articles.jsonl)")
-    ap.add_argument("--since", default="2026-04-22",
-                    help="include backtest pools with as_of >= this date (the ~3-month tail)")
+    ap = argparse.ArgumentParser(description="Build the PWR Retriever Bootstrap dashboard.")
+    ap.add_argument("--canon-dir", default="data/curator_runs/gkg-3yr-canon14")
+    ap.add_argument("--forward-corpus", default="data/forward_corpus")
+    ap.add_argument("--since", default="2026-04-22", help="include backtest pools with as_of >= this date")
     ap.add_argument("--out", default=str(ROOT / "docs" / "retrieval_bootstrap.html"))
     a = ap.parse_args()
     build(a.canon_dir, a.forward_corpus, a.since, Path(a.out))
