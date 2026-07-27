@@ -296,7 +296,8 @@ def build(run_rel, out):
     _authored_n = 0
     _native_authors = any(
         isinstance(x, dict) and "author" in x
-        for _pf in (ROOT / run_rel).glob("*-pool.json") for x in json.loads(_pf.read_text()))
+        for _pf in (ROOT / run_rel).glob("*-pool.json")
+        for x in json.loads(_pf.read_text()).get("articles", []))   # pool JSON is a dict; iterate its articles
     _af_path = ROOT / run_rel / "_authors.json"
     if _af_path.exists():
         _authors_raw = json.loads(_af_path.read_text())   # {url: byline}
