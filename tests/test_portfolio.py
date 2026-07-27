@@ -65,7 +65,11 @@ def test_initialize_holdings(tmp_path) -> None:
     allocations = {"AAA": 5000.0, "BBB": 3000.0, "CCC": 2000.0}
     prices = {"AAA": 100.0, "BBB": 50.0, "CCC": 20.0}
     out_path = tmp_path / "holdings.csv"
-    result = portfolio.initialize_holdings(allocations, prices, str(out_path))
+    wl_path = tmp_path / "watchlist.csv"
+    profile = tmp_path / "p.md"
+    _write_profile(profile)
+    result = portfolio.initialize_holdings(
+        allocations, prices, str(out_path), watchlist_path=str(wl_path), profile_path=str(profile))
 
     # Resulting CSV has the expected schema and shares.
     df = pd.read_csv(out_path)
@@ -76,13 +80,20 @@ def test_initialize_holdings(tmp_path) -> None:
     # Total invested matches the sum of allocations within rounding.
     assert result["total_invested"] == pytest.approx(10000.0, abs=0.01)
     assert result["total_requested"] == pytest.approx(10000.0, abs=0.01)
+    # watchlist.csv seeded with the same tickers as a single 'ticker' column.
+    wl = pd.read_csv(wl_path)
+    assert list(wl.columns) == ["ticker"]
+    assert set(wl["ticker"]) == {"AAA", "BBB", "CCC"}
 
 
 def test_initialize_holdings_zero_allocation_keeps_zero_shares(tmp_path) -> None:
     allocations = {"AAA": 1000.0, "BBB": 0.0}
     prices = {"AAA": 100.0, "BBB": 50.0}
     out_path = tmp_path / "holdings.csv"
-    portfolio.initialize_holdings(allocations, prices, str(out_path))
+    profile = tmp_path / "p.md"
+    _write_profile(profile)
+    portfolio.initialize_holdings(allocations, prices, str(out_path),
+                                  watchlist_path=str(tmp_path / "watchlist.csv"), profile_path=str(profile))
     df = pd.read_csv(out_path).set_index("ticker")
     assert df.loc["AAA", "shares"] == 10.0
     assert df.loc["BBB", "shares"] == 0.0
