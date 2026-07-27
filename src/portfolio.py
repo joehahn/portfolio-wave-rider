@@ -4457,7 +4457,11 @@ def build_curator_dashboard(
     for (_d, _t, _ac, _ev) in _events:
         if _ac != "add":
             continue
-        _r = _fwd_ret(_t, _d)
+        # Attribute each add its ticker's realized optimizer $ P&L (same basis as charts 4/5), NOT the raw
+        # add->end price return. The raw return ignores the optimizer's weighting + timing, so a pick the
+        # optimizer MADE money on (e.g. held through the rise, trimmed the pullback) could read as a "loss"
+        # -- contradicting charts 4/5 and the equity curve. $ P&L keeps every gain/loss plot on one basis.
+        _r = _gain_by_ticker.get(_t)
         if _r is None:
             continue
         _srcs, _auths = set(), set()
@@ -4516,22 +4520,22 @@ def build_curator_dashboard(
             # LOG x-axis: bars can be negative (a losing pick), and log can't show <=0, so plot |value| on
             # a log axis with the sign carried by color (green +, red -), and hover the true signed value.
             # A zero-return row sinks to a small floor so log() stays defined. Mirrors the gains plots.
-            _mags = [abs(r[1]) * 100 for r in nonzero]
+            _mags = [abs(r[1]) for r in nonzero]
             _floor = (min([m for m in _mags if m > 0] or [0.01])) * 0.5
             f = go.Figure(go.Bar(x=[m if m > 0 else _floor for m in _mags],
                                  y=[f"{_lab(r[0])} (n={r[2]})" for r in nonzero], orientation="h",
                                  marker_color=["#2b8a3e" if r[1] >= 0 else "#c92a2a" for r in nonzero],
-                                 customdata=[r[1] * 100 for r in nonzero],
-                                 hovertemplate="%{y}: %{customdata:.1f}% signed<extra></extra>"))
+                                 customdata=[r[1] for r in nonzero],
+                                 hovertemplate="%{y}: $%{customdata:,.0f} signed<extra></extra>"))
             f.update_layout(template="seaborn", height=max(200, 24 * len(nonzero) + 110),
                             margin={"t": 20, "l": 230, "r": 30},
                             xaxis={"title": f"|{xlab}| (log; green = +, red = &minus;)", "type": "log"})
             out += _to_html(f)
         return out + _zeros_details(zeros, noun)
 
-    _gain_src = _attr_html(_src_ret, "mean forward price return of adds (%)", universe=_recognized, noun="sources")
-    _gain_kw = _attr_html(_kw_ret, "mean forward price return of adds (%)", universe=set(_kwmap), noun="keywords")
-    _gain_author = _attr_html(_author_ret, "mean forward price return of adds (%)", noun="authors")
+    _gain_src = _attr_html(_src_ret, "mean $ P&L per add", universe=_recognized, noun="sources")
+    _gain_kw = _attr_html(_kw_ret, "mean $ P&L per add", universe=set(_kwmap), noun="keywords")
+    _gain_author = _attr_html(_author_ret, "mean $ P&L per add", noun="authors")
     # Number of adds per author: raw n behind plot 13 (co-authors each counted; byline-less adds under "(no author)").
     _npa = ""
     _naa = sorted(((a, len(v)) for a, v in _author_ret.items() if v), key=lambda r: r[1])
@@ -4577,16 +4581,16 @@ def build_curator_dashboard(
     _gain_per_art = ""
     if _gpa:
         _rws = sorted(((k, v, len(_pool_src.get(k, ()))) for k, v in _gpa.items()), key=lambda r: r[1])
-        _mags = [abs(r[1]) * 100 for r in _rws]
+        _mags = [abs(r[1]) for r in _rws]
         _floor = (min([m for m in _mags if m > 0] or [0.01])) * 0.5   # keep log(0) safe
         _f = go.Figure(go.Bar(x=[m if m > 0 else _floor for m in _mags],
                               y=[f"{r[0]} ({r[2]} art.)" for r in _rws], orientation="h",
                               marker_color=["#2b8a3e" if r[1] >= 0 else "#c92a2a" for r in _rws],
-                              customdata=[r[1] * 100 for r in _rws],
-                              hovertemplate="%{y}: %{customdata:.3f} signed<extra></extra>"))
+                              customdata=[r[1] for r in _rws],
+                              hovertemplate="%{y}: $%{customdata:,.0f} per article signed<extra></extra>"))
         _f.update_layout(template="seaborn", height=max(240, 26 * len(_rws) + 120),
                          margin={"t": 20, "l": 230, "r": 30},
-                         xaxis={"title": "|gain per article| ×100 (log; green = +, red = &minus;)", "type": "log"})
+                         xaxis={"title": "|$ P&L per pool article| (log; green = +, red = &minus;)", "type": "log"})
         _gain_per_art = _to_html(_f)
 
     # 10. Gain PER ARTICLE by LEDE SOURCE (same metric as plot 9): total forward gain of adds cited from
@@ -4599,12 +4603,12 @@ def build_curator_dashboard(
     _gain_ledesrc = ""
     if _lsr:
         _lsf = go.Figure(go.Bar(
-            x=[r[1] * 100 for r in _lsr], y=[f"{r[0]} ({r[3]} art.)" for r in _lsr],
+            x=[r[1] for r in _lsr], y=[f"{r[0]} ({r[3]} art.)" for r in _lsr],
             orientation="h", marker_color=["#2b8a3e" if r[1] >= 0 else "#c92a2a" for r in _lsr],
             customdata=[r[2] for r in _lsr],
-            hovertemplate="%{y}: %{x:.3f} gain/article (n=%{customdata} adds)<extra></extra>"))
+            hovertemplate="%{y}: $%{x:,.0f} per article (n=%{customdata} adds)<extra></extra>"))
         _lsf.update_layout(template="seaborn", height=240, margin={"t": 20, "l": 210, "r": 40},
-                           xaxis={"title": "gain per article ×100 (green = +, red = &minus;)"})
+                           xaxis={"title": "$ P&L per article (green = +, red = &minus;)"})
         _gain_ledesrc = _to_html(_lsf)
     _ledesrc_note = ('<p style="color:#555;max-width:820px;margin:0 0 .4em;">Plot&nbsp;9&#39;s <b>gain per '
                      'article</b> (total forward gain / pool-article footprint), but bucketed by the LEDE SOURCE '
@@ -4612,10 +4616,11 @@ def build_curator_dashboard(
                      '<b>live-fallback</b> ledes (fetched from today&#39;s page). If live noticeably beats Wayback, '
                      'the bias is flattering the picks &mdash; a caution on fuller-mode backtest returns.</p>')
 
-    _attr_note = ('<p style="color:#555;max-width:820px;margin:0 0 .4em;">Each add\'s forward <b>price '
-                  'return</b> (from the add date until the ticker is removed, else window end), bucketed by '
-                  'the <code>news_evidence</code> source (by URL domain) and by the wave keyword that surfaced '
-                  'the cited article. Answers which desks / search terms produced winning picks. n = number of adds.</p>')
+    _attr_note = ('<p style="color:#555;max-width:820px;margin:0 0 .4em;">Each add\'s realized <b>$ P&amp;L</b> '
+                  '(the optimizer-weighted dollar gain/loss on that ticker &mdash; same basis as charts 4/5 and '
+                  'the equity curve, NOT the raw add&rarr;end price return), bucketed by the '
+                  '<code>news_evidence</code> source (by URL domain) and by the wave keyword that surfaced the '
+                  'cited article. Answers which desks / search terms produced profitable picks. n = number of adds.</p>')
     _gpa_note = ('<p style="color:#555;max-width:820px;margin:0 0 .4em;">Plot&nbsp;8\'s total gain per source '
                  'divided by how many articles that source contributed to the pools (its footprint, shown as '
                  '<code>N&nbsp;art.</code>). Signal <b>density</b>: high = a source that produced gains from '
