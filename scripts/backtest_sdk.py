@@ -25,6 +25,7 @@ import collections
 import json
 import math
 import re
+import statistics
 import sys
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -341,6 +342,39 @@ def _rebalance_dates(start: str, end: str, cadence_days: int) -> list[str]:
     return out
 
 
+def heal_pools(dates, run_dir: Path, news_lb: int, a, write_pool, max_passes: int = 4) -> None:
+    """Rebuild pools whose clean-Wayback rate is anomalously low (0%, or < half the run median) — the
+    signature of a date built during an archive.org throttle burst (its rate limits tightened sharply
+    after the Oct-2024 outage, so a cold pull gets throttled in bursts). Transient / thin-page misses are
+    UNCACHED by news_pool, so rebuilding that date re-fetches them, usually during a calmer window, and
+    lifts it to its true rate. Bounded + idempotent: stops when no date qualifies OR a full pass improves
+    nothing (the remaining lows are genuinely sparse-archival, not throttled). Part of the pipeline, so
+    every backtest / refresh / sweep self-heals with no manual pass to remember."""
+    if a.titles_only:
+        return                                  # title-only mode fetches no Wayback -> nothing to heal
+    for _p in range(max_passes):
+        hr = {d: json.loads((run_dir / f"{d}-pool.json").read_text()).get("hit_rate", 0) for d in dates}
+        med = statistics.median(hr.values()) if hr else 0.0
+        low = [d for d in dates if hr[d] == 0 or hr[d] < 0.5 * med]
+        if not low:
+            print(f"  heal: all {len(dates)} pools >= threshold (median clean-Wayback {med:.0%})", file=sys.stderr)
+            return
+        print(f"  heal pass {_p + 1}: rebuilding {len(low)} throttle-low pools (median {med:.0%}): "
+              f"{', '.join(low[:8])}{' ...' if len(low) > 8 else ''}", file=sys.stderr)
+        for d in low:
+            for f in (run_dir / "_cache").glob(f"pool-{d}-*.json"):
+                f.unlink()
+            (run_dir / f"{d}-pool.json").unlink(missing_ok=True)
+            write_pool(d, build_article_pool(date.fromisoformat(d), news_lb, a.max_articles, run_dir,
+                                              a.live_fallback, a.live_all, a.titles_only))
+        after = {d: json.loads((run_dir / f"{d}-pool.json").read_text()).get("hit_rate", 0) for d in low}
+        gained = sum(1 for d in low if after[d] > hr[d] + 0.01)
+        print(f"  heal pass {_p + 1}: {gained}/{len(low)} pools improved", file=sys.stderr)
+        if not gained:
+            print("  heal: no further gain, remaining lows are genuine (not throttled)", file=sys.stderr)
+            return
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="SDK GKG+Wayback backtest harness.")
     ap.add_argument("--start", default=None, help="default: investor_profile.md backtest.start_date")
@@ -445,70 +479,82 @@ def main(argv=None) -> int:
         {"starter_watchlist": a.starter, "as_of_dates": dates, "rebalance_period": a.cadence,
          "initial_usd": 50000.0, "lookback_years": a.optimizer_lookback_days / 365.0,
          "max_watchlist_size": a.max_watchlist_size, "start_date": a.start, "end_date": a.end}, indent=2))
-    # Pool-building is watchlist-INDEPENDENT (it slices the corpus + fetches Wayback ledes), so
-    # pre-fetch every week's pool in a background worker while the sequential curator loop below (which
-    # IS watchlist-dependent — walk-forward) consumes them. This overlaps the curator's ~1 min/week with
-    # the ongoing Wayback fetching instead of interleaving them, cutting wall time toward max(Wayback,
-    # curator). max_workers=1: pools build one at a time (each already parallelizes its own Wayback via a
-    # 10-worker pool, and serial pool-builds avoid racing the module-global _wb_bulk flag in news_pool).
+    def _write_pool(d, arts):
+        src_split = collections.Counter(x.get("lede_source", "wayback" if x.get("lede") else "none")
+                                        for x in arts)
+        (run_dir / f"{d}-pool.json").write_text(json.dumps(
+            {"as_of_date": d, "news_lookback_days": news_lb, "source": "gkg-wayback-articles",
+             "n_articles": len(arts),
+             "hit_rate": round(src_split["wayback"] / max(len(arts), 1), 2),   # clean Wayback rate
+             "lede_sources": dict(src_split),   # {wayback (clean), live (look-ahead-biased), none}
+             "articles": arts}, indent=2))
+
+    # Pool-building is watchlist-INDEPENDENT (slice the corpus + fetch Wayback ledes), so build EVERY
+    # week's pool FIRST, as a barrier, before any curation. That ordering (not the old build/curate
+    # overlap) is what lets heal_pools lift throttle-victim pools BEFORE the walk-forward curator reads
+    # them — a date's ledes cannot be healed after it is curated, because each curation feeds the next.
+    # max_workers=1: each build already parallelizes its own Wayback; serial builds avoid racing news_pool.
     pool_ex = ThreadPoolExecutor(max_workers=1)
     pool_futs = {d: pool_ex.submit(build_article_pool, date.fromisoformat(d), news_lb,
                                    a.max_articles, run_dir, a.live_fallback, a.live_all, a.titles_only)
                  for d in dates}
     try:
         for d in dates:
-            arts = pool_futs[d].result()          # blocks until this week's pool is built (usually ahead)
-            src_split = collections.Counter(x.get("lede_source", "wayback" if x.get("lede") else "none")
-                                            for x in arts)
-            (run_dir / f"{d}-pool.json").write_text(json.dumps(
-                {"as_of_date": d, "news_lookback_days": news_lb, "source": "gkg-wayback-articles",
-                 "n_articles": len(arts),
-                 "hit_rate": round(src_split["wayback"] / max(len(arts), 1), 2),   # clean Wayback rate
-                 "lede_sources": dict(src_split),   # {wayback (clean), live (look-ahead-biased), none}
-                 "articles": arts}, indent=2))
-            if a.pools_only:
-                print(f"  {d}: {len(arts)} articles", file=sys.stderr); continue
-            # Resume-friendly: reuse an existing curation (skip the LLM call) but still APPLY it so the
-            # walk-forward history rebuilds; only fire the curator for dates not yet curated.
-            cur_path = run_dir / f"{d}-curation.json"
-            if cur_path.exists():
-                cur = json.loads(cur_path.read_text())
-            else:
-                cur_wl = portfolio.reconstruct_watchlist_at(d, a.starter, str(hist))
-                log = (run_dir / "_log" / f"{d}-curator.json") if a.log_llm else None
-                _atext = render_articles(arts, a.news_mode)
-                cur = call_curator(cli, a.model, d, cur_wl, thesis, exclusions, a.max_watchlist_size,
-                                   anchors, _atext, a.cadence, log, run_dir / "_parse_fail")
-                # reject-and-retry: if the validator would reject any proposal, tell the curator WHY and let
-                # it revise (e.g. pair a full-watchlist add with a remove). Up to 2 retries, then take what
-                # validates. Keeps the curator's intent from being silently dropped.
-                _nret = 0
-                for _ret in range(2):
-                    _chk = portfolio.apply_curator_decisions(
-                        cur, holdings_path=str(sb_hold), history_path=str(hist), profile_path="investor_profile.md",
-                        listing_check=False, as_of_date=d, max_watchlist_size=a.max_watchlist_size, dry_run=True)
-                    _rej = _chk.get("rejections") or []
-                    if not _rej:
-                        break
-                    _fb = "\n".join(f"- {x.get('ticker')} ({x.get('action')}): {x.get('reason')}" for x in _rej)
-                    cur = call_curator(cli, a.model, d, cur_wl, thesis, exclusions, a.max_watchlist_size,
-                                       anchors, _atext, a.cadence, log, run_dir / "_parse_fail", retry_feedback=_fb)
-                    _nret += 1
-                cur["_retries"] = _nret          # harness metadata: how many reject-and-retry rounds fired
-                cur["as_of_date"] = d
-                cur_path.write_text(json.dumps(cur, indent=2))
-                if log:
-                    lg = json.loads(log.read_text()); tok_in += lg["usage"]["in"]; tok_out += lg["usage"]["out"]
-            portfolio.apply_curator_decisions(cur, holdings_path=str(sb_hold), history_path=str(hist),
-                                              profile_path="investor_profile.md", listing_check=False, as_of_date=d,
-                                              max_watchlist_size=a.max_watchlist_size)
-            print(f"  {d}: {len(arts)} arts | adds={[x['ticker'] for x in cur.get('adds',[])]} "
-                  f"removes={[x['ticker'] for x in cur.get('removes',[])]}", file=sys.stderr)
+            _write_pool(d, pool_futs[d].result())   # blocks until this week's pool is built (usually ahead)
+            print(f"  {d}: pool built", file=sys.stderr)
     finally:
         pool_ex.shutdown(wait=True)
 
+    # Self-heal pools that a throttle burst left with a falsely-low clean-Wayback rate (re-fetches their
+    # uncached transient/thin misses during a calmer window). Automatic on every backtest / refresh / sweep.
+    heal_pools(dates, run_dir, news_lb, a, _write_pool)
+
     if a.pools_only:
+        for d in dates:
+            n = json.loads((run_dir / f"{d}-pool.json").read_text())["n_articles"]
+            print(f"  {d}: {n} articles", file=sys.stderr)
         return 0
+
+    # Walk-forward curation on the HEALED pools (watchlist-dependent, so strictly sequential).
+    for d in dates:
+        arts = json.loads((run_dir / f"{d}-pool.json").read_text())["articles"]
+        # Resume-friendly: reuse an existing curation (skip the LLM call) but still APPLY it so the
+        # walk-forward history rebuilds; only fire the curator for dates not yet curated.
+        cur_path = run_dir / f"{d}-curation.json"
+        if cur_path.exists():
+            cur = json.loads(cur_path.read_text())
+        else:
+            cur_wl = portfolio.reconstruct_watchlist_at(d, a.starter, str(hist))
+            log = (run_dir / "_log" / f"{d}-curator.json") if a.log_llm else None
+            _atext = render_articles(arts, a.news_mode)
+            cur = call_curator(cli, a.model, d, cur_wl, thesis, exclusions, a.max_watchlist_size,
+                               anchors, _atext, a.cadence, log, run_dir / "_parse_fail")
+            # reject-and-retry: if the validator would reject any proposal, tell the curator WHY and let
+            # it revise (e.g. pair a full-watchlist add with a remove). Up to 2 retries, then take what
+            # validates. Keeps the curator's intent from being silently dropped.
+            _nret = 0
+            for _ret in range(2):
+                _chk = portfolio.apply_curator_decisions(
+                    cur, holdings_path=str(sb_hold), history_path=str(hist), profile_path="investor_profile.md",
+                    listing_check=False, as_of_date=d, max_watchlist_size=a.max_watchlist_size, dry_run=True)
+                _rej = _chk.get("rejections") or []
+                if not _rej:
+                    break
+                _fb = "\n".join(f"- {x.get('ticker')} ({x.get('action')}): {x.get('reason')}" for x in _rej)
+                cur = call_curator(cli, a.model, d, cur_wl, thesis, exclusions, a.max_watchlist_size,
+                                   anchors, _atext, a.cadence, log, run_dir / "_parse_fail", retry_feedback=_fb)
+                _nret += 1
+            cur["_retries"] = _nret          # harness metadata: how many reject-and-retry rounds fired
+            cur["as_of_date"] = d
+            cur_path.write_text(json.dumps(cur, indent=2))
+            if log:
+                lg = json.loads(log.read_text()); tok_in += lg["usage"]["in"]; tok_out += lg["usage"]["out"]
+        portfolio.apply_curator_decisions(cur, holdings_path=str(sb_hold), history_path=str(hist),
+                                          profile_path="investor_profile.md", listing_check=False, as_of_date=d,
+                                          max_watchlist_size=a.max_watchlist_size)
+        print(f"  {d}: {len(arts)} arts | adds={[x['ticker'] for x in cur.get('adds',[])]} "
+              f"removes={[x['ticker'] for x in cur.get('removes',[])]}", file=sys.stderr)
+
     # _starter.json was written up front; replay the full run now.
     res = portfolio.curator_backtest(
         runs_dir=str(run_dir), out_dir=str(run_dir / "_backtest"), max_weight=a.max_weight,
