@@ -120,13 +120,22 @@ def build(canon_dir: str, forward_corpus: str, since: str, out: Path) -> None:
         wk_g[wk] += 1; wk_w[wk] += hw
         day_g[di] += 1; day_w[di] += hw
         dow_g[wd] += 1; dow_w[wd] += hw
-    mo_keys, wk_keys = sorted(mon_g), sorted(wk_g)
-    day_dates = [d for d in (_iso(a["date"]) for a in articles) if d]
+    # Plots 1-3 span the full pool WINDOW (first backtest pool -> last forward pull), not just the dates
+    # that happen to carry articles, so empty months/weeks/days show as zeros across the whole bridge.
+    _span_lo, _span_hi = _iso(pools[0]["as_of_date"]), _iso(pools[-1]["as_of_date"])
+    mo_keys = []
+    _m = _span_lo.replace(day=1)
+    while _m <= _span_hi:
+        mo_keys.append(_m.isoformat()[:7])
+        _m = (_m.replace(day=28) + timedelta(days=4)).replace(day=1)   # first of next month
+    wk_keys = []
+    _w = _span_lo - timedelta(days=_span_lo.weekday())                 # Monday of the start week
+    while _w <= _span_hi:
+        wk_keys.append(_w.isoformat()); _w += timedelta(days=7)
     day_x, day_yg = [], []
-    if day_dates:
-        x = min(day_dates)
-        while x <= max(day_dates):
-            k = x.isoformat(); day_x.append(k); day_yg.append(day_g.get(k, 0)); x += timedelta(days=1)
+    _d = _span_lo
+    while _d <= _span_hi:
+        k = _d.isoformat(); day_x.append(k); day_yg.append(day_g.get(k, 0)); _d += timedelta(days=1)
 
     # ---- plot 6: per-pool lede coverage. CLEAN = Wayback + WebSearch (both safe); TOTAL adds the
     # look-ahead-biased live-fallback (backtest tail only). Colored by side so the handoff is visible. ----
