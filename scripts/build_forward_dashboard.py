@@ -38,9 +38,12 @@ WAVE_COLORS = {
 
 # Forward-test window start = the day the daily cron began tracking. Scopes the value chart + date range.
 CRON_START = "2026-07-23"
-# Manual calibration of the current total to the real brokerage value (prototype). Applied as a UNIFORM
-# scale so all % returns are preserved. Update this (or later wire it to a live account feed) as reality moves.
-VALUE_TODAY = 64610.0
+# Manual calibration of the value curve to the real brokerage total. The scale = CALIB_VALUE / (computed value
+# on CALIB_DATE); because CALIB_DATE is a HISTORICAL snapshot, the factor is FIXED, so future days move
+# naturally (this does NOT pin the current value to a constant). Uniform scale -> all % returns preserved.
+# Re-anchor when it drifts from reality, or later wire it to a live account feed.
+CALIB_DATE = "2026-07-27"
+CALIB_VALUE = 64610.0
 
 
 def _card(label, value, sub="", color="#111"):
@@ -66,8 +69,10 @@ def main(out_path: str) -> int:
     tv = tv_all[tv_all.index >= pd.Timestamp(CRON_START)]           # forward-test window (cron era)
     if len(tv) < 2:                                                  # window too short to plot -> full history
         tv = tv_all
-    # Calibrate the level to the real brokerage total today (uniform scale preserves % returns).
-    _scale = VALUE_TODAY / float(tv.iloc[-1]) if VALUE_TODAY and float(tv.iloc[-1]) > 0 else 1.0
+    # FIXED calibration: scale anchored to the (historical) value on CALIB_DATE, so the factor never drifts
+    # and the current value still moves day to day. Uniform scale preserves all % returns.
+    _anchor = tv_all[tv_all.index <= pd.Timestamp(CALIB_DATE)]
+    _scale = (CALIB_VALUE / float(_anchor.iloc[-1])) if (CALIB_VALUE and len(_anchor) and float(_anchor.iloc[-1]) > 0) else 1.0
     tv = tv * _scale
     d0, d1 = tv.index[0], tv.index[-1]
     start_val, cur_val = float(tv.iloc[0]), float(tv.iloc[-1])
@@ -160,17 +165,20 @@ def main(out_path: str) -> int:
                             price[t] = v
             except Exception as e:  # noqa: BLE001 -- pricing is best-effort; unpriced tickers are dropped
                 print(f"buy-candidate price fetch failed: {e}", file=sys.stderr)
-        min_usd = float(portfolio.load_financial_model().get("min_trade_size_frac", 0.0) or 0.0) * cur_val
+        # Trades use the RAW portfolio $ (real prices/shares), NOT the display-calibrated cur_val, so the
+        # BUY/SELL share counts are correct for actual execution.
+        port_val = float(latest["value"].sum())
+        min_usd = float(portfolio.load_financial_model().get("min_trade_size_frac", 0.0) or 0.0) * port_val
         rows_t = []
         for t in sorted(set(target_w) | set(cur_sh)):
             p = price.get(t)
             if not p:
                 continue
-            delta = cur_val * target_w.get(t, 0.0) - cur_sh.get(t, 0.0) * p     # target$ - current$
+            delta = port_val * target_w.get(t, 0.0) - cur_sh.get(t, 0.0) * p     # target$ - current$
             if abs(delta) < max(min_usd, 1.0):
                 continue
             rows_t.append((t, "BUY" if delta > 0 else "SELL", abs(delta) / p, abs(delta),
-                           cur_sh.get(t, 0.0) * p / cur_val * 100, target_w.get(t, 0.0) * 100))
+                           cur_sh.get(t, 0.0) * p / port_val * 100, target_w.get(t, 0.0) * 100))
         rows_t.sort(key=lambda r: -r[3])
         if rows_t:
             buys = sum(d for _, a, _, d, _, _ in rows_t if a == "BUY")
