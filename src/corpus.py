@@ -22,6 +22,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import sys
 from pathlib import Path
 from typing import Any
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
@@ -198,22 +199,38 @@ def append_pull(pull_id: str, pulled_at: str, retriever: str, retrieval_model: s
 
 
 def read_slice(as_of: str, lookback_days: int) -> list[dict[str, Any]]:
-    """Article bodies whose published_date falls in (as_of - lookback_days, as_of]. Used by the
-    forward curator (Stage 2) to read the trailing news window. Undated articles are skipped."""
+    """Article bodies in the trailing news window (as_of - lookback_days, as_of], for the forward curator
+    (Stage 2). The window is keyed on ``published_date``; an article with NO usable publish date falls back
+    to its ``first_pulled_at`` (pull date) so recent-but-undated news is not lost, and is flagged with
+    ``date_is_pull_fallback: True`` (a per-slice copy -- the stored record is never mutated). The flag lets
+    downstream count how often the fallback fired (``sum(a.get("date_is_pull_fallback") for a in slice)``);
+    read_slice also logs that count. Articles with neither a publish nor a pull date are skipped."""
     from datetime import date, timedelta
     if not ARTICLES.exists():
         return []
     end = date.fromisoformat(as_of)
     start = end - timedelta(days=lookback_days)
-    out = []
+    out, n_fallback = [], 0
     for line in ARTICLES.read_text(encoding="utf-8").splitlines():
         if not line.strip():
             continue
         try:
             a = json.loads(line)
-            d = date.fromisoformat((a.get("published_date") or "")[:10])
         except Exception:  # noqa: BLE001
             continue
+        try:
+            d, fallback = date.fromisoformat((a.get("published_date") or "")[:10]), False
+        except Exception:  # noqa: BLE001 - no usable publish date: fall back to the pull date, flagged
+            try:
+                d, fallback = date.fromisoformat((a.get("first_pulled_at") or "")[:10]), True
+            except Exception:  # noqa: BLE001 - no usable date at all
+                continue
         if start < d <= end:
+            if fallback:
+                a = {**a, "date_is_pull_fallback": True}
+                n_fallback += 1
             out.append(a)
+    if n_fallback:
+        print(f"read_slice({as_of}, {lookback_days}d): {n_fallback}/{len(out)} articles used pull-date "
+              f"fallback (no publish date)", file=sys.stderr)
     return out
