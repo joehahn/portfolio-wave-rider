@@ -342,16 +342,22 @@ def _rebalance_dates(start: str, end: str, cadence_days: int) -> list[str]:
     return out
 
 
-def heal_pools(dates, run_dir: Path, news_lb: int, a, write_pool, max_passes: int = 4) -> None:
+def heal_pools(dates, run_dir: Path, news_lb: int, a, write_pool, max_passes: int = 6) -> None:
     """Rebuild pools whose clean-Wayback rate is anomalously low (0%, or < half the run median) — the
     signature of a date built during an archive.org throttle burst (its rate limits tightened sharply
     after the Oct-2024 outage, so a cold pull gets throttled in bursts). Transient / thin-page misses are
-    UNCACHED by news_pool, so rebuilding that date re-fetches them, usually during a calmer window, and
-    lifts it to its true rate. Bounded + idempotent: stops when no date qualifies OR a full pass improves
-    nothing (the remaining lows are genuinely sparse-archival, not throttled). Part of the pipeline, so
-    every backtest / refresh / sweep self-heals with no manual pass to remember."""
+    UNCACHED by news_pool, so rebuilding that date re-fetches them and lifts it to its true rate.
+
+    Key subtlety: throttling is BURSTY on a minutes scale and can outlast a whole build, so an IMMEDIATE
+    rebuild can be throttled too (0 gain) even when the date is fully recoverable. We therefore (a) wait a
+    GROWING cooldown before each pass so a calm window can arrive, and (b) require TWO CONSECUTIVE no-gain
+    passes before concluding the remaining lows are genuinely sparse-archival — a single no-gain pass just
+    means that pass was also throttled. archive.org's availability API stays responsive through throttling,
+    so the snapshots really are reachable on a later try. Bounded (max_passes) + idempotent; runs on every
+    backtest / refresh / sweep, so there is no manual heal to remember."""
     if a.titles_only:
         return                                  # title-only mode fetches no Wayback -> nothing to heal
+    no_gain_streak = 0
     for _p in range(max_passes):
         hr = {d: json.loads((run_dir / f"{d}-pool.json").read_text()).get("hit_rate", 0) for d in dates}
         med = statistics.median(hr.values()) if hr else 0.0
@@ -359,9 +365,15 @@ def heal_pools(dates, run_dir: Path, news_lb: int, a, write_pool, max_passes: in
         if not low:
             print(f"  heal: all {len(dates)} pools >= threshold (median clean-Wayback {med:.0%})", file=sys.stderr)
             return
-        print(f"  heal pass {_p + 1}: rebuilding {len(low)} throttle-low pools (median {med:.0%}): "
+        cool = min(30 * (_p + 1), 180)          # 30,60,90,120,150,180s — give a throttle window time to clear
+        print(f"  heal pass {_p + 1}: cooldown {cool}s, then rebuild {len(low)} low pools (median {med:.0%}): "
               f"{', '.join(low[:8])}{' ...' if len(low) > 8 else ''}", file=sys.stderr)
+        time.sleep(cool)
         for d in low:
+            pj = json.loads((run_dir / f"{d}-pool.json").read_text())
+            # purge this date's cached MISSES so the rebuild actually re-fetches (throttle-induced false
+            # 'no snapshot' misses get frozen in the lede cache; without this the rebuild just re-reads them)
+            w.purge_wayback_misses([x["url"] for x in pj["articles"]], date.fromisoformat(d))
             for f in (run_dir / "_cache").glob(f"pool-{d}-*.json"):
                 f.unlink()
             (run_dir / f"{d}-pool.json").unlink(missing_ok=True)
@@ -370,8 +382,10 @@ def heal_pools(dates, run_dir: Path, news_lb: int, a, write_pool, max_passes: in
         after = {d: json.loads((run_dir / f"{d}-pool.json").read_text()).get("hit_rate", 0) for d in low}
         gained = sum(1 for d in low if after[d] > hr[d] + 0.01)
         print(f"  heal pass {_p + 1}: {gained}/{len(low)} pools improved", file=sys.stderr)
-        if not gained:
-            print("  heal: no further gain, remaining lows are genuine (not throttled)", file=sys.stderr)
+        no_gain_streak = no_gain_streak + 1 if not gained else 0
+        if no_gain_streak >= 2:                 # two throttled/empty passes in a row -> lows are genuine
+            print("  heal: 2 consecutive no-gain passes, remaining lows are genuinely sparse-archival",
+                  file=sys.stderr)
             return
 
 
@@ -569,7 +583,8 @@ def main(argv=None) -> int:
     # the pools here for free, so the CBT (plots 12-13) and RBT author views populate on every backtest.
     _authors = {}
     for _pf in run_dir.glob("*-pool.json"):
-        for _a in json.loads(_pf.read_text()):
+        _pj = json.loads(_pf.read_text())       # pool JSON is a dict {as_of_date, ..., articles:[...]}
+        for _a in (_pj.get("articles", []) if isinstance(_pj, dict) else _pj):
             if isinstance(_a, dict) and _a.get("author"):
                 _authors.setdefault(_a["url"], _a["author"])
     (run_dir / "_authors.json").write_text(json.dumps(_authors, indent=1))

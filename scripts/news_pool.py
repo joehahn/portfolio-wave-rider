@@ -150,6 +150,21 @@ def _cache_put(kind: str, key: str, value) -> None:
     f.write_text(json.dumps(value))
 
 
+def purge_wayback_misses(urls, target) -> int:
+    """Delete cached wayback MISS entries (hit:False) for these (url, target) keys so a rebuild re-fetches
+    them. A cold bulk pull can cache a THROTTLE-induced 'no snapshot' (the availability endpoint returns an
+    empty 200 under load, indistinguishable from a real not-archived) as a confirmed miss; the heal purges
+    those so a retry in a calm window recovers them. Keeps hits (real ledes) untouched. Returns #purged."""
+    n = 0
+    for u in urls:
+        key = f"{u}|{target}"
+        c = _cache_get("wayback", key)
+        if c is not None and not c.get("hit"):
+            (CACHE / "wayback" / (re.sub(r"[^A-Za-z0-9_.-]", "_", key)[:180] + ".json")).unlink(missing_ok=True)
+            n += 1
+    return n
+
+
 # ------------------------------------------------------------------ GDELT
 def _stamp(d: date, end: bool = False) -> str:
     return d.strftime("%Y%m%d") + ("235959" if end else "000000")
