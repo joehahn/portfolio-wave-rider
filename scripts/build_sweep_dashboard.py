@@ -907,7 +907,7 @@ Current config: {_cur_l2:.0f}/yr.</p>
     print(f"  best IR: cap {top['cap']} / λ {top['lam']} / {top['lb']}d -> IR {top['ir']:+.2f} "
           f"t={top['tstat']:+.1f} Calmar {top['calmar']:.2f} ann {top['ann']*100:+.0f}% dd {top['dd']*100:.0f}%")
     cur = next(r for r in rows if r["cur"])
-    print(f"  current (0.8/2.0/30): IR {cur['ir']:+.2f} t={cur['tstat']:+.1f} Calmar {cur['calmar']:.2f} "
+    print(f"  current ({CURRENT[0]}/{CURRENT[1]}/{CURRENT[2]}): IR {cur['ir']:+.2f} t={cur['tstat']:+.1f} Calmar {cur['calmar']:.2f} "
           f"ann {cur['ann']*100:+.0f}% dd {cur['dd']*100:.0f}%")
 
 
