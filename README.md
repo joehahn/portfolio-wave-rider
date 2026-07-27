@@ -48,7 +48,7 @@ cp holdings.example.csv holdings.csv
 ### 2. Edit `investor_profile.md` and `holdings.csv`
 
 - `investor_profile.md`: here you declare your goals, constraints, exclusions, the wave-thesis prose, and the optimizer's settings (risk aversion, risk-free rate, lookback window, rebalance period, max watchlist size). Each field is documented with explanatory comments in `investor_profile.example.md`. Every recommendation cites lines from this file.
-- `holdings.csv`: a two-column CSV (`ticker,shares`) acting as your starter watchlist. Initialize with 0 shares; the `/initialize-portfolio` skill will then allocate dollars across the watchlist during its first run.
+- `holdings.csv`: a two-column CSV (`ticker,shares`) of your real positions. Start it empty (or with 0 shares); `/initialize-portfolio` allocates dollars across your thesis tickers on its first run and writes both `holdings.csv` (real shares) and `watchlist.csv` (the curator-managed universe, a single `ticker` column). Thereafter you edit `holdings.csv` only when you actually trade; the biweekly review manages `watchlist.csv` for you.
 
 `news_sources.md` is pre-populated with a curated list of suggested news sources (Bloomberg, Reuters, company newsrooms, SEC filings, etc.) grouped by your profile's waves. The curator searches these domains first and falls back to open WebSearch otherwise. Tailor to your own taste: add sources you trust, drop ones that paywall heavily or go off-topic.
 
@@ -131,25 +131,31 @@ The `/review-portfolio` report ends with recommended weights, not trades. The pr
 
 1. Read the **Profile conflicts** and **Recommended allocation** sections of the report. The optimizer regularly produces concentrated calls (single-stock weights at the `concentration_cap`); decide which subset you actually want to execute.
 2. Execute the buys and sells in your brokerage.
-3. Edit `holdings.csv` with the new share counts. The validator blocks the curator from removing tickers with `shares > 0`, so liquidate before zeroing a row.
+3. Edit `holdings.csv` with the new share counts to match your brokerage. (The curator manages `watchlist.csv`, never `holdings.csv`, so this file is yours alone to edit.)
 4. The next daily cron snapshot picks up the new positions and the dashboard catches up.
 
 You can also do nothing and let the next `/review-portfolio` produce a fresh recommendation. The split between recommendation and execution is intentional so you can review, override, or ignore each call.
 
-## How `holdings.csv` shapes outcomes
+## How `holdings.csv` and `watchlist.csv` shape outcomes
 
-`holdings.csv` is the watchlist that the curator and the optimizer operate on.
+Two files describe the portfolio, with a clean split of ownership:
 
-- **Optimizer eligibility.** The optimizer cannot assign weight to a ticker that isn't in the file.
-- **`shares = 0` is meaningful.** A row with zero shares puts the ticker on the watchlist, which allows the optimizer to assign nonzero weights and the dashboards to track that ticker's price without requiring ownership that position.
-- **Curator-driven adds and removes.** At each `/review-portfolio`, the curator can append new rows (always at `shares=0`) and delete rows for tickers it wants to drop. The validator blocks removes for tickers with `shares > 0`, so you must liquidate the live position in your brokerage first and zero out the row, then a future `/review-portfolio` can complete the remove. The full audit trail of applied changes lives in `data/curation_history.csv`.
-- **Manual edits still work.** Append `<TICKER>,0` to add by hand; delete a row to remove by hand (subject to the same liquidate-first rule for live positions).
+- **`holdings.csv`** (`ticker,shares`) is what you *actually own* — real positions, `shares > 0`. **You edit it, and only you**, after executing trades in your brokerage; the curator/cron never writes it. It drives the snapshots, current allocation, and the "sell/current" side of trade recommendations.
+- **`watchlist.csv`** (single `ticker` column) is the *curator-managed universe* — the tickers the optimizer may assign weight to. The biweekly `/review-portfolio` auto-adds and auto-removes here; you normally do not touch it.
+
+The optimizer's universe is **`watchlist.csv` ∪ (the tickers you hold in `holdings.csv`) ∪ the profile's `always_include` anchors**. Consequences:
+
+- **Optimizer eligibility.** The optimizer can only weight tickers in that union.
+- **Dropping a held ticker is safe.** If the curator removes a ticker from `watchlist.csv` while you still hold it, it stays in the universe (via the union with `holdings.csv`) so the optimizer can recommend *selling* it; it leaves the universe only once you sell it out of `holdings.csv`. No more "liquidate first" dance.
+- **Anchors** (e.g. SPY/AGG/IAU) come from the profile's `always_include`, sit outside `max_watchlist_size`, and are never in `watchlist.csv`; the curator cannot add or remove them.
+- **Audit trail.** Every applied watchlist change is logged to `data/curation_history.csv`.
+- **Manual edits.** Put a ticker on the curator's radar by appending it to `watchlist.csv`; record a real trade by editing `holdings.csv`.
 
 ## How this project utilizes Claude Skills and Subagents
 
 This project uses two kinds of Claude Code primitives:
 
-- A **Skill** is a slash command that delivers a sequence of tasks. Typing `/review-portfolio` delivers the steps described in [`.claude/skills/review-portfolio/SKILL.md`](.claude/skills/review-portfolio/SKILL.md), which: launches the curator subagent, applies the surviving adds and removes to `holdings.csv`, runs the portfolio optimizer, calls the report-writer, and refreshes the dashboard. Inspect this project's four skills, [`/initialize-portfolio`](.claude/skills/initialize-portfolio/SKILL.md), [`/review-portfolio`](.claude/skills/review-portfolio/SKILL.md), [`/run-backtest`](.claude/skills/run-backtest/SKILL.md), & [`/sweep-max-watchlist-size`](.claude/skills/sweep-max-watchlist-size/SKILL.md), to see what they do in detail.
+- A **Skill** is a slash command that delivers a sequence of tasks. Typing `/review-portfolio` delivers the steps described in [`.claude/skills/review-portfolio/SKILL.md`](.claude/skills/review-portfolio/SKILL.md), which: launches the curator subagent, applies the surviving adds and removes to `watchlist.csv`, runs the portfolio optimizer, calls the report-writer, and refreshes the dashboard. Inspect this project's four skills, [`/initialize-portfolio`](.claude/skills/initialize-portfolio/SKILL.md), [`/review-portfolio`](.claude/skills/review-portfolio/SKILL.md), [`/run-backtest`](.claude/skills/run-backtest/SKILL.md), & [`/sweep-max-watchlist-size`](.claude/skills/sweep-max-watchlist-size/SKILL.md), to see what they do in detail.
 - A **Subagent** uses an LLM with narrow lists of allowed tools. Each subagent manages its own context window so the work it does (news reading, report writing) doesn't crowd the main conversation. Calls are fire-and-forget: they spawn, run, return one message back, then the subagent's context disappears. Any state that needs to persist across calls is stored as data in files written to the `data/` directory. This project has two subagents: the [`watchlist-curator`](.claude/agents/watchlist-curator.md) that reads the news and proposes portfolio adds and removes, and the [`report-writer`](.claude/agents/report-writer.md) that writes the monthly report after synthesizing the curator's output.
 
 Other project tasks (portfolio optimization, price fetching, validation, dashboard rendering) are deterministic and handled by Python code in [`src/portfolio.py`](src/portfolio.py) and [`src/cli.py`](src/cli.py). The judgment pieces (which news matters, investment waves are currently active, and what to write in the report) are what an LLM is good at and is challenging to encode as fixed logic. So Python is used for the deterministic work and an LLM for the judgment calls, with each part staying small and easily understood.
@@ -160,12 +166,12 @@ The curator is the AI subagent that decides which tickers belong on the watchlis
 
 On each call the curator:
 
-1. Reads the wave thesis from `investor_profile.md` and the current watchlist from `holdings.csv`.
+1. Reads the wave thesis from `investor_profile.md` and the current watchlist from `watchlist.csv`.
 2. Searches recent news against the named waves, preferring sources listed in `news_sources.md`.
 3. Proposes at most 3 adds and 3 removes, each cited with 2-4 dated news items.
 4. Returns one JSON payload.
 
-Python code then validates the payload: US-listed only, listing-date check via yfinance, post-change watchlist size within `max_watchlist_size`, no double-adds, no stale removes, no removes of tickers with live share counts. Only the changes that survive validation touch `holdings.csv`.
+Python code then validates the payload: US-listed only, listing-date check via yfinance, post-change watchlist size within `max_watchlist_size`, no double-adds, no stale removes. Only the changes that survive validation touch `watchlist.csv` (your real positions in `holdings.csv` are never modified).
 
 This splitting is intentional. The mean-variance solution finds the portfolio that optimizes the objective function (which is detailed further below), while the LLM handles tasks that require a judgement call. The curator agent is detailed in [`.claude/agents/watchlist-curator.md`](.claude/agents/watchlist-curator.md).
 

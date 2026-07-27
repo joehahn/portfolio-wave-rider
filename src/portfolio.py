@@ -542,14 +542,20 @@ def initialize_holdings(
     allocations: dict[str, float],
     prices: dict[str, float],
     holdings_path: str = "holdings.csv",
+    watchlist_path: str = "watchlist.csv",
+    profile_path: str = "investor_profile.md",
 ) -> dict[str, Any]:
     """Convert ticker -> dollars + ticker -> price into ticker -> shares,
-    then overwrite ``holdings_path`` with a fresh ``ticker, shares`` CSV.
+    then overwrite ``holdings_path`` with a fresh ``ticker, shares`` CSV, and
+    SEED ``watchlist_path`` (single ``ticker`` column) with the same tickers
+    minus the profile's always_include anchors.
 
-    Allocations and prices must cover the same tickers. Shares are stored
-    as floats (4 decimals) since most modern brokers support fractional
-    shares. Tickers with $0 allocated keep shares=0 (still appear in the
-    file as a watchlist entry).
+    ``holdings.csv`` holds the real positions; ``watchlist.csv`` is the
+    curator-managed optimizer universe (anchors enter the universe from the
+    profile, not the watchlist -- see ``_optimizer_universe``). Allocations and
+    prices must cover the same tickers. Shares are stored as floats (4 decimals)
+    since most modern brokers support fractional shares. Tickers with $0
+    allocated keep shares=0.
     """
     if not allocations:
         raise ValueError("allocations must be non-empty")
@@ -574,8 +580,18 @@ def initialize_holdings(
     o_path.parent.mkdir(parents=True, exist_ok=True)
     df[["ticker", "shares"]].to_csv(o_path, index=False)
 
+    # Seed the curator-managed watchlist (single 'ticker' column) with the same
+    # tickers minus the always_include anchors (which enter the universe from the
+    # profile, not the watchlist).
+    anchors = {t.upper() for t in load_financial_model(profile_path).get("always_include", [])}
+    wl = [r["ticker"] for r in rows if r["ticker"] not in anchors]
+    w_path = Path(watchlist_path)
+    w_path.parent.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame({"ticker": wl}).to_csv(w_path, index=False)
+
     return {
         "out_path": str(o_path),
+        "watchlist_path": str(w_path),
         "total_invested": round(total, 2),
         "total_requested": round(sum(allocations.values()), 2),
         "holdings": {r["ticker"]: {"shares": r["shares"], "price": r["price"],
@@ -836,7 +852,7 @@ def _validate_curator_payload(
 
 def apply_curator_decisions(
     payload: dict[str, Any],
-    holdings_path: str = "holdings.csv",
+    holdings_path: str = "watchlist.csv",
     history_path: str = "data/curation_history.csv",
     profile_path: str = "investor_profile.md",
     listing_check: bool = True,
@@ -844,15 +860,20 @@ def apply_curator_decisions(
     max_watchlist_size: int | None = None,
     dry_run: bool = False,
 ) -> dict[str, Any]:
-    """Validate a watchlist-curator payload and apply it to holdings.csv.
+    """Validate a watchlist-curator payload and apply it to the watchlist file.
 
-    Adds are appended to holdings.csv at shares=0. Removes delete the row
-    (positions with shares>0 are blocked from removal; the user must zero
-    out their position first in the brokerage and update holdings.csv).
-    Every applied change is appended as a row to curation_history.csv.
+    Adds append a ticker row; removes delete it. Every applied change is
+    appended as a row to curation_history.csv. Returns a result dict with
+    applied/rejected lists and the post-change watchlist.
 
-    Returns a result dict with applied/rejected lists and the post-change
-    watchlist.
+    ``holdings_path`` is the file this mutates and is SCHEMA-AWARE:
+      - live path passes ``watchlist.csv`` (a single ``ticker`` column);
+      - the backtest/sweep sandbox passes a ``ticker,shares`` file.
+    The "block removing a ticker with shares>0" rule applies ONLY when a
+    ``shares`` column is present (the sandbox). In the live model real
+    positions live in the separate ``holdings.csv`` and the optimizer universe
+    (watchlist ∪ held) keeps a dropped-but-held ticker recommendable for sale,
+    so removing it from the watchlist is allowed.
     """
     fm = load_financial_model(profile_path)
     # max_watchlist_size override lets a backtest/sweep run a cap different from the profile's; without it
@@ -863,10 +884,11 @@ def apply_curator_decisions(
 
     h_path = Path(holdings_path)
     if not h_path.exists():
-        raise FileNotFoundError(f"holdings file not found: {h_path}")
+        raise FileNotFoundError(f"watchlist/holdings file not found: {h_path}")
     holdings = pd.read_csv(h_path)
-    if "ticker" not in holdings.columns or "shares" not in holdings.columns:
-        raise ValueError(f"{h_path} must have ticker,shares columns")
+    if "ticker" not in holdings.columns:
+        raise ValueError(f"{h_path} must have a 'ticker' column")
+    has_shares = "shares" in holdings.columns   # sandbox (ticker,shares) vs live watchlist (ticker only)
     current_watchlist = holdings["ticker"].astype(str).tolist()
 
     # The always_include anchors sit in holdings.csv but are OUTSIDE the
@@ -902,9 +924,11 @@ def apply_curator_decisions(
     valid_removes = validated["valid_removes"]
     rejections = anchor_rejections + validated["rejections"]
 
-    # Block removes for tickers with shares > 0 - the user has a live
-    # position that must be liquidated in the brokerage first.
-    held = {row["ticker"]: float(row["shares"]) for _, row in holdings.iterrows()}
+    # Block removes for tickers with shares > 0 ONLY when this file carries share
+    # counts (the backtest sandbox). In the live model real positions live in the
+    # separate holdings.csv, so removing a held ticker from the watchlist is allowed
+    # -- the optimizer universe (watchlist ∪ held) keeps it recommendable for sale.
+    held = {row["ticker"]: float(row["shares"]) for _, row in holdings.iterrows()} if has_shares else {}
     safe_removes: list[dict[str, Any]] = []
     for rem in valid_removes:
         t = rem["ticker"]
@@ -915,9 +939,10 @@ def apply_curator_decisions(
             safe_removes.append(rem)
     valid_removes = safe_removes
 
-    # Apply adds (append rows at shares=0) and removes (delete rows).
-    new_rows = pd.DataFrame([{"ticker": a["ticker"], "shares": 0}
-                             for a in valid_adds])
+    # Apply adds (append rows) and removes (delete rows). Preserve the file's schema:
+    # a single-column live watchlist gets ticker-only rows; the sandbox keeps ticker,shares.
+    add_row = (lambda t: {"ticker": t, "shares": 0}) if has_shares else (lambda t: {"ticker": t})
+    new_rows = pd.DataFrame([add_row(a["ticker"]) for a in valid_adds])
     if not new_rows.empty:
         holdings = pd.concat([holdings, new_rows], ignore_index=True)
     if valid_removes:
@@ -1003,8 +1028,42 @@ def reconstruct_watchlist_at(
     return sorted(watchlist)
 
 
+def _optimizer_universe(
+    watchlist_path: str = "watchlist.csv",
+    holdings_path: str = "holdings.csv",
+    anchors: list[str] | None = None,
+) -> list[str]:
+    """The optimizer's ticker universe: the curator-managed WATCHLIST, UNION the
+    tickers currently HELD in holdings.csv (shares>0), UNION the always_include
+    anchors. The union keeps a ticker recommendable for sale after the curator
+    drops it from the watchlist but before the user has sold it out of holdings.
+    Uppercased, de-duped, order-stable (watchlist first, then held, then anchors).
+    """
+    seen: list[str] = []
+
+    def _add(tks: "Any") -> None:
+        for t in tks:
+            u = str(t).upper().strip()
+            if u and u not in seen:
+                seen.append(u)
+
+    wl = Path(watchlist_path)
+    if wl.exists():
+        _add(pd.read_csv(wl)["ticker"].tolist())
+    hp = Path(holdings_path)
+    if hp.exists():
+        h = pd.read_csv(hp)
+        if "shares" in h.columns:                                  # real positions: only shares>0 count as held
+            _add(h[h["shares"].astype(float) > 0]["ticker"].tolist())
+        else:
+            _add(h["ticker"].tolist())
+    _add(anchors or [])
+    return seen
+
+
 def recommend_portfolio(
     holdings_path: str = "holdings.csv",
+    watchlist_path: str = "watchlist.csv",
     out_path: str = "data/recommendations.csv",
     period: str = "3y",
     max_weight: float = 0.25,
@@ -1013,11 +1072,13 @@ def recommend_portfolio(
     risk_aversion: float = 1.0,
     date: str | None = None,
     force: bool = False,
+    profile_path: str = "investor_profile.md",
 ) -> dict[str, Any]:
     """Run an optimization and append per-ticker weights to a CSV.
 
-    Pure Python, no news pulls, no LLM. Universe = the tickers listed in
-    ``holdings_path``.
+    Pure Python, no news pulls, no LLM. Universe = ``watchlist.csv`` UNION the
+    tickers HELD in ``holdings.csv`` (shares>0) UNION the profile's
+    always_include anchors (see ``_optimizer_universe``).
 
     Schema appended to ``out_path``:
         date, ticker, weight, expected_return, annual_volatility,
@@ -1025,13 +1086,11 @@ def recommend_portfolio(
 
     Idempotent on date (skip unless force=True).
     """
-    h_path = Path(holdings_path)
-    if not h_path.exists():
-        raise FileNotFoundError(f"holdings file not found: {h_path}")
-    holdings = pd.read_csv(h_path)
-    if "ticker" not in holdings.columns:
-        raise ValueError(f"{h_path} must have a 'ticker' column")
-    tickers = holdings["ticker"].str.upper().str.strip().tolist()
+    anchors = load_financial_model(profile_path).get("always_include", [])
+    tickers = _optimizer_universe(watchlist_path, holdings_path, anchors)
+    if not tickers:
+        raise FileNotFoundError(
+            f"empty optimizer universe: none of {watchlist_path} / {holdings_path} / anchors yielded tickers")
 
     rec_date = pd.Timestamp(date).date() if date else pd.Timestamp.today().date()
     o_path = Path(out_path)

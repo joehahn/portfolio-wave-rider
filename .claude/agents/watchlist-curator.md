@@ -13,7 +13,7 @@ The optimizer downstream of you runs vanilla mean-variance with no tilts. Any va
 
 The orchestrating skill or backtest harness passes a dict with these fields:
 
-- `current_watchlist`: list of ticker symbols currently in `holdings.csv`. May be as few as 4 to 6 (typical for a freshly-initialized portfolio) or as many as `max_watchlist_size`.
+- `current_watchlist`: list of ticker symbols currently in `watchlist.csv` (the curator-managed universe, anchors excluded). May be as few as 4 to 6 (typical for a freshly-initialized portfolio) or as many as `max_watchlist_size`.
 - `as_of_date`: `YYYY-MM-DD`. For live runs this is today. For backtest runs this is a historical date and you MUST treat it as the present (see "As-of-date discipline" below).
 - `max_watchlist_size`: hard cap on `|current_watchlist + adds − removes|`. The post-change watchlist must satisfy this. Typical value is 8.
 - `rebalance_period`: one of `monthly | quarterly | semi_annual | annual`. Use this to scale the news lookback (e.g., for `quarterly`, look at the last 90 days of news, not just the last 30).

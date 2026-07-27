@@ -1,14 +1,14 @@
 # /review-portfolio
 
-Live curator-driven portfolio review. Each run sends the watchlist-curator agent out to read recent news, propose adds and removes against the current watchlist, applies the resulting changes to `holdings.csv` and `data/curation_history.csv`, runs the optimizer on the new watchlist, writes a profile-aware report, and refreshes the live dashboard.
+Live curator-driven portfolio review. Each run sends the watchlist-curator agent out to read recent news, propose adds and removes against the current watchlist, applies the resulting changes to `watchlist.csv` (the curator-managed universe) and `data/curation_history.csv`, runs the optimizer on the post-change universe (`watchlist.csv` ∪ your held positions in `holdings.csv` ∪ the profile anchors), writes a profile-aware report, and refreshes the live dashboard. It never writes `holdings.csv` (that is your real Fidelity positions, user-edited only).
 
 The math here is identical to the curator backtest (`backtest --curator-runs-dir`); the only difference is that this skill fires ONE curator call against today's date (no as-of-date discipline, no suppression list) instead of replaying pre-collected payloads.
 
 ## Before you start
 
 1. Read `investor_profile.md`. If missing or empty, stop and tell the user to copy `investor_profile.example.md` to `investor_profile.md` and edit. Do not fall back to a default.
-2. Read `holdings.csv` for the current watchlist. Every ticker in this file is passed to the curator as `current_watchlist` (including rows with `shares=0`), **except the profile's `always_include` anchors** (e.g. SPY/AGG/IAU). Those are permanent optimizer-universe anchors that sit OUTSIDE the curator's `max_watchlist_size`: exclude them from `current_watchlist` so the curator manages only the thematic slots and never proposes adding or removing an anchor. They stay in `holdings.csv` and still flow into `analyze`/`recommend` (Steps 3-4).
-3. **Empty-holdings guard**: if every row in `holdings.csv` has `shares == 0`, stop and tell the user this is a fresh repo; they should run `/initialize-portfolio` first to set the thesis allocation. Do not proceed.
+2. Read `watchlist.csv` for the current watchlist. Every ticker in this file is passed to the curator as `current_watchlist`, **except the profile's `always_include` anchors** (e.g. SPY/AGG/IAU). Anchors are permanent optimizer-universe members that sit OUTSIDE the curator's `max_watchlist_size` and OUTSIDE `watchlist.csv`: the curator never proposes adding or removing one. The optimizer universe (Steps 3-4) is `watchlist.csv` ∪ the tickers you hold in `holdings.csv` (shares>0) ∪ the anchors.
+3. **Empty-watchlist guard**: if `watchlist.csv` is missing or has no ticker rows, stop and tell the user this is a fresh repo; they should run `/initialize-portfolio` first (which seeds both `holdings.csv` and `watchlist.csv`). Do not proceed.
 4. Read `data/thesis_baseline.json` if it exists. Its contents (`date`, `allocations_usd`, `reasoning`, `holdings`) are passed to the report-writer so every review report can render the thesis-vs-recommended comparison.
 5. Load the profile's `financial_model` settings via `python -m src.cli` (the CLI does this automatically via `portfolio.load_financial_model`). Defaults: `rebalance_period: monthly`, `max_watchlist_size: 8`.
 
@@ -21,7 +21,7 @@ Spawn the `watchlist-curator` subagent. Pass a self-contained prompt with these 
 ```json
 {
   "as_of_date": "<today, YYYY-MM-DD>",
-  "current_watchlist": [<ticker list from holdings.csv, EXCLUDING the always_include anchors>],
+  "current_watchlist": [<ticker list from watchlist.csv, EXCLUDING the always_include anchors>],
   "max_watchlist_size": <from profile, default 8>,
   "rebalance_period": "<from profile, default monthly>",
   "recent_news_lookback_days": <30 for monthly, 90 for quarterly>,
@@ -59,9 +59,9 @@ This parses the actual `WebSearch` tool calls out of the transcript and writes t
 ```
 
 Notes:
-- The CLI calls `apply_curator_decisions`, which validates the payload against the contract (listing-date check via yfinance, `max_watchlist_size`, no double-adds, no stale removes, blocked removes for tickers with `shares > 0`).
+- The CLI calls `apply_curator_decisions` (targeting `watchlist.csv`), which validates the payload against the contract (listing-date check via yfinance, `max_watchlist_size`, no double-adds, no stale removes). Removing a ticker you still hold is allowed now — it stays in the optimizer universe (via the union with `holdings.csv`) so it can be recommended for sale, and exits only when you sell it out of `holdings.csv`.
 - Rejected adds and removes appear in the `rejections` array; surface them in the report.
-- `holdings.csv` is mutated in place: adds appended at `shares=0`, removes deleted entirely.
+- `watchlist.csv` is mutated in place: adds append a ticker row, removes delete it. `holdings.csv` is never touched.
 - One row per applied change is appended to `data/curation_history.csv`.
 
 ### Step 3 — run analyze (Bash)
@@ -89,7 +89,7 @@ Appends today's optimizer output to `data/recommendations.csv` so the dashboard'
 
 Write the report yourself, in the main loop, with the Write tool, to `data/reports/<today>-review-portfolio.md`. **Do not delegate this to the `report-writer` subagent.** Background subagents fail at this task two independent ways, both verified: (a) a subagent's file `Write` does not propagate to the real repo (it reports "File created successfully" but the file never appears, because background subagents run in an isolated filesystem), and (b) the heavy "read a large context, then generate a long document in one shot" generation reliably hangs in a background subagent (every input read succeeds, then no output, indefinitely). The main loop does this task reliably; the `watchlist-curator` works only because it returns small results incrementally rather than one big generation. So the report is authored inline.
 
-Inputs to read: the analyze JSON (step 3), `data/curator_latest.json` (step 1), the curate result (step 2), `holdings.csv`, `data/thesis_baseline.json` (if present), and `investor_profile.md`.
+Inputs to read: the analyze JSON (step 3), `data/curator_latest.json` (step 1), the curate result (step 2), `watchlist.csv` and `holdings.csv`, `data/thesis_baseline.json` (if present), and `investor_profile.md`.
 
 Follow `.claude/agents/report-writer.md`'s "Report structure" and "Table formatting" sections exactly. That file is the canonical report spec; only its *agent role* is retired (it is no longer spawned), its format is not. All sections, in order: `The ask`, `Recommended allocation` (Asset-name column + per-ticker trades/tilts), `Thesis allocation` (thesis vs recommended %, omit only if `thesis_baseline` is null), `How this maps to the profile`, `Profile conflicts` (always present; cite the `investor_profile.md` line for any conflict; flag single-name concentration at the cap; never silently clamp), `Risk picture` (Sharpe, vol, max drawdown, VaR, CVaR from the analyze JSON), `Watchlist changes this period` ("Quiet period: curator proposed no changes." on a no-change run), `News evidence` (omit when there are no adds), `Caveats` (the report ends here). A no-change run still gets the full structure; numbers come only from the `src.cli` outputs, never the model.
 
@@ -108,7 +108,7 @@ Replace every em dash inside a sentence (clause separators, asides) with a comma
 .venv/bin/python -m src.cli dashboard
 ```
 
-`snapshot --force` must run first. `curate` (Step 2) mutates `holdings.csv` (adds at `shares=0`, removes deleted), but the price snapshot is otherwise only refreshed by the daily cron. Without this step, any ticker added or removed this run is stale in `data/snapshots.csv` until the next cron fire, and the dashboard's trade table (chart 5, "Trades to move from actual to recommended") joins the latest recommendation to the latest snapshot by price: a freshly-added ticker has a target weight but no price row, so the NaN-price guard silently drops it and the BUY never appears. Re-snapshotting `--force` gives every current-watchlist ticker (including new `shares=0` adds) a price row for today, so the trade table is complete. `--force` overwrites today's rows only.
+`snapshot --force` must run first. It refreshes `data/snapshots.csv` from `holdings.csv` (your real positions) so the dashboard's value chart is current for today. `curate` (Step 2) now mutates `watchlist.csv`, not `holdings.csv`, so a freshly-added *watchlist* ticker is not a held position and will not get a snapshot price row until you actually buy it. NOTE (known follow-up): the dashboard trade table (chart 5) prices recommended tickers via the snapshot, so a brand-new BUY for a not-yet-held ticker can be dropped for lack of a price row — snapshotting or pricing the full optimizer universe (`watchlist.csv` ∪ held ∪ anchors) is the fix. `--force` overwrites today's rows only.
 
 `dashboard` regenerates `docs/index.html`. Time-series charts are scoped to dates >= `thesis_baseline.date` if the file exists.
 
@@ -125,7 +125,7 @@ One short message:
 
 ## Rules
 
-- **Never skip the empty-holdings guard.** Fresh repo → `/initialize-portfolio`, not this skill.
+- **Never skip the empty-watchlist guard.** Fresh repo → `/initialize-portfolio`, not this skill.
 - Never modify the profile mid-run.
 - Never silently clamp weights to satisfy the profile; surface conflicts instead.
 - Numbers come from `src.cli`. The curator decides composition; the optimizer decides weights; both pass through Python before reaching the report.

@@ -20,7 +20,7 @@ Seven subcommands. The daily cron calls `snapshot` and `dashboard`. The `/review
 .venv/bin/python -m src.cli analyze --tickers AAPL MSFT NVDA --period 0.5y --max-weight 0.80
 .venv/bin/python -m src.cli analyze --tickers AAPL MSFT NVDA --risk-aversion 0.5
 
-# Apply a watchlist-curator JSON payload to holdings.csv and data/curation_history.csv.
+# Apply a watchlist-curator JSON payload to watchlist.csv and data/curation_history.csv.
 # Validates against the contract (listing date via yfinance, max_watchlist_size,
 # no double-adds, no stale removes, blocks removes when shares > 0). Output JSON
 # lists applied_adds, applied_removes, and rejections with reasons.
@@ -69,7 +69,8 @@ To inspect a math-only backtest visually without auto-render, point the dashboar
 portfolio-wave-rider/
 ├── investor_profile.md         # source of truth (you write this; gitignored)
 ├── investor_profile.example.md # template to copy
-├── holdings.csv                # ticker,shares (you maintain this; gitignored)
+├── holdings.csv                # ticker,shares -- your REAL positions (you maintain this; gitignored)
+├── watchlist.csv               # ticker -- curator-managed optimizer universe (auto-written; gitignored)
 ├── holdings.example.csv        # template to copy
 ├── news_sources.md             # optional curated sources per wave bucket
 ├── README.md                   # narrative tour + headline result
@@ -141,7 +142,7 @@ portfolio-wave-rider/
 | `data/reports/YYYY-MM-DD-<skill>.md` | LLM-written narrative reports from `/initialize-portfolio` and `/review-portfolio`. | After each skill run |
 | `data/snapshot.log` | cron stdout/stderr. | If a scheduled run looks missing |
 
-Note: when a ticker is removed from `holdings.csv` (manually or via the curator), historical rows in `data/snapshots.csv` and `data/recommendations.csv` are not pruned, so old charts still render correctly. No new rows accumulate for the removed ticker going forward.
+Note: when a ticker leaves the universe (removed from `watchlist.csv` by the curator, or sold out of `holdings.csv`), historical rows in `data/snapshots.csv` and `data/recommendations.csv` are not pruned, so old charts still render correctly. No new rows accumulate for the removed ticker going forward.
 
 The "Profile conflicts" section of any report is the most important thing to read. It tells you when the optimizer wanted something the profile forbids.
 
@@ -153,12 +154,12 @@ The diagram below shows the `/review-portfolio` flow — the recurring path that
 flowchart TD
     user([User]) -->|/review-portfolio| skill[Skill: review-portfolio]
     profile[(investor_profile.md)] -.read.-> skill
-    holdings[(holdings.csv)] -.read.-> skill
+    watchlist[(watchlist.csv)] -.read.-> skill
     skill --> curator[watchlist-curator]
     sources[(news_sources.md)] -.read.-> curator
     curator -->|writes JSON| latest[(curator_latest.json)]
     latest --> curate[CLI: curate]
-    curate -->|mutates| holdings_w[holdings.csv]
+    curate -->|mutates| watchlist_w[watchlist.csv]
     curate -->|appends| history[(curation_history.csv)]
     skill --> analyze[CLI: analyze]
     skill --> recommend[CLI: recommend]
@@ -181,7 +182,7 @@ flowchart TD
 Two LLM specialists (blue) bracket four Python calls (yellow). The profile is the source of truth; the curator decides composition; the optimizer decides weights.
 
 - Four skills at `.claude/skills/`:
-  - `initialize-portfolio` (one-shot): reads the profile and an empty holdings.csv, produces a thesis-driven dollar allocation, persists it to `data/thesis_baseline.json`, and writes a thesis-only report. No optimizer, no news.
+  - `initialize-portfolio` (one-shot): reads the profile, produces a thesis-driven dollar allocation, writes `holdings.csv` (real positions) + `watchlist.csv` (curator universe), persists the allocation to `data/thesis_baseline.json`, and writes a thesis-only report. No optimizer, no news.
   - `review-portfolio` (recurring): fires one watchlist-curator call against today's date, applies adds/removes via `curate`, runs `analyze` and `recommend` on the post-change watchlist, calls report-writer for a profile-aware narrative, and refreshes the live dashboard.
   - `run-backtest` (on-demand maintenance): refreshes the canonical 5-year curator backtest against a rolling 5-year window ending today, regenerates `docs/backtest_curator.html`, and commits the result.
   - `sweep-max-watchlist-size` (on-demand experiment): fires the watchlist-curator at four `max_watchlist_size` values across the 21 quarter-end dates of the standard 5y backtest and renders `docs/sweep_max_watchlist_size.html`.

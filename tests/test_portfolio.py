@@ -265,6 +265,11 @@ def _write_holdings(path, tickers, shares=None) -> None:
     pd.DataFrame({"ticker": tickers, "shares": shares}).to_csv(path, index=False)
 
 
+def _write_watchlist(path, tickers) -> None:
+    """The live curator-managed file: a single 'ticker' column, no shares."""
+    pd.DataFrame({"ticker": tickers}).to_csv(path, index=False)
+
+
 def _write_profile(path, max_size=12) -> None:
     path.write_text(
         f"---\nfinancial_model:\n  max_watchlist_size: {max_size}\n---\n# profile\n"
@@ -324,7 +329,9 @@ def test_curator_rejects_remove_of_unheld_ticker(tmp_path) -> None:
                for r in result["rejections"])
 
 
-def test_curator_rejects_remove_with_live_position(tmp_path) -> None:
+def test_curator_rejects_remove_with_live_position_sandbox_schema(tmp_path) -> None:
+    # SANDBOX schema (ticker,shares): the shares>0 remove-block still fires. This locks
+    # the has_shares branch used by the backtest sandbox files.
     holdings = tmp_path / "holdings.csv"
     profile = tmp_path / "profile.md"
     _write_holdings(holdings, ["AAPL", "MSFT"], shares=[10, 0])
@@ -338,6 +345,39 @@ def test_curator_rejects_remove_with_live_position(tmp_path) -> None:
     assert result["applied_removes"] == []
     assert any(r["ticker"] == "AAPL" and "liquidate" in r["reason"]
                for r in result["rejections"])
+
+
+def test_curator_single_column_watchlist_allows_removing_held(tmp_path) -> None:
+    # LIVE schema: a single-column watchlist.csv has no shares, so removing a ticker is
+    # ALWAYS allowed even if it is held in the separate holdings.csv -- the optimizer
+    # universe (watchlist ∪ held) keeps it recommendable for sale.
+    watchlist = tmp_path / "watchlist.csv"
+    holdings = tmp_path / "holdings.csv"
+    profile = tmp_path / "profile.md"
+    _write_watchlist(watchlist, ["AAPL", "MSFT"])
+    _write_holdings(holdings, ["AAPL"], shares=[10])   # AAPL is a REAL position
+    _write_profile(profile)
+    payload = _payload(removes=["AAPL"])
+    result = portfolio.apply_curator_decisions(
+        payload, holdings_path=str(watchlist),        # live path mutates the watchlist
+        history_path=str(tmp_path / "h.csv"),
+        profile_path=str(profile), listing_check=False,
+    )
+    assert result["applied_removes"] == ["AAPL"]                       # remove succeeds
+    assert "AAPL" not in pd.read_csv(watchlist)["ticker"].tolist()     # gone from watchlist
+    # ...but still in the universe because it is held:
+    uni = portfolio._optimizer_universe(str(watchlist), str(holdings), anchors=[])
+    assert "AAPL" in uni
+
+
+def test_optimizer_universe_unions_watchlist_held_anchors(tmp_path) -> None:
+    watchlist = tmp_path / "watchlist.csv"
+    holdings = tmp_path / "holdings.csv"
+    _write_watchlist(watchlist, ["NVDA", "MSFT"])
+    _write_holdings(holdings, ["RKLB", "AAPL"], shares=[5, 0])   # only RKLB is held (shares>0)
+    uni = portfolio._optimizer_universe(str(watchlist), str(holdings), anchors=["SPY", "nvda"])
+    assert set(uni) == {"NVDA", "MSFT", "RKLB", "SPY"}   # AAPL (shares=0) excluded; deduped/uppercased
+    assert len(uni) == len(set(uni))
 
 
 def test_curator_enforces_max_watchlist_size(tmp_path) -> None:
@@ -357,19 +397,25 @@ def test_curator_enforces_max_watchlist_size(tmp_path) -> None:
                if "max_watchlist_size" in r["reason"]) == 2
 
 
-def test_curator_rejects_overlapping_adds_and_removes(tmp_path) -> None:
+def test_curator_drops_overlapping_adds_and_removes(tmp_path) -> None:
+    # A ticker in both adds and removes is contradictory: it is dropped from BOTH
+    # and recorded as a rejection (it does not raise -- a single bad pair must not
+    # abort the whole payload mid-backtest).
     holdings = tmp_path / "holdings.csv"
     profile = tmp_path / "profile.md"
     _write_holdings(holdings, ["AAPL"])
     _write_profile(profile)
     payload = _payload(adds=["NVDA"], removes=["AAPL"])
     payload["adds"][0]["ticker"] = "AAPL"  # force the overlap
-    with pytest.raises(ValueError, match="both adds and removes"):
-        portfolio.apply_curator_decisions(
-            payload, holdings_path=str(holdings),
-            history_path=str(tmp_path / "h.csv"),
-            profile_path=str(profile), listing_check=False,
-        )
+    result = portfolio.apply_curator_decisions(
+        payload, holdings_path=str(holdings),
+        history_path=str(tmp_path / "h.csv"),
+        profile_path=str(profile), listing_check=False,
+    )
+    assert result["applied_adds"] == []
+    assert result["applied_removes"] == []
+    assert any(r["ticker"] == "AAPL" and "both adds and removes" in r["reason"]
+               for r in result["rejections"])
 
 
 def test_curator_listing_check_blocks_pre_listing_add(tmp_path, monkeypatch) -> None:

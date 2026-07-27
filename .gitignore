@@ -33,8 +33,13 @@ gcp-key.json
 data/news_ab/
 .claude/settings.local.json
 holdings.csv
+holdings.csv.pre-split.bak
+watchlist.csv
 investor_profile.md
 data/snapshots.csv
 data/recommendations.csv
 data/thesis_baseline.json
 data/curator_runs/live/
+
+# local-only holding pen: stale content we want to keep around but NOT push to git
+archived/

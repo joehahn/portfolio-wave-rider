@@ -105,7 +105,10 @@ def main(argv: list[str] | None = None) -> int:
                         help="overwrite an existing row for this date")
 
     p_rec = sub.add_parser("recommend", help="optimize and append weights to data/recommendations.csv")
-    p_rec.add_argument("--holdings", default="holdings.csv")
+    p_rec.add_argument("--holdings", default="holdings.csv",
+                       help="real positions; shares>0 rows join the optimizer universe")
+    p_rec.add_argument("--watchlist", default="watchlist.csv",
+                       help="curator-managed universe; unioned with held tickers + anchors")
     p_rec.add_argument("--out", default="data/recommendations.csv")
     p_rec.add_argument("--period", default=fm["lookback_period"])
     p_rec.add_argument("--max-weight", type=float, default=fm["concentration_cap"],
@@ -118,10 +121,11 @@ def main(argv: list[str] | None = None) -> int:
     p_rec.add_argument("--force", action="store_true")
 
     p_cur = sub.add_parser("curate",
-                            help="apply a watchlist-curator JSON payload to holdings.csv + curation_history.csv")
+                            help="apply a watchlist-curator JSON payload to watchlist.csv + curation_history.csv")
     p_cur.add_argument("--input", required=True,
                        help="path to the curator agent's JSON output")
-    p_cur.add_argument("--holdings", default="holdings.csv")
+    p_cur.add_argument("--watchlist", default="watchlist.csv",
+                       help="curator-managed watchlist file to mutate (a ticker,shares file also works)")
     p_cur.add_argument("--history", default="data/curation_history.csv")
     p_cur.add_argument("--profile", default="investor_profile.md")
     p_cur.add_argument("--as-of-date", default=None,
@@ -286,7 +290,7 @@ def main(argv: list[str] | None = None) -> int:
                                       f"{fm['rebalance_period']} cadence, need {_pd}d)"}))
                     return 0
             anchors = fm.get("always_include", [])
-            all_tk = pd.read_csv("holdings.csv")["ticker"].astype(str).str.upper().tolist()
+            all_tk = pd.read_csv("watchlist.csv")["ticker"].astype(str).str.upper().tolist()
             watchlist = [t for t in all_tk if t not in anchors]      # anchors sit outside max_watchlist_size
             lookback = args.news_lookback or fw["news_lookback_days"]
             pool = corpus.read_slice(as_of, lookback)
@@ -366,7 +370,7 @@ def main(argv: list[str] | None = None) -> int:
             )
         elif args.cmd == "recommend":
             result = portfolio.recommend_portfolio(
-                holdings_path=args.holdings, out_path=args.out,
+                holdings_path=args.holdings, watchlist_path=args.watchlist, out_path=args.out,
                 period=args.period, max_weight=args.max_weight,
                 risk_free_rate=args.risk_free_rate, objective="mean_variance",
                 risk_aversion=args.risk_aversion,
@@ -376,7 +380,7 @@ def main(argv: list[str] | None = None) -> int:
             payload = json.loads(Path(args.input).read_text())
             result = portfolio.apply_curator_decisions(
                 payload,
-                holdings_path=args.holdings,
+                holdings_path=args.watchlist,
                 history_path=args.history,
                 profile_path=args.profile,
                 listing_check=not args.no_listing_check,

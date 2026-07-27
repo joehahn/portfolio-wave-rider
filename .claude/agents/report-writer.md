@@ -30,7 +30,7 @@ From the orchestrating skill, a dict containing:
   boolean, and `rationale_overall`. May be null only if the orchestrator
   explicitly skipped curation.
 - `curate_result`: the `python -m src.cli curate ...` JSON payload
-  recording what actually got applied to `holdings.csv` and
+  recording what actually got applied to `watchlist.csv` and
   `data/curation_history.csv`: `applied_adds`, `applied_removes`,
   `rejections` (each with ticker, action, reason), `post_watchlist`.
   May differ from the curator's raw proposal when the validator rejected
