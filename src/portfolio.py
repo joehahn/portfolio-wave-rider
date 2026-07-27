@@ -4636,7 +4636,7 @@ def build_curator_dashboard(
                   + _npa) if _npa else '')
     page = (
         '<!doctype html><html><head><meta charset="utf-8">'
-        '<title>Curator Backtest</title>'
+        '<title>Curator Backtest (CBT)</title>'
         '<style>body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;'
         'max-width:1180px;margin:0 auto;padding:0 1.5em;color:#222;line-height:1.5;}'
         'h1,h2{color:#111;}'
