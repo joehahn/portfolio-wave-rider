@@ -87,6 +87,7 @@ def build(canon_dir: str, forward_corpus: str, since: str, out: Path) -> None:
     # ---- unique articles across all pools (dedupe by url); keep best provenance seen ----
     uniq = {}
     for p in pools:
+        side = "web" if p.get("source") == FW_SRC else "gkg"   # gkg = GKG discovery + Wayback; web = WebSearch
         for a in p.get("articles", []):
             url = a.get("url")
             if not url:
@@ -96,7 +97,7 @@ def build(canon_dir: str, forward_corpus: str, since: str, out: Path) -> None:
             if url not in uniq:
                 uniq[url] = {"date": a.get("date", ""), "source": a.get("source", ""),
                              "title": a.get("title", ""), "url": url, "author": a.get("author", ""),
-                             "wave": a.get("wave", ""), "has_clean": clean, "has_live": live}
+                             "wave": a.get("wave", ""), "has_clean": clean, "has_live": live, "side": side}
             else:
                 uniq[url]["has_clean"] |= clean
                 uniq[url]["has_live"] |= live
@@ -109,6 +110,7 @@ def build(canon_dir: str, forward_corpus: str, since: str, out: Path) -> None:
 
     # ---- time buckets over unique articles (green overlay = has a CLEAN lede) ----
     mon_g, mon_w, wk_g, wk_w, day_g, day_w, dow_g, dow_w = (Counter() for _ in range(8))
+    mon_gkg, mon_web, wk_gkg, wk_web, day_gkg, day_web = (Counter() for _ in range(6))   # plots 1-3, by side
     for a in articles:
         dt = _iso(a["date"])
         if dt is None:
@@ -116,9 +118,10 @@ def build(canon_dir: str, forward_corpus: str, since: str, out: Path) -> None:
         hw, mo = a["has_clean"], a["date"][:7]
         wk = (dt - timedelta(days=dt.weekday())).isoformat()
         di, wd = dt.isoformat(), DOW[dt.weekday()]
-        mon_g[mo] += 1; mon_w[mo] += hw
-        wk_g[wk] += 1; wk_w[wk] += hw
-        day_g[di] += 1; day_w[di] += hw
+        _gk = a.get("side", "gkg") == "gkg"
+        mon_g[mo] += 1; mon_w[mo] += hw; (mon_gkg if _gk else mon_web)[mo] += 1
+        wk_g[wk] += 1; wk_w[wk] += hw; (wk_gkg if _gk else wk_web)[wk] += 1
+        day_g[di] += 1; day_w[di] += hw; (day_gkg if _gk else day_web)[di] += 1
         dow_g[wd] += 1; dow_w[wd] += hw
     # Plots 1-3 span the full pool WINDOW (first backtest pool -> last forward pull), not just the dates
     # that happen to carry articles, so empty months/weeks/days show as zeros across the whole bridge.
@@ -196,23 +199,34 @@ def build(canon_dir: str, forward_corpus: str, since: str, out: Path) -> None:
               "7. Source utilization", "8. Articles per search keyword")
     fig = make_subplots(rows=8, cols=1, vertical_spacing=0.025, subplot_titles=titles,
                         row_heights=[1, 1, 1, 1, 1, 1, 3.6, 2.4])
-    fig.add_trace(go.Bar(x=mo_keys, y=[mon_g[m] for m in mo_keys], marker_color=BLUE), row=1, col=1)
-    fig.add_trace(go.Bar(x=wk_keys, y=[wk_g[w] for w in wk_keys], marker_color=BLUE), row=2, col=1)
-    fig.add_trace(go.Scatter(x=day_x, y=day_yg, mode="lines", line={"color": BLUE, "width": 1}), row=3, col=1)
-    fig.add_trace(go.Bar(x=DOW, y=[dow_g.get(d, 0) for d in DOW], marker_color=BLUE), row=4, col=1)
+    # 1-3. volume over time, STACKED by provenance: GKG discovery + Wayback ledes (backtest, blue) vs
+    # WebSearch (forward, gold). Legend shown once (row 1); the gold bars begin at the 2026-07-22 handoff.
+    fig.add_trace(go.Bar(x=mo_keys, y=[mon_gkg[m] for m in mo_keys], marker_color=BLUE,
+                         name="GKG + Wayback (backtest)", legendgroup="gkg"), row=1, col=1)
+    fig.add_trace(go.Bar(x=mo_keys, y=[mon_web[m] for m in mo_keys], marker_color=GOLD,
+                         name="WebSearch (forward)", legendgroup="web"), row=1, col=1)
+    fig.add_trace(go.Bar(x=wk_keys, y=[wk_gkg[w] for w in wk_keys], marker_color=BLUE,
+                         legendgroup="gkg", showlegend=False), row=2, col=1)
+    fig.add_trace(go.Bar(x=wk_keys, y=[wk_web[w] for w in wk_keys], marker_color=GOLD,
+                         legendgroup="web", showlegend=False), row=2, col=1)
+    fig.add_trace(go.Bar(x=day_x, y=[day_gkg[d] for d in day_x], marker_color=BLUE,
+                         legendgroup="gkg", showlegend=False), row=3, col=1)
+    fig.add_trace(go.Bar(x=day_x, y=[day_web[d] for d in day_x], marker_color=GOLD,
+                         legendgroup="web", showlegend=False), row=3, col=1)
+    fig.add_trace(go.Bar(x=DOW, y=[dow_g.get(d, 0) for d in DOW], marker_color=BLUE, showlegend=False), row=4, col=1)
     fig.add_trace(go.Bar(x=[v for _, v in wv][::-1], y=[k for k, _ in wv][::-1], orientation="h",
-                         marker_color=GREEN), row=5, col=1)
-    fig.add_trace(go.Scatter(x=bw_x, y=bw_total, mode="lines+markers", name="clean + live-fallback",
-                             line={"color": ORANGE, "width": 1.6}, marker={"size": 5}), row=6, col=1)
-    fig.add_trace(go.Scatter(x=bw_x, y=bw_clean, mode="lines+markers", name="clean (Wayback + WebSearch)",
-                             line={"color": GREEN, "width": 1.6}, marker={"size": 5}), row=6, col=1)
+                         marker_color=GREEN, showlegend=False), row=5, col=1)
+    fig.add_trace(go.Scatter(x=bw_x, y=bw_total, mode="lines+markers", line={"color": ORANGE, "width": 1.6},
+                             marker={"size": 5}, showlegend=False), row=6, col=1)
+    fig.add_trace(go.Scatter(x=bw_x, y=bw_clean, mode="lines+markers", line={"color": GREEN, "width": 1.6},
+                             marker={"size": 5}, showlegend=False), row=6, col=1)
     fig.add_vline(x="2026-07-22", line={"dash": "dot", "color": "#999"}, row=6, col=1)
     fig.add_trace(go.Bar(x=[c if c > 0 else 0.5 for _, c, _ in src_rows], y=[s for s, _, _ in src_rows],
-                         orientation="h", marker_color=[col for _, _, col in src_rows],
+                         orientation="h", marker_color=[col for _, _, col in src_rows], showlegend=False,
                          customdata=[c for _, c, _ in src_rows],
                          hovertemplate="%{y}: %{customdata} articles<extra></extra>"), row=7, col=1)
     fig.add_trace(go.Bar(x=[c if c > 0 else 0.5 for _, c, _ in kw_rows], y=[k for k, _, _ in kw_rows],
-                         orientation="h", marker_color=[col for _, _, col in kw_rows],
+                         orientation="h", marker_color=[col for _, _, col in kw_rows], showlegend=False,
                          customdata=[c for _, c, _ in kw_rows],
                          hovertemplate="%{y}: %{customdata} articles<extra></extra>"), row=8, col=1)
     for r in (1, 2, 3, 4):
@@ -223,8 +237,10 @@ def build(canon_dir: str, forward_corpus: str, since: str, out: Path) -> None:
     fig.update_yaxes(dtick=1, tickfont={"size": 9}, row=7, col=1)
     fig.update_xaxes(title_text="unique articles (log; 0 plotted at 0.5)", type="log", row=8, col=1)
     fig.update_yaxes(dtick=1, tickfont={"size": 9}, row=8, col=1)
-    fig.update_layout(template="seaborn", height=int(400 * 12.0), barmode="group", showlegend=False,
-                      margin={"t": 55, "l": 200}, hovermode="closest")
+    fig.update_layout(template="seaborn", height=int(400 * 12.0), barmode="stack", showlegend=True,
+                      legend={"orientation": "h", "y": 1.03, "x": 0.5, "xanchor": "center",
+                              "yanchor": "bottom", "font": {"size": 12}},
+                      margin={"t": 80, "l": 200}, hovermode="closest")
     chart_html = fig.to_html(full_html=False, include_plotlyjs="cdn", config={"displayModeBar": False})
 
     cfg_link = ('<p style="color:#555;max-width:820px;margin:.2em 0 0;">The full per-wave search-term lists '
