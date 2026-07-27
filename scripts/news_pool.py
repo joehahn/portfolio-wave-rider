@@ -46,9 +46,11 @@ CACHE = RUN_DIR / "_cache"
 CAP05_STARTER = ROOT / "data" / "curator_runs" / "postcovid-cap05" / "_starter.json"
 
 GDELT_URL = "https://api.gdeltproject.org/api/v2/doc/doc"
-WAYBACK_MIN_INTERVAL = 0.15    # politeness pace (s) between availability-API request STARTS across the
-                               # concurrent enrich workers. The availability API is light + tolerant
-                               # (~150+/min), so this stays low; it's not the CDX ~3.5/min bottleneck.
+WAYBACK_MIN_INTERVAL = 0.25    # politeness pace (s) between archive.org request STARTS across the
+                               # concurrent enrich workers. Kept gentle: a COLD-cache fresh pull fetches
+                               # every URL for the first time, and sustained load DOES draw transient
+                               # timeouts / 429s in bursts (empirically ~35% of dates lost clean-Wayback
+                               # ledes at 0.15s/10-workers). _wb_get retries absorb the rest.
 # A named User-Agent identifies us as a polite client; the default python-requests UA is what
 # rate-limiters clamp first. IMPORTANT: every GDELT call must route through gdelt_fetch() so it
 # goes through the single serial pacer — never make out-of-band probes (that trips the
@@ -112,14 +114,17 @@ _last_gdelt_call = [0.0]
 _wb_last = [0.0]           # archive.org pacer clock (separate from GDELT's)
 _wb_lock = threading.Lock()  # guards _wb_last slot reservation so concurrent lede fetches stagger
 _WB_STAT = {"requests": 0, "http_429": 0, "http_5xx": 0, "timeout": 0}  # process-cumulative health
-_wb_bulk = [False]           # bulk-build mode: cache an exhausted-transient as a confirmed miss so a
-                             # poorly-archived URL is not re-fetched (60-80s) on every pass. Off by
-                             # default (live path keeps retry-on-next-run); wayback_ledes turns it on.
-WAYBACK_ENRICH_WORKERS = 10  # concurrent wayback_lede fetches. The 1.5s start-slot spacing caps us at
-                             # ~40/min regardless of worker count, so 10 workers just ensures enough are
-                             # in flight to keep the pipe full while CDX's multi-second latencies overlap.
-                             # archive.org is NOT rate-limiting us (probe: clean 200s, no Retry-After) —
-                             # it's just slow, so overlapping (not hammering) is the win.
+_wb_bulk = [False]           # bulk-build mode marker (set by wayback_ledes_dated). NOTE: transient
+                             # failures are NEVER cached as misses now — only CONFIRMED "not archived"
+                             # results are. A cold bulk pull that hits a bad archive.org window thus
+                             # leaves those URLs uncached so a re-run recovers them, instead of freezing
+                             # a false miss. _wb_get's retries make persistent transients rare.
+WAYBACK_ENRICH_WORKERS = 8   # concurrent wayback_lede fetches. Overlaps archive.org's multi-second
+                             # latencies to keep the pipe full without hammering. Lowered from 10 after a
+                             # cold fresh pull drew timeout bursts; _wb_get adds per-request retry+backoff.
+WAYBACK_RETRIES = 3          # extra attempts per archive.org GET on a transient failure (timeout/429/5xx)
+WAYBACK_BACKOFF_BASE = 1.0   # seconds; exponential backoff = BASE * 2**attempt, honoring Retry-After
+WAYBACK_BACKOFF_CAP = 20.0   # max single backoff sleep (s), also caps a Retry-After we'll honor
 _cache_only = [False]      # when True, gdelt_fetch returns cached data only (no HTTP) —
                            # GHR's --no-pull: rebuild/inspect a pool without hitting GDELT
 
@@ -270,14 +275,38 @@ def _extract_author(html: str) -> str:
     return ""
 
 
+def _wb_get(url: str, timeout: float, params: "dict | None" = None) -> requests.Response:
+    """archive.org GET with retry + exponential backoff on transient failures (network errors, 429, 5xx),
+    honoring Retry-After. Each attempt reserves a polite start slot via _wb_throttle. Raises the last
+    error only after WAYBACK_RETRIES are exhausted, so a caller treats a persistent failure as a
+    (never-cached) transient miss — a bad archive.org window never freezes a false 'not-archived'."""
+    last: "Exception | None" = None
+    for attempt in range(WAYBACK_RETRIES + 1):
+        _wb_throttle()
+        _WB_STAT["requests"] += 1
+        try:
+            r = _wb_session().get(url, params=params, timeout=timeout, headers={"User-Agent": _UA})
+            if r.status_code == 429 or 500 <= r.status_code < 600:
+                _WB_STAT["http_429" if r.status_code == 429 else "http_5xx"] += 1
+                last = requests.exceptions.HTTPError(f"archive.org {r.status_code}")
+                ra = r.headers.get("Retry-After", "")
+                if ra.isdigit():                      # explicit throttle: wait the server-asked interval
+                    time.sleep(min(float(ra), WAYBACK_BACKOFF_CAP))
+            else:
+                return r
+        except requests.exceptions.RequestException as e:
+            last = e
+            _WB_STAT["timeout"] += 1
+        if attempt < WAYBACK_RETRIES:
+            time.sleep(min(WAYBACK_BACKOFF_BASE * (2 ** attempt), WAYBACK_BACKOFF_CAP))
+    raise last if last else requests.exceptions.RequestException("archive.org get failed")
+
+
 def _avail_snapshot(url: str, target: date) -> "str | None":
     """archive.org availability API: 14-digit timestamp of the closest snapshot, iff it is AT-OR-BEFORE
-    target (look-ahead-clean); else None. Raises requests exceptions on a transient network blip."""
+    target (look-ahead-clean); else None. Raises (after _wb_get's retries) on a persistent failure."""
     ts = target.strftime("%Y%m%d") + "235959"
-    _wb_throttle()
-    _WB_STAT["requests"] += 1
-    r = _wb_session().get(_AVAIL, params={"url": url, "timestamp": ts},
-                          timeout=12, headers={"User-Agent": _UA})
+    r = _wb_get(_AVAIL, 12, params={"url": url, "timestamp": ts})
     snap = r.json().get("archived_snapshots", {}).get("closest", {})
     st = snap.get("timestamp", "") if snap.get("available") else ""
     return st if st and st[:8] <= target.strftime("%Y%m%d") else None
@@ -302,21 +331,19 @@ def wayback_lede(url: str, target: date) -> tuple[str, bool]:
             ts = _avail_snapshot(cand, target)
             if not ts:
                 continue
-            _wb_throttle()
-            _WB_STAT["requests"] += 1
-            r = _wb_session().get(f"http://web.archive.org/web/{ts}id_/{cand}",
-                                  timeout=15, headers={"User-Agent": _UA})
+            r = _wb_get(f"http://web.archive.org/web/{ts}id_/{cand}", 15)
             lede = _clean_lede(trafilatura.extract(r.text, favor_precision=True, include_comments=False))
             if lede:
                 _cache_put("wayback", key, {"lede": lede, "author": _extract_author(r.text), "hit": True})
                 return lede, True
-        _cache_put("wayback", key, {"lede": "", "author": "", "hit": False})  # no snapshot / no lede
+        _cache_put("wayback", key, {"lede": "", "author": "", "hit": False})  # CONFIRMED: no snapshot / no lede
         return "", False
     except requests.exceptions.RequestException:
-        _WB_STAT["timeout"] += 1
-        if _wb_bulk[0]:                   # bulk build: accept the miss so a re-run doesn't re-burn it
-            _cache_put("wayback", key, {"lede": "", "hit": False})
-        return "", False                  # transient: DO NOT cache on the live path — retry next run
+        # Persistent transient failure (retries in _wb_get already exhausted; the timeout/429/5xx counters
+        # were bumped there). NEVER cache it — leaving the URL uncached lets a re-run recover it instead of
+        # freezing a false 'not-archived' miss (the cold-pull bug that lost clean-Wayback ledes on ~35% of
+        # dates). live-fallback still backfills the curator's lede for this run.
+        return "", False
 
 
 def wayback_ledes(urls: list[str], target: date,
