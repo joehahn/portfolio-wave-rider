@@ -174,10 +174,14 @@ def _seen_ids() -> set[str]:
 
 
 def append_pull(pull_id: str, pulled_at: str, retriever: str, retrieval_model: str,
-                sightings: list[dict[str, Any]], query_stats: dict[str, Any]) -> dict[str, Any]:
+                sightings: list[dict[str, Any]], query_stats: dict[str, Any],
+                dry_run: bool = False) -> dict[str, Any]:
     """Persist one pull. `sightings` = one dict per (result) sighting carrying both body and
     sighting fields (built by the retriever). Dedups bodies by article_id, logs every appearance,
-    and writes a manifest row. Returns a summary dict."""
+    and writes a manifest row. Returns a summary dict.
+
+    With ``dry_run=True`` the dedup/counting runs exactly as normal (so the returned summary is
+    accurate) but nothing is written to the corpus files -- for a no-op preview of a pull."""
     seen = _seen_ids()
     new_bodies, appearances = [], []
     n_new = 0
@@ -188,14 +192,15 @@ def append_pull(pull_id: str, pulled_at: str, retriever: str, retrieval_model: s
             new_bodies.append({k: s.get(k) for k in _BODY_FIELDS})
             seen.add(aid)
             n_new += 1
-    _append_jsonl(ARTICLES, new_bodies)
-    _append_jsonl(APPEARANCES, appearances)
-    manifest = {"pull_id": pull_id, "pulled_at": pulled_at, "retriever": retriever,
-                "retrieval_model": retrieval_model, "n_sightings": len(sightings),
-                "n_new_articles": n_new, "query_stats": query_stats}
-    _append_jsonl(PULLS, [manifest])
+    if not dry_run:
+        _append_jsonl(ARTICLES, new_bodies)
+        _append_jsonl(APPEARANCES, appearances)
+        manifest = {"pull_id": pull_id, "pulled_at": pulled_at, "retriever": retriever,
+                    "retrieval_model": retrieval_model, "n_sightings": len(sightings),
+                    "n_new_articles": n_new, "query_stats": query_stats}
+        _append_jsonl(PULLS, [manifest])
     return {"pull_id": pull_id, "sightings": len(sightings), "new_articles": n_new,
-            "queries": len(query_stats), "corpus_articles": len(seen)}
+            "queries": len(query_stats), "corpus_articles": len(seen), "dry_run": dry_run}
 
 
 def read_slice(as_of: str, lookback_days: int) -> list[dict[str, Any]]:

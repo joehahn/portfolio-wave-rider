@@ -221,6 +221,9 @@ def main(argv: list[str] | None = None) -> int:
                              "pipeline (BigQuery GKG discovery + Wayback lede + title-gated live fallback), "
                              "instead of a same-day WebSearch pull")
     p_pull.add_argument("--days", type=int, default=21, help="--backfill window in days (default 21)")
+    p_pull.add_argument("--dry-run", action="store_true",
+                        help="fetch and report what WOULD be pulled (sightings + new-article counts) "
+                             "without writing anything to the frozen corpus")
 
     p_rev = sub.add_parser("review",
                            help="FORWARD rebalance: curate the watchlist from the corpus news slice, "
@@ -254,7 +257,7 @@ def main(argv: list[str] | None = None) -> int:
                 r = retriever.GkgWaybackRetriever(days=args.days, max_articles=args.max_results or 160)
                 sightings, query_stats = r.pull(pull_id, pulled_at)
                 result = corpus.append_pull(pull_id, pulled_at, "gkg-wayback-backfill", f"{args.days}d",
-                                            sightings, query_stats)
+                                            sightings, query_stats, dry_run=args.dry_run)
             else:
                 waves = json.loads(Path("gkg_config.json").read_text()).get("wave_keywords", {})
                 if args.limit_waves:
@@ -263,7 +266,8 @@ def main(argv: list[str] | None = None) -> int:
                 model = args.model or fw["retrieval_model"]
                 r = retriever.WebSearchRetriever(model, waves, max_results_per_query=args.max_results)
                 sightings, query_stats = r.pull(pull_id, pulled_at)
-                result = corpus.append_pull(pull_id, pulled_at, fw["retriever"], model, sightings, query_stats)
+                result = corpus.append_pull(pull_id, pulled_at, fw["retriever"], model, sightings, query_stats,
+                                            dry_run=args.dry_run)
             result["as_of"] = as_of
         elif args.cmd == "review":
             from datetime import datetime
