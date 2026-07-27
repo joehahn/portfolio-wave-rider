@@ -33,7 +33,7 @@ TRACK_TICKERS = ["QUBT", "RKLB", "NVDA"]     # section 6: flag whether each mws 
 
 # "Recommended settings" = the risk/churn-constrained frontier read off plots 1-3: keep only configs with
 # shallow drawdown AND low churn on BOTH norms, then eyeball the survivors for the best return metrics.
-REC_MAX_DD, REC_MAX_L1, REC_MAX_L2 = 45.0, 800.0, 1000.0   # |maxDD|% , L1 turnover , L2 path-length ceilings
+REC_MAX_DD, REC_MAX_L1, REC_MAX_L2 = 40.0, 700.0, 900.0   # |maxDD|% , L1 turnover , L2 path-length ceilings
 
 # LLM curator comparison (section 3): (label, run_dir, provider, $in/M, $out/M). Agreement is measured
 # against the reference (first row). Add a row per model run you want to compare.
