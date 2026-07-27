@@ -297,12 +297,15 @@ def main(argv: list[str] | None = None) -> int:
                 curator.format_pool(pool), watchlist, as_of=as_of, model=model, anthropic_cli=cli_a,
                 max_size=int(fm["max_watchlist_size"]), anchors=anchors, cadence=fm["rebalance_period"],
                 intro=curator.LIVE_INTRO, no_reasoning=True,
-                log_path=live / f"{as_of}-curator.json", fail_dir=live / "_parse_fail")
-            live.mkdir(parents=True, exist_ok=True)
-            (live / f"{as_of}-curation.json").write_text(json.dumps(decision, indent=2))
+                log_path=(None if args.dry_run else live / f"{as_of}-curator.json"),
+                fail_dir=(None if args.dry_run else live / "_parse_fail"))
             if args.dry_run:
+                # A dry run writes NOTHING: no curator log, no curation JSON, no holdings/report change --
+                # and it leaves the --if-due cadence clock untouched (that gate reads live/*-curation.json).
                 result = {"as_of": as_of, "articles_read": len(pool), "dry_run": True, "decision": decision}
             else:
+                live.mkdir(parents=True, exist_ok=True)
+                (live / f"{as_of}-curation.json").write_text(json.dumps(decision, indent=2))
                 # Recommendation-only: apply updates the WATCHLIST (shares=0 adds; the validator blocks
                 # removing a ticker with shares>0), never real share counts. Then re-optimize + report.
                 apply_res = portfolio.apply_curator_decisions(decision, listing_check=True, as_of_date=as_of)
