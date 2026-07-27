@@ -140,16 +140,6 @@ def build(canon_dir: str, forward_corpus: str, since: str, out: Path) -> None:
     while _d <= _span_hi:
         k = _d.isoformat(); day_x.append(k); day_yg.append(day_g.get(k, 0)); _d += timedelta(days=1)
 
-    # ---- plot 6: per-pool lede coverage. CLEAN = Wayback + WebSearch (both safe); TOTAL adds the
-    # look-ahead-biased live-fallback (backtest tail only). Colored by side so the handoff is visible. ----
-    _bw = sorted(((p["as_of_date"], p.get("lede_sources", {}), max(p.get("n_articles", 1), 1),
-                   p.get("source")) for p in pools if p.get("as_of_date")), key=lambda r: r[0])
-    bw_x = [d for d, _, _, _ in _bw]
-    bw_clean = [(ls.get("wayback", 0) + ls.get("websearch", 0)) / n for _, ls, n, _ in _bw]
-    bw_total = [(ls.get("wayback", 0) + ls.get("websearch", 0) + ls.get("live", 0)) / n for _, ls, n, _ in _bw]
-    avg_clean = 100.0 * sum(bw_clean) / len(bw_clean) if bw_clean else 0.0
-    avg_total = 100.0 * sum(bw_total) / len(bw_total) if bw_total else 0.0
-
     # ---- per-wave (unique). Forward carries a wave tag; backtest doesn't, so infer via gkg_pool. ----
     wave_c = Counter()
     for a in articles:
@@ -195,10 +185,10 @@ def build(canon_dir: str, forward_corpus: str, since: str, out: Path) -> None:
 
     # ---- 8-row figure (mirrors the RBT) ----
     titles = ("1. Unique articles per month", "2. Unique articles per week", "3. Unique articles per day",
-              "4. Unique articles by day of week", "5. Unique articles by wave", "6. Lede coverage by pool",
-              "7. Source utilization", "8. Articles per search keyword")
-    fig = make_subplots(rows=8, cols=1, vertical_spacing=0.025, subplot_titles=titles,
-                        row_heights=[1, 1, 1, 1, 1, 1, 3.6, 2.4])
+              "4. Unique articles by day of week", "5. Unique articles by wave",
+              "6. Source utilization", "7. Articles per search keyword")
+    fig = make_subplots(rows=7, cols=1, vertical_spacing=0.025, subplot_titles=titles,
+                        row_heights=[1, 1, 1, 1, 1, 3.6, 2.4])
     # 1-3. volume over time, STACKED by provenance: GKG discovery + Wayback ledes (backtest, blue) vs
     # WebSearch (forward, gold). Legend shown once (row 1); the gold bars begin at the 2026-07-22 handoff.
     fig.add_trace(go.Bar(x=mo_keys, y=[mon_gkg[m] for m in mo_keys], marker_color=BLUE,
@@ -216,35 +206,29 @@ def build(canon_dir: str, forward_corpus: str, since: str, out: Path) -> None:
     fig.add_trace(go.Bar(x=DOW, y=[dow_g.get(d, 0) for d in DOW], marker_color=BLUE, showlegend=False), row=4, col=1)
     fig.add_trace(go.Bar(x=[v for _, v in wv][::-1], y=[k for k, _ in wv][::-1], orientation="h",
                          marker_color=GREEN, showlegend=False), row=5, col=1)
-    fig.add_trace(go.Scatter(x=bw_x, y=bw_total, mode="lines+markers", line={"color": ORANGE, "width": 1.6},
-                             marker={"size": 5}, showlegend=False), row=6, col=1)
-    fig.add_trace(go.Scatter(x=bw_x, y=bw_clean, mode="lines+markers", line={"color": GREEN, "width": 1.6},
-                             marker={"size": 5}, showlegend=False), row=6, col=1)
-    fig.add_vline(x="2026-07-22", line={"dash": "dot", "color": "#999"}, row=6, col=1)
     fig.add_trace(go.Bar(x=[c if c > 0 else 0.5 for _, c, _ in src_rows], y=[s for s, _, _ in src_rows],
                          orientation="h", marker_color=[col for _, _, col in src_rows], showlegend=False,
                          customdata=[c for _, c, _ in src_rows],
-                         hovertemplate="%{y}: %{customdata} articles<extra></extra>"), row=7, col=1)
+                         hovertemplate="%{y}: %{customdata} articles<extra></extra>"), row=6, col=1)
     fig.add_trace(go.Bar(x=[c if c > 0 else 0.5 for _, c, _ in kw_rows], y=[k for k, _, _ in kw_rows],
                          orientation="h", marker_color=[col for _, _, col in kw_rows], showlegend=False,
                          customdata=[c for _, c, _ in kw_rows],
-                         hovertemplate="%{y}: %{customdata} articles<extra></extra>"), row=8, col=1)
+                         hovertemplate="%{y}: %{customdata} articles<extra></extra>"), row=7, col=1)
     for r in (1, 2, 3, 4):
         fig.update_yaxes(title_text="articles", row=r, col=1)
     fig.update_xaxes(title_text="unique articles", row=5, col=1)
-    fig.update_yaxes(title_text="lede rate (clean vs +live)", row=6, col=1)
+    fig.update_xaxes(title_text="unique articles (log; 0 plotted at 0.5)", type="log", row=6, col=1)
+    fig.update_yaxes(dtick=1, tickfont={"size": 9}, row=6, col=1)
     fig.update_xaxes(title_text="unique articles (log; 0 plotted at 0.5)", type="log", row=7, col=1)
     fig.update_yaxes(dtick=1, tickfont={"size": 9}, row=7, col=1)
-    fig.update_xaxes(title_text="unique articles (log; 0 plotted at 0.5)", type="log", row=8, col=1)
-    fig.update_yaxes(dtick=1, tickfont={"size": 9}, row=8, col=1)
-    fig.update_layout(template="seaborn", height=int(400 * 12.0), barmode="stack", showlegend=True,
+    fig.update_layout(template="seaborn", height=int(400 * 11.0), barmode="stack", showlegend=True,
                       legend={"orientation": "h", "y": 1.03, "x": 0.5, "xanchor": "center",
                               "yanchor": "bottom", "font": {"size": 12}},
                       margin={"t": 80, "l": 200}, hovermode="closest")
     chart_html = fig.to_html(full_html=False, include_plotlyjs="cdn", config={"displayModeBar": False})
 
     cfg_link = ('<p style="color:#555;max-width:820px;margin:.2em 0 0;">The full per-wave search-term lists '
-                'behind plot 8 live in <a href="https://github.com/joehahn/portfolio-wave-rider/blob/main/'
+                'behind plot 7 live in <a href="https://github.com/joehahn/portfolio-wave-rider/blob/main/'
                 'gkg_config.json"><code>gkg_config.json</code></a> (<code>wave_keywords</code>). The forward '
                 'cron queries the same waves.</p>')
 
@@ -257,7 +241,7 @@ def build(canon_dir: str, forward_corpus: str, since: str, out: Path) -> None:
                              marker_color=GOLD))
     _afig.update_layout(template="seaborn", height=560, margin={"t": 10, "l": 250, "r": 20, "b": 40},
                         xaxis_title="unique articles", showlegend=False)
-    author_html = ('<h2 style="margin:1.8em 0 0.2em;">9. Articles per author</h2>'
+    author_html = ('<h2 style="margin:1.8em 0 0.2em;">8. Articles per author</h2>'
                    f'<p style="color:#555;max-width:820px;"><b>{100*len(authors)//max(n_uniq,1)}%</b> of the '
                    f'{n_uniq:,} unique articles ({len(authors):,}) carry a byline (native capture on both sides: '
                    f'Wayback/live extraction on the backtest tail, the WebSearch pull on the forward side).</p>'
@@ -273,8 +257,8 @@ def build(canon_dir: str, forward_corpus: str, since: str, out: Path) -> None:
              + card(f"{pools[0]['as_of_date']} → {pools[-1]['as_of_date']}", "coverage span")
              + card(f"{pct_clean:.0f}%", "CLEAN lede: Wayback + WebSearch (look-ahead-safe)")
              + card(f"{pct_cov:.0f}%", "clean + live-fallback coverage")
-             + card(f"{100*len(authors)//max(n_uniq,1)}%", "unique articles with a byline (plot 9)")
-             + card(f"{n_rec_zero}/{len(rec_rows)}", "configured desks surfaced 0x (plot 7)"))
+             + card(f"{100*len(authors)//max(n_uniq,1)}%", "unique articles with a byline (plot 8)")
+             + card(f"{n_rec_zero}/{len(rec_rows)}", "configured desks surfaced 0x (plot 6)"))
 
     # ---- parameter table (RETRIEVAL knobs, mirrors the RBT) ----
     _fm = _pf.load_financial_model(str(ROOT / "investor_profile.md"))
@@ -296,7 +280,7 @@ def build(canon_dir: str, forward_corpus: str, since: str, out: Path) -> None:
     ts = datetime.now().strftime("%Y-%m-%d %H:%M %Z").strip()
     span = f'{pools[0]["as_of_date"]} to {pools[-1]["as_of_date"]}'
     page = (
-        '<!doctype html><html><head><meta charset="utf-8"><title>Retriever Bootstrap</title>'
+        '<!doctype html><html><head><meta charset="utf-8"><title>Retriever Bootstrap (RBS)</title>'
         '<style>body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;'
         'max-width:1180px;margin:0 auto;padding:0 1.5em;color:#222;line-height:1.5}h1,h2{color:#111}'
         '.built{position:absolute;top:8px;right:16px;font-size:12px;color:#888}</style></head><body>'
@@ -310,8 +294,7 @@ def build(canon_dir: str, forward_corpus: str, since: str, out: Path) -> None:
         '(2026-07-22): the backtest&#39;s last ~3 months of ranked <b>top-100</b> pools (GKG discovery + '
         'look-ahead-clean <b>Wayback</b> ledes) spliced onto the forward cron&#39;s daily <b>WebSearch</b> '
         'pulls. Both Wayback and WebSearch ledes are look-ahead-safe (WebSearch because the forward news is '
-        'genuinely current); the backtest-only <b>live-fallback</b> is the single look-ahead-biased provenance. '
-        'Plot 6 tracks the clean rate (Wayback + WebSearch) vs the clean+live coverage, with the handoff marked.</p>'
+        'genuinely current); the backtest-only <b>live-fallback</b> is the single look-ahead-biased provenance.</p>'
         f'<div style="margin:1em 0 1.5em">{cards}</div>' + _params + chart_html + cfg_link + author_html
         + '</body></html>')
     out.write_text(page)
