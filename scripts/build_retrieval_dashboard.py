@@ -289,8 +289,14 @@ def build(run_rel, out):
                 '(<code>wave_keywords</code>).</p>')
 
     # ---- 9. Articles per author (bylines from run_rel/_authors.json) ----
+    # NATIVE capture attempts a byline for EVERY pooled article (build_article_pool stores a["author"]) -> a
+    # pool-wide rate is meaningful. An OLD run built before that only has _authors.json backfilled for the
+    # curator's CITED evidence URLs -> report a raw count, not a misleading "% of all pooled articles".
     author_html = ""
     _authored_n = 0
+    _native_authors = any(
+        isinstance(x, dict) and "author" in x
+        for _pf in (ROOT / run_rel).glob("*-pool.json") for x in json.loads(_pf.read_text()))
     _af_path = ROOT / run_rel / "_authors.json"
     if _af_path.exists():
         _authors_raw = json.loads(_af_path.read_text())   # {url: byline}
@@ -305,10 +311,14 @@ def build(run_rel, out):
                                  orientation="h", marker_color="#f59e0b"))
         _afig.update_layout(template="seaborn", height=560, margin={"t": 10, "l": 250, "r": 20, "b": 40},
                             xaxis_title="unique articles", showlegend=False)
+        _cap = (f'<b>{100 * _authored_n // max(n_uniq, 1)}%</b> of the {n_uniq:,} pooled articles '
+                f'({_authored_n:,}) have a known author.' if _native_authors else
+                f'This backtest predates native author capture, so bylines were only backfilled for the '
+                f'curator&#39;s cited evidence: <b>{_authored_n:,} known authors</b> (not the full pool). '
+                f'Re-run the backtest to capture bylines pool-wide.')
         author_html = (
             '<h2 style="margin:1.8em 0 0.2em;">9. Articles per author</h2>'
-            f'<p style="color:#555;max-width:820px;"><b>{100 * _authored_n // max(n_uniq, 1)}%</b> of the '
-            f'{n_uniq:,} pooled articles ({_authored_n:,}) have a known author.</p>'
+            f'<p style="color:#555;max-width:820px;">{_cap}</p>'
             + _afig.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False}))
 
     # ---- stat cards ----
@@ -320,7 +330,9 @@ def build(run_rel, out):
     cards = (card(f"{corpus_total:,}", "articles gathered (full corpus)")
              + card(len(pools), "pools / rebalances")
              + card(f"{n_uniq:,}", "unique articles shown to curator")
-             + card(f"{100*_authored_n//max(n_uniq,1)}%", "articles with a byline (plot 9)")
+             + (card(f"{100*_authored_n//max(n_uniq,1)}%", "pooled articles with a byline (plot 9)")
+                if _native_authors else
+                card(f"{_authored_n:,}", "cited-evidence authors (plot 9; not pool-wide)"))
              + card(f"{avg_clean:.0f}%", "avg CLEAN Wayback lede / window (plot 6, green)")
              + card(f"{avg_total:.0f}%", "avg CLEAN+LIVE coverage / window (plot 6, orange)")
              + card(f"{n_rec_zero}/{len(rec_rows)}", "configured desks GKG surfaced 0x (plot 7)")
