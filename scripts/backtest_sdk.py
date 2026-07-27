@@ -258,6 +258,18 @@ def build_article_pool(as_of: date, news_lookback_days: int, max_articles: int,
             a["lede_source"] = "none"
     else:
         ledes = w.wayback_ledes([a["url"] for a in arts], as_of)
+        # Self-heal transient failures WITHIN the build: a URL that came back empty but is NOT cached as a
+        # confirmed miss had _wb_get's retries exhausted by a brief archive.org burst (not a real
+        # 'not-archived'). Re-fetch just those once or twice more — bursts are short, so a later batch
+        # usually recovers them, lifting clean-Wayback to its achievable rate instead of writing a falsely
+        # low pool (e.g. a whole date reading 0% when it is really ~47% archived). Confirmed misses are
+        # cached, so this re-touches only the genuinely-transient subset — cheap.
+        for _ in range(2):
+            transient = [a["url"] for a in arts
+                         if not ledes.get(a["url"]) and w._cache_get("wayback", f"{a['url']}|{as_of}") is None]
+            if not transient:
+                break
+            ledes.update(w.wayback_ledes(transient, as_of))
         for a in arts:
             a["lede"] = ledes.get(a["url"], "")
             a["lede_source"] = "wayback" if a["lede"] else "none"   # tagged; live-fallback may upgrade "none"

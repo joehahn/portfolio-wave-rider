@@ -30,6 +30,7 @@ import argparse
 import json
 import re
 import sys
+import random
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -119,9 +120,11 @@ _wb_bulk = [False]           # bulk-build mode marker (set by wayback_ledes_date
                              # results are. A cold bulk pull that hits a bad archive.org window thus
                              # leaves those URLs uncached so a re-run recovers them, instead of freezing
                              # a false miss. _wb_get's retries make persistent transients rare.
-WAYBACK_ENRICH_WORKERS = 8   # concurrent wayback_lede fetches. Overlaps archive.org's multi-second
-                             # latencies to keep the pipe full without hammering. Lowered from 10 after a
-                             # cold fresh pull drew timeout bursts; _wb_get adds per-request retry+backoff.
+WAYBACK_ENRICH_WORKERS = 6   # concurrent wayback_lede fetches. archive.org tightened rate limits sharply
+                             # after its Oct-2024 outage (throttling can trigger even at low concurrency),
+                             # so a cold fresh pull draws timeout/thin-page bursts. Kept within the widely
+                             # recommended 5-10/domain; _wb_get retries+jitter and the build self-heal
+                             # recover the rest, so completeness no longer depends on never being throttled.
 WAYBACK_RETRIES = 3          # extra attempts per archive.org GET on a transient failure (timeout/429/5xx)
 WAYBACK_BACKOFF_BASE = 1.0   # seconds; exponential backoff = BASE * 2**attempt, honoring Retry-After
 WAYBACK_BACKOFF_CAP = 20.0   # max single backoff sleep (s), also caps a Retry-After we'll honor
@@ -210,6 +213,10 @@ def _parse_gdelt_date(seendate: str):
 # the heavy lifting on extraction (the old JSON-LD/meta/paragraph heuristic missed clean snapshots).
 _MIN_LEDE = 40                 # reject sub-fragment extractions (a truncated meta value, a nav crumb)
 _MAX_LEDE = 500                # a lede is a sentence or two; cap it (render truncates further)
+_WB_THIN_HTML = 1000           # an archived-page body shorter than this is a throttle/partial capture, NOT
+                               # a real article (which is many KB of markup). archive.org serves these with
+                               # a 200 status under load, so a 'no lede' off a thin body is untrustworthy —
+                               # never cache it as a confirmed miss; the build self-heal re-fetches it.
 _AVAIL = "http://archive.org/wayback/available"
 _UA = "portfolio-wave-rider/1.0 (+contact: jmh.datasciences@gmail.com)"
 _TRACK = re.compile(r"^(utm_|fbclid|gclid|mc_|ref$|ref_|referrer|cmpid|ncid|mkt_tok|igshid|_hsenc|"
@@ -298,7 +305,9 @@ def _wb_get(url: str, timeout: float, params: "dict | None" = None) -> requests.
             last = e
             _WB_STAT["timeout"] += 1
         if attempt < WAYBACK_RETRIES:
-            time.sleep(min(WAYBACK_BACKOFF_BASE * (2 ** attempt), WAYBACK_BACKOFF_CAP))
+            # exponential backoff + jitter (0-100%): archive.org's own guidance and scraping best practice
+            # both call for jitter so concurrent workers don't retry in lockstep and manufacture new bursts.
+            time.sleep(min(WAYBACK_BACKOFF_BASE * (2 ** attempt), WAYBACK_BACKOFF_CAP) * (1 + random.random()))
     raise last if last else requests.exceptions.RequestException("archive.org get failed")
 
 
@@ -324,6 +333,8 @@ def wayback_lede(url: str, target: date) -> tuple[str, bool]:
         return hit.get("lede", ""), hit.get("hit", False)
     try:
         seen: list[str] = []
+        thin = False               # a snapshot existed but its archived HTML came back too short to be a
+                                   # real capture (archive.org throttle/partial page) -> 'no lede' untrusted
         for cand in (_canon(url, "https"), _canon(url, "http"), url):
             if cand in seen:
                 continue
@@ -332,11 +343,19 @@ def wayback_lede(url: str, target: date) -> tuple[str, bool]:
             if not ts:
                 continue
             r = _wb_get(f"http://web.archive.org/web/{ts}id_/{cand}", 15)
+            if len(r.text) < _WB_THIN_HTML:
+                thin = True        # throttle/partial capture under load -> don't trust; let the heal retry
+                continue
             lede = _clean_lede(trafilatura.extract(r.text, favor_precision=True, include_comments=False))
             if lede:
                 _cache_put("wayback", key, {"lede": lede, "author": _extract_author(r.text), "hit": True})
                 return lede, True
-        _cache_put("wayback", key, {"lede": "", "author": "", "hit": False})  # CONFIRMED: no snapshot / no lede
+        if thin:
+            # A snapshot existed but every fetch of it came back thin (throttle). Do NOT cache a false
+            # 'not-archived' — return uncached so build_article_pool's self-heal re-fetches it when the
+            # burst passes. This was the dominant cold-pull false-miss (a whole date reading 0% clean).
+            return "", False
+        _cache_put("wayback", key, {"lede": "", "author": "", "hit": False})  # CONFIRMED: no snapshot / genuine no-lede
         return "", False
     except requests.exceptions.RequestException:
         # Persistent transient failure (retries in _wb_get already exhausted; the timeout/429/5xx counters
