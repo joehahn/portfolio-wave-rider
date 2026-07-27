@@ -752,7 +752,14 @@ def _validate_curator_payload(
     remove_tickers = {r.get("ticker") for r in raw_removes if isinstance(r, dict)}
     overlap = add_tickers & remove_tickers
     if overlap:
-        raise ValueError(f"ticker(s) appear in both adds and removes: {sorted(overlap)}")
+        # A ticker in BOTH adds and removes is a contradictory no-op. Drop it from both lists and record a
+        # rejection (mirrors the excess-adds handling above) so the reject-and-retry loop can ask the curator
+        # to clarify -- rather than raising and crashing the whole run (previously a hard ValueError).
+        for _t in sorted(overlap):
+            rejections.append({"ticker": _t, "action": "add/remove",
+                               "reason": "appeared in both adds and removes; dropped from both (contradictory)"})
+        raw_adds = [a for a in raw_adds if not (isinstance(a, dict) and a.get("ticker") in overlap)]
+        raw_removes = [r for r in raw_removes if not (isinstance(r, dict) and r.get("ticker") in overlap)]
 
     current_set = set(current_watchlist)
     valid_adds: list[dict[str, Any]] = []
