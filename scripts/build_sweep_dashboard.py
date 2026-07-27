@@ -419,9 +419,9 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         f'<tr><td style="text-align:left">concentration_cap</td><td style="text-align:left">{_fmt(CAPS)}</td><td style="text-align:left">{CURRENT[0]}</td></tr>'
         f'<tr><td style="text-align:left">risk_aversion (λ)</td><td style="text-align:left">{_fmt(LAMBDAS)}</td><td style="text-align:left">{CURRENT[1]}</td></tr>'
         f'<tr><td style="text-align:left">optimizer_lookback (days)</td><td style="text-align:left">{_fmt(LOOKBACKS)}</td><td style="text-align:left">{CURRENT[2]}</td></tr>'
-        f'<tr><td style="text-align:left">max_watchlist_size <span style="color:#9a6a00;">(re-curation, §6)</span></td>'
+        f'<tr><td style="text-align:left">max_watchlist_size <span style="color:#9a6a00;">(re-curation, §10)</span></td>'
         f'<td style="text-align:left">{_fmt([c for c, _ in MWS_SWEEP])}</td><td style="text-align:left">{_mws_fixed}</td></tr>'
-        f'<tr><td style="text-align:left">news_lookback_days <span style="color:#9a6a00;">(re-curation, mixed lede: 7/14/21 fuller, 28/45/90 titles, §7)</span></td>'
+        f'<tr><td style="text-align:left">news_lookback_days <span style="color:#9a6a00;">(re-curation, mixed lede: 7/14/21 fuller, 28/45/90 titles, §11)</span></td>'
         f'<td style="text-align:left">{_fmt([n for n, _ in NLB_SWEEP])}</td>'
         f'<td style="text-align:left">{int(portfolio.load_financial_model().get("news_lookback_days", 21))}</td></tr>'
         '</tbody></table>')
@@ -578,7 +578,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     _mwsfig.update_yaxes(title_text="portfolio value ($)", type="log",
                          tickvals=[10000, 30000, 100000, 300000, 1000000],
                          ticktext=["$10K", "$30K", "$100K", "$300K", "$1M"])
-    mws_equity_html = (('<h2>5. Portfolio value over time — by max_watchlist_size (vs buy/hold and SPY)</h2>'
+    mws_equity_html = (('<h2>9. Portfolio value over time — by max_watchlist_size (vs buy/hold and SPY)</h2>'
                         '<p style="color:#555;max-width:920px;">Each re-curated watchlist cap\'s realized '
                         'portfolio value on the same pools and starter — the equity-curve view of the '
                         'section-9 sweep. Tighter (smaller) watchlists concentrate into the top picks; wider '
@@ -657,7 +657,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                  f'<td>{r["ret"] * 100:+.0f}%</td><td>{r["n_add"]}</td><td>{r["n_rem"]}</td><td>{_rej}</td>'
                  f'<td>{r.get("n_ret", 0)}</td>{_flags}<td {_lc}>{", ".join(r["wl"])}</td></tr>')
     mws_html = (
-        '<h2>6. max_watchlist_size sweep</h2>'
+        '<h2>10. max_watchlist_size sweep</h2>'
         '<p style="color:#555;max-width:920px;">Unlike the cap/&lambda;/lookback knobs above (free math '
         'replays on one curation set), <b>max_watchlist_size changes the curator\'s decisions</b>, so each '
         'cap is a separate re-curation (~$0.40 LLM each) on the same news pools and AAPL/GOOGL/AMZN starter. '
@@ -678,7 +678,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         'silently blocked (the symptom that exposed the max_watchlist_size cap-override bug).</p>')
 
     # section 7: news_lookback_days sweep — title-only re-curation (no Wayback/live), curates the preserved
-    # GKG titles at the canonical mws6/cap1.0/λ2.0/150d config. Bar = each window's return; ticker flags as §6.
+    # GKG titles at the canonical mws6/cap1.0/λ2.0/150d config. Bar = each window's return; ticker flags as §10.
     _nlb = _nlb_rows()
     _live_nlb = int(portfolio.load_financial_model().get("news_lookback_days", 21))
     _ndone = [r for r in _nlb if not r.get("pending")]
@@ -712,7 +712,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                  f'<td>{r["ret"] * 100:+.0f}%</td><td>{r["ir"]:+.2f}</td><td>{r["l1"]:.0f}</td><td>{r["l2"]:.0f}</td>'
                  f'{_flags}<td {_lc}>{", ".join(r["funded"])}</td></tr>')
     nlb_html = (
-        '<h2>7. news_lookback_days sweep</h2>'
+        '<h2>11. news_lookback_days sweep</h2>'
         '<p style="color:#555;max-width:940px;">A CURATOR-param sweep (re-curation) at the canonical '
         'mws&nbsp;6 / cap&nbsp;1.0 / λ&nbsp;2.0 / 150d config. <b>MIXED lede mode</b>: the <b>7 / 14 / 21d</b> '
         'windows use <b>fuller</b> ledes (Wayback + look-ahead-biased live-fallback), the <b>28 / 45 / 90d</b> '
@@ -753,19 +753,19 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     _fixed_note = (f'watchlist size ({_mws_fixed})', f'cap ({CURRENT[0]})', f'&lambda; ({CURRENT[1]})',
                    f'lookback ({CURRENT[2]}d)')
     lb_html = (
-        '<h2>9. Total return vs optimizer lookback (live config)</h2>'
+        '<h2>6. Total return vs optimizer lookback (live config)</h2>'
         '<p style="color:#555;max-width:920px;">A FREE math-replay slice (no re-curation): hold the live '
         f'{_fixed_note[0]}, {_fixed_note[1]} and {_fixed_note[2]} fixed and vary only the optimizer lookback '
         '(trailing days of prices used to estimate μ/Σ). The <b style="color:#2b8a3e;">green</b> bar is the live '
         f'setting ({CURRENT[2]}d).</p>' + _free_bar("lb", LOOKBACKS, CURRENT[2], "optimizer_lookback (days)"))
     cap_html = (
-        '<h2>10. Total return vs concentration_cap (live config)</h2>'
+        '<h2>7. Total return vs concentration_cap (live config)</h2>'
         '<p style="color:#555;max-width:920px;">Same slice, holding the live '
         f'{_fixed_note[0]}, {_fixed_note[2]} and {_fixed_note[3]} fixed and varying only the concentration_cap '
         '(the per-position max weight). The <b style="color:#2b8a3e;">green</b> bar is the live setting '
         f'({CURRENT[0]}).</p>' + _free_bar("cap", CAPS, CURRENT[0], "concentration_cap"))
     lam_html = (
-        '<h2>11. Total return vs risk_aversion (live config)</h2>'
+        '<h2>8. Total return vs risk_aversion (live config)</h2>'
         '<p style="color:#555;max-width:920px;">Same slice, holding the live '
         f'{_fixed_note[0]}, {_fixed_note[1]} and {_fixed_note[3]} fixed and varying only the risk_aversion '
         '&lambda; (higher λ = more risk-averse = less concentrated). The <b style="color:#2b8a3e;">green</b> bar '
@@ -822,7 +822,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                 f'<th {_lc}>L1</th><th {_lc}>L2</th><th {_lc}>gems</th><th {_lc}>waves</th>'
                 f'<th {_lc}>waves generating the gains (pp)</th></tr></thead><tbody>' + _drows + '</tbody></table>')
         gems_html = (
-            '<h2>8. Backtest gems</h2>'
+            '<h2>5. Backtest gems</h2>'
             '<p style="color:#555;max-width:940px;">For every ticker the curator ever held, its best <b>$ gain</b> '
             '(price-driven P&amp;L on the position) across <b>all 1350 sweep settings</b>, and the setting that '
             'produced it. A ticker&#39;s gain is maximized by the config that weighted it most while it ran (usually '
@@ -836,7 +836,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
             f'</tr></thead><tbody>{_grows}</tbody></table>'
             + _div_html)
     else:
-        gems_html = ('<h2>7. Backtest gems</h2><p style="color:#999;">Gem scan not yet run '
+        gems_html = ('<h2>5. Backtest gems</h2><p style="color:#999;">Gem scan not yet run'
                      '(<code>scripts/gems_scan.py</code> writes <code>data/curator_runs/_gems.json</code>).</p>')
 
     ts = datetime.now().strftime("%Y-%m-%d %H:%M %Z").strip()
@@ -893,13 +893,13 @@ Current config: {_cur_l2:.0f}/yr.</p>
 {l2_scatter}
 <h2>4. Recommended settings</h2>
 {rec_html}
-{mws_equity_html}
-{mws_html}
-{nlb_html}
 {gems_html}
 {lb_html}
 {cap_html}
 {lam_html}
+{mws_equity_html}
+{mws_html}
+{nlb_html}
 {llm_html}
 {llm4_html}
 {llm5_html}
