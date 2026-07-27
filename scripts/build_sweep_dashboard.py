@@ -421,7 +421,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         f'<tr><td style="text-align:left">optimizer_lookback (days)</td><td style="text-align:left">{_fmt(LOOKBACKS)}</td><td style="text-align:left">{CURRENT[2]}</td></tr>'
         f'<tr><td style="text-align:left">max_watchlist_size <span style="color:#9a6a00;">(re-curation, §10)</span></td>'
         f'<td style="text-align:left">{_fmt([c for c, _ in MWS_SWEEP])}</td><td style="text-align:left">{_mws_fixed}</td></tr>'
-        f'<tr><td style="text-align:left">news_lookback_days <span style="color:#9a6a00;">(re-curation, mixed lede: 7/14/21 fuller, 28/45/90 titles, §11)</span></td>'
+        f'<tr><td style="text-align:left">news_lookback_days <span style="color:#9a6a00;">(re-curation, mixed lede: 7/14/21/28 fuller, 45/90 titles, §11)</span></td>'
         f'<td style="text-align:left">{_fmt([n for n, _ in NLB_SWEEP])}</td>'
         f'<td style="text-align:left">{int(portfolio.load_financial_model().get("news_lookback_days", 21))}</td></tr>'
         '</tbody></table>')
@@ -714,10 +714,10 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     nlb_html = (
         '<h2>11. news_lookback_days sweep</h2>'
         '<p style="color:#555;max-width:940px;">A CURATOR-param sweep (re-curation) at the canonical '
-        'mws&nbsp;6 / cap&nbsp;1.0 / λ&nbsp;2.0 / 150d config. <b>MIXED lede mode</b>: the <b>7 / 14 / 21d</b> '
-        'windows use <b>fuller</b> ledes (Wayback + look-ahead-biased live-fallback), the <b>28 / 45 / 90d</b> '
+        'mws&nbsp;6 / cap&nbsp;1.0 / λ&nbsp;2.0 / 150d config. <b>MIXED lede mode</b>: the <b>7 / 14 / 21 / 28d</b> '
+        'windows use <b>fuller</b> ledes (Wayback + look-ahead-biased live-fallback), the <b>45 / 90d</b> '
         'windows are <b>title-only</b> (preserved GKG titles, no Wayback/live) &mdash; so the trend across the '
-        '21&rarr;28d boundary <b>conflates the news-window effect with the lede-mode change</b>, not a clean '
+        '28&rarr;45d boundary <b>conflates the news-window effect with the lede-mode change</b>, not a clean '
         'single-variable sweep. Columns: total return, <b>IR</b> (success = risk-adjusted return vs SPY), '
         '<b>L1/L2</b> churn, whether QUBT/RKLB/NVDA were added, and every ticker <b>funded over the 3 years</b> '
         '(breadth). The <b style="color:#2b8a3e;">green</b> bar / ★ row is the <b>optimal</b> window '
