@@ -4192,6 +4192,7 @@ def build_curator_dashboard(
         ("Min trade size", f"{_fm['min_trade_size_frac']:.0%} of portfolio",
          "smallest proposed trade; smaller positions are filtered out"),
         ("Max watchlist size", f"{_fm['max_watchlist_size']}", ""),
+        ("news_lookback_days", f"{int(_fm['news_lookback_days'])}", ""),
         ("Always-include anchors", ", ".join(_fm["always_include"]) or "—",
          "permanent optimizer anchors, outside max_watchlist_size"),
         ("Risk-free rate", f"{_fm['risk_free_rate']:.0%}", ""),
