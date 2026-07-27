@@ -18,8 +18,7 @@ BACKTEST = [
     ("sweep_pwr.html", "Sweeps"),
 ]
 FORWARDTEST = [
-    ("corpus_pwr.html", "Retriever"),
-    ("forward_test.html", "Curator"),
+    ("forward_dashboard.html", "Dashboard"),
 ]
 BOOTSTRAP = [
     ("retrieval_bootstrap.html", "Retriever"),
