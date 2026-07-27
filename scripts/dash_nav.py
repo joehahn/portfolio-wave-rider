@@ -21,6 +21,9 @@ FORWARDTEST = [
     ("corpus_pwr.html", "Retriever"),
     ("forward_test.html", "Curator"),
 ]
+BOOTSTRAP = [
+    ("retrieval_bootstrap.html", "Retriever"),
+]
 
 
 def _link(href, name, current):
@@ -43,4 +46,5 @@ def render(current: str = "", built: bool = True) -> str:
         f'<div>{_link(*README, current)}</div>'
         f'<div><span style="color:#999;">Backtest</span> &nbsp;&nbsp;{_group(BACKTEST, current)}</div>'
         f'<div><span style="color:#999;">Forwardtest</span> &nbsp;&nbsp;{_group(FORWARDTEST, current)}</div>'
+        f'<div><span style="color:#999;">Bootstrap</span> &nbsp;&nbsp;{_group(BOOTSTRAP, current)}</div>'
         '</nav>')

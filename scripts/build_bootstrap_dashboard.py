@@ -15,12 +15,15 @@ Usage: python scripts/build_bootstrap_dashboard.py [--run-dir ...] [--out docs/r
 """
 import argparse
 import json
+import sys
 from collections import Counter
 from pathlib import Path
 
 import plotly.graph_objects as go
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "scripts"))
+import dash_nav  # shared cross-page nav (Backtest | Forwardtest | Bootstrap groups)  # noqa: E402
 BT_SRC = "gkg-wayback-articles"        # backtest pool `source` tag
 FW_SRC = "forward-websearch"           # forward pool `source` tag
 
@@ -140,7 +143,8 @@ def build(canon_dir: str, forward_corpus: str, since: str, out: Path) -> None:
              + card(f"{100*covered//max(n_uniq,1)}%", "have a lede")
              + card(f"{100*len(auth_of)//max(n_uniq,1)}%", "have a byline"))
 
-    html = f"""<h1 style="margin:0 0 .1em">PWR bootstrap retriever</h1>
+    html = f"""{dash_nav.render("retrieval_bootstrap.html")}
+<h1 style="margin:0 0 .1em">PWR bootstrap retriever</h1>
 <p style="color:#555;max-width:900px;margin:.2em 0 1em">The news-coverage bridge across the backtest&rarr;forward
 handoff (2026-07-22): the last ~3 months of the backtest (GKG discovery + <b>Wayback</b> ledes, biweekly pools)
 spliced onto the forward cron&#39;s daily <b>WebSearch</b> pulls. Wayback and WebSearch ledes are both
