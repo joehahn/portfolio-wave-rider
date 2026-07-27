@@ -129,6 +129,68 @@ def main(out_path: str) -> int:
                        showlegend=False)
     fig2.update_yaxes(gridcolor="#eee", tickprefix="$", separatethousands=True)
 
+    # ---- trades to align with the latest optimizer recommendation ----
+    # target ($) = portfolio value * target weight; current ($) = held shares * price. A BUY candidate the
+    # optimizer wants but you do not hold has no snapshot price row, so we fetch its latest price live.
+    trades_html = '<p style="color:#999">No recommendation yet &mdash; run <code>recommend</code>.</p>'
+    rec_p = ROOT / "data" / "recommendations.csv"
+    if rec_p.exists():
+        recs = pd.read_csv(rec_p)
+        latest_rec = recs[recs["date"] == recs["date"].max()]
+        rec_date = str(latest_rec["date"].iloc[0])[:10]
+        target_w = {str(t).upper(): float(w) for t, w in zip(latest_rec["ticker"], latest_rec["weight"])}
+        cur_sh = {str(t).upper(): float(s) for t, s in zip(latest["ticker"], latest["shares"])}
+        price = {str(t).upper(): float(p) for t, p in zip(latest["ticker"], latest["price"]) if float(p) > 0}
+        missing = [t for t in target_w if t not in price]      # buy candidates not yet held -> price live
+        if missing:
+            try:
+                px = portfolio.fetch_prices(missing, period="5d")
+                for t in missing:
+                    s = px[t] if t in getattr(px, "columns", []) else (px.squeeze() if len(missing) == 1 else None)
+                    if s is not None and len(s.dropna()):
+                        v = float(s.dropna().iloc[-1])
+                        if v > 0:
+                            price[t] = v
+            except Exception as e:  # noqa: BLE001 -- pricing is best-effort; unpriced tickers are dropped
+                print(f"buy-candidate price fetch failed: {e}", file=sys.stderr)
+        min_usd = float(portfolio.load_financial_model().get("min_trade_size_frac", 0.0) or 0.0) * cur_val
+        rows_t = []
+        for t in sorted(set(target_w) | set(cur_sh)):
+            p = price.get(t)
+            if not p:
+                continue
+            delta = cur_val * target_w.get(t, 0.0) - cur_sh.get(t, 0.0) * p     # target$ - current$
+            if abs(delta) < max(min_usd, 1.0):
+                continue
+            rows_t.append((t, "BUY" if delta > 0 else "SELL", abs(delta) / p, abs(delta),
+                           cur_sh.get(t, 0.0) * p / cur_val * 100, target_w.get(t, 0.0) * 100))
+        rows_t.sort(key=lambda r: -r[3])
+        if rows_t:
+            buys = sum(d for _, a, _, d, _, _ in rows_t if a == "BUY")
+            sells = sum(d for _, a, _, d, _, _ in rows_t if a == "SELL")
+            body = "".join(
+                f'<tr style="border-bottom:1px solid #eee"><td style="padding:.3em .8em"><b>{t}</b></td>'
+                f'<td style="padding:.3em .8em;color:{"#2b8a3e" if a == "BUY" else "#c92a2a"};font-weight:600">{a}</td>'
+                f'<td style="padding:.3em .8em;text-align:right">{sh:,.2f}</td>'
+                f'<td style="padding:.3em .8em;text-align:right">${d:,.0f}</td>'
+                f'<td style="padding:.3em .8em;text-align:right;color:#777">{cw:.1f}% &rarr; {tw:.1f}%</td></tr>'
+                for t, a, sh, d, cw, tw in rows_t)
+            trades_html = (
+                f'<p style="color:#666;font-size:13px;max-width:900px">To align with the <b>{rec_date}</b> optimizer '
+                f'recommendation: <span style="color:#2b8a3e">${buys:,.0f} to buy</span>, '
+                f'<span style="color:#c92a2a">${sells:,.0f} to sell</span>. Prices are latest close; a BUY candidate '
+                'you do not yet hold is priced live.</p>'
+                '<table style="border-collapse:collapse;font-size:14px"><thead>'
+                '<tr style="border-bottom:2px solid #ddd;text-align:left">'
+                '<th style="padding:.3em .8em">Ticker</th><th style="padding:.3em .8em">Action</th>'
+                '<th style="padding:.3em .8em;text-align:right">Shares</th>'
+                '<th style="padding:.3em .8em;text-align:right">$</th>'
+                '<th style="padding:.3em .8em;text-align:right">Weight now &rarr; target</th></tr></thead><tbody>'
+                + body + '</tbody></table>')
+        else:
+            trades_html = (f'<p style="color:#2b8a3e">Aligned with the {rec_date} recommendation '
+                           '&mdash; no trades needed.</p>')
+
     # ---- curation log (real live decisions, newest first) ----
     def _evidence(ev):
         out = []
@@ -192,6 +254,8 @@ def main(out_path: str) -> int:
         '<p style="color:#666;font-size:13px;max-width:900px">Latest snapshot, each position colored by its thesis '
         'wave; labels show portfolio share.</p>'
         + ch2
+        + '<h2>Trades to align with the optimizer</h2>'
+        + trades_html
         + '<h2>Curation log</h2>'
         '<p style="color:#666;font-size:13px;max-width:900px">Every live curator decision, newest first, with the '
         'rationale and the news it cited.</p>'
