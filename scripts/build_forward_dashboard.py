@@ -36,6 +36,12 @@ WAVE_COLORS = {
     "healthcare": "#FF9DA6", "aging": "#FF9DA6", "general_markets": "#BAB0AC",
 }
 
+# Forward-test window start = the day the daily cron began tracking. Scopes the value chart + date range.
+CRON_START = "2026-07-23"
+# Manual calibration of the current total to the real brokerage value (prototype). Applied as a UNIFORM
+# scale so all % returns are preserved. Update this (or later wire it to a live account feed) as reality moves.
+VALUE_TODAY = 64610.0
+
 
 def _card(label, value, sub="", color="#111"):
     return (f'<div style="display:inline-block;min-width:150px;margin:0 .6em .7em 0;padding:.7em 1em;'
@@ -53,10 +59,16 @@ def main(out_path: str) -> int:
     import plotly.graph_objects as go
 
     snaps = pd.read_csv(ROOT / "data" / "snapshots.csv", parse_dates=["date"])
-    tv = snaps.groupby("date")["value"].sum().sort_index()          # real portfolio $ over time
-    if len(tv) < 2:
+    tv_all = snaps.groupby("date")["value"].sum().sort_index()      # real portfolio $ over time
+    if len(tv_all) < 2:
         print("not enough snapshots to render the forward dashboard", file=sys.stderr)
         return 1
+    tv = tv_all[tv_all.index >= pd.Timestamp(CRON_START)]           # forward-test window (cron era)
+    if len(tv) < 2:                                                  # window too short to plot -> full history
+        tv = tv_all
+    # Calibrate the level to the real brokerage total today (uniform scale preserves % returns).
+    _scale = VALUE_TODAY / float(tv.iloc[-1]) if VALUE_TODAY and float(tv.iloc[-1]) > 0 else 1.0
+    tv = tv * _scale
     d0, d1 = tv.index[0], tv.index[-1]
     start_val, cur_val = float(tv.iloc[0]), float(tv.iloc[-1])
     port_ret = (cur_val / start_val - 1) * 100
@@ -91,7 +103,7 @@ def main(out_path: str) -> int:
         _card("vs SPY", f"{port_ret - spy_ret:+.1f} pp" if spy_ret is not None else "n/a", alpha_sub,
               _sign_color(port_ret - spy_ret) if spy_ret is not None else "#111"),
         _card("Holdings", f"{held['ticker'].nunique()}", "tickers with a position"),
-        _card("Since inception", inception or str(d0.date()), "thesis set"),
+        _card("Forward since", str(d0.date()), "daily cron tracking"),
     ])
 
     # ---- chart 1: portfolio value vs SPY ----
@@ -101,11 +113,6 @@ def main(out_path: str) -> int:
     if spy_norm is not None:
         fig.add_trace(go.Scatter(x=list(spy_norm.index), y=list(spy_norm.values), name="SPY (norm.)",
                                  line=dict(color="#999", width=1.5, dash="dash")))
-    if inception:
-        try:
-            fig.add_vline(x=pd.Timestamp(inception), line=dict(color="#bbb", width=1, dash="dot"))
-        except Exception:  # noqa: BLE001
-            pass
     fig.update_layout(height=430, margin=dict(l=60, r=20, t=10, b=40),
                       yaxis_title="Portfolio value ($)", xaxis_title="",
                       legend=dict(orientation="h", y=1.08, x=0), plot_bgcolor="white",
@@ -232,25 +239,23 @@ def main(out_path: str) -> int:
     ts = datetime.now().strftime("%Y-%m-%d %H:%M")
 
     page = (
-        '<!doctype html><html><head><meta charset="utf-8"><title>Forwardtest Dashboard</title>'
+        '<!doctype html><html><head><meta charset="utf-8"><title>Forwardtest (FT)</title>'
         '<style>body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;'
         'max-width:1180px;margin:0 auto;padding:0 1.5em;color:#222;line-height:1.5}h1,h2{color:#111}'
         '.built{position:absolute;top:8px;right:16px;font-size:12px;color:#888}</style></head><body>'
         f'<div class="built">dashboard built {ts}</div>'
         + dash_nav.render("forward_dashboard.html", built=False)
-        + '<h1>Forwardtest Dashboard</h1>'
-        f'<p style="color:#666;margin:-.4em 0 .7em;font-size:14px;">{d0.date()} to {d1.date()} '
-        '&middot; real forward portfolio (prototype)</p>'
+        + '<h1>Forwardtest (FT)</h1>'
+        f'<p style="color:#666;margin:-.4em 0 .7em;font-size:14px;">{d0.date()} to {d1.date()}</p>'
         '<p style="color:#555;max-width:900px">The live curated portfolio run forward on real money: value '
-        'vs SPY, current allocation by thesis wave, and the curator&#39;s decision log. A first-stab merge of '
-        'the live portfolio page and the Curator Bootstrap (CBS) analytics &mdash; a prototype of the eventual '
-        'production forward-use dashboard.</p>'
+        'vs SPY, current allocation by thesis wave, the trades to align with the optimizer, and the '
+        'curator&#39;s decision log.</p>'
         f'<div style="margin:1em 0 1.5em">{cards}</div>'
-        '<h2>Portfolio value over time</h2>'
-        '<p style="color:#666;font-size:13px;max-width:900px">Real portfolio dollars (blue) vs SPY normalized to '
-        'the same start (grey dashed). Dotted line marks the thesis inception.</p>'
+        '<h2>Plot 1. Portfolio value over time</h2>'
+        '<p style="color:#666;font-size:13px;max-width:900px">Portfolio value in dollars (blue) vs SPY normalized '
+        'to the same start (grey dashed), over the forward-test window.</p>'
         + ch1
-        + '<h2>Current allocation by wave</h2>'
+        + '<h2>Plot 2. Current allocation by wave</h2>'
         '<p style="color:#666;font-size:13px;max-width:900px">Latest snapshot, each position colored by its thesis '
         'wave; labels show portfolio share.</p>'
         + ch2

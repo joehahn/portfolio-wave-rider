@@ -3,7 +3,7 @@
 #
 # Installs THREE entries, preserving any other crontab lines you have:
 #   1. Every day         18:30  scripts/news_pull.sh       -> forward news pull into the frozen corpus (incl. weekends)
-#   2. Weekday (Mon-Fri) 16:30  scripts/price_snapshot.sh  -> price snapshot + dashboard + Curator Bootstrap refresh
+#   2. Weekday (Mon-Fri) 16:30  scripts/price_snapshot.sh  -> price snapshot + index.html + CBS + Forwardtest (FT) dashboards
 #   3. Weekday (Mon-Fri) 19:00  scripts/review_curation.sh -> biweekly curation review + report (self-gated, --if-due)
 # The pull runs in the evening (after the US close + after-hours) to capture the full day's news; the 19:00
 # review runs after that pull so it curates on same-day news. Idempotent: re-running only adds whichever
