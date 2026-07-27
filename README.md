@@ -67,20 +67,23 @@ crontab -e
 and add the following, editing the `PWR_path` line just once to your actual repository path:
 
 ```
-# portfolio-wave-rider: set the repo path once; both jobs below reuse it
+# portfolio-wave-rider: set the repo path once; all jobs below reuse it
 PWR_path=/path/to/portfolio-wave-rider
 # Forward news pull into the corpus, every day incl. weekends, 18:30 local (evening, after the US close)
 30 18 * * *  $PWR_path/scripts/news_pull.sh
-# Weekday price snapshot + dashboard + review (if due), Mon-Fri 16:30 local
+# Weekday price snapshot + dashboard + Curator Bootstrap refresh, Mon-Fri 16:30 local
 30 16 * * 1-5  $PWR_path/scripts/price_snapshot.sh
+# Biweekly curation review + report (self-gated by rebalance_period), Mon-Fri 19:00 local
+0 19 * * 1-5  $PWR_path/scripts/review_curation.sh
 ```
 
-Verify with `crontab -l`. Works the same on macOS and Linux, and leaves any other crontab entries untouched. cron makes the `PWR_path` variable available to every command below it, so it must appear before the two job lines. The scripts ship executable, so no `chmod` is needed.
+Verify with `crontab -l`. Works the same on macOS and Linux, and leaves any other crontab entries untouched. cron makes the `PWR_path` variable available to every command below it, so it must appear before the job lines. The scripts ship executable, so no `chmod` is needed.
 
 - **Daily at 18:30 local** (`news_pull.sh`, every day including weekends): the forward news pull. It runs your wave queries through Anthropic web_search and appends the raw articles to the frozen corpus under `data/forward_corpus/`. The evening slot (a few hours after the US close) captures the full day including after-hours earnings and evening coverage, freezing each article near its publication date, which keeps the corpus clean for later forward testing.
-- **Weekday at 16:30 local** (`price_snapshot.sh`, Mon to Fri): the price snapshot, dashboard refresh, and a self-gating rebalance review. It snapshots per-ticker prices into `data/snapshots.csv` (well after the 16:00 ET close, so the daily close is final), regenerates `docs/index.html`, then runs `review --if-due`, which curates the watchlist and writes a fresh recommendation report to `data/reports/` only when a full `rebalance_period` has elapsed since the last review. The review reads a trailing `news_lookback_days` slice of the corpus, so it does not depend on the same day's pull having run yet.
+- **Weekday at 16:30 local** (`price_snapshot.sh`, Mon to Fri): the price snapshot, dashboard refresh, and Curator Bootstrap (CBS) refresh. It snapshots per-ticker prices into `data/snapshots.csv` (well after the 16:00 ET close, so the daily close is final), regenerates `docs/index.html`, then live-extends the CBS equity curve to today via `refresh_cbs.py` (a render-only replay of the fixed bootstrap curation, no LLM call, no cost).
+- **Weekday at 19:00 local** (`review_curation.sh`, Mon to Fri): the self-gating rebalance review. It runs `review --if-due`, which curates the watchlist and writes a fresh recommendation report to `data/reports/` only when a full `rebalance_period` has elapsed since the last review (biweekly at present). The 19:00 slot is after the 18:30 news pull, so the curator reads same-day news; firing every weekday is safe because `--if-due` fires the actual curation only once per period and catches up a missed one on the next weekday. The cadence lives in `investor_profile.md`'s `rebalance_period`, so changing it needs no cron edit.
 
-Both jobs append timestamped output to `data/snapshot.log`, and both tolerate failures so a web_search hiccup never blocks the price snapshot.
+All jobs append timestamped output to `data/snapshot.log`, and all tolerate failures so a web_search or price hiccup never blocks the rest.
 
 cron only fires while the machine is awake and does not replay missed runs. Backfill a missed price snapshot with `.venv/bin/python -m src.cli snapshot --date YYYY-MM-DD`. A missed news pull cannot be cleanly backfilled, because re-querying web_search about a past day reintroduces hindsight, so a laptop that sleeps through 18:30 leaves a gap in the corpus (recorded in the manifest at `data/forward_corpus/pulls.jsonl`).
 
