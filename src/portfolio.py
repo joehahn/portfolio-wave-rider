@@ -4579,15 +4579,13 @@ def build_curator_dashboard(
                    for _k, _v in _ledesrc_ret.items() if _pool_ls.get(_k)), key=lambda r: r[1])
     _gain_ledesrc = ""
     if _lsr:
-        _lm = [abs(r[1]) * 100 for r in _lsr]
-        _lfloor = (min([m for m in _lm if m > 0] or [0.01])) * 0.5
         _lsf = go.Figure(go.Bar(
-            x=[m if m > 0 else _lfloor for m in _lm], y=[f"{r[0]} ({r[3]} art.)" for r in _lsr],
+            x=[r[1] * 100 for r in _lsr], y=[f"{r[0]} ({r[3]} art.)" for r in _lsr],
             orientation="h", marker_color=["#2b8a3e" if r[1] >= 0 else "#c92a2a" for r in _lsr],
-            customdata=[[r[1] * 100, r[2]] for r in _lsr],
-            hovertemplate="%{y}: %{customdata[0]:.3f} gain/article (n=%{customdata[1]} adds)<extra></extra>"))
+            customdata=[r[2] for r in _lsr],
+            hovertemplate="%{y}: %{x:.3f} gain/article (n=%{customdata} adds)<extra></extra>"))
         _lsf.update_layout(template="seaborn", height=240, margin={"t": 20, "l": 210, "r": 40},
-                           xaxis={"title": "|gain per article| ×100 (log; green = +, red = &minus;)", "type": "log"})
+                           xaxis={"title": "gain per article ×100 (green = +, red = &minus;)"})
         _gain_ledesrc = _to_html(_lsf)
     _ledesrc_note = ('<p style="color:#555;max-width:820px;margin:0 0 .4em;">Plot&nbsp;9&#39;s <b>gain per '
                      'article</b> (total forward gain / pool-article footprint), but bucketed by the LEDE SOURCE '
