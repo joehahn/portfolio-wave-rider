@@ -373,8 +373,8 @@ def build(run_rel, out):
         '.built{position:absolute;top:8px;right:16px;font-size:12px;color:#888}</style></head><body>'
         f'<div class="built">dashboard built {ts}</div>'
         + dash_nav.render("retrieval_pwr.html", built=False) +
-        f'<h1>Retriever Backtest <span style="font-size:0.55em;color:#666;font-weight:400;">'
-        f'&mdash; {_start} to {_end}</span></h1>'
+        f'<h1>Retriever Backtest (RBT)</h1>'
+        f'<p style="color:#666;margin:-.4em 0 .7em;font-size:14px;">{_start} to {_end}</p>'
         f'<p style="color:#666;margin:-.4em 0 .7em;font-size:14px;">{len(pools)} rebalances, each reading '
         f'a trailing 21-day news window</p>'
         '<p style="color:#555">Judges the <b>news gathering</b>, not portfolio gains: completeness of the '

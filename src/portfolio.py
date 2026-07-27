@@ -4643,9 +4643,8 @@ def build_curator_dashboard(
         'th,td{border-bottom:1px solid #eee;}'
         '</style></head><body>'
         + _nav(Path(out_path).name) +
-        f'<h1>{heading} '
-        f'<span style="font-size:0.55em;color:#666;font-weight:400;">'
-        f'— {start.date()} to {end.date()}</span></h1>'
+        f'<h1>{heading} ({acronym})</h1>'
+        f'<p style="color:#666;margin:-.4em 0 .7em;font-size:14px;">{start.date()} to {end.date()}</p>'
         f'<p style="color:#555;max-width:780px;">The watchlist-curator agent was called '
         f'{_html.escape(_cadence)} over the {start.date()} to {end.date()} window. '
         f'At each rebalance it read a date-clean news pool for the preceding '

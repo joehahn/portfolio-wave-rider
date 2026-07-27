@@ -286,8 +286,8 @@ def build(canon_dir: str, forward_corpus: str, since: str, out: Path) -> None:
         '.built{position:absolute;top:8px;right:16px;font-size:12px;color:#888}</style></head><body>'
         f'<div class="built">dashboard built {ts}</div>'
         + dash_nav.render("retrieval_bootstrap.html", built=False) +
-        f'<h1>Retriever Bootstrap <span style="font-size:0.55em;color:#666;font-weight:400;">'
-        f'&mdash; {span}</span></h1>'
+        f'<h1>Retriever Bootstrap (RBS)</h1>'
+        f'<p style="color:#666;margin:-.4em 0 .7em;font-size:14px;">{span}</p>'
         f'<p style="color:#666;margin:-.4em 0 .7em;font-size:14px;">{len(bt)} backtest-tail pools (biweekly) '
         f'+ {len(fw)} forward cron pulls (daily)</p>'
         '<p style="color:#555">The news-coverage <b>bridge</b> across the backtest&rarr;forward handoff '
