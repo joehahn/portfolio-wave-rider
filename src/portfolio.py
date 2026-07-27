@@ -4176,8 +4176,8 @@ def build_curator_dashboard(
         ("Initial capital", f"${initial:,.0f}", ""),
         ("Risk aversion (λ)", f"{_ra:g}",
          f"backtest-only override — live uses {_fm['risk_aversion']:g}" if _ra_ov else ""),
-        ("Lookback (μ/Σ estimation)", f"{_lb:g}y",
-         f"backtest-only override — live uses {str(_fm['lookback_period'])}" if _lb_ov else ""),
+        ("optimizer_lookback_days", f"{round(_lb * 365)}",
+         f"backtest-only override — live uses {_fm['optimizer_lookback_days']}" if _lb_ov else "μ/Σ estimation window"),
         ("Concentration cap (max weight)", f"{_cap:.0%}",
          f"backtest-only override — live uses {_fm['concentration_cap']:.0%}" if _cap_ov else ""),
         ("Min trade size", f"{_fm['min_trade_size_frac']:.0%} of portfolio",
@@ -4423,7 +4423,18 @@ def build_curator_dashboard(
         import gkg_pool as _gp
     except Exception:  # noqa: BLE001
         _gp = None
-    _src_ret, _kw_ret, _author_ret = _ddict(list), _ddict(list), _ddict(list)
+    # lede_source (wayback / live / none) per evidence URL, read from the pool files — lets us compare the
+    # forward gain of adds cited from clean-Wayback ledes vs the look-ahead-biased live-fallback ledes.
+    _ledesrc_by_key = {}
+    for _pf in Path(runs_dir).glob("*-pool.json"):
+        try:
+            _pj = json.loads(_pf.read_text())                       # {date}-pool.json is a dict {..., articles:[]}
+            for _pa in (_pj.get("articles", []) if isinstance(_pj, dict) else _pj):
+                if isinstance(_pa, dict) and _pa.get("url"):
+                    _ledesrc_by_key.setdefault(_url_key(_pa["url"]), _pa.get("lede_source", "none"))
+        except Exception:  # noqa: BLE001
+            pass
+    _src_ret, _kw_ret, _author_ret, _ledesrc_ret = _ddict(list), _ddict(list), _ddict(list), _ddict(list)
     for (_d, _t, _ac, _ev) in _events:
         if _ac != "add":
             continue
@@ -4435,6 +4446,8 @@ def build_curator_dashboard(
             _dom = _url_domain(_e.get("url", "")) or re.sub(r"[^a-z0-9]", "", (_e.get("source") or "").lower())
             if _dom:
                 _srcs.add(_dom)
+            _ls = _ledesrc_by_key.get(_url_key(_e.get("url", "")), "none")   # per evidence-article lede source
+            _ledesrc_ret[_ls].append(_r)
             _byline = _author_by_key.get(_url_key(_e.get("url", "")))
             for _one in re.split(r"\s*;\s*", _byline or ""):
                 _o = _one.strip()
@@ -4557,6 +4570,28 @@ def build_curator_dashboard(
                          xaxis={"title": "|gain per article| ×100 (log; green = +, red = &minus;)", "type": "log"})
         _gain_per_art = _to_html(_f)
 
+    # 9b. Gain per article by LEDE SOURCE: mean forward return of adds cited from clean-Wayback ledes vs the
+    # look-ahead-biased live-fallback ledes (vs title-only). Tests whether the biased ledes helped picks.
+    _gain_ledesrc = ""
+    _ls_order = [("wayback", "clean Wayback lede"), ("live", "live-fallback lede"), ("none", "title only")]
+    _ls_rows = [(_lab, _ledesrc_ret[_k]) for _k, _lab in _ls_order if _ledesrc_ret.get(_k)]
+    if _ls_rows:
+        def _mean(xs):
+            return sum(xs) / len(xs)
+        _lsf = go.Figure(go.Bar(
+            x=[100 * _mean(v) for _, v in _ls_rows], y=[lab for lab, _ in _ls_rows], orientation="h",
+            marker_color=["#2b8a3e" if _mean(v) >= 0 else "#c92a2a" for _, v in _ls_rows],
+            text=[f"n={len(v)}" for _, v in _ls_rows], textposition="outside",
+            hovertemplate="%{y}: %{x:+.0f}% (%{text})<extra></extra>"))
+        _lsf.update_layout(template="seaborn", height=240, margin={"t": 10, "l": 170, "r": 55, "b": 40},
+                           xaxis={"title": "mean forward price return of adds (%)"}, showlegend=False)
+        _gain_ledesrc = _to_html(_lsf)
+    _ledesrc_note = ('<p style="color:#555;max-width:820px;margin:0 0 .4em;">Each add&#39;s forward price return, '
+                     'bucketed by the LEDE SOURCE of its cited evidence: clean, look-ahead-safe <b>Wayback</b> '
+                     'ledes vs the look-ahead-biased <b>live-fallback</b> ledes (fetched from today&#39;s page). '
+                     'If live noticeably beats Wayback, the bias is flattering the picks &mdash; a caution on '
+                     'fuller-mode backtest returns. n = number of add-evidence articles of each lede type.</p>')
+
     _attr_note = ('<p style="color:#555;max-width:820px;margin:0 0 .4em;">Each add\'s forward <b>price '
                   'return</b> (from the add date until the ticker is removed, else window end), bucketed by '
                   'the <code>news_evidence</code> source (by URL domain) and by the wave keyword that surfaced '
@@ -4574,6 +4609,7 @@ def build_curator_dashboard(
         '<h2 style="margin:1.6em 0 0.2em;">7. Allocation over time</h2>' + _to_html(_af)
         + (('<h2 style="margin:1.6em 0 0.2em;">8. Gains vs news source</h2>' + _attr_note + _gain_src) if _gain_src else '')
         + (('<h2 style="margin:1.6em 0 0.2em;">9. Gain per article vs news source</h2>' + _gpa_note + _gain_per_art) if _gain_per_art else '')
+        + (('<h2 style="margin:1.6em 0 0.2em;">9b. Gain per article — Wayback vs live-fallback ledes</h2>' + _ledesrc_note + _gain_ledesrc) if _gain_ledesrc else '')
         + (('<h2 style="margin:1.6em 0 0.2em;">10. Gains vs search keyword</h2>' + _attr_note + _gain_kw) if _gain_kw else '')
     )
     # 11. Number of adds per source — the raw n behind the source-gain plots.
