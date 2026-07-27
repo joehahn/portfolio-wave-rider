@@ -30,8 +30,7 @@ def main() -> int:
 
     fm = portfolio.load_financial_model()
     anchors = fm.get("always_include") or ["SPY", "AGG", "IAU"]
-    starter = sorted(portfolio.reconstruct_watchlist_at(
-        SINCE, fm["starter_watchlist"], str(ROOT / CANON / "_wf_history.csv")))
+    starter = list(fm["starter_watchlist"])   # profile inception holdings, e.g. [AAPL, GOOGL, AMZN]
     model = portfolio.load_forward_config().get("curator_model") or "moonshotai/kimi-k2.5"
 
     bt, fw = bboot.load_pools(CANON, "data/forward_corpus", SINCE)

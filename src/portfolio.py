@@ -4199,18 +4199,15 @@ def build_curator_dashboard(
     ]
     _param_tr = "".join(
         f"<tr><td style='padding:5px 14px 5px 0;color:#555;white-space:nowrap;'>{_html.escape(k)}</td>"
-        f"<td style='padding:5px 14px 5px 0;font-weight:600;'>{_html.escape(str(v))}</td>"
-        f"<td style='padding:5px 0;color:#b45309;font-size:13px;'>{_html.escape(note)}</td></tr>"
-        for k, v, note in _param_rows
+        f"<td style='padding:5px 0;font-weight:600;'>{_html.escape(str(v))}</td></tr>"
+        for k, v, _ in _param_rows
     )
     params_html = (
         "<h2 style='margin:1.4em 0 0.3em;'>Parameter settings</h2>"
         "<p style='color:#555;max-width:780px;margin:0 0 0.6em;'>The exact "
         "optimizer and backtest knobs behind the charts below, read from "
         "<code>investor_profile.md</code>. This is the same config "
-        "<code>/review-portfolio</code> uses with real money; any row flagged "
-        "in amber is a backtest-only override (used to test a candidate config) "
-        "and would not match the live path.</p>"
+        "<code>/review-portfolio</code> uses with real money.</p>"
         "<table style='border-collapse:collapse;font-size:14px;margin-bottom:1.2em;'>"
         f"<tbody>{_param_tr}</tbody></table>"
     )
