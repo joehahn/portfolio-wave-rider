@@ -36,8 +36,9 @@ WAVE_COLORS = {
     "healthcare": "#FF9DA6", "aging": "#FF9DA6", "general_markets": "#BAB0AC",
 }
 
-# Forward-test window start = the day the daily cron began tracking. Scopes the value chart + date range.
-CRON_START = "2026-07-23"
+# Forward-test window start = the first daily cron news ingest (data/forward_corpus/pulls.jsonl earliest
+# 18:30 pull). Scopes the value chart + date range to the forward-test era.
+CRON_START = "2026-07-22"
 # Manual calibration of the value curve to the real brokerage total. The scale = CALIB_VALUE / (computed value
 # on CALIB_DATE); because CALIB_DATE is a HISTORICAL snapshot, the factor is FIXED, so future days move
 # naturally (this does NOT pin the current value to a constant). Uniform scale -> all % returns preserved.
