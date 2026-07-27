@@ -23,6 +23,7 @@ FORWARDTEST = [
 ]
 BOOTSTRAP = [
     ("retrieval_bootstrap.html", "Retriever"),
+    ("curator_bootstrap.html", "Curator"),
 ]
 
 

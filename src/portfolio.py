@@ -3584,6 +3584,8 @@ def build_curator_dashboard(
     out_path: str = "docs/backtest_curator.html",
     benchmarks: list[str] | None = None,
     config_note: str | None = None,
+    heading: str = "Curator Backtest",
+    acronym: str = "CBT",
 ) -> dict[str, Any]:
     """Render a single static HTML dashboard for one curator-backtest run.
 
@@ -4636,7 +4638,7 @@ def build_curator_dashboard(
                   + _npa) if _npa else '')
     page = (
         '<!doctype html><html><head><meta charset="utf-8">'
-        '<title>Curator Backtest (CBT)</title>'
+        f'<title>{heading} ({acronym})</title>'
         '<style>body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;'
         'max-width:1180px;margin:0 auto;padding:0 1.5em;color:#222;line-height:1.5;}'
         'h1,h2{color:#111;}'
@@ -4644,7 +4646,7 @@ def build_curator_dashboard(
         'th,td{border-bottom:1px solid #eee;}'
         '</style></head><body>'
         + _nav(Path(out_path).name) +
-        f'<h1>Curator Backtest '
+        f'<h1>{heading} '
         f'<span style="font-size:0.55em;color:#666;font-weight:400;">'
         f'— {start.date()} to {end.date()}</span></h1>'
         f'<p style="color:#555;max-width:780px;">The watchlist-curator agent was called '
