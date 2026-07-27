@@ -3587,6 +3587,7 @@ def build_curator_dashboard(
     heading: str = "Curator Backtest",
     acronym: str = "CBT",
     show_max_articles: bool = True,
+    handoff_date: str | None = None,
 ) -> dict[str, Any]:
     """Render a single static HTML dashboard for one curator-backtest run.
 
@@ -3782,6 +3783,13 @@ def build_curator_dashboard(
         tickvals=[10000, 30000, 100000, 300000, 1000000],
         ticktext=["$10K", "$30K", "$100K", "$300K", "$1M"],
     )
+    if handoff_date:   # CBS: mark the backtest -> forward news handoff on the equity curve. add_vline's own
+        # annotation breaks on a datetime axis (it averages Timestamps), so draw the line + label separately.
+        fig.add_vline(x=pd.Timestamp(handoff_date), line={"dash": "dot", "color": "#888", "width": 1.5},
+                      row=1, col=1)
+        fig.add_annotation(x=pd.Timestamp(handoff_date), y=1.0, yref="y domain", yanchor="bottom",
+                           xanchor="left", text=" backtest ← | → forward news", showarrow=False,
+                           font={"size": 11, "color": "#666"}, row=1, col=1)
 
     # Chart 2: watchlist Gantt. One row per ticker, color = wave_bucket.
     # Sort tickers so the first-added is at the top, latest at the bottom.
