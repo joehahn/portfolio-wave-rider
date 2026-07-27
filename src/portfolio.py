@@ -3586,6 +3586,7 @@ def build_curator_dashboard(
     config_note: str | None = None,
     heading: str = "Curator Backtest",
     acronym: str = "CBT",
+    show_max_articles: bool = True,
 ) -> dict[str, Any]:
     """Render a single static HTML dashboard for one curator-backtest run.
 
@@ -4194,6 +4195,8 @@ def build_curator_dashboard(
         ("Max watchlist size", f"{_fm['max_watchlist_size']}", ""),
         ("news_lookback_days", f"{int(_fm['news_lookback_days'])}", ""),
         ("Curator model (LLM)", _bc.get("curator_model") or "—", ""),
+        # max_articles is a backtest-retrieval cap; omitted for the bootstrap (CBS), whose pools vary in size.
+        *([("Max articles / pool", f"{int(_bc['max_articles'])}", "")] if show_max_articles else []),
         ("Always-include anchors", ", ".join(_fm["always_include"]) or "—",
          "permanent optimizer anchors, outside max_watchlist_size"),
         ("Risk-free rate", f"{_fm['risk_free_rate']:.0%}", ""),

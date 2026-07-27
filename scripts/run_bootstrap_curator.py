@@ -90,7 +90,7 @@ def main() -> int:
     # Render the Curator Bootstrap (CBS) dashboard from this run (parameterized clone of the CBT generator).
     portfolio.build_curator_dashboard(
         backtest_dir=str(RUN / "_backtest"), runs_dir=str(RUN), out_path="docs/curator_bootstrap.html",
-        benchmarks=["SPY"], heading="Curator Bootstrap", acronym="CBS")
+        benchmarks=["SPY"], heading="Curator Bootstrap", acronym="CBS", show_max_articles=False)
     print("  rendered docs/curator_bootstrap.html", file=sys.stderr)
     return 0
 
