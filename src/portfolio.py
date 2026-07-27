@@ -4141,7 +4141,7 @@ def build_curator_dashboard(
         search_html = (
             "<details style='margin-top:2em;'>"
             "<summary style='cursor:pointer;font-size:1.5em;font-weight:bold;color:#111;'>"
-            "14. Curator decisions &amp; search terms</summary>"
+            "15. Curator decisions &amp; search terms</summary>"
             f"<p style='color:#555;max-width:780px;'>One row per {_html.escape(_cadence)} rebalance. "
             "Click to expand the curator's overall rationale, each add/remove with its reason, the cited "
             "<code>news_evidence</code> links, and the wave keywords behind that rebalance's pool "
@@ -4513,7 +4513,7 @@ def build_curator_dashboard(
     _gain_src = _attr_html(_src_ret, "mean forward price return of adds (%)", universe=_recognized, noun="sources")
     _gain_kw = _attr_html(_kw_ret, "mean forward price return of adds (%)", universe=set(_kwmap), noun="keywords")
     _gain_author = _attr_html(_author_ret, "mean forward price return of adds (%)", noun="authors")
-    # Number of adds per author: raw n behind plot 12 (co-authors each counted; byline-less adds under "(no author)").
+    # Number of adds per author: raw n behind plot 13 (co-authors each counted; byline-less adds under "(no author)").
     _npa = ""
     _naa = sorted(((a, len(v)) for a, v in _author_ret.items() if v), key=lambda r: r[1])
     if _naa:
@@ -4570,27 +4570,30 @@ def build_curator_dashboard(
                          xaxis={"title": "|gain per article| ×100 (log; green = +, red = &minus;)", "type": "log"})
         _gain_per_art = _to_html(_f)
 
-    # 9b. Gain per article by LEDE SOURCE: mean forward return of adds cited from clean-Wayback ledes vs the
-    # look-ahead-biased live-fallback ledes (vs title-only). Tests whether the biased ledes helped picks.
+    # 10. Gain PER ARTICLE by LEDE SOURCE (same metric as plot 9): total forward gain of adds cited from
+    # each lede type / that type's pool-article footprint. Clean Wayback vs look-ahead-biased live-fallback.
+    from collections import Counter as _Ctr
+    _pool_ls = _Ctr(_ledesrc_by_key.values())
+    _ls_lab = {"wayback": "clean Wayback lede", "live": "live-fallback lede", "none": "title only"}
+    _lsr = sorted(((_ls_lab.get(_k, _k), sum(_v) / _pool_ls[_k], len(_v), _pool_ls[_k])
+                   for _k, _v in _ledesrc_ret.items() if _pool_ls.get(_k)), key=lambda r: r[1])
     _gain_ledesrc = ""
-    _ls_order = [("wayback", "clean Wayback lede"), ("live", "live-fallback lede"), ("none", "title only")]
-    _ls_rows = [(_lab, _ledesrc_ret[_k]) for _k, _lab in _ls_order if _ledesrc_ret.get(_k)]
-    if _ls_rows:
-        def _mean(xs):
-            return sum(xs) / len(xs)
+    if _lsr:
+        _lm = [abs(r[1]) * 100 for r in _lsr]
+        _lfloor = (min([m for m in _lm if m > 0] or [0.01])) * 0.5
         _lsf = go.Figure(go.Bar(
-            x=[100 * _mean(v) for _, v in _ls_rows], y=[lab for lab, _ in _ls_rows], orientation="h",
-            marker_color=["#2b8a3e" if _mean(v) >= 0 else "#c92a2a" for _, v in _ls_rows],
-            text=[f"n={len(v)}" for _, v in _ls_rows], textposition="outside",
-            hovertemplate="%{y}: %{x:+.0f}% (%{text})<extra></extra>"))
-        _lsf.update_layout(template="seaborn", height=240, margin={"t": 10, "l": 170, "r": 55, "b": 40},
-                           xaxis={"title": "mean forward price return of adds (%)"}, showlegend=False)
+            x=[m if m > 0 else _lfloor for m in _lm], y=[f"{r[0]} ({r[3]} art.)" for r in _lsr],
+            orientation="h", marker_color=["#2b8a3e" if r[1] >= 0 else "#c92a2a" for r in _lsr],
+            customdata=[[r[1] * 100, r[2]] for r in _lsr],
+            hovertemplate="%{y}: %{customdata[0]:.3f} gain/article (n=%{customdata[1]} adds)<extra></extra>"))
+        _lsf.update_layout(template="seaborn", height=240, margin={"t": 20, "l": 210, "r": 40},
+                           xaxis={"title": "|gain per article| ×100 (log; green = +, red = &minus;)", "type": "log"})
         _gain_ledesrc = _to_html(_lsf)
-    _ledesrc_note = ('<p style="color:#555;max-width:820px;margin:0 0 .4em;">Each add&#39;s forward price return, '
-                     'bucketed by the LEDE SOURCE of its cited evidence: clean, look-ahead-safe <b>Wayback</b> '
-                     'ledes vs the look-ahead-biased <b>live-fallback</b> ledes (fetched from today&#39;s page). '
-                     'If live noticeably beats Wayback, the bias is flattering the picks &mdash; a caution on '
-                     'fuller-mode backtest returns. n = number of add-evidence articles of each lede type.</p>')
+    _ledesrc_note = ('<p style="color:#555;max-width:820px;margin:0 0 .4em;">Plot&nbsp;9&#39;s <b>gain per '
+                     'article</b> (total forward gain / pool-article footprint), but bucketed by the LEDE SOURCE '
+                     'of the cited evidence: clean, look-ahead-safe <b>Wayback</b> ledes vs the look-ahead-biased '
+                     '<b>live-fallback</b> ledes (fetched from today&#39;s page). If live noticeably beats Wayback, '
+                     'the bias is flattering the picks &mdash; a caution on fuller-mode backtest returns.</p>')
 
     _attr_note = ('<p style="color:#555;max-width:820px;margin:0 0 .4em;">Each add\'s forward <b>price '
                   'return</b> (from the add date until the ticker is removed, else window end), bucketed by '
@@ -4609,22 +4612,22 @@ def build_curator_dashboard(
         '<h2 style="margin:1.6em 0 0.2em;">7. Allocation over time</h2>' + _to_html(_af)
         + (('<h2 style="margin:1.6em 0 0.2em;">8. Gains vs news source</h2>' + _attr_note + _gain_src) if _gain_src else '')
         + (('<h2 style="margin:1.6em 0 0.2em;">9. Gain per article vs news source</h2>' + _gpa_note + _gain_per_art) if _gain_per_art else '')
-        + (('<h2 style="margin:1.6em 0 0.2em;">9b. Gain per article — Wayback vs live-fallback ledes</h2>' + _ledesrc_note + _gain_ledesrc) if _gain_ledesrc else '')
-        + (('<h2 style="margin:1.6em 0 0.2em;">10. Gains vs search keyword</h2>' + _attr_note + _gain_kw) if _gain_kw else '')
+        + (('<h2 style="margin:1.6em 0 0.2em;">10. Gain per article by lede source</h2>' + _ledesrc_note + _gain_ledesrc) if _gain_ledesrc else '')
+        + (('<h2 style="margin:1.6em 0 0.2em;">11. Gains vs search keyword</h2>' + _attr_note + _gain_kw) if _gain_kw else '')
     )
-    # 11. Number of adds per source — the raw n behind the source-gain plots.
-    _nps_html = (('<h2 style="margin:1.6em 0 0.2em;">11. Number of adds per source</h2>'
+    # 12. Number of adds per source — the raw n behind the source-gain plots.
+    _nps_html = (('<h2 style="margin:1.6em 0 0.2em;">12. Number of adds per source</h2>'
                   '<p style="color:#555;max-width:820px;margin:0 0 .4em;">How many adds cited each source '
                   '(by URL domain) as evidence &mdash; the raw <code>n</code> behind plots 8 and 9.</p>'
                   + _nps) if _nps else '')
-    # 12. Gains vs author — moved here, just below "11. Number of adds per source".
-    _author_html = (('<h2 style="margin:1.6em 0 0.2em;">12. Gains vs author</h2>' + _author_note + _gain_author)
+    # 13. Gains vs author — moved here, just below "12. Number of adds per source".
+    _author_html = (('<h2 style="margin:1.6em 0 0.2em;">13. Gains vs author</h2>' + _author_note + _gain_author)
                     if _gain_author else '')
-    # 13. Number of adds per author — raw n behind plot 12 (sits just below it).
-    _npa_html = (('<h2 style="margin:1.6em 0 0.2em;">13. Number of adds per author</h2>'
+    # 14. Number of adds per author — raw n behind plot 13 (sits just below it).
+    _npa_html = (('<h2 style="margin:1.6em 0 0.2em;">14. Number of adds per author</h2>'
                   '<p style="color:#555;max-width:820px;margin:0 0 .4em;">How many adds each byline is credited '
                   'on (co-authors each counted; adds whose evidence URL carries no captured byline bucket into '
-                  '<code>(no author)</code>) &mdash; the raw <code>n</code> behind plot 12.</p>'
+                  '<code>(no author)</code>) &mdash; the raw <code>n</code> behind plot 13.</p>'
                   + _npa) if _npa else '')
     page = (
         '<!doctype html><html><head><meta charset="utf-8">'
