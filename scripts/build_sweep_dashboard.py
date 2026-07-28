@@ -790,14 +790,18 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
             _mt_rows.append({"mt": _mtf, "ret": _mr["realized_return"], "turn": _mr["turnover_ratio"]})
         _mt_cache.write_text(_json.dumps(_mt_rows, indent=2))
     _mtx = [str(r["mt"]) for r in _mt_rows]
+    _rets = [r["ret"] * 100 for r in _mt_rows]
+    # Zoom the y-axis into the bar heights (dynamic) instead of 0-based, so the differences are legible.
+    _dmin, _dmax = min(_rets), max(_rets)
+    _yrange = [max(0.0, _dmin - 0.8 * (_dmax - _dmin)), _dmax + 0.15 * (_dmax - _dmin)]
     _mtf_fig = _lgo.Figure(_lgo.Bar(
-        x=_mtx, y=[r["ret"] * 100 for r in _mt_rows],
+        x=_mtx, y=_rets,
         marker_color=[GREEN if r["mt"] == _LIVE_MT else BLUE for r in _mt_rows],
         text=["live" if r["mt"] == _LIVE_MT else "" for r in _mt_rows], textposition="outside",
         hovertemplate="mt %{x}: %{y:+.0f}%<extra></extra>"))
     _mtf_fig.update_layout(template="seaborn", height=360, margin={"t": 20, "l": 60, "r": 20},
                            xaxis={"title": "min_trade_size_frac", "type": "category"},
-                           yaxis={"title": "total return %"})
+                           yaxis={"title": "total return %", "range": _yrange})
     min_trade_html = (
         '<h2>9. Total return vs min_trade_size_frac (live config)</h2>'
         '<p style="color:#555;max-width:920px;">A FREE math-replay slice (no re-curation): hold the live '
