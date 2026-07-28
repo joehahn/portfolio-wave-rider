@@ -2,7 +2,9 @@ import json
 import pandas as pd
 from src import portfolio
 CAPS=[0.5,0.67,0.8,0.9,1.0]; LAMBDAS=[0.5,0.75,1.0,1.5,2.0]; LOOKBACKS=[14,30,60,90,120,150]
-ANCHORS=['SPY','AGG','IAU']; ANC=set(ANCHORS)
+_FM=portfolio.load_financial_model()                       # anchors + rf/lag from the profile (cap/λ/lb are swept)
+ANCHORS=_FM.get('always_include') or ['SPY','AGG','IAU']; ANC=set(ANCHORS)
+_RF=float(_FM['risk_free_rate']); _TU=int(portfolio.load_backtest_config()['t_update_days'])
 MWS=[(2,'gkg-3yr-mws2'),(3,'gkg-3yr-mws3'),(4,'gkg-3yr-mws4'),(5,'gkg-3yr-final'),(6,'gkg-3yr-mws6'),
      (7,'gkg-3yr-mws7'),(8,'gkg-3yr-mws8'),(10,'gkg-3yr-mws10'),(12,'gkg-3yr-mws12')]
 best={}; n_ok=0; n_fail=0
@@ -14,6 +16,7 @@ for mws,d in MWS:
                 out=f'/tmp/_gems/{mws}_{cap}_{lam}_{lb}'
                 try:
                     portfolio.curator_backtest(runs_dir=rd,out_dir=out,max_weight=cap,risk_aversion=lam,
+                        risk_free_rate=_RF,t_update_days=_TU,
                         benchmarks=[],lookback_years_override=lb/365.0,always_include=ANCHORS)
                     sn=pd.read_csv(f'{out}/snapshots.csv',parse_dates=['date'])
                     n_ok+=1

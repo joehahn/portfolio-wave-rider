@@ -98,7 +98,8 @@ def main() -> int:
 
     res = portfolio.curator_backtest(
         runs_dir=str(RUN), out_dir=str(RUN / "_backtest"), max_weight=float(fm["concentration_cap"]),
-        risk_aversion=float(fm["risk_aversion"]), benchmarks=["SPY"],
+        risk_aversion=float(fm["risk_aversion"]), risk_free_rate=float(fm["risk_free_rate"]),
+        t_update_days=int(portfolio.load_backtest_config()["t_update_days"]), benchmarks=["SPY"],
         lookback_years_override=fm["optimizer_lookback_days"] / 365.0, always_include=anchors,
         min_trade_frac=float(fm["min_trade_size_frac"]))     # model the live no-trade band
     authors = {}

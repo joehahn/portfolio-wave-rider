@@ -82,6 +82,7 @@ def _replay(runs_dir: Path, tmp: Path) -> pd.Series:
         out_dir=str(out_dir),
         max_weight=_BASE_MAX_WEIGHT,
         risk_aversion=_BASE_RISK_AVERSION,
+        risk_free_rate=float(_FM["risk_free_rate"]),   # from the profile (not a swept param)
         lookback_years_override=_BASE_LOOKBACK,
         t_update_days=base_t_update,
         benchmarks=[],

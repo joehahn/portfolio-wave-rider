@@ -28,7 +28,10 @@ from src import portfolio  # noqa: E402
 CAPS = [0.5, 0.67, 0.8, 0.9, 1.0]
 LAMBDAS = [0.5, 0.75, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0]
 LOOKBACKS = [14, 30, 60, 90, 120, 150]          # calendar days
-ANCHORS = portfolio.load_financial_model().get("always_include") or ["SPY", "AGG", "IAU"]  # from the profile
+_FM = portfolio.load_financial_model()                       # single profile read (anchors + CURRENT below)
+ANCHORS = _FM.get("always_include") or ["SPY", "AGG", "IAU"]  # from the profile
+_RF = float(_FM["risk_free_rate"])                           # rf + exec-lag from the profile (NOT swept params)
+_TU = int(portfolio.load_backtest_config()["t_update_days"])
 TRACK_TICKERS = ["QUBT", "RKLB", "NVDA"]     # section 6: flag whether each mws curation ever added these
 
 # "Recommended settings" = the risk/churn-constrained frontier read off plots 1-3: keep only configs with
@@ -42,7 +45,8 @@ LLM_RUNS = [   # row 0 = the DEFAULT curator. The multi-LLM comparison (Sonnet g
                # were retired from local storage. Re-add rows + re-run to refresh the comparison on this window.
     ("moonshotai/kimi-k2.5 (default)", "data/curator_runs/gkg-3yr-final", "OpenRouter", 0.57, 2.85),
 ]
-CURRENT = (1.0, 2.0, 150)         # the live investor_profile.md config (cap / λ / lookback-days)
+CURRENT = (float(_FM["concentration_cap"]), float(_FM["risk_aversion"]),
+           int(_FM["optimizer_lookback_days"]))   # the live investor_profile.md config (cap / λ / lookback-days)
 MIN_TRADE_FRACS = [0.0, 0.01, 0.02, 0.05, 0.10, 0.15, 0.20]   # no-trade-band sweep (min rebalancing trade / book)
 BLUE, GREEN, RED, GREY = "#1f77b4", "#2b8a3e", "#c92a2a", "#adb5bd"
 
@@ -271,6 +275,7 @@ def _llm_rows(cfg):
         r["time_min"] = (r["secs_call"] * len(fs) / 60.0) if gaps else float("nan")
         _out = f"/tmp/_llm/{label.replace('/', '_').replace(' ', '')}"
         res = portfolio.curator_backtest(runs_dir=str(rd), out_dir=_out, max_weight=cap, risk_aversion=lam,
+                                         risk_free_rate=_RF, t_update_days=_TU,
                                          benchmarks=["SPY"], lookback_years_override=lb / 365.0, always_include=ANCHORS)
         snaps = pd.read_csv(Path(_out) / "snapshots.csv", parse_dates=["date"])
         totals = snaps.groupby("date")["total_value"].first().sort_index()
@@ -329,8 +334,8 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                         _tag = f"{_m}_{cap}_{lam}_{lb}"
                         res = portfolio.curator_backtest(
                             runs_dir=_mdir, out_dir=f"/tmp/_sweep/{_tag}",
-                            max_weight=cap, risk_aversion=lam, benchmarks=["SPY"],
-                            lookback_years_override=lb / 365.0, always_include=ANCHORS)
+                            max_weight=cap, risk_aversion=lam, risk_free_rate=_RF, t_update_days=_TU,
+                            benchmarks=["SPY"], lookback_years_override=lb / 365.0, always_include=ANCHORS)
                         snaps = pd.read_csv(Path(f"/tmp/_sweep/{_tag}") / "snapshots.csv", parse_dates=["date"])
                         totals = snaps.groupby("date")["total_value"].first().sort_index()
                         if spy_curve is None:   # identical window across all mws dirs -> compute SPY once
@@ -785,7 +790,8 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         for _mtf in MIN_TRADE_FRACS:
             _mr = portfolio.curator_backtest(
                 runs_dir=_canon_dir, out_dir=f"/tmp/_mtsweep/{_mtf}", max_weight=CURRENT[0],
-                risk_aversion=CURRENT[1], benchmarks=["SPY"], lookback_years_override=CURRENT[2] / 365.0,
+                risk_aversion=CURRENT[1], risk_free_rate=_RF, t_update_days=_TU,
+                benchmarks=["SPY"], lookback_years_override=CURRENT[2] / 365.0,
                 always_include=ANCHORS, min_trade_frac=_mtf)
             _mt_rows.append({"mt": _mtf, "ret": _mr["realized_return"], "turn": _mr["turnover_ratio"]})
         _mt_cache.write_text(_json.dumps(_mt_rows, indent=2))

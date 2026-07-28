@@ -489,7 +489,8 @@ def main(argv=None) -> int:
     # whatever curations have completed so far — the run builds chronologically, so it grows in time.
     (run_dir / "_starter.json").write_text(json.dumps(
         {"starter_watchlist": a.starter, "as_of_dates": dates, "rebalance_period": a.cadence,
-         "initial_usd": 50000.0, "lookback_years": a.optimizer_lookback_days / 365.0,
+         "initial_usd": float(portfolio.load_financial_model().get("initial_investment_usd", 50000.0)),
+         "lookback_years": a.optimizer_lookback_days / 365.0,
          "max_watchlist_size": a.max_watchlist_size, "start_date": a.start, "end_date": a.end}, indent=2))
     def _write_pool(d, arts):
         src_split = collections.Counter(x.get("lede_source", "wayback" if x.get("lede") else "none")
@@ -568,11 +569,13 @@ def main(argv=None) -> int:
               f"removes={[x['ticker'] for x in cur.get('removes',[])]}", file=sys.stderr)
 
     # _starter.json was written up front; replay the full run now.
+    _fm = portfolio.load_financial_model()
     res = portfolio.curator_backtest(
         runs_dir=str(run_dir), out_dir=str(run_dir / "_backtest"), max_weight=a.max_weight,
-        risk_aversion=a.risk_aversion, benchmarks=["SPY"],
+        risk_aversion=a.risk_aversion, risk_free_rate=float(_fm["risk_free_rate"]),
+        t_update_days=int(portfolio.load_backtest_config()["t_update_days"]), benchmarks=["SPY"],
         lookback_years_override=a.optimizer_lookback_days / 365.0, always_include=anchors,
-        min_trade_frac=float(portfolio.load_financial_model()["min_trade_size_frac"]))  # live no-trade band
+        min_trade_frac=float(_fm["min_trade_size_frac"]))  # live no-trade band
     print(f"\n=== RESULT: {res['realized_return']*100:+.0f}% (final ${res['final_value']:,.0f}) | "
           f"SPY {res['benchmark_returns']['SPY']*100:+.0f}% | final {res['final_watchlist']}")
     if a.log_llm:

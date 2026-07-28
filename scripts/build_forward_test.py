@@ -116,7 +116,8 @@ def main() -> int:
     # Replay through the SAME engine as the backtest (free math), then render the SAME dashboard.
     res = portfolio.curator_backtest(
         runs_dir=str(RUN_DIR), out_dir=str(OUT_DIR), max_weight=fm["concentration_cap"],
-        risk_aversion=fm["risk_aversion"], risk_free_rate=fm["risk_free_rate"], benchmarks=["SPY"],
+        risk_aversion=fm["risk_aversion"], risk_free_rate=fm["risk_free_rate"],
+        t_update_days=int(portfolio.load_backtest_config()["t_update_days"]), benchmarks=["SPY"],
         lookback_years_override=fm["optimizer_lookback_days"] / 365.0, always_include=anchors,
         min_trade_frac=float(fm["min_trade_size_frac"]))     # model the live no-trade band
     # Just framing (NOT the parameter list -- those are in the Parameter-settings table above plot 1).

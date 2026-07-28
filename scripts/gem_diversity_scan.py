@@ -47,7 +47,8 @@ for r in front:
                 if p.exists()), None)
     if snp is None:                           # regenerate if neither tmp is present
         portfolio.curator_backtest(runs_dir=MWSDIR[r["mws"]], out_dir=f"/tmp/_gems/{tag}",
-                                   max_weight=r["cap"], risk_aversion=r["lam"], benchmarks=[],
+                                   max_weight=r["cap"], risk_aversion=r["lam"],
+                                   risk_free_rate=bsd._RF, t_update_days=bsd._TU, benchmarks=[],
                                    lookback_years_override=r["lb"] / 365.0, always_include=ANCH)
         snp = Path(f"/tmp/_gems/{tag}/snapshots.csv")
     sn = pd.read_csv(snp, parse_dates=["date"])

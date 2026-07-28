@@ -96,6 +96,7 @@ The `price_snapshot.sh` cron refreshes `docs/index.html` (the dashboard CLI's de
 
 - Never write financial advice without citing the profile.
 - Numbers come from Python, not from the LLM. If a subagent reports a number, it must have come from a `src.cli` invocation in the same turn.
+- **Never hardcode a value that has an input-file source.** Every optimizer/backtest/curator knob lives in `investor_profile.md` (via `load_financial_model` / `load_backtest_config` / `load_forward_config` / `load_wave_thesis` / `load_exclusions`); read it from there, never inline a literal (`risk_free_rate=0.04`, `initial_usd=50000`, `ANCHORS=[...]`, the wave thesis) that silently shadows the profile. A hardcoded default that happens to match the profile today is still a bug: it makes a future profile edit a no-op. This is the same fail-loud principle as the required `thesis`/`exclusions` args on `curate()`. When a value is genuinely swept (cap/λ/lookback in a sweep), read the *non-swept* knobs from the profile so only the intended dimension varies.
 - Don't modify `investor_profile.md` or `holdings.csv` without the user's explicit consent. (`holdings.csv` is user-edited only — the user updates it after real trades; `watchlist.csv` is the curator/cron's file.)
 - Reports and the dashboard under `data/` are session artifacts; gitignored and safe to regenerate. The two appended CSVs (`snapshots.csv`, `recommendations.csv`) are also under `data/` but are the user's history; don't truncate them without consent.
 

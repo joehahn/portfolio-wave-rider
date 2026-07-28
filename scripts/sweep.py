@@ -72,6 +72,7 @@ def run_one(param: str, value: float, runs_dir: str, tmp: Path,
         "out_dir": str(out_dir),
         "max_weight": base_max_weight,
         "risk_aversion": base_risk_aversion,
+        "risk_free_rate": float(_FM["risk_free_rate"]),   # from the profile (not a swept param)
         "lookback_years_override": base_lookback,
         "t_update_days": base_t_update,
         "benchmarks": [],
