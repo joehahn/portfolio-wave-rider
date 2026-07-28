@@ -711,8 +711,11 @@ _VALID_WAVE_BUCKETS = {
     "AI", "robotics", "rockets_spacecraft", "nuclear", "quantum",
     "engineered_biology",
     # Non-technology waves the profile may name (geopolitical realignment,
-    # demographic shifts, commodity cycles, regulatory inflections).
-    "geopolitical", "demographics", "commodities", "regulatory",
+    # demographic shifts, commodity cycles, regulatory inflections). The 2026
+    # geopolitical realignment is split into 4 sub-waves (own catalysts/names);
+    # "geopolitical" is kept for back-compat with older curations.
+    "geopolitical", "geo_defense", "geo_drones", "geo_tankers", "geo_reconstruction",
+    "demographics", "commodities", "regulatory",
     # Catch-all for tickers that aren't tied to any specific wave thesis
     # (broad-market ETFs, bonds, cash, gold as ballast).
     "general_markets",
@@ -2145,7 +2148,8 @@ def curator_backtest(
 # quantum > fusion), with the current AI wave first and general_markets last.
 _WAVE_DISPLAY_ORDER = [
     "AI", "rockets_spacecraft", "robotics", "engineered_biology",
-    "quantum", "nuclear", "nuclear_fusion", "demographics", "geopolitical",
+    "quantum", "nuclear", "nuclear_fusion", "demographics",
+    "geo_defense", "geo_drones", "geo_tankers", "geo_reconstruction", "geopolitical",
     "general_markets", "cashlike",
 ]
 
@@ -2163,7 +2167,11 @@ WAVE_COLORS: dict[str, str] = {
     "nuclear":            "#eab308",  # gold (curator's bucket name)
     "nuclear_fusion":     "#eab308",  # gold (alias used by TICKER_WAVE)
     "demographics":       "#17becf",  # cyan
-    "geopolitical":       "#e377c2",  # pink
+    "geopolitical":       "#e377c2",  # pink (legacy single geo bucket)
+    "geo_defense":        "#e377c2",  # pink
+    "geo_drones":         "#c2185b",  # deep magenta
+    "geo_tankers":        "#8c564b",  # brown (energy / shipping)
+    "geo_reconstruction": "#b5651d",  # ochre (construction)
     "general_markets":    "#7f7f7f",  # gray
     "cashlike":           "#0d9488",  # deep teal — distinct from any wave hue
 }
@@ -2246,12 +2254,14 @@ TICKER_WAVE: dict[str, str] = {
     # eldercare REITs, automation that backfills labor shortages).
     "LLY": "demographics", "XLV": "demographics", "WELL": "demographics",
     "CTRE": "demographics",
-    # Geopolitical (energy / shipping / LNG / tankers, defense; profile's
-    # non-tech wave covering energy-commodity cycles and rearmament).
-    "BWET": "geopolitical", "LNG": "geopolitical", "XLE": "geopolitical",
-    "LMT": "geopolitical", "NOC": "geopolitical", "ITA": "geopolitical",
-    "EUAD": "geopolitical", "GD": "geopolitical", "AVAV": "geopolitical",
-    "STNG": "geopolitical", "FRO": "geopolitical",
+    # Geopolitical realignment, split into 4 sub-waves (own catalysts/names).
+    "STNG": "geo_tankers", "FRO": "geo_tankers", "INSW": "geo_tankers", "DHT": "geo_tankers",
+    "BWET": "geo_tankers", "LNG": "geo_tankers", "XLE": "geo_tankers", "TNK": "geo_tankers",
+    "LMT": "geo_defense", "NOC": "geo_defense", "ITA": "geo_defense", "EUAD": "geo_defense",
+    "GD": "geo_defense", "RTX": "geo_defense", "LHX": "geo_defense", "TDY": "geo_defense",
+    "AVAV": "geo_drones", "KTOS": "geo_drones", "RCAT": "geo_drones", "ONDS": "geo_drones",
+    "PWR": "geo_reconstruction", "ACM": "geo_reconstruction", "FLR": "geo_reconstruction",
+    "URI": "geo_reconstruction", "J": "geo_reconstruction",
     # General markets (broad ETFs, bonds, cash, metals, crypto)
     "AGG": "general_markets", "BND": "general_markets", "TLT": "general_markets",
     "IEF": "general_markets", "SHY": "general_markets", "MUB": "general_markets",
@@ -2283,6 +2293,10 @@ WAVE_DISPLAY_LABEL: dict[str, str] = {
     "nuclear_fusion": "nuclear",
     "demographics": "demographics",
     "geopolitical": "geopolitical",
+    "geo_defense": "defense",
+    "geo_drones": "drones",
+    "geo_tankers": "tankers",
+    "geo_reconstruction": "reconstruction",
     "general_markets": "general_markets",
     "cashlike": "cashlike",
 }

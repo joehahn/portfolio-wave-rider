@@ -131,12 +131,27 @@ def build_user_prompt(as_of: str, watchlist: list[str], thesis: str, exclusions:
               f"Revise so nothing is rejected: to keep a rejected ADD, pair it with a REMOVE of a "
               f"lower-conviction current holding (a swap); drop any add/remove you can't justify; else "
               f"emit no_changes. Re-emit the FULL corrected JSON.\n\n") if retry_feedback else ""
+    from src.portfolio import _VALID_WAVE_BUCKETS   # valid wave_bucket vocabulary (lazy import; avoids cycle)
+    _buckets = ", ".join(sorted(b for b in _VALID_WAVE_BUCKETS if b != "general_markets"))
+    _opt_note = (
+        "A BACKWARD-LOOKING mean-variance optimizer sets the dollar weights downstream — it weights each name "
+        "by its recent trailing risk-adjusted return, so it buys winners AFTER they run and sells losers AFTER "
+        "they fall; left alone it rides a once-rising name back down. Counteract that lag: keep the watchlist "
+        "stocked with names in the EARLY buildup of a wave (fresh/accelerating catalysts, pre-run-up) so the "
+        "optimizer always has a better-trending alternative to rotate into as older holdings plateau. Favor "
+        "new/accelerating catalysts over already-crested or fully-re-rated names. Ensure BREADTH: add early-stage "
+        "names from DIFFERENT waves to fill open slots so several concurrent early-and-mid waves are represented; "
+        "remove a name only when its thesis breaks or its wave has clearly crested — NOT merely because it "
+        "matured (let the optimizer defund maturing names via its weighting; do not churn them off the watchlist "
+        "yourself).")
     return f"""{_retry}{intro}
 - as_of_date: {as_of}
 - current_watchlist: {watchlist}
 - max_watchlist_size: {max_size} (managed slots; {anchors} are always_include anchors, off-limits, don't count). {slot_rule}
 - rebalance_period: {cadence} (you are re-run every {cadence} — calibrate churn to this cadence; most {cadence} windows warrant no_changes, act only on a genuine catalyst)
 - profile_wave_thesis: {thesis}
+- wave_buckets (tag each add's wave_bucket with the single best-fitting label below; the 2026 geopolitical realignment is FOUR distinct waves — geo_defense, geo_drones, geo_tankers, geo_reconstruction — cover each as its OWN wave, not one 'geopolitical' lump): {_buckets}
+- how_your_picks_are_used: {_opt_note}
 - exclusions: {exclusions}
 
 news_pool (read it, discover US-listed wave tickers with real catalysts, DISCARD the noise):
