@@ -175,6 +175,40 @@ def _churn_metrics(snaps: pd.DataFrame):
     return 100.0 * (l1 / 2.0) / years, 100.0 * l2 / years   # L1 one-way %/yr, L2 path-length /yr (x100)
 
 
+def _rotation_metrics(snaps: pd.DataFrame, recent_days: int = 365) -> dict:
+    """Rotation-quality metrics over the FULL window and the trailing `recent_days` (forward-relevant slice):
+      pf   = profit factor = (sum of positive daily position P&L) / |sum of negative daily P&L|, where daily
+             P&L per ticker = shares_{t-1} * (price_t - price_{t-1}). >1 = captured more dollars on up-moves
+             than given back on down-moves (rotation EFFICIENCY -- not drawdown; a high-pf config can still
+             round-trip). Capped at 99 when there are ~no losing days.
+      gb   = giveback = worst peak-to-trough of the equity curve (<=0). Round-trip SEVERITY.
+      *_1y = pf/gb recomputed over the trailing year, plus the trailing-year total return -- the slice that
+             is not dominated by the 2023-24 run-up, so it actually reflects recent rotation behavior."""
+    def _pf(df):
+        P = L = 0.0
+        for _tk, s in df.groupby("ticker"):
+            s = s.sort_values("date")
+            d = (s["shares"].shift(1) * s["price"].diff()).fillna(0.0)
+            P += float(d[d > 0].sum()); L += float(-d[d < 0].sum())
+        return min(P / L, 99.0) if L > 1e-6 else 99.0
+
+    def _giveback(tot):
+        if len(tot) < 2:
+            return float("nan")
+        peak = tot.cummax()
+        return float(((tot - peak) / peak.replace(0, np.nan)).min())
+
+    tot = snaps.groupby("date")["total_value"].first().sort_index()
+    cutoff = tot.index[-1] - pd.Timedelta(days=recent_days)
+    rt = tot[tot.index >= cutoff]
+    r1 = snaps[snaps["date"] >= cutoff]
+    return {
+        "pf": _pf(snaps), "gb": _giveback(tot),
+        "pf_1y": _pf(r1), "gb_1y": _giveback(rt),
+        "ret_1y": float(rt.iloc[-1] / rt.iloc[0] - 1.0) if len(rt) > 1 else float("nan"),
+    }
+
+
 def _metrics(totals: pd.Series, spy: pd.Series, ann_ret: float, max_dd: float) -> dict:
     """Risk-adjusted, benchmark-relative metrics from a config's equity curve + the SPY curve."""
     days = max((totals.index[-1] - totals.index[0]).days, 1)
@@ -356,7 +390,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                             rows_all.append({"mws": _m, "cap": cap, "lam": lam, "lb": lb, "mt": mt,
                                              "ret": res["realized_return"],
                                              "ann": res["annualized_return"], "dd": res["max_drawdown"],
-                                             "l1": _l1, "l2": _l2, **m,
+                                             "l1": _l1, "l2": _l2, **m, **_rotation_metrics(snaps),
                                              "cur": (cap, lam, lb) == CURRENT and mt == CURRENT_MT and _m == _mws_fixed})
         spy_ret = float(spy_curve.iloc[-1] / spy_curve.iloc[0] - 1.0)
         cache_p.parent.mkdir(parents=True, exist_ok=True)
@@ -864,6 +898,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                            f'<td {_lc}>ws{x["mws"]} &middot; cap{x["cap"]}/λ{x["lam"]}/{x["lb"]}d/mt{x.get("mt", CURRENT_MT):g}'
                            + (" &larr; live" if _hit else "") + '</td>'
                            f'<td {_lc}>{x["ret"] * 100:+.0f}%</td><td {_lc}>{x["dd"] * 100:.0f}%</td>'
+                           f'<td {_lc}>{x["pf"]:.2f}</td><td {_lc}>{x["gb"] * 100:.0f}%</td>'
                            f'<td {_lc}>{x["l1"]:.0f}</td><td {_lc}>{x["l2"]:.0f}</td>'
                            f'<td {_lc}>{x["n_pos"]}</td><td {_lc}>{x["n_waves"]}</td>'
                            f'<td {_lc}>{_wv}</td></tr>')
@@ -872,12 +907,51 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                 f'<p style="color:#555;max-width:940px;">Within the low-churn box (|maxDD| &lt; {REC_MAX_DD:.0f}% '
                 f'AND L1 &lt; {REC_MAX_L1:.0f} AND L2 &lt; {REC_MAX_L2:.0f}), the settings whose gains come from the '
                 '<b>most gem tickers</b> &mdash; ranked by gem count, then return &mdash; with the <b>waves</b> '
-                'driving those gains. Broad wave coverage is more robust than a single-stock run; the top row is the '
-                'canonical live config. Wave figures are percentage points of total return.</p>'
+                'driving those gains. Broad wave coverage is more robust than a single-stock run. '
+                '<b>P/|L|</b> = profit factor (up-day $ &divide; down-day $; &gt;1 = captured more on rises '
+                'than given back on falls) and <b>giveback</b> = worst peak&rarr;trough; together they read '
+                'rotation EFFICIENCY vs round-trip SEVERITY. Wave figures are percentage points of total '
+                'return. NOTE: all 3-year and in-sample &mdash; the 2023-24 RKLB run-up dominates, so use the '
+                'recent-year table below to judge rotation on the forward-relevant slice.</p>'
                 + '<table style="font-size:12.5px;margin-top:.4em;"><thead><tr>'
                 f'<th {_lc}>#</th><th {_lc}>setting</th><th {_lc}>return</th><th {_lc}>maxDD</th>'
+                f'<th {_lc}>P/|L|</th><th {_lc}>giveback</th>'
                 f'<th {_lc}>L1</th><th {_lc}>L2</th><th {_lc}>gems</th><th {_lc}>waves</th>'
                 f'<th {_lc}>waves generating the gains (pp)</th></tr></thead><tbody>' + _drows + '</tbody></table>')
+
+        # Recent-year (trailing 365d) rotation ranking: the SAME canonical-mws grid scored on ONLY the last
+        # year -- the slice NOT dominated by the 2023-24 RKLB run-up -- ranked by 1y return / |1y giveback|
+        # (return per unit round-trip). Churn is unfiltered here (zero-cost IRA). Answers "which config best
+        # navigates recent, forward-relevant data" rather than "which rode the 2023-24 winners".
+        _ry = [r for r in rows if r.get("ret_1y") == r.get("ret_1y")]   # drop NaN (short-window configs)
+        for r in _ry:
+            _gbd = max(abs(r.get("gb_1y") or 0.0), 0.02)                # floor the denominator
+            r["_cal1"] = r["ret_1y"] / _gbd
+        _ry.sort(key=lambda r: -r["_cal1"])
+        _ryrows = ""
+        for _i, r in enumerate(_ry[:12]):
+            _rh = ((r["cap"], r["lam"], r["lb"]) == CURRENT and r.get("mt", CURRENT_MT) == CURRENT_MT)
+            _rhl = "background:#fff7e6;" if _rh else ""
+            _ryrows += (f'<tr style="{_rhl}border-bottom:1px solid #eee;"><td {_lc}>{_i + 1}</td>'
+                        f'<td {_lc}>cap{r["cap"]}/λ{r["lam"]}/{r["lb"]}d/mt{r.get("mt", CURRENT_MT):g}'
+                        + (" &larr; live" if _rh else "") + '</td>'
+                        f'<td {_lc}>{r["ret_1y"] * 100:+.0f}%</td><td {_lc}>{r["pf_1y"]:.2f}</td>'
+                        f'<td {_lc}>{r["gb_1y"] * 100:.0f}%</td><td {_lc}>{r["_cal1"]:.1f}</td>'
+                        f'<td {_lc}>{r["ret"] * 100:+.0f}%</td></tr>')
+        _recent_html = (
+            f'<h3 style="margin:1.3em 0 .2em;">Recent-year rotation ranking (trailing 365d, mws&nbsp;{_mws_fixed})</h3>'
+            '<p style="color:#555;max-width:940px;">The same canonical-watchlist grid scored on ONLY the trailing '
+            '12 months &mdash; the slice NOT dominated by the 2023-24 RKLB run-up, so it reflects how each config '
+            'rotates on recent, forward-relevant data. Ranked by <b>1y return &divide; |1y giveback|</b> (return per '
+            'unit round-trip). Churn is not filtered (zero-cost IRA). <b>CAVEAT:</b> still in-sample, and on the '
+            f'OLD-thesis mws-{_mws_fixed} curations &mdash; the live path uses a newer thesis, so read it as a '
+            'config signal, not a guarantee.</p>'
+            '<table style="font-size:12.5px;margin-top:.4em;"><thead><tr>'
+            f'<th {_lc}>#</th><th {_lc}>setting</th><th {_lc}>1y return</th><th {_lc}>1y P/|L|</th>'
+            f'<th {_lc}>1y giveback</th><th {_lc}>1y ret&divide;|giveback|</th><th {_lc}>3y return</th>'
+            '</tr></thead><tbody>' + _ryrows + '</tbody></table>')
+        _div_html = _div_html + _recent_html
+
         gems_html = (
             '<h2>5. Backtest gems</h2>'
             '<p style="color:#555;max-width:940px;">For every ticker the curator ever held, its best <b>$ gain</b> '

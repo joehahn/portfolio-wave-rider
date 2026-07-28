@@ -72,7 +72,7 @@ for r in front:
         w = WAVE_OF.get(t, "other")
         waves[w] = round(waves.get(w, 0.0) + v, 1)
     out.append({"mws": r["mws"], "cap": r["cap"], "lam": r["lam"], "lb": r["lb"],
-                "mt": r.get("mt", bsd.CURRENT_MT), "ret": r["ret"],
+                "mt": r.get("mt", bsd.CURRENT_MT), "pf": r.get("pf"), "gb": r.get("gb"), "ret": r["ret"],
                 "dd": r["dd"], "l1": r["l1"], "l2": r["l2"], "n_pos": len(pos), "n_waves": len(waves),
                 "gem_ret": round(sum(pos.values()), 1),
                 "pos": dict(sorted(pos.items(), key=lambda x: -x[1])),
