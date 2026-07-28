@@ -7,7 +7,29 @@
 
 This Claude Code project uses AI to manage a curated watchlist of tickers. You declare your goals, constraints, and an investment thesis (namely what you think will drive future returns), then initialize a starter watchlist of tickers that you want exposure to. At each periodic rebalance the curator agent reads recent news against your thesis and evolves the watchlist by proposing adds and removes. A standard mean-variance optimizer then recommends portfolio weights across the resulting watchlist. The result accumulates into a static Plotly dashboard so you can watch the watchlist composition, the recommended weights, and the realized portfolio value evolve over time. In our experiments, this coupling of AI-driven watchlist curation with standard portfolio optimization significantly outperforms the optimizer on its own.
 
-**Who this helps.** An investor who has a thesis about where markets are going but not enough time to track the news, or who wants help optimizing a portfolio. This demo helps that investor move from a static buy-and-hold portfolio to one that is lightly but effectively managed by AI. In the 3-year backtest below (2023 to 2026) the AI-managed portfolio returned about **+957%** against **+217%** for a buy-and-hold of the starter watchlist, roughly **3.4x** the buy-and-hold gain. Read that as one favorable wave the curator caught and held rather than a broad edge: most of the lift sits in a single position, and the whole result is in-sample. The caveats section is honest about both. The curator's job is to compound a thesis you already hold, not to invent one you don't.
+**Who this helps.** An investor who has a thesis about where markets are going but not enough time to track the news, or who wants help optimizing a portfolio. This demo helps that investor move from a static buy-and-hold portfolio to one that is lightly but effectively managed by AI. In the 3-year backtest below (2023 to 2026) the AI-managed portfolio outperforms a buy-and-hold of the starter watchlist by a wide margin; the current figure lives on the [curator-backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_gkg_3yr_kimi.html), since it moves whenever the config or thesis is tuned. Read that lift as one favorable wave the curator caught and held rather than a broad edge: most of it sits in a single position, and the whole result is in-sample. The caveats section is honest about both. The curator's job is to compound a thesis you already hold, not to invent one you don't.
+
+## How it works, at a glance
+
+Each rebalance runs one loop. The curator is the only judgment call; everything else is deterministic Python.
+
+```mermaid
+flowchart LR
+    N["News<br/>date-clean GKG + Wayback (backtest)<br/>Anthropic web_search (live)"]
+    subgraph CUR["Curator: kimi-k2.5 (the edge)"]
+      direction TB
+      A["read your wave thesis<br/>from investor_profile.md"] --> B["propose adds / removes,<br/>each cited to dated news"]
+    end
+    N --> CUR
+    CUR --> W["watchlist.csv<br/>curator-managed universe"]
+    W --> O["mean-variance optimizer<br/>weights = argmax μᵀw − λ·wᵀΣw"]
+    O --> D["recommended weights<br/>and a static Plotly dashboard"]
+    D --> U["you: place the trades,<br/>then edit holdings.csv"]
+    U -. next rebalance .-> N
+    style CUR fill:#fff3cd,stroke:#d39e00,stroke-width:2px
+```
+
+The highlighted box is where the advantage comes from: an LLM reading the news against your thesis to decide *which tickers* the optimizer gets to choose among. The optimizer only ever sets the weights.
 
 Four dashboards are served from GitHub Pages:
 
@@ -25,7 +47,7 @@ The project has evolved since its first release, and the dashboards above reflec
 - **Clean news retrieval.** The backtest curator no longer reads news via live WebSearch, which leaks present-day knowledge into historical queries (a 2023 rebalance would surface 2026 "best stocks to buy" lists). It now reads a date-honest **GDELT-GKG plus Wayback** corpus: server-enforced date bounds and archived same-date article ledes, so each rebalance only sees news that existed at that time. This removes the *retrieval* leak. It does not remove the model's training-memorization leak, so only forward testing can settle that (more in the caveats).
 - **A cheap, disciplined default curator.** Every backtest return is in-sample and cannot rank one curator LLM against another, so a **blind, leak-free rationale judge** scores the reasoning instead: an independent Opus grader rates each add and remove with the market outcome hidden. It found **kimi-k2.5** ties Sonnet on reasoning quality while running about 8x cheaper and 3x faster, so kimi is now the default backtest curator.
 - **One unified sweep.** The four separate sweep pages are retired in favor of a single [parameter-sweep dashboard](https://joehahn.github.io/portfolio-wave-rider/sweep_pwr.html): the zero-cost optimizer-knob frontier, the curator-LLM comparison, and the blind judge, side by side.
-- **Coming next, forward usage.** The Claude-Code *skills* are moving to plain Python that calls the Anthropic and OpenRouter SDKs directly, so routine runs use an API key and Claude-Code tokens are spent only during development. The aim is a single curator prompt, retriever, validator, and optimizer shared by both the backtest and the forward path, so a lesson learned on either side lands on the other.
+- **Skills retired, plain Python in.** The Claude-Code *skills* (the slash commands) are gone. Every routine run is now plain Python: the CLI (`python -m src.cli`) plus a few scripts, calling the OpenRouter and Anthropic SDKs directly for the curator. So the backtest and the forward path share one curator prompt, retriever, validator, and optimizer, a lesson learned on either side lands on the other, and routine runs cost an API key rather than Claude-Code tokens (those are spent only during development). Setup below covers the API keys.
 
 The granular numbers (exact config, per-wave attribution, the full bias accounting) live in [REFERENCE.md](REFERENCE.md); this page keeps the visitor-level tour.
 
@@ -45,16 +67,26 @@ cp investor_profile.example.md investor_profile.md
 cp holdings.example.csv holdings.csv
 ```
 
+Then set the API keys the curator and retriever use. Export them in your shell profile so cron inherits them:
+
+```bash
+export OPENROUTER_API_KEY=...        # the kimi-k2.5 curator (backtest and live)
+export ANTHROPIC_API_KEY=...         # the live forward web_search news pull
+export GOOGLE_APPLICATION_CREDENTIALS=/path/to/gcp-key.json   # BigQuery, only to (re)build the GKG backtest corpus
+```
+
+A routine forward run needs only the OpenRouter key; the Anthropic key powers the daily news pull, and the Google credentials are needed solely when rebuilding the backtest news corpus from GDELT-GKG.
+
 ### 2. Edit `investor_profile.md` and `holdings.csv`
 
 - `investor_profile.md`: here you declare your goals, constraints, exclusions, the wave-thesis prose, and the optimizer's settings (risk aversion, risk-free rate, lookback window, rebalance period, max watchlist size). Each field is documented with explanatory comments in `investor_profile.example.md`. Every recommendation cites lines from this file.
-- `holdings.csv`: a two-column CSV (`ticker,shares`) of your real positions. Start it empty (or with 0 shares); `/initialize-portfolio` allocates dollars across your thesis tickers on its first run and writes both `holdings.csv` (real shares) and `watchlist.csv` (the curator-managed universe, a single `ticker` column). Thereafter you edit `holdings.csv` only when you actually trade; the biweekly review manages `watchlist.csv` for you.
+- `holdings.csv`: a two-column CSV (`ticker,shares`) of your real positions. Start it empty (or with 0 shares); the one-time bootstrap (step 3) allocates dollars across your thesis tickers and writes both `holdings.csv` (real shares) and `watchlist.csv` (the curator-managed universe, a single `ticker` column). Thereafter you edit `holdings.csv` only when you actually trade; the biweekly review manages `watchlist.csv` for you.
 
 `news_sources.md` is pre-populated with a curated list of suggested news sources (Bloomberg, Reuters, company newsrooms, SEC filings, etc.) grouped by your profile's waves. The curator searches these domains first and falls back to open WebSearch otherwise. Tailor to your own taste: add sources you trust, drop ones that paywall heavily or go off-topic.
 
 ### 3. Bootstrap the portfolio
 
-Run `/initialize-portfolio` in Claude Code. This converts your wave thesis and starter watchlist into a concrete day-0 dollar allocation per ticker (beliefs in dollar form, no optimizer yet) and saves it as the baseline that every future review will compare against. A narrative report of the allocation reasoning is produced alongside.
+Bootstrap the portfolio once: turn your wave thesis and starter watchlist into a concrete day-0 dollar allocation per ticker (beliefs in dollar form, no optimizer yet), convert those dollars to share counts with `.venv/bin/python -m src.cli init-holdings`, and save the allocation as `data/thesis_baseline.json`, the baseline every future review compares against.
 
 ### 4. Install the cron jobs (required)
 
@@ -97,7 +129,7 @@ This project's portfolio-optimization activities.
 
 ### 1. initialize (once)
 
-Run `/initialize-portfolio` in Claude Code. This distributes your starting dollars across the watchlist noted in `holdings.csv` using only the qualitative inputs in `investor_profile.md`. The result is a "beliefs in dollar form" initial baseline portfolio that is written to `data/thesis_baseline.json`.
+Bootstrap the portfolio once (Setup step 3): distribute your starting dollars across your thesis tickers using only the qualitative inputs in `investor_profile.md`, convert to shares with `.venv/bin/python -m src.cli init-holdings`, and write the "beliefs in dollar form" baseline to `data/thesis_baseline.json`.
 
 ### 2. cron to monitor ticker changes (daily)
 
@@ -105,15 +137,15 @@ Cron captures today's per-ticker shares and close price into `data/snapshots.csv
 
 ### 3. update watchlist and optimize portfolio (monthly, quarterly, etc.)
 
-Run `/review-portfolio` in Claude Code. The cadence is declared in `investor_profile.md` under `financial_model.rebalance_period` (`monthly` / `quarterly` / `semi_annual` / `annual`); how often you actually invoke the skill is up to you. The `rebalance_period` setting also determines the curator's news-lookback window on each call. Each call's window is anchored on that day's date, so running more often than the declared cadence (e.g. running daily under `monthly`) gives you a rolling 30-day window that overlaps heavily between consecutive runs. Each run: the curator reads recent news against your wave thesis and proposes adds and removes against the current watchlist; the optimizer then recomputes weights across the updated watchlist; the resulting report is written to `data/reports/<date>-review-portfolio.md`. Read the report to see the curator's adds and removes this period and any conflicts where the optimizer wanted something your profile forbids.
+The review runs on the biweekly cron (`review_curation.sh`, which calls `.venv/bin/python -m src.cli review --if-due`); you can also run it by hand with `.venv/bin/python -m src.cli review`. The cadence is `financial_model.rebalance_period` in `investor_profile.md` (`weekly` / `biweekly` / `monthly` / `quarterly`); `--if-due` self-gates to that period, so firing the cron every weekday is safe and it acts only once per period. The curator reads the trailing `news_lookback_days` of news against your wave thesis and proposes adds and removes against the current watchlist; the optimizer then recomputes weights across the updated watchlist; the report is written to `data/reports/<date>-review-portfolio.md`. Read it to see the curator's adds and removes this period and any conflicts where the optimizer wanted something your profile forbids.
 
 Note that recommendations do not execute trades, they only append optimizer output to `data/recommendations.csv`. To act on a recommendation, execute trades in your brokerage and then edit `holdings.csv` so the next daily snapshot picks up the new share counts.
 
 ### 4. run the curator backtest (anytime)
 
-Run the curator backtest (`scripts/backtest_sdk.py`, invoked today by the `/run-backtest` skill and being migrated to a plain CLI call). It builds the date-clean GKG plus Wayback news pool for each missing rebalance, evolves the watchlist week by week against your wave thesis via the curator LLM, optimizes the portfolio at each rebalance, measures the lift over a buy-and-hold strategy, and regenerates the dashboard at `docs/backtest_gkg_3yr_kimi.html`.
+Run the curator backtest with `scripts/backtest_sdk.py`. It builds the date-clean GKG plus Wayback news pool for each missing rebalance, evolves the watchlist rebalance by rebalance against your wave thesis via the curator LLM, optimizes the portfolio at each rebalance, measures the lift over a buy-and-hold strategy, and regenerates the dashboard at `docs/backtest_gkg_3yr_kimi.html`.
 
-At each weekly rebalance the curator reads the date-bounded news pool as of that date and proposes adds and removes, then the optimizer recomputes weights for whatever watchlist results, repeated across the window. Compare your run to ours at [our curator backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_gkg_3yr_kimi.html): about **+957%** over the 3-year window against **+217%** buy-and-hold, roughly **3.4x**, with the honest caveats spelled out below.
+At each rebalance the curator reads the date-bounded news pool as of that date and proposes adds and removes, then the optimizer recomputes weights for whatever watchlist results, repeated across the window. Compare your run to ours at [our curator backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_gkg_3yr_kimi.html), which shows the current lift over buy-and-hold and SPY, with the honest caveats spelled out below.
 
 ### 5. sweep the settings (anytime)
 
@@ -123,25 +155,25 @@ The four old per-parameter sweep pages are retired. Everything now lives on one 
 - **Curator-LLM comparison.** Each candidate model reads the same news pools at the same config, so the only variable is the curator. This is where the cheap-workhorse choice (kimi) was made.
 - **Blind rationale judge.** The leak-free scoring described in Recent revisions.
 
-`max_watchlist_size` is swept separately (via the `/sweep-max-watchlist-size` skill) because it shapes the curator's *decisions*, so each value needs its own set of curator calls rather than a free re-solve. See [REFERENCE.md](REFERENCE.md) for what each knob does and how the sweep is run.
+`max_watchlist_size` is swept separately, by re-curating at each size, because it shapes the curator's *decisions*, so each value needs its own set of curator calls rather than a free re-solve. See [REFERENCE.md](REFERENCE.md) for what each knob does and how the sweep is run.
 
 ## Acting on a recommendation
 
-The `/review-portfolio` report ends with recommended weights, not trades. The project never touches your brokerage. To act on a recommendation:
+The review report ends with recommended weights, not trades. The project never touches your brokerage. To act on a recommendation:
 
 1. Read the **Profile conflicts** and **Recommended allocation** sections of the report. The optimizer regularly produces concentrated calls (single-stock weights at the `concentration_cap`); decide which subset you actually want to execute.
 2. Execute the buys and sells in your brokerage.
 3. Edit `holdings.csv` with the new share counts to match your brokerage. (The curator manages `watchlist.csv`, never `holdings.csv`, so this file is yours alone to edit.)
 4. The next daily cron snapshot picks up the new positions and the dashboard catches up.
 
-You can also do nothing and let the next `/review-portfolio` produce a fresh recommendation. The split between recommendation and execution is intentional so you can review, override, or ignore each call.
+You can also do nothing and let the next review produce a fresh recommendation. The split between recommendation and execution is intentional so you can review, override, or ignore each call.
 
 ## How `holdings.csv` and `watchlist.csv` shape outcomes
 
 Two files describe the portfolio, with a clean split of ownership:
 
 - **`holdings.csv`** (`ticker,shares`) is what you *actually own* — real positions, `shares > 0`. **You edit it, and only you**, after executing trades in your brokerage; the curator/cron never writes it. It drives the snapshots, current allocation, and the "sell/current" side of trade recommendations.
-- **`watchlist.csv`** (single `ticker` column) is the *curator-managed universe* — the tickers the optimizer may assign weight to. The biweekly `/review-portfolio` auto-adds and auto-removes here; you normally do not touch it.
+- **`watchlist.csv`** (single `ticker` column) is the *curator-managed universe* — the tickers the optimizer may assign weight to. The biweekly review auto-adds and auto-removes here; you normally do not touch it.
 
 The optimizer's universe is **`watchlist.csv` ∪ (the tickers you hold in `holdings.csv`) ∪ the profile's `always_include` anchors**. Consequences:
 
@@ -151,29 +183,27 @@ The optimizer's universe is **`watchlist.csv` ∪ (the tickers you hold in `hold
 - **Audit trail.** Every applied watchlist change is logged to `data/curation_history.csv`.
 - **Manual edits.** Put a ticker on the curator's radar by appending it to `watchlist.csv`; record a real trade by editing `holdings.csv`.
 
-## How this project utilizes Claude Skills and Subagents
+## How the pieces fit: Python plus one LLM curator
 
-This project uses two kinds of Claude Code primitives:
+The split is deliberate. Python does everything deterministic; an LLM does the one judgment call.
 
-- A **Skill** is a slash command that delivers a sequence of tasks. Typing `/review-portfolio` delivers the steps described in [`.claude/skills/review-portfolio/SKILL.md`](.claude/skills/review-portfolio/SKILL.md), which: launches the curator subagent, applies the surviving adds and removes to `watchlist.csv`, runs the portfolio optimizer, calls the report-writer, and refreshes the dashboard. Inspect this project's four skills, [`/initialize-portfolio`](.claude/skills/initialize-portfolio/SKILL.md), [`/review-portfolio`](.claude/skills/review-portfolio/SKILL.md), [`/run-backtest`](.claude/skills/run-backtest/SKILL.md), & [`/sweep-max-watchlist-size`](.claude/skills/sweep-max-watchlist-size/SKILL.md), to see what they do in detail.
-- A **Subagent** uses an LLM with narrow lists of allowed tools. Each subagent manages its own context window so the work it does (news reading, report writing) doesn't crowd the main conversation. Calls are fire-and-forget: they spawn, run, return one message back, then the subagent's context disappears. Any state that needs to persist across calls is stored as data in files written to the `data/` directory. This project has two subagents: the [`watchlist-curator`](.claude/agents/watchlist-curator.md) that reads the news and proposes portfolio adds and removes, and the [`report-writer`](.claude/agents/report-writer.md) that writes the monthly report after synthesizing the curator's output.
+- **Deterministic work is Python.** Portfolio optimization, price fetching, payload validation, the news retriever, and dashboard rendering all live in [`src/portfolio.py`](src/portfolio.py) and [`src/cli.py`](src/cli.py). You run them through the CLI (`python -m src.cli <subcommand>`) and a few thin cron scripts. There are no Claude-Code skills or subagents anymore.
+- **The one judgment call is an LLM.** Deciding which news matters and which tickers to add or remove is the piece that resists fixed logic, so it goes to an LLM curator: kimi-k2.5, called through the OpenRouter SDK. The same curator prompt and validator serve both the backtest and the forward path, so a lesson learned on either side lands on the other.
 
-Other project tasks (portfolio optimization, price fetching, validation, dashboard rendering) are deterministic and handled by Python code in [`src/portfolio.py`](src/portfolio.py) and [`src/cli.py`](src/cli.py). The judgment pieces (which news matters, investment waves are currently active, and what to write in the report) are what an LLM is good at and is challenging to encode as fixed logic. So Python is used for the deterministic work and an LLM for the judgment calls, with each part staying small and easily understood.
+Each part stays small and reads at a glance. Anything that must persist between runs is a file under `data/`.
 
 ## How the watchlist-curator works
 
-The curator is the AI subagent that decides which tickers belong on the watchlist, and it executes when you call `/review-portfolio`. Its job is composition only: read the news, decide what to add and what to remove against the current watchlist. It does not propose weights or generate any forecasts. Instead it manages the list of tickers that the optimizer can choose from, doing so in a way that is informed by current news and aligned with your investing thesis.
+The curator decides which tickers belong on the watchlist. Its job is composition only: read the news, decide what to add and remove against the current watchlist. It never proposes weights or forecasts; it manages the set of tickers the optimizer may choose among, informed by current news and aligned with your thesis. In the backtest it is kimi-k2.5 reading the date-clean GKG pool; the live path fires the same curator on the biweekly cron review (`cli review --if-due`).
 
 On each call the curator:
 
 1. Reads the wave thesis from `investor_profile.md` and the current watchlist from `watchlist.csv`.
-2. Searches recent news against the named waves, preferring sources listed in `news_sources.md`.
-3. Proposes at most 3 adds and 3 removes, each cited with 2-4 dated news items.
+2. Reads the recent-news pool for that date: the GKG plus Wayback pool in the backtest, an Anthropic web_search pull live, preferring the sources in `news_sources.md`.
+3. Proposes adds and removes, bounded by the free slots in `max_watchlist_size`, each cited to dated news.
 4. Returns one JSON payload.
 
-Python code then validates the payload: US-listed only, listing-date check via yfinance, post-change watchlist size within `max_watchlist_size`, no double-adds, no stale removes. Only the changes that survive validation touch `watchlist.csv` (your real positions in `holdings.csv` are never modified).
-
-This splitting is intentional. The mean-variance solution finds the portfolio that optimizes the objective function (which is detailed further below), while the LLM handles tasks that require a judgement call. The curator agent is detailed in [`.claude/agents/watchlist-curator.md`](.claude/agents/watchlist-curator.md).
+Python then validates the payload: US-listed only, listing-date check via yfinance, post-change watchlist size within `max_watchlist_size`, no double-adds, no stale removes. Only the changes that survive touch `watchlist.csv`; your real positions in `holdings.csv` are never modified. The curator prompt and parser live in [`src/curator.py`](src/curator.py).
 
 ## How the optimizer works
 
@@ -183,33 +213,23 @@ The optimizer used here selects a portfolio that maximizes the mean-variance obj
 μᵀw − λ·wᵀΣw
 ```
 
-subject to ∑ᵢ wᵢ = 1 (weights sum to one) and 0 ≤ wᵢ ≤ concentration_cap. The first term `μᵀw` is the portfolio's expected return (the weighted average of per-ticker expected returns); the second term `wᵀΣw` is the portfolio's return variance, scaled by `λ` to act as a risk penalty. `μ` is the per-ticker expected-return vector, computed as the annualized mean of daily log returns over a 0.5y price-history lookback set in `investor_profile.md`. `Σ` is the ticker × ticker covariance matrix estimated over the same window. `w` is the weight vector the optimizer is solving for. `λ` (risk aversion) trades expected return against variance:
+subject to ∑ᵢ wᵢ = 1 (weights sum to one) and 0 ≤ wᵢ ≤ concentration_cap. The first term `μᵀw` is the portfolio's expected return (the weighted average of per-ticker expected returns); the second term `wᵀΣw` is the portfolio's return variance, scaled by `λ` to act as a risk penalty. `μ` is the per-ticker expected-return vector, computed as the annualized mean of daily log returns over a trailing price-history window (`optimizer_lookback_days`, set in `investor_profile.md`). `Σ` is the ticker × ticker covariance matrix estimated over the same window. `w` is the weight vector the optimizer is solving for. `λ` (risk aversion) trades expected return against variance:
 
 - `λ → 0`: the solution favors high-return tickers, which also tend to have greater variability.
-- `λ = 0.5`: a moderate setting that leans toward higher-reward tickers while keeping a real variance penalty. This is this project's default.
+- Intermediate `λ`: leans toward higher-reward tickers while keeping a real variance penalty. The live value is set in `investor_profile.md` under `financial_model.risk_aversion`, chosen with the parameter sweep rather than hardcoded here (it moves as the strategy is tuned).
 - `λ ≫ 1`: the variance penalty dominates, so the solution tends toward a low-variance portfolio that is heavy in cash and bonds.
 
 This is the standard Markowitz mean-variance formulation (Markowitz 1952, *Portfolio Selection*, Journal of Finance 7:77-91), which is the textbook starting point for portfolio construction because it captures the central return-vs-risk tradeoff in a single closed-form quadratic expression. See [GLOSSARY.md](GLOSSARY.md) for the full definitions.
 
 ## Main findings
 
-This project reads business news against a user's stated investment thesis, derives a curated watchlist from it, and hands that watchlist to a standard mean-variance optimizer for weighting at each rebalance. The AI's job is watchlist composition only, and the financial model turns the watchlist into weights. The published backtest runs weekly from May 2023 to May 2026 (about 3 years, 157 rebalances), starting from an equal-weight `[AAPL, MSFT, GOOGL, NVDA, SPY]` buy-and-hold investor who is too busy to track the news and revise the portfolio. We know such investors exist because the author is one.
+This project reads business news against a user's stated investment thesis, derives a curated watchlist from it, and hands that watchlist to a standard mean-variance optimizer for weighting at each rebalance. The AI's job is watchlist composition only; the financial model turns the watchlist into weights. The published backtest runs biweekly across 2023 to 2026 from an equal-weight `[AAPL, GOOGL, AMZN]` buy-and-hold investor who is too busy to track the news and revise the portfolio. We know such investors exist because the author is one.
 
-The curator here is kimi-k2.5 reading the date-clean GKG pool, and it is disciplined. Over 157 weeks it made just four swaps, every ticker real and US-listed, and it held the line the rest of the time. It kept NVDA through the AI boom, added Rocket Lab (RKLB) on a mid-2024 Space Force catalyst and rode it, opened a nuclear slot with Constellation Energy (CEG) on the Microsoft / Three Mile Island restart, played defense with Lockheed (LMT), and re-added Google as a quantum name on the Willow-chip breakthrough. The optimizer then concentrated into whatever was running, and the book ends **RKLB 60% / NVDA 40%**.
+The curator (kimi-k2.5 reading the date-clean GKG pool) is disciplined: it swaps rarely, every ticker real and US-listed, and holds the line the rest of the time, rotating into a next-wave name only on a concrete catalyst. The optimizer then concentrates into whatever is running. The AI-managed book beats the busy investor's buy-and-hold by a wide margin over the window. The exact returns move whenever the config or thesis is tuned, so this page does not hardcode them; the current figures are on the [curator-backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_gkg_3yr_kimi.html).
 
-**Total return over the window (May 2023 to May 2026, about 3 years):**
+**Where the lift comes from, and why to distrust it.** Most of the gain typically rides on a single dominant position. That is the headline and the caveat at once: it is one favorable wave the curator caught and held, not a broad-based edge, and a single winning bet (n=1) cannot separate skill from luck. Worse, the whole result is in-sample. The clean GKG plus Wayback retriever removes the *retrieval* leak, so the curator only ever saw period-correct news, but the curator is an LLM whose training postdates the window, so it may simply remember which 2023-to-2026 names won. The backtest is therefore a hindsight-tinted upper bound, not a clean out-of-sample result. The only honest test is **forward testing**: hold the config fixed and measure realized performance on quarters that postdate the model's training cutoff. That is the next phase of this project.
 
-| Strategy | Total return |
-|---|---|
-| Curator (kimi; cap 0.8, `λ` 2.0, 30-day lookback, weekly) | **+957%** (about +120%/yr, 29% max drawdown) |
-| Buy-and-hold (equal-weight starter, includes NVDA) | +217% |
-| SPY benchmark | +85% |
-
-The curator beat the buy-and-hold investor by about **+740 percentage points**, or **3.4x** its gain.
-
-**Where the return comes from, and why to distrust it.** Rocket Lab alone is roughly 71% of the gain. That is the headline and the caveat at once: this is one favorable wave the curator caught and held, not a broad-based edge, and a single winning bet (n=1) cannot separate skill from luck. Worse, the whole result is in-sample. The clean GKG plus Wayback retriever removes the *retrieval* leak, so the curator only ever saw period-correct news, but the curator is an LLM whose training postdates the window, so it may simply remember which 2023-to-2026 names won. The backtest is therefore a hindsight-tinted upper bound, not a clean out-of-sample result. The only honest test is **forward testing**: hold the config fixed and measure realized performance on quarters that postdate the model's training cutoff. That is the next phase of this project.
-
-See the [curator backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_gkg_3yr_kimi.html) for the full picture, and [REFERENCE.md](REFERENCE.md) for the exact config, the per-wave attribution, the safe-haven-anchor accounting, and the full bias discussion.
+See the [curator backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_gkg_3yr_kimi.html) for the current figures, and [REFERENCE.md](REFERENCE.md) for the config, the per-wave attribution, the safe-haven-anchor accounting, and the full bias discussion.
 
 ## Notes
 
