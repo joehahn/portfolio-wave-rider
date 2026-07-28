@@ -571,7 +571,8 @@ def main(argv=None) -> int:
     res = portfolio.curator_backtest(
         runs_dir=str(run_dir), out_dir=str(run_dir / "_backtest"), max_weight=a.max_weight,
         risk_aversion=a.risk_aversion, benchmarks=["SPY"],
-        lookback_years_override=a.optimizer_lookback_days / 365.0, always_include=anchors)
+        lookback_years_override=a.optimizer_lookback_days / 365.0, always_include=anchors,
+        min_trade_frac=float(portfolio.load_financial_model()["min_trade_size_frac"]))  # live no-trade band
     print(f"\n=== RESULT: {res['realized_return']*100:+.0f}% (final ${res['final_value']:,.0f}) | "
           f"SPY {res['benchmark_returns']['SPY']*100:+.0f}% | final {res['final_watchlist']}")
     if a.log_llm:

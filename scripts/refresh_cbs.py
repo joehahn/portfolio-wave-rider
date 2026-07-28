@@ -40,7 +40,8 @@ def main() -> int:
     portfolio.curator_backtest(
         runs_dir=str(RUN), out_dir=str(RUN / "_backtest"), max_weight=float(fm["concentration_cap"]),
         risk_aversion=float(fm["risk_aversion"]), benchmarks=["SPY"],
-        lookback_years_override=fm["optimizer_lookback_days"] / 365.0, always_include=anchors)
+        lookback_years_override=fm["optimizer_lookback_days"] / 365.0, always_include=anchors,
+        min_trade_frac=float(fm["min_trade_size_frac"]))     # model the live no-trade band in the CBS backtest
     portfolio.build_curator_dashboard(
         backtest_dir=str(RUN / "_backtest"), runs_dir=str(RUN), out_path="docs/curator_bootstrap.html",
         benchmarks=["SPY"], heading="Curator Bootstrap", acronym="CBS", show_max_articles=False,
