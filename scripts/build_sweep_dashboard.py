@@ -923,6 +923,45 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         # year -- the slice NOT dominated by the 2023-24 RKLB run-up -- ranked by 1y return / |1y giveback|
         # (return per unit round-trip). Churn is unfiltered here (zero-cost IRA). Answers "which config best
         # navigates recent, forward-relevant data" rather than "which rode the 2023-24 winners".
+        # Portfolio value over time for the gem/wave-diversity table's configs (+ buy/hold + SPY), like plot 10.
+        # Curves are stored in _gem_diversity.json by gem_diversity_scan (durable -- no /tmp dependency here).
+        _geq_html = ""
+        _gcurved = [x for x in _div if x.get("curve", {}).get("x")]
+        if _gcurved:
+            _gpal = ["#1f77b4", "#ff7f0e", "#2ca02c", "#9467bd", "#8c564b", "#e377c2", "#17becf", "#bcbd22",
+                     "#7f7f7f", "#d97706"]
+            _gfig = go.Figure()
+            for _gi, _gx in enumerate(_gcurved):
+                _glive = ((_gx["cap"], _gx["lam"], _gx["lb"]) == CURRENT and _gx.get("mt", CURRENT_MT) == CURRENT_MT)
+                _gnm = (f'cap{_gx["cap"]}/λ{_gx["lam"]}/{_gx["lb"]}d/mt{_gx.get("mt", CURRENT_MT):g}'
+                        + (" (live)" if _glive else ""))
+                _gfig.add_trace(go.Scatter(
+                    x=_gx["curve"]["x"], y=_gx["curve"]["y"], mode="lines", name=_gnm,
+                    line={"color": ("#d62728" if _glive else _gpal[_gi % len(_gpal)]),
+                          "width": (3.2 if _glive else 1.3)}, opacity=(1.0 if _glive else 0.6)))
+            if _ref and _ref.get("bnh_x"):
+                _gfig.add_trace(go.Scatter(x=_ref["bnh_x"], y=_ref["bnh_y"], mode="lines", name="Buy-and-hold",
+                                           line={"color": "#3b82f6", "width": 2.2, "dash": "dash"}))
+            if _ref and _ref.get("spy_y"):
+                _gfig.add_trace(go.Scatter(x=_ref["curve_x"], y=_ref["spy_y"], mode="lines", name="SPY benchmark",
+                                           line={"color": "#10b981", "width": 2.0, "dash": "dot"}))
+            _gfig.update_layout(template="seaborn", height=520, margin={"t": 20, "l": 72, "r": 250},
+                                hovermode="closest",
+                                legend={"x": 1.02, "xanchor": "left", "y": 1, "yanchor": "top", "font": {"size": 10}})
+            _gfig.update_xaxes(range=_xr)
+            _gfig.update_yaxes(title_text="portfolio value ($)", type="log",
+                               tickvals=[10000, 30000, 100000, 300000, 1000000, 3000000],
+                               ticktext=["$10K", "$30K", "$100K", "$300K", "$1M", "$3M"])
+            _geq_html = (
+                f'<h3 style="margin:1.3em 0 .2em;">Portfolio value over time &mdash; the {len(_gcurved)} gem &amp; '
+                'wave-diversity configs (vs buy/hold and SPY)</h3>'
+                '<p style="color:#555;max-width:940px;">The equity curve of every config in the table above, on the '
+                f'canonical mws-{_mws_fixed} (new-thesis) curations, alongside the equal-weight starter buy/hold and '
+                'SPY. Log axis. The <b style="color:#d62728;">red</b> line is the live config; the rest are the '
+                'gem-diversity survivors &mdash; the spread shows how differently the SAME curations perform under '
+                'different optimizer settings (same picks, different weighting).</p>'
+                + _gfig.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False}))
+
         _ry = [r for r in rows if r.get("ret_1y") == r.get("ret_1y")]   # drop NaN (short-window configs)
         for r in _ry:
             _gbd = max(abs(r.get("gb_1y") or 0.0), 0.02)                # floor the denominator
@@ -951,7 +990,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
             f'<th {_lc}>#</th><th {_lc}>setting</th><th {_lc}>1y return</th><th {_lc}>1y P/|L|</th>'
             f'<th {_lc}>1y giveback</th><th {_lc}>1y ret&divide;|giveback|</th><th {_lc}>3y return</th>'
             '</tr></thead><tbody>' + _ryrows + '</tbody></table>')
-        _div_html = _div_html + _recent_html
+        _div_html = _div_html + _geq_html + _recent_html
 
         gems_html = (
             '<h2>5. Backtest gems</h2>'

@@ -71,12 +71,15 @@ for r in front:
     for t, v in pos.items():
         w = WAVE_OF.get(t, "other")
         waves[w] = round(waves.get(w, 0.0) + v, 1)
+    _ts = tot.sort_index()[::5]     # equity curve, downsampled to ~weekly for the portfolio-value-over-time plot
     out.append({"mws": r["mws"], "cap": r["cap"], "lam": r["lam"], "lb": r["lb"],
                 "mt": r.get("mt", bsd.CURRENT_MT), "pf": r.get("pf"), "gb": r.get("gb"), "ret": r["ret"],
                 "dd": r["dd"], "l1": r["l1"], "l2": r["l2"], "n_pos": len(pos), "n_waves": len(waves),
                 "gem_ret": round(sum(pos.values()), 1),
                 "pos": dict(sorted(pos.items(), key=lambda x: -x[1])),
-                "waves": dict(sorted(waves.items(), key=lambda x: -x[1]))})
+                "waves": dict(sorted(waves.items(), key=lambda x: -x[1])),
+                "curve": {"x": [d.strftime("%Y-%m-%d") for d in _ts.index],
+                          "y": [round(float(v), 2) for v in _ts.values]}})
 # rank: most gems contributing positively, then highest total return
 out.sort(key=lambda x: (-x["n_pos"], -x["ret"]))
 json.dump(out[:20], open(ROOT / "data/curator_runs/_gem_diversity.json", "w"), indent=1)
