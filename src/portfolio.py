@@ -1487,6 +1487,42 @@ def _optimize_or_equal_weight(
     }
 
 
+def _rebalance_with_min_trade(target_w, target_watch, cur_shares, cur_value, prices, thr_frac):
+    """Rebalance the curator book toward ``target_w`` but SUPPRESS any per-ticker trade whose dollar size is
+    below ``thr_frac * cur_value`` (a no-trade band). Suppressed tickers keep their current shares; the tickers
+    that ARE traded split the remaining budget by their relative target weights, so the book stays fully
+    invested and sums to ``cur_value``. ``thr_frac == 0`` reduces to a full rebalance.
+    """
+    thr = thr_frac * cur_value
+    px = {t: float(prices[t]) for t in set(target_watch) | set(cur_shares)
+          if t in prices.index and not pd.isna(prices[t])}
+    held: dict[str, float] = {}     # suppressed: keep current shares
+    trade: list[str] = []           # rebalance these to fill the remaining budget
+    for t in target_watch:
+        if t not in px:
+            continue
+        tgt_sh = (target_w[t] * cur_value) / px[t]
+        if abs(tgt_sh - cur_shares.get(t, 0.0)) * px[t] >= thr:
+            trade.append(t)
+        else:
+            held[t] = cur_shares.get(t, 0.0)
+    # currently-held tickers dropped from the target: sell if the sell clears the band, else keep holding.
+    for t, sh in cur_shares.items():
+        if t not in target_watch and sh > 0 and t in px and sh * px[t] < thr:
+            held[t] = sh
+    held_val = sum(sh * px[t] for t, sh in held.items())
+    budget = cur_value - held_val
+    tw = sum(target_w[t] for t in trade)
+    new = {t: sh for t, sh in held.items() if sh > 0}
+    if tw > 0 and budget > 0:
+        for t in trade:
+            new[t] = (target_w[t] / tw * budget) / px[t]
+    else:                                   # nothing tradable / no budget -> hold current for the trade set
+        for t in trade:
+            new[t] = cur_shares.get(t, 0.0)
+    return {t: sh for t, sh in new.items() if sh > 0}
+
+
 def curator_backtest(
     runs_dir: str,
     out_dir: str = "data/backtest/",
@@ -1499,6 +1535,7 @@ def curator_backtest(
     t_update_days: int = 1,
     forward_split_date: str | None = None,
     always_include: list[str] | None = None,
+    min_trade_frac: float = 0.0,
 ) -> dict[str, Any]:
     """Replay a curator-runs directory through the optimizer.
 
@@ -1621,6 +1658,7 @@ def curator_backtest(
     rec_rows: list[dict[str, Any]] = []
     baseline_rows: list[dict[str, Any]] = []
     weight_l1: list[float] = []
+    _turnover_usd = 0.0                     # actual $ traded on rebalances (post-min_trade suppression)
     last_weights: dict[str, float] | None = None
     last_period: tuple | None = None
     curation_summary: list[dict[str, Any]] = []
@@ -1802,10 +1840,25 @@ def curator_backtest(
         if pending is not None and date >= pending["exec_date"]:
             p = pending
             cur_value = _value(cur_shares, date) if cur_shares else initial_usd
-            cur_shares = {
-                t: (p["cur_w"][t] * cur_value) / float(full_prices.loc[date, t])
-                for t in p["cur_watch"]
-            }
+            _old_shares = dict(cur_shares)      # pre-rebalance book, for actual-turnover tracking
+            if min_trade_frac > 0 and cur_shares:
+                # Suppress rebalancing trades below min_trade_frac of the book (no-trade band). The one-time
+                # initial deployment (empty book) is never suppressed -- you must buy in.
+                cur_shares = _rebalance_with_min_trade(
+                    p["cur_w"], p["cur_watch"], cur_shares, cur_value,
+                    full_prices.loc[date], min_trade_frac)
+            else:
+                cur_shares = {
+                    t: (p["cur_w"][t] * cur_value) / float(full_prices.loc[date, t])
+                    for t in p["cur_watch"]
+                }
+            # Actual $ traded on REBALANCES (post-suppression), summed for the turnover metric. The one-time
+            # initial deployment (empty prior book) is excluded so the metric is pure ongoing rebalancing.
+            if _old_shares:
+                _turnover_usd += sum(
+                    abs(cur_shares.get(t, 0.0) - _old_shares.get(t, 0.0)) * float(full_prices.loc[date, t])
+                    for t in set(cur_shares) | set(_old_shares)
+                    if t in full_prices.columns and not pd.isna(full_prices.loc[date, t]))
             if p["fix_w"] is not None:
                 fix_value = _value(fix_shares, date) if fix_shares else initial_usd
                 fix_shares = {
@@ -2045,6 +2098,10 @@ def curator_backtest(
         "annualized_return": round(annualized, 4),
         "max_drawdown": round(max_dd, 4),
         "weight_stability_l1": round(weight_stability, 4),
+        "actual_turnover_usd": round(_turnover_usd, 2),
+        # Total $ actually traded on rebalances / initial capital -> a unit-free churn number that DROPS as
+        # min_trade_frac rises (the point of the sweep). Excludes the one-time initial deployment.
+        "turnover_ratio": round(_turnover_usd / initial_v, 3) if initial_v else 0.0,
         "forward_split": forward_split,
         "fixed_baseline_return": round(fix_return, 4) if fix_return is not None else None,
         "bnh_baseline_return": round(bnh_return, 4) if bnh_return is not None else None,

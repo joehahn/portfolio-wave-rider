@@ -43,6 +43,7 @@ LLM_RUNS = [   # row 0 = the DEFAULT curator. The multi-LLM comparison (Sonnet g
     ("moonshotai/kimi-k2.5 (default)", "data/curator_runs/gkg-3yr-final", "OpenRouter", 0.57, 2.85),
 ]
 CURRENT = (1.0, 2.0, 150)         # the live investor_profile.md config (cap / λ / lookback-days)
+MIN_TRADE_FRACS = [0.0, 0.01, 0.02, 0.05, 0.10, 0.15, 0.20]   # no-trade-band sweep (min rebalancing trade / book)
 BLUE, GREEN, RED, GREY = "#1f77b4", "#2b8a3e", "#c92a2a", "#adb5bd"
 
 # max_watchlist_size sweep (section 6): unlike cap/lambda/lookback, this knob changes the CURATOR's
@@ -419,9 +420,9 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         f'<tr><td style="text-align:left">concentration_cap</td><td style="text-align:left">{_fmt(CAPS)}</td><td style="text-align:left">{CURRENT[0]}</td></tr>'
         f'<tr><td style="text-align:left">risk_aversion (λ)</td><td style="text-align:left">{_fmt(LAMBDAS)}</td><td style="text-align:left">{CURRENT[1]}</td></tr>'
         f'<tr><td style="text-align:left">optimizer_lookback (days)</td><td style="text-align:left">{_fmt(LOOKBACKS)}</td><td style="text-align:left">{CURRENT[2]}</td></tr>'
-        f'<tr><td style="text-align:left">max_watchlist_size <span style="color:#9a6a00;">(re-curation, §10)</span></td>'
+        f'<tr><td style="text-align:left">max_watchlist_size <span style="color:#9a6a00;">(re-curation, §11)</span></td>'
         f'<td style="text-align:left">{_fmt([c for c, _ in MWS_SWEEP])}</td><td style="text-align:left">{_mws_fixed}</td></tr>'
-        f'<tr><td style="text-align:left">news_lookback_days <span style="color:#9a6a00;">(re-curation, fuller ledes, all windows, §11)</span></td>'
+        f'<tr><td style="text-align:left">news_lookback_days <span style="color:#9a6a00;">(re-curation, fuller ledes, all windows, §12)</span></td>'
         f'<td style="text-align:left">{_fmt([n for n, _ in NLB_SWEEP])}</td>'
         f'<td style="text-align:left">{int(portfolio.load_financial_model().get("news_lookback_days", 21))}</td></tr>'
         '</tbody></table>')
@@ -509,7 +510,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
             + _c2(r["ir"], "{:+.2f}") + _c2(r["tstat"], "{:+.1f}") + _c2(r["sharpe"], "{:.2f}")
             + _c2(r["calmar"], "{:.2f}") + _c2(r["dd"] * 100, "{:.0f}%") + "</tr>")
     llm_html = (
-        '<h2>12. LLM comparison — curator model (same pools + profile config)</h2>'
+        '<h2>13. LLM comparison — curator model (same pools + profile config)</h2>'
         '<p style="color:#555;max-width:920px;">Every model reads the <b>same</b> news pools and replays at '
         'the profile config (cap 0.8 / λ 2.0 / 30d); the only variable is the curator LLM. The decision '
         'columns are the ones that matter: <b>agree</b> = share of weeks the model made the identical '
@@ -547,7 +548,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     _fig4.update_yaxes(title_text="portfolio value ($)", type="log",
                        tickvals=[10000, 30000, 100000, 300000, 1000000],
                        ticktext=["$10K", "$30K", "$100K", "$300K", "$1M"])
-    llm4_html = (('<h2>13. Portfolio value over time — by curator LLM (vs buy/hold and SPY)</h2>'
+    llm4_html = (('<h2>14. Portfolio value over time — by curator LLM (vs buy/hold and SPY)</h2>'
                   '<p style="color:#555;max-width:920px;">Each LLM\'s realized portfolio value on the same pools '
                   'and profile config, alongside the equal-weight buy/hold starter and SPY. Same idea as the '
                   'curator DB\'s plot 1, without the rebalance markers.</p>'
@@ -578,7 +579,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     _mwsfig.update_yaxes(title_text="portfolio value ($)", type="log",
                          tickvals=[10000, 30000, 100000, 300000, 1000000],
                          ticktext=["$10K", "$30K", "$100K", "$300K", "$1M"])
-    mws_equity_html = (('<h2>9. Portfolio value over time — by max_watchlist_size (vs buy/hold and SPY)</h2>'
+    mws_equity_html = (('<h2>10. Portfolio value over time — by max_watchlist_size (vs buy/hold and SPY)</h2>'
                         '<p style="color:#555;max-width:920px;">Each re-curated watchlist cap\'s realized '
                         'portfolio value on the same pools and starter — the equity-curve view of the '
                         'section-9 sweep. Tighter (smaller) watchlists concentrate into the top picks; wider '
@@ -604,7 +605,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                       + _c2(s["add_mean"], "{:.2f}") + _c2(s["rem_mean"], "{:.2f}")
                       + "".join(_c2((s[k] or 0) * 100, "{:.0f}%") for k in _cr) + "</tr>")
         llm5_html = (
-            '<h2>14. Rationale-soundness — blind judge (leak-free)</h2>'
+            '<h2>15. Rationale-soundness — blind judge (leak-free)</h2>'
             '<p style="color:#555;max-width:920px;">Every backtest column above (return, IR, Sharpe, Calmar, '
             't-stat) is <b>in-sample</b> &mdash; the curator could have memorized which 2023&ndash;2026 names '
             'later won, so those numbers can\'t honestly rank <i>reasoning</i>. This section does: an '
@@ -657,7 +658,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                  f'<td>{r["ret"] * 100:+.0f}%</td><td>{r["n_add"]}</td><td>{r["n_rem"]}</td><td>{_rej}</td>'
                  f'<td>{r.get("n_ret", 0)}</td>{_flags}<td {_lc}>{", ".join(r["wl"])}</td></tr>')
     mws_html = (
-        '<h2>10. max_watchlist_size sweep</h2>'
+        '<h2>11. max_watchlist_size sweep</h2>'
         '<p style="color:#555;max-width:920px;">Unlike the cap/&lambda;/lookback knobs above (free math '
         'replays on one curation set), <b>max_watchlist_size changes the curator\'s decisions</b>, so each '
         'cap is a separate re-curation (~$0.40 LLM each) on the same news pools and AAPL/GOOGL/AMZN starter. '
@@ -678,7 +679,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         'silently blocked (the symptom that exposed the max_watchlist_size cap-override bug).</p>')
 
     # section 7: news_lookback_days sweep — title-only re-curation (no Wayback/live), curates the preserved
-    # GKG titles at the canonical mws6/cap1.0/λ2.0/150d config. Bar = each window's return; ticker flags as §10.
+    # GKG titles at the canonical mws6/cap1.0/λ2.0/150d config. Bar = each window's return; ticker flags as §11.
     _nlb = _nlb_rows()
     _live_nlb = int(portfolio.load_financial_model().get("news_lookback_days", 21))
     _ndone = [r for r in _nlb if not r.get("pending")]
@@ -712,7 +713,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                  f'<td>{r["ret"] * 100:+.0f}%</td><td>{r["ir"]:+.2f}</td><td>{r["l1"]:.0f}</td><td>{r["l2"]:.0f}</td>'
                  f'{_flags}<td {_lc}>{", ".join(r["funded"])}</td></tr>')
     nlb_html = (
-        '<h2>11. news_lookback_days sweep</h2>'
+        '<h2>12. news_lookback_days sweep</h2>'
         '<p style="color:#555;max-width:940px;">A CURATOR-param sweep (re-curation) at the canonical '
         'mws&nbsp;6 / cap&nbsp;1.0 / λ&nbsp;2.0 / 150d config. <b>All six windows (7 / 14 / 21 / 28 / 45 / 90d) now '
         'use fuller ledes</b> (Wayback + look-ahead-biased live-fallback), so this is a <b>clean single-variable '
@@ -769,6 +770,53 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         f'{_fixed_note[0]}, {_fixed_note[1]} and {_fixed_note[3]} fixed and varying only the risk_aversion '
         '&lambda; (higher λ = more risk-averse = less concentrated). The <b style="color:#2b8a3e;">green</b> bar '
         f'is the live setting (λ&nbsp;{CURRENT[1]}).</p>' + _free_bar("lam", LAMBDAS, CURRENT[1], "risk_aversion (λ)"))
+
+    # 9. min_trade_size_frac sweep: FREE replays of the canonical run at the live cap/λ/lookback, varying only
+    # the no-trade band. NOT in the cached grid, so run 7 replays (~15s); cache them, recompute on --recompute.
+    _LIVE_MT = float(portfolio.load_financial_model().get("min_trade_size_frac", 0.0))
+    # Use the CANONICAL watchlist-size run (the mws == _mws_fixed dir, same as plots 1-8's "current"), NOT the
+    # CLI --runs-dir default (which is the mws5 gkg-3yr-final run).
+    _canon_dir = next((d for m, d in MWS_SWEEP if m == _mws_fixed), runs_dir)
+    _mt_cache = Path("data/curator_runs/_min_trade_sweep.json")
+    if not recompute and _mt_cache.exists():
+        _mt_rows = _json.loads(_mt_cache.read_text())
+    else:
+        _mt_rows = []
+        for _mtf in MIN_TRADE_FRACS:
+            _mr = portfolio.curator_backtest(
+                runs_dir=_canon_dir, out_dir=f"/tmp/_mtsweep/{_mtf}", max_weight=CURRENT[0],
+                risk_aversion=CURRENT[1], benchmarks=["SPY"], lookback_years_override=CURRENT[2] / 365.0,
+                always_include=ANCHORS, min_trade_frac=_mtf)
+            _mt_rows.append({"mt": _mtf, "ret": _mr["realized_return"], "turn": _mr["turnover_ratio"]})
+        _mt_cache.write_text(_json.dumps(_mt_rows, indent=2))
+    _mtx = [str(r["mt"]) for r in _mt_rows]
+    _mtf_fig = _lgo.Figure()
+    _mtf_fig.add_trace(_lgo.Bar(
+        x=_mtx, y=[r["ret"] * 100 for r in _mt_rows], name="total return",
+        marker_color=[GREEN if r["mt"] == _LIVE_MT else BLUE for r in _mt_rows],
+        text=["live" if r["mt"] == _LIVE_MT else "" for r in _mt_rows], textposition="outside",
+        hovertemplate="mt %{x}: %{y:+.0f}%<extra></extra>"))
+    _mtf_fig.add_trace(_lgo.Scatter(
+        x=_mtx, y=[r["turn"] for r in _mt_rows], name="turnover (× capital)", yaxis="y2",
+        mode="lines+markers", line={"color": "#d97706"},
+        hovertemplate="mt %{x}: %{y:.0f}×<extra></extra>"))
+    _mtf_fig.update_layout(template="seaborn", height=380, margin={"t": 20, "l": 60, "r": 60},
+                           xaxis={"title": "min_trade_size_frac", "type": "category"},
+                           yaxis={"title": "total return %"},
+                           yaxis2={"title": "turnover (× capital)", "overlaying": "y", "side": "right",
+                                   "showgrid": False}, legend={"orientation": "h", "y": 1.12})
+    min_trade_html = (
+        '<h2>9. Total return &amp; turnover vs min_trade_size_frac (live config)</h2>'
+        '<p style="color:#555;max-width:920px;">A FREE math-replay slice (no re-curation): hold the live '
+        f'cap ({CURRENT[0]}), &lambda; ({CURRENT[1]}), lookback ({CURRENT[2]}d) fixed and vary only the '
+        '<b>no-trade band</b> &mdash; the smallest rebalancing trade the backtest executes, as a fraction of the '
+        'book. A suppressed trade&#39;s dollars are redistributed across the trades that DO clear the band, so the '
+        'book stays fully invested (Fidelity IRA = zero cost, so no cost model &mdash; pure return / turnover). '
+        'Bars = total return (left axis); orange line = actual turnover as a multiple of capital (right axis). The '
+        f'<b style="color:#2b8a3e;">green</b> bar is the live setting ({_LIVE_MT}). A small band can slightly '
+        '<i>improve</i> return (avoiding whipsaw) while cutting turnover; too large a band (&ge;0.15) starves the '
+        'momentum signal.</p>'
+        + _mtf_fig.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False}))
 
     # section 7: backtest gems — for every ticker, the best $ P&L it achieved across ALL 1350 sweep settings,
     # and the setting that produced it. Built from data/curator_runs/_gems.json (scripts/gems_scan.py).
@@ -896,6 +944,7 @@ Current config: {_cur_l2:.0f}/yr.</p>
 {lb_html}
 {cap_html}
 {lam_html}
+{min_trade_html}
 {mws_equity_html}
 {mws_html}
 {nlb_html}
