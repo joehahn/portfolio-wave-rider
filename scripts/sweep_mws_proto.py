@@ -22,12 +22,15 @@ CANON = ROOT / "data" / "curator_runs" / "gkg-3yr-geosplit"   # geo-split titles
 
 
 def _titles(arts):
-    """Render the pool as TITLES ONLY (no ledes) -- the fast, look-ahead-clean curator input."""
-    lines = ["DATE-CLEAN NEWS ARTICLES (title only). Discover the tickers; discard non-investable noise "
+    """Render the pool for the curator: title + LIVE lede (`lede_live`) when present, else title-only. The
+    same function serves the titles-only prototype AND the titles+live prototype (pools augmented by
+    fetch_live_ledes.py). Wayback ledes (`lede`) are used if present (the overnight clean pass)."""
+    lines = ["DATE-CLEAN NEWS ARTICLES (title + snippet). Discover the tickers; discard non-investable noise "
              "(war/weather events, private cos, foreign/OTC, keyword false-matches):"]
     for a in arts:
-        lines.append(f"[{a.get('date', '')} | {a.get('source', '')}] {a.get('title', '')[:100]} "
-                     f"({a.get('url', '')})")
+        snip = (a.get("lede_live") or a.get("lede") or a.get("title", ""))[:220]
+        lines.append(f"\n[{a.get('date', '')} | {a.get('source', '')}] {a.get('title', '')[:90]}\n"
+                     f"   {snip} ({a.get('url', '')})")
     return "\n".join(lines)
 
 
