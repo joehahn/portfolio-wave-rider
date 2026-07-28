@@ -48,6 +48,7 @@ LLM_RUNS = [   # row 0 = the DEFAULT curator. The multi-LLM comparison (Sonnet g
 CURRENT = (float(_FM["concentration_cap"]), float(_FM["risk_aversion"]),
            int(_FM["optimizer_lookback_days"]))   # the live investor_profile.md config (cap / λ / lookback-days)
 MIN_TRADE_FRACS = [0.0, 0.01, 0.02, 0.05, 0.10, 0.15, 0.20]   # no-trade-band sweep (min rebalancing trade / book)
+CURRENT_MT = float(_FM["min_trade_size_frac"])   # live no-trade band; the 4th swept grid axis (canonical mws only)
 BLUE, GREEN, RED, GREY = "#1f77b4", "#2b8a3e", "#c92a2a", "#adb5bd"
 
 # max_watchlist_size sweep (section 6): unlike cap/lambda/lookback, this knob changes the CURATOR's
@@ -314,8 +315,11 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     cache_p = ROOT / "data" / "curator_runs" / "_sweep_cache.json"
     # CURRENT / _mws_fixed are DELIBERATELY excluded from the key: the grid metrics (ir/ret/dd/l1/l2) are
     # config-independent, so a live-config change reuses the cache and only re-flags `cur` (set post-load below).
+    # min_trade is swept only on the canonical mws (_mws_fixed), so both the frac list and which mws is
+    # canonical enter the key; non-canonical mws replay at the live CURRENT_MT (held, not swept).
     key = hashlib.md5(_json.dumps([CAPS, LAMBDAS, LOOKBACKS, runs_dir,
-                                   [m for m, _ in READY_MWS], "churn-v3-l1l2-mws"]).encode()).hexdigest()
+                                   [m for m, _ in READY_MWS], MIN_TRADE_FRACS, CURRENT_MT, _mws_fixed,
+                                   "churn-v4-mt"]).encode()).hexdigest()
     rows_all = spy_ret = None
     if not recompute and cache_p.exists():
         try:
@@ -328,35 +332,45 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     if rows_all is None:
         rows_all, spy_curve = [], None
         for _m, _mdir in READY_MWS:
+            # min_trade_size_frac is the 4th swept axis but ONLY on the canonical watchlist (_mws_fixed): there
+            # the frontier can trade it off against cap/λ/lookback. Every other mws replays at the live CURRENT_MT
+            # (held, not swept) so the mws-comparison plots 1-3 stay a clean 3-D cloud at one min_trade.
+            _mts = MIN_TRADE_FRACS if _m == _mws_fixed else [CURRENT_MT]
             for cap in CAPS:
                 for lam in LAMBDAS:
                     for lb in LOOKBACKS:
-                        _tag = f"{_m}_{cap}_{lam}_{lb}"
-                        res = portfolio.curator_backtest(
-                            runs_dir=_mdir, out_dir=f"/tmp/_sweep/{_tag}",
-                            max_weight=cap, risk_aversion=lam, risk_free_rate=_RF, t_update_days=_TU,
-                            benchmarks=["SPY"], lookback_years_override=lb / 365.0, always_include=ANCHORS)
-                        snaps = pd.read_csv(Path(f"/tmp/_sweep/{_tag}") / "snapshots.csv", parse_dates=["date"])
-                        totals = snaps.groupby("date")["total_value"].first().sort_index()
-                        if spy_curve is None:   # identical window across all mws dirs -> compute SPY once
-                            spy_curve = portfolio._fetch_benchmark_curves(["SPY"], totals.index[0], totals.index[-1],
-                                                                          float(totals.iloc[0]))["SPY"]
-                        m = _metrics(totals, spy_curve, res["annualized_return"], res["max_drawdown"])
-                        _l1, _l2 = _churn_metrics(snaps)
-                        rows_all.append({"mws": _m, "cap": cap, "lam": lam, "lb": lb, "ret": res["realized_return"],
-                                         "ann": res["annualized_return"], "dd": res["max_drawdown"],
-                                         "l1": _l1, "l2": _l2, **m,
-                                         "cur": (cap, lam, lb) == CURRENT and _m == _mws_fixed})
+                        for mt in _mts:
+                            _tag = f"{_m}_{cap}_{lam}_{lb}_{mt}"
+                            res = portfolio.curator_backtest(
+                                runs_dir=_mdir, out_dir=f"/tmp/_sweep/{_tag}",
+                                max_weight=cap, risk_aversion=lam, risk_free_rate=_RF, t_update_days=_TU,
+                                benchmarks=["SPY"], lookback_years_override=lb / 365.0, always_include=ANCHORS,
+                                min_trade_frac=mt)
+                            snaps = pd.read_csv(Path(f"/tmp/_sweep/{_tag}") / "snapshots.csv", parse_dates=["date"])
+                            totals = snaps.groupby("date")["total_value"].first().sort_index()
+                            if spy_curve is None:   # identical window across all mws dirs -> compute SPY once
+                                spy_curve = portfolio._fetch_benchmark_curves(["SPY"], totals.index[0], totals.index[-1],
+                                                                              float(totals.iloc[0]))["SPY"]
+                            m = _metrics(totals, spy_curve, res["annualized_return"], res["max_drawdown"])
+                            _l1, _l2 = _churn_metrics(snaps)
+                            rows_all.append({"mws": _m, "cap": cap, "lam": lam, "lb": lb, "mt": mt,
+                                             "ret": res["realized_return"],
+                                             "ann": res["annualized_return"], "dd": res["max_drawdown"],
+                                             "l1": _l1, "l2": _l2, **m,
+                                             "cur": (cap, lam, lb) == CURRENT and mt == CURRENT_MT and _m == _mws_fixed})
         spy_ret = float(spy_curve.iloc[-1] / spy_curve.iloc[0] - 1.0)
         cache_p.parent.mkdir(parents=True, exist_ok=True)
         cache_p.write_text(_json.dumps({"key": key, "spy_ret": spy_ret, "rows": rows_all}))
     # `cur` marks the live-config point. It is a DISPLAY flag, not grid data (which is config-independent
     # and cached), so set it here — this reflects the current profile / CURRENT even on a cache hit.
     for r in rows_all:
-        r["cur"] = (r["cap"], r["lam"], r["lb"]) == CURRENT and r["mws"] == _mws_fixed
+        r["cur"] = ((r["cap"], r["lam"], r["lb"]) == CURRENT and r.get("mt", CURRENT_MT) == CURRENT_MT
+                    and r["mws"] == _mws_fixed)
     # The ranking table / recommended-settings / plots 4+ stay on the CANONICAL watchlist (mws == _mws_fixed);
     # only plots 1-3 use the full rows_all overlay across every ready max_watchlist_size.
     rows = [r for r in rows_all if r["mws"] == _mws_fixed]
+    _grid3d = len(CAPS) * len(LAMBDAS) * len(LOOKBACKS)   # per-mws cloud size (cap×λ×lookback, one min_trade)
+    _plotted = len(sorted({r["mws"] for r in rows_all})) * _grid3d   # points shown in plots 1-3 (mt pinned to live)
 
 
     # plots 1-3: ann return vs (drawdown | L1 | L2), one colored cloud PER max_watchlist_size (each its own
@@ -372,7 +386,9 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     def _mws_scatter(xfn, xtitle, xhover, first):
         f = go.Figure()
         for _m in _mws_present:
-            sub = [r for r in rows_all if r["mws"] == _m]
+            # min_trade is swept only on the canonical mws; pin it to the live value here so each mws is one
+            # 3-D cloud (cap/λ/lookback), not a denser mt-smeared blob for the canonical size.
+            sub = [r for r in rows_all if r["mws"] == _m and r.get("mt", CURRENT_MT) == CURRENT_MT]
             f.add_trace(go.Scatter(
                 x=[xfn(r) for r in sub], y=[r["ann"] * 100 for r in sub], mode="markers",
                 name=f"{_m}" + (" ★" if _m == _mws_fixed else ""),
@@ -416,15 +432,19 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     _fmt = lambda xs: ", ".join(str(x) for x in xs)  # noqa: E731
     grid_html = (
         '<h2>Parameter settings</h2>'
-        f'<p style="color:#555;max-width:860px;">The three swept knobs (every combination = {len(rows)} '
-        'configs) and the values considered. All other optimizer / backtest params are held at the '
-        '<code>investor_profile.md</code> values — these knobs only re-weight the <b>same</b> curations.</p>'
+        f'<p style="color:#555;max-width:860px;">The four FREE swept knobs (every combination on the canonical '
+        f'watchlist = {len(rows)} configs) and the values considered. min_trade_size_frac is swept only on the '
+        f'canonical watchlist (mws&nbsp;{_mws_fixed}); every other size is held at its live value. All other '
+        'optimizer / backtest params are held at the <code>investor_profile.md</code> values — these knobs only '
+        're-weight the <b>same</b> curations.</p>'
         '<table style="font-size:13px;margin-bottom:.6em;"><thead><tr>'
         '<th style="text-align:left">parameter</th><th style="text-align:left">values swept</th>'
         '<th style="text-align:left">current (profile)</th></tr></thead><tbody>'
         f'<tr><td style="text-align:left">concentration_cap</td><td style="text-align:left">{_fmt(CAPS)}</td><td style="text-align:left">{CURRENT[0]}</td></tr>'
         f'<tr><td style="text-align:left">risk_aversion (λ)</td><td style="text-align:left">{_fmt(LAMBDAS)}</td><td style="text-align:left">{CURRENT[1]}</td></tr>'
         f'<tr><td style="text-align:left">optimizer_lookback (days)</td><td style="text-align:left">{_fmt(LOOKBACKS)}</td><td style="text-align:left">{CURRENT[2]}</td></tr>'
+        f'<tr><td style="text-align:left">min_trade_size_frac <span style="color:#0b7285;">(canonical mws)</span></td>'
+        f'<td style="text-align:left">{_fmt(MIN_TRADE_FRACS)}</td><td style="text-align:left">{CURRENT_MT:g}</td></tr>'
         f'<tr><td style="text-align:left">max_watchlist_size <span style="color:#9a6a00;">(re-curation, §11)</span></td>'
         f'<td style="text-align:left">{_fmt([c for c, _ in MWS_SWEEP])}</td><td style="text-align:left">{_mws_fixed}</td></tr>'
         f'<tr><td style="text-align:left">news_lookback_days <span style="color:#9a6a00;">(re-curation, fuller ledes, all windows, §12)</span></td>'
@@ -462,7 +482,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         return out
 
     _hdr = (f'<tr><th {_lc}>#</th><th {_lc}>max_watchlist_size</th><th {_lc}>concentration_cap</th>'
-            f'<th {_lc}>λ</th><th {_lc}>lookback</th>'
+            f'<th {_lc}>λ</th><th {_lc}>lookback</th><th {_lc}>min_trade</th>'
             + "".join(f'<th {_lc}>{_m}</th>' for _m, _, _ in _MET)
             + f'<th {_lc}>L1</th><th {_lc}>L2</th></tr>')
     _body = ""
@@ -471,7 +491,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         _live = " &larr; live" if r["cur"] else ""
         _body += (f'<tr style="{_hl}border-bottom:1px solid #eee;"><td {_lc}>{_i + 1}</td>'
                   f'<td {_lc}>{r["mws"]}</td><td {_lc}>{r["cap"]:.2f}</td><td {_lc}>{r["lam"]:.1f}</td>'
-                  f'<td {_lc}>{r["lb"]}d{_live}</td>{_cells(r)}'
+                  f'<td {_lc}>{r["lb"]}d</td><td {_lc}>{r.get("mt", CURRENT_MT):g}{_live}</td>{_cells(r)}'
                   f'<td {_lc}>{r["l1"]:.0f}</td><td {_lc}>{r["l2"]:.0f}</td></tr>')
     _mws_survivors = ", ".join(f"{_m}:{sum(1 for r in _passed if r['mws'] == _m)}"
                                for _m in sorted({r["mws"] for r in _passed})) if _passed else "none"
@@ -485,9 +505,11 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         f'AND L2 &lt; {REC_MAX_L2:.0f}</b> (shallow drawdown, low churn on both norms). '
         f'<b>{len(_passed)} of {len(rows_all)}</b> configs survive (by watchlist size &mdash; {_mws_survivors}), '
         'listed once, sorted by IR. ★ = best in that column among the survivors, so you can eyeball the top IR / '
-        't-stat / Sharpe / Calmar / ann / shallowest-DD without re-sorting. These stay in-sample &mdash; a '
-        'forward-test shortlist, not an auto-switch. Note the <b>live config</b> (ws&nbsp;'
-        f'{_cur_row["mws"]} {_cur_row["cap"]:.2f}/{_cur_row["lam"]:.1f}/{_cur_row["lb"]}d, dd '
+        't-stat / Sharpe / Calmar / ann / shallowest-DD without re-sorting. <b>min_trade_size_frac</b> is swept as a '
+        f'4th axis on the canonical watchlist (mws&nbsp;{_mws_fixed}); every other size is held at the live '
+        f'{CURRENT_MT:g}. These stay in-sample &mdash; a forward-test shortlist, not an auto-switch. Note the '
+        '<b>live config</b> (ws&nbsp;'
+        f'{_cur_row["mws"]} {_cur_row["cap"]:.2f}/{_cur_row["lam"]:.1f}/{_cur_row["lb"]}d/mt&nbsp;{_cur_row.get("mt", CURRENT_MT):g}, dd '
         f'{abs(_cur_row["dd"])*100:.0f}% / L1&nbsp;{_cur_row["l1"]:.0f} / L2&nbsp;{_cur_row["l2"]:.0f}) '
         + ("<b>passes</b> and is listed below (highlighted)." if _cur_pass
            else f'is <b>excluded</b> &mdash; fails {", ".join(_cur_fail)}.') + '</p>'
@@ -742,9 +764,9 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     import plotly.graph_objects as _lgo
 
     def _free_bar(field, values, live_val, xtitle):
-        fixed = {"mws": _mws_fixed, "cap": CURRENT[0], "lam": CURRENT[1], "lb": CURRENT[2]}
-        del fixed[field]                       # `field` varies; the rest pinned to live
-        sub = {r[field]: r for r in rows_all if all(r[k] == v for k, v in fixed.items())}
+        fixed = {"mws": _mws_fixed, "cap": CURRENT[0], "lam": CURRENT[1], "lb": CURRENT[2], "mt": CURRENT_MT}
+        del fixed[field]                       # `field` varies; the rest pinned to live (incl. min_trade)
+        sub = {r[field]: r for r in rows_all if all(r.get(k) == v for k, v in fixed.items())}
         xs = [v for v in values if v in sub]
         f = _lgo.Figure(_lgo.Bar(
             x=[str(v) for v in xs], y=[sub[v]["ret"] * 100 for v in xs],
@@ -776,25 +798,11 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         '&lambda; (higher λ = more risk-averse = less concentrated). The <b style="color:#2b8a3e;">green</b> bar '
         f'is the live setting (λ&nbsp;{CURRENT[1]}).</p>' + _free_bar("lam", LAMBDAS, CURRENT[1], "risk_aversion (λ)"))
 
-    # 9. min_trade_size_frac sweep: FREE replays of the canonical run at the live cap/λ/lookback, varying only
-    # the no-trade band. NOT in the cached grid, so run 7 replays (~15s); cache them, recompute on --recompute.
-    _LIVE_MT = float(portfolio.load_financial_model().get("min_trade_size_frac", 0.0))
-    # Use the CANONICAL watchlist-size run (the mws == _mws_fixed dir, same as plots 1-8's "current"), NOT the
-    # CLI --runs-dir default (which is the mws5 gkg-3yr-final run).
-    _canon_dir = next((d for m, d in MWS_SWEEP if m == _mws_fixed), runs_dir)
-    _mt_cache = Path("data/curator_runs/_min_trade_sweep.json")
-    if not recompute and _mt_cache.exists():
-        _mt_rows = _json.loads(_mt_cache.read_text())
-    else:
-        _mt_rows = []
-        for _mtf in MIN_TRADE_FRACS:
-            _mr = portfolio.curator_backtest(
-                runs_dir=_canon_dir, out_dir=f"/tmp/_mtsweep/{_mtf}", max_weight=CURRENT[0],
-                risk_aversion=CURRENT[1], risk_free_rate=_RF, t_update_days=_TU,
-                benchmarks=["SPY"], lookback_years_override=CURRENT[2] / 365.0,
-                always_include=ANCHORS, min_trade_frac=_mtf)
-            _mt_rows.append({"mt": _mtf, "ret": _mr["realized_return"], "turn": _mr["turnover_ratio"]})
-        _mt_cache.write_text(_json.dumps(_mt_rows, indent=2))
+    # 9. min_trade_size_frac sweep: now a FIRST-CLASS grid axis (swept on the canonical watchlist in the cached
+    # grid above), so this is a $0 slice of `rows` at the live cap/λ/lookback -- no separate replays.
+    _LIVE_MT = CURRENT_MT
+    _mt_by = {r["mt"]: r for r in rows if (r["cap"], r["lam"], r["lb"]) == CURRENT}
+    _mt_rows = [{"mt": v, "ret": _mt_by[v]["ret"]} for v in MIN_TRADE_FRACS if v in _mt_by]
     _mtx = [str(r["mt"]) for r in _mt_rows]
     _rets = [r["ret"] * 100 for r in _mt_rows]
     # Zoom the y-axis into the bar heights (dynamic) instead of 0-based, so the differences are legible.
@@ -901,8 +909,9 @@ th{{text-align:right;padding:6px 10px;border-bottom:2px solid #ccc;white-space:n
 </style></head><body><div class="built">dashboard built {ts}</div>{nav}
 <h1>Backtest sweeps (BTS)</h1>
 {_range}
-<p style="color:#555;max-width:860px;">{len(rows_all)} configs = concentration_cap × risk_aversion (λ) × optimizer_lookback
-({len(rows)} combinations) replayed across all {len(_mws_present)} <b>max_watchlist_size</b> curation sets. These
+<p style="color:#555;max-width:860px;">{len(rows_all)} configs: concentration_cap × risk_aversion (λ) × optimizer_lookback
+({_grid3d} combinations) replayed across all {len(_mws_present)} <b>max_watchlist_size</b> curation sets, plus
+<b>min_trade_size_frac</b> swept as a 4th axis on the canonical watchlist ({len(MIN_TRADE_FRACS)} values). These
 knobs touch only the mean-variance replay, not the curator, so the whole grid costs <b>$0</b> (no LLM — the
 curations already exist; only expanding max_watchlist_size itself, section 6, re-curates). Metrics are
 benchmark-relative: <b>Information Ratio</b> = annualized active return ÷ tracking error vs SPY (consistency of
@@ -917,8 +926,9 @@ both halves) before trusting any row.</p>
 peak-to-trough loss as a fraction of its running peak (the single worst high-to-low decline over the window);
 further right = deeper loss. The vertical axis is annualized return, so <b>upper-left is best</b> (high return,
 shallow drawdown). Each point is one cap/λ/lookback config; <b>color = max_watchlist_size</b>
-({_fmt([m for m in _mws_present])} shown), so every watchlist size contributes its own {len(rows)}-config cloud
-(total {len(rows_all)} points). Within a cloud the free knobs move a point deterministically; jumping between
+({_fmt([m for m in _mws_present])} shown), so every watchlist size contributes its own {_grid3d}-config cloud
+(total {_plotted} points; min_trade pinned to the live {CURRENT_MT:g} here — it is swept separately in section 9).
+Within a cloud the free knobs move a point deterministically; jumping between
 colors ALSO swaps the underlying curation, and those kimi re-curations swing 2-5&times; on their own — so
 <b>read cross-color separation as parameter effect + curation-draw noise, not a clean mws response</b>. The
 canonical live config (watchlist {_mws_fixed}) is the <b>black star</b>.</p>
