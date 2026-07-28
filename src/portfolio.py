@@ -3751,6 +3751,10 @@ def build_curator_dashboard(
             "6. Actual portfolio $ by wave over time",
         ),
     )
+    # Style plots 2-6's subplot titles to match the HTML <h2> of plots 7+ (bold, #111, left-aligned, larger).
+    # At this point fig.layout.annotations holds exactly the 5 subplot titles (nothing else added yet).
+    for _st in fig.layout.annotations:
+        _st.update(font={"size": 18, "color": "#111"}, x=0.0, xanchor="left", text=f"<b>{_st.text}</b>")
 
     # Chart 1: equity-curve race.
     fig.add_trace(
@@ -3836,12 +3840,17 @@ def build_curator_dashboard(
                        mode="lines", line={"color": "#10b981", "width": 1.5, "dash": "dot"}),
             row=1, col=1,
         )
-    fig.update_yaxes(
-        title_text="portfolio value ($)", row=1, col=1,
-        type="log",
-        tickvals=[10000, 30000, 100000, 300000, 1000000],
-        ticktext=["$10K", "$30K", "$100K", "$300K", "$1M"],
-    )
+    if acronym == "CBS":
+        # CBS spans a narrow range ($50-58K), so a linear axis reads cleanly; CBT's $50K->$millions needs log.
+        fig.update_yaxes(title_text="portfolio value ($)", row=1, col=1,
+                         tickprefix="$", separatethousands=True)
+    else:
+        fig.update_yaxes(
+            title_text="portfolio value ($)", row=1, col=1,
+            type="log",
+            tickvals=[10000, 30000, 100000, 300000, 1000000],
+            ticktext=["$10K", "$30K", "$100K", "$300K", "$1M"],
+        )
     if handoff_date:   # CBS: mark the backtest -> forward news handoff on the equity curve. add_vline's own
         # annotation breaks on a datetime axis (it averages Timestamps), so draw the line + label separately.
         fig.add_vline(x=pd.Timestamp(handoff_date), line={"dash": "dot", "color": "#888", "width": 1.5},

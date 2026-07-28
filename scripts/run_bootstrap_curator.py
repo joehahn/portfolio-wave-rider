@@ -12,6 +12,8 @@ import json
 import sys
 from pathlib import Path
 
+import pandas as pd
+
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 sys.path.insert(0, str(ROOT))
@@ -20,6 +22,7 @@ from src import curator, portfolio  # noqa: E402
 
 CANON = "data/curator_runs/gkg-3yr-canon14"
 SINCE = "2026-04-22"
+CBS_DAY0 = "2026-04-27"     # CBS day 0: seed the starter from the CBT portfolio held on/before this date
 RUN = ROOT / "data" / "curator_runs" / "bootstrap-cbs"
 
 
@@ -30,7 +33,14 @@ def main() -> int:
 
     fm = portfolio.load_financial_model()
     anchors = fm.get("always_include") or ["SPY", "AGG", "IAU"]
-    starter = list(fm["starter_watchlist"])   # profile inception holdings, e.g. [AAPL, GOOGL, AMZN]
+    # CBS starts from the CBT (canon14) portfolio as of CBS_DAY0 -> a genuine backtest->bootstrap
+    # continuation, instead of resetting to the naive profile starter_watchlist. Use the tickers the CBT
+    # held (value>0) on the nearest snapshot on/before CBS_DAY0. Same optimizer config as the CBT, so the
+    # CBS day-0 optimize reproduces the CBT's allocation on that date.
+    _cbt = pd.read_csv(ROOT / CANON / "_backtest" / "snapshots.csv", parse_dates=["date"])
+    _held = _cbt[(_cbt["date"] <= pd.Timestamp(CBS_DAY0)) & (_cbt["value"] > 0)]
+    _held = _held[_held["date"] == _held["date"].max()]
+    starter = _held.sort_values("value", ascending=False)["ticker"].str.upper().tolist()
     model = portfolio.load_forward_config().get("curator_model") or "moonshotai/kimi-k2.5"
 
     bt, fw = bboot.load_pools(CANON, "data/forward_corpus", SINCE)
@@ -40,7 +50,8 @@ def main() -> int:
         (RUN / f"{p['as_of_date']}-pool.json").write_text(json.dumps(p, indent=2))
     (RUN / "_starter.json").write_text(json.dumps(
         {"starter_watchlist": starter, "as_of_dates": dates, "rebalance_period": fm["rebalance_period"],
-         "initial_usd": 50000.0, "lookback_years": fm["optimizer_lookback_days"] / 365.0,
+         "initial_usd": float(fm.get("initial_investment_usd", 50000.0)),
+         "lookback_years": fm["optimizer_lookback_days"] / 365.0,
          "max_watchlist_size": int(fm["max_watchlist_size"]), "start_date": dates[0], "end_date": dates[-1]},
         indent=2))
     hist = RUN / "_wf_history.csv"
