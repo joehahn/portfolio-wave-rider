@@ -4257,7 +4257,7 @@ def build_curator_dashboard(
         # The whole section collapses under a clickable triangle (summary styled like the h2 headings); the
         # per-rebalance rows inside are their own nested <details>.
         search_html = (
-            "<details style='margin-top:2em;'>"
+            "<details id='curator-decisions' style='margin-top:2em;'>"
             "<summary style='cursor:pointer;font-size:1.5em;font-weight:bold;color:#111;'>"
             "16. Curator decisions &amp; search terms</summary>"
             f"<p style='color:#555;max-width:780px;'>One row per {_html.escape(_cadence)} rebalance. "
@@ -4791,7 +4791,9 @@ def build_curator_dashboard(
                 '<h2 style="margin:1.6em 0 0.2em;">15. Latest recommended portfolio %</h2>'
                 f'<p style="color:#555;max-width:820px;margin:0 0 .4em;">The optimizer&#39;s target weights at the '
                 f'final rebalance ({str(_lr["date"].iloc[0])[:10]}) &mdash; the allocation the curator strategy '
-                f'would hold now. Red dotted line = the concentration_cap ({_rcap:.0%}).</p>'
+                f'would hold now. Red dotted line = the concentration_cap ({_rcap:.0%}). The curator&#39;s '
+                'decisions behind this allocation are in <a href="#curator-decisions">plot 16</a> (a backtest '
+                'replay writes no standalone review report).</p>'
                 + _rf.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False}))
     except Exception:  # noqa: BLE001
         pass
