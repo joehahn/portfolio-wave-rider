@@ -159,6 +159,10 @@ def main(argv: list[str] | None = None) -> int:
     p_bt.add_argument("--risk-aversion", type=float, default=fm["risk_aversion"],
                       help="lambda in the mean-variance utility; see analyze --risk-aversion")
     p_bt.add_argument("--risk-free-rate", type=float, default=fm["risk_free_rate"])
+    p_bt.add_argument("--min-trade-frac", type=float, default=fm["min_trade_size_frac"],
+                      help="curator mode only: no-trade band -- suppress rebalancing trades smaller "
+                           "than this fraction of the book (default from investor_profile's "
+                           "min_trade_size_frac; 0 rebalances on every signal).")
     p_bt.add_argument("--benchmarks", nargs="*", default=["SPY"],
                       help="benchmark tickers compared against the backtest's realized return "
                            "(default: SPY). Pass an empty list to skip the benchmark section.")
@@ -346,6 +350,7 @@ def main(argv: list[str] | None = None) -> int:
                     lookback_years_override=lb,
                     forward_split_date=args.forward_split_date,
                     always_include=fm["always_include"],
+                    min_trade_frac=args.min_trade_frac,
                 )
             else:
                 result = portfolio.backtest(
