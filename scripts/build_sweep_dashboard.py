@@ -790,32 +790,23 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
             _mt_rows.append({"mt": _mtf, "ret": _mr["realized_return"], "turn": _mr["turnover_ratio"]})
         _mt_cache.write_text(_json.dumps(_mt_rows, indent=2))
     _mtx = [str(r["mt"]) for r in _mt_rows]
-    _mtf_fig = _lgo.Figure()
-    _mtf_fig.add_trace(_lgo.Bar(
-        x=_mtx, y=[r["ret"] * 100 for r in _mt_rows], name="total return",
+    _mtf_fig = _lgo.Figure(_lgo.Bar(
+        x=_mtx, y=[r["ret"] * 100 for r in _mt_rows],
         marker_color=[GREEN if r["mt"] == _LIVE_MT else BLUE for r in _mt_rows],
         text=["live" if r["mt"] == _LIVE_MT else "" for r in _mt_rows], textposition="outside",
         hovertemplate="mt %{x}: %{y:+.0f}%<extra></extra>"))
-    _mtf_fig.add_trace(_lgo.Scatter(
-        x=_mtx, y=[r["turn"] for r in _mt_rows], name="turnover (× capital)", yaxis="y2",
-        mode="lines+markers", line={"color": "#d97706"},
-        hovertemplate="mt %{x}: %{y:.0f}×<extra></extra>"))
-    _mtf_fig.update_layout(template="seaborn", height=380, margin={"t": 20, "l": 60, "r": 60},
+    _mtf_fig.update_layout(template="seaborn", height=360, margin={"t": 20, "l": 60, "r": 20},
                            xaxis={"title": "min_trade_size_frac", "type": "category"},
-                           yaxis={"title": "total return %"},
-                           yaxis2={"title": "turnover (× capital)", "overlaying": "y", "side": "right",
-                                   "showgrid": False}, legend={"orientation": "h", "y": 1.12})
+                           yaxis={"title": "total return %"})
     min_trade_html = (
-        '<h2>9. Total return &amp; turnover vs min_trade_size_frac (live config)</h2>'
+        '<h2>9. Total return vs min_trade_size_frac (live config)</h2>'
         '<p style="color:#555;max-width:920px;">A FREE math-replay slice (no re-curation): hold the live '
         f'cap ({CURRENT[0]}), &lambda; ({CURRENT[1]}), lookback ({CURRENT[2]}d) fixed and vary only the '
         '<b>no-trade band</b> &mdash; the smallest rebalancing trade the backtest executes, as a fraction of the '
         'book. A suppressed trade&#39;s dollars are redistributed across the trades that DO clear the band, so the '
-        'book stays fully invested (Fidelity IRA = zero cost, so no cost model &mdash; pure return / turnover). '
-        'Bars = total return (left axis); orange line = actual turnover as a multiple of capital (right axis). The '
+        'book stays fully invested (Fidelity IRA = zero cost, so no cost model). The '
         f'<b style="color:#2b8a3e;">green</b> bar is the live setting ({_LIVE_MT}). A small band can slightly '
-        '<i>improve</i> return (avoiding whipsaw) while cutting turnover; too large a band (&ge;0.15) starves the '
-        'momentum signal.</p>'
+        '<i>improve</i> return (avoiding whipsaw); too large a band (&ge;0.15) starves the momentum signal.</p>'
         + _mtf_fig.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False}))
 
     # section 7: backtest gems — for every ticker, the best $ P&L it achieved across ALL 1350 sweep settings,
