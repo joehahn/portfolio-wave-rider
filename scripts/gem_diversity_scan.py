@@ -33,8 +33,8 @@ WAVE_OF = {
 }
 MWSDIR = dict(bsd.MWS_SWEEP)  # mws -> run dir
 ANCH = bsd.ANCHORS
-rows = {(r["mws"], r["cap"], r["lam"], r["lb"]): r
-        for r in json.load(open(ROOT / "data/curator_runs/_sweep_cache.json"))["rows"]}
+rows = {(r["mws"], r["cap"], r["lam"], r["lb"], r.get("mt", bsd.CURRENT_MT)): r
+        for r in json.load(open(ROOT / "data/curator_runs/_sweep_cache.json"))["rows"]}  # mt in key: keep all bands
 front = [r for r in rows.values()
          if abs(r["dd"]) * 100 < bsd.REC_MAX_DD and r["l1"] < bsd.REC_MAX_L1 and r["l2"] < bsd.REC_MAX_L2]
 print(f"frontier configs (dd<{bsd.REC_MAX_DD}/L1<{bsd.REC_MAX_L1}/L2<{bsd.REC_MAX_L2}): {len(front)}")
@@ -43,8 +43,10 @@ out = []
 for r in front:
     tag = f"{r['mws']}_{r['cap']}_{r['lam']}_{r['lb']}_{r.get('mt', bsd.CURRENT_MT)}"  # mt = 4th frontier axis
     # snapshots left on disk by the earlier scans: gems_scan -> /tmp/_gems, λ-extend -> /tmp/_lam
-    snp = next((p for p in (Path(f"/tmp/_gems/{tag}/snapshots.csv"), Path(f"/tmp/_lam/{tag}/snapshots.csv"))
-                if p.exists()), None)
+    # Reuse snapshots left by the sweep dashboard (/tmp/_sweep, same tag) or the earlier gems/λ scans; the tag
+    # includes mt, so these are the exact per-config replays already on disk -- no regeneration needed.
+    snp = next((p for p in (Path(f"/tmp/_sweep/{tag}/snapshots.csv"), Path(f"/tmp/_gems/{tag}/snapshots.csv"),
+                            Path(f"/tmp/_lam/{tag}/snapshots.csv")) if p.exists()), None)
     if snp is None:                           # regenerate if neither tmp is present
         portfolio.curator_backtest(runs_dir=MWSDIR[r["mws"]], out_dir=f"/tmp/_gems/{tag}",
                                    max_weight=r["cap"], risk_aversion=r["lam"],
@@ -69,7 +71,8 @@ for r in front:
     for t, v in pos.items():
         w = WAVE_OF.get(t, "other")
         waves[w] = round(waves.get(w, 0.0) + v, 1)
-    out.append({"mws": r["mws"], "cap": r["cap"], "lam": r["lam"], "lb": r["lb"], "ret": r["ret"],
+    out.append({"mws": r["mws"], "cap": r["cap"], "lam": r["lam"], "lb": r["lb"],
+                "mt": r.get("mt", bsd.CURRENT_MT), "ret": r["ret"],
                 "dd": r["dd"], "l1": r["l1"], "l2": r["l2"], "n_pos": len(pos), "n_waves": len(waves),
                 "gem_ret": round(sum(pos.values()), 1),
                 "pos": dict(sorted(pos.items(), key=lambda x: -x[1])),
@@ -79,5 +82,5 @@ out.sort(key=lambda x: (-x["n_pos"], -x["ret"]))
 json.dump(out[:20], open(ROOT / "data/curator_runs/_gem_diversity.json", "w"), indent=1)
 print("wrote data/curator_runs/_gem_diversity.json (top 20)")
 for x in out[:8]:
-    print(f"  ws{x['mws']} cap{x['cap']} λ{x['lam']} {x['lb']}d | ret{x['ret']*100:.0f}% dd{x['dd']*100:.0f}% "
+    print(f"  ws{x['mws']} cap{x['cap']} λ{x['lam']} {x['lb']}d mt{x['mt']:g} | ret{x['ret']*100:.0f}% dd{x['dd']*100:.0f}% "
           f"L1{x['l1']:.0f} L2{x['l2']:.0f} | {x['n_pos']} gems +{x['gem_ret']:.0f}pp | {x['pos']}")
