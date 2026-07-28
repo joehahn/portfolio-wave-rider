@@ -56,7 +56,7 @@ BLUE, GREEN, RED, GREY = "#1f77b4", "#2b8a3e", "#c92a2a", "#adb5bd"
 # run; the rest are re-curated into gkg-3yr-mws{cap}. Tests whether more slots let the curator add NVDA.
 MWS_SWEEP = [(2, "data/curator_runs/gkg-3yr-mws2"), (3, "data/curator_runs/gkg-3yr-mws3"),
              (4, "data/curator_runs/gkg-3yr-mws4"), (5, "data/curator_runs/gkg-3yr-final"),
-             (6, "data/curator_runs/gkg-3yr-mws6"), (7, "data/curator_runs/gkg-3yr-mws7"),
+             (6, "data/curator_runs/gkg-3yr-canon14"), (7, "data/curator_runs/gkg-3yr-mws7"),
              (8, "data/curator_runs/gkg-3yr-mws8"), (10, "data/curator_runs/gkg-3yr-mws10"),
              (12, "data/curator_runs/gkg-3yr-mws12")]   # mws16 dropped from consideration 2026-07-25
 
@@ -353,7 +353,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     # canonical enter the key; non-canonical mws replay at the live CURRENT_MT (held, not swept).
     key = hashlib.md5(_json.dumps([CAPS, LAMBDAS, LOOKBACKS, runs_dir,
                                    [m for m, _ in READY_MWS], MIN_TRADE_FRACS, CURRENT_MT, _mws_fixed,
-                                   "churn-v4-mt"]).encode()).hexdigest()
+                                   "churn-v5-canon6-rot"]).encode()).hexdigest()   # mws6 -> canon14 (new thesis)
     rows_all = spy_ret = None
     if not recompute and cache_p.exists():
         try:
@@ -943,9 +943,10 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
             '<p style="color:#555;max-width:940px;">The same canonical-watchlist grid scored on ONLY the trailing '
             '12 months &mdash; the slice NOT dominated by the 2023-24 RKLB run-up, so it reflects how each config '
             'rotates on recent, forward-relevant data. Ranked by <b>1y return &divide; |1y giveback|</b> (return per '
-            'unit round-trip). Churn is not filtered (zero-cost IRA). <b>CAVEAT:</b> still in-sample, and on the '
-            f'OLD-thesis mws-{_mws_fixed} curations &mdash; the live path uses a newer thesis, so read it as a '
-            'config signal, not a guarantee.</p>'
+            'unit round-trip). Churn is not filtered (zero-cost IRA). <b>CAVEAT:</b> still in-sample &mdash; but now '
+            f'on the NEW-thesis (canon14) mws-{_mws_fixed} curations, the same ones the CBT / live path uses, so the '
+            'absolute returns here match the CBT (the live config replays to the CBT&rsquo;s +178%, not the old '
+            'thesis&rsquo;s +526%).</p>'
             '<table style="font-size:12.5px;margin-top:.4em;"><thead><tr>'
             f'<th {_lc}>#</th><th {_lc}>setting</th><th {_lc}>1y return</th><th {_lc}>1y P/|L|</th>'
             f'<th {_lc}>1y giveback</th><th {_lc}>1y ret&divide;|giveback|</th><th {_lc}>3y return</th>'
@@ -986,8 +987,11 @@ th{{text-align:right;padding:6px 10px;border-bottom:2px solid #ccc;white-space:n
 {_range}
 <p style="color:#555;max-width:860px;">{len(rows_all)} configs: concentration_cap × risk_aversion (λ) × optimizer_lookback
 ({_grid3d} combinations) replayed across all {len(_mws_present)} <b>max_watchlist_size</b> curation sets, plus
-<b>min_trade_size_frac</b> swept as a 4th axis on the canonical watchlist ({len(MIN_TRADE_FRACS)} values). These
-knobs touch only the mean-variance replay, not the curator, so the whole grid costs <b>$0</b> (no LLM — the
+<b>min_trade_size_frac</b> swept as a 4th axis on the canonical watchlist ({len(MIN_TRADE_FRACS)} values).
+<b>Note:</b> the canonical mws&nbsp;{_mws_fixed} set is the <b>new-thesis</b> curation (canon14, so its numbers
+match the CBT); the other watchlist sizes are still the older-thesis sweep, so cross-size comparisons in
+plots 1-3 mix theses. These knobs touch only the mean-variance replay, not the curator, so the whole grid
+costs <b>$0</b> (no LLM — the
 curations already exist; only expanding max_watchlist_size itself, section 6, re-curates). Metrics are
 benchmark-relative: <b>Information Ratio</b> = annualized active return ÷ tracking error vs SPY (consistency of
 beating the benchmark). SPY returned {spy_ret*100:+.0f}% over the window. ★ = best in column.</p>
