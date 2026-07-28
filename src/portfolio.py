@@ -4259,7 +4259,7 @@ def build_curator_dashboard(
         search_html = (
             "<details style='margin-top:2em;'>"
             "<summary style='cursor:pointer;font-size:1.5em;font-weight:bold;color:#111;'>"
-            "15. Curator decisions &amp; search terms</summary>"
+            "16. Curator decisions &amp; search terms</summary>"
             f"<p style='color:#555;max-width:780px;'>One row per {_html.escape(_cadence)} rebalance. "
             "Click to expand the curator's overall rationale, each add/remove with its reason, the cited "
             "<code>news_evidence</code> links, and the wave keywords behind that rebalance's pool "
@@ -4768,6 +4768,33 @@ def build_curator_dashboard(
                   'on (co-authors each counted; adds whose evidence URL carries no captured byline bucket into '
                   '<code>(no author)</code>) &mdash; the raw <code>n</code> behind plot 13.</p>'
                   + _npa) if _npa else '')
+    # 15. Latest recommended portfolio % — the optimizer's target weights at the final rebalance (mirrors the
+    # live dashboard's plot 4), each bar colored by its wave. Read from the run's recommendations.csv.
+    _latest_rec_html = ""
+    try:
+        _rec = pd.read_csv(Path(backtest_dir) / "recommendations.csv")
+        _lr = _rec[_rec["date"] == _rec["date"].max()]
+        _lr = _lr[_lr["weight"] > 0.0005].sort_values("weight", ascending=False)
+        if not _lr.empty:
+            _rw = [_most_recent_bucket(str(t)) for t in _lr["ticker"]]
+            _rf = go.Figure(go.Bar(
+                x=list(_lr["ticker"].astype(str)), y=list(_lr["weight"]),
+                marker_color=[WAVE_COLORS.get(w, "#888888") for w in _rw], customdata=_rw,
+                text=[f"{w * 100:.0f}%" for w in _lr["weight"]], textposition="outside",
+                hovertemplate="%{x} (%{customdata})<br>%{y:.1%}<extra></extra>"))
+            _rcap = float(_fm.get("concentration_cap", 0.25))
+            _rf.add_hline(y=_rcap, line={"color": "#d62728", "width": 1.5, "dash": "dot"})
+            _rf.update_layout(height=340, margin={"l": 60, "r": 20, "t": 10, "b": 60}, plot_bgcolor="white",
+                              font={"size": 13}, showlegend=False, yaxis_title="portfolio %")
+            _rf.update_yaxes(tickformat=".0%", gridcolor="#eee")
+            _latest_rec_html = (
+                '<h2 style="margin:1.6em 0 0.2em;">15. Latest recommended portfolio %</h2>'
+                f'<p style="color:#555;max-width:820px;margin:0 0 .4em;">The optimizer&#39;s target weights at the '
+                f'final rebalance ({str(_lr["date"].iloc[0])[:10]}) &mdash; the allocation the curator strategy '
+                f'would hold now. Red dotted line = the concentration_cap ({_rcap:.0%}).</p>'
+                + _rf.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False}))
+    except Exception:  # noqa: BLE001
+        pass
     page = (
         '<!doctype html><html><head><meta charset="utf-8">'
         f'<title>{heading} ({acronym})</title>'
@@ -4807,6 +4834,7 @@ def build_curator_dashboard(
         + _nps_html
         + _author_html
         + _npa_html
+        + _latest_rec_html
         + search_html
         + '</body></html>'
     )
