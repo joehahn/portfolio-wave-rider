@@ -4585,6 +4585,23 @@ def build_curator_dashboard(
         for _a1 in (_auths or {"(no author)"}):   # byline-less adds bucket into "(no author)" (co-authors deduped per add)
             _author_ret[_a1].append(_r)
 
+    # Seed (CBT inheritance) bucket: the day-0 seeded tickers (initial_weights, CBS-only) are NOT curator adds,
+    # so their P&L -- often the bulk of a seeded CBS's losses (the inherited LHX-heavy portfolio) -- is otherwise
+    # invisible in these add-attribution plots. Add it as one explicit "seed (CBT inheritance)" bar (total
+    # seed-only P&L) so plots 8/10/11/13 reflect the real strategy P&L, not just the curator's own adds.
+    _seed_tk = set()
+    try:
+        _sj = json.loads((Path(runs_dir) / "_starter.json").read_text())
+        _seed_tk = {str(t).upper() for t in (_sj.get("initial_weights") or {})}
+    except Exception:  # noqa: BLE001
+        pass
+    _added_tk = {e[1] for e in _events if e[2] == "add"}
+    _seed_only = [t for t in _seed_tk if t not in _added_tk]
+    if _seed_only:
+        _seed_pnl = sum(_gain_by_ticker.get(t, 0.0) for t in _seed_only)
+        for _dct in (_src_ret, _author_ret, _kw_ret, _ledesrc_ret):
+            _dct["seed (CBT inheritance)"].append(_seed_pnl)
+
     # universe padding: show configured items that produced ZERO with a 0 bar (like the retriever DB) —
     # recognized desks (news_sources.md) for the source plots, all wave keywords for the keyword plot.
     _recognized = set()
