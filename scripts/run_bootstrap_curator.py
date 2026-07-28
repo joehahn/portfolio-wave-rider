@@ -41,6 +41,11 @@ def main() -> int:
     _held = _cbt[(_cbt["date"] <= pd.Timestamp(CBS_DAY0)) & (_cbt["value"] > 0)]
     _held = _held[_held["date"] == _held["date"].max()]
     starter = _held.sort_values("value", ascending=False)["ticker"].str.upper().tolist()
+    # The CBT's exact allocation on CBS_DAY0 -> seed the curator's day-0 portfolio to match it (initial_weights).
+    _cbt_tot = float(_held["value"].sum())
+    initial_weights = {str(r["ticker"]).upper(): float(r["value"]) / _cbt_tot for _, r in _held.iterrows()}
+    # Naive comparator on plot 2: the profile's starter_watchlist (e.g. AAPL/GOOGL/AMZN) equal-weight, held.
+    naive_benchmark = [str(t).upper() for t in fm["starter_watchlist"]]
     model = portfolio.load_forward_config().get("curator_model") or "moonshotai/kimi-k2.5"
 
     bt, fw = bboot.load_pools(CANON, "data/forward_corpus", SINCE)
@@ -52,7 +57,8 @@ def main() -> int:
         {"starter_watchlist": starter, "as_of_dates": dates, "rebalance_period": fm["rebalance_period"],
          "initial_usd": float(fm.get("initial_investment_usd", 50000.0)),
          "lookback_years": fm["optimizer_lookback_days"] / 365.0,
-         "max_watchlist_size": int(fm["max_watchlist_size"]), "start_date": dates[0], "end_date": dates[-1]},
+         "max_watchlist_size": int(fm["max_watchlist_size"]), "start_date": dates[0], "end_date": dates[-1],
+         "initial_weights": initial_weights, "naive_benchmark": naive_benchmark},
         indent=2))
     hist = RUN / "_wf_history.csv"
     hist.write_text("date,action,ticker,wave_bucket,rationale,news_evidence_urls\n")

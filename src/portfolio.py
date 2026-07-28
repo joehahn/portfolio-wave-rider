@@ -1555,10 +1555,17 @@ def curator_backtest(
     # covariance over a handful of assets is still estimable.
     min_obs = max(10, int(round(lookback_years * 252 * 0.5)))
     max_size = int(starter.get("max_watchlist_size", 12))
+    # Optional CBS extras (from _starter.json): seed the curator's day-0 holdings with a fixed weight vector
+    # (initial_weights, e.g. the CBT portfolio at the CBS start) instead of the day-0 optimize; and a naive
+    # equal-weight buy-and-hold benchmark over a given ticker list (naive_benchmark, e.g. AAPL/GOOGL/AMZN).
+    initial_weights = starter.get("initial_weights") or None
+    naive_benchmark = [str(t).upper() for t in (starter.get("naive_benchmark") or [])]
 
     # Union of every ticker that could appear across the run, so the
     # bulk yfinance fetch only happens once. Anchors are always in the fetch.
-    union: set[str] = set(starter_watchlist) | set(anchors)
+    union: set[str] = set(starter_watchlist) | set(anchors) | set(naive_benchmark)
+    if initial_weights:
+        union |= {str(t).upper() for t in initial_weights}
     curation_files: dict[pd.Timestamp, Path] = {}
     for p in sorted(runs.glob("*-curation.json")):
         d = pd.Timestamp(p.stem.replace("-curation", ""))
@@ -1609,6 +1616,7 @@ def curator_backtest(
     fix_shares: dict[str, float] = {}
     bnh_shares: dict[str, float] = {}      # optimizer day-0 weights held forever (ablation)
     eq_shares: dict[str, float] = {}       # equal-weight starter held forever (headline)
+    naive_shares: dict[str, float] = {}    # equal-weight naive_benchmark held forever (e.g. AAPL/GOOGL/AMZN)
     snap_rows: list[dict[str, Any]] = []
     rec_rows: list[dict[str, Any]] = []
     baseline_rows: list[dict[str, Any]] = []
@@ -1709,6 +1717,16 @@ def curator_backtest(
                 risk_aversion, risk_free_rate,
             )
             cur_weights = opt["weights"]
+            if is_first_day and initial_weights:
+                # Seed the curator's day-0 portfolio with a FIXED allocation (e.g. the CBT portfolio at the
+                # CBS start date) instead of the day-0 optimize. The curator drives normally from the next
+                # rebalance, so day 0 = the given distribution and the first real curator move lands next period.
+                _iw = {str(t).upper(): float(w) for t, w in initial_weights.items()
+                       if str(t).upper() in full_prices.columns}
+                _tot = sum(_iw.values())
+                if _tot > 0:
+                    cur_weights = {t: w / _tot for t, w in _iw.items()}
+                    cur_watchlist = list(cur_weights)
 
             for t in cur_watchlist:
                 rec_rows.append({
@@ -1758,6 +1776,14 @@ def curator_backtest(
                     t: (w_eq * initial_usd) / float(full_prices.loc[date, t])
                     for t in fix_watch
                 }
+            # Naive equal-weight buy-and-hold benchmark over an explicit ticker list (e.g. AAPL/GOOGL/AMZN):
+            # $initial_usd / N to each on day 0, then held. Passive, entered at the day-0 close (not lagged).
+            if not naive_shares and naive_benchmark:
+                _nb = [t for t in naive_benchmark if t in full_prices.columns
+                       and not pd.isna(full_prices.loc[date, t])]
+                if _nb:
+                    _wn = 1.0 / len(_nb)
+                    naive_shares = {t: (_wn * initial_usd) / float(full_prices.loc[date, t]) for t in _nb}
 
             # Schedule the curator + fixed-optimizer execution for the lagged
             # day. Holdings stay put until then.
@@ -1802,12 +1828,13 @@ def curator_backtest(
                     "total_value": round(day_total, 2),
                 })
         # Daily baseline totals (single row per date).
-        if fix_shares or bnh_shares or eq_shares:
+        if fix_shares or bnh_shares or eq_shares or naive_shares:
             baseline_rows.append({
                 "date": str(date.date()),
                 "fixed_total": round(_value(fix_shares, date), 2) if fix_shares else None,
                 "bnh_total": round(_value(bnh_shares, date), 2) if bnh_shares else None,
                 "eq_total": round(_value(eq_shares, date), 2) if eq_shares else None,
+                "naive_total": round(_value(naive_shares, date), 2) if naive_shares else None,
             })
 
     if not snap_rows:
@@ -3734,9 +3761,8 @@ def build_curator_dashboard(
     fix_final = float(baselines["fixed_total"].dropna().iloc[-1]) if "fixed_total" in baselines else initial
     fix_return = (fix_final / fix_initial) - 1.0
     # Headline buy-and-hold: CBT = equal-weight starter held forever (eq_total, its established headline);
-    # CBS = day-0 OPTIMIZED starter allocation held forever (bnh_total), matching its plot-2 blue curve and
-    # its "start from the CBT portfolio" framing.
-    _bh_hdl = "bnh_total" if acronym == "CBS" else "eq_total"
+    # CBS = the naive AAPL/GOOGL/AMZN equal-weight comparator (naive_total), matching its plot-2 blue curve.
+    _bh_hdl = "naive_total" if (acronym == "CBS" and "naive_total" in baselines.columns) else "eq_total"
     bnh_initial = float(baselines[_bh_hdl].dropna().iloc[0]) if _bh_hdl in baselines else initial
     bnh_final = float(baselines[_bh_hdl].dropna().iloc[-1]) if _bh_hdl in baselines else initial
     bnh_return = (bnh_final / bnh_initial) - 1.0
@@ -3827,12 +3853,12 @@ def build_curator_dashboard(
                                  "<extra></extra>"),
         row=1, col=1,
     )
-    # Blue buy-and-hold curve. CBS starts from the CBT portfolio, so its buy-and-hold is the DAY-0 OPTIMIZED
-    # starter allocation held static (bnh_total) -- the curator's own starting portfolio with no further action.
-    # CBT keeps its established EQUAL-WEIGHT starter buy-and-hold headline (eq_total).
-    _bh_col = "bnh_total" if acronym == "CBS" else "eq_total"
-    _bh_name = "Buy-and-hold (day-0 starter portfolio)" if acronym == "CBS" else "Buy-and-hold"
-    if _bh_col in baselines.columns:
+    # Blue benchmark curve. CBS = the naive AAPL/GOOGL/AMZN equal-weight buy-and-hold (naive_total) -- a
+    # "what a typical investor might just hold" comparator. CBT keeps its equal-weight starter buy-and-hold
+    # headline (eq_total).
+    _bh_col = "naive_total" if (acronym == "CBS" and "naive_total" in baselines.columns) else "eq_total"
+    _bh_name = "AAPL/GOOGL/AMZN equal-weight (buy-and-hold)" if _bh_col == "naive_total" else "Buy-and-hold"
+    if _bh_col in baselines.columns and baselines[_bh_col].notna().any():
         _bh = baselines.dropna(subset=[_bh_col])
         fig.add_trace(
             go.Scatter(x=_bh["date"], y=_bh[_bh_col],
