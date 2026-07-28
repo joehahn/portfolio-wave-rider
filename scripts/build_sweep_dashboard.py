@@ -923,44 +923,48 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         # year -- the slice NOT dominated by the 2023-24 RKLB run-up -- ranked by 1y return / |1y giveback|
         # (return per unit round-trip). Churn is unfiltered here (zero-cost IRA). Answers "which config best
         # navigates recent, forward-relevant data" rather than "which rode the 2023-24 winners".
-        # Portfolio value over time for the gem/wave-diversity table's configs (+ buy/hold + SPY), like plot 10.
-        # Curves are stored in _gem_diversity.json by gem_diversity_scan (durable -- no /tmp dependency here).
-        _geq_html = ""
-        _gcurved = [x for x in _div if x.get("curve", {}).get("x")]
-        if _gcurved:
-            _gpal = ["#1f77b4", "#ff7f0e", "#2ca02c", "#9467bd", "#8c564b", "#e377c2", "#17becf", "#bcbd22",
-                     "#7f7f7f", "#d97706"]
-            _gfig = go.Figure()
-            for _gi, _gx in enumerate(_gcurved):
-                _glive = ((_gx["cap"], _gx["lam"], _gx["lb"]) == CURRENT and _gx.get("mt", CURRENT_MT) == CURRENT_MT)
-                _gnm = (f'cap{_gx["cap"]}/λ{_gx["lam"]}/{_gx["lb"]}d/mt{_gx.get("mt", CURRENT_MT):g}'
-                        + (" (live)" if _glive else ""))
-                _gfig.add_trace(go.Scatter(
-                    x=_gx["curve"]["x"], y=_gx["curve"]["y"], mode="lines", name=_gnm,
-                    line={"color": ("#d62728" if _glive else _gpal[_gi % len(_gpal)]),
-                          "width": (3.2 if _glive else 1.3)}, opacity=(1.0 if _glive else 0.6)))
+        # Shared "portfolio value over time" chart for a list of configs (each: cap/lam/lb/mt + curve{x,y})
+        # plus the buy/hold + SPY baselines from _ref. Live config = thick red. Log axis, styled like plot 10.
+        def _eqplot(items, title, caption):
+            _its = [it for it in items if it.get("curve", {}).get("x")]
+            if not _its:
+                return ""
+            _pal = ["#1f77b4", "#ff7f0e", "#2ca02c", "#9467bd", "#8c564b", "#e377c2", "#17becf", "#bcbd22",
+                    "#7f7f7f", "#d97706"]
+            _f = go.Figure()
+            for _k, _it in enumerate(_its):
+                _lv = ((_it["cap"], _it["lam"], _it["lb"]) == CURRENT and _it.get("mt", CURRENT_MT) == CURRENT_MT)
+                _nm = (f'cap{_it["cap"]}/λ{_it["lam"]}/{_it["lb"]}d/mt{_it.get("mt", CURRENT_MT):g}'
+                       + (" (live)" if _lv else ""))
+                _f.add_trace(go.Scatter(x=_it["curve"]["x"], y=_it["curve"]["y"], mode="lines", name=_nm,
+                             line={"color": ("#d62728" if _lv else _pal[_k % len(_pal)]),
+                                   "width": (3.2 if _lv else 1.3)}, opacity=(1.0 if _lv else 0.6)))
             if _ref and _ref.get("bnh_x"):
-                _gfig.add_trace(go.Scatter(x=_ref["bnh_x"], y=_ref["bnh_y"], mode="lines", name="Buy-and-hold",
-                                           line={"color": "#3b82f6", "width": 2.2, "dash": "dash"}))
+                _f.add_trace(go.Scatter(x=_ref["bnh_x"], y=_ref["bnh_y"], mode="lines", name="Buy-and-hold",
+                                        line={"color": "#3b82f6", "width": 2.2, "dash": "dash"}))
             if _ref and _ref.get("spy_y"):
-                _gfig.add_trace(go.Scatter(x=_ref["curve_x"], y=_ref["spy_y"], mode="lines", name="SPY benchmark",
-                                           line={"color": "#10b981", "width": 2.0, "dash": "dot"}))
-            _gfig.update_layout(template="seaborn", height=520, margin={"t": 20, "l": 72, "r": 250},
-                                hovermode="closest",
-                                legend={"x": 1.02, "xanchor": "left", "y": 1, "yanchor": "top", "font": {"size": 10}})
-            _gfig.update_xaxes(range=_xr)
-            _gfig.update_yaxes(title_text="portfolio value ($)", type="log",
-                               tickvals=[10000, 30000, 100000, 300000, 1000000, 3000000],
-                               ticktext=["$10K", "$30K", "$100K", "$300K", "$1M", "$3M"])
-            _geq_html = (
-                f'<h3 style="margin:1.3em 0 .2em;">Portfolio value over time &mdash; the {len(_gcurved)} gem &amp; '
-                'wave-diversity configs (vs buy/hold and SPY)</h3>'
-                '<p style="color:#555;max-width:940px;">The equity curve of every config in the table above, on the '
-                f'canonical mws-{_mws_fixed} (new-thesis) curations, alongside the equal-weight starter buy/hold and '
-                'SPY. Log axis. The <b style="color:#d62728;">red</b> line is the live config; the rest are the '
-                'gem-diversity survivors &mdash; the spread shows how differently the SAME curations perform under '
-                'different optimizer settings (same picks, different weighting).</p>'
-                + _gfig.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False}))
+                _f.add_trace(go.Scatter(x=_ref["curve_x"], y=_ref["spy_y"], mode="lines", name="SPY benchmark",
+                                        line={"color": "#10b981", "width": 2.0, "dash": "dot"}))
+            _f.update_layout(template="seaborn", height=520, margin={"t": 20, "l": 72, "r": 250},
+                             hovermode="closest",
+                             legend={"x": 1.02, "xanchor": "left", "y": 1, "yanchor": "top", "font": {"size": 10}})
+            _f.update_xaxes(range=_xr)
+            _f.update_yaxes(title_text="portfolio value ($)", type="log",
+                            tickvals=[10000, 30000, 100000, 300000, 1000000, 3000000],
+                            ticktext=["$10K", "$30K", "$100K", "$300K", "$1M", "$3M"])
+            return (f'<h3 style="margin:1.3em 0 .2em;">{title}</h3>'
+                    f'<p style="color:#555;max-width:940px;">{caption}</p>'
+                    + _f.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False}))
+
+        # Portfolio value over time for the gem/wave-diversity table's configs (curves stored in _gem_diversity.json).
+        _gcurved = [x for x in _div if x.get("curve", {}).get("x")]
+        _geq_html = _eqplot(
+            _gcurved,
+            f'Portfolio value over time &mdash; the {len(_gcurved)} gem &amp; wave-diversity configs (vs buy/hold and SPY)',
+            'The equity curve of every config in the table above, on the canonical mws-'
+            f'{_mws_fixed} (new-thesis) curations, alongside the equal-weight starter buy/hold and SPY. Log axis. '
+            'The <b style="color:#d62728;">red</b> line is the live config; the spread shows how differently the '
+            'SAME curations perform under different optimizer settings (same picks, different weighting).')
 
         _ry = [r for r in rows if r.get("ret_1y") == r.get("ret_1y")]   # drop NaN (short-window configs)
         for r in _ry:
@@ -990,6 +994,34 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
             f'<th {_lc}>#</th><th {_lc}>setting</th><th {_lc}>1y return</th><th {_lc}>1y P/|L|</th>'
             f'<th {_lc}>1y giveback</th><th {_lc}>1y ret&divide;|giveback|</th><th {_lc}>3y return</th>'
             '</tr></thead><tbody>' + _ryrows + '</tbody></table>')
+
+        # Portfolio value over time for the recent-year top-12: fetch each curve (prefer the sweep snapshots on
+        # disk, else replay on the canonical run dir -> durable), then the shared _eqplot.
+        _canon_rd = dict(MWS_SWEEP).get(_mws_fixed, runs_dir)
+        _rycurves = []
+        for r in _ry[:12]:
+            _rtag = f'{_mws_fixed}_{r["cap"]}_{r["lam"]}_{r["lb"]}_{r["mt"]}'
+            _rsp = Path(f"/tmp/_sweep/{_rtag}/snapshots.csv")
+            try:
+                if not _rsp.exists():
+                    portfolio.curator_backtest(
+                        runs_dir=_canon_rd, out_dir=f"/tmp/_ryeq/{_rtag}", max_weight=r["cap"],
+                        risk_aversion=r["lam"], risk_free_rate=_RF, t_update_days=_TU, benchmarks=[],
+                        lookback_years_override=r["lb"] / 365.0, always_include=ANCHORS, min_trade_frac=r["mt"])
+                    _rsp = Path(f"/tmp/_ryeq/{_rtag}/snapshots.csv")
+                _rtt = pd.read_csv(_rsp, parse_dates=["date"]).groupby("date")["total_value"].first().sort_index()[::5]
+                _rycurves.append({**r, "curve": {"x": [d.strftime("%Y-%m-%d") for d in _rtt.index],
+                                                 "y": [round(float(v), 2) for v in _rtt.values]}})
+            except Exception:  # noqa: BLE001
+                continue
+        _ryeq_html = _eqplot(
+            _rycurves,
+            f'Portfolio value over time &mdash; the {len(_rycurves)} recent-year rotation configs (vs buy/hold and SPY)',
+            'The full 3-year equity curve of every config in the recent-year table above (ranked by trailing-12-'
+            f'month rotation), on the canonical mws-{_mws_fixed} curations, with buy/hold + SPY. Log axis, '
+            '<b style="color:#d62728;">red</b> = live config. The short-lookback winners pull far above the live '
+            'line; the rightmost year is the slice the ranking is based on.')
+        _recent_html = _recent_html + _ryeq_html
         _div_html = _div_html + _geq_html + _recent_html
 
         gems_html = (
