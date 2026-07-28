@@ -119,10 +119,10 @@ def load_financial_model(profile_path: str = "investor_profile.md") -> dict[str,
     # but only as a fallback — the financial_model value wins.
     if "concentration_cap" not in fm and "concentration_cap" in data:
         out["concentration_cap"] = data["concentration_cap"]
-    # min_trade_size_frac is also a top-level key (smallest proposed trade, as a
-    # fraction of portfolio value). Accept the legacy min_trade_size_usd key too,
-    # but the fraction wins if both are present.
-    if "min_trade_size_frac" in data:
+    # min_trade_size_frac is an optimizer/rebalancing knob (smallest proposed trade, as a fraction of
+    # portfolio value) whose home is `financial_model` (picked up by out.update(fm) above). A legacy
+    # TOP-LEVEL key is still honored as a fallback for older profiles, but the financial_model value wins.
+    if "min_trade_size_frac" not in fm and "min_trade_size_frac" in data:
         out["min_trade_size_frac"] = data["min_trade_size_frac"]
     # always_include is also a top-level key; normalize to uppercase tickers.
     if "always_include" in data:
