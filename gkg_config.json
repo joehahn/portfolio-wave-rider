@@ -48,23 +48,29 @@
       "AI model",
       "gpu"
     ],
-    "geopolitical": [
+    "geo_defense": [
       "hypersonic",
       "missile",
       "fighter jet",
       "warship",
       "munition",
+      "defense contract"
+    ],
+    "geo_drones": [
       "loitering munition",
       "counter-drone",
-      "defense contract",
-      "drone swarm",
+      "drone swarm"
+    ],
+    "geo_tankers": [
       "oil tanker",
       "crude tanker",
       "product tanker",
       "tanker rates",
       "vlcc",
       "strait of hormuz",
-      "tanker demand",
+      "tanker demand"
+    ],
+    "geo_reconstruction": [
       "gaza reconstruction",
       "syria reconstruction",
       "lebanon reconstruction",
