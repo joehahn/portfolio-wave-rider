@@ -1,120 +1,165 @@
 #!/usr/bin/env python3
-"""Run the curator over the BOOTSTRAP dataset (backtest tail + forward WebSearch) and replay through the
-optimizer, producing a curator-backtest run dir (data/curator_runs/bootstrap-cbs/) for the Curator
-Bootstrap (CBS) dashboard.
+"""Run the curator over the BOOTSTRAP dataset (1-year backtest tail + forward WebSearch) and replay through
+the optimizer, producing the Curator Bootstrap (CBS) dashboard (docs/curator_bootstrap.html).
 
-Feeds the SAME curator (src/curator.curate -> kimi, LIVE article-list intro) that the live forward path
-uses over the 12 bootstrap pool dates (7 biweekly backtest-tail + 5 daily forward). Starter = canon14's
-watchlist at the window start (continuity into the forward); optimizer config = the live profile (same as
-the CBT). Idempotent-ish: overwrites the run dir each time so a re-run reflects the latest bootstrap.
+Design (biweekly throughout -- matches the profile's rebalance_period):
+  - ONE biweekly rebalance timeline from SINCE to today.
+  - Each rebalance reads a trailing news_lookback_days window from the right source:
+      * date <= HANDOFF : canon14's own biweekly GKG+Wayback pool (news already 14d-windowed at build time).
+      * date >  HANDOFF : the live forward corpus via corpus.read_slice(date, news_lb) (daily WebSearch
+                          ingests, surfaced as a trailing 14d window -- the SAME reader the live path uses).
+  - Day-0 portfolio = the CBT (canon14) RECOMMENDED weights on the nearest rebalance <= SINCE, so the CBS
+    continues the backtest's recommended portfolio into the bootstrap.
+  - Optimizer config + curator params all come from investor_profile.md (the canonical settings).
+
+Lookbacks: the optimizer's 90d price window is auto-fetched by curator_backtest (start - 120d); the
+curator's 14d news window is satisfied by the per-date pools above. The curator is fired ONCE per biweekly
+date (not per daily ingest); curator_backtest batches decisions and rebalances biweekly.
+
+Idempotent-ish: overwrites the run dir each time. `--dry-run` prints the plan (dates, seed, pool sizes)
+without firing any curator call, so the setup can be checked before spending kimi tokens.
 """
 import json
 import sys
+from datetime import date, timedelta
 from pathlib import Path
 
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(ROOT / "scripts"))
 sys.path.insert(0, str(ROOT))
-import build_bootstrap_dashboard as bboot  # noqa: E402  reuse the bootstrap pool assembler
-from src import curator, portfolio  # noqa: E402
+from src import corpus, curator, portfolio  # noqa: E402
 
 CANON = "data/curator_runs/gkg-3yr-canon14"
-SINCE = "2026-04-22"
-CBS_DAY0 = "2026-04-27"     # CBS day 0: seed the starter from the CBT portfolio held on/before this date
+SINCE = "2025-07-19"       # 1-year backtest-tail start (first canon14 biweekly pool on/after this date)
+HANDOFF = "2026-07-22"     # backtest end / forward start (canon14's last pool date)
 RUN = ROOT / "data" / "curator_runs" / "bootstrap-cbs"
 
 
 def main() -> int:
+    dry = "--dry-run" in sys.argv
     RUN.mkdir(parents=True, exist_ok=True)
-    for f in list(RUN.glob("*-pool.json")) + list(RUN.glob("*-curation.json")):
-        f.unlink()
+    if not dry:
+        for f in list(RUN.glob("*-pool.json")) + list(RUN.glob("*-curation.json")):
+            f.unlink()
 
     fm = portfolio.load_financial_model()
-    anchors = fm.get("always_include") or ["SPY", "AGG", "IAU"]
-    # CBS starts from the CBT (canon14) portfolio as of CBS_DAY0 -> a genuine backtest->bootstrap
-    # continuation, instead of resetting to the naive profile starter_watchlist. Use the tickers the CBT
-    # held (value>0) on the nearest snapshot on/before CBS_DAY0. Same optimizer config as the CBT, so the
-    # CBS day-0 optimize reproduces the CBT's allocation on that date.
-    _cbt = pd.read_csv(ROOT / CANON / "_backtest" / "snapshots.csv", parse_dates=["date"])
-    _held = _cbt[(_cbt["date"] <= pd.Timestamp(CBS_DAY0)) & (_cbt["value"] > 0)]
-    _held = _held[_held["date"] == _held["date"].max()]
-    starter = _held.sort_values("value", ascending=False)["ticker"].str.upper().tolist()
-    # The CBT's exact allocation on CBS_DAY0 -> seed the curator's day-0 portfolio to match it (initial_weights).
-    _cbt_tot = float(_held["value"].sum())
-    initial_weights = {str(r["ticker"]).upper(): float(r["value"]) / _cbt_tot for _, r in _held.iterrows()}
-    # Naive comparator on plot 2: the profile's starter_watchlist (e.g. AAPL/GOOGL/AMZN) equal-weight, held.
-    naive_benchmark = [str(t).upper() for t in fm["starter_watchlist"]]
+    anchors = [t.upper() for t in (fm.get("always_include") or ["SPY", "AGG", "IAU"])]
+    ms = int(fm["max_watchlist_size"])
+    news_lb = int(fm["news_lookback_days"])
     model = portfolio.load_forward_config().get("curator_model") or "moonshotai/kimi-k2.5"
-    _thesis = portfolio.load_wave_thesis()      # from investor_profile.md (not hardcoded)
-    _excl = portfolio.load_exclusions()
+    thesis = portfolio.load_wave_thesis()      # from investor_profile.md (canonical thesis)
+    excl = portfolio.load_exclusions()
 
-    bt, fw = bboot.load_pools(CANON, "data/forward_corpus", SINCE)
-    pools = sorted(bt + fw, key=lambda p: p["as_of_date"])
-    dates = [p["as_of_date"] for p in pools]
-    for p in pools:
-        (RUN / f"{p['as_of_date']}-pool.json").write_text(json.dumps(p, indent=2))
+    # --- Backtest-tail pools: canon14's own biweekly pools in [SINCE, HANDOFF] (14d Wayback news baked in).
+    bt_pools = []
+    for f in sorted((ROOT / CANON).glob("*-pool.json")):
+        d = f.stem.replace("-pool", "")
+        if SINCE <= d <= HANDOFF:
+            bt_pools.append((d, json.loads(f.read_text()).get("articles", []), "gkg-wayback"))
+    if not bt_pools:
+        print(f"no canon14 pools in [{SINCE}, {HANDOFF}]", file=sys.stderr)
+        return 1
+
+    # --- Forward dates: biweekly continuation from the last backtest date up to today, each read as a
+    #     trailing news_lb window over the live forward corpus (empty until the first forward biweekly date).
+    last_bt = date.fromisoformat(bt_pools[-1][0])
+    end = date.today()
+    fw_pools = []
+    d = last_bt + timedelta(days=14)
+    while d <= end:
+        fw_pools.append((d.isoformat(), corpus.read_slice(d.isoformat(), news_lb), "websearch"))
+        d += timedelta(days=14)
+
+    pools = bt_pools + fw_pools     # already chronological
+    dates = [dd for dd, _, _ in pools]
+
+    # --- Seed: CBT (canon14) RECOMMENDED weights on the nearest rebalance <= SINCE (the portfolio in effect
+    #     when the CBS starts). Anchors (e.g. IAU) stay in the seed weights; they are dropped from the
+    #     curator's starter watchlist (they are optimizer anchors, not curator-managed tickers).
+    recs = pd.read_csv(ROOT / CANON / "_backtest" / "recommendations.csv", parse_dates=["date"])
+    seed_date = recs[recs.date <= pd.Timestamp(SINCE)]["date"].max()
+    seed = recs[(recs["date"] == seed_date) & (recs["weight"] > 1e-6)]
+    initial_weights = {str(r.ticker).upper(): float(r.weight) for r in seed.itertuples()}
+    _tot = sum(initial_weights.values()) or 1.0
+    initial_weights = {k: round(v / _tot, 6) for k, v in initial_weights.items()}   # renormalize off rounding
+    # starter watchlist = canon14's active watchlist at SINCE (so the curator continues from there) plus any
+    # seed ticker, minus anchors.
+    periods, _ = portfolio._build_ticker_periods(CANON, fm["starter_watchlist"], pd.Timestamp(end.isoformat()))
+    _at = pd.Timestamp(SINCE)
+    starter = sorted(({tk for tk, s, e, _wb in periods if s <= _at <= e} | set(initial_weights)) - set(anchors))
+    naive_benchmark = [str(t).upper() for t in fm["starter_watchlist"]]
+
+    print(f"CBS plan: {len(bt_pools)} backtest-tail (biweekly GKG) + {len(fw_pools)} forward (WebSearch) "
+          f"= {len(dates)} rebalances", file=sys.stderr)
+    print(f"  window {dates[0]} -> {dates[-1]} (biweekly)  | seed @ {seed_date.date()}: {initial_weights}",
+          file=sys.stderr)
+    print(f"  starter watchlist: {starter}", file=sys.stderr)
+    for dd, arts, src in pools:
+        print(f"    {dd}  {src:11s} {len(arts)} articles", file=sys.stderr)
+    if dry:
+        print("(dry run -- no curator calls, no files written)", file=sys.stderr)
+        return 0
+
+    # write pool JSONs + _starter.json
+    for dd, arts, src in pools:
+        (RUN / f"{dd}-pool.json").write_text(json.dumps(
+            {"as_of_date": dd, "source": src, "n_articles": len(arts), "articles": arts}, indent=2))
     (RUN / "_starter.json").write_text(json.dumps(
         {"starter_watchlist": starter, "as_of_dates": dates, "rebalance_period": fm["rebalance_period"],
          "initial_usd": float(fm.get("initial_investment_usd", 50000.0)),
          "lookback_years": fm["optimizer_lookback_days"] / 365.0,
-         "max_watchlist_size": int(fm["max_watchlist_size"]), "start_date": dates[0], "end_date": dates[-1],
-         "initial_weights": initial_weights, "naive_benchmark": naive_benchmark},
-        indent=2))
+         "max_watchlist_size": ms, "start_date": dates[0], "end_date": end.isoformat(),
+         "initial_weights": initial_weights, "naive_benchmark": naive_benchmark}, indent=2))
     hist = RUN / "_wf_history.csv"
     hist.write_text("date,action,ticker,wave_bucket,rationale,news_evidence_urls\n")
     hold = RUN / "_wf_holdings.csv"
     hold.write_text("ticker,shares\n" + "".join(f"{t},0\n" for t in starter + anchors))
-    print(f"starter @ {SINCE}: {starter} | {len(dates)} rebalances ({len(bt)} backtest + {len(fw)} forward)",
-          file=sys.stderr)
 
-    ms = int(fm["max_watchlist_size"])
-    for d in dates:
-        cur_wl = portfolio.reconstruct_watchlist_at(d, starter, str(hist))
-        arts = json.loads((RUN / f"{d}-pool.json").read_text())["articles"]
+    # curate each biweekly date (reject-and-retry, same discipline as backtest_sdk / the live path)
+    for dd, arts, src in pools:
+        cur_wl = portfolio.reconstruct_watchlist_at(dd, starter, str(hist))
         ptext = curator.format_pool(arts)
-        cur = curator.curate(ptext, cur_wl, as_of=d, model=model, max_size=ms, anchors=anchors,
-                             thesis=_thesis, exclusions=_excl,
-                             cadence=fm["rebalance_period"], intro=curator.LIVE_INTRO, no_reasoning=True)
-        for _ in range(2):   # reject-and-retry (same discipline as backtest_sdk / the live path)
+        cur = curator.curate(ptext, cur_wl, as_of=dd, model=model, max_size=ms, anchors=anchors,
+                             thesis=thesis, exclusions=excl, cadence=fm["rebalance_period"],
+                             intro=curator.LIVE_INTRO, no_reasoning=True)
+        for _ in range(2):
             chk = portfolio.apply_curator_decisions(cur, holdings_path=str(hold), history_path=str(hist),
-                  profile_path="investor_profile.md", listing_check=False, as_of_date=d,
+                  profile_path="investor_profile.md", listing_check=False, as_of_date=dd,
                   max_watchlist_size=ms, dry_run=True)
             rej = chk.get("rejections") or []
             if not rej:
                 break
             fb = "\n".join(f"- {x.get('ticker')} ({x.get('action')}): {x.get('reason')}" for x in rej)
-            cur = curator.curate(ptext, cur_wl, as_of=d, model=model, max_size=ms, anchors=anchors,
-                                 thesis=_thesis, exclusions=_excl,
-                                 cadence=fm["rebalance_period"], intro=curator.LIVE_INTRO, no_reasoning=True,
-                                 retry_feedback=fb)
-        cur["as_of_date"] = d
-        (RUN / f"{d}-curation.json").write_text(json.dumps(cur, indent=2))
+            cur = curator.curate(ptext, cur_wl, as_of=dd, model=model, max_size=ms, anchors=anchors,
+                                 thesis=thesis, exclusions=excl, cadence=fm["rebalance_period"],
+                                 intro=curator.LIVE_INTRO, no_reasoning=True, retry_feedback=fb)
+        cur["as_of_date"] = dd
+        (RUN / f"{dd}-curation.json").write_text(json.dumps(cur, indent=2))
         portfolio.apply_curator_decisions(cur, holdings_path=str(hold), history_path=str(hist),
-              profile_path="investor_profile.md", listing_check=False, as_of_date=d, max_watchlist_size=ms)
-        print(f"  {d}: adds={[x['ticker'] for x in cur.get('adds', [])]} "
+              profile_path="investor_profile.md", listing_check=False, as_of_date=dd, max_watchlist_size=ms)
+        print(f"  {dd} [{src}]: adds={[x['ticker'] for x in cur.get('adds', [])]} "
               f"removes={[x['ticker'] for x in cur.get('removes', [])]}", file=sys.stderr)
 
+    # replay through the optimizer at the canonical config (all from investor_profile.md), then render
     res = portfolio.curator_backtest(
         runs_dir=str(RUN), out_dir=str(RUN / "_backtest"), max_weight=float(fm["concentration_cap"]),
         risk_aversion=float(fm["risk_aversion"]), risk_free_rate=float(fm["risk_free_rate"]),
         t_update_days=int(portfolio.load_backtest_config()["t_update_days"]), benchmarks=["SPY"],
         lookback_years_override=fm["optimizer_lookback_days"] / 365.0, always_include=anchors,
-        min_trade_frac=float(fm["min_trade_size_frac"]))     # model the live no-trade band
+        min_trade_frac=float(fm["min_trade_size_frac"]))
     authors = {}
     for pf in RUN.glob("*-pool.json"):
         for a in json.loads(pf.read_text()).get("articles", []):
             if a.get("author"):
-                authors.setdefault(a["url"], a["author"])
+                authors.setdefault(a.get("url", ""), a["author"])
     (RUN / "_authors.json").write_text(json.dumps(authors, indent=1))
     print(f"\n=== CBS RESULT: {res['realized_return']*100:+.0f}% (final ${res['final_value']:,.0f}) | "
-          f"SPY {res['benchmark_returns']['SPY']*100:+.0f}% | final {res['final_watchlist']}")
-    # Render the Curator Bootstrap (CBS) dashboard from this run (parameterized clone of the CBT generator).
+          f"SPY {res['benchmark_returns']['SPY']*100:+.0f}% | final {res['final_watchlist']}", file=sys.stderr)
     portfolio.build_curator_dashboard(
         backtest_dir=str(RUN / "_backtest"), runs_dir=str(RUN), out_path="docs/curator_bootstrap.html",
         benchmarks=["SPY"], heading="Curator Bootstrap", acronym="CBS", show_max_articles=False,
-        handoff_date="2026-07-22")
+        handoff_date=HANDOFF)
     print("  rendered docs/curator_bootstrap.html", file=sys.stderr)
     return 0
 
