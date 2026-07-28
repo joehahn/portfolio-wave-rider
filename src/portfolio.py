@@ -3733,11 +3733,12 @@ def build_curator_dashboard(
     fix_initial = float(baselines["fixed_total"].dropna().iloc[0]) if "fixed_total" in baselines else initial
     fix_final = float(baselines["fixed_total"].dropna().iloc[-1]) if "fixed_total" in baselines else initial
     fix_return = (fix_final / fix_initial) - 1.0
-    # Headline buy-and-hold curve = equal-weight starter held forever
-    # (eq_total). bnh_total is the optimizer-day-0-weights ablation kept
-    # only in the CSV for researchers.
-    bnh_initial = float(baselines["eq_total"].dropna().iloc[0]) if "eq_total" in baselines else initial
-    bnh_final = float(baselines["eq_total"].dropna().iloc[-1]) if "eq_total" in baselines else initial
+    # Headline buy-and-hold: CBT = equal-weight starter held forever (eq_total, its established headline);
+    # CBS = day-0 OPTIMIZED starter allocation held forever (bnh_total), matching its plot-2 blue curve and
+    # its "start from the CBT portfolio" framing.
+    _bh_hdl = "bnh_total" if acronym == "CBS" else "eq_total"
+    bnh_initial = float(baselines[_bh_hdl].dropna().iloc[0]) if _bh_hdl in baselines else initial
+    bnh_final = float(baselines[_bh_hdl].dropna().iloc[-1]) if _bh_hdl in baselines else initial
     bnh_return = (bnh_final / bnh_initial) - 1.0
 
     fig = make_subplots(
@@ -3826,11 +3827,16 @@ def build_curator_dashboard(
                                  "<extra></extra>"),
         row=1, col=1,
     )
-    if "eq_total" in baselines.columns:
-        eq = baselines.dropna(subset=["eq_total"])
+    # Blue buy-and-hold curve. CBS starts from the CBT portfolio, so its buy-and-hold is the DAY-0 OPTIMIZED
+    # starter allocation held static (bnh_total) -- the curator's own starting portfolio with no further action.
+    # CBT keeps its established EQUAL-WEIGHT starter buy-and-hold headline (eq_total).
+    _bh_col = "bnh_total" if acronym == "CBS" else "eq_total"
+    _bh_name = "Buy-and-hold (day-0 starter portfolio)" if acronym == "CBS" else "Buy-and-hold"
+    if _bh_col in baselines.columns:
+        _bh = baselines.dropna(subset=[_bh_col])
         fig.add_trace(
-            go.Scatter(x=eq["date"], y=eq["eq_total"],
-                       name="Buy-and-hold",
+            go.Scatter(x=_bh["date"], y=_bh[_bh_col],
+                       name=_bh_name,
                        mode="lines", line={"color": "#3b82f6", "width": 1.8}),
             row=1, col=1,
         )
