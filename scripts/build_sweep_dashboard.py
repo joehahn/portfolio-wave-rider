@@ -856,11 +856,12 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         if _div:
             _drows = ""
             for _i, x in enumerate(_div):
-                _hit = x["mws"] == _mws_fixed and (x["cap"], x["lam"], x["lb"]) == CURRENT
+                _hit = (x["mws"] == _mws_fixed and (x["cap"], x["lam"], x["lb"]) == CURRENT
+                        and x.get("mt", CURRENT_MT) == CURRENT_MT)   # match min_trade too, else all mt bands flag "live"
                 _dbg = "background:#fff7e6;" if _hit else ""
                 _wv = " &middot; ".join(f'{k} +{v:.0f}' for k, v in x["waves"].items())
                 _drows += (f'<tr style="{_dbg}border-bottom:1px solid #eee;"><td {_lc}>{_i + 1}</td>'
-                           f'<td {_lc}>ws{x["mws"]} &middot; cap{x["cap"]}/λ{x["lam"]}/{x["lb"]}d'
+                           f'<td {_lc}>ws{x["mws"]} &middot; cap{x["cap"]}/λ{x["lam"]}/{x["lb"]}d/mt{x.get("mt", CURRENT_MT):g}'
                            + (" &larr; live" if _hit else "") + '</td>'
                            f'<td {_lc}>{x["ret"] * 100:+.0f}%</td><td {_lc}>{x["dd"] * 100:.0f}%</td>'
                            f'<td {_lc}>{x["l1"]:.0f}</td><td {_lc}>{x["l2"]:.0f}</td>'
