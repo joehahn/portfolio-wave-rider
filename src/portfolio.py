@@ -810,10 +810,16 @@ def _validate_curator_payload(
     valid_adds: list[dict[str, Any]] = []
     asof = as_of_date or payload.get("as_of_date")
 
+    def _as_text(v: Any) -> str:
+        """Coerce an LLM field to a string: some models emit rationale as a LIST of strings."""
+        if isinstance(v, (list, tuple)):
+            return " ".join(str(x) for x in v).strip()
+        return str(v or "").strip()
+
     for add in raw_adds:
         t = add.get("ticker")
         wb = add.get("wave_bucket")
-        rationale = (add.get("rationale") or "").strip()
+        rationale = _as_text(add.get("rationale"))
         evidence = add.get("news_evidence") or []
         if not t:
             rejections.append({"ticker": str(t), "action": "add", "reason": "missing ticker"})
@@ -845,7 +851,7 @@ def _validate_curator_payload(
     valid_removes: list[dict[str, Any]] = []
     for rem in raw_removes:
         t = rem.get("ticker")
-        rationale = (rem.get("rationale") or "").strip()
+        rationale = _as_text(rem.get("rationale"))
         if not t:
             rejections.append({"ticker": str(t), "action": "remove",
                                "reason": "missing ticker"})
