@@ -4791,9 +4791,7 @@ def build_curator_dashboard(
                 '<h2 style="margin:1.6em 0 0.2em;">15. Latest recommended portfolio %</h2>'
                 f'<p style="color:#555;max-width:820px;margin:0 0 .4em;">The optimizer&#39;s target weights at the '
                 f'final rebalance ({str(_lr["date"].iloc[0])[:10]}) &mdash; the allocation the curator strategy '
-                f'would hold now. Red dotted line = the concentration_cap ({_rcap:.0%}). The curator&#39;s '
-                'decisions behind this allocation are in <a href="#curator-decisions">plot 16</a> (a backtest '
-                'replay writes no standalone review report).</p>'
+                f'would hold now. Red dotted line = the concentration_cap ({_rcap:.0%}).</p>'
                 + _rf.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False}))
     except Exception:  # noqa: BLE001
         pass
