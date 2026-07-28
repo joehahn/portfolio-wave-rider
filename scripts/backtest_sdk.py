@@ -473,7 +473,7 @@ def main(argv=None) -> int:
     cli = _anthropic() if (not a.pools_only and a.model.startswith("claude")) else None  # only for Anthropic models
     thesis = portfolio.load_wave_thesis()       # from investor_profile.md '# Strategy & beliefs' (not hardcoded)
     exclusions = portfolio.load_exclusions()    # from investor_profile.md 'exclusions:' list
-    anchors = ["SPY", "AGG", "IAU"]
+    anchors = portfolio.load_financial_model().get("always_include") or ["SPY", "AGG", "IAU"]
     tok_in = tok_out = 0
 
     hist = run_dir / "_wf_history.csv"

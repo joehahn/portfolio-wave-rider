@@ -28,7 +28,7 @@ from src import portfolio  # noqa: E402
 CAPS = [0.5, 0.67, 0.8, 0.9, 1.0]
 LAMBDAS = [0.5, 0.75, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0]
 LOOKBACKS = [14, 30, 60, 90, 120, 150]          # calendar days
-ANCHORS = ["SPY", "AGG", "IAU"]
+ANCHORS = portfolio.load_financial_model().get("always_include") or ["SPY", "AGG", "IAU"]  # from the profile
 TRACK_TICKERS = ["QUBT", "RKLB", "NVDA"]     # section 6: flag whether each mws curation ever added these
 
 # "Recommended settings" = the risk/churn-constrained frontier read off plots 1-3: keep only configs with
