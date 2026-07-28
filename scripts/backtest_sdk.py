@@ -471,10 +471,8 @@ def main(argv=None) -> int:
 
     bq = g._client()
     cli = _anthropic() if (not a.pools_only and a.model.startswith("claude")) else None  # only for Anthropic models
-    thesis = ("Ride durable waves to early exposure, trim before the crest. Current wave = AI. Next tech "
-              "waves: rockets & spacecraft, robotics, quantum, nuclear (SMRs near-term, fusion long-term). "
-              "Non-tech: geopolitical realignment (defense/rearmament, tankers/shipping, drones), aging demographics.")
-    exclusions = "solar energy, wind energy"
+    thesis = portfolio.load_wave_thesis()       # from investor_profile.md '# Strategy & beliefs' (not hardcoded)
+    exclusions = portfolio.load_exclusions()    # from investor_profile.md 'exclusions:' list
     anchors = ["SPY", "AGG", "IAU"]
     tok_in = tok_out = 0
 

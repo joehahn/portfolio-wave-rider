@@ -21,11 +21,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SYSTEM_PROMPT = (ROOT / ".claude" / "agents" / "watchlist-curator.md").read_text()
 
-# Compact wave thesis + exclusions + anchors, shared by forward and backtest (one edit -> both paths).
-DEFAULT_THESIS = ("Ride durable waves to early exposure, trim before the crest. Current wave = AI. Next tech "
-                  "waves: rockets & spacecraft, robotics, quantum, nuclear (SMRs near-term, fusion long-term). "
-                  "Non-tech: geopolitical realignment (defense/rearmament, tankers/shipping, drones), aging demographics.")
-DEFAULT_EXCLUSIONS = "solar energy, wind energy"
+# The wave thesis + exclusions are NOT hardcoded here on purpose: they MUST come from investor_profile.md
+# (via portfolio.load_wave_thesis / load_exclusions), so editing the profile actually changes behavior.
+# curate() takes them as REQUIRED args -- a caller that forgets errors loudly instead of silently using a
+# stale hardcoded thesis (the historical bug this prevents). Anchors keep a default (safe-haven trio).
 DEFAULT_ANCHORS = ["SPY", "AGG", "IAU"]
 
 # Prompt intros: the backtest keeps its EXACT wording (byte-identical prompt -> parity); the forward
@@ -146,8 +145,8 @@ news_pool (read it, discover US-listed wave tickers with real catalysts, DISCARD
 {action_rule} In rationale_overall, note what noise you filtered. Emit ONLY the JSON object per your output schema."""
 
 
-def curate(pool_text: str, watchlist: list[str], *, as_of: str, model: str, anthropic_cli=None,
-           thesis: str = DEFAULT_THESIS, exclusions: str = DEFAULT_EXCLUSIONS,
+def curate(pool_text: str, watchlist: list[str], *, as_of: str, model: str, thesis: str, exclusions: str,
+           anthropic_cli=None,
            max_size: int = 5, anchors: "list[str] | None" = None, cadence: str = "weekly",
            intro: str = _BT_INTRO, no_reasoning: bool = True,
            log_path: "Path | None" = None, fail_dir: "Path | None" = None, retry_feedback: str = "") -> dict:

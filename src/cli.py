@@ -299,6 +299,7 @@ def main(argv: list[str] | None = None) -> int:
             cli_a = curator.anthropic_client() if model.startswith("claude") else None
             decision = curator.curate(
                 curator.format_pool(pool), watchlist, as_of=as_of, model=model, anthropic_cli=cli_a,
+                thesis=portfolio.load_wave_thesis(), exclusions=portfolio.load_exclusions(),
                 max_size=int(fm["max_watchlist_size"]), anchors=anchors, cadence=fm["rebalance_period"],
                 intro=curator.LIVE_INTRO, no_reasoning=True,
                 log_path=(None if args.dry_run else live / f"{as_of}-curator.json"),

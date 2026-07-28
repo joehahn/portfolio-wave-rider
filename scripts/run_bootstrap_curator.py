@@ -47,6 +47,8 @@ def main() -> int:
     # Naive comparator on plot 2: the profile's starter_watchlist (e.g. AAPL/GOOGL/AMZN) equal-weight, held.
     naive_benchmark = [str(t).upper() for t in fm["starter_watchlist"]]
     model = portfolio.load_forward_config().get("curator_model") or "moonshotai/kimi-k2.5"
+    _thesis = portfolio.load_wave_thesis()      # from investor_profile.md (not hardcoded)
+    _excl = portfolio.load_exclusions()
 
     bt, fw = bboot.load_pools(CANON, "data/forward_corpus", SINCE)
     pools = sorted(bt + fw, key=lambda p: p["as_of_date"])
@@ -73,6 +75,7 @@ def main() -> int:
         arts = json.loads((RUN / f"{d}-pool.json").read_text())["articles"]
         ptext = curator.format_pool(arts)
         cur = curator.curate(ptext, cur_wl, as_of=d, model=model, max_size=ms, anchors=anchors,
+                             thesis=_thesis, exclusions=_excl,
                              cadence=fm["rebalance_period"], intro=curator.LIVE_INTRO, no_reasoning=True)
         for _ in range(2):   # reject-and-retry (same discipline as backtest_sdk / the live path)
             chk = portfolio.apply_curator_decisions(cur, holdings_path=str(hold), history_path=str(hist),
@@ -83,6 +86,7 @@ def main() -> int:
                 break
             fb = "\n".join(f"- {x.get('ticker')} ({x.get('action')}): {x.get('reason')}" for x in rej)
             cur = curator.curate(ptext, cur_wl, as_of=d, model=model, max_size=ms, anchors=anchors,
+                                 thesis=_thesis, exclusions=_excl,
                                  cadence=fm["rebalance_period"], intro=curator.LIVE_INTRO, no_reasoning=True,
                                  retry_feedback=fb)
         cur["as_of_date"] = d

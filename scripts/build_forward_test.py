@@ -102,6 +102,7 @@ def main() -> int:
         else:
             decision = curator.curate(
                 curator.format_pool(pool), watchlist, as_of=as_of, model=model, anthropic_cli=cli_a,
+                thesis=portfolio.load_wave_thesis(), exclusions=portfolio.load_exclusions(),
                 max_size=max_size, anchors=anchors, cadence=fm["rebalance_period"],
                 intro=curator.LIVE_INTRO, no_reasoning=True,
                 log_path=RUN_DIR / f"{as_of}-curator.json", fail_dir=RUN_DIR / "_parse_fail")

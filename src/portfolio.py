@@ -177,6 +177,32 @@ _BACKTEST_DEFAULTS: dict[str, Any] = {
 }
 
 
+def load_wave_thesis(profile_path: str = "investor_profile.md") -> str:
+    """The wave thesis the curator reasons against: the profile's ``# Strategy & beliefs`` markdown section.
+    FAIL LOUD -- raise if the profile or that section is missing, so the thesis always comes from the profile
+    and is never silently replaced by a hardcoded default (which is how the thesis got ignored historically)."""
+    p = Path(profile_path)
+    if not p.exists():
+        raise FileNotFoundError(f"{profile_path} not found; the curator's wave thesis must come from it")
+    m = re.search(r"^#\s+Strategy\s*&\s*beliefs\s*$(.*?)(?=^#\s+\S|\Z)", p.read_text(),
+                  re.MULTILINE | re.DOTALL)
+    if not m or not m.group(1).strip():
+        raise ValueError(f"{profile_path} has no '# Strategy & beliefs' section (the curator's wave thesis)")
+    return m.group(1).strip()
+
+
+def load_exclusions(profile_path: str = "investor_profile.md") -> str:
+    """The profile's ``exclusions:`` YAML list, joined into the comma string the curator expects (``''`` if
+    none). Fail loud only on a missing profile; an absent/empty exclusions list is allowed."""
+    import yaml
+    p = Path(profile_path)
+    if not p.exists():
+        raise FileNotFoundError(f"{profile_path} not found; exclusions must come from it")
+    m = re.match(r"^---\s*\n(.*?)\n---\s*\n", p.read_text(), re.DOTALL)
+    data = (yaml.safe_load(m.group(1)) if m else {}) or {}
+    return ", ".join(str(e).strip() for e in (data.get("exclusions") or []))
+
+
 def load_backtest_config(profile_path: str = "investor_profile.md") -> dict[str, Any]:
     """Read the `backtest` section from investor_profile.md's YAML front matter.
 
