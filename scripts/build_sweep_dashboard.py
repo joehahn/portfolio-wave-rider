@@ -502,10 +502,13 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         f'<td style="text-align:left">{_fmt(MIN_TRADE_FRACS)}</td><td style="text-align:left">{CURRENT_MT:g}</td></tr>'
         f'<tr><td style="text-align:left">max_watchlist_size <span style="color:#9a6a00;">(re-curation, §11)</span></td>'
         f'<td style="text-align:left">{_fmt([c for c, _ in MWS_SWEEP])}</td><td style="text-align:left">{_mws_fixed}</td></tr>'
-        f'<tr><td style="text-align:left">news_lookback_days <span style="color:#9a6a00;">(re-curation, fuller ledes, all windows, §12)</span></td>'
-        f'<td style="text-align:left">{_fmt([n for n, _ in NLB_SWEEP])}</td>'
-        f'<td style="text-align:left">{int(portfolio.load_financial_model().get("news_lookback_days", 21))}</td></tr>'
-        '</tbody></table>')
+        # news_lookback_days is a re-curation sweep (§12); shown only when it is actually swept. Currently the
+        # compounder run holds it at the profile value (no nlb re-curations yet), so the row is omitted.
+        + (f'<tr><td style="text-align:left">news_lookback_days <span style="color:#9a6a00;">(re-curation, §12)</span></td>'
+           f'<td style="text-align:left">{_fmt([n for n, _ in NLB_SWEEP])}</td>'
+           f'<td style="text-align:left">{int(portfolio.load_financial_model().get("news_lookback_days", 21))}</td></tr>'
+           if NLB_SWEEP else '')
+        + '</tbody></table>')
 
     # recommended-settings: the risk/churn-constrained frontier from plots 1-3. Keep only configs with shallow
     # drawdown AND low churn on BOTH norms (|maxDD| < REC_MAX_DD, L1 < REC_MAX_L1, L2 < REC_MAX_L2), then list the
