@@ -60,6 +60,12 @@ def main() -> int:
     hold = RUN / "_wf_holdings.csv"
     hold.write_text("ticker,shares\n" + "".join(f"{t},0\n" for t in starter + anchors))
 
+    # Emit the URL->author map from the pool bylines so the dashboard's author-attribution plot (13/14)
+    # populates. Fix at the source: the pools already carry bylines, so no post-run page refetch is needed.
+    authors = {a["url"]: a["author"] for arts in pools.values() for a in arts
+               if a.get("url") and (a.get("author") or "").strip()}
+    (RUN / "_authors.json").write_text(json.dumps(authors, indent=1))
+
     for i, d in enumerate(dates):
         wl = portfolio.reconstruct_watchlist_at(d, starter, str(hist))
         ptext = _titles(pools[d])

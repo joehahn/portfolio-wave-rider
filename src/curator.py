@@ -116,8 +116,9 @@ def build_user_prompt(as_of: str, watchlist: list[str], thesis: str, exclusions:
     if free > 0:
         slot_rule = (f"{free} of the {max_size} managed slots are FREE: you may ADD up to {free} name(s) "
                      f"with NO paired remove; once full, a further add needs a paired remove.")
-        action_rule = ("Fill a free slot with a clearly rising wave vehicle when the pool shows one, or swap "
-                       "a weaker current holding for a stronger name; else no_changes.")
+        action_rule = ("A free slot is NOT a mandate to add: add a name only when the pool shows a clearly rising "
+                       "wave vehicle with a concrete fresh catalyst, or swap a weaker current holding for a "
+                       "decisively stronger name; otherwise prefer no_changes and leave the slot open.")
     else:
         slot_rule = (f"The watchlist is FULL ({max_size}/{max_size} managed slots used). A bare ADD (with no "
                      f"paired REMOVE) is INVALID and will be REJECTED and wasted — the new name will NOT enter "
@@ -139,11 +140,14 @@ def build_user_prompt(as_of: str, watchlist: list[str], thesis: str, exclusions:
         "they fall; left alone it rides a once-rising name back down. Counteract that lag: keep the watchlist "
         "stocked with names in the EARLY buildup of a wave (fresh/accelerating catalysts, pre-run-up) so the "
         "optimizer always has a better-trending alternative to rotate into as older holdings plateau. Favor "
-        "new/accelerating catalysts over already-crested or fully-re-rated names. Ensure BREADTH: add early-stage "
-        "names from DIFFERENT waves to fill open slots so several concurrent early-and-mid waves are represented; "
-        "remove a name only when its thesis breaks or its wave has clearly crested — NOT merely because it "
-        "matured (let the optimizer defund maturing names via its weighting; do not churn them off the watchlist "
-        "yourself).")
+        "new/accelerating catalysts over already-crested or fully-re-rated names. When you DO add, prefer names "
+        "spanning DIFFERENT waves so several concurrent early-and-mid waves are represented. But an EMPTY SLOT is "
+        "better than a WEAK NAME: the watchlist is a quality-gated candidate menu, NOT a quota to fill. The "
+        "optimizer funds only the few best-trending names and leaves the rest near 0, so padding the list with "
+        "marginal tickers just adds noise and risks the short-lookback optimizer chasing a fluke. Add ONLY a name "
+        "with a concrete, fresh catalyst you can cite; when in doubt, leave the slot open. Remove a name only when "
+        "its thesis breaks or its wave has clearly crested, NOT merely because it matured (let the optimizer "
+        "defund maturing names via its weighting; do not churn them off the watchlist yourself).")
     return f"""{_retry}{intro}
 - as_of_date: {as_of}
 - current_watchlist: {watchlist}

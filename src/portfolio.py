@@ -4637,6 +4637,16 @@ def build_curator_dashboard(
                 _author_by_key[_url_key(_k)] = _v
     except Exception:  # noqa: BLE001
         pass
+    # Supplement with bylines harvested directly from the run's in-dir pool files (the authoritative source;
+    # covers runs whose _authors.json was never written). Any explicit _authors.json entry takes precedence.
+    try:
+        for _pf in sorted(Path(runs_dir).glob("*-pool.json")):
+            for _a in json.loads(_pf.read_text()).get("articles", []):
+                _u, _au = _a.get("url"), (_a.get("author") or "").strip()
+                if _u and _au:
+                    _author_by_key.setdefault(_url_key(_u), _au)
+    except Exception:  # noqa: BLE001
+        pass
     try:                                                  # gkg_pool.is_source_name for byline filtering
         import sys as _sys
         _sp = str(Path(__file__).resolve().parent.parent / "scripts")
