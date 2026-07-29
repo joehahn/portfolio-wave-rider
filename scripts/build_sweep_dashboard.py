@@ -25,7 +25,9 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 from src import portfolio  # noqa: E402
 
-CAPS = [0.5, 0.67, 0.8, 0.9, 1.0]
+# INTERIM COMPOUNDER REPOINT (titles+live geosplit proto runs, pending Wayback). Revert CAPS / MWS_SWEEP /
+# NLB_SWEEP / LLM_RUNS / --runs-dir to the gkg-3yr clean runs after the clean re-curation.
+CAPS = [0.333, 0.5, 0.667, 0.8, 1.0]            # includes the canonical 0.333
 LAMBDAS = [0.5, 0.75, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0]
 LOOKBACKS = [14, 30, 60, 90, 120, 150]          # calendar days
 _FM = portfolio.load_financial_model()                       # single profile read (anchors + CURRENT below)
@@ -43,7 +45,7 @@ REC_MAX_DD, REC_MAX_L1, REC_MAX_L2 = 40.0, 700.0, 900.0   # |maxDD|% , L1 turnov
 LLM_RUNS = [   # row 0 = the DEFAULT curator. The multi-LLM comparison (Sonnet gkg-2yr-weekly + deepseek
                # gkg-3yr-deepseek) is preserved in archived/sweep_pwr-with-LLM-comparison.html; those runs
                # were retired from local storage. Re-add rows + re-run to refresh the comparison on this window.
-    ("moonshotai/kimi-k2.5 (default)", "data/curator_runs/gkg-3yr-final", "OpenRouter", 0.57, 2.85),
+    ("moonshotai/kimi-k2.5 (default)", "data/curator_runs/proto-mws20", "OpenRouter", 0.57, 2.85),
 ]
 CURRENT = (float(_FM["concentration_cap"]), float(_FM["risk_aversion"]),
            int(_FM["optimizer_lookback_days"]))   # the live investor_profile.md config (cap / λ / lookback-days)
@@ -54,18 +56,15 @@ BLUE, GREEN, RED, GREY = "#1f77b4", "#2b8a3e", "#c92a2a", "#adb5bd"
 # max_watchlist_size sweep (section 6): unlike cap/lambda/lookback, this knob changes the CURATOR's
 # decisions, so each cap is a separate RE-CURATION (LLM cost), not a free replay. cap 5 = the canonical
 # run; the rest are re-curated into gkg-3yr-mws{cap}. Tests whether more slots let the curator add NVDA.
-MWS_SWEEP = [(2, "data/curator_runs/gkg-3yr-mws2"), (3, "data/curator_runs/gkg-3yr-mws3"),
-             (4, "data/curator_runs/gkg-3yr-mws4"), (5, "data/curator_runs/gkg-3yr-final"),
-             (6, "data/curator_runs/gkg-3yr-canon14"), (7, "data/curator_runs/gkg-3yr-mws7"),
-             (8, "data/curator_runs/gkg-3yr-mws8"), (10, "data/curator_runs/gkg-3yr-mws10"),
-             (12, "data/curator_runs/gkg-3yr-mws12")]   # mws16 dropped from consideration 2026-07-25
+MWS_SWEEP = [(4, "data/curator_runs/proto-mws4"), (6, "data/curator_runs/proto-mws6"),
+             (8, "data/curator_runs/proto-mws8"), (12, "data/curator_runs/proto-mws12"),
+             (16, "data/curator_runs/proto-mws16"), (20, "data/curator_runs/proto-mws20"),
+             (24, "data/curator_runs/proto-mws24")]   # INTERIM: geosplit titles+live proto runs
 
 # news_lookback_days sweep (section 7): also a CURATOR-param sweep (re-curation), but title-only (no Wayback/
 # live fetch) so it curates on the preserved GKG titles at zero network cost. Each window = a separate
 # re-curation into gkg-3yr-nlb{N}, all at the canonical mws=6 / cap1.0 / λ2.0 / 150d config.
-NLB_SWEEP = [(7, "data/curator_runs/gkg-3yr-nlb7"), (14, "data/curator_runs/gkg-3yr-nlb14"),
-             (21, "data/curator_runs/gkg-3yr-nlb21"), (28, "data/curator_runs/gkg-3yr-nlb28"),
-             (45, "data/curator_runs/gkg-3yr-nlb45"), (90, "data/curator_runs/gkg-3yr-nlb90")]
+NLB_SWEEP = []   # INTERIM: no news_lookback re-curations on the geosplit proto runs yet (section 12 omitted)
 
 
 def _mws_rows():
@@ -353,7 +352,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     # canonical enter the key; non-canonical mws replay at the live CURRENT_MT (held, not swept).
     key = hashlib.md5(_json.dumps([CAPS, LAMBDAS, LOOKBACKS, runs_dir,
                                    [m for m, _ in READY_MWS], MIN_TRADE_FRACS, CURRENT_MT, _mws_fixed,
-                                   "churn-v5-canon6-rot"]).encode()).hexdigest()   # mws6 -> canon14 (new thesis)
+                                   "compounder-v1-proto-mws20"]).encode()).hexdigest()   # INTERIM compounder repoint
     rows_all = spy_ret = None
     if not recompute and cache_p.exists():
         try:
@@ -570,10 +569,10 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
             + f'<td {_lc}>{r["nadd"]} / {r["nrem"]}</td>' + _c2(r["ret"] * 100, "{:+.0f}%")
             + _c2(r["ir"], "{:+.2f}") + _c2(r["tstat"], "{:+.1f}") + _c2(r["sharpe"], "{:.2f}")
             + _c2(r["calmar"], "{:.2f}") + _c2(r["dd"] * 100, "{:.0f}%") + "</tr>")
-    llm_html = (
+    llm_html = "" if len(LLM_RUNS) < 2 else (   # single-model "comparison" is degenerate; omit
         '<h2>13. LLM comparison — curator model (same pools + profile config)</h2>'
         '<p style="color:#555;max-width:920px;">Every model reads the <b>same</b> news pools and replays at '
-        'the profile config (cap 0.8 / λ 2.0 / 30d); the only variable is the curator LLM. The decision '
+        'the profile config; the only variable is the curator LLM. The decision '
         'columns are the ones that matter: <b>agree</b> = share of weeks the model made the identical '
         'add/remove call as the <b>default</b> model (top row, kimi), <b>valid-JSON</b> = share of calls that parsed, '
         '<b>$/run</b> = curator LLM cost of a full 157-week curate, and <b>curator time</b> = wall-clock of '
@@ -614,7 +613,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                   'and profile config, alongside the equal-weight buy/hold starter and SPY. Same idea as the '
                   'curator DB\'s plot 1, without the rebalance markers.</p>'
                   + _fig4.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False}))
-                 if _curved else "")
+                 if (_curved and len(LLM_RUNS) >= 2) else "")
 
     # plot 5 (new): equity-curve race by max_watchlist_size (one curve per re-curated cap) + buy/hold + SPY.
     _mws_pal = ["#d97706", "#9467bd", "#d62728", "#8c564b", "#e377c2", "#17becf"]
@@ -773,7 +772,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         _ntr += (f'<tr style="{_bg}border-bottom:1px solid #eee;"><td {_lc}><b>{r["nlb"]}</b>{_tag}</td>'
                  f'<td>{r["ret"] * 100:+.0f}%</td><td>{r["ir"]:+.2f}</td><td>{r["l1"]:.0f}</td><td>{r["l2"]:.0f}</td>'
                  f'{_flags}<td {_lc}>{", ".join(r["funded"])}</td></tr>')
-    nlb_html = (
+    nlb_html = "" if not NLB_SWEEP else (
         '<h2>12. news_lookback_days sweep</h2>'
         '<p style="color:#555;max-width:940px;">A CURATOR-param sweep (re-curation) at the canonical '
         'mws&nbsp;6 / cap&nbsp;1.0 / λ&nbsp;2.0 / 150d config. <b>All six windows (7 / 14 / 21 / 28 / 45 / 90d) now '
@@ -1059,17 +1058,18 @@ th{{text-align:right;padding:6px 10px;border-bottom:2px solid #ccc;white-space:n
 <p style="color:#555;max-width:860px;">{len(rows_all)} configs: concentration_cap × risk_aversion (λ) × optimizer_lookback
 ({_grid3d} combinations) replayed across all {len(_mws_present)} <b>max_watchlist_size</b> curation sets, plus
 <b>min_trade_size_frac</b> swept as a 4th axis on the canonical watchlist ({len(MIN_TRADE_FRACS)} values).
-<b>Note:</b> the canonical mws&nbsp;{_mws_fixed} set is the <b>new-thesis</b> curation (canon14, so its numbers
-match the CBT); the other watchlist sizes are still the older-thesis sweep, so cross-size comparisons in
-plots 1-3 mix theses. These knobs touch only the mean-variance replay, not the curator, so the whole grid
-costs <b>$0</b> (no LLM — the
-curations already exist; only expanding max_watchlist_size itself, section 6, re-curates). Metrics are
-benchmark-relative: <b>Information Ratio</b> = annualized active return ÷ tracking error vs SPY (consistency of
-beating the benchmark). SPY returned {spy_ret*100:+.0f}% over the window. ★ = best in column.</p>
-<p style="color:#b45309;max-width:860px;"><b>All in-sample.</b> These rank candidate configs to
-<b>forward-test</b>; they don't prove an optimum. Read the <b>IR t-stat</b> (|t|&gt;2 ≈ real vs luck),
-the bootstrap <b>CI</b> (error bar on annualized return), and <b>H1/H2 stable</b> (does the edge hold in
-both halves) before trusting any row.</p>
+All {len(_mws_present)} watchlist sizes are the SAME geosplit thesis (one coherent curation family), so
+cross-size comparisons in plots 1-3 are clean. These knobs touch only the mean-variance replay, not the
+curator, so the whole grid costs <b>$0</b> (no LLM — the curations already exist; only expanding
+max_watchlist_size itself, section 11, re-curates). Metrics are benchmark-relative: <b>Information Ratio</b>
+= annualized active return ÷ tracking error vs SPY (consistency of beating the benchmark). SPY returned
+{spy_ret*100:+.0f}% over the window. ★ = best in column.</p>
+<p style="color:#b45309;max-width:860px;background:#fffbeb;border:1px solid #fde68a;padding:.6em .8em;border-radius:6px;">
+<b>Interim, biased-lede.</b> This is the compounder gridsearch on the <code>proto-mws{{N}}</code> curations
+(geosplit titles + look-ahead-<b>biased live ledes</b>), pending the clean Wayback pass. Absolute returns are
+OPTIMISTIC; the cross-config <b>ranking</b> is the robust signal. Sections that need clean re-curations
+(news_lookback §12, blind judge §15), plus the single-model LLM comparison §13-14, are omitted for now. Canonical config: mws&nbsp;{_mws_fixed} / cap&nbsp;{CURRENT[0]}
+/ λ&nbsp;{CURRENT[1]} / {CURRENT[2]}d. <b>All in-sample</b> — these rank candidates to <b>forward-test</b>, not an optimum.</p>
 {grid_html}
 <h2>1. Return vs drawdown</h2>
 <p style="color:#555;max-width:920px;">The horizontal axis is <b>max drawdown</b> — the portfolio&#39;s biggest
@@ -1125,7 +1125,7 @@ Current config: {_cur_l2:.0f}/yr.</p>
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("--runs-dir", default="data/curator_runs/gkg-3yr-final")  # the DEFAULT curator's curations (kimi)
+    ap.add_argument("--runs-dir", default="data/curator_runs/proto-mws20")  # INTERIM canonical (mws20 geosplit titles+live)
     ap.add_argument("--out", default=str(ROOT / "docs" / "sweep_pwr.html"))
     ap.add_argument("--recompute", action="store_true", help="re-run the 150 backtests (else use cache)")
     a = ap.parse_args()

@@ -72,6 +72,7 @@ def main() -> int:
         cur = curator.curate(ptext, wl, as_of=d, model=model, max_size=ms, anchors=anchors,
                              thesis=thesis, exclusions=excl, cadence=cadence,
                              intro=curator.LIVE_INTRO, no_reasoning=True)
+        _nret = 0
         for _ in range(2):        # reject-and-retry (same discipline as the other curation paths)
             chk = portfolio.apply_curator_decisions(cur, holdings_path=str(hold), history_path=str(hist),
                   profile_path="investor_profile.md", listing_check=False, as_of_date=d,
@@ -83,6 +84,8 @@ def main() -> int:
             cur = curator.curate(ptext, wl, as_of=d, model=model, max_size=ms, anchors=anchors,
                                  thesis=thesis, exclusions=excl, cadence=cadence,
                                  intro=curator.LIVE_INTRO, no_reasoning=True, retry_feedback=fb)
+            _nret += 1
+        cur["_retries"] = _nret       # harness metadata (BTS 'complete' gate + reject-and-retry counts)
         cur["as_of_date"] = d
         (RUN / f"{d}-curation.json").write_text(json.dumps(cur, indent=2))
         portfolio.apply_curator_decisions(cur, holdings_path=str(hold), history_path=str(hist),
