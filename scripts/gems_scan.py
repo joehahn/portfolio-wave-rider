@@ -1,12 +1,12 @@
 import json
 import pandas as pd
 from src import portfolio
-CAPS=[0.5,0.67,0.8,0.9,1.0]; LAMBDAS=[0.5,0.75,1.0,1.5,2.0]; LOOKBACKS=[14,30,60,90,120,150]
+CAPS=[0.333,0.5,0.8,1.0]; LAMBDAS=[0.5,1.0,2.0,4.0]; LOOKBACKS=[14,30,90]   # modest grid; gems = max $/ticker
 _FM=portfolio.load_financial_model()                       # anchors + rf/lag from the profile (cap/λ/lb are swept)
 ANCHORS=_FM.get('always_include') or ['SPY','AGG','IAU']; ANC=set(ANCHORS)
 _RF=float(_FM['risk_free_rate']); _TU=int(portfolio.load_backtest_config()['t_update_days'])
-MWS=[(2,'gkg-3yr-mws2'),(3,'gkg-3yr-mws3'),(4,'gkg-3yr-mws4'),(5,'gkg-3yr-final'),(6,'gkg-3yr-mws6'),
-     (7,'gkg-3yr-mws7'),(8,'gkg-3yr-mws8'),(10,'gkg-3yr-mws10'),(12,'gkg-3yr-mws12')]
+MWS=[(4,'proto-mws4'),(6,'proto-mws6'),(8,'proto-mws8'),(12,'proto-mws12'),   # clean geosplit compounder runs
+     (16,'proto-mws16'),(20,'proto-mws20'),(24,'proto-mws24')]
 best={}; n_ok=0; n_fail=0
 for mws,d in MWS:
     rd=f'data/curator_runs/{d}'

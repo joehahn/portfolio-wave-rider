@@ -27,9 +27,9 @@ from src import portfolio  # noqa: E402
 
 # INTERIM COMPOUNDER REPOINT (titles+live geosplit proto runs, pending Wayback). Revert CAPS / MWS_SWEEP /
 # NLB_SWEEP / LLM_RUNS / --runs-dir to the gkg-3yr clean runs after the clean re-curation.
-CAPS = [0.333, 0.5, 0.667, 0.8, 1.0]            # includes the canonical 0.333
-LAMBDAS = [0.5, 0.75, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0]
-LOOKBACKS = [14, 30, 60, 90, 120, 150]          # calendar days
+CAPS = [0.1, 0.25, 0.333, 0.5, 0.667, 0.8, 1.0]   # includes the canonical 0.333
+LAMBDAS = [0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0]
+LOOKBACKS = [7, 14, 30, 60, 90, 120, 150]          # calendar days
 _FM = portfolio.load_financial_model()                       # single profile read (anchors + CURRENT below)
 ANCHORS = _FM.get("always_include") or ["SPY", "AGG", "IAU"]  # from the profile
 _RF = float(_FM["risk_free_rate"])                           # rf + exec-lag from the profile (NOT swept params)
@@ -49,7 +49,7 @@ LLM_RUNS = [   # row 0 = the DEFAULT curator. The multi-LLM comparison (Sonnet g
 ]
 CURRENT = (float(_FM["concentration_cap"]), float(_FM["risk_aversion"]),
            int(_FM["optimizer_lookback_days"]))   # the live investor_profile.md config (cap / λ / lookback-days)
-MIN_TRADE_FRACS = [0.0, 0.01, 0.02, 0.05, 0.10, 0.15, 0.20]   # no-trade-band sweep (min rebalancing trade / book)
+MIN_TRADE_FRACS = [0.0, 0.025, 0.05, 0.10, 0.15, 0.20]   # no-trade-band sweep (min rebalancing trade / book)
 CURRENT_MT = float(_FM["min_trade_size_frac"])   # live no-trade band; the 4th swept grid axis (canonical mws only)
 BLUE, GREEN, RED, GREY = "#1f77b4", "#2b8a3e", "#c92a2a", "#adb5bd"
 
@@ -350,50 +350,71 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     # config-independent, so a live-config change reuses the cache and only re-flags `cur` (set post-load below).
     # min_trade is swept only on the canonical mws (_mws_fixed), so both the frac list and which mws is
     # canonical enter the key; non-canonical mws replay at the live CURRENT_MT (held, not swept).
-    key = hashlib.md5(_json.dumps([CAPS, LAMBDAS, LOOKBACKS, runs_dir,
-                                   [m for m, _ in READY_MWS], MIN_TRADE_FRACS, CURRENT_MT, _mws_fixed,
-                                   "compounder-v1-proto-mws20"]).encode()).hexdigest()   # INTERIM compounder repoint
-    rows_all = spy_ret = None
+    # PER-CONFIG cache: each config's metrics are keyed on its own (mws,cap,λ,lookback,mt) tuple, so
+    # EXPANDING the grid (new caps/λ/lookbacks/min_trades) recomputes ONLY the new configs and reuses every
+    # already-cached one (an INCREMENTAL sweep). `formula`+`runs_dir` invalidate the whole cache if the metric
+    # code or the underlying curations change; a legacy cache (missing those fields) is trusted once. --recompute
+    # forces a full re-sweep. `cur`/CURRENT are excluded (display flag, re-set post-load below).
+    FORMULA_VERSION = "clean-geosplit-v1"
+    _cached, _skipped, spy_ret = {}, set(), None
     if not recompute and cache_p.exists():
         try:
             c = _json.loads(cache_p.read_text())
-            if c.get("key") == key:
-                rows_all, spy_ret = c["rows"], c["spy_ret"]
-                print(f"  loaded {len(rows_all)} configs from cache (--recompute to re-sweep)")
+            if c.get("runs_dir", runs_dir) == runs_dir and c.get("formula", FORMULA_VERSION) == FORMULA_VERSION:
+                spy_ret = c.get("spy_ret")
+                for r in c.get("rows", []):
+                    _cached[(r["mws"], r["cap"], r["lam"], r["lb"], r.get("mt", CURRENT_MT))] = r
+                _skipped = {tuple(k) for k in c.get("skipped", [])}   # remember infeasible corners
         except Exception:  # noqa: BLE001
             pass
-    if rows_all is None:
-        rows_all, spy_curve = [], None
-        for _m, _mdir in READY_MWS:
-            # min_trade_size_frac is the 4th swept axis but ONLY on the canonical watchlist (_mws_fixed): there
-            # the frontier can trade it off against cap/λ/lookback. Every other mws replays at the live CURRENT_MT
-            # (held, not swept) so the mws-comparison plots 1-3 stay a clean 3-D cloud at one min_trade.
-            _mts = MIN_TRADE_FRACS if _m == _mws_fixed else [CURRENT_MT]
-            for cap in CAPS:
-                for lam in LAMBDAS:
-                    for lb in LOOKBACKS:
-                        for mt in _mts:
-                            _tag = f"{_m}_{cap}_{lam}_{lb}_{mt}"
+    rows_all, spy_curve, _n_new, _n_skip = [], None, 0, 0
+    for _m, _mdir in READY_MWS:
+        # min_trade_size_frac is the 4th swept axis but ONLY on the canonical watchlist (_mws_fixed); every
+        # other mws replays at the live CURRENT_MT (held) so plots 1-3 stay a clean 3-D cloud at one min_trade.
+        _mts = MIN_TRADE_FRACS if _m == _mws_fixed else [CURRENT_MT]
+        for cap in CAPS:
+            for lam in LAMBDAS:
+                for lb in LOOKBACKS:
+                    for mt in _mts:
+                        _ck = (_m, cap, lam, lb, mt)
+                        if _ck in _cached:                 # incremental: reuse an already-swept config
+                            rows_all.append(_cached[_ck])
+                            continue
+                        if _ck in _skipped:                # known-infeasible corner: don't re-attempt each render
+                            _n_skip += 1
+                            continue
+                        _tag = f"{_m}_{cap}_{lam}_{lb}_{mt}"
+                        try:
                             res = portfolio.curator_backtest(
                                 runs_dir=_mdir, out_dir=f"/tmp/_sweep/{_tag}",
                                 max_weight=cap, risk_aversion=lam, risk_free_rate=_RF, t_update_days=_TU,
                                 benchmarks=["SPY"], lookback_years_override=lb / 365.0, always_include=ANCHORS,
                                 min_trade_frac=mt)
                             snaps = pd.read_csv(Path(f"/tmp/_sweep/{_tag}") / "snapshots.csv", parse_dates=["date"])
-                            totals = snaps.groupby("date")["total_value"].first().sort_index()
-                            if spy_curve is None:   # identical window across all mws dirs -> compute SPY once
-                                spy_curve = portfolio._fetch_benchmark_curves(["SPY"], totals.index[0], totals.index[-1],
-                                                                              float(totals.iloc[0]))["SPY"]
-                            m = _metrics(totals, spy_curve, res["annualized_return"], res["max_drawdown"])
-                            _l1, _l2 = _churn_metrics(snaps)
-                            rows_all.append({"mws": _m, "cap": cap, "lam": lam, "lb": lb, "mt": mt,
-                                             "ret": res["realized_return"],
-                                             "ann": res["annualized_return"], "dd": res["max_drawdown"],
-                                             "l1": _l1, "l2": _l2, **m, **_rotation_metrics(snaps),
-                                             "cur": (cap, lam, lb) == CURRENT and mt == CURRENT_MT and _m == _mws_fixed})
+                        except Exception:  # noqa: BLE001 — infeasible corner (e.g. cap 0.1 with too few names to
+                            _skipped.add(_ck)   # reach 100%, or a 7d lookback with degenerate covariance): remember
+                            _n_skip += 1        # it so future renders skip it instead of re-attempting
+                            continue
+                        totals = snaps.groupby("date")["total_value"].first().sort_index()
+                        if spy_curve is None:   # identical window across all mws dirs -> compute SPY once
+                            spy_curve = portfolio._fetch_benchmark_curves(["SPY"], totals.index[0], totals.index[-1],
+                                                                          float(totals.iloc[0]))["SPY"]
+                        m = _metrics(totals, spy_curve, res["annualized_return"], res["max_drawdown"])
+                        _l1, _l2 = _churn_metrics(snaps)
+                        rows_all.append({"mws": _m, "cap": cap, "lam": lam, "lb": lb, "mt": mt,
+                                         "ret": res["realized_return"],
+                                         "ann": res["annualized_return"], "dd": res["max_drawdown"],
+                                         "l1": _l1, "l2": _l2, **m, **_rotation_metrics(snaps),
+                                         "cur": (cap, lam, lb) == CURRENT and mt == CURRENT_MT and _m == _mws_fixed})
+                        _n_new += 1
+    if spy_ret is None and spy_curve is not None:
         spy_ret = float(spy_curve.iloc[-1] / spy_curve.iloc[0] - 1.0)
-        cache_p.parent.mkdir(parents=True, exist_ok=True)
-        cache_p.write_text(_json.dumps({"key": key, "spy_ret": spy_ret, "rows": rows_all}))
+    print(f"  incremental sweep: {_n_new} new computed, {len(rows_all) - _n_new} reused, "
+          f"{_n_skip} skipped (infeasible corner) -> {len(rows_all)} configs")
+    cache_p.parent.mkdir(parents=True, exist_ok=True)
+    cache_p.write_text(_json.dumps({"formula": FORMULA_VERSION, "runs_dir": runs_dir,
+                                    "spy_ret": spy_ret, "rows": rows_all,
+                                    "skipped": [list(k) for k in _skipped]}))
     # `cur` marks the live-config point. It is a DISPLAY flag, not grid data (which is config-independent
     # and cached), so set it here — this reflects the current profile / CURRENT even on a cache hit.
     for r in rows_all:
@@ -493,7 +514,31 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     _cur_row = next(r for r in rows_all if r["cur"])
     _lc = 'style="text-align:left"'
     # (label, cell-format, value fn); maxDD ranks by least-negative (higher r['dd'] = shallower loss = better)
-    _MET = [("IR", "{:+.2f}", lambda r: r["ir"]),
+    # PLATEAU robustness: score each config by how well its GRID NEIGHBORS also do (same mws, one ±1 step in
+    # cap / λ / lookback / min_trade). A lone in-sample spike (great alone, weak neighbors) ranks BELOW a broad
+    # high plateau (robust to parameter mis-specification -> more likely to hold FORWARD). The anti-overfit lever
+    # for choosing a config from a grid. plateau = ½·own IR + ½·mean(neighbor IR).
+    _by_key = {(r["mws"], r["cap"], r["lam"], r["lb"], r.get("mt", CURRENT_MT)): r for r in rows_all}
+    _axes = [CAPS, LAMBDAS, LOOKBACKS, MIN_TRADE_FRACS]   # positions 1..4 of the key (cap,λ,lb,mt)
+    for r in rows_all:
+        _key = (r["mws"], r["cap"], r["lam"], r["lb"], r.get("mt", CURRENT_MT))
+        _nb = []
+        for _ai, _vals in enumerate(_axes):
+            _v = _key[_ai + 1]
+            _pos = _vals.index(_v) if _v in _vals else -1
+            if _pos < 0:
+                continue
+            for _j in (_pos - 1, _pos + 1):
+                if 0 <= _j < len(_vals):
+                    _nk = list(_key); _nk[_ai + 1] = _vals[_j]
+                    _n = _by_key.get(tuple(_nk))
+                    if _n is not None and _n["ir"] == _n["ir"]:
+                        _nb.append(_n["ir"])
+        _own = r["ir"] if r["ir"] == r["ir"] else None
+        r["plateau"] = ((0.5 * _own + 0.5 * sum(_nb) / len(_nb)) if _nb else _own) if _own is not None else float("nan")
+    _MET = [("plateau", "{:+.2f}", lambda r: r["plateau"]),
+            ("IR", "{:+.2f}", lambda r: r["ir"]),
+            ("Gain/Pain", "{:.2f}", lambda r: r.get("pf", float("nan")) - 1.0),  # GPR = profit factor - 1 (Schwager)
             ("t-stat", "{:+.1f}", lambda r: r["tstat"]),
             ("Sharpe", "{:.2f}", lambda r: r["sharpe"]),
             ("Calmar", "{:.2f}", lambda r: r["calmar"]),
@@ -501,7 +546,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
             ("maxDD", "{:.0f}%", lambda r: r["dd"] * 100)]
     _passed = [r for r in rows_all
                if abs(r["dd"]) * 100 < REC_MAX_DD and r["l1"] < REC_MAX_L1 and r["l2"] < REC_MAX_L2]
-    _passed.sort(key=lambda r: -(r["ir"] if r["ir"] == r["ir"] else -9e9))
+    _passed.sort(key=lambda r: -(r["plateau"] if r["plateau"] == r["plateau"] else -9e9))
     # best-in-column among survivors (all six value fns are "higher = better", maxDD included), for the ★
     _colbest = {_m: max(_passed, key=lambda r, fn=_fn: (fn(r) if fn(r) == fn(r) else -9e9))
                 for _m, _, _fn in _MET} if _passed else {}
@@ -538,8 +583,13 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         f'keep only configs in the safe corner &mdash; <b>|maxDD| &lt; {REC_MAX_DD:.0f}% AND L1 &lt; {REC_MAX_L1:.0f} '
         f'AND L2 &lt; {REC_MAX_L2:.0f}</b> (shallow drawdown, low churn on both norms). '
         f'<b>{len(_passed)} of {len(rows_all)}</b> configs survive (by watchlist size &mdash; {_mws_survivors}), '
-        'listed once, sorted by IR. ★ = best in that column among the survivors, so you can eyeball the top IR / '
-        't-stat / Sharpe / Calmar / ann / shallowest-DD without re-sorting. <b>min_trade_size_frac</b> is swept as a '
+        'listed once, sorted by <b>plateau</b> = ½·own&nbsp;IR + ½·mean(grid-neighbor&nbsp;IR) over the config&#39;s '
+        '&plusmn;1-step cap/&lambda;/lookback/min_trade neighbors. A lone in-sample spike (high IR, weak neighbors) '
+        'sinks below a broad high <b>plateau</b> &mdash; the anti-overfit rank, since a robust region is likelier to '
+        'hold FORWARD than a fragile peak. <b>Gain/Pain</b> = Schwager&#39;s Gain-to-Pain Ratio (total gain &divide; sum '
+        'of all down-moves = profit&nbsp;factor&nbsp;&minus;&nbsp;1); unlike Calmar (worst single drawdown) it counts '
+        '<b>every</b> loss, so it rewards greatest-gains-with-fewest-losses. ★ = best in that column among the survivors '
+        '(eyeball the top plateau / IR / Gain-Pain / t-stat / Sharpe / Calmar / ann / shallowest-DD). <b>min_trade_size_frac</b> is swept as a '
         f'4th axis on the canonical watchlist (mws&nbsp;{_mws_fixed}); every other size is held at the live '
         f'{CURRENT_MT:g}. These stay in-sample &mdash; a forward-test shortlist, not an auto-switch. Note the '
         '<b>live config</b> (ws&nbsp;'
