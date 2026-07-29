@@ -12,6 +12,7 @@ Usage: python scripts/build_compounder_sweep_preview.py
 """
 import json
 import sys
+from datetime import datetime
 from pathlib import Path
 
 import plotly.graph_objects as go
@@ -27,8 +28,13 @@ OUT = ROOT / "docs" / "sweep_compounder_preview.html"
 
 def main() -> int:
     rows = json.loads(SWEEP.read_text())
+    # window length (years) from the proto run's starter, so annualized return carries no magic constant
+    _st = json.loads((ROOT / "data/curator_runs/proto-mws20/_starter.json").read_text())
+    _d0, _d1 = (datetime.strptime(_st[k], "%Y-%m-%d") for k in ("start_date", "end_date"))
+    _yrs = max((_d1 - _d0).days / 365.25, 1e-9)
     for r in rows:
         r["cal1"] = r["ret1"] / max(abs(r["gb1"]), 0.02)   # trailing-year return per unit round-trip
+        r["ann"] = (1.0 + r["ret"]) ** (1.0 / _yrs) - 1.0   # annualized (linear-plottable, matches canonical BTS)
 
     fm = portfolio.load_financial_model()
     CAN = (int(fm["max_watchlist_size"]), float(fm["concentration_cap"]), float(fm["risk_aversion"]),
@@ -71,9 +77,9 @@ def main() -> int:
                         legend={"title": {"text": colortitle}, "x": 1.02, "xanchor": "left", "y": 1})
         return f.to_html(full_html=False, include_plotlyjs="cdn", config={"displayModeBar": False})
 
-    # Plot 1: 3-year return vs full max-giveback, colored by watchlist size (the return/drawdown frontier).
-    p1 = scatter(lambda r: r["gb"], lambda r: r["ret"], "max giveback (full window) — risk →",
-                 "3-year return (log) →", lambda r: r["mws"], "watchlist<br>size", ylog=True, ypct=False)
+    # Plot 1: annualized return vs full max-giveback, colored by watchlist size (the return/drawdown frontier).
+    p1 = scatter(lambda r: r["gb"], lambda r: r["ann"], "max giveback (full window) — risk →",
+                 "annualized return →", lambda r: r["mws"], "watchlist<br>size", ylog=False, ypct=True)
     # Plot 2: trailing-year return vs trailing-year giveback, colored by cap (the drawdown-aware, recent slice).
     p2 = scatter(lambda r: r["gb1"], lambda r: r["ret1"], "trailing-year giveback — risk →",
                  "trailing-year return →", lambda r: r["cap"], "concentration<br>cap")
@@ -116,9 +122,9 @@ def main() -> int:
                f"3y {canon['ret']*100:+.0f}%, 1y {canon['ret1']*100:+.0f}%, 1y giveback {canon['gb1']*100:.0f}%, "
                f"breadth {canon['breadth_waves']:.1f} waves")
 
-    nav = dash_nav.render("", built=True)
-    html = (f"{nav}"
-            '<h1 style="margin:.2em 0;">Parameter sweep — compounder preview (interim)</h1>'
+    nav = dash_nav.render("", built=False)   # the doc shell renders its own "dashboard built" stamp
+    ts = datetime.now().strftime("%Y-%m-%d %H:%M")
+    body = ('<h1 style="margin:.2em 0;">Parameter sweep — compounder preview (interim)</h1>'
             f'<p style="color:#b45309;max-width:900px;background:#fffbeb;border:1px solid #fde68a;'
             'padding:.6em .8em;border-radius:6px;">'
             '<b>Interim, biased-lede.</b> This renders the 5,600-config zero-cost grid '
@@ -138,7 +144,16 @@ def main() -> int:
             'trailing-year giveback. Low cap pushes breadth up and giveback toward zero &mdash; the compounder '
             'thesis in one plot (though the deepest-return configs still round-trip).</p>' + p3
             + t_dd + t_ret)
-    OUT.write_text(html)
+    # Wrap in the SAME document shell / font as the canonical BTS (docs/sweep_pwr.html) so the styling matches.
+    page = (f'<!doctype html><html><head><meta charset="utf-8">'
+            f'<title>Parameter sweep — compounder preview</title>\n'
+            '<style>body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;max-width:1180px;'
+            'margin:0 auto;padding:0 1.5em;color:#222;line-height:1.5}h1,h2{color:#111}'
+            'table{border-collapse:collapse;font-size:13px;width:100%}'
+            'th{text-align:right;padding:6px 10px;border-bottom:2px solid #ccc;white-space:nowrap}'
+            'th:first-child{text-align:left}.built{position:absolute;top:8px;right:16px;font-size:12px;color:#888}'
+            f'</style></head><body><div class="built">dashboard built {ts}</div>{nav}{body}</body></html>')
+    OUT.write_text(page)
     print(f"wrote {OUT}  ({len(rows)} configs; canonical {'FOUND' if canon else 'MISSING'})")
     return 0
 
