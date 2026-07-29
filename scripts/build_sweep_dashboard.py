@@ -413,7 +413,8 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     import plotly.graph_objects as go
     # discrete, distinct palette keyed by watchlist size (grey fallback for any unlisted size); 5 = live = green
     MWS_COLORS = {2: "#8c564b", 3: "#1f77b4", 4: "#17becf", 5: "#2b8a3e", 6: "#bcbd22",
-                  7: "#ff7f0e", 8: "#d62728", 10: "#9467bd", 12: "#e377c2"}
+                  7: "#ff7f0e", 8: "#d62728", 10: "#9467bd", 12: "#e377c2",
+                  16: "#ff7f0e", 20: "#9467bd", 24: "#8c564b"}   # compounder sizes (were grey fallback)
     _mws_present = sorted({r["mws"] for r in rows_all})
 
     def _mws_scatter(xfn, xtitle, xhover, first):
