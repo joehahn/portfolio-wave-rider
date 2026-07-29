@@ -752,7 +752,9 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     if _done:
         import plotly.graph_objects as _mgo
         _mfig = _mgo.Figure(_mgo.Bar(
-            x=[r["cap"] for r in _done], y=[r["ret"] * 100 for r in _done], marker_color=BLUE,
+            x=[r["cap"] for r in _done], y=[r["ret"] * 100 for r in _done],
+            marker_color=[GREEN if r["cap"] == _mws_fixed else BLUE for r in _done],   # live mws highlighted
+            text=["live" if r["cap"] == _mws_fixed else "" for r in _done], textposition="outside",
             hovertemplate="watchlist %{x}: %{y:+.0f}%<extra></extra>"))
         _mfig.update_layout(template="seaborn", height=360, margin={"t": 20, "l": 60, "r": 20},
                             xaxis={"title": "max_watchlist_size", "dtick": 1},
