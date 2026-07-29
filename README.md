@@ -5,9 +5,26 @@
 **Date:** 2026-May-14 <br>
 **branch:** main
 
-This project uses AI to manage a curated watchlist of tickers. You declare your goals, constraints, and an investment thesis (what you think will drive future returns), then initialize a starter watchlist you want exposure to. The two halves have a deliberate division of labor. The **curator** is the AI, and it is forward-looking: at each rebalance it reads recent news against your thesis and evolves the watchlist, hunting tickers in the early buildup of a wave that may rise soon and preferring the news sources you trust. The **optimizer** is strictly backward-looking: a standard mean-variance model that sets the weights from trailing returns and covariances, pure math, no AI. So the AI decides *which* tickers the optimizer may choose among, and the math decides the weights. The results accumulate into static Plotly dashboards where you can watch the watchlist composition, the recommended weights, and the realized portfolio value evolve over time, and where realized gains are attributed to the news sources, authors, keywords, and waves behind each pick. In our experiments this coupling of AI curation with standard optimization significantly outperforms the optimizer on its own.
+This project uses AI to manage a curated watchlist of tickers. You declare your goals, constraints, and an investment thesis (what you think will drive future returns), then initialize a starter watchlist you want exposure to. This solution's two halves have a deliberate division of labor. The **curator** is the AI, and it is forward-looking: at each rebalance it reads recent news against your thesis and evolves the watchlist, hunting tickers in the early buildup of a wave that may rise soon and preferring the news sources you trust. The **optimizer** is strictly backward-looking: a standard mean-variance model that sets the weights from trailing returns and covariances, pure math, no AI. So the AI decides *which* tickers the optimizer may choose among, and the math decides the weights. The results accumulate into static Plotly dashboards where you can watch the watchlist composition, the recommended weights, and the realized portfolio value evolve over time, and where realized gains are attributed to the news sources, authors, keywords, and waves behind each pick. In our experiments this coupling of AI curation with standard optimization significantly outperforms the optimizer on its own.
 
-**Who this helps.** An investor who has a thesis about where markets are going but not enough time to track the news, or who wants help optimizing a portfolio. This demo helps that investor move from a static buy-and-hold portfolio to one that is lightly but effectively managed by AI. In the 3-year backtest below (2023 to 2026) the AI-managed portfolio outperforms a buy-and-hold of the starter watchlist by a wide margin; the current figure lives on the [curator-backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_gkg_3yr_kimi.html), since it moves whenever the config or thesis is tuned. Read that lift as one favorable wave the curator caught and held rather than a broad edge: most of it sits in a single position, and the whole result is in-sample. The caveats section is honest about both. The curator's job is to compound a thesis you already hold, not to invent one you don't.
+**Who this helps.** An investor who has a thesis about where markets are going but not enough time to track the news, or who wants help optimizing a portfolio. This demo helps that investor move from a static buy-and-hold portfolio to one that is lightly but effectively managed by AI. In the 3-year backtest below (2023 to 2026) the AI-managed portfolio outperforms a buy-and-hold of the starter watchlist by a wide margin. The curator's job is to compound a thesis you already hold, not to invent one you don't.
+
+**The dashboards.** The results are served from GitHub Pages in three families, each running the same retriever-then-curator pipeline on a different slice of time.
+
+*Backtest* (the historical GDELT-GKG plus Wayback replay, 2023 to 2026):
+
+- **[Retriever, RBT](https://joehahn.github.io/portfolio-wave-rider/retrieval_pwr.html)**: the date-clean GKG plus Wayback news corpus the backtest curator reads, with coverage, sources, and per-window article counts. Mechanical, no LLM.
+- **[Curator, CBT](https://joehahn.github.io/portfolio-wave-rider/backtest_gkg_3yr_kimi.html)**: the curator's watchlist decisions replayed over the window, portfolio value against buy-and-hold and SPY, the watchlist Gantt, and per-wave profit and loss.
+- **[Sweeps](https://joehahn.github.io/portfolio-wave-rider/sweep_pwr.html)**: a zero-cost sweep of the optimizer knobs (cap, `λ`, lookback), a curator-LLM comparison, and a blind, leak-free judge that scores each curator's reasoning with the market outcome hidden.
+
+*Bootstrap* (a recent backtest tail stitched to ongoing daily forward ingests, so the curve keeps extending in real time):
+
+- **[Retriever, RBS](https://joehahn.github.io/portfolio-wave-rider/retrieval_bootstrap.html)**: the bootstrap's news corpus, the backtest tail plus the daily live ingests that carry it forward.
+- **[Curator, CBS](https://joehahn.github.io/portfolio-wave-rider/curator_bootstrap.html)**: the curator seeded from the latest backtest recommendation, then carried forward biweekly on fresh news, its equity curve extending as new snapshots land.
+
+*Forwardtest* (the live, genuinely out-of-sample test):
+
+- **[Dashboard, FT](https://joehahn.github.io/portfolio-wave-rider/forward_dashboard.html)**: the live portfolio, value against SPY, the current allocation, and the trades needed to align with the latest optimizer recommendation.
 
 ## How it works, at a glance
 
@@ -30,13 +47,6 @@ flowchart LR
 ```
 
 The highlighted box is where the advantage comes from: an LLM reading the news against your thesis to decide *which tickers* the optimizer gets to choose among. The optimizer only ever sets the weights.
-
-Four dashboards are served from GitHub Pages:
-
-- **[Live dashboard](https://joehahn.github.io/portfolio-wave-rider/)**: today's portfolio, its value over time, the latest recommended weights, and the asset-class and wave-bucket breakdowns.
-- **[News retriever](https://joehahn.github.io/portfolio-wave-rider/retrieval_pwr.html)**: the date-clean GDELT-GKG plus Wayback news corpus that the backtest curator reads, with coverage, sources, and per-window article counts. Mechanical, no LLM.
-- **[Curator backtest](https://joehahn.github.io/portfolio-wave-rider/backtest_gkg_3yr_kimi.html)**: the curator's weekly watchlist decisions replayed over 2023 to 2026, portfolio value against buy-and-hold and SPY, the watchlist Gantt, and per-wave profit and loss.
-- **[Parameter sweep](https://joehahn.github.io/portfolio-wave-rider/sweep_pwr.html)**: a zero-cost sweep of the optimizer knobs (cap, `λ`, lookback), a curator-LLM comparison, and a blind, leak-free judge that scores each curator's reasoning with the market outcome hidden.
 
 See [GLOSSARY.md](GLOSSARY.md) for the meanings of the finance terms used below (`σ`, `μ`, `Σ`, Sharpe ratio, risk aversion `λ`, mean-variance optimization, etc.) and [REFERENCE.md](REFERENCE.md) for project details (repo layout, code, input and output files, architecture overview, and testing instructions).
 
