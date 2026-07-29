@@ -39,6 +39,7 @@ TRACK_TICKERS = ["QUBT", "RKLB", "NVDA"]     # section 6: flag whether each mws 
 # "Recommended settings" = the risk/churn-constrained frontier read off plots 1-3: keep only configs with
 # shallow drawdown AND low churn on BOTH norms, then eyeball the survivors for the best return metrics.
 REC_MAX_DD, REC_MAX_L1, REC_MAX_L2 = 55.0, 1500.0, 2000.0   # |maxDD|% , L1 turnover , L2 path-length ceilings
+REC_MIN_ANN = 80.0   # annualized-return floor (%) — the "must make real money" gate; a GATE, not the sort key
 
 # LLM curator comparison (section 3): (label, run_dir, provider, $in/M, $out/M). Agreement is measured
 # against the reference (first row). Add a row per model run you want to compare.
@@ -548,7 +549,8 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
             ("ann", "{:+.0f}%", lambda r: r["ann"] * 100),
             ("maxDD", "{:.0f}%", lambda r: r["dd"] * 100)]
     _passed = [r for r in rows_all
-               if abs(r["dd"]) * 100 < REC_MAX_DD and r["l1"] < REC_MAX_L1 and r["l2"] < REC_MAX_L2]
+               if abs(r["dd"]) * 100 < REC_MAX_DD and r["l1"] < REC_MAX_L1 and r["l2"] < REC_MAX_L2
+               and r["ann"] * 100 > REC_MIN_ANN]
     _passed.sort(key=lambda r: -(r["plateau"] if r["plateau"] == r["plateau"] else -9e9))
     # best-in-column among survivors (all six value fns are "higher = better", maxDD included), for the ★
     _colbest = {_m: max(_passed, key=lambda r, fn=_fn: (fn(r) if fn(r) == fn(r) else -9e9))
@@ -584,7 +586,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     rec_html = (
         f'<p style="color:#555;font-size:12px;max-width:940px;margin:.2em 0 .5em;">Read straight off plots 1-3: '
         f'keep only configs in the safe corner &mdash; <b>|maxDD| &lt; {REC_MAX_DD:.0f}% AND L1 &lt; {REC_MAX_L1:.0f} '
-        f'AND L2 &lt; {REC_MAX_L2:.0f}</b> (shallow drawdown, low churn on both norms). '
+        f'AND L2 &lt; {REC_MAX_L2:.0f} AND ann &gt; {REC_MIN_ANN:.0f}%</b> (shallow drawdown, low churn, real return). '
         f'<b>{len(_passed)} of {len(rows_all)}</b> configs survive (by watchlist size &mdash; {_mws_survivors}), '
         'listed once, sorted by <b>plateau</b> = ½·own&nbsp;IR + ½·mean(grid-neighbor&nbsp;IR) over the config&#39;s '
         '&plusmn;1-step cap/&lambda;/lookback/min_trade neighbors. A lone in-sample spike (high IR, weak neighbors) '
