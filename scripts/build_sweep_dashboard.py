@@ -1065,10 +1065,10 @@ max_watchlist_size itself, section 11, re-curates). Metrics are benchmark-relati
 = annualized active return ÷ tracking error vs SPY (consistency of beating the benchmark). SPY returned
 {spy_ret*100:+.0f}% over the window. ★ = best in column.</p>
 <p style="color:#b45309;max-width:860px;background:#fffbeb;border:1px solid #fde68a;padding:.6em .8em;border-radius:6px;">
-<b>Interim, biased-lede.</b> This is the compounder gridsearch on the <code>proto-mws{{N}}</code> curations
-(geosplit titles + look-ahead-<b>biased live ledes</b>), pending the clean Wayback pass. Absolute returns are
-OPTIMISTIC; the cross-config <b>ranking</b> is the robust signal. Sections that need clean re-curations
-(news_lookback §12, blind judge §15), plus the single-model LLM comparison §13-14, are omitted for now. Canonical config: mws&nbsp;{_mws_fixed} / cap&nbsp;{CURRENT[0]}
+<b>Look-ahead-clean.</b> The compounder gridsearch on the geosplit curations: the curator read archived
+<b>Wayback</b> ledes where available (~46% of articles) else title-only, with the biased live ledes ignored,
+so each rebalance saw only period-correct news. Sections needing more curations (news_lookback §12, and the
+single-model LLM comparison §13-14, blind judge §15) are omitted for now. Canonical config: mws&nbsp;{_mws_fixed} / cap&nbsp;{CURRENT[0]}
 / λ&nbsp;{CURRENT[1]} / {CURRENT[2]}d. <b>All in-sample</b> — these rank candidates to <b>forward-test</b>, not an optimum.</p>
 {grid_html}
 <h2>1. Return vs drawdown</h2>

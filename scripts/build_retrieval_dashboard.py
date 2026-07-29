@@ -40,7 +40,7 @@ import gkg_pool as g  # noqa: E402  (wave/domain-tier classifiers; needs the rep
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 from src import portfolio as _pf  # noqa: E402  (load_financial_model -> the param-settings table)
-DEFAULT_RUN_REL = "data/curator_runs/gkg-3yr-final"   # the canonical backtest run (relative to repo root)
+DEFAULT_RUN_REL = "data/curator_runs/gkg-3yr-geosplit"   # canonical retriever pools (geosplit, Wayback-filled)
 
 BLUE, GREEN, ORANGE, RED, GREY = "#1f77b4", "#2ca02c", "#ff7f0e", "#e03131", "#adb5bd"
 DOW = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
@@ -155,14 +155,10 @@ def build(run_rel, out):
             day_x.append(k); day_yg.append(day_g.get(k, 0)); day_yw.append(day_w.get(k, 0))
             x += timedelta(days=1)
 
-    # ---- per-POOL (biweekly) lede coverage (plot 6): one point per rebalance pool at the finest
-    # granularity, so a single Wayback-miss pool shows as its own drop rather than being averaged into a
-    # coarser monthly bucket (where a healthy sibling pool would mask it). ----
+    # ---- per-POOL (biweekly) lede-source COUNTS for the composition plot: one row per rebalance pool,
+    # from its lede_sources dict, at the finest granularity so a single Wayback-miss pool shows as its own dip. ----
     _bw = sorted(((p.get("as_of_date", ""), p.get("lede_sources", {}), max(p.get("n_articles", 1), 1))
                   for p in pools if p.get("as_of_date")), key=lambda r: r[0])
-    bw_x = [d for d, _, _ in _bw]
-    bw_clean = [ls.get("wayback", 0) / n for _, ls, n in _bw]
-    bw_total = [(ls.get("wayback", 0) + ls.get("live", 0)) / n for _, ls, n in _bw]
 
     # ---- per-wave (unique articles; first wave from title+url, else "general") ----
     wave_c = Counter()
@@ -224,67 +220,75 @@ def build(run_rel, out):
 
     # ---- figure (7 rows) ---- (pool-size-per-window plot dropped: it was flat at the 100-article
     # cap for all 53 windows; that one fact is now a stat card instead.)
-    titles = (
+    titles = (   # figA subplot titles (plots 1-6); composition (7) + source/keyword (8-9) are their own figures
         "1. Unique articles per month",
         "2. Unique articles per week",
         "3. Unique articles per day",
         "4. Unique articles by day of week",
         "5. Unique articles by wave",
-        "6. Lede coverage by pool",
-        "7. Source utilization",
-        "8. Articles per search keyword",
     )
-    # Plots 7 & 8 list many rows, so give those rows much more vertical room than the others.
-    fig = make_subplots(rows=8, cols=1, vertical_spacing=0.025, subplot_titles=titles,
-                        row_heights=[1, 1, 1, 1, 1, 1, 3.6, 2.4])
-
-    # 1. articles per month (GKG only)
-    fig.add_trace(go.Bar(x=mo_keys, y=[mon_g[m] for m in mo_keys], marker_color=BLUE, name="GKG"), row=1, col=1)
-    # 2. articles per week (GKG only)
-    fig.add_trace(go.Bar(x=wk_keys, y=[wk_g[w] for w in wk_keys], marker_color=BLUE, name="GKG"), row=2, col=1)
-    # 3. articles per day (GKG only, linear y)
-    fig.add_trace(go.Scatter(x=day_x, y=day_yg, mode="lines", line={"color": BLUE, "width": 1}, name="GKG"), row=3, col=1)
-    # 4. day-of-week (GKG only)
-    fig.add_trace(go.Bar(x=DOW, y=[dow_g.get(d, 0) for d in DOW], marker_color=BLUE, name="GKG"), row=4, col=1)
-    # 5. per-wave horizontal bars
-    fig.add_trace(go.Bar(x=[v for _, v in wv][::-1], y=[k for k, _ in wv][::-1],
-                         orientation="h", marker_color=GREEN), row=5, col=1)
-    # 6. lede coverage BY POOL (per biweekly rebalance): clean (Wayback) and clean+live (total), one point
-    # per pool at the finest granularity. The band between them is the look-ahead-biased live-fallback
-    # contribution; a single Wayback-miss pool shows as its own drop rather than being averaged into a month.
-    fig.add_trace(go.Scatter(x=bw_x, y=bw_total, mode="lines+markers", name="clean + live",
-                             line={"color": ORANGE, "width": 1.6}, marker={"size": 5}), row=6, col=1)
-    fig.add_trace(go.Scatter(x=bw_x, y=bw_clean, mode="lines+markers", name="clean (Wayback)",
-                             line={"color": GREEN, "width": 1.6}, marker={"size": 5}), row=6, col=1)
-    # 7. source utilization horizontal, tier-colored (all recognized incl zeros + top other).
-    # Log x-axis; a zero-contributor is plotted at 0.5 so it shows a tiny bar (log 0 is undefined).
-    # The hover keeps the TRUE count so the 0.5 substitution isn't misleading.
-    fig.add_trace(go.Bar(x=[c if c > 0 else 0.5 for _, c, _ in src_rows], y=[s for s, _, _ in src_rows],
-                         orientation="h", marker_color=[col for _, _, col in src_rows],
-                         customdata=[c for _, c, _ in src_rows],
-                         hovertemplate="%{y}: %{customdata} articles<extra></extra>"), row=7, col=1)
-    # 8. articles per SEARCH KEYWORD, wave-colored (geopolitical split into subwaves); log x, 0 -> 0.5.
-    fig.add_trace(go.Bar(x=[c if c > 0 else 0.5 for _, c, _ in kw_rows], y=[k for k, _, _ in kw_rows],
-                         orientation="h", marker_color=[col for _, _, col in kw_rows],
-                         customdata=[c for _, c, _ in kw_rows],
-                         hovertemplate="%{y}: %{customdata} articles<extra></extra>"), row=8, col=1)
-
+    # Two subplot figures so the lede-source COMPOSITION (plot 6, a separate figure with its own legend)
+    # can sit right after the article-count plots. figA = plots 1-5; figB = plots 7-8 (source + keyword).
+    figA = make_subplots(rows=5, cols=1, vertical_spacing=0.05, subplot_titles=titles[:5],
+                         row_heights=[1, 1, 1, 1, 1])
+    figA.add_trace(go.Bar(x=mo_keys, y=[mon_g[m] for m in mo_keys], marker_color=BLUE, name="GKG"), row=1, col=1)
+    figA.add_trace(go.Bar(x=wk_keys, y=[wk_g[w] for w in wk_keys], marker_color=BLUE, name="GKG"), row=2, col=1)
+    figA.add_trace(go.Scatter(x=day_x, y=day_yg, mode="lines", line={"color": BLUE, "width": 1}, name="GKG"), row=3, col=1)
+    figA.add_trace(go.Bar(x=DOW, y=[dow_g.get(d, 0) for d in DOW], marker_color=BLUE, name="GKG"), row=4, col=1)
+    figA.add_trace(go.Bar(x=[v for _, v in wv][::-1], y=[k for k, _ in wv][::-1],
+                          orientation="h", marker_color=GREEN), row=5, col=1)
     for r in (1, 2, 3, 4):
-        fig.update_yaxes(title_text="articles", row=r, col=1)
-    fig.update_xaxes(title_text="unique articles", row=5, col=1)
-    fig.update_yaxes(title_text="lede rate (clean vs +live)", row=6, col=1)
-    fig.update_xaxes(title_text="unique articles (log; 0 plotted at 0.5)", type="log", row=7, col=1)
-    fig.update_yaxes(dtick=1, tickfont={"size": 9}, row=7, col=1)   # force EVERY source label (no every-other skip)
-    fig.update_xaxes(title_text="unique articles (log; 0 plotted at 0.5)", type="log", row=8, col=1)
-    fig.update_yaxes(dtick=1, tickfont={"size": 9}, row=8, col=1)   # force EVERY keyword label
-    fig.update_layout(template="seaborn", height=int(400 * 12.0), barmode="group", showlegend=False,
-                      margin={"t": 55, "l": 200}, hovermode="closest")
-    chart_html = fig.to_html(full_html=False, include_plotlyjs="cdn", config={"displayModeBar": False})
+        figA.update_yaxes(title_text="articles", row=r, col=1)
+    figA.update_xaxes(title_text="unique articles", row=5, col=1)
+    figA.update_layout(template="seaborn", height=1300, barmode="group", showlegend=False,
+                       margin={"t": 40, "l": 95}, hovermode="closest")
+    chartA_html = figA.to_html(full_html=False, include_plotlyjs="cdn", config={"displayModeBar": False})
 
-    # Link to the full keyword config just below the keyword plot (plot 9), so a reader can see the
+    # figB = plots 8-9 (source utilization + keywords): many rows each, log x, 0 -> 0.5, wide left margin.
+    figB = make_subplots(rows=2, cols=1, vertical_spacing=0.06,
+                         subplot_titles=("7. Source utilization", "8. Articles per search keyword"),
+                         row_heights=[3.6, 2.4])
+    figB.add_trace(go.Bar(x=[c if c > 0 else 0.5 for _, c, _ in src_rows], y=[s for s, _, _ in src_rows],
+                          orientation="h", marker_color=[col for _, _, col in src_rows],
+                          customdata=[c for _, c, _ in src_rows],
+                          hovertemplate="%{y}: %{customdata} articles<extra></extra>"), row=1, col=1)
+    figB.add_trace(go.Bar(x=[c if c > 0 else 0.5 for _, c, _ in kw_rows], y=[k for k, _, _ in kw_rows],
+                          orientation="h", marker_color=[col for _, _, col in kw_rows],
+                          customdata=[c for _, c, _ in kw_rows],
+                          hovertemplate="%{y}: %{customdata} articles<extra></extra>"), row=2, col=1)
+    figB.update_xaxes(title_text="unique articles (log; 0 plotted at 0.5)", type="log", row=1, col=1)
+    figB.update_yaxes(dtick=1, tickfont={"size": 9}, row=1, col=1)   # force EVERY source label
+    figB.update_xaxes(title_text="unique articles (log; 0 plotted at 0.5)", type="log", row=2, col=1)
+    figB.update_yaxes(dtick=1, tickfont={"size": 9}, row=2, col=1)   # force EVERY keyword label
+    figB.update_layout(template="seaborn", height=int(400 * 6.5), barmode="group", showlegend=False,
+                       margin={"t": 40, "l": 200}, hovermode="closest")
+    chartB_html = figB.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False})
+
+    # ---- separate figure: lede-source COMPOSITION per pool (COUNTS, stacked): how many of each rebalance
+    # pool's articles carried a clean Wayback lede vs a biased live-fallback lede vs title-only (no lede). A
+    # standalone figure (not a subplot) so it can carry its own legend. ----
+    comp_x = [d for d, _, _ in _bw]
+    comp_wb = [ls.get("wayback", 0) for _, ls, _ in _bw]
+    comp_lv = [ls.get("live", 0) for _, ls, _ in _bw]
+    comp_ti = [max(n - ls.get("wayback", 0) - ls.get("live", 0), 0) for _, ls, n in _bw]
+    _cfig = go.Figure()
+    _cfig.add_trace(go.Bar(x=comp_x, y=comp_wb, name="clean Wayback", marker_color=GREEN))
+    _cfig.add_trace(go.Bar(x=comp_x, y=comp_lv, name="biased live", marker_color=ORANGE))
+    _cfig.add_trace(go.Bar(x=comp_x, y=comp_ti, name="titles-only", marker_color=GREY))
+    _cfig.update_layout(template="seaborn", height=380, barmode="stack",
+                        margin={"t": 10, "l": 60, "r": 20, "b": 40}, yaxis_title="articles per pool",
+                        legend={"orientation": "h", "y": 1.12, "x": 0})
+    comp_html = ('<h2 style="margin:1.8em 0 0.2em;">6. Lede source composition</h2>'
+                 '<p style="color:#555;max-width:820px;margin:0 0 .4em;">How many of each biweekly pool&#39;s '
+                 'articles the curator read with a clean, look-ahead-safe <b>Wayback</b> lede, a look-ahead-biased '
+                 '<b>live-fallback</b> lede, or <b>title only</b> (no lede). The clean-Wayback share is what a '
+                 'look-ahead-honest backtest relies on.</p>'
+                 + _cfig.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False}))
+
+    # Link to the full keyword config just below the keyword plot (plot 8), so a reader can see the
     # complete per-wave search-term lists that drive retrieval (gkg_config.json is git-tracked / public).
     cfg_link = ('<p style="color:#555;max-width:820px;margin:.2em 0 0;">The full per-wave search-term '
-                'lists behind plot 9 live in <a href="https://github.com/joehahn/portfolio-wave-rider/'
+                'lists behind plot 8 live in <a href="https://github.com/joehahn/portfolio-wave-rider/'
                 'blob/main/gkg_config.json"><code>gkg_config.json</code></a> '
                 '(<code>wave_keywords</code>).</p>')
 
@@ -389,7 +393,7 @@ def build(run_rel, out):
         f'per-window <code>&lt;date&gt;-pool.json</code> (ranked article list; <code>lede</code> = clean '
         f'Wayback join, <code>lede_live</code> = biased live-fallback, <code>lede_sources</code> = the '
         f'clean/live/none split), plus <code>_corpus/</code> (full gathering, one file per day).</p>'
-        + f'<div style="margin:1em 0 1.5em">{cards}</div>' + _params + chart_html + cfg_link + author_html + '</body></html>'
+        + f'<div style="margin:1em 0 1.5em">{cards}</div>' + _params + chartA_html + comp_html + chartB_html + cfg_link + author_html + '</body></html>'
     )
     out.write_text(page)
     print(f"wrote {out}")

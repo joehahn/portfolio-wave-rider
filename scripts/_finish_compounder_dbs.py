@@ -39,11 +39,11 @@ def main() -> int:
         if p.exists():
             p.rename(p.with_suffix(p.suffix + ".preproto"))
             print(f"  moved aside: {f}", file=sys.stderr)
-    # 3) flagship CBT from the mws20 run (interim, biased-lede note)
-    note = (f"INTERIM (biased-lede): mws{fm['max_watchlist_size']} / cap{fm['concentration_cap']} / "
-            f"λ{fm['risk_aversion']} / {fm['optimizer_lookback_days']}d / mt{fm['min_trade_size_frac']}, "
-            f"anchors {anchors}. Curated on geosplit titles + look-ahead-BIASED live ledes; returns are "
-            f"OPTIMISTIC pending the clean Wayback re-curation. New quality-gate curator prompt.")
+    # 3) flagship CBT from the mws20 run (look-ahead-clean note)
+    note = (f"mws{fm['max_watchlist_size']} / cap{fm['concentration_cap']} / λ{fm['risk_aversion']} / "
+            f"{fm['optimizer_lookback_days']}d / mt{fm['min_trade_size_frac']}, anchors {anchors}. "
+            f"Look-ahead-CLEAN: curated on geosplit pools with archived Wayback ledes where available (~46%) "
+            f"else title-only, biased live ledes ignored. New quality-gate curator prompt. In-sample backtest.")
     portfolio.build_curator_dashboard(
         backtest_dir="data/curator_runs/proto-mws20/_backtest", runs_dir="data/curator_runs/proto-mws20",
         out_path="docs/backtest_gkg_3yr_kimi.html", benchmarks=["SPY"], config_note=note,
@@ -51,7 +51,16 @@ def main() -> int:
     sn = json.loads((ROOT / "data/curator_runs/proto-mws20/_backtest/summary.json").read_text()) \
         if (ROOT / "data/curator_runs/proto-mws20/_backtest/summary.json").exists() else {}
     print("  flagship CBT rebuilt -> docs/backtest_gkg_3yr_kimi.html")
-    print("DONE _backtest + CBT; now run: build_sweep_dashboard.py --recompute")
+    # 4) geosplit _authors.json from the pool bylines, so the RBT's author plot (9) populates
+    geo = ROOT / "data" / "curator_runs" / "gkg-3yr-geosplit"
+    au = {}
+    for pf in geo.glob("*-pool.json"):
+        for a in json.loads(pf.read_text()).get("articles", []):
+            if a.get("url") and (a.get("author") or "").strip():
+                au.setdefault(a["url"], a["author"])
+    (geo / "_authors.json").write_text(json.dumps(au, indent=1))
+    print(f"  geosplit _authors.json: {len(au)} bylines")
+    print("DONE _backtest + CBT + authors; now run build_retrieval_dashboard.py and build_sweep_dashboard.py --recompute")
     return 0
 
 
