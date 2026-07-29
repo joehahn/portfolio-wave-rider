@@ -861,13 +861,19 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         del fixed[field]                       # `field` varies; the rest pinned to live (incl. min_trade)
         sub = {r[field]: r for r in rows_all if all(r.get(k) == v for k, v in fixed.items())}
         xs = [v for v in values if v in sub]
+        _yv = [sub[v]["ret"] * 100 for v in xs]
+        # dynamic y-range: zoom into the bar heights (not 0-based) so differences among high returns are legible.
+        _lo, _hi = (min(_yv), max(_yv)) if _yv else (0.0, 1.0)
+        _sp = _hi - _lo
+        _yr = [max(0.0, _lo - 0.8 * _sp), _hi + (0.20 * _sp if _sp else max(abs(_hi) * 0.1, 1.0))]
         f = _lgo.Figure(_lgo.Bar(
-            x=[str(v) for v in xs], y=[sub[v]["ret"] * 100 for v in xs],
+            x=[str(v) for v in xs], y=_yv,
             marker_color=[GREEN if v == live_val else BLUE for v in xs],
             text=["live" if v == live_val else "" for v in xs], textposition="outside",
             hovertemplate="%{x}: %{y:+.0f}%<extra></extra>"))
         f.update_layout(template="seaborn", height=360, margin={"t": 20, "l": 60, "r": 20},
-                        xaxis={"title": xtitle, "type": "category"}, yaxis={"title": "total return %"})
+                        xaxis={"title": xtitle, "type": "category"},
+                        yaxis={"title": "total return %", "range": _yr})
         return f.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False})
 
     _fixed_note = (f'watchlist size ({_mws_fixed})', f'cap ({CURRENT[0]})', f'&lambda; ({CURRENT[1]})',
