@@ -4528,6 +4528,7 @@ def build_curator_dashboard(
     cards_html = (
         '<h2 style="margin:1.4em 0 0.3em;">Summary</h2>'
         '<div style="margin:0.4em 0 0.6em">'
+        + (_card(handoff_date, "backtest → WebSearch news handoff") if handoff_date else "")
         + _card(f"{cur_return * 100:+.0f}%", "total return")
         + _card(f"{_ann * 100:+.0f}%", "annualized")
         + _card(f"{_maxdd * 100:.0f}%", "max drawdown")

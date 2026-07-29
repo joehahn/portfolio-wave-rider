@@ -38,6 +38,7 @@ GOLD = "#f59e0b"
 DOW = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 BT_SRC, FW_SRC = "gkg-wayback-articles", "forward-websearch"
 CLEAN_LS = ("wayback", "websearch")            # look-ahead-safe lede provenances
+HANDOFF = "2026-07-22"          # backtest -> forward news handoff (last backtest pool; WebSearch-only ~14d later)
 
 
 def _iso(s):
@@ -225,6 +226,11 @@ def build(canon_dir: str, forward_corpus: str, since: str, out: Path) -> None:
                       legend={"orientation": "h", "y": 1.03, "x": 0.5, "xanchor": "center",
                               "yanchor": "bottom", "font": {"size": 12}},
                       margin={"t": 80, "l": 200}, hovermode="closest")
+    # dashed vertical line at the backtest->WebSearch handoff on the daily plot (row 3): the news source
+    # transitions here (GKG+Wayback before, WebSearch after), converging to WebSearch-only ~14d later.
+    # (annotation omitted: plotly's add_vline annotation trips on a category x-axis; the card + the blue->gold
+    #  provenance shift already label the handoff. The dashed line marks the exact day.)
+    fig.add_vline(x=HANDOFF, row=3, col=1, line={"dash": "dash", "color": "#c92a2a", "width": 1.5})
     chart_html = fig.to_html(full_html=False, include_plotlyjs="cdn", config={"displayModeBar": False})
 
     cfg_link = ('<p style="color:#555;max-width:820px;margin:.2em 0 0;">The full per-wave search-term lists '
@@ -252,7 +258,8 @@ def build(canon_dir: str, forward_corpus: str, since: str, out: Path) -> None:
         return (f'<div style="display:inline-block;margin:0 1.6em 0.6em 0">'
                 f'<b style="font-size:1.5em;color:#0b7285">{v}</b><br>'
                 f'<span style="font-size:.8em;color:#555">{label}</span></div>')
-    cards = (card(f"{n_uniq:,}", "unique articles (deduped)")
+    cards = (card(HANDOFF, "backtest → WebSearch handoff (news source shift)")
+             + card(f"{n_uniq:,}", "unique articles (deduped)")
              + card(f"{len(bt)} + {len(fw)}", "backtest + forward pools")
              + card(f"{pools[0]['as_of_date']} → {pools[-1]['as_of_date']}", "coverage span")
              + card(f"{pct_clean:.0f}%", "CLEAN lede: Wayback + WebSearch (look-ahead-safe)")
@@ -304,7 +311,7 @@ def build(canon_dir: str, forward_corpus: str, since: str, out: Path) -> None:
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="Build the PWR Retriever Bootstrap dashboard.")
-    ap.add_argument("--canon-dir", default="data/curator_runs/gkg-3yr-canon14")
+    ap.add_argument("--canon-dir", default="data/curator_runs/gkg-3yr-geosplit")   # current-thesis backtest pools
     ap.add_argument("--forward-corpus", default="data/forward_corpus")
     ap.add_argument("--since", default="2026-04-22", help="include backtest pools with as_of >= this date")
     ap.add_argument("--out", default=str(ROOT / "docs" / "retrieval_bootstrap.html"))

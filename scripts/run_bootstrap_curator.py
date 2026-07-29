@@ -30,9 +30,10 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 from src import corpus, curator, portfolio  # noqa: E402
 
-CANON = "data/curator_runs/gkg-3yr-canon14"
-SINCE = "2025-07-19"       # 1-year backtest-tail start (first canon14 biweekly pool on/after this date)
-HANDOFF = "2026-07-22"     # backtest end / forward start (canon14's last pool date)
+POOL_SRC = "data/curator_runs/gkg-3yr-geosplit"   # backtest-tail NEWS pools (current thesis; SAME as RBS)
+SEED_SRC = "data/curator_runs/proto-mws16"         # the CBT run: day-0 seed weights + starter watchlist come from here
+SINCE = "2026-04-22"       # 3-month backtest-tail start (matches RBS --since; ~3mo before the handoff)
+HANDOFF = "2026-07-22"     # backtest end / forward start (geosplit's last pool date)
 RUN = ROOT / "data" / "curator_runs" / "bootstrap-cbs"
 
 
@@ -53,12 +54,12 @@ def main() -> int:
 
     # --- Backtest-tail pools: canon14's own biweekly pools in [SINCE, HANDOFF] (14d Wayback news baked in).
     bt_pools = []
-    for f in sorted((ROOT / CANON).glob("*-pool.json")):
+    for f in sorted((ROOT / POOL_SRC).glob("*-pool.json")):
         d = f.stem.replace("-pool", "")
         if SINCE <= d <= HANDOFF:
             bt_pools.append((d, json.loads(f.read_text()).get("articles", []), "gkg-wayback"))
     if not bt_pools:
-        print(f"no canon14 pools in [{SINCE}, {HANDOFF}]", file=sys.stderr)
+        print(f"no geosplit pools in [{SINCE}, {HANDOFF}]", file=sys.stderr)
         return 1
 
     # --- Forward dates: biweekly continuation from the last backtest date up to today, each read as a
@@ -77,7 +78,7 @@ def main() -> int:
     # --- Seed: CBT (canon14) RECOMMENDED weights on the nearest rebalance <= SINCE (the portfolio in effect
     #     when the CBS starts). Anchors (e.g. IAU) stay in the seed weights; they are dropped from the
     #     curator's starter watchlist (they are optimizer anchors, not curator-managed tickers).
-    recs = pd.read_csv(ROOT / CANON / "_backtest" / "recommendations.csv", parse_dates=["date"])
+    recs = pd.read_csv(ROOT / SEED_SRC / "_backtest" / "recommendations.csv", parse_dates=["date"])
     seed_date = recs[recs.date <= pd.Timestamp(SINCE)]["date"].max()
     seed = recs[(recs["date"] == seed_date) & (recs["weight"] > 1e-6)]
     initial_weights = {str(r.ticker).upper(): float(r.weight) for r in seed.itertuples()}
@@ -85,7 +86,7 @@ def main() -> int:
     initial_weights = {k: round(v / _tot, 6) for k, v in initial_weights.items()}   # renormalize off rounding
     # starter watchlist = canon14's active watchlist at SINCE (so the curator continues from there) plus any
     # seed ticker, minus anchors.
-    periods, _ = portfolio._build_ticker_periods(CANON, fm["starter_watchlist"], pd.Timestamp(end.isoformat()))
+    periods, _ = portfolio._build_ticker_periods(SEED_SRC, fm["starter_watchlist"], pd.Timestamp(end.isoformat()))
     _at = pd.Timestamp(SINCE)
     starter = sorted(({tk for tk, s, e, _wb in periods if s <= _at <= e} | set(initial_weights)) - set(anchors))
     naive_benchmark = [str(t).upper() for t in fm["starter_watchlist"]]
