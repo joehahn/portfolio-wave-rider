@@ -28,8 +28,9 @@ from src import portfolio  # noqa: E402
 # INTERIM COMPOUNDER REPOINT (titles+live geosplit proto runs, pending Wayback). Revert CAPS / MWS_SWEEP /
 # NLB_SWEEP / LLM_RUNS / --runs-dir to the gkg-3yr clean runs after the clean re-curation.
 CAPS = [0.1, 0.25, 0.333, 0.5, 0.667, 0.8, 1.0]   # includes the canonical 0.333
-LAMBDAS = [0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0]
-LOOKBACKS = [7, 14, 30, 60, 90, 120, 150]          # calendar days
+LAMBDAS = [0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0]   # FUTURE: prepend 0.1 when you want it swept (deferred per user)
+LOOKBACKS = [14, 30, 60, 90, 120, 150]          # calendar days (7d dropped: infeasible — ~5 trading days can't
+                                                #  estimate a covariance for a ~20-asset universe; all lb7 configs skip)
 _FM = portfolio.load_financial_model()                       # single profile read (anchors + CURRENT below)
 ANCHORS = _FM.get("always_include") or ["SPY", "AGG", "IAU"]  # from the profile
 _RF = float(_FM["risk_free_rate"])                           # rf + exec-lag from the profile (NOT swept params)
@@ -51,7 +52,10 @@ LLM_RUNS = [   # row 0 = the DEFAULT curator. The multi-LLM comparison (Sonnet g
 CURRENT = (float(_FM["concentration_cap"]), float(_FM["risk_aversion"]),
            int(_FM["optimizer_lookback_days"]))   # the live investor_profile.md config (cap / λ / lookback-days)
 MIN_TRADE_FRACS = [0.0, 0.025, 0.05, 0.10, 0.15, 0.20]   # no-trade-band sweep (min rebalancing trade / book)
-CURRENT_MT = float(_FM["min_trade_size_frac"])   # live no-trade band; the 4th swept grid axis (canonical mws only)
+CURRENT_MT = float(_FM["min_trade_size_frac"])   # live no-trade band; the 4th swept grid axis
+# The min_trade axis is swept on ONE fixed anchor mws (DECOUPLED from the canonical), so changing the canonical
+# never triggers a re-sweep — the dashboard just re-flags the new live config from the already-cached grid.
+MT_SWEEP_MWS = 20   # the min_trade-anchor watchlist size (already fully swept); NOT tied to the profile canonical
 BLUE, GREEN, RED, GREY = "#1f77b4", "#2b8a3e", "#c92a2a", "#adb5bd"
 
 # max_watchlist_size sweep (section 6): unlike cap/lambda/lookback, this knob changes the CURATOR's
@@ -370,9 +374,9 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
             pass
     rows_all, spy_curve, _n_new, _n_skip = [], None, 0, 0
     for _m, _mdir in READY_MWS:
-        # min_trade_size_frac is the 4th swept axis but ONLY on the canonical watchlist (_mws_fixed); every
-        # other mws replays at the live CURRENT_MT (held) so plots 1-3 stay a clean 3-D cloud at one min_trade.
-        _mts = MIN_TRADE_FRACS if _m == _mws_fixed else [CURRENT_MT]
+        # min_trade_size_frac is the 4th swept axis but ONLY on the fixed anchor MT_SWEEP_MWS (decoupled from the
+        # canonical, so a canonical change never re-sweeps); every other mws replays at the live CURRENT_MT (held).
+        _mts = MIN_TRADE_FRACS if _m == MT_SWEEP_MWS else [CURRENT_MT]
         for cap in CAPS:
             for lam in LAMBDAS:
                 for lb in LOOKBACKS:
@@ -546,7 +550,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
             ("t-stat", "{:+.1f}", lambda r: r["tstat"]),
             ("Sharpe", "{:.2f}", lambda r: r["sharpe"]),
             ("Calmar", "{:.2f}", lambda r: r["calmar"]),
-            ("ann", "{:+.0f}%", lambda r: r["ann"] * 100),
+            ("ann ret%", "{:+.0f}%", lambda r: r["ann"] * 100),
             ("maxDD", "{:.0f}%", lambda r: r["dd"] * 100)]
     _passed = [r for r in rows_all
                if abs(r["dd"]) * 100 < REC_MAX_DD and r["l1"] < REC_MAX_L1 and r["l2"] < REC_MAX_L2
@@ -890,7 +894,8 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     # 9. min_trade_size_frac sweep: now a FIRST-CLASS grid axis (swept on the canonical watchlist in the cached
     # grid above), so this is a $0 slice of `rows` at the live cap/λ/lookback -- no separate replays.
     _LIVE_MT = CURRENT_MT
-    _mt_by = {r["mt"]: r for r in rows if (r["cap"], r["lam"], r["lb"]) == CURRENT}
+    # min_trade is swept on the fixed anchor MT_SWEEP_MWS (not the canonical), so pull the slice from there.
+    _mt_by = {r["mt"]: r for r in rows_all if r["mws"] == MT_SWEEP_MWS and (r["cap"], r["lam"], r["lb"]) == CURRENT}
     _mt_rows = [{"mt": v, "ret": _mt_by[v]["ret"]} for v in MIN_TRADE_FRACS if v in _mt_by]
     _mtx = [str(r["mt"]) for r in _mt_rows]
     _rets = [r["ret"] * 100 for r in _mt_rows]
@@ -912,8 +917,10 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         '<b>no-trade band</b> &mdash; the smallest rebalancing trade the backtest executes, as a fraction of the '
         'book. A suppressed trade&#39;s dollars are redistributed across the trades that DO clear the band, so the '
         'book stays fully invested (Fidelity IRA = zero cost, so no cost model). The '
-        f'<b style="color:#2b8a3e;">green</b> bar is the live setting ({_LIVE_MT}). A small band can slightly '
-        '<i>improve</i> return (avoiding whipsaw); too large a band (&ge;0.15) starves the momentum signal.</p>'
+        f'<b style="color:#2b8a3e;">green</b> bar is the live setting ({_LIVE_MT}). The min_trade axis is swept on '
+        f'the fixed mws&nbsp;{MT_SWEEP_MWS} anchor (representative; the effect is not watchlist-size-sensitive). A '
+        'small band can slightly <i>improve</i> return (avoiding whipsaw); too large a band (&ge;0.15) starves '
+        'the momentum signal.</p>'
         + _mtf_fig.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False}))
 
     # section 7: backtest gems — for every ticker, the best $ P&L it achieved across ALL 1350 sweep settings,
@@ -1021,63 +1028,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
             'The <b style="color:#d62728;">red</b> line is the live config; the spread shows how differently the '
             'SAME curations perform under different optimizer settings (same picks, different weighting).')
 
-        _ry = [r for r in rows if r.get("ret_1y") == r.get("ret_1y")]   # drop NaN (short-window configs)
-        for r in _ry:
-            _gbd = max(abs(r.get("gb_1y") or 0.0), 0.02)                # floor the denominator
-            r["_cal1"] = r["ret_1y"] / _gbd
-        _ry.sort(key=lambda r: -r["_cal1"])
-        _ryrows = ""
-        for _i, r in enumerate(_ry[:12]):
-            _rh = ((r["cap"], r["lam"], r["lb"]) == CURRENT and r.get("mt", CURRENT_MT) == CURRENT_MT)
-            _rhl = "background:#fff7e6;" if _rh else ""
-            _ryrows += (f'<tr style="{_rhl}border-bottom:1px solid #eee;"><td {_lc}>{_i + 1}</td>'
-                        f'<td {_lc}>cap{r["cap"]}/λ{r["lam"]}/{r["lb"]}d/mt{r.get("mt", CURRENT_MT):g}'
-                        + (" &larr; live" if _rh else "") + '</td>'
-                        f'<td {_lc}>{r["ret_1y"] * 100:+.0f}%</td><td {_lc}>{r["pf_1y"]:.2f}</td>'
-                        f'<td {_lc}>{r["gb_1y"] * 100:.0f}%</td><td {_lc}>{r["_cal1"]:.1f}</td>'
-                        f'<td {_lc}>{r["ret"] * 100:+.0f}%</td></tr>')
-        _recent_html = (
-            f'<h3 style="margin:1.3em 0 .2em;">Recent-year rotation ranking (trailing 365d, mws&nbsp;{_mws_fixed})</h3>'
-            '<p style="color:#555;max-width:940px;">The same canonical-watchlist grid scored on ONLY the trailing '
-            '12 months &mdash; the slice NOT dominated by the 2023-24 RKLB run-up, so it reflects how each config '
-            'rotates on recent, forward-relevant data. Ranked by <b>1y return &divide; |1y giveback|</b> (return per '
-            'unit round-trip). Churn is not filtered (zero-cost IRA). <b>CAVEAT:</b> still in-sample &mdash; but now '
-            f'on the NEW-thesis (canon14) mws-{_mws_fixed} curations, the same ones the CBT / live path uses, so the '
-            'absolute returns here match the CBT (the live config replays to the CBT&rsquo;s +178%, not the old '
-            'thesis&rsquo;s +526%).</p>'
-            '<table style="font-size:12.5px;margin-top:.4em;"><thead><tr>'
-            f'<th {_lc}>#</th><th {_lc}>setting</th><th {_lc}>1y return</th><th {_lc}>1y P/|L|</th>'
-            f'<th {_lc}>1y giveback</th><th {_lc}>1y ret&divide;|giveback|</th><th {_lc}>3y return</th>'
-            '</tr></thead><tbody>' + _ryrows + '</tbody></table>')
-
-        # Portfolio value over time for the recent-year top-12: fetch each curve (prefer the sweep snapshots on
-        # disk, else replay on the canonical run dir -> durable), then the shared _eqplot.
-        _canon_rd = dict(MWS_SWEEP).get(_mws_fixed, runs_dir)
-        _rycurves = []
-        for r in _ry[:12]:
-            _rtag = f'{_mws_fixed}_{r["cap"]}_{r["lam"]}_{r["lb"]}_{r["mt"]}'
-            _rsp = Path(f"/tmp/_sweep/{_rtag}/snapshots.csv")
-            try:
-                if not _rsp.exists():
-                    portfolio.curator_backtest(
-                        runs_dir=_canon_rd, out_dir=f"/tmp/_ryeq/{_rtag}", max_weight=r["cap"],
-                        risk_aversion=r["lam"], risk_free_rate=_RF, t_update_days=_TU, benchmarks=[],
-                        lookback_years_override=r["lb"] / 365.0, always_include=ANCHORS, min_trade_frac=r["mt"])
-                    _rsp = Path(f"/tmp/_ryeq/{_rtag}/snapshots.csv")
-                _rtt = pd.read_csv(_rsp, parse_dates=["date"]).groupby("date")["total_value"].first().sort_index()[::5]
-                _rycurves.append({**r, "curve": {"x": [d.strftime("%Y-%m-%d") for d in _rtt.index],
-                                                 "y": [round(float(v), 2) for v in _rtt.values]}})
-            except Exception:  # noqa: BLE001
-                continue
-        _ryeq_html = _eqplot(
-            _rycurves,
-            f'Portfolio value over time &mdash; the {len(_rycurves)} recent-year rotation configs (vs buy/hold and SPY)',
-            'The full 3-year equity curve of every config in the recent-year table above (ranked by trailing-12-'
-            f'month rotation), on the canonical mws-{_mws_fixed} curations, with buy/hold + SPY. Log axis, '
-            '<b style="color:#d62728;">red</b> = live config. The short-lookback winners pull far above the live '
-            'line; the rightmost year is the slice the ranking is based on.')
-        _recent_html = _recent_html + _ryeq_html
-        _div_html = _div_html + _geq_html + _recent_html
+        _div_html = _div_html + _geq_html   # recent-year rotation table/plot dropped (didn't factor into the canonical decision)
 
         gems_html = (
             '<h2>5. Backtest gems</h2>'
