@@ -43,8 +43,8 @@ CRON_START = "2026-07-22"
 # on CALIB_DATE); because CALIB_DATE is a HISTORICAL snapshot, the factor is FIXED, so future days move
 # naturally (this does NOT pin the current value to a constant). Uniform scale -> all % returns preserved.
 # Re-anchor when it drifts from reality, or later wire it to a live account feed.
-CALIB_DATE = "2026-07-27"
-CALIB_VALUE = 64610.0
+CALIB_DATE = "2026-07-30"
+CALIB_VALUE = 64598.0
 
 
 def _card(label, value, sub="", color="#111"):
