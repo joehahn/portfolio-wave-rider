@@ -4698,7 +4698,7 @@ def build_curator_dashboard(
 
     _kwmap = {}
     try:
-        _cfg = json.loads((Path(__file__).resolve().parent.parent / "gkg_config.json").read_text())
+        _cfg = json.loads((Path(__file__).resolve().parent.parent / "retrieval_config.json").read_text())
         for _wv, _ks in _cfg.get("wave_keywords", {}).items():
             for _k in _ks:
                 _kwmap[_k.lower()] = _wv

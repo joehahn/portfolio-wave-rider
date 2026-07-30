@@ -43,7 +43,7 @@ PROJECT = "portfolio-wave-rider"
 TABLE = "gdelt-bq.gdeltv2.gkg_partitioned"
 RUN_DIR = ROOT / "data" / "curator_runs" / "postcovid-gkg"
 CAP05_STARTER = ROOT / "data" / "curator_runs" / "postcovid-cap05" / "_starter.json"
-CONFIG_FILE = ROOT / "gkg_config.json"   # ALL GKG solution params, shared backtest+forward
+CONFIG_FILE = ROOT / "retrieval_config.json"   # ALL GKG solution params, shared backtest+forward
 
 _cfg = json.loads(CONFIG_FILE.read_text())
 _eng = _cfg["engine"]
@@ -51,7 +51,7 @@ ONTOPIC_OFFSET = _eng["ontopic_offset"]   # org counts as SUBJECT only within fi
 MAX_SCAN_GB = _eng["max_scan_gb"]         # BigQuery dry-run cost guard (live-backtest ingest)
 # Discovery-mode-only constants (used solely by build_pool, the older company-discovery path behind the
 # run-backtest-gkg skill; the current article-based backtest in backtest_sdk.py does NOT use them). Kept
-# as literals here rather than in gkg_config.json so the shared config lists only the live-pipeline knobs.
+# as literals here rather than in retrieval_config.json so the shared config lists only the live-pipeline knobs.
 LOOKBACK_DAYS = 90        # discovery trailing-news window (days)
 TOP_COMPANIES = 60        # cap on the discovered-company ranking fed to the curator
 SAMPLE_HEADLINES = 3      # example headlines per discovered company in the prompt

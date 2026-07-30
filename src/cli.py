@@ -267,7 +267,7 @@ def main(argv: list[str] | None = None) -> int:
                 result = corpus.append_pull(pull_id, pulled_at, "gkg-wayback-backfill", f"{args.days}d",
                                             sightings, query_stats, dry_run=args.dry_run)
             else:
-                waves = json.loads(Path("gkg_config.json").read_text()).get("wave_keywords", {})
+                waves = json.loads(Path("retrieval_config.json").read_text()).get("wave_keywords", {})
                 if args.limit_waves:
                     waves = dict(list(waves.items())[: args.limit_waves])
                 pull_id = f"pull-{pulled_at.replace(':', '').replace('-', '')}"

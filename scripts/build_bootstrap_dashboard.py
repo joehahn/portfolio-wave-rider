@@ -160,7 +160,7 @@ def build(canon_dir: str, forward_corpus: str, since: str, out: Path) -> None:
                         if not g._domain_in(s, g.RECOGNIZED_DOMAINS)), key=lambda r: -r[1])[:12]
     src_rows = sorted(rec_rows + grey_rows, key=lambda r: r[1])
 
-    # ---- articles per search keyword (gkg_config wave_keywords), geopolitical split into subwaves ----
+    # ---- articles per search keyword (retrieval_config wave_keywords), geopolitical split into subwaves ----
     KW_WAVE = g._KW_WAVE
     GEO_SUB = {"geo-defense": {"hypersonic", "missile", "fighter jet", "warship", "munition", "defense contract"},
                "geo-drones": {"loitering", "counter-drone", "drone swarm"},
@@ -235,7 +235,7 @@ def build(canon_dir: str, forward_corpus: str, since: str, out: Path) -> None:
 
     cfg_link = ('<p style="color:#555;max-width:820px;margin:.2em 0 0;">The full per-wave search-term lists '
                 'behind plot 7 live in <a href="https://github.com/joehahn/portfolio-wave-rider/blob/main/'
-                'gkg_config.json"><code>gkg_config.json</code></a> (<code>wave_keywords</code>). The forward '
+                'retrieval_config.json"><code>retrieval_config.json</code></a> (<code>wave_keywords</code>). The forward '
                 'cron queries the same waves.</p>')
 
     # ---- 9. articles per author ----

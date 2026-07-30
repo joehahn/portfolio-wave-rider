@@ -183,7 +183,7 @@ def build(run_rel, out):
                         if not g._domain_in(s, g.RECOGNIZED_DOMAINS)), key=lambda r: -r[1])[:N_GREY]
     src_rows = sorted(rec_rows + grey_rows, key=lambda r: r[1])   # ascending -> highest at top (h-bars)
 
-    # ---- articles per SEARCH KEYWORD (plot 8): the retriever's surfacing mechanism is gkg_config.json's
+    # ---- articles per SEARCH KEYWORD (plot 8): the retriever's surfacing mechanism is retrieval_config.json's
     # wave_keywords, so each keyword IS a query term. Geopolitical is split into its four profile subwaves
     # for display (defense, drones, tankers, reconstruction). All profile waves/subwaves now carry keywords
     # (the tanker/reconstruction/aging gaps were filled 2026-07-24); rows for the newly-added terms read low
@@ -286,10 +286,10 @@ def build(run_rel, out):
                  + _cfig.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False}))
 
     # Link to the full keyword config just below the keyword plot (plot 8), so a reader can see the
-    # complete per-wave search-term lists that drive retrieval (gkg_config.json is git-tracked / public).
+    # complete per-wave search-term lists that drive retrieval (retrieval_config.json is git-tracked / public).
     cfg_link = ('<p style="color:#555;max-width:820px;margin:.2em 0 0;">The full per-wave search-term '
                 'lists behind plot 8 live in <a href="https://github.com/joehahn/portfolio-wave-rider/'
-                'blob/main/gkg_config.json"><code>gkg_config.json</code></a> '
+                'blob/main/retrieval_config.json"><code>retrieval_config.json</code></a> '
                 '(<code>wave_keywords</code>).</p>')
 
     # ---- 9. Articles per author (bylines from run_rel/_authors.json) ----
