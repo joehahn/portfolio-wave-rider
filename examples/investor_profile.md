@@ -10,7 +10,8 @@
 # ============================================================================
 
 initial_investment_usd: 50000            # total dollars to allocate on day 0
-starter_watchlist: [AAPL, MSFT, GOOGL]   # the day-0 watchlist, equal-weighted
+starter_watchlist: [AAPL, GOOGL, AMZN]   # the day-0 watchlist, equal-weighted
+                                         # (matches the placeholder rows in examples/holdings.csv)
 always_include: [SPY, AGG, IAU]          # permanent optimizer anchors (equity / bond / gold safe havens).
                                          # Always in the optimizer universe, OUTSIDE max_watchlist_size,
                                          # never added or removed by the curator. Use [] to disable.
