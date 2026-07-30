@@ -631,28 +631,34 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         _J, _JCRIT, _jmeta = _JJ["models"], _JJ["criteria"], _JJ
     _crlab = {"on_thesis": "on-thesis", "evidence_supports": "evidence", "real_catalyst": "catalyst",
               "disciplined": "discipline", "valid_ticker": "valid-ticker"}
-    # order: judge soundness desc (fall back to return if a model lacks a judge score)
+    def _estcost(L):   # est LLM $/run: ~24k in / 1.3k out per call x 79 dates, at the model's OpenRouter/Anthropic rate
+        pin, pout = _price.get(L, (float("nan"), float("nan")))
+        return 79 * (24000 * pin + 1300 * pout) / 1e6 if pin == pin else float("nan")
+    # scorecard order: judge soundness desc (fall back to return if a model lacks a judge score)
     _order = sorted(_llm_by, key=lambda L: -((_J.get(L, {}) or {}).get("mean_overall") or _llm_by[L].get("ret", -9)))
+    # plot 12 order: cheapest curator first (left) -> most expensive (right)
+    _cost_order = sorted(_llm_by, key=lambda L: _estcost(L) if _estcost(L) == _estcost(L) else 9e9)
 
     model_html = ""
     if len(_llm_by) >= 2:
         import plotly.graph_objects as _lgo
-        # plot 12: total return vs curator model (bar; deployed kimi flagged green, same convention as plot 11)
+        # plot 12: total return vs curator model, x ordered by curator cost (deployed kimi flagged green)
         _lfig = _lgo.Figure(_lgo.Bar(
-            x=[L.split("/")[-1] for L in _order], y=[_llm_by[L]["ret"] * 100 for L in _order],
-            marker_color=[GREEN if L == _DEPLOYED else BLUE for L in _order],
-            text=["deployed" if L == _DEPLOYED else "" for L in _order], textposition="outside",
-            hovertemplate="%{x}: %{y:+.0f}%<extra></extra>"))
+            x=[L.split("/")[-1] for L in _cost_order], y=[_llm_by[L]["ret"] * 100 for L in _cost_order],
+            marker_color=[GREEN if L == _DEPLOYED else BLUE for L in _cost_order],
+            text=["deployed" if L == _DEPLOYED else "" for L in _cost_order], textposition="outside",
+            customdata=[_estcost(L) for L in _cost_order],
+            hovertemplate="%{x}: %{y:+.0f}% return (~$%{customdata:.1f}/run)<extra></extra>"))
         _lfig.update_layout(template="seaborn", height=360, margin={"t": 20, "l": 60, "r": 20},
-                            xaxis={"title": "curator model"}, yaxis={"title": "curator total return %"})
+                            xaxis={"title": "curator model (cheapest → most expensive)"},
+                            yaxis={"title": "curator total return %"})
         _lbar = _lfig.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False})
 
         _scorecard = ""
         for i, L in enumerate(_order):
             r = _llm_by[L]
             j = _J.get(L, {}) or {}
-            pin, pout = _price.get(L, (float("nan"), float("nan")))
-            est = 79 * (24000 * pin + 1300 * pout) / 1e6 if pin == pin else float("nan")  # ~24k in / 1.3k out per call
+            est = _estcost(L)
             bg = "background:#eef7ee;" if i == 0 else ("background:#fafafa;" if i % 2 else "")
             tag = " <span style='color:#2b8a3e;'>(deployed)</span>" if L == _DEPLOYED else ""
             _scorecard += (
@@ -661,7 +667,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                 + _c2(j.get("mean_overall"), "{:.2f}")
                 + "".join(_c2((j.get(k) or 0) * 100, "{:.0f}%") if j else '<td {_lc}>n/a</td>' for k in _JCRIT)
                 + _c2(r["agree"] * 100, "{:.0f}%")
-                + _c2(r["ret"] * 100, "{:+.0f}%") + _c2(r["ann"] * 100, "{:+.0f}%") + _c2(r["dd"] * 100, "{:.0f}%")
+                + _c2(r["ret"] * 100, "{:+.0f}%") + _c2(r["dd"] * 100, "{:.0f}%")
                 + _c2(r["calmar"], "{:.2f}") + _c2(r["ir"], "{:+.2f}") + _c2(est, "~${:.1f}") + "</tr>")
         _njudged = _jmeta.get("n_decisions", "?")
         _jcost = _jmeta.get("cost_usd")
@@ -688,7 +694,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
             f'<th style="text-align:left">model</th><th style="text-align:left">provider</th>'
             f'<th {_lc}>decisions<br>(add/rem)</th><th {_lc}>soundness<br>(1-5)</th>'
             + "".join(f'<th {_lc}>{_crlab[k]}</th>' for k in _JCRIT)
-            + f'<th {_lc}>agree<br>vs kimi</th><th {_lc}>total<br>ret</th><th {_lc}>ann</th><th {_lc}>maxDD</th>'
+            + f'<th {_lc}>agree<br>vs kimi</th><th {_lc}>total<br>ret</th><th {_lc}>maxDD</th>'
             f'<th {_lc}>Calmar</th><th {_lc}>IR</th><th {_lc}>~$/run</th>'
             f'</tr></thead><tbody>{_scorecard}</tbody></table></div>'
             '<p style="color:#666;font-size:12px;max-width:940px;line-height:1.6;margin:.5em 0 .3em;">'
