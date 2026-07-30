@@ -7,7 +7,7 @@ requires-python = ">=3.11"
 authors = [
     { name = "Joseph M. Hahn" },
 ]
-license = { text = "MIT" }
+license = { text = "PolyForm-Noncommercial-1.0.0" }
 
 dependencies = [
     # core: profile parsing, optimizer math, price data, dashboards

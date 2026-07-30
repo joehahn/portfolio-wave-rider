@@ -269,4 +269,8 @@ Technical demo. Not financial advice. Historical performance is not predictive. 
 
 ## License
 
-MIT.
+[PolyForm Noncommercial License 1.0.0](LICENSE), effective 2026-07-30. Free to use, modify, and share for any noncommercial purpose: research, experimentation, education, personal projects, and use by nonprofit or government organizations. Commercial use is not granted by this license.
+
+Commercial rights are reserved by the author. If you want to use this work commercially, email jmh.datasciences@gmail.com and we will talk.
+
+This project was released under MIT before 2026-07-30. That grant is irrevocable for the commits it covered, so anything published under it stays MIT in those versions; the terms above govern this commit onward.
