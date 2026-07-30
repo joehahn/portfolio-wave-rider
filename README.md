@@ -34,7 +34,8 @@ Results are served via three families of GitHub Pages, each showing results gene
 Each rebalance runs one loop. The curator is the only judgment call; everything else is deterministic Python.
 
 ```mermaid
-flowchart LR
+%%{init: {"theme":"base", "themeVariables": {"fontSize":"22px"}}}%%
+flowchart TD
     N["News<br/>date-clean GKG + Wayback (backtest)<br/>Anthropic web_search (live)"]
     subgraph CUR["Curator: kimi-k2.5 (the edge)"]
       direction TB
@@ -51,18 +52,7 @@ flowchart LR
 
 The highlighted box is where the advantage comes from: an LLM reading the news against your thesis to decide *which tickers* the optimizer gets to choose among. The optimizer only ever sets the weights.
 
-See [GLOSSARY.md](GLOSSARY.md) for the meanings of the finance terms used below (`σ`, `μ`, `Σ`, Sharpe ratio, risk aversion `λ`, mean-variance optimization, etc.) and [REFERENCE.md](REFERENCE.md) for project details (repo layout, code, input and output files, architecture overview, and testing instructions).
-
-## Recent revisions
-
-The project has evolved since its first release, and the dashboards above reflect the current design.
-
-- **Clean news retrieval.** The backtest curator no longer reads news via live WebSearch, which leaks present-day knowledge into historical queries (a 2023 rebalance would surface 2026 "best stocks to buy" lists). It now reads a date-honest **GDELT-GKG plus Wayback** corpus: server-enforced date bounds and archived same-date article ledes, so each rebalance only sees news that existed at that time. This removes the *retrieval* leak. It does not remove the model's training-memorization leak, so only forward testing can settle that (more in the caveats).
-- **A cheap, disciplined default curator.** Every backtest return is in-sample and cannot rank one curator LLM against another, so a **blind, leak-free rationale judge** scores the reasoning instead: an independent Opus grader rates each add and remove with the market outcome hidden. It found **kimi-k2.5** ties Sonnet on reasoning quality while running about 8x cheaper and 3x faster, so kimi is now the default backtest curator.
-- **One unified sweep.** The four separate sweep pages are retired in favor of a single [parameter-sweep dashboard](https://joehahn.github.io/portfolio-wave-rider/sweep_pwr.html): the zero-cost optimizer-knob frontier, the curator-LLM comparison, and the blind judge, side by side.
-- **Skills retired, plain Python in.** The Claude-Code *skills* (the slash commands) are gone. Every routine run is now plain Python: the CLI (`python -m src.cli`) plus a few scripts, calling the OpenRouter and Anthropic SDKs directly for the curator. So the backtest and the forward path share one curator prompt, retriever, validator, and optimizer, a lesson learned on either side lands on the other, and routine runs cost an API key rather than Claude-Code tokens (those are spent only during development). Setup below covers the API keys.
-
-The granular numbers (exact config, per-wave attribution, the full bias accounting) live in [REFERENCE.md](REFERENCE.md); this page keeps the visitor-level tour.
+See [GLOSSARY.md](GLOSSARY.md) for the finance terms used below (`σ`, `μ`, `Σ`, Sharpe ratio, risk aversion `λ`, mean-variance optimization, etc.). [REFERENCE.md](REFERENCE.md) has the project details (repo layout, code, input and output files, architecture, testing) and the granular numbers (exact config, per-wave attribution, the full bias accounting); this page keeps the visitor-level tour.
 
 ## Setup
 
@@ -184,7 +174,7 @@ The four old per-parameter sweep pages are retired. Everything now lives on one 
 
 - **Optimizer-knob frontier.** The optimizer settings (`concentration_cap`, risk aversion `λ`, and the price lookback) only touch the mean-variance replay, not the curator, so the entire grid is a **zero-cost** local re-solve on a fixed set of curations. No LLM tokens, no news re-fetch. The dashboard ranks every config by Information Ratio and flags the current one.
 - **Curator-LLM comparison.** Each candidate model reads the same news pools at the same config, so the only variable is the curator. This is where the cheap-workhorse choice (kimi) was made.
-- **Blind rationale judge.** The leak-free scoring described in Recent revisions.
+- **Blind rationale judge.** An independent Opus grader scores each add and remove with the market outcome hidden, so a curator is ranked on the quality of its reasoning rather than on an in-sample return.
 
 `max_watchlist_size` is swept separately, by re-curating at each size, because it shapes the curator's *decisions*, so each value needs its own set of curator calls rather than a free re-solve. See [REFERENCE.md](REFERENCE.md) for what each knob does and how the sweep is run.
 
