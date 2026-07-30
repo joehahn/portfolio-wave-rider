@@ -111,7 +111,8 @@ def main() -> int:
          "initial_usd": float(fm.get("initial_investment_usd", 50000.0)),
          "lookback_years": fm["optimizer_lookback_days"] / 365.0,
          "max_watchlist_size": ms, "start_date": dates[0], "end_date": end.isoformat(),
-         "initial_weights": initial_weights, "naive_benchmark": naive_benchmark}, indent=2))
+         "initial_weights": initial_weights, "naive_benchmark": naive_benchmark,
+         "seed_src": SEED_SRC}, indent=2))     # remember the CBT run so the daily refresh can build the KPI table
     hist = RUN / "_wf_history.csv"
     hist.write_text("date,action,ticker,wave_bucket,rationale,news_evidence_urls\n")
     hold = RUN / "_wf_holdings.csv"
@@ -160,7 +161,7 @@ def main() -> int:
     portfolio.build_curator_dashboard(
         backtest_dir=str(RUN / "_backtest"), runs_dir=str(RUN), out_path="docs/curator_bootstrap.html",
         benchmarks=["SPY"], heading="Curator Bootstrap", acronym="CBS", show_max_articles=False,
-        handoff_date=HANDOFF)
+        handoff_date=HANDOFF, compare_backtest_dir=str(ROOT / SEED_SRC / "_backtest"))
     print("  rendered docs/curator_bootstrap.html", file=sys.stderr)
     return 0
 

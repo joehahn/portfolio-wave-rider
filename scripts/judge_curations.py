@@ -35,10 +35,10 @@ from random import Random
 ROOT = Path(__file__).resolve().parent.parent
 
 # curators under judgement: (display label, run dir). Order is irrelevant — decisions are pooled + shuffled.
-RUNS = [
-    ("claude-sonnet-5", "data/curator_runs/gkg-2yr-weekly"),
-    ("moonshotai/kimi-k2.5", "data/curator_runs/gkg-3yr-final"),
-    ("deepseek/deepseek-v4-flash", "data/curator_runs/gkg-3yr-deepseek"),
+RUNS = [   # geosplit-config runs at the canonical mws16: same pools/dates/config, only the curator LLM varies
+    ("claude-sonnet-5", "data/curator_runs/proto-sonnet"),
+    ("moonshotai/kimi-k2.5", "data/curator_runs/proto-mws16"),
+    ("deepseek/deepseek-v4-flash", "data/curator_runs/proto-deepseek"),
 ]
 JUDGE_DEFAULT = "claude-opus-4-8"
 JUDGE_PRICE = {"in": 5.0, "out": 25.0}      # $/M tokens, Opus 4.8 estimate (only used to report an approx cost)
@@ -139,7 +139,11 @@ def judge_one(cli, judge_model, dec):
     last = None
     for t in range(5):
         try:
+            # Disable extended thinking: Opus 4.8 runs it ON by default, which would consume the 400-token
+            # budget and leave the verdict JSON empty/truncated (every decision would fail to parse). The
+            # rubric is a short structured verdict that needs no thinking pass.
             r = cli.messages.create(model=judge_model, max_tokens=400, system=JUDGE_SYSTEM,
+                                    thinking={"type": "disabled"},
                                     messages=[{"role": "user", "content": _decision_text(dec)}])
             txt = "".join(getattr(b, "text", "") for b in r.content).strip()
             v = _parse(txt)

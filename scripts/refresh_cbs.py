@@ -36,6 +36,9 @@ def main() -> int:
     starter = json.loads(sp.read_text())
     starter["end_date"] = datetime.now().strftime("%Y-%m-%d")
     sp.write_text(json.dumps(starter, indent=2))
+    # CBT reference run (persisted by run_bootstrap_curator.py) for the bootstrap-vs-backtest KPI table.
+    _seed_src = starter.get("seed_src")
+    _cmp_dir = str(ROOT / _seed_src / "_backtest") if _seed_src else None
     # Pure-math replay of the existing curation JSONs through the (now longer) window -- no LLM call.
     portfolio.curator_backtest(
         runs_dir=str(RUN), out_dir=str(RUN / "_backtest"), max_weight=float(fm["concentration_cap"]),
@@ -46,7 +49,7 @@ def main() -> int:
     portfolio.build_curator_dashboard(
         backtest_dir=str(RUN / "_backtest"), runs_dir=str(RUN), out_path="docs/curator_bootstrap.html",
         benchmarks=["SPY"], heading="Curator Bootstrap", acronym="CBS", show_max_articles=False,
-        handoff_date="2026-07-22")
+        handoff_date="2026-07-22", compare_backtest_dir=_cmp_dir)
     print(f"  CBS refreshed to {starter['end_date']} -> docs/curator_bootstrap.html", file=sys.stderr)
     return 0
 

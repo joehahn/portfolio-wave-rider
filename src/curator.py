@@ -56,8 +56,13 @@ def _llm_complete(model: str, system: str, user: str, max_tokens: int, anthropic
     """One completion, provider-agnostic. `claude-*` -> Anthropic SDK; `vendor/model` -> OpenRouter's
     OpenAI-compatible endpoint (raw requests). Returns (text, tokens_in, tokens_out)."""
     if model.startswith("claude"):
+        # claude-sonnet-5 / opus etc. run EXTENDED THINKING on by default, which (a) balloons output cost
+        # (thinking tokens bill as output), (b) can overflow max_tokens and truncate the JSON, and (c) makes
+        # the model unfairly stronger than the OpenRouter models we run with reasoning OFF. Honor no_reasoning
+        # by explicitly disabling thinking so every curator LLM is compared on the same (no-reasoning) footing.
+        kwargs = {"thinking": {"type": "disabled"}} if no_reasoning else {}
         r = anthropic_cli.messages.create(model=model, max_tokens=max_tokens, system=system,
-                                          messages=[{"role": "user", "content": user}])
+                                          messages=[{"role": "user", "content": user}], **kwargs)
         txt = "".join(getattr(b, "text", "") for b in r.content).strip()
         return txt, r.usage.input_tokens, r.usage.output_tokens
     import requests

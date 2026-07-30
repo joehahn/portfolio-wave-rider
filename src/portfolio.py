@@ -3739,7 +3739,11 @@ def _build_ticker_periods(
     completed: list[tuple[str, pd.Timestamp, pd.Timestamp, str]] = []
 
     for t in starter_tickers:
-        open_periods[t] = (run_start, _STARTER_WAVE_DEFAULTS.get(t, "general_markets"))
+        # Seed/starter tickers carry no curator wave_bucket, so resolve their wave from the explicit
+        # _STARTER_WAVE_DEFAULTS override, then the ticker->wave map, and only then fall back to
+        # general_markets. Without the TICKER_WAVE step a seed AI name like AMZN reads grey (general_markets)
+        # in the Gantt + gain plots and its wave never enters the legend.
+        open_periods[t] = (run_start, _STARTER_WAVE_DEFAULTS.get(t) or TICKER_WAVE.get(t, "general_markets"))
 
     for f in files:
         payload = json.loads(f.read_text())
@@ -3777,6 +3781,7 @@ def build_curator_dashboard(
     acronym: str = "CBT",
     show_max_articles: bool = True,
     handoff_date: str | None = None,
+    compare_backtest_dir: str | None = None,
 ) -> dict[str, Any]:
     """Render a single static HTML dashboard for one curator-backtest run.
 
@@ -3986,13 +3991,19 @@ def build_curator_dashboard(
             tickvals=[10000, 30000, 100000, 300000, 1000000],
             ticktext=["$10K", "$30K", "$100K", "$300K", "$1M"],
         )
+    # Align plot 2's (equity curve, row 1) x-axis with the [start, end] range used by the other time-axis
+    # subplots (row 2 Gantt, row 5 wave-area) so dates — and the handoff line — line up vertically down the stack.
+    fig.update_xaxes(range=[start, end], row=1, col=1)
     if handoff_date:   # CBS: mark the backtest -> forward news handoff on the equity curve. add_vline's own
         # annotation breaks on a datetime axis (it averages Timestamps), so draw the line + label separately.
         fig.add_vline(x=pd.Timestamp(handoff_date), line={"dash": "dot", "color": "#888", "width": 1.5},
                       row=1, col=1)
         fig.add_annotation(x=pd.Timestamp(handoff_date), y=1.0, yref="y domain", yanchor="bottom",
-                           xanchor="left", text=" backtest ← | → forward news", showarrow=False,
+                           xanchor="center", xshift=9, text="backtest ← | → forward news", showarrow=False,
                            font={"size": 11, "color": "#666"}, row=1, col=1)
+        # Plots 3 (Gantt) and 6 (wave-area) get the same marker, but drawn AFTER their traces exist (below,
+        # once every subplot axis is established) — add_vline here, before those rows are populated, would
+        # silently fall back onto row 1's x-axis.
 
     # Chart 2: watchlist Gantt. One row per ticker, color = wave_bucket.
     # Sort tickers so the first-added is at the top, latest at the bottom.
@@ -4165,6 +4176,12 @@ def build_curator_dashboard(
         )
     fig.update_yaxes(title_text="$", tickformat="$,.0f", row=5, col=1)
     fig.update_xaxes(range=[start, end], row=5, col=1)
+
+    if handoff_date:   # plots 3 (Gantt row 2) and 6 (wave-area row 5): draw the handoff marker now that every
+        # subplot axis exists, so each shape resolves to its own x-axis (x2, x5) instead of falling back to x.
+        for _r in (2, 5):
+            fig.add_vline(x=pd.Timestamp(handoff_date), line={"dash": "dot", "color": "#888", "width": 1.5},
+                          row=_r, col=1)
 
     fig.update_layout(
         template="seaborn",
@@ -4543,6 +4560,70 @@ def build_curator_dashboard(
         + '</div>'
     )
 
+    # ---- Bootstrap-vs-backtest KPI table: the SAME canonical config scored two ways over the OVERLAPPING
+    # window -- this run's bootstrap-news path (CBS) vs the reference backtest-news path (CBT). Only built when
+    # the caller passes a comparison backtest dir (CBS mode); it doubles as the backtest-vs-forward overfit read.
+    _cmp_html = ""
+    if compare_backtest_dir and (Path(compare_backtest_dir) / "snapshots.csv").exists():
+        _cbt_tot = (pd.read_csv(Path(compare_backtest_dir) / "snapshots.csv", parse_dates=["date"])
+                    .groupby("date")["total_value"].first().sort_index())
+        _lo, _hi = max(start, _cbt_tot.index[0]), min(end, _cbt_tot.index[-1])
+        if _lo < _hi:
+            _ov_spy = _fetch_benchmark_curves(["SPY"], _lo, _hi, 1.0).get("SPY")
+
+            def _kpi_set(_t):   # KPIs for a total-value series restricted to the overlap [_lo, _hi]
+                _t = _t[(_t.index >= _lo) & (_t.index <= _hi)].dropna()
+                if len(_t) < 3:
+                    return None
+                _i0, _f0 = float(_t.iloc[0]), float(_t.iloc[-1])
+                _d = max((_t.index[-1] - _t.index[0]).days, 1)
+                _a = (_f0 / _i0) ** (365.25 / _d) - 1.0 if _i0 > 0 and _f0 > 0 else float("nan")
+                _md = float((_t / _t.cummax() - 1.0).min())
+                _dv = _t.diff().dropna()                      # Gain-to-Pain = net gain / sum of down-moves
+                _pain = float(-_dv[_dv < 0].sum())
+                _ir = _ts = _al = float("nan")
+                if _ov_spy is not None:
+                    _sp = _ov_spy.reindex(_t.index).ffill()
+                    _c = _t.pct_change().dropna()
+                    _ac = (_c - _sp.pct_change().reindex(_c.index)).dropna()
+                    if len(_ac) > 2 and _ac.std() > 0:
+                        _ir = _ac.mean() / _ac.std() * _math.sqrt(len(_ac) / (_d / 365.25))
+                        _ts = _ac.mean() / _ac.std() * _math.sqrt(len(_ac))
+                    if len(_sp) > 1 and float(_sp.iloc[0]) > 0:
+                        _al = _a - ((float(_sp.iloc[-1]) / float(_sp.iloc[0])) ** (365.25 / _d) - 1.0)
+                return {"total": _f0 / _i0 - 1.0, "ann": _a, "mdd": _md,
+                        "calmar": _a / abs(_md) if _md < 0 else float("nan"),
+                        "gpr": (_f0 - _i0) / _pain if _pain > 0 else float("nan"),
+                        "ir": _ir, "tstat": _ts, "alpha": _al}
+
+            _kb, _kc = _kpi_set(totals), _kpi_set(_cbt_tot)   # bootstrap-news path, backtest-news path
+            if _kb and _kc:
+                _pf = lambda x: f"{x * 100:+.0f}%" if x == x else "n/a"     # noqa: E731
+                _nf = lambda x, d=2: f"{x:.{d}f}" if x == x else "n/a"      # noqa: E731
+                _METR = [("Total return", "total", _pf), ("Annualized (CAGR)", "ann", _pf),
+                         ("Max drawdown", "mdd", _pf), ("Calmar (ann / |DD|)", "calmar", _nf),
+                         ("Gain-to-Pain", "gpr", _nf), ("Info Ratio vs SPY", "ir", _nf),
+                         ("IR t-stat", "tstat", lambda x: _nf(x, 1)), ("Ann. alpha vs SPY", "alpha", _pf)]
+                _trs = "".join(
+                    f'<tr><td style="padding:3px 14px 3px 0">{_html.escape(_lab)}</td>'
+                    f'<td style="padding:3px 22px 3px 0;text-align:right">{_fmt(_kb[_k])}</td>'
+                    f'<td style="padding:3px 0;text-align:right">{_fmt(_kc[_k])}</td></tr>'
+                    for _lab, _k, _fmt in _METR)
+                _cmp_html = (
+                    '<h2 style="margin:1.4em 0 0.3em;">Bootstrap vs backtest KPIs (same config)</h2>'
+                    f'<p style="color:#555;max-width:840px;margin:0 0 .5em;">The <b>same canonical config</b> '
+                    f'scored over the <b>overlapping</b> window ({_lo.date()} to {_hi.date()}): the '
+                    '<b>bootstrap (CBS)</b> column is this run&#39;s live/forward-style news path, the '
+                    '<b>backtest (CBT)</b> column is the GKG+Wayback backtest-news path. A wide gap flags '
+                    'path-sensitivity / overfit. <b>Caveat:</b> the window is short and the CBS is still '
+                    'seed-dominated (one curator add so far), so every figure is noisy and mostly reflects the '
+                    'inherited seed, not the curator&#39;s forward skill; it firms up as forward quarters accrue.</p>'
+                    '<table style="border-collapse:collapse;font-size:14px;">'
+                    '<tr><th style="text-align:left;padding:3px 14px 3px 0">Metric</th>'
+                    '<th style="text-align:right;padding:3px 22px 3px 0">Bootstrap (CBS)</th>'
+                    '<th style="text-align:right;padding:3px 0">Backtest (CBT)</th></tr>'
+                    f'{_trs}</table>')
+
     # Make the plots 1-5 subplot titles match the h2 section headers below (plots 6+): bold, left-justified,
     # instead of Plotly's default unbold-centered. The subplot titles are the annotations whose text starts
     # with a digit ("1." .. "5."); left-anchor them at the plot's left edge and bold via <b>.
@@ -4582,9 +4663,11 @@ def build_curator_dashboard(
     if float(_cash.max()) > 0.1:
         _af.add_trace(go.Scatter(x=_cash.index, y=_cash, name="cash", mode="lines",
                                  stackgroup="a", line={"width": 0.4, "color": "#ced4da"}))
-    _af.update_layout(template="seaborn", height=400, margin={"t": 20, "l": 60, "r": 30},
-                      yaxis={"title": "% of portfolio", "range": [0, 100]},
-                      xaxis={"range": [start, end]})
+    _af.update_layout(template="seaborn", height=400, margin={"t": 20, "l": 80, "r": 30},  # l=80 matches the
+                      yaxis={"title": "% of portfolio", "range": [0, 100]},                # main fig so plot 7's
+                      xaxis={"range": [start, end]})                                       # x-axis aligns with plot 6
+    if handoff_date:   # plot 7: mark the backtest -> forward news handoff (same dotted line as plots 2/3/6)
+        _af.add_vline(x=pd.Timestamp(handoff_date), line={"dash": "dot", "color": "#888", "width": 1.5})
 
     # (b) Gains vs news source / vs keyword: each add's forward price return (add -> next remove / end),
     # bucketed by its news_evidence source and by the wave keyword that surfaced the evidence article.
@@ -4841,8 +4924,8 @@ def build_curator_dashboard(
         _lsf.update_layout(template="seaborn", height=240, margin={"t": 20, "l": 210, "r": 40},
                            xaxis={"title": "$ P&L per article (green = +, red = &minus;)"})
         _gain_ledesrc = _to_html(_lsf)
-    _ledesrc_note = ('<p style="color:#555;max-width:820px;margin:0 0 .4em;">Plot&nbsp;9&#39;s <b>gain per '
-                     'article</b> (total forward gain / pool-article footprint), but bucketed by the LEDE SOURCE '
+    _ledesrc_note = ('<p style="color:#555;max-width:820px;margin:0 0 .4em;">Plot&nbsp;9&#39;s <b>$ P&amp;L per '
+                     'article</b> (total $ P&amp;L / pool-article footprint), but bucketed by the LEDE SOURCE '
                      'of the cited evidence: clean, look-ahead-safe <b>Wayback</b> ledes vs the look-ahead-biased '
                      '<b>live-fallback</b> ledes (fetched from today&#39;s page). If live noticeably beats Wayback, '
                      'the bias is flattering the picks &mdash; a caution on fuller-mode backtest returns.</p>')
@@ -4852,20 +4935,22 @@ def build_curator_dashboard(
                   'the equity curve, NOT the raw add&rarr;end price return), bucketed by the '
                   '<code>news_evidence</code> source (by URL domain) and by the wave keyword that surfaced the '
                   'cited article. Answers which desks / search terms produced profitable picks. n = number of adds.</p>')
-    _gpa_note = ('<p style="color:#555;max-width:820px;margin:0 0 .4em;">Plot&nbsp;8\'s total gain per source '
+    _gpa_note = ('<p style="color:#555;max-width:820px;margin:0 0 .4em;">Plot&nbsp;8\'s total $ P&amp;L per source '
                  'divided by how many articles that source contributed to the pools (its footprint, shown as '
                  '<code>N&nbsp;art.</code>). Signal <b>density</b>: high = a source that produced gains from '
-                 'few articles; near-zero/negative with many articles = low-signal, a block-list candidate.</p>')
-    _author_note = ('<p style="color:#555;max-width:820px;margin:0 0 .4em;">Plot&nbsp;8\'s forward price return, '
-                    'but bucketed by the article <b>author</b> (byline extracted from each cited evidence URL) '
+                 'few articles; near-zero/negative with many articles = low-signal, a block-list candidate. '
+                 'The day-0 seed (CBT inheritance) has no pool-article footprint, so it is dropped here: these '
+                 'bars reflect the curator&#39;s news-sourced adds only, not the inherited seed&#39;s P&amp;L.</p>')
+    _author_note = ('<p style="color:#555;max-width:820px;margin:0 0 .4em;">Plot&nbsp;8\'s realized <b>$ P&amp;L</b> '
+                    'per add, but bucketed by the article <b>author</b> (byline extracted from each cited evidence URL) '
                     'instead of the source domain. Which reporters surfaced winning picks. n = number of adds; a '
                     'co-authored article credits each byline. Adds whose evidence URL has no captured byline are omitted.</p>')
 
     extra_html = (
         '<h2 style="margin:1.6em 0 0.2em;">7. Allocation over time</h2>' + _to_html(_af)
         + (('<h2 style="margin:1.6em 0 0.2em;">8. Gains vs news source</h2>' + _attr_note + _gain_src) if _gain_src else '')
-        + (('<h2 style="margin:1.6em 0 0.2em;">9. Gain per article vs news source</h2>' + _gpa_note + _gain_per_art) if _gain_per_art else '')
-        + (('<h2 style="margin:1.6em 0 0.2em;">10. Gain per article by lede source</h2>' + _ledesrc_note + _gain_ledesrc) if _gain_ledesrc else '')
+        + (('<h2 style="margin:1.6em 0 0.2em;">9. $ P&amp;L per article vs news source</h2>' + _gpa_note + _gain_per_art) if _gain_per_art else '')
+        + (('<h2 style="margin:1.6em 0 0.2em;">10. $ P&amp;L per article by lede source</h2>' + _ledesrc_note + _gain_ledesrc) if _gain_ledesrc else '')
         + (('<h2 style="margin:1.6em 0 0.2em;">11. Gains vs search keyword</h2>' + _attr_note + _gain_kw) if _gain_kw else '')
     )
     # 12. Number of adds per source — the raw n behind the source-gain plots.
@@ -4898,17 +4983,118 @@ def build_curator_dashboard(
                 hovertemplate="%{x} (%{customdata})<br>%{y:.1%}<extra></extra>"))
             _rcap = float(_fm.get("concentration_cap", 0.25))
             _rf.add_hline(y=_rcap, line={"color": "#d62728", "width": 1.5, "dash": "dot"})
-            _rf.update_layout(height=340, margin={"l": 60, "r": 20, "t": 10, "b": 60}, plot_bgcolor="white",
+            _rf.update_layout(height=340, margin={"l": 60, "r": 20, "t": 10, "b": 74}, plot_bgcolor="white",
                               font={"size": 13}, showlegend=False, yaxis_title="portfolio %")
             _rf.update_yaxes(tickformat=".0%", gridcolor="#eee")
+            # Two-line x labels: ticker on top, its wave bucket below (fed the most-recent-bucket map so the
+            # sub-label matches each bar's wave color), same format as plot 4. Hover/click still key on the
+            # plain ticker (the x value), so the 1Y/3Y popup is unaffected.
+            _rwmap = dict(zip(_lr["ticker"].astype(str), _rw))
+            _rf.update_xaxes(tickmode="array", tickvals=list(_lr["ticker"].astype(str)),
+                             ticktext=[_ticker_label(str(t), _rwmap) for t in _lr["ticker"]])
+            # Click-to-inspect: fetch each recommended ticker's 3-year daily closes (independently, so a
+            # short-history IPO doesn't truncate the others) and embed them, so clicking a bar opens a modal
+            # with that ticker's price line and a 1Y/3Y toggle (1Y is sliced client-side from the 3Y series).
+            # Fetched at render; a yfinance failure just omits the popup.
+            _tkhist: dict[str, dict] = {}
+            for _tk in _lr["ticker"].astype(str):
+                try:
+                    _hp = fetch_prices([_tk], period="3y")
+                    _col = (_hp[_tk] if _tk in _hp.columns else _hp.iloc[:, 0]).dropna()
+                    if len(_col) > 5:
+                        _tkhist[_tk] = {"x": [d.strftime("%Y-%m-%d") for d in _col.index],
+                                        "y": [round(float(v), 2) for v in _col.values]}
+                except Exception:  # noqa: BLE001
+                    pass
+            _barid = "rec15chart"
+            _bar_html = _rf.to_html(full_html=False, include_plotlyjs=False,
+                                    config={"displayModeBar": False}, div_id=_barid)
+            _modal = ""
+            if _tkhist:
+                _modal = (
+                    '<div id="tkmodal" style="display:none;position:fixed;inset:0;'
+                    'background:rgba(0,0,0,.45);z-index:9999;" '
+                    "onclick=\"if(event.target===this)this.style.display='none'\">"
+                    '<div style="background:#fff;max-width:780px;margin:6vh auto;padding:12px 16px 6px;'
+                    'border-radius:8px;position:relative;">'
+                    "<button onclick=\"document.getElementById('tkmodal').style.display='none'\" "
+                    'style="position:absolute;top:6px;right:12px;border:none;background:none;'
+                    'font-size:24px;cursor:pointer;color:#999;">&times;</button>'
+                    '<div style="margin:2px 0 8px;"><button id="tkb1" onclick="_setTkYrs(1)">1Y</button>'
+                    '<button id="tkb3" onclick="_setTkYrs(3)">3Y</button></div>'
+                    '<div id="tkmodal_chart" style="width:100%;height:380px;"></div></div></div>'
+                    '<script>var _TKHIST=' + json.dumps(_tkhist) + ';var _curTk=null,_curYrs=1;'
+                    # slice the embedded 3Y series to the last `y` years so the y-axis auto-scales to the view
+                    'function _tkslice(h,y){if(y>=3)return h;var L=new Date(h.x[h.x.length-1]);'
+                    'var c=new Date(L);c.setFullYear(c.getFullYear()-y);var X=[],Y=[];'
+                    'for(var i=0;i<h.x.length;i++){if(new Date(h.x[i])>=c){X.push(h.x[i]);Y.push(h.y[i]);}}'
+                    'return{x:X,y:Y};}'
+                    'function _tkdraw(){var h=_TKHIST[_curTk];if(!h)return;var d=_tkslice(h,_curYrs);'
+                    'Plotly.newPlot("tkmodal_chart",[{x:d.x,y:d.y,type:"scatter",mode:"lines",'
+                    'line:{color:"#1f77b4",width:1.6},'
+                    'hovertemplate:"%{x|%Y-%m-%d}<br>$%{y:.2f}<extra></extra>"}],'
+                    '{margin:{l:58,r:20,t:42,b:40},template:"seaborn",'
+                    'title:{text:_curTk+": "+_curYrs+"-year price history",x:0.02,font:{size:16}},'
+                    'yaxis:{title:"$",tickprefix:"$"}},{displayModeBar:false,responsive:true});'
+                    'var on="background:#1f77b4;color:#fff;",off="background:#eee;color:#333;",'
+                    'b="border:none;border-radius:4px;padding:3px 12px;margin-right:6px;cursor:pointer;font-size:13px;";'
+                    'document.getElementById("tkb1").style.cssText=b+(_curYrs==1?on:off);'
+                    'document.getElementById("tkb3").style.cssText=b+(_curYrs==3?on:off);}'
+                    'window._showTkHist=function(tk){if(!_TKHIST[tk])return;_curTk=tk;_curYrs=1;'
+                    'document.getElementById("tkmodal").style.display="block";_tkdraw();};'
+                    'window._setTkYrs=function(y){_curYrs=y;_tkdraw();};'
+                    '(function a(){var g=document.getElementById("' + _barid + '");'
+                    'if(g&&g.on){g.on("plotly_click",function(ev){window._showTkHist(ev.points[0].x);});}'
+                    'else setTimeout(a,150);})();</script>')
+            _hint = (" Click any bar to open that ticker&#39;s price history (1Y / 3Y toggle)."
+                     if _tkhist else "")
             _latest_rec_html = (
                 '<h2 style="margin:1.6em 0 0.2em;">15. Latest recommended portfolio %</h2>'
                 f'<p style="color:#555;max-width:820px;margin:0 0 .4em;">The optimizer&#39;s target weights at the '
                 f'final rebalance ({str(_lr["date"].iloc[0])[:10]}) &mdash; the allocation the curator strategy '
-                f'would hold now. Red dotted line = the concentration_cap ({_rcap:.0%}).</p>'
-                + _rf.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False}))
+                f'would hold now. Red dotted line = the concentration_cap ({_rcap:.0%}).{_hint}</p>'
+                + _bar_html + _modal)
     except Exception:  # noqa: BLE001
         pass
+    # Intro news description: CBS (handoff_date set) is a backtest-news -> live-news SPLICE; CBT is plain
+    # backtest news. The old intro hardcoded the GKG+Wayback (backtest-only) description for both, which
+    # misdescribed the CBS's whole reason to exist.
+    if handoff_date:
+        _pool_line = (
+            f'Before the {handoff_date} handoff (dotted line in chart&nbsp;2) each pool is the backtest&#39;s '
+            f'GDELT&nbsp;GKG + Wayback pool (look-ahead-reduced); after it, the live WebSearch forward corpus, '
+            f'the same news path <code>/review-portfolio</code> consumes with real money. This backtest-news '
+            f'to live-news splice is the point of the CBS; see the <a href="retrieval_bootstrap.html">RBS</a> '
+            f'for the news-side view of the same transition. ')
+    else:
+        _pool_line = ('Each pool is built upstream from GDELT&nbsp;GKG + Wayback (look-ahead-reduced); browse '
+                      'them in the <a href="pool_browser.html">pool browser</a>. ')
+    # Forward-transition status (CBS only): how many rebalances postdate the handoff. 0 => the post-handoff
+    # curve is price-extension of the frozen watchlist, NOT WebSearch-driven curation -- state that so the
+    # segment past the dotted line isn't misread as "the forward regime". The "next due" date uses the median
+    # rebalance gap so no cadence->days constant is hardcoded.
+    _forward_note = ""
+    if handoff_date:
+        _reb = (sorted(pd.Timestamp(x) for x in rebalance_dates) if rebalance_dates
+                else sorted(pd.Timestamp(p.stem.replace("-curation", ""))
+                            for p in Path(runs_dir).glob("*-curation.json")))
+        _n_fwd = sum(1 for d in _reb if d > pd.Timestamp(handoff_date))
+        if _reb and _n_fwd == 0:
+            _gaps = pd.Series(_reb).diff().dropna()
+            _gap = _gaps.median() if len(_gaps) else pd.Timedelta(days=14)
+            _forward_note = (
+                '<p style="color:#8a5a00;background:#fff8e6;border-left:3px solid #f0b429;'
+                'padding:.5em .7em;max-width:780px;margin:.2em 0 .7em;font-size:14px;">'
+                f'<b>Transition status:</b> no forward-news (WebSearch) rebalance has fired yet. The last '
+                f'curation was {_reb[-1].date()} on backtest-tail news, so the curve to the right of the dotted '
+                f'handoff line is price-extension of that frozen watchlist, not WebSearch-driven curation. The '
+                f'first forward rebalance is due ~{(_reb[-1] + _gap).date()}.</p>')
+        elif _reb and _n_fwd > 0:
+            _forward_note = (
+                '<p style="color:#555;max-width:780px;margin:.2em 0 .7em;font-size:14px;">'
+                f'<b>Transition status:</b> {_n_fwd} forward-news (WebSearch) rebalance'
+                f'{"s have" if _n_fwd != 1 else " has"} fired since the {handoff_date} handoff.</p>')
+
     page = (
         '<!doctype html><html><head><meta charset="utf-8">'
         f'<title>{heading} ({acronym})</title>'
@@ -4924,11 +5110,10 @@ def build_curator_dashboard(
         f'<p style="color:#555;max-width:780px;">The watchlist-curator agent was called '
         f'{_html.escape(_cadence)} over the {start.date()} to {end.date()} window. '
         f'At each rebalance it read a date-clean news pool for the preceding '
-        f'{_html.escape(_cadence)} window (built upstream from GDELT&nbsp;GKG + Wayback, '
-        f'look-ahead-reduced; browse them in the <a href="pool_browser.html">pool browser</a>) and proposed '
-        'adds and removes against the active watchlist; the optimizer then ran '
+        f'{_html.escape(_cadence)} window. ' + _pool_line +
+        'The curator proposed adds and removes against the active watchlist; the optimizer then ran '
         'mean-variance on the revised watchlist. Each rebalance is marked by an '
-        'orange square on the curator curve in chart 2 — hover over one to see '
+        'orange square on the curator curve in chart 2; hover over one to see '
         'that rebalance\'s adds, removes, and the curator\'s rationale. '
         'The buy-and-hold curve below is '
         'the value of the initial portfolio (which never gets rebalanced or '
@@ -4939,7 +5124,9 @@ def build_curator_dashboard(
         'equity ETFs (broad-market / dividend / utilities / staples); '
         '<code>cashlike</code> = bonds + cash-equivalents + precious metals '
         '(e.g., AGG, BIL, IAU).</p>'
+        + _forward_note
         + cards_html
+        + _cmp_html
         + params_html
         + forward_html
         + log_html

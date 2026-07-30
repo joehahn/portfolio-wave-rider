@@ -44,10 +44,12 @@ REC_MIN_ANN = 80.0   # annualized-return floor (%) — the "must make real money
 
 # LLM curator comparison (section 3): (label, run_dir, provider, $in/M, $out/M). Agreement is measured
 # against the reference (first row). Add a row per model run you want to compare.
-LLM_RUNS = [   # row 0 = the DEFAULT curator. The multi-LLM comparison (Sonnet gkg-2yr-weekly + deepseek
-               # gkg-3yr-deepseek) is preserved in archived/sweep_pwr-with-LLM-comparison.html; those runs
-               # were retired from local storage. Re-add rows + re-run to refresh the comparison on this window.
-    ("moonshotai/kimi-k2.5 (default)", "data/curator_runs/proto-mws20", "OpenRouter", 0.57, 2.85),
+LLM_RUNS = [   # row 0 = the DEPLOYED default (kimi); "agree" is measured against it. All three are the SAME
+               # geosplit pools / dates / canonical mws16 config, reasoning-OFF — only the curator model varies.
+               # Primary ranking is the blind Opus judge (section 12 table), NOT agreement.
+    ("moonshotai/kimi-k2.5", "data/curator_runs/proto-mws16", "OpenRouter", 0.57, 2.85),
+    ("claude-sonnet-5", "data/curator_runs/proto-sonnet", "Anthropic", 3.0, 15.0),
+    ("deepseek/deepseek-v4-flash", "data/curator_runs/proto-deepseek", "OpenRouter", 0.27, 0.40),
 ]
 CURRENT = (float(_FM["concentration_cap"]), float(_FM["risk_aversion"]),
            int(_FM["optimizer_lookback_days"]))   # the live investor_profile.md config (cap / λ / lookback-days)
@@ -611,38 +613,89 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         f'<table style="font-size:12.5px;margin:.3em 0 .4em;"><thead>{_hdr}</thead><tbody>{_body}</tbody></table>'
         '</details>')
 
-    # section 3: per-LLM comparison (same pools + profile config; only the curator model varies)
+    # section 12: curator-MODEL comparison. Same geosplit pools / dates / canonical mws16 config, reasoning-OFF
+    # for every model; the ONLY variable is the curator LLM. Ordered by the blind Opus soundness judge (the one
+    # leak-free ranking), with backtest KPIs (in-sample, secondary) + agreement + est cost alongside.
     def _c2(v, fmt):
         return f'<td {_lc}>{fmt.format(v) if v == v else "n/a"}</td>'
     _llm = _llm_rows(CURRENT)
-    llm_trs = ""
-    for r in _llm:
-        if r.get("pending"):
-            llm_trs += (f'<tr style="border-bottom:1px solid #eee;color:#999;"><td {_lc}>{r["label"]}</td>'
-                        f'<td {_lc}>{r["prov"]}</td><td {_lc} colspan="11"><i>run in progress…</i></td></tr>')
-            continue
-        bg = "background:#fff7e6;" if "reference" in r["label"] else ""
-        llm_trs += (
-            f'<tr style="{bg}border-bottom:1px solid #eee;"><td {_lc}><b>{r["label"]}</b></td><td {_lc}>{r["prov"]}</td>'
-            + _c2(r["cost"], "${:,.2f}") + _c2(r["time_min"], "{:.0f} min")
-            + _c2(r["json"] * 100, "{:.0f}%") + _c2(r["agree"] * 100, "{:.0f}%")
-            + f'<td {_lc}>{r["nadd"]} / {r["nrem"]}</td>' + _c2(r["ret"] * 100, "{:+.0f}%")
-            + _c2(r["ir"], "{:+.2f}") + _c2(r["tstat"], "{:+.1f}") + _c2(r["sharpe"], "{:.2f}")
-            + _c2(r["calmar"], "{:.2f}") + _c2(r["dd"] * 100, "{:.0f}%") + "</tr>")
-    llm_html = "" if len(LLM_RUNS) < 2 else (   # single-model "comparison" is degenerate; omit
-        '<h2>13. LLM comparison — curator model (same pools + profile config)</h2>'
-        '<p style="color:#555;max-width:920px;">Every model reads the <b>same</b> news pools and replays at '
-        'the profile config; the only variable is the curator LLM. The decision '
-        'columns are the ones that matter: <b>agree</b> = share of weeks the model made the identical '
-        'add/remove call as the <b>default</b> model (top row, kimi), <b>valid-JSON</b> = share of calls that parsed, '
-        '<b>$/run</b> = curator LLM cost of a full 157-week curate, and <b>curator time</b> = wall-clock of '
-        'those 157 calls (≈ per-call latency × 157; excludes GKG ingest + optimizer replay). Backtest '
-        'columns are secondary (in-sample / leaky). A cheap model that tracks the default makes the whole '
-        'non-zero-cost sweep affordable.</p>'
-        f'<table><thead><tr><th style="text-align:left">model</th><th style="text-align:left">provider</th>'
-        f'<th {_lc}>$/run</th><th {_lc}>curator time</th><th {_lc}>valid-JSON</th><th {_lc}>agree vs default</th><th {_lc}>adds/removes</th>'
-        f'<th {_lc}>total</th><th {_lc}>IR</th><th {_lc}>t-stat</th><th {_lc}>Sharpe</th><th {_lc}>Calmar</th><th {_lc}>maxDD</th>'
-        f'</tr></thead><tbody>{llm_trs}</tbody></table>')
+    _llm_by = {r["label"]: r for r in _llm if not r.get("pending")}
+    _price = {lab: (pin, pout) for lab, _d, _p, pin, pout in LLM_RUNS}   # for the est $/run column
+    _DEPLOYED = "moonshotai/kimi-k2.5"                                   # the model the live curator uses
+    # blind Opus soundness judge (the PRIMARY ranking): data/curator_runs/_judge_scores.json
+    _J, _JCRIT = {}, ["on_thesis", "evidence_supports", "real_catalyst", "disciplined", "valid_ticker"]
+    _jf = ROOT / "data" / "curator_runs" / "_judge_scores.json"
+    _jmeta = {}
+    if _jf.exists():
+        _JJ = json.loads(_jf.read_text())
+        _J, _JCRIT, _jmeta = _JJ["models"], _JJ["criteria"], _JJ
+    _crlab = {"on_thesis": "on-thesis", "evidence_supports": "evidence", "real_catalyst": "catalyst",
+              "disciplined": "discipline", "valid_ticker": "valid-ticker"}
+    # order: judge soundness desc (fall back to return if a model lacks a judge score)
+    _order = sorted(_llm_by, key=lambda L: -((_J.get(L, {}) or {}).get("mean_overall") or _llm_by[L].get("ret", -9)))
+
+    model_html = ""
+    if len(_llm_by) >= 2:
+        import plotly.graph_objects as _lgo
+        # plot 12: total return vs curator model (bar; deployed kimi flagged green, same convention as plot 11)
+        _lfig = _lgo.Figure(_lgo.Bar(
+            x=[L.split("/")[-1] for L in _order], y=[_llm_by[L]["ret"] * 100 for L in _order],
+            marker_color=[GREEN if L == _DEPLOYED else BLUE for L in _order],
+            text=["deployed" if L == _DEPLOYED else "" for L in _order], textposition="outside",
+            hovertemplate="%{x}: %{y:+.0f}%<extra></extra>"))
+        _lfig.update_layout(template="seaborn", height=360, margin={"t": 20, "l": 60, "r": 20},
+                            xaxis={"title": "curator model"}, yaxis={"title": "curator total return %"})
+        _lbar = _lfig.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False})
+
+        _scorecard = ""
+        for i, L in enumerate(_order):
+            r = _llm_by[L]
+            j = _J.get(L, {}) or {}
+            pin, pout = _price.get(L, (float("nan"), float("nan")))
+            est = 79 * (24000 * pin + 1300 * pout) / 1e6 if pin == pin else float("nan")  # ~24k in / 1.3k out per call
+            bg = "background:#eef7ee;" if i == 0 else ("background:#fafafa;" if i % 2 else "")
+            tag = " <span style='color:#2b8a3e;'>(deployed)</span>" if L == _DEPLOYED else ""
+            _scorecard += (
+                f'<tr style="{bg}border-bottom:1px solid #eee;"><td {_lc}><b>{L.split("/")[-1]}</b>{tag}</td>'
+                f'<td {_lc}>{r["prov"]}</td><td {_lc}>{r["nadd"]} / {r["nrem"]}</td>'
+                + _c2(j.get("mean_overall"), "{:.2f}")
+                + "".join(_c2((j.get(k) or 0) * 100, "{:.0f}%") if j else '<td {_lc}>n/a</td>' for k in _JCRIT)
+                + _c2(r["agree"] * 100, "{:.0f}%")
+                + _c2(r["ret"] * 100, "{:+.0f}%") + _c2(r["ann"] * 100, "{:+.0f}%") + _c2(r["dd"] * 100, "{:.0f}%")
+                + _c2(r["calmar"], "{:.2f}") + _c2(r["ir"], "{:+.2f}") + _c2(est, "~${:.1f}") + "</tr>")
+        _njudged = _jmeta.get("n_decisions", "?")
+        _jcost = _jmeta.get("cost_usd")
+        model_html = (
+            '<h2>12. Total return vs curator model</h2>'
+            '<p style="color:#555;max-width:940px;">The same news pools, dates, and canonical config '
+            f'(mws&nbsp;{_mws_fixed} / cap&nbsp;{CURRENT[0]} / &lambda;&nbsp;{CURRENT[1]} / {CURRENT[2]}d), '
+            'reasoning-OFF for every model &mdash; the <b>only</b> variable is the curator LLM. The bar is each '
+            'model&#39;s in-sample backtest return (deployed kimi in green). But return here is <b>hindsight-'
+            'leaky</b> (the curator could have memorized which 2023&ndash;2026 names later won), so the '
+            'scorecard below ranks by the one metric that owes nothing to hindsight: a blind soundness judge.</p>'
+            + _lbar
+            + '<h2 style="margin-top:1.4em;">Curator-model scorecard</h2>'
+            '<p style="color:#555;max-width:940px;">Rows ordered by <b>soundness</b> &mdash; an independent judge '
+            f'(<b>{_jmeta.get("judge_model", "Opus")}</b>, not one of the curators) reads each add/remove '
+            '<b>blind</b> (model identity stripped, decisions shuffled, the ticker&#39;s later price never shown) '
+            'and grades whether the rationale + cited news justified the call <i>at the time</i>: a holistic '
+            '<b>soundness</b> 1&ndash;5 plus five pass/fail criteria. This is leak-free. The backtest columns '
+            f'(return / ann / maxDD / Calmar / IR) are <b>in-sample, secondary</b>; <b>agree</b> = share of '
+            f'weeks the model made the identical call as deployed kimi; <b>~$/run</b> = estimated LLM cost of a '
+            f'full {len(_order) and 79}-date curate. {_njudged} decisions judged'
+            + (f', ~${_jcost:.2f}.' if _jcost else '.') + '</p>'
+            '<div style="overflow-x:auto;"><table><thead><tr>'
+            f'<th style="text-align:left">model</th><th style="text-align:left">provider</th>'
+            f'<th {_lc}>decisions<br>(add/rem)</th><th {_lc}>soundness<br>(1-5)</th>'
+            + "".join(f'<th {_lc}>{_crlab[k]}</th>' for k in _JCRIT)
+            + f'<th {_lc}>agree<br>vs kimi</th><th {_lc}>total<br>ret</th><th {_lc}>ann</th><th {_lc}>maxDD</th>'
+            f'<th {_lc}>Calmar</th><th {_lc}>IR</th><th {_lc}>~$/run</th>'
+            f'</tr></thead><tbody>{_scorecard}</tbody></table></div>'
+            '<p style="color:#666;font-size:12px;max-width:940px;line-height:1.6;margin:.5em 0 .3em;">'
+            'Criteria (share of a model&#39;s decisions passing each): <b>on-thesis</b> (maps to a named wave) · '
+            '<b>evidence</b> (cited news actually supports the claim) · <b>catalyst</b> (concrete milestone, not '
+            'noise) · <b>discipline</b> (buildup-not-crest; a remove is justified, not churn) · <b>valid-ticker</b> '
+            '(real investable US listing). Soundness is the only leak-free ranking on this page.</p>')
 
     # plot 4: equity-curve race per LLM + buy/hold + SPY (no rebalance markers, per request)
     import plotly.graph_objects as go
@@ -668,7 +721,7 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     _fig4.update_yaxes(title_text="portfolio value ($)", type="log",
                        tickvals=[10000, 30000, 100000, 300000, 1000000],
                        ticktext=["$10K", "$30K", "$100K", "$300K", "$1M"])
-    llm4_html = (('<h2>14. Portfolio value over time — by curator LLM (vs buy/hold and SPY)</h2>'
+    llm4_html = (('<h2>13. Portfolio value over time — by curator model (vs buy/hold and SPY)</h2>'
                   '<p style="color:#555;max-width:920px;">Each LLM\'s realized portfolio value on the same pools '
                   'and profile config, alongside the equal-weight buy/hold starter and SPY. Same idea as the '
                   'curator DB\'s plot 1, without the rebalance markers.</p>'
@@ -784,21 +837,8 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
         '<p style="color:#555;max-width:920px;">Unlike the cap/&lambda;/lookback knobs above (free math '
         'replays on one curation set), <b>max_watchlist_size changes the curator\'s decisions</b>, so each '
         'cap is a separate re-curation (~$0.40 LLM each) on the same news pools and AAPL/GOOGL/AMZN starter. '
-        'The bar is each curation&#39;s total return; the <b>QUBT / RKLB / NVDA</b> columns flag whether that '
-        'curation ever added those tickers (yes = entered the watchlist; proposed-rejected = tried but blocked).</p>'
-        + _mbar
-        + '<table style="margin-top:.6em;"><thead><tr>'
-        f'<th {_lc}>max_watchlist_size</th><th {_lc}>curator return</th><th {_lc}>adds</th><th {_lc}>removes</th>'
-        f'<th {_lc}>rejects</th><th {_lc}>retries</th>'
-        + "".join(f'<th {_lc}>{t}?</th>' for t in TRACK_TICKERS)
-        + f'<th {_lc}>final watchlist (managed picks)</th>'
-        '</tr></thead><tbody>' + _mtr + '</tbody></table>'
-        '<p style="color:#888;font-size:12px;max-width:920px;"><b>adds/removes</b> = the curator\'s proposals '
-        'that the validator APPLIED; <b>rejects</b> = proposals still blocked after retries (double-add, add to '
-        'a full watchlist with no paired remove, or a stale remove); <b>retries</b> = reject-and-retry rounds '
-        'fired (the validator told the curator why a proposal was rejected and it re-proposed). Rejects should '
-        'be ~0; retries shows how much correction that took. A large reject count means decisions are being '
-        'silently blocked (the symptom that exposed the max_watchlist_size cap-override bug).</p>')
+        'The bar is each curation&#39;s total return; the live watchlist size is flagged in green.</p>'
+        + _mbar)
 
     # section 7: news_lookback_days sweep — title-only re-curation (no Wayback/live), curates the preserved
     # GKG titles at the canonical mws6/cap1.0/λ2.0/150d config. Bar = each window's return; ticker flags as §11.
@@ -1082,8 +1122,8 @@ max_watchlist_size itself, section 11, re-curates). Metrics are benchmark-relati
 <p style="color:#b45309;max-width:860px;background:#fffbeb;border:1px solid #fde68a;padding:.6em .8em;border-radius:6px;">
 <b>Look-ahead-clean.</b> The compounder gridsearch on the geosplit curations: the curator read archived
 <b>Wayback</b> ledes where available (~46% of articles) else title-only, with the biased live ledes ignored,
-so each rebalance saw only period-correct news. Sections needing more curations (news_lookback §12, and the
-single-model LLM comparison §13-14, blind judge §15) are omitted for now. Canonical config: mws&nbsp;{_mws_fixed} / cap&nbsp;{CURRENT[0]}
+so each rebalance saw only period-correct news. The curator-<b>model</b> comparison (§12, kimi vs sonnet vs
+deepseek, ranked by a blind Opus soundness judge) sits at the bottom. Canonical config: mws&nbsp;{_mws_fixed} / cap&nbsp;{CURRENT[0]}
 / λ&nbsp;{CURRENT[1]} / {CURRENT[2]}d. <b>All in-sample</b> — these rank candidates to <b>forward-test</b>, not an optimum.</p>
 {grid_html}
 <h2>1. Return vs drawdown</h2>
@@ -1123,10 +1163,8 @@ Current config: {_cur_l2:.0f}/yr.</p>
 {min_trade_html}
 {mws_equity_html}
 {mws_html}
-{nlb_html}
-{llm_html}
+{model_html}
 {llm4_html}
-{llm5_html}
 </body></html>"""
     out.write_text(page)
     top = max(rows, key=lambda r: r["ir"] if r["ir"] == r["ir"] else -9e9)
