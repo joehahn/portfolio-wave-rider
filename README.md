@@ -33,7 +33,7 @@ Results are served via three families of GitHub Pages, each showing results gene
 
 Each rebalance runs one loop. The curator is the only judgment call; everything else is deterministic Python.
 
-<img src="docs/pipeline.svg" width="860" alt="Top-to-bottom flow: search terms and trusted sources feed the news, and the investor profile feeds the AI curator. News flows into the AI curator, which ingests the news, proposes ticker adds and removes to the watchlist, and manages the news citations justifying each change. The curator updates watchlist.csv, which feeds the mean-variance optimizer, which outputs recommended weights, which are rendered as static Plotly dashboards, after which you place the trades and edit holdings.csv, looping back to the news at the next rebalance.">
+<img src="docs/pipeline.svg" width="860" alt="Top-to-bottom flow: news is a data source. The AI curator reads search terms and trusted sources plus the investor profile, pulls in the news, proposes ticker adds and removes to the watchlist, and manages the news citations justifying each change. The curator updates watchlist.csv, which feeds the mean-variance optimizer. The optimizer also reads ticker prices, daily closes from yfinance, and outputs recommended weights, which are rendered as static Plotly dashboards, after which you place the trades and edit holdings.csv, looping back to the news at the next rebalance.">
 
 The highlighted box is where the advantage comes from: an LLM reading the news against your thesis to decide *which tickers* the optimizer gets to choose among. The optimizer only ever sets the weights.
 
