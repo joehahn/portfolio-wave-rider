@@ -41,7 +41,7 @@ See [GLOSSARY.md](GLOSSARY.md) for the finance terms used below (`σ`, `μ`, `Σ
 
 ## Setup
 
-Install dependencies, edit the configuration files to your taste, bootstrap your initial portfolio, and install the daily cron job.
+Install dependencies, copy the starter files, edit them to your taste, add your API keys, bootstrap your initial portfolio, and install the cron jobs.
 
 ### 1. Install dependencies
 
@@ -49,16 +49,19 @@ Install dependencies, edit the configuration files to your taste, bootstrap your
 python3.12 -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
+```
 
-# Copy the starter templates to the repo root (no renaming needed):
+### 2. Copy the starter files
+
+```bash
 cp examples/* .
 ```
 
-`examples/` holds a starter version of every file you configure. None of the four are tracked at the repo root, so a fresh clone has no personal data and no curated source lists; you copy the templates once and then edit them in place.
+`examples/` holds a starter version of every file you configure, and the names match their destinations, so nothing needs renaming. None of the four are tracked at the repo root, so a fresh clone carries no personal data and no curated source lists; you copy the templates once and then edit them in place. Step 3 covers what goes in each.
 
-API keys go in a `.env` file rather than your shell profile, covered in step 2 below.
+API keys are the exception: they live in a `.env` file you create yourself, covered in step 4.
 
-### 2. Configure the input files
+### 3. Configure the input files
 
 Everything you configure lives in six files at the repo root, and all six are gitignored, so nothing you write there reaches GitHub. Starter versions of each ship in `examples/`, which is tracked.
 
@@ -72,11 +75,11 @@ Everything you configure lives in six files at the repo root, and all six are gi
 | `retrieval_config.json` | no | Per-wave search keywords, used by both the backtest and the live retriever |
 
 - **`investor_profile.md`** is the source of truth for every recommendation: goals, constraints, sector exclusions, the wave-thesis prose the curator reasons against, and the YAML front matter holding all the numeric knobs (`initial_investment_usd`, `starter_watchlist`, `always_include` anchors, `financial_model` with risk aversion `λ`, risk-free rate, lookback and rebalance periods, concentration cap, and `max_watchlist_size`, plus the `backtest` and `forward` sections that pick each path's window and curator LLM). Nothing is hardcoded elsewhere, so this file alone changes behavior. Every recommendation cites lines from it.
-- **`holdings.csv`** is a two-column CSV (`ticker,shares`) of your real positions. The template ships with placeholder rows showing the format; replace them with what you actually own, or set the shares to 0 to start from cash. The one-time bootstrap (step 3) allocates dollars across your thesis tickers and writes both `holdings.csv` (real shares) and `watchlist.csv` (the curator-managed universe, a single `ticker` column). Thereafter you edit `holdings.csv` only when you actually trade; the biweekly review manages `watchlist.csv` for you, so that one is not a file you configure.
+- **`holdings.csv`** is a two-column CSV (`ticker,shares`) of your real positions. The template ships with placeholder rows showing the format; replace them with what you actually own, or set the shares to 0 to start from cash. The one-time bootstrap (step 5) allocates dollars across your thesis tickers and writes both `holdings.csv` (real shares) and `watchlist.csv` (the curator-managed universe, a single `ticker` column). Thereafter you edit `holdings.csv` only when you actually trade; the biweekly review manages `watchlist.csv` for you, so that one is not a file you configure.
 - **`news_sources.md`** ships pre-populated: a YAML `source_block` list of content-farm domains the retriever drops, a `source_major` list of wire services and major outlets (the ranker's mid-authority tier), and a prose section of specialty, wave-specific desks (the top tier, also read by the live curator). Tailor to your taste: add sources you trust, block ones that paywall heavily or go off-topic.
 - **`retrieval_config.json`** configures the retriever. `wave_keywords` maps each wave to the phrases that surface an article, and it drives **both** engines: the historical GDELT-GKG replay matches them against article URLs and titles, and the daily live pull turns them into web_search queries. `org_stoplist` drops non-company entities, and `engine` holds two GKG-only guards (`ontopic_offset`, and `max_scan_gb`, a BigQuery cost cap). Adding a wave to `investor_profile.md` does **not** feed retrieval on its own: you must add matching keywords here, and the backtest additionally needs a re-ingest, since the keyword regex is what BigQuery is queried with.
 
-### 2a. API keys
+### 4. API keys
 
 All keys live in a single **`.env` file at the repo root**, gitignored and never committed. One `KEY=value` per line, no quotes and no `export` prefix (the readers in `src/curator.py`, `src/retriever.py`, `scripts/backtest_sdk.py`, and `scripts/judge_curations.py` are plain line parsers, so both would be read as part of the value):
 
@@ -91,11 +94,11 @@ Google credentials work differently: **`gcp-key.json`**, a BigQuery service-acco
 
 Nothing reads keys from the shell environment, so cron inherits nothing and needs no export line. Rotating a key means editing the one value in `.env`. Both `.env` and `gcp-key.json` are listed in `.gitignore` under "personal data, never push".
 
-### 3. Bootstrap the portfolio
+### 5. Bootstrap the portfolio
 
 Bootstrap the portfolio once: turn your wave thesis and starter watchlist into a concrete day-0 dollar allocation per ticker (beliefs in dollar form, no optimizer yet), convert those dollars to share counts with `.venv/bin/python -m src.cli init-holdings`, and save the allocation as `data/thesis_baseline.json`, the baseline every future review compares against.
 
-### 4. Install the cron jobs (required)
+### 6. Install the cron jobs (required)
 
 Open your crontab:
 
@@ -136,7 +139,7 @@ This project's portfolio-optimization activities.
 
 ### 1. initialize (once)
 
-Bootstrap the portfolio once (Setup step 3): distribute your starting dollars across your thesis tickers using only the qualitative inputs in `investor_profile.md`, convert to shares with `.venv/bin/python -m src.cli init-holdings`, and write the "beliefs in dollar form" baseline to `data/thesis_baseline.json`.
+Bootstrap the portfolio once (Setup step 5): distribute your starting dollars across your thesis tickers using only the qualitative inputs in `investor_profile.md`, convert to shares with `.venv/bin/python -m src.cli init-holdings`, and write the "beliefs in dollar form" baseline to `data/thesis_baseline.json`.
 
 ### 2. cron to monitor ticker changes (daily)
 
