@@ -286,13 +286,14 @@ def build(run_rel, out):
                  + _cfig.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False}))
 
     # Link to the full keyword config just below the keyword plot (plot 8), so a reader can see the
-    # shape of the config that drives retrieval. The author's own retrieval_config.json is NOT tracked, so
-    # link the STARTER template in examples/ instead; linking blob/main/retrieval_config.json would 404.
-    cfg_link = ('<p style="color:#555;max-width:820px;margin:.2em 0 0;">Plot 8 is driven by the per-wave '
-                'search terms in <code>retrieval_config.json</code>; a starter version of that file is at '
-                '<a href="https://github.com/joehahn/portfolio-wave-rider/blob/main/examples/'
-                'retrieval_config.json"><code>examples/retrieval_config.json</code></a> '
-                '(<code>wave_keywords</code>).</p>')
+    # RELATIVE link (docs/ -> repo root), deliberately not an absolute github.com blob URL: the config is
+    # gitignored, so it exists only in a working tree. Relative means the link resolves whenever the page is
+    # opened from a checkout that has the file -- the author's, or anyone who ran `cp examples/* .`. It 404s
+    # on the published Pages copy, which is the accepted tradeoff for keeping the terms out of the repo.
+    cfg_link = ('<p style="color:#555;max-width:820px;margin:.2em 0 0;">The full per-wave search-term '
+                'lists behind plot 8 live in <a href="../retrieval_config.json"><code>retrieval_config.json'
+                '</code></a> (<code>wave_keywords</code>), which is gitignored, so this link resolves only '
+                'when you are viewing a local copy of the dashboard.</p>')
 
     # ---- 9. Articles per author (bylines from run_rel/_authors.json) ----
     # NATIVE capture attempts a byline for EVERY pooled article (build_article_pool stores a["author"]) -> a

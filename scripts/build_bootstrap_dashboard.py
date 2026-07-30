@@ -233,12 +233,12 @@ def build(canon_dir: str, forward_corpus: str, since: str, out: Path) -> None:
     fig.add_vline(x=HANDOFF, row=3, col=1, line={"dash": "dash", "color": "#c92a2a", "width": 1.5})
     chart_html = fig.to_html(full_html=False, include_plotlyjs="cdn", config={"displayModeBar": False})
 
-    # link the STARTER template: the author's own retrieval_config.json is not tracked, so blob/main/ 404s.
-    cfg_link = ('<p style="color:#555;max-width:820px;margin:.2em 0 0;">Plot 7 is driven by the per-wave '
-                'search terms in <code>retrieval_config.json</code>; a starter version of that file is at '
-                '<a href="https://github.com/joehahn/portfolio-wave-rider/blob/main/examples/'
-                'retrieval_config.json"><code>examples/retrieval_config.json</code></a> '
-                '(<code>wave_keywords</code>). The forward cron queries the same waves.</p>')
+    # RELATIVE link (docs/ -> repo root), not an absolute github.com blob URL: the config is gitignored, so
+    # it exists only in a working tree. Resolves for anyone viewing a local copy; 404s on published Pages.
+    cfg_link = ('<p style="color:#555;max-width:820px;margin:.2em 0 0;">The full per-wave search-term lists '
+                'behind plot 7 live in <a href="../retrieval_config.json"><code>retrieval_config.json</code>'
+                '</a> (<code>wave_keywords</code>), which is gitignored, so this link resolves only when you '
+                'are viewing a local copy of the dashboard. The forward cron queries the same waves.</p>')
 
     # ---- 9. articles per author ----
     auth = {a["url"]: a["author"] for a in articles if a.get("author")}
