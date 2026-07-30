@@ -33,22 +33,7 @@ Results are served via three families of GitHub Pages, each showing results gene
 
 Each rebalance runs one loop. The curator is the only judgment call; everything else is deterministic Python.
 
-```mermaid
-%%{init: {"theme":"base", "themeVariables": {"fontSize":"22px"}}}%%
-flowchart TD
-    N["News<br/>date-clean GKG + Wayback (backtest)<br/>Anthropic web_search (live)"]
-    subgraph CUR["Curator: kimi-k2.5 (the edge)"]
-      direction TB
-      A["read your wave thesis<br/>from investor_profile.md"] --> B["propose adds / removes,<br/>each cited to dated news"]
-    end
-    N --> CUR
-    CUR --> W["watchlist.csv<br/>curator-managed universe"]
-    W --> O["mean-variance optimizer<br/>weights = argmax μᵀw − λ·wᵀΣw"]
-    O --> D["recommended weights<br/>and a static Plotly dashboard"]
-    D --> U["you: place the trades,<br/>then edit holdings.csv"]
-    U -. next rebalance .-> N
-    style CUR fill:#fff3cd,stroke:#d39e00,stroke-width:2px
-```
+<img src="docs/pipeline.svg" width="700" alt="Top-to-bottom flow: news feeds the curator, which updates watchlist.csv, which feeds the mean-variance optimizer, which produces recommended weights and a dashboard, after which you place the trades and edit holdings.csv, looping back to news at the next rebalance.">
 
 The highlighted box is where the advantage comes from: an LLM reading the news against your thesis to decide *which tickers* the optimizer gets to choose among. The optimizer only ever sets the weights.
 
