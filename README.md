@@ -4,7 +4,7 @@
 **Email:** jmh.datasciences@gmail.com  
 **Date:** 2026-May-14 <br>
 **branch:** main <br>
-**License:** [PolyForm Noncommercial 1.0.0](LICENSE), free for noncommercial use; [commercial rights reserved](#license)
+**License:** [PolyForm Noncommercial 1.0.0](LICENSE.md), free for noncommercial use; [commercial rights reserved](#license)
 
 This project uses AI to manage a curated watchlist of tickers. You declare your goals, constraints, and an investment thesis (what you think will drive future returns), then initialize a starter watchlist you want exposure to. This solution's two halves have a deliberate division of labor. The **curator** is AI-powered, and it is forward-looking: at each rebalance it reads recent news against your thesis and evolves the watchlist, hunting tickers in the early buildup of a wave that may rise soon and preferring the news sources you trust. The **optimizer** is strictly backward-looking: an industry standard math-only mean-variance model that sets the weights from trailing returns and covariances, pure math, no AI. So the AI decides *which* tickers the optimizer may choose among, and the math decides the weights. The results accumulate into dashboards where you can watch the watchlist composition, the recommended weights, and the realized portfolio value evolve over time, and monitor how realized gains are attributed to the news sources, authors, keywords, and waves behind each pick. In our experiments this coupling of AI curation with standard optimization significantly outperforms the optimizer on its own.
 
@@ -270,7 +270,7 @@ Technical demo. Not financial advice. Historical performance is not predictive. 
 
 ## License
 
-[PolyForm Noncommercial License 1.0.0](LICENSE), effective 2026-07-30. Free to use, modify, and share for any noncommercial purpose: research, experimentation, education, personal projects, and use by nonprofit or government organizations. Commercial use is not granted by this license.
+[PolyForm Noncommercial License 1.0.0](LICENSE.md), effective 2026-07-30. Free to use, modify, and share for any noncommercial purpose: research, experimentation, education, personal projects, and use by nonprofit or government organizations. Commercial use is not granted by this license.
 
 Commercial rights are reserved by the author. If you want to use this work commercially, email jmh.datasciences@gmail.com and we will talk.
 
