@@ -12,6 +12,7 @@ portfolio index.html is the site landing page and is not itself a nav entry.)
 from datetime import datetime
 
 README = ("https://github.com/joehahn/portfolio-wave-rider/blob/main/README.md", "README")
+PAGES_ROOT = "https://joehahn.github.io/portfolio-wave-rider/"   # the published (GitHub Pages) copy
 BACKTEST = [
     ("retrieval_pwr.html", "Retriever"),
     ("backtest_gkg_3yr_kimi.html", "Curator"),
@@ -34,6 +35,22 @@ def _group(pages, current):
     return " &middot; ".join(_link(h, n, current) for h, n in pages)
 
 
+# Local <-> published pivot. ONE-WAY BY NECESSITY: browsers refuse to navigate from an https page to a
+# file:// URL, so the published copy cannot link back to your disk -- it prints the repo-relative path
+# instead (and printing the ABSOLUTE path would leak the author's home directory onto a public site and
+# be wrong for anyone else's clone). Reads the page's own filename from location, so this snippet is
+# identical on every dashboard and needs no per-page wiring.
+_PIVOT = (
+    '<span id="pwr-pivot"></span>'
+    '<script>(function(){var e=document.getElementById("pwr-pivot");'
+    'var f=location.pathname.split("/").pop()||"index.html";'
+    'if(location.protocol==="file:"){'
+    'e.innerHTML=\' &middot; <a href="' + PAGES_ROOT + '\'+f+\'">published copy &#8599;</a>\';}'
+    'else{e.innerHTML=\' &middot; <span style="color:#999;">local copy: <code>docs/\'+f+\'</code></span>\';}'
+    '})();</script>'
+)
+
+
 def render(current: str = "", built: bool = True) -> str:
     """An HTML <nav>: README, then the Backtest and Forwardtest groups. The page whose bare filename
     matches `current` is bold, not a link (so a reader sees which page they're on)."""
@@ -43,7 +60,7 @@ def render(current: str = "", built: bool = True) -> str:
         '<nav style="font-size:13px;color:#555;margin:0 0 1.2em;padding-bottom:.5em;'
         'border-bottom:1px solid #eee;line-height:1.9;">'
         f'{ts}'
-        f'<div>{_link(*README, current)}</div>'
+        f'<div>{_link(*README, current)}{_PIVOT}</div>'
         f'<div><span style="color:#999;">Backtest</span> &nbsp;&nbsp;{_group(BACKTEST, current)}</div>'
         f'<div><span style="color:#999;">Bootstrap</span> &nbsp;&nbsp;{_group(BOOTSTRAP, current)}</div>'
         f'<div><span style="color:#999;">Forwardtest</span> &nbsp;&nbsp;{_group(FORWARDTEST, current)}</div>'
