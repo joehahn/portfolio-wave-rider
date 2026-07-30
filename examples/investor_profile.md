@@ -9,7 +9,7 @@
 # optimal: use the Sweeps dashboard to tune them against your own thesis.
 # ============================================================================
 
-initial_investment_usd: 50000            # total dollars to allocate on day 0
+initial_investment_usd: 10000            # total dollars to allocate on day 0
 starter_watchlist: [AAPL, GOOGL, AMZN]   # the day-0 watchlist, equal-weighted
                                          # (matches the placeholder rows in examples/holdings.csv)
 always_include: [SPY, AGG, IAU]          # permanent optimizer anchors (equity / bond / gold safe havens).
@@ -19,21 +19,20 @@ dashboard_growth_guides_pct_per_week: [0.5, 1.0, 1.5]   # dotted reference curve
 
 exclusions:                       # sectors or themes the curator must never propose
   - solar energy (companies and ETFs)
-  - wind energy (companies and ETFs)
 
 financial_model:                  # the optimizer's math. All of it is swept by the Sweeps dashboard.
-  concentration_cap: 0.35         # per-position cap: no single holding above 35% of the portfolio.
+  concentration_cap: 0.5          # per-position cap: no single holding above 50% of the portfolio.
                                   # Lower forces breadth; higher lets winners run and raises drawdown.
-  min_trade_size_frac: 0.05       # skip trades smaller than this FRACTION of portfolio value (0.05 = 5%),
+  min_trade_size_frac: 0.10       # skip trades smaller than this FRACTION of portfolio value (0.10 = 10%),
                                   # so the optimizer does not churn on noise
-  risk_aversion: 2.0              # λ in the mean-variance utility (μᵀw − λ·wᵀΣw). Higher = more
+  risk_aversion: 1.0              # λ in the mean-variance utility (μᵀw − λ·wᵀΣw). Higher = more
                                   # diversified and risk-averse; lower = more concentrated in whatever is running.
   risk_free_rate: 0.04            # ≈ 1y Treasury yield; the baseline subtracted from E[r] in the Sharpe ratio
   rebalance_period: monthly       # weekly | biweekly | monthly | quarterly. How often the curator runs.
   optimizer_lookback_days: 180    # trailing calendar days of prices used to estimate μ and Σ.
                                   # Short = faster rotation but noisier; long = steadier but slower to react.
-  news_lookback_days: 14          # trailing calendar days of news the curator reads each rebalance
-  max_watchlist_size: 10          # hard cap on tickers the curator may carry. Tighter caps concentrate.
+  news_lookback_days: 90          # trailing calendar days of news the curator reads each rebalance
+  max_watchlist_size: 5           # hard cap on tickers the curator may carry. Tighter caps concentrate.
 
 backtest:                              # the historical replay only; does not affect live recommendations
   start_date: 2023-07-22               # window start
@@ -71,10 +70,8 @@ This section is prose, not configuration, and the curator reads it verbatim at e
 
 Roughly in order of when material commercial impact is likely to land:
 
-- **Rockets & spacecraft**: making space resources (satellite services, the Moon, asteroids) commercially usable.
 - **Robotics**: lowering labor costs across physical industries.
 - **Quantum computing**: making hard computations tractable and driving new products and services.
-- **Nuclear (fission and fusion)**: abundant lower-cost energy. Near-term via small modular reactors; longer-horizon via fusion.
 
 ## Non-technology waves I'm watching
 
