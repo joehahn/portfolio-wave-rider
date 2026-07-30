@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="860" height="766" viewBox="0 0 860 766" role="img" aria-label="Top-to-bottom pipeline. News is a data source. The AI curator reads search terms and trusted sources plus the investor profile, pulls in the news, proposes ticker adds and removes to the watchlist, and manages the news citations justifying each change. The curator updates watchlist.csv, which feeds the mean-variance optimizer. The optimizer also reads ticker prices, daily closes from yfinance, and outputs recommended weights, which are rendered as static Plotly dashboards, after which you place the trades and edit holdings.csv, looping back to the news at the next rebalance.">
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="862" viewBox="0 0 860 862" role="img" aria-label="Top-to-bottom pipeline. News is the outside-world data source. The retriever reads your search terms and trusted sources and fetches and ranks articles into a dated pool. The AI curator reads that pool plus the investor profile, proposes ticker adds and removes to the watchlist, and manages the news citations justifying each change. The curator updates watchlist.csv, which feeds the mean-variance optimizer. The optimizer also reads ticker prices, daily closes from yfinance, and outputs recommended weights, which are rendered as static Plotly dashboards, after which you place the trades and edit holdings.csv, looping back to the news at the next rebalance.">
   <defs>
     <marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#57606a"/>
@@ -6,75 +6,78 @@
   </defs>
 
   <!-- explicit light background so the diagram reads identically in GitHub's dark theme -->
-  <rect x="0" y="0" width="860" height="766" fill="#ffffff"/>
+  <rect x="0" y="0" width="860" height="862" fill="#ffffff"/>
 
-  <!-- ============ left column: user-authored config, BOTH read by the curator (dashed = config, not a step) ============ -->
+  <!-- Visual grammar: dashed box = user-authored config file; solid box = data source or pipeline step. -->
 
-  <rect x="30" y="124" width="250" height="62" rx="8" fill="#fbfbfc" stroke="#8c959f" stroke-width="1.5" stroke-dasharray="5 4"/>
-  <text x="155" y="152" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="14" font-weight="600" fill="#1f2328">search terms + trusted sources</text>
-  <text x="155" y="174" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="13" fill="#57606a">gkg_config.json &#183; news_sources.md</text>
-  <line x1="280" y1="155" x2="316" y2="155" stroke="#8c959f" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arw)"/>
-
-  <rect x="30" y="196" width="250" height="80" rx="8" fill="#fbfbfc" stroke="#8c959f" stroke-width="1.5" stroke-dasharray="5 4"/>
-  <text x="155" y="225" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="14" font-weight="600" fill="#1f2328">investor_profile.md</text>
-  <text x="155" y="246" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="13" fill="#57606a">wave thesis, exclusions,</text>
-  <text x="155" y="267" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="13" fill="#57606a">watchlist size</text>
-  <line x1="280" y1="236" x2="316" y2="236" stroke="#8c959f" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arw)"/>
-
-  <!-- ============ main column: the pipeline ============ -->
-
-  <!-- News: a data source the curator pulls from -->
+  <!-- ============ News: the outside world, the raw data ============ -->
   <rect x="320" y="40" width="440" height="52" rx="8" fill="#f6f8fa" stroke="#57606a" stroke-width="1.5"/>
   <text x="540" y="72" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="17" font-weight="600" fill="#1f2328">News</text>
 
   <line x1="540" y1="92" x2="540" y2="124" stroke="#57606a" stroke-width="2" marker-end="url(#arw)"/>
 
-  <!-- AI Curator: the only judgment call in the loop -->
-  <rect x="320" y="126" width="440" height="160" rx="10" fill="#fff3cd" stroke="#d39e00" stroke-width="2.5"/>
-  <text x="540" y="158" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="17" font-weight="600" fill="#1f2328">AI Curator</text>
-  <text x="352" y="192" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="15" fill="#1f2328">&#8226;&#160; pulls in the news</text>
-  <text x="352" y="219" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="15" fill="#1f2328">&#8226;&#160; proposes ticker adds / removes to the watchlist</text>
-  <text x="352" y="246" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="15" fill="#1f2328">&#8226;&#160; manages the news citations justifying each change</text>
+  <!-- ============ Retriever: reads the search terms, fetches + ranks. Mechanical, no LLM. ============ -->
+  <rect x="30" y="126" width="250" height="62" rx="8" fill="#fbfbfc" stroke="#8c959f" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="155" y="154" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="14" font-weight="600" fill="#1f2328">search terms + trusted sources</text>
+  <text x="155" y="176" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="13" fill="#57606a">gkg_config.json &#183; news_sources.md</text>
+  <line x1="280" y1="157" x2="316" y2="157" stroke="#8c959f" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arw)"/>
 
-  <line x1="540" y1="286" x2="540" y2="318" stroke="#57606a" stroke-width="2" marker-end="url(#arw)"/>
+  <rect x="320" y="126" width="440" height="62" rx="8" fill="#f6f8fa" stroke="#57606a" stroke-width="1.5"/>
+  <text x="540" y="153" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="16" font-weight="600" fill="#1f2328">Retriever</text>
+  <text x="540" y="175" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="14" fill="#57606a">fetches and ranks articles into a dated pool</text>
 
-  <!-- watchlist -->
-  <rect x="320" y="320" width="440" height="48" rx="8" fill="#f6f8fa" stroke="#57606a" stroke-width="1.5"/>
-  <text x="540" y="350" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="16" font-weight="600" fill="#1f2328">watchlist.csv</text>
+  <line x1="540" y1="188" x2="540" y2="220" stroke="#57606a" stroke-width="2" marker-end="url(#arw)"/>
 
-  <line x1="540" y1="368" x2="540" y2="400" stroke="#57606a" stroke-width="2" marker-end="url(#arw)"/>
+  <!-- ============ AI Curator: the only judgment call in the loop ============ -->
+  <rect x="30" y="262" width="250" height="80" rx="8" fill="#fbfbfc" stroke="#8c959f" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="155" y="291" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="14" font-weight="600" fill="#1f2328">investor_profile.md</text>
+  <text x="155" y="312" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="13" fill="#57606a">wave thesis, exclusions,</text>
+  <text x="155" y="333" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="13" fill="#57606a">watchlist size</text>
+  <line x1="280" y1="302" x2="316" y2="302" stroke="#8c959f" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arw)"/>
 
-  <!-- ticker prices: a data source like News, but it feeds the OPTIMIZER (mu and Sigma come from
-       trailing closes). The curator never reads prices. -->
-  <rect x="30" y="395" width="250" height="62" rx="8" fill="#f6f8fa" stroke="#57606a" stroke-width="1.5"/>
-  <text x="155" y="423" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="14" font-weight="600" fill="#1f2328">ticker prices</text>
-  <text x="155" y="445" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="13" fill="#57606a">daily closes (yfinance)</text>
-  <line x1="280" y1="426" x2="316" y2="426" stroke="#57606a" stroke-width="2" marker-end="url(#arw)"/>
+  <rect x="320" y="222" width="440" height="160" rx="10" fill="#fff3cd" stroke="#d39e00" stroke-width="2.5"/>
+  <text x="540" y="254" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="17" font-weight="600" fill="#1f2328">AI Curator</text>
+  <text x="352" y="288" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="15" fill="#1f2328">&#8226;&#160; reads the ranked article pool</text>
+  <text x="352" y="315" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="15" fill="#1f2328">&#8226;&#160; proposes ticker adds / removes to the watchlist</text>
+  <text x="352" y="342" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="15" fill="#1f2328">&#8226;&#160; manages the news citations justifying each change</text>
 
-  <!-- optimizer -->
-  <rect x="320" y="402" width="440" height="48" rx="8" fill="#f6f8fa" stroke="#57606a" stroke-width="1.5"/>
-  <text x="540" y="432" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="16" font-weight="600" fill="#1f2328">mean-variance optimizer</text>
+  <line x1="540" y1="382" x2="540" y2="414" stroke="#57606a" stroke-width="2" marker-end="url(#arw)"/>
 
-  <line x1="540" y1="450" x2="540" y2="482" stroke="#57606a" stroke-width="2" marker-end="url(#arw)"/>
+  <!-- ============ watchlist ============ -->
+  <rect x="320" y="416" width="440" height="48" rx="8" fill="#f6f8fa" stroke="#57606a" stroke-width="1.5"/>
+  <text x="540" y="446" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="16" font-weight="600" fill="#1f2328">watchlist.csv</text>
 
-  <!-- recommended weights -->
-  <rect x="320" y="484" width="440" height="48" rx="8" fill="#f6f8fa" stroke="#57606a" stroke-width="1.5"/>
-  <text x="540" y="514" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="15" fill="#1f2328">recommended weights</text>
+  <line x1="540" y1="464" x2="540" y2="496" stroke="#57606a" stroke-width="2" marker-end="url(#arw)"/>
 
-  <line x1="540" y1="532" x2="540" y2="564" stroke="#57606a" stroke-width="2" marker-end="url(#arw)"/>
+  <!-- ============ optimizer: prices feed HERE, not the curator ============ -->
+  <rect x="30" y="491" width="250" height="62" rx="8" fill="#f6f8fa" stroke="#57606a" stroke-width="1.5"/>
+  <text x="155" y="519" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="14" font-weight="600" fill="#1f2328">ticker prices</text>
+  <text x="155" y="541" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="13" fill="#57606a">daily closes (yfinance)</text>
+  <line x1="280" y1="522" x2="316" y2="522" stroke="#57606a" stroke-width="2" marker-end="url(#arw)"/>
 
-  <!-- dashboards: its own step -->
-  <rect x="320" y="566" width="440" height="48" rx="8" fill="#f6f8fa" stroke="#57606a" stroke-width="1.5"/>
-  <text x="540" y="596" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="15" fill="#1f2328">static Plotly dashboards</text>
+  <rect x="320" y="498" width="440" height="48" rx="8" fill="#f6f8fa" stroke="#57606a" stroke-width="1.5"/>
+  <text x="540" y="528" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="16" font-weight="600" fill="#1f2328">mean-variance optimizer</text>
 
-  <line x1="540" y1="614" x2="540" y2="646" stroke="#57606a" stroke-width="2" marker-end="url(#arw)"/>
+  <line x1="540" y1="546" x2="540" y2="578" stroke="#57606a" stroke-width="2" marker-end="url(#arw)"/>
 
-  <!-- you -->
-  <rect x="320" y="648" width="440" height="62" rx="8" fill="#f6f8fa" stroke="#57606a" stroke-width="1.5"/>
-  <text x="540" y="674" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="15" fill="#1f2328">you: place the trades,</text>
-  <text x="540" y="696" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="15" fill="#1f2328">then edit holdings.csv</text>
+  <!-- ============ recommended weights ============ -->
+  <rect x="320" y="580" width="440" height="48" rx="8" fill="#f6f8fa" stroke="#57606a" stroke-width="1.5"/>
+  <text x="540" y="610" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="15" fill="#1f2328">recommended weights</text>
+
+  <line x1="540" y1="628" x2="540" y2="660" stroke="#57606a" stroke-width="2" marker-end="url(#arw)"/>
+
+  <!-- ============ dashboards: its own step ============ -->
+  <rect x="320" y="662" width="440" height="48" rx="8" fill="#f6f8fa" stroke="#57606a" stroke-width="1.5"/>
+  <text x="540" y="692" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="15" fill="#1f2328">static Plotly dashboards</text>
+
+  <line x1="540" y1="710" x2="540" y2="742" stroke="#57606a" stroke-width="2" marker-end="url(#arw)"/>
+
+  <!-- ============ you ============ -->
+  <rect x="320" y="744" width="440" height="62" rx="8" fill="#f6f8fa" stroke="#57606a" stroke-width="1.5"/>
+  <text x="540" y="770" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="15" fill="#1f2328">you: place the trades,</text>
+  <text x="540" y="792" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="15" fill="#1f2328">then edit holdings.csv</text>
 
   <!-- feedback loop back to the news -->
-  <path d="M 540 710 L 540 736 L 808 736 L 808 66 L 764 66" fill="none" stroke="#57606a" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arw)"/>
-  <text x="794" y="401" text-anchor="middle" transform="rotate(-90 794 401)" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="14" fill="#57606a">next rebalance</text>
+  <path d="M 540 806 L 540 832 L 808 832 L 808 66 L 764 66" fill="none" stroke="#57606a" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arw)"/>
+  <text x="794" y="449" text-anchor="middle" transform="rotate(-90 794 449)" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif" font-size="14" fill="#57606a">next rebalance</text>
 </svg>
