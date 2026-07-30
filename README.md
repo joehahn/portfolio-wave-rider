@@ -35,7 +35,7 @@ Each portfolio rebalance after one iteration of the following loop. The Curator 
 
 <img src="docs/pipeline.svg" width="860" alt="Top-to-bottom flow: news is the outside-world data source. The retriever reads your search terms and trusted sources and fetches and ranks articles into a date-stamped pool. The AI curator reads that pool plus the user's investment thesis, proposes ticker adds and removes to the watchlist, and manages citations justifying each watchlist change. The curator updates watchlist.csv, which feeds the mean variance portfolio optimizer. The optimizer also reads ticker prices and outputs recommended portfolio weights, which are rendered as dashboards, after which you place the trades, looping back to the retriever at the next rebalance.">
 
-The highlighted box is where the advantage comes from: an LLM reading the news against your thesis to decide *which tickers* the optimizer gets to choose among. The optimizer only ever sets the weights.
+The highlighted box is where AI provides an advantage to the buy/hold investor: an LLM reading the news against your thesis to decide *which tickers* the optimizer gets to choose among. Then a traditional math-only optimizer selects which tickers in the watchlist get funded, and how much.
 
 See [GLOSSARY.md](GLOSSARY.md) for the finance terms used below (`σ`, `μ`, `Σ`, Sharpe ratio, risk aversion `λ`, mean-variance optimization, etc.). [REFERENCE.md](REFERENCE.md) has the project details (repo layout, code, input and output files, architecture, testing) and the granular numbers (exact config, per-wave attribution, the full bias accounting); this page keeps the visitor-level tour.
 
