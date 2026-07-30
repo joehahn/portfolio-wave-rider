@@ -51,16 +51,16 @@ source .venv/bin/activate
 pip install -e ".[dev]"
 
 # Copy the starter templates to the repo root (no renaming needed):
-cp examples/investor_profile.md examples/holdings.csv .
+cp examples/* .
 ```
 
-`examples/` holds starter versions of the two files you must create yourself. The other two configurable files, `news_sources.md` and `retrieval_config.json`, already ship populated at the repo root, so you edit those in place rather than copying a template.
+`examples/` holds a starter version of every file you configure. None of the four are tracked at the repo root, so a fresh clone has no personal data and no curated source lists; you copy the templates once and then edit them in place.
 
 API keys go in a `.env` file rather than your shell profile, covered in step 2 below.
 
 ### 2. Configure the input files
 
-Everything you configure lives in six files at the repo root. The first four are personal and gitignored (they never reach GitHub); the last two ship with the repo and are tracked, so edits to them are public.
+Everything you configure lives in six files at the repo root, and all six are gitignored, so nothing you write there reaches GitHub. Starter versions of each ship in `examples/`, which is tracked.
 
 | File | Tracked | What you put in it |
 |---|---|---|
@@ -68,8 +68,8 @@ Everything you configure lives in six files at the repo root. The first four are
 | `holdings.csv` | no | Your real positions, `ticker,shares` |
 | `.env` | no | API keys |
 | `gcp-key.json` | no | Google BigQuery service-account credentials, needed only to rebuild the backtest news corpus |
-| `news_sources.md` | yes | Which news domains to trust, block, and treat as specialty desks |
-| `retrieval_config.json` | yes | Per-wave search keywords, used by both the backtest and the live retriever |
+| `news_sources.md` | no | Which news domains to trust, block, and treat as specialty desks |
+| `retrieval_config.json` | no | Per-wave search keywords, used by both the backtest and the live retriever |
 
 - **`investor_profile.md`** is the source of truth for every recommendation: goals, constraints, sector exclusions, the wave-thesis prose the curator reasons against, and the YAML front matter holding all the numeric knobs (`initial_investment_usd`, `starter_watchlist`, `always_include` anchors, `financial_model` with risk aversion `λ`, risk-free rate, lookback and rebalance periods, concentration cap, and `max_watchlist_size`, plus the `backtest` and `forward` sections that pick each path's window and curator LLM). Nothing is hardcoded elsewhere, so this file alone changes behavior. Every recommendation cites lines from it.
 - **`holdings.csv`** is a two-column CSV (`ticker,shares`) of your real positions. The template ships with placeholder rows showing the format; replace them with what you actually own, or set the shares to 0 to start from cash. The one-time bootstrap (step 3) allocates dollars across your thesis tickers and writes both `holdings.csv` (real shares) and `watchlist.csv` (the curator-managed universe, a single `ticker` column). Thereafter you edit `holdings.csv` only when you actually trade; the biweekly review manages `watchlist.csv` for you, so that one is not a file you configure.

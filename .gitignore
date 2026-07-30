@@ -39,6 +39,10 @@ data/news_ab/
 /holdings.csv.pre-split.bak
 /watchlist.csv
 /investor_profile.md
+# The curated retrieval recipe: source tiering and per-wave search terms. Held back so the tuned
+# versions stay private; slim starter versions ship in examples/ and are tracked.
+/news_sources.md
+/retrieval_config.json
 data/snapshots.csv
 data/recommendations.csv
 data/thesis_baseline.json

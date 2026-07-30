@@ -1,0 +1,37 @@
+{
+ "description": "STARTER retrieval config. Copy to the repo root and edit: cp examples/retrieval_config.json retrieval_config.json  --  SHARED by BOTH news engines. `wave_keywords` drives the historical GKG replay (matched case-insensitively against each article's URL + page title, where a space also allows a hyphen for URL slugs) AND the live/forward web_search pull (src/cli.py's pull-news turns each wave's terms into queries). Edit the terms and both paths change; the backtest additionally needs a RE-INGEST, because the keyword regex is what BigQuery is queried with. Use NO company or ticker names here -- the curator discovers the tickers; these terms only surface the articles. The wave names should match the waves you describe in investor_profile.md. `org_stoplist` is substring-matched to drop non-company ENTITIES that GKG tags as organizations. The `engine` block is GKG-only. The SOURCE lists live in news_sources.md, not here.",
+ "_starter_note": "This ships with three example waves and a few terms each, enough to run end to end. Expect to iterate: add terms until the retrieval dashboard shows each wave surfacing a healthy article count, and add a wave here for every wave you name in investor_profile.md (naming it in the profile alone does NOT feed retrieval).",
+ "engine": {
+  "ontopic_offset": 500,
+  "max_scan_gb": 60.0
+ },
+ "wave_keywords": {
+  "AI": [
+   "artificial intelligence",
+   "large language model",
+   "ai chip",
+   "data center"
+  ],
+  "robotics": [
+   "humanoid robot",
+   "warehouse automation",
+   "industrial robot"
+  ],
+  "quantum": [
+   "quantum computing",
+   "qubit",
+   "quantum error correction"
+  ]
+ },
+ "org_stoplist": [
+  "reuters",
+  "bloomberg",
+  "associated press",
+  "european union",
+  "federal reserve",
+  "white house",
+  "congress",
+  "nasdaq",
+  "new york stock exchange"
+ ]
+}

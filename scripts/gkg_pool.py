@@ -61,8 +61,9 @@ ORG_STOPLIST = {s.lower() for s in _cfg["org_stoplist"]}   # non-company ENTITIE
 
 def _profile_source_lists() -> "tuple[set, list]":
     """Read the source_block domain list from news_sources.md's YAML front matter — the single source
-    of truth for the BLOCK list. news_sources.md is tracked (public), unlike investor_profile.md, so
-    the block-list ships with the repo. Returns (block_set, allow_list); empty on any missing/parse
+    of truth for the BLOCK list. news_sources.md is gitignored like investor_profile.md — the curated
+    source tiering is held back — so only the slim examples/news_sources.md ships with the repo.
+    Returns (block_set, allow_list); empty on any missing/parse
     issue (a missing news_sources.md is non-fatal per CLAUDE.md — the gather then runs unfiltered).
 
     The ALLOW list is intentionally NOT in the front matter: it lives as the prose 'News sources'

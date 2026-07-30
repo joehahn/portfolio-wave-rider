@@ -286,10 +286,12 @@ def build(run_rel, out):
                  + _cfig.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False}))
 
     # Link to the full keyword config just below the keyword plot (plot 8), so a reader can see the
-    # complete per-wave search-term lists that drive retrieval (retrieval_config.json is git-tracked / public).
-    cfg_link = ('<p style="color:#555;max-width:820px;margin:.2em 0 0;">The full per-wave search-term '
-                'lists behind plot 8 live in <a href="https://github.com/joehahn/portfolio-wave-rider/'
-                'blob/main/retrieval_config.json"><code>retrieval_config.json</code></a> '
+    # shape of the config that drives retrieval. The author's own retrieval_config.json is NOT tracked, so
+    # link the STARTER template in examples/ instead; linking blob/main/retrieval_config.json would 404.
+    cfg_link = ('<p style="color:#555;max-width:820px;margin:.2em 0 0;">Plot 8 is driven by the per-wave '
+                'search terms in <code>retrieval_config.json</code>; a starter version of that file is at '
+                '<a href="https://github.com/joehahn/portfolio-wave-rider/blob/main/examples/'
+                'retrieval_config.json"><code>examples/retrieval_config.json</code></a> '
                 '(<code>wave_keywords</code>).</p>')
 
     # ---- 9. Articles per author (bylines from run_rel/_authors.json) ----
