@@ -18,7 +18,7 @@ The results are served from GitHub Pages via three families, each running the sa
 
 - **[Retriever (RBT)](https://joehahn.github.io/portfolio-wave-rider/retrieval_pwr.html)**: inspect results from the intitial part of the curator which merely reads historical news and then visualizes coverage, sources, and per-window article counts.
 - **[Curator (CBT)](https://joehahn.github.io/portfolio-wave-rider/backtest_gkg_3yr_kimi.html)**: the curator uses AI to scans the backtest news and to make periodic changes to the ticker watchlist that is then fed into the portfolio optimizer, and this dashboard monitors the ticker recommendations and portfolio valuations over time.
-- **[Sweeps (BTS)](https://joehahn.github.io/portfolio-wave-rider/sweep_pwr.html)**: a sweep of the optimizer knobs, to illustrate how portfolio metrics and outcomes vary with parameter settings.
+- **[Sweeps (SBT)](https://joehahn.github.io/portfolio-wave-rider/sweep_pwr.html)**: a sweep of the optimizer knobs, to illustrate how portfolio metrics and outcomes vary with parameter settings.
 
 *Bootstrap* (a recent backtest tail stitched to ongoing daily forward ingests, so the curve keeps extending in real time):
 

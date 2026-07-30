@@ -1080,13 +1080,13 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
     _sd = sorted({ln.split(",", 1)[0] for ln in _snap.read_text().splitlines()[1:] if ln}) if _snap.exists() else []
     _range = (f'<p style="color:#666;margin:-.4em 0 .7em;font-size:14px;">{_sd[0]} to {_sd[-1]}</p>'
               if _sd else "")
-    page = f"""<!doctype html><html><head><meta charset="utf-8"><title>Backtest sweeps (BTS)</title>
+    page = f"""<!doctype html><html><head><meta charset="utf-8"><title>Sweeps Backtest (SBT)</title>
 <style>body{{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;max-width:1180px;margin:0 auto;
 padding:0 1.5em;color:#222;line-height:1.5}}h1,h2{{color:#111}}table{{border-collapse:collapse;font-size:13px;width:100%}}
 th{{text-align:right;padding:6px 10px;border-bottom:2px solid #ccc;white-space:nowrap}}th:first-child{{text-align:left}}
 .built{{position:absolute;top:8px;right:16px;font-size:12px;color:#888}}
 </style></head><body><div class="built">dashboard built {ts}</div>{nav}
-<h1>Backtest sweeps (BTS)</h1>
+<h1>Sweeps Backtest (SBT)</h1>
 {_range}
 <p style="color:#555;max-width:860px;">{len(rows_all)} configs: concentration_cap × risk_aversion (λ) × optimizer_lookback
 ({_grid3d} combinations) replayed across all {len(_mws_present)} <b>max_watchlist_size</b> curation sets, plus
