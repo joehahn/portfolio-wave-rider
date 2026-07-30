@@ -14,9 +14,9 @@ This project uses AI to manage a curated watchlist of tickers. You declare your 
 
 *Backtest* (historical replay across years 2023 to 2026):
 
-- **[Retriever, RBT](https://joehahn.github.io/portfolio-wave-rider/retrieval_pwr.html)**: here the backtest curator merely reads historical news and displays coverage, sources, and per-window article counts.
-- **[Curator, CBT](https://joehahn.github.io/portfolio-wave-rider/backtest_gkg_3yr_kimi.html)**: the curator scans the above 2023-2026 news and reveals the AI-recommended watchlist decisions across that time-window, with portfolio values over time relative to buy-and-hold and SPY, and per-wave profit and loss.
-- **[Sweeps](https://joehahn.github.io/portfolio-wave-rider/sweep_pwr.html)**: a sweep of the optimizer knobs (cap, `λ`, lookback), to illustrate how portfolio outcomes vary with parameter settings.
+- **[Retriever (RBT)](https://joehahn.github.io/portfolio-wave-rider/retrieval_pwr.html)**: inspect results from the intitial part of the curator which merely reads historical news and then visualizes coverage, sources, and per-window article counts.
+- **[Curator (CBT)](https://joehahn.github.io/portfolio-wave-rider/backtest_gkg_3yr_kimi.html)**: the curator uses AI to scans the backtest news and to make periodic changes to the ticker watchlist that is then fed into the portfolio optimizer, and this dashboard monitors the ticker recommendations and portfolio valuations over time.
+- **[Sweeps (BTS)](https://joehahn.github.io/portfolio-wave-rider/sweep_pwr.html)**: a sweep of the optimizer knobs, to illustrate how portfolio metrics and outcomes vary with parameter settings.
 
 *Bootstrap* (a recent backtest tail stitched to ongoing daily forward ingests, so the curve keeps extending in real time):
 
