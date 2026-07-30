@@ -10,7 +10,9 @@ This project uses AI to manage a curated watchlist of tickers. You declare your 
 
 **Who this helps.** An investor who has a thesis about where markets are going but not enough time to track the news. This demo helps that investor move from a static buy-and-hold portfolio to one that is lightly but effectively managed by AI. In the 3-year backtest described below, the AI-managed portfolio outperforms a buy-and-hold of a representative starter watchlist by a wide margin. The curator's job is to compound a thesis you already hold, not to invent one you don't.
 
-**The dashboards.** The results are served from GitHub Pages via three families, each running the same retriever+curator pipeline on different slices of time.
+## Dashboards
+
+The results are served from GitHub Pages via three families, each running the same retriever+curator pipeline on different slices of time.
 
 *Backtest* (historical replay across years 2023 to 2026):
 
