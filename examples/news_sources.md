@@ -36,7 +36,20 @@ up, which is exactly where a wave is cheapest to enter. Finding them is a resear
 follow the reporters your wave's practitioners actually cite, then check whether the retrieval
 dashboard shows the domain surfacing articles at all before you rely on it.
 
-The single generic example below is a placeholder. Replace it.
+The examples below are placeholders, one per wave, chosen to be broad and easy to find rather than
+good. Replace them with the desks you actually rely on.
+
+## AI
+
+- **VentureBeat AI** — https://venturebeat.com — steady coverage of model releases and enterprise adoption.
+
+## Robotics
+
+- **Automate (A3)** — https://automate.org — the industry association's news feed on automation and robotics.
+
+## Quantum
+
+- **The Quantum Insider** — https://thequantuminsider.com — tracks funding rounds and hardware announcements.
 
 ## General markets
 
