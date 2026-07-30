@@ -14,7 +14,7 @@ This project uses AI to manage a curated watchlist of tickers. You declare your 
 
 The results are served from GitHub Pages via three families, each running the same retriever+curator pipeline on different slices of time.
 
-*Backtest* (historical replay across years July-2023 to July-2026):
+*Backtest* (historical replay across July 2023 to 2026):
 
 - **[Retriever (RBT)](https://joehahn.github.io/portfolio-wave-rider/retrieval_pwr.html)**: inspect results from the intitial part of the curator which merely reads historical news and then visualizes coverage, sources, and per-window article counts.
 - **[Curator (CBT)](https://joehahn.github.io/portfolio-wave-rider/backtest_gkg_3yr_kimi.html)**: the curator uses AI to scans the backtest news and to make periodic changes to the ticker watchlist that is then fed into the portfolio optimizer, and this dashboard monitors the ticker recommendations and portfolio valuations over time.
