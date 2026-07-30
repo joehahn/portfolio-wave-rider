@@ -37,7 +37,7 @@ Each portfolio rebalance after one iteration of the following loop. The Curator 
 
 The highlighted box is where AI provides an advantage to the buy/hold investor: an LLM reads the news against your thesis to decide *which tickers* the optimizer then gets to choose among. After thatn, a traditional math-only optimizer then selects which tickers among those in the watchlist get funded, and how much.
 
-See [GLOSSARY.md](GLOSSARY.md) for the finance terms used below (`σ`, `μ`, `Σ`, Sharpe ratio, risk aversion `λ`, mean-variance optimization, etc.). [REFERENCE.md](REFERENCE.md) has the project details (repo layout, code, input and output files, architecture, testing) and the granular numbers (exact config, per-wave attribution, the full bias accounting); this page keeps the visitor-level tour.
+See [GLOSSARY.md](GLOSSARY.md) for the finance terms used below (`σ`, `μ`, `Σ`, Sharpe ratio, risk aversion `λ`, mean-variance optimization, etc.). [REFERENCE.md](REFERENCE.md) also contains many other project details (repo layout, code, input and output files, architecture, testing) and the granular details while this page provides the higher-level tour.
 
 ## Setup
 
