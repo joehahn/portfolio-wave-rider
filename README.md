@@ -14,20 +14,20 @@ This project uses AI to manage a curated watchlist of tickers. You declare your 
 
 The results are served from GitHub Pages via three families, each running the same retriever+curator pipeline on different slices of time.
 
-*Backtest* (historical replay across years 2023 to 2026):
+*Backtest* (historical replay across years July-2023 to July-2026):
 
 - **[Retriever (RBT)](https://joehahn.github.io/portfolio-wave-rider/retrieval_pwr.html)**: inspect results from the intitial part of the curator which merely reads historical news and then visualizes coverage, sources, and per-window article counts.
 - **[Curator (CBT)](https://joehahn.github.io/portfolio-wave-rider/backtest_gkg_3yr_kimi.html)**: the curator uses AI to scans the backtest news and to make periodic changes to the ticker watchlist that is then fed into the portfolio optimizer, and this dashboard monitors the ticker recommendations and portfolio valuations over time.
 - **[Sweeps (SBT)](https://joehahn.github.io/portfolio-wave-rider/sweep_pwr.html)**: a sweep of the optimizer knobs, to illustrate how portfolio metrics and outcomes vary with parameter settings.
 
-*Bootstrap* (apply the AI curator to news from final 3 months of the above backtest + daily news collected going forward):
+*Bootstrap* (apply the AI curator to news from final 3 months of the above backtest + daily news collected going forward since 2026-07-22):
 
 - **[Retriever (RBS)](https://joehahn.github.io/portfolio-wave-rider/retrieval_bootstrap.html)**: inspect and visualize the bootstrap news corpus
 - **[Curator (CBS)](https://joehahn.github.io/portfolio-wave-rider/curator_bootstrap.html)**: apply the AI curator across the boostrap era and view the portfolio recommendations and value over time
 
-*Forwardtest* (the live, genuinely out-of-sample test):
+*Forwardtest* (this solution tgathers news daily since 2026-07-22 and makes periodic portfolio recommendations thereafter):
 
-- **[Dashboard, FT](https://joehahn.github.io/portfolio-wave-rider/forward_dashboard.html)**: the live portfolio, value against SPY, the current allocation, and the trades needed to align with the latest optimizer recommendation.
+- **[Forwardtest (FT)](https://joehahn.github.io/portfolio-wave-rider/forward_dashboard.html)**: visualize gains/losses made by live portfolio
 
 ## How it works, at a glance
 
