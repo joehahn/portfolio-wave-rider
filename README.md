@@ -5,7 +5,7 @@
 **Date:** 2026-May-14 <br>
 **branch:** main
 
-This project uses AI to manage a curated watchlist of tickers. You declare your goals, constraints, and an investment thesis (what you think will drive future returns), then initialize a starter watchlist you want exposure to. This solution's two halves have a deliberate division of labor. The **curator** is the AI, and it is forward-looking: at each rebalance it reads recent news against your thesis and evolves the watchlist, hunting tickers in the early buildup of a wave that may rise soon and preferring the news sources you trust. The **optimizer** is strictly backward-looking: a standard mean-variance model that sets the weights from trailing returns and covariances, pure math, no AI. So the AI decides *which* tickers the optimizer may choose among, and the math decides the weights. The results accumulate into static Plotly dashboards where you can watch the watchlist composition, the recommended weights, and the realized portfolio value evolve over time, and where realized gains are attributed to the news sources, authors, keywords, and waves behind each pick. In our experiments this coupling of AI curation with standard optimization significantly outperforms the optimizer on its own.
+This project uses AI to manage a curated watchlist of tickers. You declare your goals, constraints, and an investment thesis (what you think will drive future returns), then initialize a starter watchlist you want exposure to. This solution's two halves have a deliberate division of labor. The **curator** is AI-powered, and it is forward-looking: at each rebalance it reads recent news against your thesis and evolves the watchlist, hunting tickers in the early buildup of a wave that may rise soon and preferring the news sources you trust. The **optimizer** is strictly backward-looking: an industry standard math-only mean-variance model that sets the weights from trailing returns and covariances, pure math, no AI. So the AI decides *which* tickers the optimizer may choose among, and the math decides the weights. The results accumulate into static Plotly dashboards where you can watch the watchlist composition, the recommended weights, and the realized portfolio value evolve over time, and where realized gains are attributed to the news sources, authors, keywords, and waves behind each pick. In our experiments this coupling of AI curation with standard optimization significantly outperforms the optimizer on its own.
 
 **Who this helps.** An investor who has a thesis about where markets are going but not enough time to track the news, or who wants help optimizing a portfolio. This demo helps that investor move from a static buy-and-hold portfolio to one that is lightly but effectively managed by AI. In the 3-year backtest below (2023 to 2026) the AI-managed portfolio outperforms a buy-and-hold of the starter watchlist by a wide margin. The curator's job is to compound a thesis you already hold, not to invent one you don't.
 
@@ -77,22 +77,40 @@ cp investor_profile.example.md investor_profile.md
 cp holdings.example.csv holdings.csv
 ```
 
-Then set the API keys the curator and retriever use. Export them in your shell profile so cron inherits them:
+API keys go in a `.env` file rather than your shell profile, covered in step 2 below.
 
-```bash
-export OPENROUTER_API_KEY=...        # the kimi-k2.5 curator (backtest and live)
-export ANTHROPIC_API_KEY=...         # the live forward web_search news pull
-export GOOGLE_APPLICATION_CREDENTIALS=/path/to/gcp-key.json   # BigQuery, only to (re)build the GKG backtest corpus
+### 2. Configure the input files
+
+Everything you configure lives in six files at the repo root. The first four are personal and gitignored (they never reach GitHub); the last two ship with the repo and are tracked, so edits to them are public.
+
+| File | Tracked | What you put in it |
+|---|---|---|
+| `investor_profile.md` | no | Goals, wave thesis, exclusions, and every optimizer and curator knob |
+| `holdings.csv` | no | Your real positions, `ticker,shares` |
+| `.env` | no | API keys |
+| `gcp-key.json` | no | Google BigQuery service-account credentials, needed only to rebuild the backtest news corpus |
+| `news_sources.md` | yes | Which news domains to trust, block, and treat as specialty desks |
+| `gkg_config.json` | yes | The backtest retriever's per-wave search keywords |
+
+- **`investor_profile.md`** is the source of truth for every recommendation: goals, constraints, sector exclusions, the wave-thesis prose the curator reasons against, and the YAML front matter holding all the numeric knobs (`initial_investment_usd`, `starter_watchlist`, `always_include` anchors, `financial_model` with risk aversion `λ`, risk-free rate, lookback and rebalance periods, concentration cap, and `max_watchlist_size`, plus the `backtest` and `forward` sections that pick each path's window and curator LLM). Nothing is hardcoded elsewhere, so this file alone changes behavior. Every recommendation cites lines from it.
+- **`holdings.csv`** is a two-column CSV (`ticker,shares`) of your real positions. Start it empty (or with 0 shares); the one-time bootstrap (step 3) allocates dollars across your thesis tickers and writes both `holdings.csv` (real shares) and `watchlist.csv` (the curator-managed universe, a single `ticker` column). Thereafter you edit `holdings.csv` only when you actually trade; the biweekly review manages `watchlist.csv` for you, so that one is not a file you configure.
+- **`news_sources.md`** ships pre-populated: a YAML `source_block` list of content-farm domains the retriever drops, a `source_major` list of wire services and major outlets (the ranker's mid-authority tier), and a prose section of specialty, wave-specific desks (the top tier, also read by the live curator). Tailor to your taste: add sources you trust, block ones that paywall heavily or go off-topic.
+- **`gkg_config.json`** drives the historical (GDELT-GKG) retriever: `wave_keywords` maps each wave to the phrases matched against article URLs and titles, `org_stoplist` drops non-company entities, and `engine` holds two mechanical guards (`ontopic_offset`, `max_scan_gb`, a BigQuery cost cap). Adding a wave to `investor_profile.md` is picked up automatically by the live path but **not** here: the backtest needs matching keywords added, then a re-ingest, since the keyword regex is what BigQuery is queried with.
+
+### 2a. API keys
+
+All keys live in a single **`.env` file at the repo root**, gitignored and never committed. One `KEY=value` per line, no quotes and no `export` prefix (the readers in `src/curator.py`, `src/retriever.py`, `scripts/backtest_sdk.py`, and `scripts/judge_curations.py` are plain line parsers, so both would be read as part of the value):
+
+```
+OPENROUTER_API_KEY=...     # every non-Claude curator model, e.g. the kimi-k2.5 backtest default
+ANTHROPIC_API_KEY=...      # every claude-* model: the live sonnet curator, the haiku news pull, the blind judge
 ```
 
-A routine forward run needs only the OpenRouter key; the Anthropic key powers the daily news pull, and the Google credentials are needed solely when rebuilding the backtest news corpus from GDELT-GKG.
+Which key a run needs follows from the model named in `investor_profile.md`: a model id starting with `claude` routes through the Anthropic SDK and needs the Anthropic key, anything of the form `vendor/model` routes through OpenRouter. So a backtest replay at the kimi default needs only the OpenRouter key, while the live forward loop (a `claude-sonnet-5` curator and an Anthropic `web_search` news pull) needs only the Anthropic key. Pure math runs, meaning the optimizer, the snapshots, and every dashboard refresh, call no LLM and need no key at all.
 
-### 2. Edit `investor_profile.md` and `holdings.csv`
+Google credentials work differently: **`gcp-key.json`**, a BigQuery service-account key file, is read from the repo root by path (`scripts/gkg_pool.py`), not through the usual `GOOGLE_APPLICATION_CREDENTIALS` environment variable. It is needed only when rebuilding the backtest news corpus from GDELT-GKG, not for any routine run.
 
-- `investor_profile.md`: here you declare your goals, constraints, exclusions, the wave-thesis prose, and the optimizer's settings (risk aversion, risk-free rate, lookback window, rebalance period, max watchlist size). Each field is documented with explanatory comments in `investor_profile.example.md`. Every recommendation cites lines from this file.
-- `holdings.csv`: a two-column CSV (`ticker,shares`) of your real positions. Start it empty (or with 0 shares); the one-time bootstrap (step 3) allocates dollars across your thesis tickers and writes both `holdings.csv` (real shares) and `watchlist.csv` (the curator-managed universe, a single `ticker` column). Thereafter you edit `holdings.csv` only when you actually trade; the biweekly review manages `watchlist.csv` for you.
-
-`news_sources.md` is pre-populated with a curated list of suggested news sources (Bloomberg, Reuters, company newsrooms, SEC filings, etc.) grouped by your profile's waves. The curator searches these domains first and falls back to open WebSearch otherwise. Tailor to your own taste: add sources you trust, drop ones that paywall heavily or go off-topic.
+Nothing reads keys from the shell environment, so cron inherits nothing and needs no export line. Rotating a key means editing the one value in `.env`. Both `.env` and `gcp-key.json` are listed in `.gitignore` under "personal data, never push".
 
 ### 3. Bootstrap the portfolio
 
