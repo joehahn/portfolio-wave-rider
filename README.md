@@ -8,15 +8,15 @@
 
 This project uses AI to manage a curated watchlist of tickers. You declare your goals, constraints, and an investment thesis (what you think will drive future returns), then initialize a starter watchlist you want exposure to. This solution's two halves have a deliberate division of labor. The **curator** is AI-powered, and it is forward-looking: at each rebalance it reads recent news against your thesis and evolves the watchlist, hunting tickers in the early buildup of a wave that may rise soon and preferring the news sources you trust. The **optimizer** is strictly backward-looking: an industry standard math-only mean-variance model that sets the weights from trailing returns and covariances, pure math, no AI. So the AI decides *which* tickers the optimizer may choose among, and the math decides the weights. The results accumulate into dashboards where you can watch the watchlist composition, the recommended weights, and the realized portfolio value evolve over time, and monitor how realized gains are attributed to the news sources, authors, keywords, and waves behind each pick. In our experiments this coupling of AI curation with standard optimization significantly outperforms the optimizer on its own.
 
-**Who this helps.** An investor who has a thesis about where markets are going but not enough time to track the news, or who wants help optimizing a portfolio. This demo helps that investor move from a static buy-and-hold portfolio to one that is lightly but effectively managed by AI. In the 3-year backtest below (2023 to 2026) the AI-managed portfolio outperforms a buy-and-hold of the starter watchlist by a wide margin. The curator's job is to compound a thesis you already hold, not to invent one you don't.
+**Who this helps.** An investor who has a thesis about where markets are going but not enough time to track the news. This demo helps that investor move from a static buy-and-hold portfolio to one that is lightly but effectively managed by AI. In the 3-year backtest described below, the AI-managed portfolio outperforms a buy-and-hold of a representative starter watchlist by a wide margin. The curator's job is to compound a thesis you already hold, not to invent one you don't.
 
-**The dashboards.** The results are served from GitHub Pages in three families, each running the same retriever-then-curator pipeline on a different slice of time.
+**The dashboards.** The results are served from GitHub Pages via three families, each running the same retriever+curator pipeline on different slices of time.
 
-*Backtest* (the historical GDELT-GKG plus Wayback replay, 2023 to 2026):
+*Backtest* (historical replay across years 2023 to 2026):
 
-- **[Retriever, RBT](https://joehahn.github.io/portfolio-wave-rider/retrieval_pwr.html)**: the date-clean GKG plus Wayback news corpus the backtest curator reads, with coverage, sources, and per-window article counts. Mechanical, no LLM.
-- **[Curator, CBT](https://joehahn.github.io/portfolio-wave-rider/backtest_gkg_3yr_kimi.html)**: the curator's watchlist decisions replayed over the window, portfolio value against buy-and-hold and SPY, the watchlist Gantt, and per-wave profit and loss.
-- **[Sweeps](https://joehahn.github.io/portfolio-wave-rider/sweep_pwr.html)**: a zero-cost sweep of the optimizer knobs (cap, `λ`, lookback), a curator-LLM comparison, and a blind, leak-free judge that scores each curator's reasoning with the market outcome hidden.
+- **[Retriever, RBT](https://joehahn.github.io/portfolio-wave-rider/retrieval_pwr.html)**: here the backtest curator merely reads historical news and displays coverage, sources, and per-window article counts. 
+- **[Curator, CBT](https://joehahn.github.io/portfolio-wave-rider/backtest_gkg_3yr_kimi.html)**: the curator scans the above 2023-2026 news and reveal's the AI-recommended watchlist decisions across that time-window, with portfolio values over time relative to buy-and-hold and SPY, and per-wave profit and loss.
+- **[Sweeps](https://joehahn.github.io/portfolio-wave-rider/sweep_pwr.html)**: a sweep of the optimizer knobs (cap, `λ`, lookback), to illustrate how portfolio outcomes vary with parameter settings.
 
 *Bootstrap* (a recent backtest tail stitched to ongoing daily forward ingests, so the curve keeps extending in real time):
 
