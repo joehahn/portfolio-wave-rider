@@ -72,10 +72,17 @@ def _llm_complete(model: str, system: str, user: str, max_tokens: int, anthropic
     body = {"model": model, "max_tokens": max_tokens,
             "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}]}
     if no_reasoning:
-        body["reasoning"] = {"enabled": False}   # skip the reasoning pass (big speed-up on reasoning models)
-    resp = requests.post("https://openrouter.ai/api/v1/chat/completions",
-                         headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
-                         json=body, timeout=120)
+        body["reasoning"] = {"enabled": False}   # try to skip the reasoning pass (speed/cost on reasoning models)
+
+    def _post(b):
+        return requests.post("https://openrouter.ai/api/v1/chat/completions",
+                             headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
+                             json=b, timeout=120)
+    resp = _post(body)
+    if resp.status_code == 400 and "reasoning" in body and "reasoning" in resp.text.lower():
+        # some models (e.g. gemini-3-pro, grok-4.x) make reasoning MANDATORY -> disabling it 400s; let it reason.
+        body.pop("reasoning")
+        resp = _post(body)
     resp.raise_for_status()
     j = resp.json()
     txt = (j["choices"][0]["message"].get("content") or "").strip()

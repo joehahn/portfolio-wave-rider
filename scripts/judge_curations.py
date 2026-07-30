@@ -33,13 +33,27 @@ from pathlib import Path
 from random import Random
 
 ROOT = Path(__file__).resolve().parent.parent
+import statistics  # noqa: E402
+import sys  # noqa: E402
+sys.path.insert(0, str(ROOT))
+from src import curator  # noqa: E402  (reused for provider-agnostic, reasoning-OFF judge calls)
 
 # curators under judgement: (display label, run dir). Order is irrelevant — decisions are pooled + shuffled.
 RUNS = [   # geosplit-config runs at the canonical mws16: same pools/dates/config, only the curator LLM varies
     ("claude-sonnet-5", "data/curator_runs/proto-sonnet"),
     ("moonshotai/kimi-k2.5", "data/curator_runs/proto-mws16"),
     ("deepseek/deepseek-v4-flash", "data/curator_runs/proto-deepseek"),
+    ("claude-opus-4-8", "data/curator_runs/proto-opus"),
 ]
+# JUDGE PANEL: three NON-FAMILY judges (disjoint from every candidate's vendor -> no self/in-family preference).
+# Panel score = mean of the three; dispersion = their stdev. Opus is a CROSS-CHECK reference only (in-family with
+# the sonnet/opus candidates, so it is reported alongside but NOT folded into the panel mean).
+PANEL_JUDGES = ["openai/gpt-5.4", "google/gemini-3.1-pro-preview", "x-ai/grok-4.5"]
+CROSSCHECK_JUDGE = "claude-opus-4-8"
+ALL_JUDGES = PANEL_JUDGES + [CROSSCHECK_JUDGE]
+JUDGE_PRICES = {   # $/M (in, out) for the approx cost report
+    "openai/gpt-5.4": (2.5, 15.0), "google/gemini-3.1-pro-preview": (2.0, 12.0),
+    "x-ai/grok-4.5": (2.0, 6.0), "claude-opus-4-8": (5.0, 25.0)}
 JUDGE_DEFAULT = "claude-opus-4-8"
 JUDGE_PRICE = {"in": 5.0, "out": 25.0}      # $/M tokens, Opus 4.8 estimate (only used to report an approx cost)
 CRITERIA = ["on_thesis", "evidence_supports", "real_catalyst", "disciplined", "valid_ticker"]
@@ -133,26 +147,22 @@ def _parse(txt):
     return j
 
 
-def judge_one(cli, judge_model, dec):
-    """One blind judgement (5 tries, exponential backoff on API/overload errors, parse-retry).
+def judge_one(judge_model, dec, cli):
+    """One blind judgement by `judge_model` (provider-agnostic via curator._llm_complete, reasoning OFF so
+    the short verdict isn't truncated by a thinking pass). 5 tries, backoff, parse-retry.
     Returns (verdict_dict, tokens_in, tokens_out)."""
     last = None
     for t in range(5):
         try:
-            # Disable extended thinking: Opus 4.8 runs it ON by default, which would consume the 400-token
-            # budget and leave the verdict JSON empty/truncated (every decision would fail to parse). The
-            # rubric is a short structured verdict that needs no thinking pass.
-            r = cli.messages.create(model=judge_model, max_tokens=400, system=JUDGE_SYSTEM,
-                                    thinking={"type": "disabled"},
-                                    messages=[{"role": "user", "content": _decision_text(dec)}])
-            txt = "".join(getattr(b, "text", "") for b in r.content).strip()
+            txt, ti, to = curator._llm_complete(judge_model, JUDGE_SYSTEM, _decision_text(dec),
+                                                2000, cli, no_reasoning=True)   # headroom: gemini/grok force reasoning
             v = _parse(txt)
             if v is not None:
-                return v, r.usage.input_tokens, r.usage.output_tokens
-            last = (None, r.usage.input_tokens, r.usage.output_tokens)   # parsed empty -> retry
+                return v, ti, to
+            last = (None, ti, to)   # parsed empty -> retry
         except Exception as e:  # noqa: BLE001  (overload / rate-limit / transient)
             last = (None, 0, 0)
-            print(f"  ! judge error on {dec['model']} {dec['date']} {dec['ticker']}: {str(e)[:80]}")
+            print(f"  ! {judge_model} error on {dec['model']} {dec['date']} {dec['ticker']}: {str(e)[:80]}")
             time.sleep(min(30, 3 * 2 ** t))
     return last or (None, 0, 0)
 
@@ -163,7 +173,6 @@ def _key(dec):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--judge", default=JUDGE_DEFAULT, help="judge model id (Anthropic)")
     ap.add_argument("--limit", type=int, default=0, help="judge only N sampled decisions (smoke test)")
     ap.add_argument("--workers", type=int, default=6)
     a = ap.parse_args()
@@ -173,80 +182,105 @@ def main():
     if a.limit:
         decisions = decisions[:a.limit]
 
-    # resume: reuse cached verdicts (keyed by model|date|action|ticker), only call the API for the rest.
-    cache = json.loads(CACHE.read_text()) if CACHE.exists() else {}
-    cache = cache.get(a.judge, {}) if isinstance(cache.get(a.judge), dict) else {}
-    todo = [d for d in decisions if _key(d) not in cache]
-    print(f"{len(decisions)} decisions; {len(decisions)-len(todo)} cached, judging {len(todo)} with "
-          f"{a.judge} ({a.workers} workers)...")
+    # Run every judge over every decision. Resume-friendly: cache is {judge: {dec_key: verdict}}; only the
+    # uncached (judge, decision) pairs hit the API. curator._llm_complete routes claude-* -> Anthropic (cli),
+    # everything else -> OpenRouter, both reasoning-OFF so the short verdict can't be truncated by a think pass.
+    allc = json.loads(CACHE.read_text()) if CACHE.exists() else {}
+    cli = _anthropic()
+    tin = {j: 0 for j in ALL_JUDGES}
+    tout = {j: 0 for j in ALL_JUDGES}
+    verdicts = {}
+    for j in ALL_JUDGES:
+        cache = allc.get(j, {}) if isinstance(allc.get(j), dict) else {}
+        todo = [d for d in decisions if _key(d) not in cache]
+        print(f"[{j}] {len(decisions)} decisions; {len(decisions) - len(todo)} cached, judging {len(todo)}...")
+        if todo:
+            with ThreadPoolExecutor(max_workers=a.workers) as ex:
+                futs = {ex.submit(judge_one, j, d, cli): d for d in todo}
+                for done, (fut, d) in enumerate(list(futs.items()), 1):
+                    v, ti, to = fut.result()
+                    tin[j] += ti
+                    tout[j] += to
+                    if v is not None:
+                        cache[_key(d)] = v
+                    if done % 20 == 0:
+                        print(f"  [{j}] {done}/{len(todo)}")
+            allc[j] = cache
+            CACHE.write_text(json.dumps(allc, indent=1))
+        verdicts[j] = cache
 
-    cli = _anthropic() if todo else None
-    tin = tout = 0
-    if todo:
-        with ThreadPoolExecutor(max_workers=a.workers) as ex:
-            futs = {ex.submit(judge_one, cli, a.judge, d): d for d in todo}
-            done = 0
-            for fut, d in list(futs.items()):
-                v, ti, to = fut.result()
-                tin += ti
-                tout += to
-                if v is not None:
-                    cache[_key(d)] = v
-                done += 1
-                if done % 15 == 0:
-                    print(f"  {done}/{len(todo)} judged")
-        allc = json.loads(CACHE.read_text()) if CACHE.exists() else {}
-        allc[a.judge] = cache
-        CACHE.write_text(json.dumps(allc, indent=1))
-    results = [cache.get(_key(d)) for d in decisions]
-
-    # aggregate per curator
-    models = {}
-    for dec, v in zip(decisions, results):
-        if v is None:
-            continue
-        m = models.setdefault(dec["model"], {"n": 0, "overall": [], "add": [], "rem": [],
-                                             **{k: [] for k in CRITERIA}})
-        m["n"] += 1
-        ov = float(v["overall"])
-        m["overall"].append(ov)
-        (m["add"] if dec["action"] == "add" else m["rem"]).append(ov)
-        for k in CRITERIA:
-            m[k].append(1.0 if v.get(k) else 0.0)
+    _ov = lambda v: float(v["overall"]) if v else None   # noqa: E731
 
     def _mean(xs):
         return round(sum(xs) / len(xs), 3) if xs else None
 
+    def _pstd(xs):
+        return round(statistics.pstdev(xs), 3) if len(xs) > 1 else 0.0
+
+    # panel overall + dispersion per decision = mean / stdev across the panel judges that returned a verdict
+    pov, pdisp = {}, {}
+    for d in decisions:
+        k = _key(d)
+        pj = [x for x in (_ov(verdicts[j].get(k)) for j in PANEL_JUDGES) if x is not None]
+        if pj:
+            pov[k], pdisp[k] = sum(pj) / len(pj), _pstd(pj)
+
+    # per-candidate aggregation (panel mean + dispersion + per-judge + Opus cross-check + panel-averaged criteria)
+    models = {}
+    for d in decisions:
+        k = _key(d)
+        if k not in pov:
+            continue
+        m = models.setdefault(d["model"], {"n": 0, "panel": [], "disp": [], "add": [], "rem": [], "cross": [],
+                                           "pj": {j: [] for j in ALL_JUDGES}, **{c: [] for c in CRITERIA}})
+        m["n"] += 1
+        m["panel"].append(pov[k])
+        m["disp"].append(pdisp[k])
+        (m["add"] if d["action"] == "add" else m["rem"]).append(pov[k])
+        for j in ALL_JUDGES:
+            x = _ov(verdicts[j].get(k))
+            if x is not None:
+                m["pj"][j].append(x)
+        cx = _ov(verdicts[CROSSCHECK_JUDGE].get(k))
+        if cx is not None:
+            m["cross"].append(cx)
+        for c in CRITERIA:                               # share of PANEL judges passing c, averaged over decisions
+            passes = [1.0 if (verdicts[j].get(k) or {}).get(c) else 0.0
+                      for j in PANEL_JUDGES if verdicts[j].get(k) is not None]
+            if passes:
+                m[c].append(sum(passes) / len(passes))
+
     summary = {}
     for label, m in models.items():
-        summary[label] = {"n": m["n"], "mean_overall": _mean(m["overall"]),
+        summary[label] = {"n": m["n"], "mean_overall": _mean(m["panel"]), "dispersion": _mean(m["disp"]),
                           "add_mean": _mean(m["add"]), "rem_mean": _mean(m["rem"]),
-                          **{k: _mean(m[k]) for k in CRITERIA}}
+                          "crosscheck_overall": _mean(m["cross"]),
+                          "per_judge": {j: _mean(m["pj"][j]) for j in ALL_JUDGES},
+                          **{c: _mean(m[c]) for c in CRITERIA}}
 
-    # a few example verdicts for the dashboard (lowest-scoring first — the interesting failures)
-    ex_rows = sorted(
-        [{"model": d["model"], "date": d["date"], "action": d["action"], "ticker": d["ticker"],
-          "overall": v["overall"], "reason": v.get("reason", "")}
-         for d, v in zip(decisions, results) if v is not None],
-        key=lambda x: x["overall"])
-    # full-batch cost estimate: scale this run's per-call token average to all judged decisions (stable
-    # across resume runs, which only re-pay for the uncached tail).
-    n_ok = sum(m["n"] for m in models.values())
-    if todo:
-        per = (tin * JUDGE_PRICE["in"] + tout * JUDGE_PRICE["out"]) / 1e6 / len(todo)
-        cost = per * n_ok
-    else:  # fully cached re-run: carry the last full-batch cost estimate forward instead of showing $0
-        cost = json.loads(OUT.read_text()).get("cost_usd", 0.0) if OUT.exists() else 0.0
+    panel_rank = [l for l, _ in sorted(summary.items(), key=lambda kv: -(kv[1]["mean_overall"] or -9))]
+    opus_rank = [l for l, _ in sorted(summary.items(), key=lambda kv: -(kv[1]["crosscheck_overall"] or -9))]
+    ex_rows = sorted(({"model": d["model"], "date": d["date"], "action": d["action"], "ticker": d["ticker"],
+                       "overall": round(pov[_key(d)], 2)} for d in decisions if _key(d) in pov),
+                     key=lambda x: x["overall"])[:12]
+    cost = sum((tin[j] * JUDGE_PRICES.get(j, (0, 0))[0] + tout[j] * JUDGE_PRICES.get(j, (0, 0))[1]) / 1e6
+               for j in ALL_JUDGES)
 
-    payload = {"judge_model": a.judge, "built": datetime.now().strftime("%Y-%m-%d %H:%M"),
-               "n_decisions": sum(m["n"] for m in models.values()), "n_failed": results.count(None),
-               "cost_usd": round(cost, 2), "tokens_in": tin, "tokens_out": tout,
-               "criteria": CRITERIA, "models": summary, "examples": ex_rows[:12]}
+    payload = {"built": datetime.now().strftime("%Y-%m-%d %H:%M"), "panel_judges": PANEL_JUDGES,
+               "crosscheck_judge": CROSSCHECK_JUDGE, "n_decisions": sum(m["n"] for m in models.values()),
+               "cost_usd": round(cost, 2), "criteria": CRITERIA, "models": summary,
+               "panel_rank": panel_rank, "crosscheck_rank": opus_rank, "examples": ex_rows}
     OUT.write_text(json.dumps(payload, indent=1))
-    print(f"\nwrote {OUT}  (cost ~${cost:.2f}, {results.count(None)} failed)")
-    for label, s in sorted(summary.items(), key=lambda kv: -(kv[1]["mean_overall"] or 0)):
-        print(f"  {label:32s} overall {s['mean_overall']}  (n={s['n']})  "
-              + " ".join(f"{k[:4]}={s[k]}" for k in CRITERIA))
+
+    print(f"\nwrote {OUT}  (this-run cost ~${cost:.2f})")
+    print("panel = mean of " + ", ".join(j.split("/")[-1] for j in PANEL_JUDGES) + "; ± = stdev across them:")
+    for label in panel_rank:
+        s = summary[label]
+        pj = "  ".join(f"{j.split('/')[-1]}={s['per_judge'][j]}" for j in PANEL_JUDGES)
+        print(f"  {label.split('/')[-1]:20s} panel {s['mean_overall']} ±{s['dispersion']}  (n={s['n']})  "
+              f"opus_x={s['crosscheck_overall']}   [{pj}]")
+    print(f"panel rank: {[l.split('/')[-1] for l in panel_rank]}")
+    print(f"opus  rank: {[l.split('/')[-1] for l in opus_rank]}   (cross-check: do the neutral panel + Opus agree?)")
 
 
 if __name__ == "__main__":

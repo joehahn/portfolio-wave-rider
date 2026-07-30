@@ -50,6 +50,7 @@ LLM_RUNS = [   # row 0 = the DEPLOYED default (kimi); "agree" is measured agains
     ("moonshotai/kimi-k2.5", "data/curator_runs/proto-mws16", "OpenRouter", 0.57, 2.85),
     ("claude-sonnet-5", "data/curator_runs/proto-sonnet", "Anthropic", 3.0, 15.0),
     ("deepseek/deepseek-v4-flash", "data/curator_runs/proto-deepseek", "OpenRouter", 0.27, 0.40),
+    ("claude-opus-4-8", "data/curator_runs/proto-opus", "Anthropic", 5.0, 25.0),
 ]
 CURRENT = (float(_FM["concentration_cap"]), float(_FM["risk_aversion"]),
            int(_FM["optimizer_lookback_days"]))   # the live investor_profile.md config (cap / λ / lookback-days)
@@ -664,13 +665,16 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
             _scorecard += (
                 f'<tr style="{bg}border-bottom:1px solid #eee;"><td {_lc}><b>{L.split("/")[-1]}</b>{tag}</td>'
                 f'<td {_lc}>{r["prov"]}</td><td {_lc}>{r["nadd"]} / {r["nrem"]}</td>'
-                + _c2(j.get("mean_overall"), "{:.2f}")
+                + _c2(j.get("mean_overall"), "{:.2f}") + _c2(j.get("dispersion"), "±{:.2f}")
                 + "".join(_c2((j.get(k) or 0) * 100, "{:.0f}%") if j else '<td {_lc}>n/a</td>' for k in _JCRIT)
                 + _c2(r["agree"] * 100, "{:.0f}%")
                 + _c2(r["ret"] * 100, "{:+.0f}%") + _c2(r["dd"] * 100, "{:.0f}%")
                 + _c2(r["calmar"], "{:.2f}") + _c2(r["ir"], "{:+.2f}") + _c2(est, "~${:.1f}") + "</tr>")
         _njudged = _jmeta.get("n_decisions", "?")
-        _jcost = _jmeta.get("cost_usd")
+        _panel = _jmeta.get("panel_judges", [])
+        _panel_lbl = ", ".join(p.split("/")[-1] for p in _panel) or "3-judge panel"
+        _xchk = (_jmeta.get("crosscheck_judge") or "opus").split("/")[-1]
+        _agree = "identical" if _jmeta.get("panel_rank") == _jmeta.get("crosscheck_rank") else "similar"
         model_html = (
             '<h2>12. Total return vs curator model</h2>'
             '<p style="color:#555;max-width:940px;">The same news pools, dates, and canonical config '
@@ -678,21 +682,24 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
             'reasoning-OFF for every model &mdash; the <b>only</b> variable is the curator LLM. The bar is each '
             'model&#39;s in-sample backtest return (deployed kimi in green). But return here is <b>hindsight-'
             'leaky</b> (the curator could have memorized which 2023&ndash;2026 names later won), so the '
-            'scorecard below ranks by the one metric that owes nothing to hindsight: a blind soundness judge.</p>'
+            'scorecard below ranks by the one metric that owes nothing to hindsight: blind soundness judging.</p>'
             + _lbar
             + '<h2 style="margin-top:1.4em;">Curator-model scorecard</h2>'
-            '<p style="color:#555;max-width:940px;">Rows ordered by <b>soundness</b> &mdash; an independent judge '
-            f'(<b>{_jmeta.get("judge_model", "Opus")}</b>, not one of the curators) reads each add/remove '
-            '<b>blind</b> (model identity stripped, decisions shuffled, the ticker&#39;s later price never shown) '
-            'and grades whether the rationale + cited news justified the call <i>at the time</i>: a holistic '
-            '<b>soundness</b> 1&ndash;5 plus five pass/fail criteria. This is leak-free. The backtest columns '
-            f'(return / ann / maxDD / Calmar / IR) are <b>in-sample, secondary</b>; <b>agree</b> = share of '
-            f'weeks the model made the identical call as deployed kimi; <b>~$/run</b> = estimated LLM cost of a '
-            f'full {len(_order) and 79}-date curate. {_njudged} decisions judged'
-            + (f', ~${_jcost:.2f}.' if _jcost else '.') + '</p>'
+            '<p style="color:#555;max-width:940px;">Rows ordered by <b>soundness</b> = the mean of a '
+            f'<b>3-judge non-family panel</b> ({_panel_lbl}) &mdash; none shares a vendor with any candidate, so '
+            'no self-preference. Each judge reads every add/remove <b>blind</b> (model identity stripped, '
+            'decisions shuffled, the ticker&#39;s later price never shown) and grades whether the rationale + '
+            'cited news justified the call <i>at the time</i>: a holistic 1&ndash;5 plus five pass/fail criteria. '
+            '<b>±disp</b> = stdev across the three judges (how much they disagree). This is leak-free. As a '
+            f'cross-check, an independent <b>{_xchk}</b> judge (not in the panel) ranks the models '
+            f'<b>{_agree}</b>ly. The backtest columns (return / maxDD / Calmar / IR) are <b>in-sample, '
+            'secondary</b>; <b>agree</b> = share of weeks the model made the identical call as deployed kimi; '
+            f'<b>~$/run</b> = estimated LLM cost of a full {len(_order) and 79}-date curate. {_njudged} decisions '
+            f'judged x {len(_panel) + 1} judges'
+            + (f', ~${_jmeta.get("cost_usd"):.2f}.' if _jmeta.get("cost_usd") else '.') + '</p>'
             '<div style="overflow-x:auto;"><table><thead><tr>'
             f'<th style="text-align:left">model</th><th style="text-align:left">provider</th>'
-            f'<th {_lc}>decisions<br>(add/rem)</th><th {_lc}>soundness<br>(1-5)</th>'
+            f'<th {_lc}>decisions<br>(add/rem)</th><th {_lc}>soundness<br>(1-5)</th><th {_lc}>±disp</th>'
             + "".join(f'<th {_lc}>{_crlab[k]}</th>' for k in _JCRIT)
             + f'<th {_lc}>agree<br>vs kimi</th><th {_lc}>total<br>ret</th><th {_lc}>maxDD</th>'
             f'<th {_lc}>Calmar</th><th {_lc}>IR</th><th {_lc}>~$/run</th>'
@@ -766,44 +773,9 @@ def build(runs_dir: str, out: Path, recompute: bool = False) -> None:
                         + _mwsfig.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False}))
                        if _mws_curves else "")
 
-    # section 5: blind rationale-soundness judge (leak-free). Reads data/curator_runs/_judge_scores.json
-    # produced by scripts/judge_curations.py; if absent, the section is simply omitted.
-    llm5_html = ""
-    _jf = ROOT / "data" / "curator_runs" / "_judge_scores.json"
-    if _jf.exists():
-        J = json.loads(_jf.read_text())
-        _cr = J["criteria"]
-        _crlabel = {"on_thesis": "on-thesis", "evidence_supports": "evidence", "real_catalyst": "catalyst",
-                    "disciplined": "discipline", "valid_ticker": "valid-ticker"}
-        _mods = sorted(J["models"].items(), key=lambda kv: -(kv[1]["mean_overall"] or 0))  # best reasoning first
-        _jtrs = ""
-        for i, (label, s) in enumerate(_mods):
-            bg = "background:#eef7ee;" if i == 0 else ("background:#fafafa;" if i % 2 else "")
-            _jtrs += (f'<tr style="{bg}border-bottom:1px solid #eee;"><td {_lc}><b>{label.split("/")[-1]}</b></td>'
-                      + _c2(s["mean_overall"], "{:.2f}") + f'<td {_lc}>{s["n"]}</td>'
-                      + _c2(s["add_mean"], "{:.2f}") + _c2(s["rem_mean"], "{:.2f}")
-                      + "".join(_c2((s[k] or 0) * 100, "{:.0f}%") for k in _cr) + "</tr>")
-        llm5_html = (
-            '<h2>15. Rationale-soundness — blind judge (leak-free)</h2>'
-            '<p style="color:#555;max-width:920px;">Every backtest column above (return, IR, Sharpe, Calmar, '
-            't-stat) is <b>in-sample</b> &mdash; the curator could have memorized which 2023&ndash;2026 names '
-            'later won, so those numbers can\'t honestly rank <i>reasoning</i>. This section does: an '
-            f'independent judge (<b>{J["judge_model"]}</b>, not one of the curators) reads each add/remove '
-            '<b>blind</b> &mdash; model identity stripped, decisions shuffled, and the ticker\'s later price '
-            '<b>never shown</b> &mdash; and grades only whether the stated rationale + cited news justified the '
-            'call at the time. Five criteria (each pass/fail) + a holistic <b>overall</b> 1&ndash;5. '
-            f'{J["n_decisions"]} decisions judged, ~${J["cost_usd"]:.2f}. Ranked by mean overall &mdash; this is '
-            'the one ranking here that owes nothing to hindsight.</p>'
-            f'<table><thead><tr><th style="text-align:left">curator</th><th {_lc}>overall (1-5)</th>'
-            f'<th {_lc}>n</th><th {_lc}>add</th><th {_lc}>remove</th>'
-            + "".join(f'<th {_lc}>{_crlabel[k]}</th>' for k in _cr)
-            + f'</tr></thead><tbody>{_jtrs}</tbody></table>'
-            '<p style="color:#666;font-size:12px;max-width:920px;line-height:1.6;margin:.5em 0 .3em;">'
-            '<b>overall</b> = mean 1&ndash;5 soundness · <b>add/remove</b> = mean overall split by action · the '
-            'five % columns = share of that curator\'s decisions passing each criterion: <b>on-thesis</b> (maps '
-            'to a named wave), <b>evidence</b> (cited news actually supports the claim), <b>catalyst</b> '
-            '(concrete milestone, not noise), <b>discipline</b> (buildup-not-crest; a remove is justified, not '
-            'churn), <b>valid-ticker</b> (real investable US listing, not a name/delisted/false-match).</p>')
+    # (The standalone blind-judge section was folded into §12's Curator-model scorecard above, which now
+    # carries the 3-judge panel soundness + dispersion + Opus cross-check; no separate section is rendered.)
+
     # section 6: max_watchlist_size sweep (non-zero-cost: each cap is a re-curation). Does more room let
     # the curator add NVDA? Table (cap / return / #changes / NVDA? / final watchlist) + a return-vs-cap bar.
     _mws = _mws_rows()
