@@ -25,7 +25,7 @@ The results are served from GitHub Pages via three families, each running the sa
 - **[Retriever (RBS)](https://joehahn.github.io/portfolio-wave-rider/retrieval_bootstrap.html)**: inspect and visualize the bootstrap news corpus
 - **[Curator (CBS)](https://joehahn.github.io/portfolio-wave-rider/curator_bootstrap.html)**: apply the AI curator across the boostrap era and view the portfolio recommendations and value over time
 
-*Forwardtest* (this solution tgathers news daily since 2026-07-22 and makes periodic portfolio recommendations thereafter):
+*Forwardtest* (this solution gathers news daily since 2026-07-22 and makes periodic portfolio recommendations thereafter):
 
 - **[Forwardtest (FT)](https://joehahn.github.io/portfolio-wave-rider/forward_dashboard.html)**: visualize gains/losses made by live portfolio
 
