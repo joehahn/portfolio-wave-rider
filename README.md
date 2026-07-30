@@ -50,10 +50,11 @@ python3.12 -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
 
-# Copy templates:
-cp investor_profile.example.md investor_profile.md
-cp holdings.example.csv holdings.csv
+# Copy the starter templates to the repo root (no renaming needed):
+cp examples/investor_profile.md examples/holdings.csv .
 ```
+
+`examples/` holds starter versions of the two files you must create yourself. The other two configurable files, `news_sources.md` and `retrieval_config.json`, already ship populated at the repo root, so you edit those in place rather than copying a template.
 
 API keys go in a `.env` file rather than your shell profile, covered in step 2 below.
 
