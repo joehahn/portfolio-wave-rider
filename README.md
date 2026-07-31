@@ -139,7 +139,7 @@ This project's portfolio-optimization activities.
 
 ### 1. initialize (once)
 
-Put what you own into `holdings.csv` (Setup step 3), either by editing the file directly or, if you would rather think in dollars, by handing a per-ticker dollar allocation to `.venv/bin/python -m src.cli init-holdings`, which converts those dollars to share counts at today's prices.
+Put what you own into `holdings.csv` (Setup step 3) by editing the file directly. [REFERENCE.md](REFERENCE.md#cli-reference) covers `init-holdings`, which does the same job from a per-ticker dollar allocation.
 
 ### 2. cron to monitor ticker changes (daily)
 

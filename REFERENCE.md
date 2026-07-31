@@ -7,9 +7,9 @@ CLI flags, repo layout, architecture, and testing instructions for Portfolio Wav
 Nine subcommands (`init-holdings`, `analyze`, `snapshot`, `recommend`, `curate`, `backtest`, `dashboard`, `pull-news`, `review`). The daily crons call `pull-news`, `snapshot`, and `dashboard`; the biweekly cron calls `review --if-due`, which curates, applies, re-optimizes, and writes its report in one process. `analyze`, `curate`, and `backtest` are manual spot-check tools. Every subcommand prints a single JSON blob to stdout.
 
 ```bash
-# Convert a thesis-driven dollar allocation into shares (used internally by the
-# initialize-portfolio skill; runnable directly if you ever want to redo a thesis
-# allocation, e.g. after expanding the watchlist).
+# Convert a per-ticker dollar allocation into share counts at today's prices, and
+# write both holdings.csv (real shares) and watchlist.csv (the curator universe).
+# Use it if you would rather think in dollars than hand-edit holdings.csv.
 .venv/bin/python -m src.cli init-holdings --allocations '{"NVDA": 5000, "MSFT": 5000, ...}' --out holdings.csv
 
 # One-shot analysis (fetch prices + compute log-returns + optimize + risk metrics).
