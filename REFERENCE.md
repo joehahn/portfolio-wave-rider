@@ -198,6 +198,20 @@ The README covers the two `.env` keys. The rest:
 - Nothing reads keys from the shell environment, so cron inherits nothing and needs no export line. Rotating a key means editing the one value in `.env`.
 - Both `.env` and `gcp-key.json` are listed in `.gitignore` under "personal data, never push".
 
+## The curator
+
+The prompt, the routing, and the JSON parser all live in [`src/curator.py`](src/curator.py); the system prompt itself is `.claude/agents/watchlist-curator.md`. The curator returns a decision payload and writes nothing.
+
+`portfolio.apply_curator_decisions` is what validates that payload, and only the changes that survive reach `watchlist.csv` and `data/curation_history.csv`:
+
+- **US-listed only**, with a listing-date check via yfinance, so a backtest cannot add a ticker that had not yet listed on the as-of date.
+- **Post-change watchlist size within `max_watchlist_size`.** Anchors are excluded from the count.
+- **No double-adds** (a ticker already on the watchlist) and **no stale removes** (a ticker that is not on it).
+- **Anchors are protected**: the profile's `always_include` tickers cannot be added or removed by the curator.
+- The backtest sandbox additionally **blocks removing a ticker with shares > 0**. That rule does not apply on the live path, where the optimizer universe (watchlist ∪ held) keeps a dropped-but-held ticker recommendable for sale.
+
+Every rejection comes back with a reason, and the applied adds and removes are appended to `data/curation_history.csv`.
+
 ## Retrieval engines
 
 Staged here until it gets its own doc. The README deliberately keeps the backtest-vs-forward retrieval split out of the tour.

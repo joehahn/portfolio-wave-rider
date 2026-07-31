@@ -188,16 +188,16 @@ The split is deliberate. Python does everything deterministic; an LLM does the o
 
 ## How the AI curator works
 
-The curator decides which tickers belong on the watchlist. Its job is composition only: read the news, decide what to add and remove against the current watchlist. It never proposes weights or forecasts; it manages the set of tickers the optimizer may choose among, informed by current news and aligned with your thesis. In the backtest it is kimi-k2.5 reading the date-clean GKG pool; the live path fires the same curator on the biweekly cron review (`cli review --if-due`).
+The curator decides which tickers belong on the watchlist. Its job is composition only: read the news, decide what to add and remove against the current watchlist. It never proposes weights or forecasts; it manages the set of tickers the optimizer may choose among, informed by recent news and aligned with your thesis.
 
 On each call the curator:
 
 1. Reads the wave thesis from `investor_profile.md` and the current watchlist from `watchlist.csv`.
-2. Reads the recent-news pool for that date: the GKG plus Wayback pool in the backtest, an Anthropic web_search pull live, preferring the sources in `news_sources.md`.
+2. Reads the pool of recent news the retriever assembled for that date, preferring the sources you trust in `news_sources.md`.
 3. Proposes adds and removes, bounded by the free slots in `max_watchlist_size`, each cited to dated news.
 4. Returns one JSON payload.
 
-Python then validates the payload: US-listed only, listing-date check via yfinance, post-change watchlist size within `max_watchlist_size`, no double-adds, no stale removes. Only the changes that survive touch `watchlist.csv`; your real positions in `holdings.csv` are never modified. The curator prompt and parser live in [`src/curator.py`](src/curator.py).
+Python then validates that payload, and only the changes that survive touch `watchlist.csv`; your real positions in `holdings.csv` are never modified. [REFERENCE.md](REFERENCE.md#the-curator) has the validation rules.
 
 ## How the optimizer works
 
