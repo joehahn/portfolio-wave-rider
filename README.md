@@ -161,7 +161,7 @@ Our own run is on two dashboards: [RBT](https://joehahn.github.io/portfolio-wave
 
 A sweep re-runs the pipeline across a grid of parameter values and ranks the outcomes, so you can see how sensitive the result is to a setting instead of trusting the one you happened to pick. The optimizer knobs (`concentration_cap`, risk aversion `λ`, the price lookback) touch only the mean-variance replay, so an entire grid costs nothing but local compute, no LLM calls and no news re-fetch. Curator knobs are different: `max_watchlist_size` shapes the curator's *decisions*, so each value needs its own set of curator calls.
 
-Our sweeps are on [SBT](https://joehahn.github.io/portfolio-wave-rider/sweep_pwr.html), which has three parts: an optimizer-knob frontier ranked by Information Ratio with the current config flagged; a curator-LLM comparison in which each candidate model reads the same news pools at the same config, so the only variable is the curator; and a blind rationale judge, an independent grader that scores each add and remove with the market outcome hidden, ranking a curator on its reasoning rather than on an in-sample return.
+Results from our sweeps are displayed in the [SBT](https://joehahn.github.io/portfolio-wave-rider/sweep_pwr.html) dashboard.
 
 Steps 2 and 3 happen on their own once the cron jobs are installed. Steps 1, 4, and 5 are yours to run.
 
