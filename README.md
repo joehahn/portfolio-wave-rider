@@ -163,8 +163,6 @@ A sweep re-runs the pipeline across a grid of parameter values and ranks the out
 
 Results from our sweeps are displayed in the [SBT](https://joehahn.github.io/portfolio-wave-rider/sweep_pwr.html) dashboard.
 
-Steps 2 and 3 happen on their own once the cron jobs are installed. Steps 1, 4, and 5 are yours to run.
-
 ## Acting on a recommendation
 
 The review report ends with recommended weights, not trades. The project never touches your brokerage. To act on a recommendation:
