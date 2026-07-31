@@ -210,10 +210,10 @@ The optimizer used here selects a portfolio that maximizes the mean-variance obj
 subject to ∑ᵢ wᵢ = 1 (weights sum to one) and 0 ≤ wᵢ ≤ concentration_cap. The first term `μᵀw` is the portfolio's expected return (the weighted average of per-ticker expected returns); the second term `wᵀΣw` is the portfolio's return variance, scaled by `λ` to act as a risk penalty. `μ` is the per-ticker expected-return vector, computed as the annualized mean of daily log returns over a trailing price-history window (`optimizer_lookback_days`, set in `investor_profile.md`). `Σ` is the ticker × ticker covariance matrix estimated over the same window. `w` is the weight vector the optimizer is solving for. `λ` (risk aversion) trades expected return against variance:
 
 - `λ → 0`: the solution favors high-return tickers, which also tend to have greater variability.
-- Intermediate `λ`: leans toward higher-reward tickers while keeping a real variance penalty. The live value is set in `investor_profile.md` under `financial_model.risk_aversion`, chosen with the parameter sweep rather than hardcoded here (it moves as the strategy is tuned).
-- `λ ≫ 1`: the variance penalty dominates, so the solution tends toward a low-variance portfolio that is heavy in cash and bonds.
+- Intermediate `λ`: leans toward higher-reward tickers while keeping a real variance penalty. The live value is set in `investor_profile.md` under `financial_model.risk_aversion`.
+- `λ ≫ 1`: the variance penalty dominates, so the solution concentrates in the lowest-variance tickers available, typically the bond and T-bill anchors.
 
-This is the standard Markowitz mean-variance formulation (Markowitz 1952, *Portfolio Selection*, Journal of Finance 7:77-91), which is the textbook starting point for portfolio construction because it captures the central return-vs-risk tradeoff in a single closed-form quadratic expression. See [GLOSSARY.md](GLOSSARY.md) for the full definitions.
+This is the standard Markowitz mean-variance formulation (Markowitz 1952, *Portfolio Selection*, Journal of Finance 7:77-91), which is the textbook starting point for portfolio construction because it captures the central return-vs-risk tradeoff in a single quadratic expression. See [GLOSSARY.md](GLOSSARY.md) for the full definitions.
 
 ## Main findings
 

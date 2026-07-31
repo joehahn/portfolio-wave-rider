@@ -198,6 +198,12 @@ The README covers the two `.env` keys. The rest:
 - Nothing reads keys from the shell environment, so cron inherits nothing and needs no export line. Rotating a key means editing the one value in `.env`.
 - Both `.env` and `gcp-key.json` are listed in `.gitignore` under "personal data, never push".
 
+## The optimizer
+
+`portfolio.optimize_portfolio` solves the mean-variance problem with SLSQP: maximize `μᵀw − λ·wᵀΣw` subject to `∑w = 1` and `0 ≤ wᵢ ≤ concentration_cap`. `μ` and `Σ` come from `compute_returns`, which annualizes the mean and covariance of daily log returns by 252 over the trailing `optimizer_lookback_days` window. Three other objectives exist in the code (`max_sharpe`, `min_variance`, `target_return`) but the live and backtest paths both use `mean_variance`; `risk_free_rate` enters only the reported Sharpe, not the objective.
+
+One profile knob is **backtest-only**: `min_trade_size_frac` suppresses any rebalance smaller than that fraction of portfolio value, so a walk-forward run does not churn on noise. `curator_backtest` applies it (`_rebalance_with_min_trade`); the live `recommend_portfolio` never does, because it emits target weights rather than executing trades.
+
 ## The curator
 
 The prompt, the routing, and the JSON parser all live in [`src/curator.py`](src/curator.py); the system prompt itself is `.claude/agents/watchlist-curator.md`. The curator returns a decision payload and writes nothing.
