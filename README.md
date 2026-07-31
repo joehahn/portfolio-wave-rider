@@ -37,9 +37,9 @@ Results are served via three families of GitHub Pages, with each showing results
 
 ## How it works
 
-Each portfolio rebalance follows one iteration of the following loop. The Curator is the only part of this solution that relies on AI for judgment calls, everything else is deterministic Python.
+Each news ingest + portfolio rebalance follows one iteration of the following loop. The Curator is the only part of this solution that relies on AI for judgment calls, everything else is deterministic Python.
 
-<img src="docs/pipeline.svg" width="860" alt="Top-to-bottom flow: news is the outside-world data source. The retriever reads your search terms and trusted sources and fetches and ranks articles into a date-stamped pool. The AI curator reads that pool plus the user's investment thesis, proposes ticker adds and removes to the watchlist, and manages citations justifying each watchlist change. The curator updates watchlist.csv, which feeds the mean variance portfolio optimizer. The optimizer also reads ticker prices and outputs recommended portfolio weights, which are rendered as dashboards, after which you place the trades, looping back to the retriever at the next rebalance.">
+<img src="docs/pipeline.svg" width="860" alt="Top-to-bottom flow: news is the outside-world data source. The retriever reads your search terms and trusted sources and fetches and ranks articles into a date-stamped pool. The AI curator reads that pool plus the user's investment thesis, proposes ticker adds and removes to the watchlist, and manages citations to justify each watchlist change. The curator updates watchlist.csv, which feeds the portfolio optimizer. The optimizer also reads ticker prices and outputs portfolio weights, which are rendered as dashboards, after which you place the trades, looping back to the retriever at the next rebalance.">
 
 The highlighted box is where AI provides an advantage to the buy/hold investor: an LLM reads the news against your thesis to decide *which tickers* the optimizer then gets to choose among. After that, a traditional math-only optimizer selects which tickers among those in the watchlist get funded, and how much.
 
