@@ -176,15 +176,15 @@ Two files describe the portfolio, with a clean split of ownership:
 The optimizer's universe is the **combination of three lists**: every ticker in `watchlist.csv`, every ticker you currently hold in `holdings.csv`, and the profile's `always_include` anchors. It can weight nothing outside that combined list. Consequences:
 
 - **Dropping a held ticker is safe.** If the curator removes a ticker from `watchlist.csv` while you still hold it, it stays in the universe (via the union with `holdings.csv`) so the optimizer can recommend *selling* it; it leaves the universe only once you sell it out of `holdings.csv`.
-- **Anchors** (e.g. SPY/AGG/IAU/BIL) come from the profile's `always_include`, they sit outside `max_watchlist_size`, and they are never in `watchlist.csv`, so the curator cannot add or remove them. This guarantees the optimizer always has safe-haven tickers available to fund, though nothing forces it to: at a return-hungry `λ` it typically gives them ~0% weight.
+- **Anchors** (e.g. SPY/AGG/IAU/BIL) come from the profile's `always_include`, they sit outside `max_watchlist_size`, and they are never in `watchlist.csv`, so the curator cannot add or remove them. This guarantees the optimizer always has safe-haven tickers available to fund, though nothing forces it to.
 - **Audit trail.** Every applied watchlist change is logged to `data/curation_history.csv`.
 
 ## How the pieces fit: Python plus one LLM curator
 
 The split is deliberate. Python does everything deterministic; an LLM does the one judgment call.
 
-- **Deterministic work is Python.** Portfolio optimization, price fetching, payload validation, the news retriever, and dashboard rendering all live in [`src/portfolio.py`](src/portfolio.py) and [`src/cli.py`](src/cli.py). You run them through the CLI (`python -m src.cli <subcommand>`) and a few thin cron scripts. There are no Claude-Code skills or subagents anymore.
-- **The one judgment call is an LLM.** Deciding which news matters and which tickers to add or remove is the piece that resists fixed logic, so it goes to an LLM curator: kimi-k2.5, called through the OpenRouter SDK. The same curator prompt and validator serve both the backtest and the forward path, so a lesson learned on either side lands on the other.
+- **Deterministic work is Python.** Portfolio optimization, price fetching, payload validation, the news retriever, and dashboard rendering all live in [`src/portfolio.py`](src/portfolio.py) and [`src/cli.py`](src/cli.py). You run them through the CLI (`python -m src.cli <subcommand>`) and a few thin cron scripts.
+- **The one judgment call is an LLM.** Deciding which news matters and which tickers to add or remove is the piece that resists fixed logic, so it goes to an LLM curator: `claude-sonnet-5` on the live forward path, and the cheaper `kimi-k2.5` for backtest replays and sweeps. Both are called from `src/curator.py`, which routes `claude-*` model ids to Anthropic and `vendor/model` ids to OpenRouter. The same curator prompt and validator serve both the backtest and the forward path, so a lesson learned on either side lands on the other.
 
 Each part stays small and reads at a glance. Anything that must persist between runs is a file under `data/`.
 
