@@ -10,7 +10,7 @@ This project uses AI to manage a curated watchlist of tickers. You declare your 
 
 1. The **retriever** is deterministic, it does not use AI. It pulls news matching your wave keywords from the sources you trust, drops the junk domains, and ranks and dedupes what survives into a date-stamped article pool.
 2. The **curator** is AI-powered and forward-looking. At each rebalance it reads that pool against your thesis and evolves the watchlist, searching for tickers that are in the early buildup of a wave that may rise soon, and citing the articles behind every add and remove.
-3. The **optimizer** is strictly backward-looking, it is an industry standard math-only mean-variance model that derives the portfolio's weights from trailing returns and covariances, is pure math with no AI.
+3. The **optimizer** is strictly backward-looking, it is an industry standard mean-variance model that derives the portfolio's weights from trailing returns and covariances, and is pure math with no AI.
 
 So the AI decides *which* tickers the optimizer may choose among, and the math decides the weights. The results accumulate into dashboards where you can watch the watchlist composition, the recommended weights, and the realized portfolio value evolve over time, and monitor how realized gains are attributed to the news sources, authors, keywords, and waves behind each pick. In our experiments this coupling of AI curation with standard optimization significantly outperforms the optimizer on its own.
 
