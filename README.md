@@ -137,7 +137,7 @@ To uninstall: run `crontab -e` and delete the `PWR_path` line and the two `news_
 
 This project's portfolio-optimization activities:
 
-### 1. initialize (once)
+### 1. you initialize the solution (once)
 
 Put what you own into `holdings.csv` (Setup step 3) by editing the file directly.
 
@@ -151,13 +151,13 @@ The review is a cron job, and it self-gates to the cadence you set in `investor_
 
 Note that recommendations do not execute trades, they only append optimizer output to `data/recommendations.csv`. To act on a recommendation, execute trades in your brokerage and then edit `holdings.csv` so the next daily snapshot picks up your new share counts.
 
-### 4. run the curator backtest (anytime)
+### 4. you manually run the curator backtest (anytime)
 
 The curator backtest builds the date-clean GKG plus Wayback news pool for each missing rebalance, evolves the watchlist rebalance by rebalance against your wave thesis via the curator LLM, optimizes the portfolio at each rebalance, measures the lift over a buy-and-hold strategy, and regenerates the dashboard at `docs/backtest_gkg_3yr_kimi.html`.
 
 At each rebalance the curator reads the date-bounded news pool as of that date and proposes adds and removes, then the optimizer recomputes weights for whatever watchlist results, repeated across the window. Compare your run to ours at [our curator backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_gkg_3yr_kimi.html), which shows the current lift over buy-and-hold and SPY, with the honest caveats spelled out below.
 
-### 5. sweep the settings (anytime)
+### 5. you manually sweep the settings (anytime)
 
 The four old per-parameter sweep pages are retired. Everything now lives on one [parameter-sweep dashboard](https://joehahn.github.io/portfolio-wave-rider/sweep_pwr.html). It has three parts:
 
