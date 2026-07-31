@@ -192,6 +192,16 @@ Two LLM specialists (blue) bracket four Python calls (yellow). The profile is th
 - All Python in two files: `src/portfolio.py` (math) and `src/cli.py` (one entry point with seven subcommands).
 - The user-authored `investor_profile.md` is the source of truth. Every recommendation cites lines from it. When the optimal numerical answer violates a profile constraint, the report flags the conflict in a dedicated section; it does not silently clamp.
 
+## Retrieval engines
+
+Staged here until it gets its own doc. The README deliberately keeps the backtest-vs-forward retrieval split out of the tour.
+
+Both paths read the same `retrieval_config.json`: `wave_keywords` (per-wave phrases that surface an article), `org_stoplist` (non-company entities to drop), and `engine` (two GKG-only guards, `ontopic_offset` and `max_scan_gb`, a BigQuery cost cap). What differs is how the keywords are used.
+
+- **Historical (backtest, bootstrap)**: `GkgWaybackRetriever` in `src/retriever.py`, wrapping `scripts/gkg_pool.py` + `scripts/news_pool.py`. GDELT's GKG table in BigQuery discovers the date-honest article list, matching the keyword regex against article titles and URLs, then Wayback supplies each article's as-of lede so the curator only ever sees text that existed on the decision date. A title-gated live fetch fills Wayback misses (`backtest_sdk._apply_live_fallback`), which carries some look-ahead risk and is tagged as such. Because BigQuery is queried with the keyword regex, changing `wave_keywords` requires a re-ingest before the backtest reflects it.
+- **Forward (daily live pull)**: `WebSearchRetriever` in `src/retriever.py` turns each wave's keywords into a fixed `web_search` query, run through a cheap model with no discretion (`retrieval_model` in the profile's `forward` section), and trafilatura extracts each article's full text at pull time. No look-ahead risk, since as-of is today.
+- `GkgWaybackRetriever` is also the cold-start backfill for the forward corpus (`cli.py pull --backfill`), which is how the bootstrap corpus was seeded with a trailing window before the daily cron took over.
+
 ## The curator backtest
 
 The headline experiment behind the watchlist-curator design. See [docs/backtest_gkg_3yr_kimi.html](https://joehahn.github.io/portfolio-wave-rider/backtest_gkg_3yr_kimi.html) for the rendered result.
