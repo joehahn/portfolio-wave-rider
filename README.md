@@ -153,15 +153,11 @@ Note that recommendations do not execute trades, they only append optimizer outp
 
 ### 4. you manually run the curator backtest (anytime)
 
-A backtest replays the whole pipeline across the historical window named in `investor_profile.md`. At each rebalance the curator sees only the news that existed on that date, proposes adds and removes against your wave thesis, and the optimizer recomputes weights for whatever watchlist results. The run then measures the portfolio against two baselines, a buy-and-hold of your starter watchlist and SPY, so what you learn is whether curation added anything the market would not have handed you anyway.
-
-Our own run is on two dashboards: [RBT](https://joehahn.github.io/portfolio-wave-rider/retrieval_pwr.html) for what the retriever surfaced across the window, and [CBT](https://joehahn.github.io/portfolio-wave-rider/backtest_gkg_3yr_kimi.html) for what the curator did with it and how the portfolio fared. The honest caveats are spelled out below.
+A backtest replays the whole pipeline across the historical window named in `investor_profile.md`. At each rebalance the curator sees only the news that existed on that date, proposes adds and removes against your wave thesis, and the optimizer recomputes weights for whatever watchlist results. The run then measures the portfolio against two baselines, a buy-and-hold of your starter watchlist and SPY, so what you learn is whether curation added anything the market would not have handed you anyway. Results from our own backtest are displayed via two dashboards: [RBT](https://joehahn.github.io/portfolio-wave-rider/retrieval_pwr.html) for what the retriever surfaced across the window, and [CBT](https://joehahn.github.io/portfolio-wave-rider/backtest_gkg_3yr_kimi.html) for what the curator did with it and how the portfolio fared.
 
 ### 5. you manually sweep the settings (anytime)
 
-A sweep re-runs the pipeline across a grid of parameter values and ranks the outcomes, so you can see how sensitive the result is to a setting instead of trusting the one you happened to pick. The optimizer knobs (`concentration_cap`, risk aversion `λ`, the price lookback) touch only the mean-variance replay, so an entire grid costs nothing but local compute, no LLM calls and no news re-fetch. Curator knobs are different: `max_watchlist_size` shapes the curator's *decisions*, so each value needs its own set of curator calls.
-
-Results from our sweeps are displayed in the [SBT](https://joehahn.github.io/portfolio-wave-rider/sweep_pwr.html) dashboard.
+A sweep re-runs the pipeline across a grid of parameter values and ranks the outcomes, so you can see how sensitive the result is to a setting instead of trusting the one you happened to pick. The optimizer knobs (`concentration_cap`, risk aversion `λ`, the price lookback) touch only the mean-variance replay, so an entire grid costs nothing but local compute, no LLM calls and no news re-fetch. Curator knobs are different: `max_watchlist_size` shapes the curator's *decisions*, so each value needs its own set of curator calls. Results from our sweeps are displayed in the [SBT](https://joehahn.github.io/portfolio-wave-rider/sweep_pwr.html) dashboard.
 
 ## Acting on a recommendation
 
