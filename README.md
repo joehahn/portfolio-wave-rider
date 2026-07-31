@@ -137,7 +137,7 @@ To uninstall: run `crontab -e` and delete the `PWR_path` line and the three job 
 
 This project's portfolio-optimization activities:
 
-### 1. cron to monitor ticker changes (daily)
+### 1. cron to track portfolio value (daily)
 
 Every weekday after the close, cron records what your portfolio is worth: per-ticker shares, close prices, and totals append to `data/snapshots.csv`, and the dashboards re-render off that fresh snapshot.
 
