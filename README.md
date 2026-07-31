@@ -6,7 +6,13 @@
 **branch:** main <br>
 **License:** [PolyForm Noncommercial 1.0.0](LICENSE.md), free for noncommercial use; [commercial rights reserved](#license)
 
-This project uses AI to manage a curated watchlist of tickers. You declare your goals, constraints, and an investment thesis (what you think will drive future returns), then initialize a starter watchlist you want exposure to. This solution has two halves to manage a deliberate division of labor. The **curator** is AI-powered, and it is forward-looking: at each rebalance it reads recent news against your thesis and evolves the watchlist, hunting tickers in the early buildup of a wave that may rise soon and preferring the news sources you trust. The **optimizer** is strictly backward-looking: an industry standard math-only mean-variance model that sets the weights from trailing returns and covariances, pure math, no AI. So the AI decides *which* tickers the optimizer may choose among, and the math decides the weights. The results accumulate into dashboards where you can watch the watchlist composition, the recommended weights, and the realized portfolio value evolve over time, and monitor how realized gains are attributed to the news sources, authors, keywords, and waves behind each pick. In our experiments this coupling of AI curation with standard optimization significantly outperforms the optimizer on its own.
+This project uses AI to manage a curated watchlist of tickers. You declare your goals, constraints, and an investment thesis (what you think will drive future returns), then initialize a starter watchlist you want exposure to. The solution is a three-stage pipeline with a deliberate division of labor, and only the middle stage uses AI:
+
+1. The **retriever** is deterministic Python, no AI. It pulls news matching your wave keywords from the sources you trust, drops the junk domains, and ranks and dedupes what survives into a date-stamped article pool.
+2. The **curator** is AI-powered and forward-looking. At each rebalance it reads that pool against your thesis and evolves the watchlist, hunting tickers in the early buildup of a wave that may rise soon, and citing the articles behind every add and remove.
+3. The **optimizer** is strictly backward-looking: an industry standard math-only mean-variance model that sets the weights from trailing returns and covariances, pure math, no AI.
+
+So the AI decides *which* tickers the optimizer may choose among, and the math decides the weights. The results accumulate into dashboards where you can watch the watchlist composition, the recommended weights, and the realized portfolio value evolve over time, and monitor how realized gains are attributed to the news sources, authors, keywords, and waves behind each pick. In our experiments this coupling of AI curation with standard optimization significantly outperforms the optimizer on its own.
 
 **Who this helps.** An investor who has a thesis about where markets are going but not enough time to track the news. This demo helps that investor move from a static buy-and-hold portfolio to one that is lightly but effectively managed by AI. In the 3-year backtest described below, the AI-managed portfolio outperforms a buy-and-hold of a representative starter watchlist by a wide margin. The curator's job is to compound a thesis you already hold, not to invent one you don't.
 
@@ -16,7 +22,7 @@ Results are served via three families of GitHub Pages, each showing results gene
 
 *Backtest:* historical replay across July 2023 to 2026:
 
-- **[Retriever (RBT)](https://joehahn.github.io/portfolio-wave-rider/retrieval_pwr.html)**: inspect results from the intitial part of the curator which merely reads historical news and then visualizes coverage, sources, and per-window article counts.
+- **[Retriever (RBT)](https://joehahn.github.io/portfolio-wave-rider/retrieval_pwr.html)**: inspect the retriever stage over historical news, visualizing coverage, sources, and per-window article counts.
 - **[Curator (CBT)](https://joehahn.github.io/portfolio-wave-rider/backtest_gkg_3yr_kimi.html)**: the curator uses AI to scans the backtest news and to make periodic changes to the ticker watchlist that is then fed into the portfolio optimizer, and this dashboard monitors the ticker recommendations and portfolio valuations over time.
 - **[Sweeps (SBT)](https://joehahn.github.io/portfolio-wave-rider/sweep_pwr.html)**: a sweep of the optimizer knobs, to illustrate how portfolio metrics and outcomes vary with parameter settings.
 
