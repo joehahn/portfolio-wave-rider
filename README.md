@@ -87,11 +87,12 @@ Everything you configure lives in six files at the repo root, and all six are gi
 
 ### 4. API keys
 
-Two keys, one `KEY=value` per line, in a **`.env` file you create at the repo root** (gitignored, no quotes, no `export` prefix):
+One key is required. Put it in a **`.env` file you create at the repo root** (gitignored, no quotes, no `export` prefix), one `KEY=value` per line:
 
 ```
 ANTHROPIC_API_KEY=...      # required: the live sonnet curator and the haiku news pull
-OPENROUTER_API_KEY=...     # optional: only for non-Claude curator models, e.g. the kimi backtest replay
+OPENROUTER_API_KEY=...     # optional, omit this line unless you point the curator at a non-Claude
+                           # model, e.g. the kimi backtest replay
 ```
 
 Which key a run needs follows from the model named in `investor_profile.md`: a `claude-*` id routes through Anthropic, a `vendor/model` id routes through OpenRouter. Pure math runs, meaning the optimizer, the snapshots, and every dashboard refresh, call no LLM and need no key at all. See [REFERENCE.md](REFERENCE.md#api-keys) for the BigQuery credential file and the cron and rotation notes.
