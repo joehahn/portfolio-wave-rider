@@ -215,19 +215,21 @@ subject to ∑ᵢ wᵢ = 1 (weights sum to one) and 0 ≤ wᵢ ≤ concentration
 
 This is the standard Markowitz mean-variance formulation (Markowitz 1952, *Portfolio Selection*, Journal of Finance 7:77-91), which is the textbook starting point for portfolio construction because it captures the central return-vs-risk tradeoff in a single quadratic expression. See [GLOSSARY.md](GLOSSARY.md) for the full definitions.
 
-## Main findings
+## Findings so far
+
+**Provisional.** The forward test that would settle the central question is still accumulating, so what follows is what the backtest shows, not a result to lean on.
 
 This project reads business news against a user's stated investment thesis, derives a curated watchlist from it, and hands that watchlist to a standard mean-variance optimizer for weighting at each rebalance. The AI's job is watchlist composition only; the financial model turns the watchlist into weights. The published backtest runs biweekly across 2023 to 2026 from an equal-weight `[AAPL, GOOGL, AMZN]` buy-and-hold investor who is too busy to track the news and revise the portfolio. We know such investors exist because the author is one.
 
-The curator (kimi-k2.5 reading the date-clean GKG pool) is disciplined: it swaps rarely, every ticker real and US-listed, and holds the line the rest of the time, rotating into a next-wave name only on a concrete catalyst. The optimizer then concentrates into whatever is running. The AI-managed book beats the busy investor's buy-and-hold by a wide margin over the window. The exact returns move whenever the config or thesis is tuned, so this page does not hardcode them; the current figures are on the [curator-backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_gkg_3yr_kimi.html).
+The curator is disciplined: it swaps rarely, every ticker real and US-listed, and holds the line the rest of the time, rotating into a next-wave name only on a concrete catalyst. The optimizer then concentrates into whatever is running. The AI-managed book beats the busy investor's buy-and-hold by a wide margin over the window. The exact returns move whenever the config or thesis is tuned, so this page does not hardcode them.
 
-**Where the lift comes from, and why to distrust it.** Most of the gain typically rides on a single dominant position. That is the headline and the caveat at once: it is one favorable wave the curator caught and held, not a broad-based edge, and a single winning bet (n=1) cannot separate skill from luck. Worse, the whole result is in-sample. The clean GKG plus Wayback retriever removes the *retrieval* leak, so the curator only ever saw period-correct news, but the curator is an LLM whose training postdates the window, so it may simply remember which 2023-to-2026 names won. The backtest is therefore a hindsight-tinted upper bound, not a clean out-of-sample result. The only honest test is **forward testing**: hold the config fixed and measure realized performance on quarters that postdate the model's training cutoff. That is the next phase of this project.
+**Where the lift comes from, and why to distrust it.** Most of the gain typically rides on a single dominant position. That is the headline and the caveat at once: it is one favorable wave the curator caught and held, not a broad-based edge, and a single winning bet (n=1) cannot separate skill from luck. Worse, the whole result is in-sample. The date-clean retriever removes the *retrieval* leak, so the curator only ever saw period-correct news, but the curator is an LLM whose training postdates the window, so it may simply remember which 2023-to-2026 names won. The backtest is therefore a hindsight-tinted upper bound, not a clean out-of-sample result. The only honest test is **forward testing**: hold the config fixed and measure realized performance on quarters that postdate the model's training cutoff. That is the next phase of this project.
 
-See the [curator backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_gkg_3yr_kimi.html) for the current figures, and [REFERENCE.md](REFERENCE.md) for the config, the per-wave attribution, the safe-haven-anchor accounting, and the full bias discussion.
+See [CBT](https://joehahn.github.io/portfolio-wave-rider/backtest_gkg_3yr_kimi.html) for the current figures, and [REFERENCE.md](REFERENCE.md) for the config, the per-wave attribution, the safe-haven-anchor accounting, and the full bias discussion.
 
 ## Notes
 
-This project was developed with [Claude Code](https://claude.com/claude-code). See `CLAUDE.md` for the rules Claude follows when operating in this repo. CLI flags, repo layout, output files, architecture overview, and testing instructions live in [REFERENCE.md](REFERENCE.md). Finance and stats terms are defined in [GLOSSARY.md](GLOSSARY.md).
+This project was developed with [Claude Code](https://claude.com/claude-code). See [CLAUDE.md](CLAUDE.md) for the rules Claude follows when operating in this repo. CLI flags, repo layout, output files, architecture overview, and testing instructions live in [REFERENCE.md](REFERENCE.md). Finance and stats terms are defined in [GLOSSARY.md](GLOSSARY.md).
 
 ## Disclaimer
 

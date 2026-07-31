@@ -230,9 +230,11 @@ Both paths read the same `retrieval_config.json`: `wave_keywords` (per-wave phra
 
 ## The curator backtest
 
-The headline experiment behind the watchlist-curator design. See [docs/backtest_gkg_3yr_kimi.html](https://joehahn.github.io/portfolio-wave-rider/backtest_gkg_3yr_kimi.html) for the rendered result.
+The headline experiment behind the curator design. See [docs/backtest_gkg_3yr_kimi.html](https://joehahn.github.io/portfolio-wave-rider/backtest_gkg_3yr_kimi.html) for the rendered result.
 
-- **Window**: 2023-05-04 to 2026-05-03 (about 3 years, 157 weekly rebalances). Set in `investor_profile.md`'s `backtest` section (`start_date` / `end_date`).
+> **Stale below.** The optimizer config, the decision narrative, and the results table in this section describe an earlier weekly run at a different starter watchlist. The dashboard is authoritative; this prose is pending a refresh.
+
+- **Window**: 2023-07-22 to 2026-07-22 (3 years, biweekly, 79 curation calls and 82 rebalances in the current run). Set in `investor_profile.md`'s `backtest` section (`start_date` / `end_date`), with the cadence from `financial_model.rebalance_period`.
 - **Starter watchlist**: AAPL, MSFT, GOOGL, NVDA, SPY, a realistic tech-savvy investor's holding.
 - **Optimizer (one config)**: mean-variance `λ=2.0`, 30-day price lookback, `concentration_cap=0.80`, weekly cadence, `max_watchlist_size=5`, plus the three permanent `always_include` anchors SPY / AGG / IAU. All from `investor_profile.md` (`financial_model` plus the top-level `concentration_cap`). The same config drives the live recommend path and the backtest.
 - **Curator**: kimi-k2.5 (`backtest.curator_model` in the profile), run with `--no-reasoning` via OpenRouter, one call per week. Each call reads a date-clean **GKG plus Wayback** news pool (see the retriever section) instead of live WebSearch, so it only ever sees period-correct news. A full 157-week curate costs about $1.60.
