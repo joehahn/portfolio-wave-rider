@@ -196,7 +196,7 @@ Two LLM specialists (blue) bracket four Python calls (yellow). The profile is th
 
 The README covers the two `.env` keys. The rest:
 
-- **`gcp-key.json`**, a BigQuery service-account key file, is read from the repo root by path (`scripts/gkg_pool.py`), not through the usual `GOOGLE_APPLICATION_CREDENTIALS` environment variable. It is needed only when rebuilding the backtest news corpus from GDELT-GKG, not for any routine run.
+- **`gcp-key.json`**, a BigQuery service-account key file, is read from the repo root by path (`scripts/gkg_pool.py`), not through the usual `GOOGLE_APPLICATION_CREDENTIALS` environment variable. No news corpus is committed to the repo, so a fresh clone must rebuild it from GDELT-GKG before any backtest can run, and that rebuild is what needs this key. The live forward loop does not.
 - The `.env` readers (`src/curator.py`, `src/retriever.py`, `scripts/backtest_sdk.py`, `scripts/judge_curations.py`) are plain line parsers, so quotes and an `export` prefix would be read as part of the value.
 - Nothing reads keys from the shell environment, so cron inherits nothing and needs no export line. Rotating a key means editing the one value in `.env`.
 - Both `.env` and `gcp-key.json` are listed in `.gitignore` under "personal data, never push".
