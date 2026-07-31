@@ -26,7 +26,7 @@ Results are served via three families of GitHub Pages, each showing results that
 - **[Curator (CBT)](https://joehahn.github.io/portfolio-wave-rider/backtest_gkg_3yr_kimi.html)**: the curator uses AI to scans the backtest news and to make periodic changes to the ticker watchlist that is then fed into the portfolio optimizer, and this dashboard monitors the ticker recommendations and portfolio valuations over time.
 - **[Sweeps (SBT)](https://joehahn.github.io/portfolio-wave-rider/sweep_pwr.html)**: a sweep of the optimizer knobs, to illustrate how portfolio metrics and outcomes vary with parameter settings.
 
-**Bootstrap dashboards**: these dashboards inspect outcomes as the solution scans the transition from using the last 3 months of the historical backtest news to that acquired daily since July 22, 2026:
+**Bootstrap dashboards**: these dashboards inspect outcomes as this solution scans the transition period using the last 3 months of the historical backtest news to that acquired daily since July 22, 2026:
 
 - **[Retriever (RBS)](https://joehahn.github.io/portfolio-wave-rider/retrieval_bootstrap.html)**: inspect and visualize the bootstrap news corpus
 - **[Curator (CBS)](https://joehahn.github.io/portfolio-wave-rider/curator_bootstrap.html)**: apply the AI curator across the boostrap era and view the portfolio recommendations and value over time
