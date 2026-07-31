@@ -137,25 +137,21 @@ To uninstall: run `crontab -e` and delete the `PWR_path` line and the two `news_
 
 This project's portfolio-optimization activities:
 
-### 1. you initialize the solution (once)
-
-Put what you own into `holdings.csv` (Setup step 3) by editing the file directly.
-
-### 2. cron to monitor ticker changes (daily)
+### 1. cron to monitor ticker changes (daily)
 
 Cron captures today's per-ticker shares and close price into `data/snapshots.csv` and updates the portfolio dashboard stored at `docs/index.html`.
 
-### 3. cron to update watchlist and optimize portfolio (biweekly, monthly, etc.)
+### 2. cron to update watchlist and optimize portfolio (biweekly, monthly, etc.)
 
 The review is a cron job, and it self-gates to the cadence you set in `investor_profile.md` (`financial_model.rebalance_period`, one of `weekly` / `biweekly` / `monthly` / `quarterly`), so it fires every weekday but acts only once per period. Change the cadence in the profile, not in your crontab. Each time it acts, the curator reads the trailing `news_lookback_days` of news against your wave thesis and proposes adds and removes against the current watchlist, the optimizer recomputes weights across the updated watchlist, and a report lands in `data/reports/<date>-review-portfolio.md`. Read it to see the curator's adds and removes this period and any conflicts where the optimizer wanted something your profile forbids.
 
 Note that recommendations do not execute trades, they only append optimizer output to `data/recommendations.csv`. To act on a recommendation, execute trades in your brokerage and then edit `holdings.csv` so the next daily snapshot picks up your new share counts.
 
-### 4. you manually run the curator backtest (anytime)
+### 3. you manually run the curator backtest (anytime)
 
 A backtest replays the whole pipeline across the historical window named in `investor_profile.md`. At each rebalance the curator sees only the news that existed on that date, proposes adds and removes against your wave thesis, and the optimizer recomputes weights for whatever watchlist results. The run then measures the portfolio against two baselines, a buy-and-hold of your starter watchlist and SPY, so what you learn is whether curation added anything the market would not have handed you anyway. Results from our own backtest are displayed via two dashboards: [RBT](https://joehahn.github.io/portfolio-wave-rider/retrieval_pwr.html) for what the retriever surfaced across the window, and [CBT](https://joehahn.github.io/portfolio-wave-rider/backtest_gkg_3yr_kimi.html) for what the curator did with it and how the portfolio fared.
 
-### 5. you manually sweep the settings (anytime)
+### 4. you manually sweep the settings (anytime)
 
 A sweep re-runs the pipeline across a grid of parameter values and ranks the outcomes, so you can see how sensitive the result is to a setting instead of trusting the one you happened to pick. The optimizer knobs (`concentration_cap`, risk aversion `λ`, the price lookback) touch only the mean-variance replay, so an entire grid costs nothing but local compute, no LLM calls and no news re-fetch. Curator knobs are different: `max_watchlist_size` shapes the curator's *decisions*, so each value needs its own set of curator calls. Results from our sweeps are displayed in the [SBT](https://joehahn.github.io/portfolio-wave-rider/sweep_pwr.html) dashboard.
 
