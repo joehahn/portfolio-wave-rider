@@ -90,12 +90,11 @@ Everything you configure lives in six files at the repo root, and all six are gi
 One key is required. Put it in a **`.env` file you create at the repo root** (gitignored, no quotes, no `export` prefix), one `KEY=value` per line:
 
 ```
-ANTHROPIC_API_KEY=...      # required: the live sonnet curator and the haiku news pull
-OPENROUTER_API_KEY=...     # optional, omit this line unless you point the curator at a non-Claude
-                           # model, e.g. the kimi backtest replay
+ANTHROPIC_API_KEY=...      # required: an Anthropic LLM drives the daily web search
+OPENROUTER_API_KEY=...     # optional: only for non-Claude curator models
 ```
 
-Which key a run needs follows from the model named in `investor_profile.md`: a `claude-*` id routes through Anthropic, a `vendor/model` id routes through OpenRouter. Pure math runs, meaning the optimizer, the snapshots, and every dashboard refresh, call no LLM and need no key at all. See [REFERENCE.md](REFERENCE.md#api-keys) for the BigQuery credential file and the cron and rotation notes.
+Any Claude model can drive the news pull, and any model can curate; this demo gets good results from `claude-sonnet-5` as the curator and the cheaper `claude-haiku-4-5` on the pull. Which key a run needs follows from the model named in `investor_profile.md`: a `claude-*` id routes through Anthropic, a `vendor/model` id routes through OpenRouter, so omit the OpenRouter line unless you name a non-Claude model. Pure math runs, meaning the optimizer, the snapshots, and every dashboard refresh, call no LLM and need no key at all. See [REFERENCE.md](REFERENCE.md#api-keys) for the BigQuery credential file and the cron and rotation notes.
 
 ### 5. Bootstrap the portfolio
 
