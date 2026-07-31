@@ -22,9 +22,9 @@ Results are served via three families of GitHub Pages, each showing results that
 
 **Backtest dashboards**: these dashboards test this solution across 3 years of historical news gathered from July 2023 to 2026:
 
-- **[Retriever (RBT)](https://joehahn.github.io/portfolio-wave-rider/retrieval_pwr.html)**: inspect the retriever stage over historical news, visualizing coverage, sources, and per-window article counts.
-- **[Curator (CBT)](https://joehahn.github.io/portfolio-wave-rider/backtest_gkg_3yr_kimi.html)**: the curator uses AI to scans the backtest news and to make periodic changes to the ticker watchlist that is then fed into the portfolio optimizer, and this dashboard monitors the ticker recommendations and portfolio valuations over time.
-- **[Sweeps (SBT)](https://joehahn.github.io/portfolio-wave-rider/sweep_pwr.html)**: a sweep of the optimizer knobs, to illustrate how portfolio metrics and outcomes vary with parameter settings.
+- **[Retriever Backtest (RBT) dashboard](https://joehahn.github.io/portfolio-wave-rider/retrieval_pwr.html)**: this dashboard visualizes the retriever's effectiveness at pulling the desired historical news by visualizing its coverage, sources, and per-window article counts.
+- **[Curator Backtest (CBT) dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_gkg_3yr_kimi.html)**: the curator uses AI to scans the backtest news and to make periodic changes to the ticker watchlist that is then fed into the portfolio optimizer, and this dashboard monitors the ticker recommendations and portfolio valuations over time.
+- **[Sweeps Backtest (SBT) dashboard](https://joehahn.github.io/portfolio-wave-rider/sweep_pwr.html)**: a sweep of the optimizer knobs, to illustrate how portfolio metrics and outcomes vary with parameter settings.
 
 **Bootstrap dashboards**: these dashboards inspect outcomes as this solution scans the transition period using the last 3 months of the historical backtest news to that acquired daily since July 22, 2026:
 
