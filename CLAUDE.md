@@ -47,6 +47,8 @@ When the best numerical answer violates a profile constraint, the agent still pr
 
 The user decides. Never silently clamp a recommendation to fit the profile.
 
+**Not currently implemented.** This was `report-writer` behavior and died with the skills; `_write_review_report` in `src/cli.py` emits only Watchlist changes, Recommended allocation, and Acting on this. The rule stands as design intent for the report revision to come, so restore it there rather than dropping it.
+
 ## Architecture
 
 - **No Claude-Code skills or subagents.** `.claude/skills/` is gone. The flows that used to be slash commands (`/initialize-portfolio`, `/review-portfolio`, `/run-backtest`, `/sweep-max-watchlist-size`) are now CLI subcommands, `scripts/` helpers, and cron shims, so nothing in the pipeline needs a Claude Code session.

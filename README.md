@@ -159,9 +159,9 @@ A sweep re-runs the pipeline across a grid of parameter values and ranks the out
 
 The review report ends with recommended weights, not trades. The project never touches your brokerage. To act on a recommendation:
 
-1. Read the **Profile conflicts** and **Recommended allocation** sections of the report. The optimizer regularly produces concentrated calls (single-stock weights at the `concentration_cap`); decide which subset you actually want to execute.
+1. Read the report's **Watchlist changes** and **Recommended allocation** sections. The optimizer regularly produces concentrated calls (single-stock weights at the `concentration_cap`); decide which subset you actually want to execute.
 2. Execute the buys and sells in your brokerage.
-3. Edit `holdings.csv` with the new share counts to match your brokerage. (The curator manages `watchlist.csv`, never `holdings.csv`, so this file is yours alone to edit.)
+3. Edit `holdings.csv` with the new share counts to match your brokerage.
 4. The next daily cron snapshot picks up the new positions and the dashboard catches up.
 
 You can also do nothing and let the next review produce a fresh recommendation. The split between recommendation and execution is intentional so you can review, override, or ignore each call.
