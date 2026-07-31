@@ -6,11 +6,11 @@
 **branch:** main <br>
 **License:** [PolyForm Noncommercial 1.0.0](LICENSE.md), free for noncommercial use; [commercial rights reserved](#license)
 
-This project uses AI to manage a curated watchlist of tickers. You declare your goals, constraints, and an investment thesis (what you think will drive future returns), then initialize a starter watchlist you want exposure to. The solution is a three-stage pipeline with a deliberate division of labor, and only the middle stage uses AI:
+This project uses AI to manage a curated watchlist of tickers. You declare your goals, constraints, and an investment thesis (what you think will drive future returns), then initialize a starter watchlist you want exposure to. The solution is a three-stage pipeline with a deliberate division of labor, with only the middle stage using AI:
 
-1. The **retriever** is deterministic Python, no AI. It pulls news matching your wave keywords from the sources you trust, drops the junk domains, and ranks and dedupes what survives into a date-stamped article pool.
-2. The **curator** is AI-powered and forward-looking. At each rebalance it reads that pool against your thesis and evolves the watchlist, hunting tickers in the early buildup of a wave that may rise soon, and citing the articles behind every add and remove.
-3. The **optimizer** is strictly backward-looking: an industry standard math-only mean-variance model that sets the weights from trailing returns and covariances, pure math, no AI.
+1. The **retriever** is deterministic, it does not use AI. It pulls news matching your wave keywords from the sources you trust, drops the junk domains, and ranks and dedupes what survives into a date-stamped article pool.
+2. The **curator** is AI-powered and forward-looking. At each rebalance it reads that pool against your thesis and evolves the watchlist, searching for tickers that are in the early buildup of a wave that may rise soon, and citing the articles behind every add and remove.
+3. The **optimizer** is strictly backward-looking, it is an industry standard math-only mean-variance model that derives the portfolio's weights from trailing returns and covariances, is pure math with no AI.
 
 So the AI decides *which* tickers the optimizer may choose among, and the math decides the weights. The results accumulate into dashboards where you can watch the watchlist composition, the recommended weights, and the realized portfolio value evolve over time, and monitor how realized gains are attributed to the news sources, authors, keywords, and waves behind each pick. In our experiments this coupling of AI curation with standard optimization significantly outperforms the optimizer on its own.
 
