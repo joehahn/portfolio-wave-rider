@@ -47,7 +47,7 @@ See [GLOSSARY.md](GLOSSARY.md) for the finance terms used below (`σ`, `μ`, `Σ
 
 ## Setup
 
-Install dependencies, copy the starter files, edit them to your taste, add your API keys, bootstrap your initial portfolio, and install the cron jobs.
+Install dependencies, copy the starter files, edit them to your taste, add your API keys, bootstrap your initial portfolio, and then install the cron jobs:
 
 ### 1. Install dependencies
 
@@ -74,9 +74,9 @@ Everything you configure lives in six files at the repo root, and all six are gi
 | File | Tracked | What you put in it |
 |---|---|---|
 | `investor_profile.md` | no | Goals, wave thesis, exclusions, and every optimizer and curator knob |
-| `holdings.csv` | no | Your real positions, `ticker,shares` |
+| `holdings.csv` | no | Your actual portfolio, `ticker,shares` |
 | `.env` | no | API keys |
-| `gcp-key.json` | no | Google BigQuery service-account credentials, needed only to rebuild the backtest news corpus |
+| `gcp-key.json` | no | Google BigQuery service-account credentials, is needed only if you want to rebuild the backtest news corpus |
 | `news_sources.md` | no | Which news domains to trust, block, and treat as specialty desks |
 | `retrieval_config.json` | no | Per-wave search keywords, used by both the backtest and the live retriever |
 
