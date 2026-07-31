@@ -175,8 +175,8 @@ Two files describe the portfolio, with a clean split of ownership:
 
 The optimizer's universe is the **combination of three lists**: every ticker in `watchlist.csv`, every ticker you currently hold in `holdings.csv`, and the profile's `always_include` anchors. It can weight nothing outside that combined list. Consequences:
 
-- **Dropping a held ticker is safe.** If the curator removes a ticker from `watchlist.csv` while you still hold it, it stays in the universe (via the union with `holdings.csv`) so the optimizer can recommend *selling* it; it leaves the universe only once you sell it out of `holdings.csv`. No more "liquidate first" dance.
-- **Anchors** (e.g. SPY/AGG/IAU/BIL) come from the profile's `always_include`, sit outside `max_watchlist_size`, and are never in `watchlist.csv`; the curator cannot add or remove them.
+- **Dropping a held ticker is safe.** If the curator removes a ticker from `watchlist.csv` while you still hold it, it stays in the universe (via the union with `holdings.csv`) so the optimizer can recommend *selling* it; it leaves the universe only once you sell it out of `holdings.csv`.
+- **Anchors** (e.g. SPY/AGG/IAU/BIL) come from the profile's `always_include`, they sit outside `max_watchlist_size`, and they are never in `watchlist.csv`, so the curator cannot add or remove them. This guarantees the optimizer always has safe-haven tickers available to fund, though nothing forces it to: at a return-hungry `λ` it typically gives them ~0% weight.
 - **Audit trail.** Every applied watchlist change is logged to `data/curation_history.csv`.
 
 ## How the pieces fit: Python plus one LLM curator
