@@ -81,7 +81,7 @@ Everything you configure lives in six files at the repo root, and all six are gi
 | `retrieval_config.json` | no | Per-wave search keywords, used by both the backtest and the live retriever |
 
 - **`investor_profile.md`** is where you state your investing goals, constraints, and exclusions, write the wave thesis the curator reasons against, and set every parameter this solution runs on. The knobs you will touch most are `risk_aversion` (λ, how hard the optimizer trades expected return against variance), `max_watchlist_size` (how many tickers the curator may keep in play), and `news_lookback_days` (how much recent news it reads at each rebalance).
-- **`holdings.csv`** is a two-column CSV (`ticker,shares`) of your real positions. The template ships with placeholder rows showing the format; replace them with what you actually own, or set the shares to 0 to start from cash. The one-time bootstrap (step 5) allocates dollars across your thesis tickers and writes both `holdings.csv` (real shares) and `watchlist.csv` (the curator-managed universe, a single `ticker` column). Thereafter you edit `holdings.csv` only when you actually trade; the biweekly review manages `watchlist.csv` for you, so that one is not a file you configure.
+- **`holdings.csv`** is a two-column CSV (`ticker,shares`) of your real positions. The template ships with placeholder rows showing the format; replace them with what you actually own, or set the shares to 0 to start from cash. Thereafter you edit `holdings.csv` only when you actually trade; the biweekly review manages `watchlist.csv` (the curator's universe, a single `ticker` column) for you, so that one is not a file you configure.
 - **`news_sources.md`** is where you list the news sources you trust, in two tiers: `source_major` for the wire services and major outlets, and a prose section for the specialty, wave-specific desks. The two are ranked differently because the specialty desks cover a narrow wave in depth and also get their own dedicated search pass, so their reporting is not buried under the generic market wires. A third list, `source_block`, names domains to drop outright, the listicle and press-release mills. It ships pre-populated, so edit to taste.
 - **`retrieval_config.json`** is where you tell the retriever what to look for. `wave_keywords` maps each wave to the phrases that surface an article, `org_stoplist` drops entities that are not companies, and `engine` holds a few tuning guards. Adding a wave to `investor_profile.md` does **not** feed retrieval on its own: you must add matching keywords here too. [REFERENCE.md](REFERENCE.md#retrieval-engines) covers the retrieval engines themselves.
 
@@ -96,11 +96,7 @@ OPENROUTER_API_KEY=...     # optional: only for non-Claude curator models
 
 Any Claude model can drive the news pull, and any model can curate; this demo gets good results from `claude-sonnet-5` as the curator and the cheaper `claude-haiku-4-5` on the pull. Which key a run needs follows from the model named in `investor_profile.md`: a `claude-*` id routes through Anthropic, a `vendor/model` id routes through OpenRouter, so omit the OpenRouter line unless you name a non-Claude model. See [REFERENCE.md](REFERENCE.md#api-keys) for an additional BigQuery credential that will be required to execute this solution's backtest.
 
-### 5. Bootstrap the portfolio
-
-Bootstrap the portfolio once: turn your wave thesis and starter watchlist into a concrete day-0 dollar allocation per ticker (beliefs in dollar form, no optimizer yet), convert those dollars to share counts with `.venv/bin/python -m src.cli init-holdings`, and save the allocation as `data/thesis_baseline.json`, the baseline every future review compares against.
-
-### 6. Install the cron jobs (required)
+### 5. Install the cron jobs (required)
 
 Open your crontab:
 
@@ -141,7 +137,7 @@ This project's portfolio-optimization activities.
 
 ### 1. initialize (once)
 
-Bootstrap the portfolio once (Setup step 5): distribute your starting dollars across your thesis tickers using only the qualitative inputs in `investor_profile.md`, convert to shares with `.venv/bin/python -m src.cli init-holdings`, and write the "beliefs in dollar form" baseline to `data/thesis_baseline.json`.
+Put what you own into `holdings.csv` (Setup step 3), either by editing the file directly or, if you would rather think in dollars, by handing a per-ticker dollar allocation to `.venv/bin/python -m src.cli init-holdings`, which converts those dollars to share counts at today's prices.
 
 ### 2. cron to monitor ticker changes (daily)
 
