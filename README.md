@@ -139,7 +139,7 @@ This project's portfolio-optimization activities.
 
 ### 1. initialize (once)
 
-Put what you own into `holdings.csv` (Setup step 3) by editing the file directly. [REFERENCE.md](REFERENCE.md#cli-reference) covers `init-holdings`, which does the same job from a per-ticker dollar allocation.
+Put what you own into `holdings.csv` (Setup step 3) by editing the file directly.
 
 ### 2. cron to monitor ticker changes (daily)
 
