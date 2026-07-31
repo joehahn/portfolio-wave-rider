@@ -145,7 +145,7 @@ Cron captures today's per-ticker shares and close price into `data/snapshots.csv
 
 The review is a cron job, and it self-gates to the cadence you set in `investor_profile.md` (`financial_model.rebalance_period`, one of `weekly` / `biweekly` / `monthly` / `quarterly`), so it fires every weekday but acts only once per period. Change the cadence in the profile, not in your crontab. Each time it acts, the curator reads the trailing `news_lookback_days` of news against your wave thesis and proposes adds and removes against the current watchlist, the optimizer recomputes weights across the updated watchlist, and a report lands in `data/reports/<date>-review-portfolio.md`. Read it to see the curator's adds and removes this period and any conflicts where the optimizer wanted something your profile forbids.
 
-Note that recommendations do not execute trades, they only append optimizer output to `data/recommendations.csv`. To act on a recommendation, execute trades in your brokerage and then edit `holdings.csv` so the next daily snapshot picks up your new share counts.
+The optimizer's output is appended to `data/recommendations.csv`, and nothing is traded; see [Acting on a recommendation](#acting-on-a-recommendation) below.
 
 ### 3. you manually run the curator backtest (anytime)
 
