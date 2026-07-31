@@ -4,7 +4,7 @@ CLI flags, repo layout, architecture, and testing instructions for Portfolio Wav
 
 ## CLI reference
 
-Seven subcommands. The daily cron calls `snapshot` and `dashboard`. The `/review-portfolio` skill calls `curate`, `analyze`, `recommend`, and `dashboard`. `backtest` is a one-off spot-check tool. Every subcommand prints a single JSON blob to stdout.
+Nine subcommands (`init-holdings`, `analyze`, `snapshot`, `recommend`, `curate`, `backtest`, `dashboard`, `pull-news`, `review`). The daily crons call `pull-news`, `snapshot`, and `dashboard`; the biweekly cron calls `review --if-due`, which curates, applies, re-optimizes, and writes its report in one process. `analyze`, `curate`, and `backtest` are manual spot-check tools. Every subcommand prints a single JSON blob to stdout.
 
 ```bash
 # Convert a thesis-driven dollar allocation into shares (used internally by the
@@ -78,21 +78,16 @@ portfolio-wave-rider/
 ├── GLOSSARY.md                 # finance and stats terms
 ├── CLAUDE.md                   # rules for Claude operating in this repo
 ├── .claude/
-│   ├── agents/                 # 2 subagent specs
-│   │   ├── watchlist-curator.md  # proposes adds/removes per rebalance from news
-│   │   └── report-writer.md      # synthesizes analyze + curator into a report
-│   ├── skills/                 # 4 slash commands
-│   │   ├── initialize-portfolio/SKILL.md      # one-shot thesis allocation (day 0)
-│   │   ├── review-portfolio/SKILL.md          # recurring curator-driven review
-│   │   ├── run-backtest/SKILL.md              # rolling-5y backtest refresh + auto-publish
-│   │   └── sweep-max-watchlist-size/SKILL.md  # 4-cap experiment over the 5y window
+│   ├── agents/                 # prompt files, NOT spawned subagents
+│   │   ├── watchlist-curator.md  # the curator system prompt, read by src/curator.py
+│   │   └── report-writer.md      # legacy report format spec, read by nothing
 │   └── settings.json           # tool allowlist
 ├── src/
 │   ├── portfolio.py            # all math
 │   └── cli.py                  # one CLI, seven subcommands
 ├── scripts/
 │   ├── setup_curator_run.py    # creates a curator runs dir + _starter.json
-│   ├── compute_backtest_dates.py  # rolling-5y date diff used by /run-backtest
+│   ├── compute_backtest_dates.py  # rolling-5y date diff for backtest refreshes
 │   ├── post_date_events.py     # chronological event timeline; suppression list for as-of-date backtests
 │   ├── replay_watchlist.py     # replays curator JSONs to compute the watchlist at any as-of date
 │   ├── sweep.py                # parameter sweeps for risk_aversion / lookback / concentration_cap
@@ -107,13 +102,13 @@ portfolio-wave-rider/
 │   ├── snapshots.csv           # daily, appended (your history)
 │   ├── recommendations.csv     # appended on each recommend run (your history)
 │   ├── curation_history.csv    # appended on each curate run (your history)
-│   ├── thesis_baseline.json    # one-time artifact from /initialize-portfolio
-│   ├── curator_latest.json     # most recent /review-portfolio curator output
+│   ├── thesis_baseline.json    # day-0 allocation; anchors the live + forward dashboards
+│   ├── curator_latest.json     # most recent live curator output
 │   ├── curator_runs/           # one subdir per curator backtest run + a live/ archive
 │   │   ├── 5y-sweep-cap08/       # canonical 5y backtest JSONs (cap=8, committed)
 │   │   ├── 5y-quarterly/         # cap=12 historical record from before the default migration
-│   │   ├── 5y-sweep-cap{05,16,24}/  # /sweep-max-watchlist-size variants (committed)
-│   │   └── live/                 # one JSON per /review-portfolio run (committed)
+│   │   ├── 5y-sweep-cap{05,16,24}/  # max_watchlist_size sweep variants
+│   │   └── live/                 # one JSON per live `review` run
 │   ├── backtest/               # output of math-only `cli backtest` runs (gitignored)
 │   ├── backtest_curator_5y/    # output of the curator-driven 5y backtest (committed)
 │   ├── reports/                # LLM-written reports (gitignored)
@@ -136,10 +131,10 @@ portfolio-wave-rider/
 | `data/snapshots.csv` | Long-format daily snapshots (date, ticker, shares, price, value, total_value). | Raw price/share history |
 | `data/recommendations.csv` | Long-format optimizer output (date, ticker, weight, return, vol, Sharpe, objective). One row block per recommend run. | Raw weight history |
 | `data/curation_history.csv` | One row per applied add or remove: date, action, ticker, wave_bucket, rationale, news_evidence_urls. | Audit trail of watchlist composition over time |
-| `data/curator_latest.json` | Most recent watchlist-curator JSON return (overwritten each `/review-portfolio` run). | Latest curator decisions + evidence |
+| `data/curator_latest.json` | Most recent curator JSON return (overwritten each live `review` run). | Latest curator decisions + evidence |
 | `data/curator_runs/<run_id>/*-curation.json` | Per-rebalance archive of curator outputs from backtest runs and live runs. | Forensic re-read; replay input to `backtest --curator-runs-dir` |
 | `data/backtest_curator_5y/report.md` | Headline curator-backtest numbers (curator vs both baselines vs SPY, max drawdown, weight stability). | After re-running the 5y replay |
-| `data/reports/YYYY-MM-DD-<skill>.md` | LLM-written narrative reports from `/initialize-portfolio` and `/review-portfolio`. | After each skill run |
+| `data/reports/YYYY-MM-DD-review-portfolio.md` | Narrative report written by `cli review`. | After each review run |
 | `data/snapshot.log` | cron stdout/stderr. | If a scheduled run looks missing |
 
 Note: when a ticker leaves the universe (removed from `watchlist.csv` by the curator, or sold out of `holdings.csv`), historical rows in `data/snapshots.csv` and `data/recommendations.csv` are not pruned, so old charts still render correctly. No new rows accumulate for the removed ticker going forward.
@@ -148,48 +143,38 @@ The "Profile conflicts" section of any report is the most important thing to rea
 
 ## How it's built
 
-The diagram below shows the `/review-portfolio` flow — the recurring path that fires once per rebalance. The other three skills (`/initialize-portfolio`, `/run-backtest`, `/sweep-max-watchlist-size`) reuse the same CLI subcommands and subagents in different combinations; see each `SKILL.md` for the per-skill orchestration.
+The diagram below shows the `cli review` flow, the recurring path that fires once per rebalance (`scripts/review_curation.sh`, self-gated by `--if-due`). Everything inside `review` runs in-process: read the corpus slice, call the curator, validate and apply its decisions, re-optimize, write the report.
 
 ```mermaid
 flowchart TD
-    user([User]) -->|/review-portfolio| skill[Skill: review-portfolio]
-    profile[(investor_profile.md)] -.read.-> skill
-    watchlist[(watchlist.csv)] -.read.-> skill
-    skill --> curator[watchlist-curator]
-    sources[(news_sources.md)] -.read.-> curator
-    curator -->|writes JSON| latest[(curator_latest.json)]
-    latest --> curate[CLI: curate]
-    curate -->|mutates| watchlist_w[watchlist.csv]
-    curate -->|appends| history[(curation_history.csv)]
-    skill --> analyze[CLI: analyze]
-    skill --> recommend[CLI: recommend]
+    cron([cron: review_curation.sh]) -->|review --if-due| review[CLI: review]
+    profile[(investor_profile.md)] -.read.-> review
+    watchlist[(watchlist.csv)] -.read.-> review
+    corpus[(forward_corpus)] -.read.-> review
+    review --> curator[curator LLM via src/curator.py]
+    curator -->|JSON decision| apply[apply_curator_decisions]
+    apply -->|mutates| watchlist_w[watchlist.csv]
+    apply -->|appends| history[(curation_history.csv)]
+    apply --> recommend[recommend_portfolio]
     recommend -->|appends| recs[(recommendations.csv)]
-    analyze --> writer[report-writer]
-    curator --> writer
-    curate --> writer
-    writer --> report[/report.md/]
-    skill --> dash[CLI: dashboard]
+    recommend --> report[/review report.md/]
+    snapcron([cron: price_snapshot.sh]) --> dash[CLI: dashboard]
     dash --> idx[/docs/index.html/]
 
     classDef agent fill:#e1f0ff,stroke:#3b82f6
     classDef cli fill:#fef3c7,stroke:#d97706
     classDef file fill:#f3f4f6,stroke:#6b7280
-    class curator,writer agent
-    class curate,analyze,recommend,dash cli
-    class report,idx,history,latest,recs file
+    class curator agent
+    class review,apply,recommend,dash cli
+    class report,idx,history,recs file
 ```
 
-Two LLM specialists (blue) bracket four Python calls (yellow). The profile is the source of truth; the curator decides composition; the optimizer decides weights.
+One LLM call (blue) sits inside a chain of Python steps (yellow). The profile is the source of truth; the curator decides composition; the optimizer decides weights.
 
-- Four skills at `.claude/skills/`:
-  - `initialize-portfolio` (one-shot): reads the profile, produces a thesis-driven dollar allocation, writes `holdings.csv` (real positions) + `watchlist.csv` (curator universe), persists the allocation to `data/thesis_baseline.json`, and writes a thesis-only report. No optimizer, no news.
-  - `review-portfolio` (recurring): fires one watchlist-curator call against today's date, applies adds/removes via `curate`, runs `analyze` and `recommend` on the post-change watchlist, calls report-writer for a profile-aware narrative, and refreshes the live dashboard.
-  - `run-backtest` (on-demand maintenance): refreshes the canonical 5-year curator backtest against a rolling 5-year window ending today, regenerates `docs/backtest_curator.html`, and commits the result.
-  - `sweep-max-watchlist-size` (on-demand experiment): fires the watchlist-curator at four `max_watchlist_size` values across the 21 quarter-end dates of the standard 5y backtest and renders `docs/sweep_max_watchlist_size.html`.
-- Two subagents at `.claude/agents/`:
-  - `watchlist-curator` (Sonnet): reads recent news (and `news_sources.md` if present), proposes adds and removes against the current watchlist. Returns JSON; does not write files. Carries strict as-of-date discipline (persona reset, WebSearch `before:` filters, suppression list, self-critique pass) when the harness passes a historical as-of date — used by curator backtests to suppress lookahead bias.
-  - `report-writer` (Sonnet): synthesizes the analyze output and curator output into the final markdown report.
-- All Python in two files: `src/portfolio.py` (math) and `src/cli.py` (one entry point with seven subcommands).
+- **No Claude-Code skills or subagents.** `.claude/skills/` is gone; the flows that used to be slash commands (`/initialize-portfolio`, `/review-portfolio`, `/run-backtest`, `/sweep-max-watchlist-size`) are now CLI subcommands and cron scripts. Nothing in the pipeline needs a Claude Code session.
+- The curator LLM is called from **one place**, `src/curator.py`, by both the forward loop and the backtest, so a prompt or parsing change lands on both. It routes `claude-*` model ids to the Anthropic SDK and `vendor/model` ids to OpenRouter, parses the JSON decision, retries transient errors, and falls back to `no_changes`.
+- `.claude/agents/watchlist-curator.md` is still live, but as a **prompt file**, not a subagent: `src/curator.py` reads it as the curator's system prompt. `.claude/agents/report-writer.md` is legacy and read by nothing.
+- Python lives in `src/` (`portfolio.py` math, `cli.py` entry point, `curator.py` LLM call, `retriever.py` news pull, `corpus.py` storage) plus the `scripts/` helpers and cron shims.
 - The user-authored `investor_profile.md` is the source of truth. Every recommendation cites lines from it. When the optimal numerical answer violates a profile constraint, the report flags the conflict in a dedicated section; it does not silently clamp.
 
 ## API keys
