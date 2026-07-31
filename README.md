@@ -171,9 +171,9 @@ You can also do nothing and let the next review produce a fresh recommendation. 
 Two files describe the portfolio, with a clean split of ownership:
 
 - **`holdings.csv`** (`ticker,shares`) is what you *actually own* — real positions, `shares > 0`. **You edit it, and only you**, after executing trades in your brokerage; the curator/cron never writes it. It drives the snapshots, current allocation, and the "sell/current" side of trade recommendations.
-- **`watchlist.csv`** (single `ticker` column) is the *curator-managed universe* — the tickers the optimizer may assign weight to. The biweekly review auto-adds and auto-removes here and you normally do not touch it, though appending a ticker by hand is how you put one on the curator's radar.
+- **`watchlist.csv`** (single `ticker` column) is the *curator-managed universe* — the tickers the optimizer may assign weight to. The biweekly review auto-adds and auto-removes here and you normally do not touch it, though appending a ticker by hand would be how one could manually put a new ticker on the curator's radar.
 
-The optimizer's universe is **`watchlist.csv` ∪ (the tickers you hold in `holdings.csv`) ∪ the profile's `always_include` anchors**, and it can weight nothing outside that union. Consequences:
+The optimizer's universe is the **combination of three lists**: every ticker in `watchlist.csv`, every ticker you currently hold in `holdings.csv`, and the profile's `always_include` anchors. It can weight nothing outside that combined list. Consequences:
 
 - **Dropping a held ticker is safe.** If the curator removes a ticker from `watchlist.csv` while you still hold it, it stays in the universe (via the union with `holdings.csv`) so the optimizer can recommend *selling* it; it leaves the universe only once you sell it out of `holdings.csv`. No more "liquidate first" dance.
 - **Anchors** (e.g. SPY/AGG/IAU/BIL) come from the profile's `always_include`, sit outside `max_watchlist_size`, and are never in `watchlist.csv`; the curator cannot add or remove them.
