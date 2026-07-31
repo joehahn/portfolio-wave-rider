@@ -30,6 +30,18 @@ Nine subcommands (`init-holdings`, `analyze`, `snapshot`, `recommend`, `curate`,
 .venv/bin/python -m src.cli snapshot   [--date YYYY-MM-DD] [--force]
 .venv/bin/python -m src.cli recommend  [--max-weight 0.80] [--force]
 
+# Pull today's news into data/forward_corpus/ (the daily cron's first step).
+# --backfill switches from the live web_search pull to the GKG+Wayback cold start.
+.venv/bin/python -m src.cli pull-news [--max-results N] [--backfill --days 21] [--dry-run]
+
+# One rebalance, end to end and in-process: read the trailing news_lookback_days
+# slice of the corpus, call the curator, validate and apply its adds/removes,
+# re-optimize, and write data/reports/<date>-review-portfolio.md.
+# --if-due self-gates to financial_model.rebalance_period (weekly / biweekly /
+# monthly / quarterly), so the weekday cron can fire safely and still act only
+# once per period. Without it, the review runs unconditionally.
+.venv/bin/python -m src.cli review [--if-due] [--as-of YYYY-MM-DD] [--model ID] [--dry-run]
+
 # Math-only walk-forward backtest of a fixed watchlist. Default window is a rolling
 # 12 months ending today (yfinance silently clips to whatever trading day has data).
 # Writes data/backtest/{snapshots, recommendations}.csv plus report.md to data/backtest/.
