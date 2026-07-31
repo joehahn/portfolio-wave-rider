@@ -153,21 +153,17 @@ Note that recommendations do not execute trades, they only append optimizer outp
 
 ### 4. you manually run the curator backtest (anytime)
 
-The curator backtest builds the date-clean GKG plus Wayback news pool for each missing rebalance, evolves the watchlist rebalance by rebalance against your wave thesis via the curator LLM, optimizes the portfolio at each rebalance, measures the lift over a buy-and-hold strategy, and regenerates the dashboard at `docs/backtest_gkg_3yr_kimi.html`.
+A backtest replays the whole pipeline across the historical window named in `investor_profile.md`. At each rebalance the curator sees only the news that existed on that date, proposes adds and removes against your wave thesis, and the optimizer recomputes weights for whatever watchlist results. The run then measures the portfolio against two baselines, a buy-and-hold of your starter watchlist and SPY, so what you learn is whether curation added anything the market would not have handed you anyway.
 
-At each rebalance the curator reads the date-bounded news pool as of that date and proposes adds and removes, then the optimizer recomputes weights for whatever watchlist results, repeated across the window. Compare your run to ours at [our curator backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_gkg_3yr_kimi.html), which shows the current lift over buy-and-hold and SPY, with the honest caveats spelled out below.
+Our own run is on two dashboards: [RBT](https://joehahn.github.io/portfolio-wave-rider/retrieval_pwr.html) for what the retriever surfaced across the window, and [CBT](https://joehahn.github.io/portfolio-wave-rider/backtest_gkg_3yr_kimi.html) for what the curator did with it and how the portfolio fared. The honest caveats are spelled out below.
 
 ### 5. you manually sweep the settings (anytime)
 
-The four old per-parameter sweep pages are retired. Everything now lives on one [parameter-sweep dashboard](https://joehahn.github.io/portfolio-wave-rider/sweep_pwr.html). It has three parts:
+A sweep re-runs the pipeline across a grid of parameter values and ranks the outcomes, so you can see how sensitive the result is to a setting instead of trusting the one you happened to pick. The optimizer knobs (`concentration_cap`, risk aversion `λ`, the price lookback) touch only the mean-variance replay, so an entire grid costs nothing but local compute, no LLM calls and no news re-fetch. Curator knobs are different: `max_watchlist_size` shapes the curator's *decisions*, so each value needs its own set of curator calls.
 
-- **Optimizer-knob frontier.** The optimizer settings (`concentration_cap`, risk aversion `λ`, and the price lookback) only touch the mean-variance replay, not the curator, so the entire grid is a **zero-cost** local re-solve on a fixed set of curations. No LLM tokens, no news re-fetch. The dashboard ranks every config by Information Ratio and flags the current one.
-- **Curator-LLM comparison.** Each candidate model reads the same news pools at the same config, so the only variable is the curator. This is where the cheap-workhorse choice (kimi) was made.
-- **Blind rationale judge.** An independent Opus grader scores each add and remove with the market outcome hidden, so a curator is ranked on the quality of its reasoning rather than on an in-sample return.
+Our sweeps are on [SBT](https://joehahn.github.io/portfolio-wave-rider/sweep_pwr.html), which has three parts: an optimizer-knob frontier ranked by Information Ratio with the current config flagged; a curator-LLM comparison in which each candidate model reads the same news pools at the same config, so the only variable is the curator; and a blind rationale judge, an independent grader that scores each add and remove with the market outcome hidden, ranking a curator on its reasoning rather than on an in-sample return.
 
-`max_watchlist_size` is swept separately, by re-curating at each size, because it shapes the curator's *decisions*, so each value needs its own set of curator calls rather than a free re-solve.
-
-Steps 2 and 3 happen on their own once the cron jobs are installed, and steps 4 and 5 are run on demand. [REFERENCE.md](REFERENCE.md#cli-reference) carries every command line: running a review by hand, driving the backtest with `scripts/backtest_sdk.py`, rebuilding the sweep dashboard with `scripts/build_sweep_dashboard.py`, and what each knob does.
+Steps 2 and 3 happen on their own once the cron jobs are installed. Steps 1, 4, and 5 are yours to run.
 
 ## Acting on a recommendation
 
