@@ -87,18 +87,14 @@ Everything you configure lives in six files at the repo root, and all six are gi
 
 ### 4. API keys
 
-All keys live in a single **`.env` file at the repo root**, gitignored and never committed. One `KEY=value` per line, no quotes and no `export` prefix (the readers in `src/curator.py`, `src/retriever.py`, `scripts/backtest_sdk.py`, and `scripts/judge_curations.py` are plain line parsers, so both would be read as part of the value):
+Two keys, one `KEY=value` per line, in a **`.env` file you create at the repo root** (gitignored, no quotes, no `export` prefix):
 
 ```
-OPENROUTER_API_KEY=...     # every non-Claude curator model, e.g. the kimi-k2.5 backtest default
-ANTHROPIC_API_KEY=...      # every claude-* model: the live sonnet curator, the haiku news pull, the blind judge
+ANTHROPIC_API_KEY=...      # required: the live sonnet curator and the haiku news pull
+OPENROUTER_API_KEY=...     # optional: only for non-Claude curator models, e.g. the kimi backtest replay
 ```
 
-Which key a run needs follows from the model named in `investor_profile.md`: a model id starting with `claude` routes through the Anthropic SDK and needs the Anthropic key, anything of the form `vendor/model` routes through OpenRouter. So a backtest replay at the kimi default needs only the OpenRouter key, while the live forward loop (a `claude-sonnet-5` curator and an Anthropic `web_search` news pull) needs only the Anthropic key. Pure math runs, meaning the optimizer, the snapshots, and every dashboard refresh, call no LLM and need no key at all.
-
-Google credentials work differently: **`gcp-key.json`**, a BigQuery service-account key file, is read from the repo root by path (`scripts/gkg_pool.py`), not through the usual `GOOGLE_APPLICATION_CREDENTIALS` environment variable. It is needed only when rebuilding the backtest news corpus from GDELT-GKG, not for any routine run.
-
-Nothing reads keys from the shell environment, so cron inherits nothing and needs no export line. Rotating a key means editing the one value in `.env`. Both `.env` and `gcp-key.json` are listed in `.gitignore` under "personal data, never push".
+Which key a run needs follows from the model named in `investor_profile.md`: a `claude-*` id routes through Anthropic, a `vendor/model` id routes through OpenRouter. Pure math runs, meaning the optimizer, the snapshots, and every dashboard refresh, call no LLM and need no key at all. See [REFERENCE.md](REFERENCE.md#api-keys) for the BigQuery credential file and the cron and rotation notes.
 
 ### 5. Bootstrap the portfolio
 
