@@ -186,9 +186,7 @@ The split is deliberate. Python does everything deterministic; an LLM does the o
 - **Deterministic work is Python.** Portfolio optimization, price fetching, payload validation, the news retriever, and dashboard rendering all live in [`src/portfolio.py`](src/portfolio.py) and [`src/cli.py`](src/cli.py). You run them through the CLI (`python -m src.cli <subcommand>`) and a few thin cron scripts.
 - **The one judgment call is an LLM.** Deciding which news matters and which tickers to add or remove is the piece that resists fixed logic, so it goes to an LLM curator.
 
-Each part stays small and reads at a glance. Anything that must persist between runs is a file under `data/`.
-
-## How the watchlist-curator works
+## How the AI curator works
 
 The curator decides which tickers belong on the watchlist. Its job is composition only: read the news, decide what to add and remove against the current watchlist. It never proposes weights or forecasts; it manages the set of tickers the optimizer may choose among, informed by current news and aligned with your thesis. In the backtest it is kimi-k2.5 reading the date-clean GKG pool; the live path fires the same curator on the biweekly cron review (`cli review --if-due`).
 
