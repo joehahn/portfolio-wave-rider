@@ -239,4 +239,4 @@ Technical demo. Not financial advice. Historical performance is not predictive. 
 
 Commercial rights are reserved by the author. If you want to use this work commercially, email jmh.datasciences@gmail.com and we will talk.
 
-This project was released under MIT before 2026-07-30. That grant is irrevocable for the commits it covered, so anything published under it stays MIT in those versions; the terms above govern this commit onward.
+Versions published before 2026-07-30 were MIT and remain MIT; the terms above govern this commit onward.
