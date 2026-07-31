@@ -188,7 +188,7 @@ The split is deliberate. Python does everything deterministic; an LLM does the o
 
 ## How the AI curator works
 
-The curator decides which tickers belong on the watchlist. Its job is composition only: read the news, decide what to add and remove against the current watchlist. It never proposes weights or forecasts; it manages the set of tickers the optimizer may choose among, informed by recent news and aligned with your thesis.
+The curator decides which tickers belong on the watchlist. Its job is composition only: read the news, decide what to add and remove against the current watchlist. It never proposes weights or forecasts; it manages the set of tickers the optimizer may choose among, informed by recent news and in a way that is aligned with your investment thesis.
 
 On each call the curator:
 
