@@ -149,23 +149,25 @@ Cron captures today's per-ticker shares and close price into `data/snapshots.csv
 
 The review is a cron job, and it self-gates to the cadence you set in `investor_profile.md` (`financial_model.rebalance_period`, one of `weekly` / `biweekly` / `monthly` / `quarterly`), so it fires every weekday but acts only once per period. Change the cadence in the profile, not in your crontab. Each time it acts, the curator reads the trailing `news_lookback_days` of news against your wave thesis and proposes adds and removes against the current watchlist, the optimizer recomputes weights across the updated watchlist, and a report lands in `data/reports/<date>-review-portfolio.md`. Read it to see the curator's adds and removes this period and any conflicts where the optimizer wanted something your profile forbids.
 
-Note that recommendations do not execute trades, they only append optimizer output to `data/recommendations.csv`. To act on a recommendation, execute trades in your brokerage and then edit `holdings.csv` so the next daily snapshot picks up the new share counts. [REFERENCE.md](REFERENCE.md#cli-reference) has the command line for running a review by hand.
+Note that recommendations do not execute trades, they only append optimizer output to `data/recommendations.csv`. To act on a recommendation, execute trades in your brokerage and then edit `holdings.csv` so the next daily snapshot picks up the new share counts.
 
 ### 4. run the curator backtest (anytime)
 
-Run the curator backtest with `scripts/backtest_sdk.py`. It builds the date-clean GKG plus Wayback news pool for each missing rebalance, evolves the watchlist rebalance by rebalance against your wave thesis via the curator LLM, optimizes the portfolio at each rebalance, measures the lift over a buy-and-hold strategy, and regenerates the dashboard at `docs/backtest_gkg_3yr_kimi.html`.
+The curator backtest builds the date-clean GKG plus Wayback news pool for each missing rebalance, evolves the watchlist rebalance by rebalance against your wave thesis via the curator LLM, optimizes the portfolio at each rebalance, measures the lift over a buy-and-hold strategy, and regenerates the dashboard at `docs/backtest_gkg_3yr_kimi.html`.
 
 At each rebalance the curator reads the date-bounded news pool as of that date and proposes adds and removes, then the optimizer recomputes weights for whatever watchlist results, repeated across the window. Compare your run to ours at [our curator backtest dashboard](https://joehahn.github.io/portfolio-wave-rider/backtest_gkg_3yr_kimi.html), which shows the current lift over buy-and-hold and SPY, with the honest caveats spelled out below.
 
 ### 5. sweep the settings (anytime)
 
-The four old per-parameter sweep pages are retired. Everything now lives on one [parameter-sweep dashboard](https://joehahn.github.io/portfolio-wave-rider/sweep_pwr.html), built by `scripts/build_sweep_dashboard.py`. It has three parts:
+The four old per-parameter sweep pages are retired. Everything now lives on one [parameter-sweep dashboard](https://joehahn.github.io/portfolio-wave-rider/sweep_pwr.html). It has three parts:
 
 - **Optimizer-knob frontier.** The optimizer settings (`concentration_cap`, risk aversion `λ`, and the price lookback) only touch the mean-variance replay, not the curator, so the entire grid is a **zero-cost** local re-solve on a fixed set of curations. No LLM tokens, no news re-fetch. The dashboard ranks every config by Information Ratio and flags the current one.
 - **Curator-LLM comparison.** Each candidate model reads the same news pools at the same config, so the only variable is the curator. This is where the cheap-workhorse choice (kimi) was made.
 - **Blind rationale judge.** An independent Opus grader scores each add and remove with the market outcome hidden, so a curator is ranked on the quality of its reasoning rather than on an in-sample return.
 
-`max_watchlist_size` is swept separately, by re-curating at each size, because it shapes the curator's *decisions*, so each value needs its own set of curator calls rather than a free re-solve. See [REFERENCE.md](REFERENCE.md) for what each knob does and how the sweep is run.
+`max_watchlist_size` is swept separately, by re-curating at each size, because it shapes the curator's *decisions*, so each value needs its own set of curator calls rather than a free re-solve.
+
+Steps 2 and 3 happen on their own once the cron jobs are installed, and steps 4 and 5 are run on demand. [REFERENCE.md](REFERENCE.md#cli-reference) carries every command line: running a review by hand, driving the backtest with `scripts/backtest_sdk.py`, rebuilding the sweep dashboard with `scripts/build_sweep_dashboard.py`, and what each knob does.
 
 ## Acting on a recommendation
 
