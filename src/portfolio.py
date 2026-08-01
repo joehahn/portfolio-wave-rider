@@ -4968,14 +4968,19 @@ def build_curator_dashboard(
                    if _pool_ls.get(_k) or _k in _SYNTH_BUCKETS), key=lambda r: r[1])
     _gain_ledesrc = ""
     if _lsr:
+        # Same presentation as plots 9 and 11: |value| on a LOG axis so a wide spread stays readable, with
+        # the sign carried by colour, not direction -- so a loss bar extends right like every other bar.
+        _lmags = [abs(r[1]) for r in _lsr]
+        _lfloor = (min([m for m in _lmags if m > 0] or [0.01])) * 0.5      # keep log(0) safe
         _lsf = go.Figure(go.Bar(
-            x=[r[1] for r in _lsr],
+            x=[m if m > 0 else _lfloor for m in _lmags],
             y=[f"{r[0]} ({r[3]} art.)" if r[3] else f"{r[0]} (total P&L)" for r in _lsr],
             orientation="h", marker_color=["#2b8a3e" if r[1] >= 0 else "#c92a2a" for r in _lsr],
-            customdata=[r[2] for r in _lsr],
-            hovertemplate="%{y}: $%{x:,.0f} per article (n=%{customdata} adds)<extra></extra>"))
+            customdata=[[r[1], r[2]] for r in _lsr],
+            hovertemplate="%{y}: $%{customdata[0]:,.0f} signed (n=%{customdata[1]} adds)<extra></extra>"))
         _lsf.update_layout(template="seaborn", height=240, margin={"t": 20, "l": 210, "r": 40},
-                           xaxis={"title": "$ P&L per article (green = +, red = &minus;)"})
+                           xaxis={"title": "|$ P&L per article| (log; green = +, red = &minus;)",
+                                  "type": "log"})
         _gain_ledesrc = _to_html(_lsf)
     _ledesrc_note = ('<p style="color:#555;max-width:820px;margin:0 0 .4em;">Plot&nbsp;9&#39;s <b>$ P&amp;L per '
                      'article</b> (total $ P&amp;L / pool-article footprint), but bucketed by the LEDE SOURCE '
