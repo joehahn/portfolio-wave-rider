@@ -16,8 +16,11 @@ Lookbacks: the optimizer's 90d price window is auto-fetched by curator_backtest 
 curator's 14d news window is satisfied by the per-date pools above. The curator is fired ONCE per biweekly
 date (not per daily ingest); curator_backtest batches decisions and rebalances biweekly.
 
-Idempotent-ish: overwrites the run dir each time. `--dry-run` prints the plan (dates, seed, pool sizes)
-without firing any curator call, so the setup can be checked before spending kimi tokens.
+INCREMENTAL, so it is safe to schedule: a date that already has a `<date>-curation.json` is replayed from
+that file (no LLM call, no cost); only dates missing one are curated. Flags:
+  --dry-run  print the plan (dates, seed, pool sizes, which dates would be curated) and write nothing.
+  --if-due   cron mode: exit immediately when every rebalance date already has a curation.
+  --force    delete the pool + curation JSONs first and re-curate the whole window from scratch.
 """
 import json
 import sys
@@ -39,8 +42,10 @@ RUN = ROOT / "data" / "curator_runs" / "bootstrap-cbs"
 
 def main() -> int:
     dry = "--dry-run" in sys.argv
+    if_due = "--if-due" in sys.argv     # cron mode: do nothing unless a rebalance date lacks a curation
+    force = "--force" in sys.argv       # re-curate every date from scratch (throws away the LLM record)
     RUN.mkdir(parents=True, exist_ok=True)
-    if not dry:
+    if force and not dry:
         for f in list(RUN.glob("*-pool.json")) + list(RUN.glob("*-curation.json")):
             f.unlink()
 
@@ -91,15 +96,25 @@ def main() -> int:
     starter = sorted(({tk for tk, s, e, _wb in periods if s <= _at <= e} | set(initial_weights)) - set(anchors))
     naive_benchmark = [str(t).upper() for t in fm["starter_watchlist"]]
 
+    # INCREMENTAL: a date that already has a curation JSON is replayed from that file, never re-curated.
+    # Only the missing dates cost an LLM call, so this is safe to run on a schedule.
+    done = {f.stem.replace("-curation", "") for f in RUN.glob("*-curation.json")}
+    missing = [dd for dd in dates if dd not in done]
+
     print(f"CBS plan: {len(bt_pools)} backtest-tail (biweekly GKG) + {len(fw_pools)} forward (WebSearch) "
-          f"= {len(dates)} rebalances", file=sys.stderr)
+          f"= {len(dates)} rebalances, {len(missing)} needing curation", file=sys.stderr)
     print(f"  window {dates[0]} -> {dates[-1]} (biweekly)  | seed @ {seed_date.date()}: {initial_weights}",
           file=sys.stderr)
     print(f"  starter watchlist: {starter}", file=sys.stderr)
     for dd, arts, src in pools:
-        print(f"    {dd}  {src:11s} {len(arts)} articles", file=sys.stderr)
+        print(f"    {dd}  {src:11s} {len(arts):4d} articles  {'CURATE' if dd in missing else 'cached'}",
+              file=sys.stderr)
     if dry:
         print("(dry run -- no curator calls, no files written)", file=sys.stderr)
+        return 0
+    if if_due and not missing:
+        print(json.dumps({"as_of": end.isoformat(), "skipped": f"not due (all {len(dates)} dates curated, "
+                          f"last {dates[-1]})"}))
         return 0
 
     # write pool JSONs + _starter.json
@@ -118,29 +133,36 @@ def main() -> int:
     hold = RUN / "_wf_holdings.csv"
     hold.write_text("ticker,shares\n" + "".join(f"{t},0\n" for t in starter + anchors))
 
-    # curate each biweekly date (reject-and-retry, same discipline as backtest_sdk / the live path)
+    # Walk every date in order so the watchlist/history state rebuilds deterministically: dates that
+    # already have a curation JSON are REPLAYED from disk (no LLM), missing dates are curated fresh
+    # (reject-and-retry, same discipline as backtest_sdk / the live path).
     for dd, arts, src in pools:
-        cur_wl = portfolio.reconstruct_watchlist_at(dd, starter, str(hist))
-        ptext = curator.format_pool(arts)
-        cur = curator.curate(ptext, cur_wl, as_of=dd, model=model, max_size=ms, anchors=anchors,
-                             thesis=thesis, exclusions=excl, cadence=fm["rebalance_period"],
-                             intro=curator.LIVE_INTRO, no_reasoning=True)
-        for _ in range(2):
-            chk = portfolio.apply_curator_decisions(cur, holdings_path=str(hold), history_path=str(hist),
-                  profile_path="investor_profile.md", listing_check=False, as_of_date=dd,
-                  max_watchlist_size=ms, dry_run=True)
-            rej = chk.get("rejections") or []
-            if not rej:
-                break
-            fb = "\n".join(f"- {x.get('ticker')} ({x.get('action')}): {x.get('reason')}" for x in rej)
+        cur_path = RUN / f"{dd}-curation.json"
+        if cur_path.exists():
+            cur, tag = json.loads(cur_path.read_text()), "cached"
+        else:
+            tag = "curated"
+            cur_wl = portfolio.reconstruct_watchlist_at(dd, starter, str(hist))
+            ptext = curator.format_pool(arts)
             cur = curator.curate(ptext, cur_wl, as_of=dd, model=model, max_size=ms, anchors=anchors,
                                  thesis=thesis, exclusions=excl, cadence=fm["rebalance_period"],
-                                 intro=curator.LIVE_INTRO, no_reasoning=True, retry_feedback=fb)
-        cur["as_of_date"] = dd
-        (RUN / f"{dd}-curation.json").write_text(json.dumps(cur, indent=2))
+                                 intro=curator.LIVE_INTRO, no_reasoning=True)
+            for _ in range(2):
+                chk = portfolio.apply_curator_decisions(cur, holdings_path=str(hold), history_path=str(hist),
+                      profile_path="investor_profile.md", listing_check=False, as_of_date=dd,
+                      max_watchlist_size=ms, dry_run=True)
+                rej = chk.get("rejections") or []
+                if not rej:
+                    break
+                fb = "\n".join(f"- {x.get('ticker')} ({x.get('action')}): {x.get('reason')}" for x in rej)
+                cur = curator.curate(ptext, cur_wl, as_of=dd, model=model, max_size=ms, anchors=anchors,
+                                     thesis=thesis, exclusions=excl, cadence=fm["rebalance_period"],
+                                     intro=curator.LIVE_INTRO, no_reasoning=True, retry_feedback=fb)
+            cur["as_of_date"] = dd
+            cur_path.write_text(json.dumps(cur, indent=2))
         portfolio.apply_curator_decisions(cur, holdings_path=str(hold), history_path=str(hist),
               profile_path="investor_profile.md", listing_check=False, as_of_date=dd, max_watchlist_size=ms)
-        print(f"  {dd} [{src}]: adds={[x['ticker'] for x in cur.get('adds', [])]} "
+        print(f"  {dd} [{src}] {tag}: adds={[x['ticker'] for x in cur.get('adds', [])]} "
               f"removes={[x['ticker'] for x in cur.get('removes', [])]}", file=sys.stderr)
 
     # replay through the optimizer at the canonical config (all from investor_profile.md), then render
