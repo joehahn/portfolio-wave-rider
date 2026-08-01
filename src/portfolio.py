@@ -5216,6 +5216,23 @@ def build_curator_dashboard(
             # against THIS run's target weights and the user's real holdings. Sized off the actual book value
             # (these are trades the user would place), and rows below min_trade_size_frac of it are dropped
             # so the table never proposes noise-sized orders.
+            # Curation reports for THIS portfolio, linked from the dashboard. The .md lives in the
+            # gitignored data/reports/; write_review_report also drops a browser-readable .html twin in
+            # docs/reports/, which is what these links point at (relative to docs/, so it works locally
+            # and on Pages alike).
+            _reports_html = ""
+            _rdir = Path("docs/reports")
+            _rfiles = sorted(_rdir.glob(f"*-{acronym.lower()}-curation.html"), reverse=True) if _rdir.exists() else []
+            if handoff_date and _rfiles:
+                _rlinks = "".join(
+                    f'<li><a href="reports/{f.name}">{f.name[:10]}</a></li>' for f in _rfiles)
+                _reports_html = (
+                    f'<h2 style="margin:1.6em 0 0.2em;">19. Curation reports</h2>'
+                    f'<p style="color:#555;max-width:820px;margin:0 0 .4em;">One report per curation: what '
+                    f'the curator changed, why, and the resulting recommended allocation. Same text as '
+                    f'<code>data/reports/&lt;date&gt;-{acronym.lower()}-curation.md</code>.</p>'
+                    f'<ul style="margin:.2em 0 0;font-size:14px;">{_rlinks}</ul>')
+
             _trades_html = ""
             if handoff_date and _hrows and _htot > 0:
                 _px_all = {t: px for t, _sh, px, _v in _hrows if px}
@@ -5288,7 +5305,7 @@ def build_curator_dashboard(
                    '<p style="color:#555;max-width:820px;margin:0 0 .4em;">Enter what '
                    'you have to invest and the table gives the dollars and share count each funded ticker '
                    'implies at these weights. Recommendation only &mdash; nothing here places a trade.</p>'
-                   if _calc else '') + _calc)
+                   if _calc else '') + _calc + _reports_html)
     except Exception:  # noqa: BLE001
         pass
     # Intro news description: CBS (handoff_date set) is a backtest-news -> live-news SPLICE; CBT is plain
@@ -5393,7 +5410,8 @@ def build_curator_dashboard(
 
 
 def write_review_report(date, decision, apply_res, rec, n_articles, lookback, model,
-                        label="review-portfolio", title="Portfolio review"):
+                        label="review-portfolio", title="Portfolio review",
+                        html_dir="docs/reports"):
     """Recommendation-only review report -> data/reports/<date>-<label>.md.
 
     Shared by the live `cli review` path and the paper portfolios (CBS / FT), so one
@@ -5429,4 +5447,52 @@ def write_review_report(date, decision, apply_res, rec, n_articles, lookback, mo
     path = Path("data/reports") / f"{date}-{label}.md"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(L))
+    # Browser-readable twin under docs/, so the dashboard can LINK to the report: a .md link only makes
+    # the browser offer a download, and data/reports/ is gitignored so it is never served by Pages.
+    if html_dir:
+        Path(html_dir).mkdir(parents=True, exist_ok=True)
+        (Path(html_dir) / f"{date}-{label}.html").write_text(_md_to_html("\n".join(L)), encoding="utf-8")
     return str(path)
+
+
+def _md_to_html(md: str) -> str:
+    """Minimal markdown -> standalone HTML for the report twin: headings, bold, bullets, pipe tables.
+    Deliberately small -- these reports are written by write_review_report above, so the subset is known."""
+    import html as _h
+    import re as _re
+
+    def _inline(t: str) -> str:
+        t = _h.escape(t)
+        t = _re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", t)
+        t = _re.sub(r"_(.+?)_", r"<i>\1</i>", t)
+        t = _re.sub(r"`(.+?)`", r"<code>\1</code>", t)
+        return _re.sub(r"(https?://[^\s)]+)", r'<a href="\1">\1</a>', t)
+
+    out, rows = [], []
+    for line in md.splitlines():
+        if line.startswith("|"):
+            cells = [c.strip() for c in line.strip("|").split("|")]
+            if all(_re.fullmatch(r":?-{2,}:?", c or "-") for c in cells):
+                continue                                    # the |---|---| separator row
+            rows.append(cells)
+            continue
+        if rows:
+            head = "".join(f"<th style='padding:4px 10px;text-align:left;'>{_inline(c)}</th>" for c in rows[0])
+            body = "".join("<tr>" + "".join(f"<td style='padding:4px 10px;'>{_inline(c)}</td>"
+                                            for c in r) + "</tr>" for r in rows[1:])
+            out.append(f"<table style='border-collapse:collapse;margin:.6em 0;'><thead><tr>{head}</tr>"
+                       f"</thead><tbody>{body}</tbody></table>")
+            rows = []
+        if line.startswith("## "):
+            out.append(f"<h2>{_inline(line[3:])}</h2>")
+        elif line.startswith("# "):
+            out.append(f"<h1>{_inline(line[2:])}</h1>")
+        elif line.startswith("- ") or line.startswith("  - "):
+            out.append(f"<li>{_inline(line.lstrip(' -'))}</li>")
+        elif line.strip():
+            out.append(f"<p>{_inline(line)}</p>")
+    return ("<!doctype html><html><head><meta charset='utf-8'><title>curation report</title>"
+            "<style>body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;max-width:860px;"
+            "margin:2em auto;padding:0 1.2em;color:#222;line-height:1.55;}h1{font-size:1.5em;}"
+            "h2{font-size:1.15em;margin-top:1.4em;}li{margin:.2em 0;}code{background:#f3f4f6;padding:1px 4px;}"
+            "</style></head><body>" + "".join(out) + "</body></html>")
