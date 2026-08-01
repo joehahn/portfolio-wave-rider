@@ -5097,8 +5097,8 @@ def build_curator_dashboard(
                 _dn = (_next_cur - pd.Timestamp.today().normalize()).days
                 _when = (f"{_dn} day{'s' if _dn != 1 else ''} from this refresh" if _dn > 0
                          else ("today" if _dn == 0 else f"overdue by {-_dn} day{'s' if _dn != -1 else ''}"))
-                _clock = (f' Most recent curation {_last_cur.date()}; the next is due '
-                          f'{_next_cur.date()} ({_when}), on the profile&#39;s {_cadence} cadence. '
+                _clock = (f' <b>Most recent curation {_last_cur.date()}; the next is due '
+                          f'{_next_cur.date()} ({_when})</b>, on the profile&#39;s {_cadence} cadence. '
                           f'Between curations the watchlist is fixed and only the weights move.')
             _latest_rec_html = (
                 '<h2 style="margin:1.6em 0 0.2em;">15. Latest recommended portfolio %</h2>'
