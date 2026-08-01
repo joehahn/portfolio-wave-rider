@@ -6,7 +6,7 @@ lede (fuller mode: Wayback clean, else live-fallback), and a Wayback / live URL 
 Self-contained: the pool data is embedded as JSON and rendered client-side (week dropdown + lede-source
 filter), so it works on the public Pages site (unlike the raw-JSON 'inspect' links, which 404 there).
 
-Usage: python scripts/build_pool_browser.py [--run-dir data/curator_runs/gkg-2yr-weekly]
+Usage: python scripts/build_pool_browser.py [--run-dir data/curator_runs/gkg-3yr-geosplit]
 """
 import argparse
 import glob
@@ -110,7 +110,7 @@ render();
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("--run-dir", default="data/curator_runs/gkg-2yr-weekly")
+    ap.add_argument("--run-dir", default="data/curator_runs/gkg-3yr-geosplit")
     ap.add_argument("--out", default=str(ROOT / "docs" / "pool_browser.html"))
     a = ap.parse_args()
     build(a.run_dir, Path(a.out))

@@ -42,9 +42,9 @@ import trafilatura
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 ROOT = Path(__file__).resolve().parent.parent
-RUN_DIR = ROOT / "data" / "curator_runs" / "postcovid-gdelt"
+RUN_DIR = ROOT / "data" / "curator_runs" / "gkg-3yr-geosplit"          # current-thesis pool dir
 CACHE = RUN_DIR / "_cache"
-CAP05_STARTER = ROOT / "data" / "curator_runs" / "postcovid-cap05" / "_starter.json"
+CANON_STARTER = ROOT / "data" / "curator_runs" / "proto-mws16" / "_starter.json"   # canonical run's date list
 
 GDELT_URL = "https://api.gdeltproject.org/api/v2/doc/doc"
 WAYBACK_MIN_INTERVAL = 0.25    # politeness pace (s) between archive.org request STARTS across the
@@ -572,7 +572,7 @@ def render_pool(pool_path: str) -> str:
 # ------------------------------------------------------------------ CLI
 def _dates(args) -> list[str]:
     if args.all:
-        return json.loads(CAP05_STARTER.read_text())["as_of_dates"]
+        return json.loads(CANON_STARTER.read_text())["as_of_dates"]
     return args.dates or []
 
 

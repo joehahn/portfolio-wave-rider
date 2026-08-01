@@ -3772,9 +3772,11 @@ def _build_ticker_periods(
 
 
 def build_curator_dashboard(
-    backtest_dir: str = "data/curator_runs/gkg-3yr-final/_backtest",
-    runs_dir: str = "data/curator_runs/5y-quarterly",
-    out_path: str = "docs/backtest_curator.html",
+    # defaults = the canonical CBT run; every caller passes these explicitly, so they are
+    # a safety net rather than a config surface.
+    backtest_dir: str = "data/curator_runs/proto-mws16/_backtest",
+    runs_dir: str = "data/curator_runs/proto-mws16",
+    out_path: str = "docs/backtest_gkg_3yr_kimi.html",
     benchmarks: list[str] | None = None,
     config_note: str | None = None,
     heading: str = "Curator Backtest",

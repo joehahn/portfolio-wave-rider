@@ -41,8 +41,8 @@ ROOT = Path(__file__).resolve().parent.parent
 KEY_PATH = ROOT / "gcp-key.json"
 PROJECT = "portfolio-wave-rider"
 TABLE = "gdelt-bq.gdeltv2.gkg_partitioned"
-RUN_DIR = ROOT / "data" / "curator_runs" / "postcovid-gkg"
-CAP05_STARTER = ROOT / "data" / "curator_runs" / "postcovid-cap05" / "_starter.json"
+RUN_DIR = ROOT / "data" / "curator_runs" / "gkg-3yr-geosplit"          # current-thesis pool dir
+CANON_STARTER = ROOT / "data" / "curator_runs" / "proto-mws16" / "_starter.json"   # canonical run's date list
 CONFIG_FILE = ROOT / "retrieval_config.json"   # ALL GKG solution params, shared backtest+forward
 
 _cfg = json.loads(CONFIG_FILE.read_text())
@@ -517,7 +517,7 @@ def render_pool(pool_path: str) -> str:
 # ---------------------------------------------------------------------- CLI
 def _dates(args) -> list[str]:
     if args.all:
-        return json.loads(CAP05_STARTER.read_text())["as_of_dates"]
+        return json.loads(CANON_STARTER.read_text())["as_of_dates"]
     return args.dates or []
 
 
