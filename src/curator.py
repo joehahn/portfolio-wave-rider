@@ -18,6 +18,8 @@ import sys
 import time
 from pathlib import Path
 
+from . import corpus
+
 ROOT = Path(__file__).resolve().parent.parent
 SYSTEM_PROMPT = (ROOT / ".claude" / "agents" / "watchlist-curator.md").read_text()
 
@@ -153,7 +155,8 @@ def format_pool(articles: list[dict]) -> str:
         d = a.get("published_date") or a.get("date") or "?"
         title = (a.get("title") or "").strip()
         src = a.get("source_domain") or a.get("source") or ""
-        body = (a.get("snippet") or a.get("full_text") or a.get("lede") or "").strip()[:400]
+        # strip error-page text ("503 Service Unavailable...") -- it reads as content but carries none
+        body = corpus.clean_lede(a.get("snippet") or a.get("full_text") or a.get("lede") or "")[:400]
         url = a.get("url") or ""
         out.append(f"[{d}] {title} ({src})\n{body}\n{url}")
     return "\n\n".join(out) if out else "(no articles in the trailing window)"

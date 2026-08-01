@@ -203,6 +203,38 @@ def append_pull(pull_id: str, pulled_at: str, retriever: str, retrieval_model: s
             "queries": len(query_stats), "corpus_articles": len(seen), "dry_run": dry_run}
 
 
+# Quote pages, ticker hubs and "latest news" landing pages are not articles: they carry a live price
+# widget and a boilerplate caption, no reporting, and their content changes every time anyone loads them.
+# They enter the corpus because a web_search hit looks like any other URL. Matched on URL shape and on the
+# stock title templates the big finance sites use.
+_NON_ARTICLE_URL = re.compile(
+    r"/(quote|quotes|symbol|symbols|topic|topics|tag|tags|markets/stocks)/[^/]*/?$"
+    r"|/stocks/[a-z]{1,5}/?$|/(watchlist|screener|portfolio)s?/?$", re.I)
+_NON_ARTICLE_TITLE = re.compile(
+    r"stock price, news, quote|quote & history|latest news and breaking headlines"
+    r"|^[^|]{0,40}\(([A-Z]{1,5})\) stock (price|quote)", re.I)
+
+
+# Fetch failures whose ERROR PAGE text got stored as the lede. These read as content to the curator
+# ("503 Service Unavailable...") while carrying no information at all, so treat them as no lede.
+_ERROR_LEDE = re.compile(
+    r"^\s*(?:4\d\d|5\d\d)\s|service unavailable|access denied|forbidden|not found"
+    r"|are you a robot|enable javascript|please enable cookies|subscribe to (?:continue|read)"
+    r"|attention required|checking your browser", re.I)
+
+
+def clean_lede(text: str) -> str:
+    """The lede, or "" when what was captured is an error/interstitial page rather than reporting."""
+    t = (text or "").strip()
+    return "" if (not t or _ERROR_LEDE.search(t[:160])) else t
+
+
+def is_article(a: dict) -> bool:
+    """False for quote/landing pages, which are noise in a curator's news pool."""
+    return not (_NON_ARTICLE_URL.search(str(a.get("url") or ""))
+                or _NON_ARTICLE_TITLE.search(str(a.get("title") or "")))
+
+
 def read_slice(as_of: str, lookback_days: int) -> list[dict[str, Any]]:
     """Article bodies in the trailing news window (as_of - lookback_days, as_of], for the forward curator
     (Stage 2). The window is keyed on ``published_date``; an article with NO usable publish date falls back
@@ -215,7 +247,7 @@ def read_slice(as_of: str, lookback_days: int) -> list[dict[str, Any]]:
         return []
     end = date.fromisoformat(as_of)
     start = end - timedelta(days=lookback_days)
-    out, n_fallback = [], 0
+    out, n_fallback, n_nonart = [], 0, 0
     for line in ARTICLES.read_text(encoding="utf-8").splitlines():
         if not line.strip():
             continue
@@ -231,11 +263,15 @@ def read_slice(as_of: str, lookback_days: int) -> list[dict[str, Any]]:
             except Exception:  # noqa: BLE001 - no usable date at all
                 continue
         if start < d <= end:
+            if not is_article(a):        # quote page / ticker hub, not reporting
+                n_nonart += 1
+                continue
             if fallback:
                 a = {**a, "date_is_pull_fallback": True}
                 n_fallback += 1
             out.append(a)
-    if n_fallback:
-        print(f"read_slice({as_of}, {lookback_days}d): {n_fallback}/{len(out)} articles used pull-date "
-              f"fallback (no publish date)", file=sys.stderr)
+    if n_fallback or n_nonart:
+        print(f"read_slice({as_of}, {lookback_days}d): {len(out)} articles"
+              + (f", {n_fallback} used a pull-date fallback (no publish date)" if n_fallback else "")
+              + (f", {n_nonart} quote/landing pages dropped" if n_nonart else ""), file=sys.stderr)
     return out

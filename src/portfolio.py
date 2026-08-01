@@ -5490,10 +5490,27 @@ def write_review_report(date, decision, apply_res, rec, n_articles, lookback, mo
             if _u in _seen_u:
                 continue
             _seen_u.add(_u)
-            _rows.append((str(_a.get("date") or _a.get("published_date") or "")[:10],
-                          str(_a.get("title") or "").strip(),
-                          str(_a.get("source") or _a.get("source_domain") or "").strip(), _u))
-        _rows.sort(key=lambda r: r[0], reverse=True)
+            # lede: the forward corpus stores `snippet` (trafilatura description) or `full_text`; the
+            # backtest pools store `lede`. Trim to a couple of sentences so the list stays scannable.
+            from . import corpus as _corpus
+            _lede = _corpus.clean_lede(str(_a.get("snippet") or _a.get("lede") or _a.get("full_text") or ""))
+            _lede = re.sub(r"\s+", " ", _lede)
+            if len(_lede) > 300:
+                _lede = _lede[:300].rsplit(" ", 1)[0] + "…"
+            _rows.append({
+                "date": str(_a.get("date") or _a.get("published_date") or "")[:10],
+                "title": str(_a.get("title") or "").strip(),
+                "source": str(_a.get("source") or _a.get("source_domain") or "").strip(),
+                "author": str(_a.get("author") or "").strip(),
+                "lede": _lede, "url": _u})
+        _rows.sort(key=lambda r: r["date"], reverse=True)
+
+        def _cite(r):
+            """One article: date · source · byline · linked title, with the lede indented beneath."""
+            _head = " · ".join(x for x in (f"**{r['date'] or 'undated'}**", r["source"], r["author"]) if x)
+            _ttl = r["title"] or r["url"] or "(untitled)"
+            _line = f"- {_head} · [{_ttl}]({r['url']})" if r["url"] else f"- {_head} · {_ttl}"
+            return _line + (f"\n  {r['lede']}" if r["lede"] else "\n  _(no lede captured)_")
         # Articles the curator actually cited (news_evidence on any add or remove) are listed openly; the
         # rest of the pool is real context but would bury them, so it folds into a <details> block --
         # GitHub renders that inline, so nothing is truncated and nothing is lost.
@@ -5501,14 +5518,14 @@ def write_review_report(date, decision, apply_res, rec, n_articles, lookback, mo
                     for _dec in (decision.get("adds") or []) + (decision.get("removes") or [])
                     for _e in (_dec.get("news_evidence") or [])}
         _cited_u.discard("")
-        _cited = [r for r in _rows if r[3] in _cited_u]
-        _other = [r for r in _rows if r[3] not in _cited_u]
-        _dates = [r[0] for r in _rows if r[0]]
+        _cited = [r for r in _rows if r["url"] in _cited_u]
+        _other = [r for r in _rows if r["url"] not in _cited_u]
+        _dates = [r["date"] for r in _rows if r["date"]]
         _span = f", {min(_dates)} to {max(_dates)}" if _dates else ""
         L += ["", f"## News considered ({len(_rows)} unique articles{_span})", ""]
         if _cited:
             L.append(f"**Cited in the decisions above ({len(_cited)}):**")
-            L += [f"- {_d} · [{_t or _u}]({_u})" if _u else f"- {_d} · {_t}" for _d, _t, _src, _u in _cited]
+            L += [_cite(r) for r in _cited]
             L.append("")
         else:
             L += ["No article was cited: this call proposed no changes, so the whole pool below is "
@@ -5517,7 +5534,7 @@ def write_review_report(date, decision, apply_res, rec, n_articles, lookback, mo
             L += ["<details>",
                   f"<summary>{len(_other)} more article(s) in the pool &mdash; click to expand</summary>",
                   ""]
-            L += [f"- {_d} · [{_t or _u}]({_u})" if _u else f"- {_d} · {_t}" for _d, _t, _src, _u in _other]
+            L += [_cite(r) for r in _other]
             L += ["", "</details>"]
     path = Path("data/reports") / f"{date}-{label}.md"
     path.parent.mkdir(parents=True, exist_ok=True)
