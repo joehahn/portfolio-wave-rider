@@ -22,7 +22,9 @@ cd "$PROJ"
   .venv/bin/python -m src.cli review --if-due || echo "[$(date '+%Y-%m-%d %H:%M:%S')] review failed (tolerated)"
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] review done"
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] CBS curation (if due) start"
-  .venv/bin/python scripts/run_bootstrap_curator.py --if-due \
+  # --no-report on purpose: CBS is a comparison portfolio, not the recommendation of record, so it does
+  # not write into data/reports/. FT (below) does, since that is the book real money follows.
+  .venv/bin/python scripts/run_bootstrap_curator.py --if-due --no-report \
     || echo "[$(date '+%Y-%m-%d %H:%M:%S')] CBS curation failed (tolerated)"
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] CBS curation done"
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] FT curation (if due) start"
