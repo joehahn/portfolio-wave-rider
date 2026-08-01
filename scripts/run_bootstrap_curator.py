@@ -25,7 +25,7 @@ that file (no LLM call, no cost); only dates missing one are curated. Flags:
 PARAMETERIZED, so the same machinery drives both paper portfolios; they differ only in seed date and news
 source, which is what makes comparing them meaningful:
   CBS (default) : --since 2026-04-22, backtest-tail GKG pools up to the handoff, forward corpus after.
-  FT            : --forward-only --since 2026-07-22 --run-dir .../forward-ft --out docs/forward_dashboard.html
+  FT            : --forward-only --since 2026-07-22 --run-dir .../forward-ft --out docs/index.html
                   --heading Forwardtest --acronym FT   (no backtest news at all).
 """
 import argparse

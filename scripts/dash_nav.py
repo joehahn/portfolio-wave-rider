@@ -6,8 +6,8 @@ build_curator_dashboard import it via portfolio._nav). One README link plus two 
   - Forwardtest : the live out-of-sample test -- Retriever (WebSearch corpus) -> Curator.
 
 Adding a dashboard = one line in the relevant group; it appears in every page's nav. (pool_browser is
-intentionally absent: it's reachable only from the Curator Backtest DB's intro paragraph. The live
-portfolio index.html is the site landing page and is not itself a nav entry.)
+intentionally absent: it's reachable only from the Curator Backtest DB's intro paragraph. The Forwardtest
+dashboard IS index.html, i.e. the site landing page -- the old real-holdings page it replaced is retired.)
 """
 from datetime import datetime
 
@@ -18,7 +18,7 @@ BACKTEST = [
     ("sweep_pwr.html", "Sweeps"),
 ]
 FORWARDTEST = [
-    ("forward_dashboard.html", "Dashboard"),
+    ("index.html", "Dashboard"),
 ]
 BOOTSTRAP = [
     ("retrieval_bootstrap.html", "Retriever"),

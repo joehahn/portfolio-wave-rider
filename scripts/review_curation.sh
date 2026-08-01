@@ -27,7 +27,7 @@ cd "$PROJ"
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] CBS curation done"
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] FT curation (if due) start"
   .venv/bin/python scripts/run_bootstrap_curator.py --if-due --forward-only --since 2026-07-22 \
-    --run-dir data/curator_runs/forward-ft --out docs/forward_dashboard.html \
+    --run-dir data/curator_runs/forward-ft --out docs/index.html \
     --heading Forwardtest --acronym FT \
     || echo "[$(date '+%Y-%m-%d %H:%M:%S')] FT curation failed (tolerated)"
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] FT curation done"
