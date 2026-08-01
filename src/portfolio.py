@@ -4410,7 +4410,7 @@ def build_curator_dashboard(
         search_html = (
             "<details id='curator-decisions' style='margin-top:2em;'>"
             "<summary style='cursor:pointer;font-size:1.5em;font-weight:bold;color:#111;'>"
-            "17. Curator decisions &amp; search terms</summary>"
+            "18. Curator decisions &amp; search terms</summary>"
             f"<p style='color:#555;max-width:780px;'>One row per {_html.escape(_cadence)} rebalance. "
             "Click to expand the curator's overall rationale, each add/remove with its reason, the cited "
             "<code>news_evidence</code> links, and the wave keywords behind that rebalance's pool "
@@ -5128,6 +5128,8 @@ def build_curator_dashboard(
             # download prompt). Prices reuse the histories already fetched above; a ticker with no fetched
             # history shows shares only. Missing/empty file -> nothing rendered.
             _holdings_html = ""
+            _hrows: list[tuple] = []
+            _htot = 0.0
             try:
                 _hf = pd.read_csv("holdings.csv")
                 _hf = _hf[pd.to_numeric(_hf["shares"], errors="coerce").fillna(0) > 0]
@@ -5142,7 +5144,6 @@ def build_curator_dashboard(
                                 _hpx[_tk3] = float(_c3.iloc[-1])
                         except Exception:  # noqa: BLE001
                             pass
-                    _hrows, _htot = [], 0.0
                     for _r in _hf.itertuples():
                         _tk2 = str(_r.ticker).upper()
                         _px2 = (float(_tkhist[_tk2]["y"][-1]) if _tk2 in _tkhist
@@ -5210,6 +5211,52 @@ def build_curator_dashboard(
                     '<td style=\\"padding:5px;\\"></td></tr>";'
                     'document.getElementById("pfcalcbody").innerHTML=h;}'
                     'document.getElementById("pfcalc").addEventListener("input",_pfcalc);_pfcalc();</script>')
+
+            # 16. Trades to move from actual to recommended -- the live dashboard's old plot 5, rebuilt here
+            # against THIS run's target weights and the user's real holdings. Sized off the actual book value
+            # (these are trades the user would place), and rows below min_trade_size_frac of it are dropped
+            # so the table never proposes noise-sized orders.
+            _trades_html = ""
+            if handoff_date and _hrows and _htot > 0:
+                _px_all = {t: px for t, _sh, px, _v in _hrows if px}
+                _px_all.update({t: float(_tkhist[t]["y"][-1]) for t in _tkhist})
+                _cur_sh = {t: sh for t, sh, _px, _v in _hrows}
+                _tgt_w = {str(t): float(w) for t, w in zip(_lr["ticker"], _lr["weight"])}
+                _min_usd = float(_fm.get("min_trade_size_frac", 0.0)) * _htot
+                _trs = []
+                for _t4 in sorted(set(_cur_sh) | set(_tgt_w)):
+                    _p4 = _px_all.get(_t4)
+                    if not _p4:
+                        continue
+                    _tgt_d = _htot * _tgt_w.get(_t4, 0.0)
+                    _cur_d = _cur_sh.get(_t4, 0.0) * _p4
+                    _dd = _tgt_d - _cur_d
+                    if abs(_dd) < _min_usd:
+                        continue
+                    _trs.append((_t4, "BUY" if _dd > 0 else "SELL", abs(_dd) / _p4, abs(_dd),
+                                 _cur_sh.get(_t4, 0.0), _tgt_d / _p4))
+                _trs.sort(key=lambda r: -r[3])
+                if _trs:
+                    _tbody = "".join(
+                        f'<tr style="border-bottom:1px solid #eee;"><td style="padding:5px;"><b>{r[0]}</b></td>'
+                        f'<td style="padding:5px;color:{"#15803d" if r[1] == "BUY" else "#b91c1c"};">'
+                        f'<b>{r[1]}</b></td><td style="padding:5px;">{r[2]:,.2f}</td>'
+                        f'<td style="padding:5px;">${r[3]:,.0f}</td>'
+                        f'<td style="padding:5px;color:#888;">{r[4]:,.2f} &rarr; {r[5]:,.2f}</td></tr>'
+                        for r in _trs)
+                    _trades_html = (
+                        '<h2 style="margin:1.6em 0 0.2em;">16. Trades to move from actual to recommended</h2>'
+                        f'<p style="color:#555;max-width:820px;margin:0 0 .4em;">What it would take to bring '
+                        f'your real <code>holdings.csv</code> book (${_htot:,.0f}) onto the recommended '
+                        f'weights above, at the latest closes. Orders smaller than '
+                        f'{float(_fm.get("min_trade_size_frac", 0.0)):.0%} of the book are omitted as noise. '
+                        f'Recommendation only &mdash; nothing here places a trade.</p>'
+                        '<table style="border-collapse:collapse;width:100%;max-width:820px;font-size:14px;">'
+                        '<thead><tr style="border-bottom:2px solid #ccc;text-align:left;">'
+                        '<th style="padding:5px;">Ticker</th><th style="padding:5px;">Action</th>'
+                        '<th style="padding:5px;">Shares</th><th style="padding:5px;">$ amount</th>'
+                        '<th style="padding:5px;">Shares: current &rarr; target</th></tr></thead>'
+                        f'<tbody>{_tbody}</tbody></table>')
             # Curation clock, live paper portfolios only (handoff_date is set for CBS/FT, not for the
             # finished CBT backtest, where a "next curation" would be meaningless).
             _clock = ""
@@ -5237,8 +5284,8 @@ def build_curator_dashboard(
                 # it READS in the page. A plain link to the .csv makes the browser offer a download instead
                 # of showing it. NB this embeds the real share counts in a published file.
                 + (_holdings_html if handoff_date else '')
-                + _modal
-                + ('<h2 style="margin:1.6em 0 0.2em;">16. Position sizes</h2>'
+                + _modal + _trades_html
+                + ('<h2 style="margin:1.6em 0 0.2em;">17. Position sizes</h2>'
                    '<p style="color:#555;max-width:820px;margin:0 0 .4em;">Enter what '
                    'you have to invest and the table gives the dollars and share count each funded ticker '
                    'implies at these weights. Recommendation only &mdash; nothing here places a trade.</p>'
