@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
-# Biweekly curation review + report, weekdays (Mon-Fri) 19:00 local.
+# Biweekly paper-portfolio curation, weekdays (Mon-Fri) 19:00 local.
 #
-# Split out of price_snapshot.sh so it runs AFTER the 18:30 news pull (scripts/news_pull.sh) and thus
-# curates on SAME-DAY news (the old embedded 16:30 review read ~day-old news). --if-due self-gates to
-# investor_profile.md's rebalance_period, so firing every weekday is safe: it actually curates only once
-# per period (biweekly at present), the exact day floats to period-end, and a missed run catches up on the
-# next weekday wake. The cadence lives in the profile, not in cron -- change rebalance_period there and this
-# job follows with no cron edit. Recommendation-only; never trades. Resolves its own location.
+# Runs AFTER the 18:30 news pull (scripts/news_pull.sh) so it curates on SAME-DAY news. --if-due self-gates
+# to investor_profile.md's rebalance_period, so firing every weekday is safe: each portfolio curates only
+# once per period (biweekly at present), the exact day floats to period-end, and a missed run catches up on
+# the next weekday wake. The cadence lives in the profile, not in cron. Recommendation-only; never trades.
 #
-# Also re-curates the two PAPER portfolios on the same cadence, via the same incremental script:
+# The old live `cli review --if-due` step is RETIRED (2026-08-01): it curated the root watchlist.csv in
+# parallel with FT and produced a second, competing recommendation. FT is the recommendation of record.
+# `cli review` still exists for a deliberate manual run.
+#
+# Curates the two PAPER portfolios via one incremental script:
 #   CBS  seeded 2026-04-22 from the canonical CBT run; backtest-tail GKG news up to the handoff, live corpus after.
 #   FT   seeded 2026-07-22 (the handoff) from the same CBT run; live corpus ONLY, no backtest news.
 # Both use --if-due, which exits immediately unless a biweekly date is missing its curation JSON, so each
@@ -18,9 +20,6 @@ set -euo pipefail
 PROJ="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$PROJ"
 {
-  echo "[$(date '+%Y-%m-%d %H:%M:%S')] review (if due) start"
-  .venv/bin/python -m src.cli review --if-due || echo "[$(date '+%Y-%m-%d %H:%M:%S')] review failed (tolerated)"
-  echo "[$(date '+%Y-%m-%d %H:%M:%S')] review done"
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] CBS curation (if due) start"
   # No --report: CBS is a comparison portfolio, not the recommendation of record, so it stays out of
   # data/reports/. Reporting is opt-in; only FT (below) asks for it.
