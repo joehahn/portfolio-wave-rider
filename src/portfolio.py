@@ -5020,8 +5020,9 @@ def build_curator_dashboard(
                 hovertemplate="%{x} (%{customdata})<br>%{y:.1%}<extra></extra>"))
             _rcap = float(_fm.get("concentration_cap", 0.25))
             _rf.add_hline(y=_rcap, line={"color": "#d62728", "width": 1.5, "dash": "dot"})
-            _rf.update_layout(height=340, margin={"l": 60, "r": 20, "t": 10, "b": 74}, plot_bgcolor="white",
-                              font={"size": 13}, showlegend=False, yaxis_title="portfolio %")
+            _rf.update_layout(height=352, margin={"l": 60, "r": 20, "t": 10, "b": 96}, plot_bgcolor="white",
+                              font={"size": 13}, showlegend=False, yaxis_title="portfolio %",
+                              xaxis_title="Watchlist")
             _rf.update_yaxes(tickformat=".0%", gridcolor="#eee")
             # Two-line x labels: ticker on top, its wave bucket below (fed the most-recent-bucket map so the
             # sub-label matches each bar's wave color), same format as plot 4. Hover/click still key on the
@@ -5085,6 +5086,20 @@ def build_curator_dashboard(
                     'else setTimeout(a,150);})();</script>')
             _hint = (" Click any bar to open that ticker&#39;s price history (1Y / 3Y toggle)."
                      if _tkhist else "")
+            # Curation clock, live paper portfolios only (handoff_date is set for CBS/FT, not for the
+            # finished CBT backtest, where a "next curation" would be meaningless).
+            _clock = ""
+            if handoff_date and rebalance_dates:
+                _cad_days = {"weekly": 7, "biweekly": 14, "monthly": 30,
+                             "quarterly": 91}.get(str(_cadence), 14)
+                _last_cur = pd.Timestamp(str(rebalance_dates[-1])[:10])
+                _next_cur = _last_cur + pd.Timedelta(days=_cad_days)
+                _dn = (_next_cur - pd.Timestamp.today().normalize()).days
+                _when = (f"{_dn} day{'s' if _dn != 1 else ''} from this refresh" if _dn > 0
+                         else ("today" if _dn == 0 else f"overdue by {-_dn} day{'s' if _dn != -1 else ''}"))
+                _clock = (f' Most recent curation {_last_cur.date()}; the next is due '
+                          f'{_next_cur.date()} ({_when}), on the profile&#39;s {_cadence} cadence. '
+                          f'Between curations the watchlist is fixed and only the weights move.')
             _latest_rec_html = (
                 '<h2 style="margin:1.6em 0 0.2em;">15. Latest recommended portfolio %</h2>'
                 f'<p style="color:#555;max-width:820px;margin:0 0 .4em;">The optimizer&#39;s target weights at the '
@@ -5092,7 +5107,7 @@ def build_curator_dashboard(
                 f'would hold now. Bars at zero are the {len(_unfunded)} watchlisted ticker(s) the optimizer '
                 f'left unfunded: the curator judged them worth watching, the math did not fund them this '
                 f'rebalance. Each ticker&#39;s wave is labelled beneath it and sets the bar colour. '
-                f'Red dotted line = the concentration_cap ({_rcap:.0%}).{_hint}</p>'
+                f'Red dotted line = the concentration_cap ({_rcap:.0%}).{_clock}{_hint}</p>'
                 + _bar_html + _modal)
     except Exception:  # noqa: BLE001
         pass
