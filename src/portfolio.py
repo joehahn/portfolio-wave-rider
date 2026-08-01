@@ -5120,6 +5120,45 @@ def build_curator_dashboard(
                     'else setTimeout(a,150);})();</script>')
             _hint = (" Click any bar to open that ticker&#39;s price history (1Y / 3Y toggle)."
                      if _tkhist else "")
+            # 15b. Position-size calculator: enter a portfolio $ and get the per-ticker $ and share counts
+            # implied by the recommended weights. Pure client-side arithmetic on values embedded at render
+            # (weight from the optimizer, last close from the same 3Y history the click-popup uses), so the
+            # page stays a single static file with no backend.
+            _calc = ""
+            _crows = [(str(t), float(w), float(_tkhist[str(t)]["y"][-1]))
+                      for t, w in zip(_lr["ticker"], _lr["weight"]) if str(t) in _tkhist]
+            if _crows:
+                _cdefault = int(round(float(totals.iloc[-1]) / 1000.0) * 1000) or 50000
+                _asof_px = str(_tkhist[_crows[0][0]]["x"][-1])
+                _calc = (
+                    '<div style="margin:.9em 0 0;padding:12px 14px;border:1px solid #e5e7eb;border-radius:8px;'
+                    'background:#fafafa;max-width:820px;">'
+                    '<label style="font-size:14px;color:#333;">Portfolio to invest: $'
+                    '<input id="pfcalc" type="number" min="0" step="1000" value="' + str(_cdefault) + '" '
+                    'style="width:130px;padding:3px 6px;margin-left:4px;font-size:14px;"></label>'
+                    '<span style="color:#777;font-size:13px;margin-left:10px;">shares at the '
+                    + _asof_px + ' close; fractional shares assumed</span>'
+                    '<table style="border-collapse:collapse;width:100%;font-size:14px;margin-top:8px;">'
+                    '<thead><tr style="border-bottom:2px solid #ccc;text-align:left;">'
+                    '<th style="padding:5px;">Ticker</th><th style="padding:5px;">Weight</th>'
+                    '<th style="padding:5px;">Price</th><th style="padding:5px;">Invest $</th>'
+                    '<th style="padding:5px;">Shares</th></tr></thead>'
+                    '<tbody id="pfcalcbody"></tbody></table></div>'
+                    '<script>var _PFROWS=' + json.dumps(_crows) + ';'
+                    'function _pfcalc(){var v=parseFloat(document.getElementById("pfcalc").value)||0;'
+                    'var h="",tot=0;for(var i=0;i<_PFROWS.length;i++){var r=_PFROWS[i],d=v*r[1];tot+=d;'
+                    'h+="<tr style=\\"border-bottom:1px solid #eee;\\"><td style=\\"padding:5px;\\"><b>"+r[0]'
+                    '+"</b></td><td style=\\"padding:5px;\\">"+(r[1]*100).toFixed(1)+"%</td>'
+                    '<td style=\\"padding:5px;\\">$"+r[2].toFixed(2)+"</td>'
+                    '<td style=\\"padding:5px;\\">$"+d.toLocaleString(undefined,{maximumFractionDigits:0})'
+                    '+"</td><td style=\\"padding:5px;\\">"+(d/r[2]).toFixed(4)+"</td></tr>";}'
+                    'h+="<tr style=\\"border-top:2px solid #ccc;\\"><td style=\\"padding:5px;\\"><b>total</b>'
+                    '</td><td style=\\"padding:5px;\\">"+((tot/(v||1))*100).toFixed(1)+"%</td>'
+                    '<td style=\\"padding:5px;\\"></td><td style=\\"padding:5px;\\"><b>$"'
+                    '+tot.toLocaleString(undefined,{maximumFractionDigits:0})+"</b></td>'
+                    '<td style=\\"padding:5px;\\"></td></tr>";'
+                    'document.getElementById("pfcalcbody").innerHTML=h;}'
+                    'document.getElementById("pfcalc").addEventListener("input",_pfcalc);_pfcalc();</script>')
             # Curation clock, live paper portfolios only (handoff_date is set for CBS/FT, not for the
             # finished CBT backtest, where a "next curation" would be meaningless).
             _clock = ""
@@ -5142,7 +5181,11 @@ def build_curator_dashboard(
                 f'left unfunded: the curator judged them worth watching, the math did not fund them this '
                 f'rebalance. Each ticker&#39;s wave is labelled beneath it and sets the bar colour. '
                 f'Red dotted line = the concentration_cap ({_rcap:.0%}).{_clock}{_hint}</p>'
-                + _bar_html + _modal)
+                + _bar_html + _modal
+                + ('<p style="color:#555;max-width:820px;margin:1em 0 .2em;"><b>Position sizes.</b> Enter what '
+                   'you have to invest and the table gives the dollars and share count each funded ticker '
+                   'implies at these weights. Recommendation only &mdash; nothing here places a trade.</p>'
+                   if _calc else '') + _calc)
     except Exception:  # noqa: BLE001
         pass
     # Intro news description: CBS (handoff_date set) is a backtest-news -> live-news SPLICE; CBT is plain
