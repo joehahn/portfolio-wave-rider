@@ -4976,8 +4976,8 @@ def build_curator_dashboard(
     extra_html = (
         '<h2 style="margin:1.6em 0 0.2em;">7. Allocation over time</h2>' + _to_html(_af)
         + (('<h2 style="margin:1.6em 0 0.2em;">8. Gains vs news source</h2>' + _attr_note + _gain_src) if _gain_src else '')
-        + (('<h2 style="margin:1.6em 0 0.2em;">9. $ P&amp;L per article vs news source</h2>' + _gpa_note + _gain_per_art) if _gain_per_art else '')
-        + (('<h2 style="margin:1.6em 0 0.2em;">10. $ P&amp;L per article by lede source</h2>' + _ledesrc_note + _gain_ledesrc) if _gain_ledesrc else '')
+        + (('<h2 style="margin:1.6em 0 0.2em;">9. P&amp;L per article vs news source</h2>' + _gpa_note + _gain_per_art) if _gain_per_art else '')
+        + (('<h2 style="margin:1.6em 0 0.2em;">10. P&amp;L per article vs lede source</h2>' + _ledesrc_note + _gain_ledesrc) if _gain_ledesrc else '')
         + (('<h2 style="margin:1.6em 0 0.2em;">11. Gains vs search keyword</h2>' + _attr_note + _gain_kw) if _gain_kw else '')
     )
     # 12. Number of adds per source — the raw n behind the source-gain plots.
