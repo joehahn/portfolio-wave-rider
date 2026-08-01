@@ -33,11 +33,13 @@ def _load_allocations(arg: str) -> dict[str, float]:
     return {str(k).upper(): float(v) for k, v in raw.items()}
 
 
-def _write_review_report(date, decision, apply_res, rec, n_articles, lookback, model):
+def _write_review_report(date, decision, apply_res, rec, n_articles, lookback, model,
+                         watchlist=None, max_size=None, pool=None):
     """Thin wrapper: the report writer itself lives in portfolio.py so the paper-portfolio
     runs (CBS / FT, via scripts/run_bootstrap_curator.py) emit the SAME report format."""
     return portfolio.write_review_report(date, decision, apply_res, rec, n_articles,
-                                         lookback, model)
+                                         lookback, model, watchlist=watchlist,
+                                         max_size=max_size, pool=pool)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -301,7 +303,9 @@ def main(argv: list[str] | None = None) -> int:
                     period=fm["lookback_period"], max_weight=fm["concentration_cap"],
                     risk_free_rate=fm["risk_free_rate"], objective="mean_variance",
                     risk_aversion=fm["risk_aversion"], date=as_of, force=True)
-                report = _write_review_report(as_of, decision, apply_res, rec, len(pool), lookback, model)
+                report = _write_review_report(as_of, decision, apply_res, rec, len(pool), lookback,
+                                              model, watchlist=apply_res.get("watchlist"),
+                                              max_size=int(fm["max_watchlist_size"]), pool=pool)
                 result = {"as_of": as_of, "articles_read": len(pool),
                           "applied_adds": apply_res.get("applied_adds"),
                           "applied_removes": apply_res.get("applied_removes"),

@@ -5432,11 +5432,17 @@ def build_curator_dashboard(
 
 
 def write_review_report(date, decision, apply_res, rec, n_articles, lookback, model,
-                        label="review-portfolio", title="Portfolio review"):
+                        label="review-portfolio", title="Portfolio review",
+                        watchlist=None, max_size=None, pool=None):
     """Recommendation-only review report -> data/reports/<date>-<label>.md.
 
     Shared by the live `cli review` path and the paper portfolios (CBS / FT), so one
-    curation produces one report in one format wherever it was fired from."""
+    curation produces one report in one format wherever it was fired from.
+
+    ``watchlist`` / ``max_size``: the post-change watchlist and its cap, so the report states what is
+    actually in play rather than only what changed. ``pool``: the article records the curator read, listed
+    at the end so its claims are checkable -- on a no-change call that citation list is the only evidence
+    there is, since evidence otherwise renders only under adds."""
     L = [f"# {title} — {date}", "",
          f"_Curator: {model} · news window: {lookback}d ({n_articles} articles read) · "
          f"recommendation only, no trades executed._", "", "## Watchlist changes"]
@@ -5447,8 +5453,18 @@ def write_review_report(date, decision, apply_res, rec, n_articles, lookback, mo
     if rej:
         L.append("- **Rejected:** " + "; ".join(
             f"{r.get('ticker')} ({r.get('action')}: {r.get('reason')})" for r in rej))
+    if watchlist:
+        _wl = sorted(str(t).upper() for t in watchlist)
+        _cap = f" ({len(_wl)}/{max_size} slots used)" if max_size else f" ({len(_wl)})"
+        L.append(f"- **Watchlist after this call**{_cap}: {', '.join(_wl)}")
     if decision.get("rationale_overall"):
         L += ["", decision["rationale_overall"]]
+    # Every REMOVE's own reasoning + citations. These are stored per-decision exactly like adds, and
+    # dropping them hid the decisions most worth auditing.
+    for _r in decision.get("removes", []) or []:
+        L.append(f"\n- **REMOVE {_r.get('ticker')}**: {_r.get('rationale', '')}")
+        for _e in _r.get("news_evidence", []) or []:
+            L.append(f"  - {_e.get('summary', '')} ({_e.get('url', '')})")
     for a in decision.get("adds", []):
         L.append(f"\n- **{a.get('ticker')}** [{a.get('wave_bucket', '')}]: {a.get('rationale', '')}")
         for e in a.get("news_evidence", []):
@@ -5465,6 +5481,28 @@ def write_review_report(date, decision, apply_res, rec, n_articles, lookback, mo
     L += ["", "## Acting on this",
           "This is a recommendation, not a trade. Execute in your brokerage, then edit `holdings.csv` "
           "so the next daily snapshot reflects the new positions."]
+    # The news the curator actually read. Sorted newest first; the header's article count is the full pool,
+    # this list is capped so the report stays readable.
+    if pool:
+        _rows, _seen_u = [], set()
+        for _a in pool:
+            _u = str(_a.get("url") or "")
+            if _u in _seen_u:
+                continue
+            _seen_u.add(_u)
+            _rows.append((str(_a.get("date") or _a.get("published_date") or "")[:10],
+                          str(_a.get("title") or "").strip(),
+                          str(_a.get("source") or _a.get("source_domain") or "").strip(), _u))
+        _rows.sort(key=lambda r: r[0], reverse=True)
+        _cap_n = 40
+        _dates = [r[0] for r in _rows if r[0]]
+        _span = f", {min(_dates)} to {max(_dates)}" if _dates else ""
+        L += ["", f"## News considered ({len(_rows)} unique articles{_span})",
+              f"The pool this decision was made from" +
+              (f", newest {_cap_n} shown" if len(_rows) > _cap_n else "") + ":", ""]
+        for _d, _t, _src, _u in _rows[:_cap_n]:
+            _lbl = _t or _u
+            L.append(f"- {_d} · {_src} · [{_lbl}]({_u})" if _u else f"- {_d} · {_src} · {_lbl}")
     path = Path("data/reports") / f"{date}-{label}.md"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(L))

@@ -285,11 +285,19 @@ def main(argv=None) -> int:
                     "expected_annual_return": float(_blk["expected_return"].iloc[0]),
                     "annual_volatility": float(_blk["annual_volatility"].iloc[0])}
 
+        _pool_by_date = {_d0: _arts0 for _d0, _arts0, _s0 in pools}
         for _dd, _cur, _app, _nart in _want:
             _rec = _rec_at(_dd)
+            # watchlist AFTER this call, replayed from the history file (same source the dashboard uses)
+            try:
+                _wl_after = portfolio.reconstruct_watchlist_at(
+                    (pd.Timestamp(_dd) + pd.Timedelta(days=1)).strftime("%Y-%m-%d"), starter, str(hist))
+            except Exception:  # noqa: BLE001
+                _wl_after = None
             _rp = portfolio.write_review_report(
                 _dd, _cur, _app, _rec, _nart, news_lb, model,
-                label=f"{a.acronym.lower()}-curation", title=f"{a.heading} ({a.acronym}) curation")
+                label=f"{a.acronym.lower()}-curation", title=f"{a.heading} ({a.acronym}) curation",
+                watchlist=_wl_after, max_size=ms, pool=_pool_by_date.get(_dd))
             print(f"  report: {_rp}", file=sys.stderr)
 
     portfolio.build_curator_dashboard(
