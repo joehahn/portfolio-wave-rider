@@ -5390,3 +5390,43 @@ def build_curator_dashboard(
         "bnh_baseline_return": round(bnh_return, 4),
         "benchmarks": {b: float(c.iloc[-1] / c.iloc[0] - 1.0) for b, c in bench_curves.items()},
     }
+
+
+def write_review_report(date, decision, apply_res, rec, n_articles, lookback, model,
+                        label="review-portfolio", title="Portfolio review"):
+    """Recommendation-only review report -> data/reports/<date>-<label>.md.
+
+    Shared by the live `cli review` path and the paper portfolios (CBS / FT), so one
+    curation produces one report in one format wherever it was fired from."""
+    L = [f"# {title} — {date}", "",
+         f"_Curator: {model} · news window: {lookback}d ({n_articles} articles read) · "
+         f"recommendation only, no trades executed._", "", "## Watchlist changes"]
+    adds, removes = apply_res.get("applied_adds", []), apply_res.get("applied_removes", [])
+    rej = apply_res.get("rejections", [])
+    L.append(f"- **Adds:** {', '.join(adds) or '—'}")
+    L.append(f"- **Removes:** {', '.join(removes) or '—'}")
+    if rej:
+        L.append("- **Rejected:** " + "; ".join(
+            f"{r.get('ticker')} ({r.get('action')}: {r.get('reason')})" for r in rej))
+    if decision.get("rationale_overall"):
+        L += ["", decision["rationale_overall"]]
+    for a in decision.get("adds", []):
+        L.append(f"\n- **{a.get('ticker')}** [{a.get('wave_bucket', '')}]: {a.get('rationale', '')}")
+        for e in a.get("news_evidence", []):
+            L.append(f"  - {e.get('summary', '')} ({e.get('url', '')})")
+    L += ["", "## Recommended allocation (mean-variance optimizer)"]
+    weights = (rec or {}).get("weights") or {}
+    if weights:
+        L += ["| ticker | weight |", "|---|---|"]
+        for t, w in sorted(weights.items(), key=lambda kv: -kv[1]):
+            if w > 0.001:
+                L.append(f"| {t} | {w * 100:.1f}% |")
+        L.append(f"\nSharpe {rec.get('sharpe_ratio'):.2f} · E[r] {rec.get('expected_annual_return', 0) * 100:.1f}% · "
+                 f"vol {rec.get('annual_volatility', 0) * 100:.1f}%")
+    L += ["", "## Acting on this",
+          "This is a recommendation, not a trade. Execute in your brokerage, then edit `holdings.csv` "
+          "so the next daily snapshot reflects the new positions."]
+    path = Path("data/reports") / f"{date}-{label}.md"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("\n".join(L))
+    return str(path)

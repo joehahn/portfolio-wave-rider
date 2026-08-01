@@ -62,6 +62,8 @@ def _args(argv=None):
     p.add_argument("--rebalance-now", action="store_true",
                    help="insert an EXTRA off-grid rebalance today, on top of the regular cadence")
     p.add_argument("--extra-date", default="", help="insert an extra off-grid rebalance on this date")
+    p.add_argument("--no-report", action="store_true",
+                   help="skip the markdown report that every fresh curation writes by default")
     return p.parse_args(argv)
 
 
@@ -189,6 +191,7 @@ def main(argv=None) -> int:
     # Walk every date in order so the watchlist/history state rebuilds deterministically: dates that
     # already have a curation JSON are REPLAYED from disk (no LLM), missing dates are curated fresh
     # (reject-and-retry, same discipline as backtest_sdk / the live path).
+    _fresh: list[tuple] = []      # dates curated on THIS run -> one report each
     for dd, arts, src in pools:
         cur_path = RUN / f"{dd}-curation.json"
         if cur_path.exists():
@@ -215,8 +218,11 @@ def main(argv=None) -> int:
                                      intro=curator.LIVE_INTRO, no_reasoning=True, retry_feedback=fb)
             cur["as_of_date"] = dd
             cur_path.write_text(json.dumps(cur, indent=2))
-        portfolio.apply_curator_decisions(cur, holdings_path=str(hold), history_path=str(hist),
+        _applied = portfolio.apply_curator_decisions(
+              cur, holdings_path=str(hold), history_path=str(hist),
               profile_path="investor_profile.md", listing_check=False, as_of_date=dd, max_watchlist_size=ms)
+        if tag == "curated":
+            _fresh.append((dd, cur, _applied, len(arts)))
         print(f"  {dd} [{src}] {tag}: adds={[x['ticker'] for x in cur.get('adds', [])]} "
               f"removes={[x['ticker'] for x in cur.get('removes', [])]}", file=sys.stderr)
 
@@ -241,6 +247,26 @@ def main(argv=None) -> int:
         handoff_date=HANDOFF, compare_backtest_dir=str(ROOT / SEED_SRC / "_backtest"),
         actual_csv=(a.actual_csv or None))
     print(f"  rendered {a.out}", file=sys.stderr)
+
+    # One markdown report per date curated on THIS run (cron and manual alike; --no-report opts out).
+    # Same writer and format as the live `cli review` path, so every curation reads the same wherever it
+    # fired from. The recommended weights come from the replay's own last rebalance block.
+    if _fresh and not a.no_report:
+        _rec = {}
+        try:
+            _rc = pd.read_csv(RUN / "_backtest" / "recommendations.csv")
+            _last = _rc[_rc["date"] == _rc["date"].max()]
+            _rec = {"weights": {str(r.ticker): float(r.weight) for r in _last.itertuples()},
+                    "sharpe_ratio": float(_last["sharpe_ratio"].iloc[0]),
+                    "expected_annual_return": float(_last["expected_return"].iloc[0]),
+                    "annual_volatility": float(_last["annual_volatility"].iloc[0])}
+        except Exception:  # noqa: BLE001
+            pass
+        for _dd, _cur, _app, _nart in _fresh:
+            _rp = portfolio.write_review_report(
+                _dd, _cur, _app, _rec, _nart, news_lb, model,
+                label=f"{a.acronym.lower()}-curation", title=f"{a.heading} ({a.acronym}) curation")
+            print(f"  report: {_rp}", file=sys.stderr)
     return 0
 
 
