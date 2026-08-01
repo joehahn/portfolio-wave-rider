@@ -5002,11 +5002,21 @@ def build_curator_dashboard(
         _lr = _rec[_rec["date"] == _rec["date"].max()]
         _lr = _lr[_lr["weight"] > 0.0005].sort_values("weight", ascending=False)
         if not _lr.empty:
-            _rw = [_most_recent_bucket(str(t)) for t in _lr["ticker"]]
+            # Every ticker the curator has on the watchlist at this rebalance, funded or not. The unfunded
+            # ones draw as zero-height bars, so the chart shows the whole eligible set and makes plain how
+            # much of it the optimizer chose to skip. `_have_tk` is the watchlist set (anchors excluded).
+            _last_dt = pd.Timestamp(str(_lr["date"].iloc[0])[:10])
+            _funded = list(_lr["ticker"].astype(str))
+            _unfunded = sorted({tk for tk, _s, _e, _wb in periods
+                                if tk in _have_tk and _s <= _last_dt <= _e and tk not in set(_funded)})
+            _tickers = _funded + _unfunded
+            _weights = list(_lr["weight"]) + [0.0] * len(_unfunded)
+            _rw = [_most_recent_bucket(str(t)) for t in _tickers]
             _rf = go.Figure(go.Bar(
-                x=list(_lr["ticker"].astype(str)), y=list(_lr["weight"]),
+                x=_tickers, y=_weights,
                 marker_color=[WAVE_COLORS.get(w, "#888888") for w in _rw], customdata=_rw,
-                text=[f"{w * 100:.0f}%" for w in _lr["weight"]], textposition="outside",
+                text=[f"{w * 100:.0f}%" if w > 0.0005 else "unfunded" for w in _weights],
+                textposition="outside", textfont={"size": 11},
                 hovertemplate="%{x} (%{customdata})<br>%{y:.1%}<extra></extra>"))
             _rcap = float(_fm.get("concentration_cap", 0.25))
             _rf.add_hline(y=_rcap, line={"color": "#d62728", "width": 1.5, "dash": "dot"})
@@ -5016,15 +5026,15 @@ def build_curator_dashboard(
             # Two-line x labels: ticker on top, its wave bucket below (fed the most-recent-bucket map so the
             # sub-label matches each bar's wave color), same format as plot 4. Hover/click still key on the
             # plain ticker (the x value), so the 1Y/3Y popup is unaffected.
-            _rwmap = dict(zip(_lr["ticker"].astype(str), _rw))
-            _rf.update_xaxes(tickmode="array", tickvals=list(_lr["ticker"].astype(str)),
-                             ticktext=[_ticker_label(str(t), _rwmap) for t in _lr["ticker"]])
+            _rwmap = dict(zip(_tickers, _rw))
+            _rf.update_xaxes(tickmode="array", tickvals=_tickers,
+                             ticktext=[_ticker_label(str(t), _rwmap) for t in _tickers])
             # Click-to-inspect: fetch each recommended ticker's 3-year daily closes (independently, so a
             # short-history IPO doesn't truncate the others) and embed them, so clicking a bar opens a modal
             # with that ticker's price line and a 1Y/3Y toggle (1Y is sliced client-side from the 3Y series).
             # Fetched at render; a yfinance failure just omits the popup.
             _tkhist: dict[str, dict] = {}
-            for _tk in _lr["ticker"].astype(str):
+            for _tk in _tickers:
                 try:
                     _hp = fetch_prices([_tk], period="3y")
                     _col = (_hp[_tk] if _tk in _hp.columns else _hp.iloc[:, 0]).dropna()
@@ -5079,7 +5089,10 @@ def build_curator_dashboard(
                 '<h2 style="margin:1.6em 0 0.2em;">15. Latest recommended portfolio %</h2>'
                 f'<p style="color:#555;max-width:820px;margin:0 0 .4em;">The optimizer&#39;s target weights at the '
                 f'final rebalance ({str(_lr["date"].iloc[0])[:10]}) &mdash; the allocation the curator strategy '
-                f'would hold now. Red dotted line = the concentration_cap ({_rcap:.0%}).{_hint}</p>'
+                f'would hold now. Bars at zero are the {len(_unfunded)} watchlisted ticker(s) the optimizer '
+                f'left unfunded: the curator judged them worth watching, the math did not fund them this '
+                f'rebalance. Each ticker&#39;s wave is labelled beneath it and sets the bar colour. '
+                f'Red dotted line = the concentration_cap ({_rcap:.0%}).{_hint}</p>'
                 + _bar_html + _modal)
     except Exception:  # noqa: BLE001
         pass
