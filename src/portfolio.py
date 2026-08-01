@@ -5494,15 +5494,31 @@ def write_review_report(date, decision, apply_res, rec, n_articles, lookback, mo
                           str(_a.get("title") or "").strip(),
                           str(_a.get("source") or _a.get("source_domain") or "").strip(), _u))
         _rows.sort(key=lambda r: r[0], reverse=True)
-        _cap_n = 40
+        # Articles the curator actually cited (news_evidence on any add or remove) are listed openly; the
+        # rest of the pool is real context but would bury them, so it folds into a <details> block --
+        # GitHub renders that inline, so nothing is truncated and nothing is lost.
+        _cited_u = {str(_e.get("url") or "")
+                    for _dec in (decision.get("adds") or []) + (decision.get("removes") or [])
+                    for _e in (_dec.get("news_evidence") or [])}
+        _cited_u.discard("")
+        _cited = [r for r in _rows if r[3] in _cited_u]
+        _other = [r for r in _rows if r[3] not in _cited_u]
         _dates = [r[0] for r in _rows if r[0]]
         _span = f", {min(_dates)} to {max(_dates)}" if _dates else ""
-        L += ["", f"## News considered ({len(_rows)} unique articles{_span})",
-              f"The pool this decision was made from" +
-              (f", newest {_cap_n} shown" if len(_rows) > _cap_n else "") + ":", ""]
-        for _d, _t, _src, _u in _rows[:_cap_n]:
-            _lbl = _t or _u
-            L.append(f"- {_d} · {_src} · [{_lbl}]({_u})" if _u else f"- {_d} · {_src} · {_lbl}")
+        L += ["", f"## News considered ({len(_rows)} unique articles{_span})", ""]
+        if _cited:
+            L.append(f"**Cited in the decisions above ({len(_cited)}):**")
+            L += [f"- {_d} · [{_t or _u}]({_u})" if _u else f"- {_d} · {_t}" for _d, _t, _src, _u in _cited]
+            L.append("")
+        else:
+            L += ["No article was cited: this call proposed no changes, so the whole pool below is "
+                  "context the curator read and set aside.", ""]
+        if _other:
+            L += ["<details>",
+                  f"<summary>{len(_other)} more article(s) in the pool &mdash; click to expand</summary>",
+                  ""]
+            L += [f"- {_d} · [{_t or _u}]({_u})" if _u else f"- {_d} · {_t}" for _d, _t, _src, _u in _other]
+            L += ["", "</details>"]
     path = Path("data/reports") / f"{date}-{label}.md"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(L))

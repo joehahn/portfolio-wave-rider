@@ -53,6 +53,10 @@ def _args(argv=None):
     p.add_argument("--handoff", default="2026-07-22", help="last backtest-news date; forward corpus after it")
     p.add_argument("--forward-only", action="store_true",
                    help="read EVERY date from the live corpus (no backtest news); FT mode")
+    p.add_argument("--blend-backtest-news", action="store_true",
+                   help="with --forward-only: also feed backtest-tail articles that fall inside the\n"
+                        "trailing news window, so an early forward date is not starved. The blend\n"
+                        "weans itself off automatically as the window clears the handoff date.")
     p.add_argument("--out", default="docs/curator_bootstrap.html")
     p.add_argument("--heading", default="Curator Bootstrap")
     p.add_argument("--acronym", default="CBS")
@@ -107,10 +111,31 @@ def main(argv=None) -> int:
     # --- Forward dates: biweekly, each read as a trailing news_lb window over the live corpus. In
     #     --forward-only mode the timeline STARTS at SINCE; otherwise it continues from the last
     #     backtest-tail date (and is empty until the first forward biweekly date arrives).
+    # Backtest-tail articles available for blending: every article in the backtest pools, keyed by its own
+    # published date, so a forward date can pull in the ones inside its trailing window. Loaded once.
+    _bt_articles = []
+    if a.forward_only and a.blend_backtest_news:
+        for f in sorted((ROOT / POOL_SRC).glob("*-pool.json")):
+            for _art in json.loads(f.read_text()).get("articles", []):
+                _ad = str(_art.get("date") or _art.get("published_date") or "")[:10]
+                if _ad:
+                    _bt_articles.append((_ad, _art))
+
+    def _blend(_iso: str, _live: list) -> list:
+        """live-corpus slice + any backtest-tail article published inside the same trailing window."""
+        if not _bt_articles:
+            return _live
+        _lo = (date.fromisoformat(_iso) - timedelta(days=news_lb)).isoformat()
+        _have = {str(x.get("url") or "") for x in _live}
+        _extra = [x for _ad, x in _bt_articles
+                  if _lo <= _ad <= _iso and str(x.get("url") or "") not in _have]
+        return _live + _extra
+
     fw_pools = []
     d = date.fromisoformat(SINCE) if a.forward_only else date.fromisoformat(bt_pools[-1][0]) + timedelta(days=14)
     while d <= end:
-        fw_pools.append((d.isoformat(), corpus.read_slice(d.isoformat(), news_lb), "websearch"))
+        _iso = d.isoformat()
+        fw_pools.append((_iso, _blend(_iso, corpus.read_slice(_iso, news_lb)), "websearch"))
         d += timedelta(days=14)
 
     # Off-grid manual rebalances. These are EXTRA dates merged into the regular cadence, never a
@@ -129,7 +154,7 @@ def main(argv=None) -> int:
     _grid = {dd for dd, _, _ in bt_pools + fw_pools}
     for _md in _manual:
         if _md not in _grid and _md <= end.isoformat():
-            fw_pools.append((_md, corpus.read_slice(_md, news_lb), "websearch"))
+            fw_pools.append((_md, _blend(_md, corpus.read_slice(_md, news_lb)), "websearch"))
 
     pools = sorted(bt_pools + fw_pools, key=lambda r: r[0])
     dates = [dd for dd, _, _ in pools]

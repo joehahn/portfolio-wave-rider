@@ -12,7 +12,10 @@
 #
 # Curates the two PAPER portfolios via one incremental script:
 #   CBS  seeded 2026-04-22 from the canonical CBT run; backtest-tail GKG news up to the handoff, live corpus after.
-#   FT   seeded 2026-07-22 (the handoff) from the same CBT run; live corpus ONLY, no backtest news.
+#   FT   seeded 2026-07-22 (the handoff) from the same CBT run; live corpus, plus any backtest-tail
+#        article still inside the trailing news window (--blend-backtest-news). That blend weans
+#        itself off automatically as the window clears the handoff, so early forward dates are not
+#        starved of context while later ones are pure forward news.
 # Both use --if-due, which exits immediately unless a biweekly date is missing its curation JSON, so each
 # costs one curator call per period, not one per firing. Without this their watchlists FREEZE past the last
 # manual run and only the equity curves move (the 16:30 refreshes are render-only, no LLM).
@@ -27,7 +30,8 @@ cd "$PROJ"
     || echo "[$(date '+%Y-%m-%d %H:%M:%S')] CBS curation failed (tolerated)"
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] CBS curation done"
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] FT curation (if due) start"
-  .venv/bin/python scripts/run_bootstrap_curator.py --if-due --forward-only --since 2026-07-22 \
+  .venv/bin/python scripts/run_bootstrap_curator.py --if-due --forward-only --blend-backtest-news \
+    --since 2026-07-22 \
     --run-dir data/curator_runs/forward-ft --out docs/index.html \
     --heading Forwardtest --acronym FT --actual-csv data/snapshots.csv --report \
     || echo "[$(date '+%Y-%m-%d %H:%M:%S')] FT curation failed (tolerated)"
