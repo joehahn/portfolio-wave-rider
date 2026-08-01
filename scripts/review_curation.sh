@@ -8,10 +8,12 @@
 # next weekday wake. The cadence lives in the profile, not in cron -- change rebalance_period there and this
 # job follows with no cron edit. Recommendation-only; never trades. Resolves its own location.
 #
-# Also re-curates the Curator Bootstrap (CBS) paper portfolio on the same cadence. run_bootstrap_curator.py
-# is incremental: --if-due exits immediately unless a biweekly date is missing its curation JSON, so the
-# LLM cost is one call per period, not one per firing. Without this the CBS watchlist FREEZES past its last
-# manual run and only its equity curve moves (the 16:30 refresh_cbs.py is render-only, no LLM).
+# Also re-curates the two PAPER portfolios on the same cadence, via the same incremental script:
+#   CBS  seeded 2026-04-22 from the canonical CBT run; backtest-tail GKG news up to the handoff, live corpus after.
+#   FT   seeded 2026-07-22 (the handoff) from the same CBT run; live corpus ONLY, no backtest news.
+# Both use --if-due, which exits immediately unless a biweekly date is missing its curation JSON, so each
+# costs one curator call per period, not one per firing. Without this their watchlists FREEZE past the last
+# manual run and only the equity curves move (the 16:30 refreshes are render-only, no LLM).
 set -euo pipefail
 PROJ="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$PROJ"
@@ -23,4 +25,10 @@ cd "$PROJ"
   .venv/bin/python scripts/run_bootstrap_curator.py --if-due \
     || echo "[$(date '+%Y-%m-%d %H:%M:%S')] CBS curation failed (tolerated)"
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] CBS curation done"
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] FT curation (if due) start"
+  .venv/bin/python scripts/run_bootstrap_curator.py --if-due --forward-only --since 2026-07-22 \
+    --run-dir data/curator_runs/forward-ft --out docs/forward_dashboard.html \
+    --heading Forwardtest --acronym FT \
+    || echo "[$(date '+%Y-%m-%d %H:%M:%S')] FT curation failed (tolerated)"
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] FT curation done"
 } >> data/snapshot.log 2>&1
