@@ -2847,7 +2847,7 @@ def build_dashboard(
                                hovertext=_rb_text,
                                hoverlabel={"align": "left", "bgcolor": "white",
                                            "bordercolor": "#7c2d12"},
-                               hovertemplate="<b>Rebalanced %{x|%Y-%m-%d}</b>"
+                               hovertemplate="<b>Executed %{x|%Y-%m-%d}</b>"
                                              "<br>portfolio $%{y:,.0f}<br>%{hovertext}"
                                              "<extra></extra>",
                                legend="legend", legendrank=6),
@@ -3891,7 +3891,7 @@ def build_curator_dashboard(
         row_heights=[0.22, 0.24, 0.13, 0.12, 0.17],
         subplot_titles=(
             "1. Realized portfolio value: curator vs baselines vs benchmark",
-            "2. Watchlist composition over time — translucent = watchlisted, solid = funded by optimizer (color = wave bucket)",
+            "2. Watchlist composition over time — translucent = watchlisted, solid = funded by optimizer",
             "3. Cumulative $ gain per holding",
             "4. Cumulative $ gain per wave bucket",
             "5. Actual portfolio $ by wave over time",
@@ -3936,24 +3936,22 @@ def build_curator_dashboard(
     # Split rebalance markers: watchlist CHANGED (non-empty adds/removes) -> a bigger RED square that
     # stands out; a no-change rebalance -> the small orange square. So the eye lands on the dates that
     # actually rotated the watchlist.
+    # Markers sit on the EXECUTION date, not the decision date, mirroring the replay's own rule: snap the
+    # decision to the last session at/before it, then advance t_update_days sessions (the day-0 deployment
+    # is capital setup, so it is not lagged). A weekend decision therefore lands on the following Monday,
+    # which is where the trade actually happened. A decision whose execution has not happened yet (today's
+    # curation, filling next session) draws no marker until it does.
+    _t_upd = int(load_backtest_config().get("t_update_days", 1))
+    _idx = totals.index
     _rebal_x, _rebal_y, _rebal_text = [], [], []     # no-change rebalances
     _chg_x, _chg_y, _chg_text = [], [], []           # watchlist changed
-    for _d in rebalance_dates:
+    for _i, _d in enumerate(rebalance_dates):
         _ts = pd.Timestamp(_d)
-        if _ts > end:
-            continue
-        # NB: do NOT exclude _ts < start here. The day-0 rebalance can fall a day or two BEFORE the first
-        # snapshot (weekend + the t_update_days execution lag), and start = totals.index[0] is that first
-        # snapshot; excluding it would drop the opening rebalance's marker (often a watchlist change).
-        _val = totals.asof(_ts)                          # last value at/before the rebalance date
-        if pd.isna(_val):
-            # Date precedes the first snapshot (e.g. the day-0 rebalance on a Fri/Sat, before the
-            # t_update_days execution lag lands the first trade) -> anchor to the first value instead,
-            # so the opening rebalance's marker (often a watchlist change) still renders.
-            _after = totals[totals.index >= _ts]
-            if _after.empty:
-                continue
-            _val = float(_after.iloc[0])
+        _pos = int(_idx.searchsorted(_ts, side="right")) - 1     # last session at/before the decision
+        _epos = 0 if _pos < 0 else _pos + (0 if _i == 0 else _t_upd)
+        if _epos > len(_idx) - 1:
+            continue                                             # decided, not yet executed
+        _x, _val = _idx[_epos], float(totals.iloc[_epos])
         _cj_path = Path(runs_dir) / f"{_d}-curation.json"
         _changed = False
         try:
@@ -3962,10 +3960,12 @@ def build_curator_dashboard(
         except Exception:  # noqa: BLE001
             pass
         _popup = _rebalance_popup(_cj_path)
+        if str(_x.date()) != str(_ts.date()):        # weekend/lagged fill: name the decision date too
+            _popup = f"decided {_ts.date()}<br>{_popup}"
         if _changed:
-            _chg_x.append(_ts); _chg_y.append(float(_val)); _chg_text.append(_popup)
+            _chg_x.append(_x); _chg_y.append(_val); _chg_text.append(_popup)
         else:
-            _rebal_x.append(_ts); _rebal_y.append(float(_val)); _rebal_text.append(_popup)
+            _rebal_x.append(_x); _rebal_y.append(_val); _rebal_text.append(_popup)
     fig.add_trace(
         go.Scatter(x=_rebal_x, y=_rebal_y, mode="markers", name="Rebalanced (no change)",
                    marker=_REBALANCE_MARKER,
@@ -3983,7 +3983,7 @@ def build_curator_dashboard(
                            "line": {"width": 1.5, "color": "white"}},
                    hovertext=_chg_text,
                    hoverlabel={"align": "left", "bgcolor": "white", "bordercolor": "#7f1d1d"},
-                   hovertemplate="<b>Watchlist changed %{x|%Y-%m-%d}</b>"
+                   hovertemplate="<b>Watchlist changed, executed %{x|%Y-%m-%d}</b>"
                                  "<br>portfolio $%{y:,.0f}<br>%{hovertext}"
                                  "<extra></extra>"),
         row=1, col=1,
