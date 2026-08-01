@@ -65,6 +65,8 @@ def _args(argv=None):
     p.add_argument("--extra-date", default="", help="insert an extra off-grid rebalance on this date")
     p.add_argument("--report", action="store_true",
                    help="write a markdown report to data/reports/ for each date curated on this run")
+    p.add_argument("--report-backfill", action="store_true",
+                   help="with --report: write one for EVERY curated date, not just this run's")
     return p.parse_args(argv)
 
 
@@ -242,34 +244,54 @@ def main(argv=None) -> int:
     (RUN / "_authors.json").write_text(json.dumps(authors, indent=1))
     print(f"\n=== {a.acronym} RESULT: {res['realized_return']*100:+.0f}% (final ${res['final_value']:,.0f}) | "
           f"SPY {res['benchmark_returns']['SPY']*100:+.0f}% | final {res['final_watchlist']}", file=sys.stderr)
+    # One markdown report per date curated on THIS run, only when --report is passed. Off by default
+    # because reporting belongs to the recommendation of record (FT), not to curation in general: CBS is
+    # a comparison portfolio and stays out of data/reports/. Same writer and format as the live
+    # `cli review` path, so every report reads the same wherever it fired from. The recommended weights
+    # come from the replay's own last rebalance block.
+    _want = _fresh
+    if a.report and a.report_backfill:      # every curated date, using each one's own decision + weights
+        _want = []
+        for _dd0, _arts0, _src0 in pools:
+            _cp0 = RUN / f"{_dd0}-curation.json"
+            if _cp0.exists():
+                _c0 = json.loads(_cp0.read_text())
+                _want.append((_dd0, _c0,
+                              {"applied_adds": [x.get("ticker") for x in _c0.get("adds") or []],
+                               "applied_removes": [x.get("ticker") for x in _c0.get("removes") or []]},
+                              len(_arts0)))
+    if _want and a.report:
+        try:
+            _rc = pd.read_csv(RUN / "_backtest" / "recommendations.csv")
+        except Exception:  # noqa: BLE001
+            _rc = None
+
+        def _rec_at(_when):
+            """The optimizer block for the rebalance this decision produced: the first recommendation
+            dated on/after the decision (execution can lag it by t_update_days), else the latest."""
+            if _rc is None or _rc.empty:
+                return {}
+            _sel = _rc[_rc["date"] >= _when]
+            _blk = _sel[_sel["date"] == _sel["date"].min()] if not _sel.empty else \
+                _rc[_rc["date"] == _rc["date"].max()]
+            return {"weights": {str(r.ticker): float(r.weight) for r in _blk.itertuples()},
+                    "sharpe_ratio": float(_blk["sharpe_ratio"].iloc[0]),
+                    "expected_annual_return": float(_blk["expected_return"].iloc[0]),
+                    "annual_volatility": float(_blk["annual_volatility"].iloc[0])}
+
+        for _dd, _cur, _app, _nart in _want:
+            _rec = _rec_at(_dd)
+            _rp = portfolio.write_review_report(
+                _dd, _cur, _app, _rec, _nart, news_lb, model,
+                label=f"{a.acronym.lower()}-curation", title=f"{a.heading} ({a.acronym}) curation")
+            print(f"  report: {_rp}", file=sys.stderr)
+
     portfolio.build_curator_dashboard(
         backtest_dir=str(RUN / "_backtest"), runs_dir=str(RUN), out_path=a.out,
         benchmarks=["SPY"], heading=a.heading, acronym=a.acronym, show_max_articles=False,
         handoff_date=HANDOFF, compare_backtest_dir=str(ROOT / SEED_SRC / "_backtest"),
         actual_csv=(a.actual_csv or None))
     print(f"  rendered {a.out}", file=sys.stderr)
-
-    # One markdown report per date curated on THIS run, only when --report is passed. Off by default
-    # because reporting belongs to the recommendation of record (FT), not to curation in general: CBS is
-    # a comparison portfolio and stays out of data/reports/. Same writer and format as the live
-    # `cli review` path, so every report reads the same wherever it fired from. The recommended weights
-    # come from the replay's own last rebalance block.
-    if _fresh and a.report:
-        _rec = {}
-        try:
-            _rc = pd.read_csv(RUN / "_backtest" / "recommendations.csv")
-            _last = _rc[_rc["date"] == _rc["date"].max()]
-            _rec = {"weights": {str(r.ticker): float(r.weight) for r in _last.itertuples()},
-                    "sharpe_ratio": float(_last["sharpe_ratio"].iloc[0]),
-                    "expected_annual_return": float(_last["expected_return"].iloc[0]),
-                    "annual_volatility": float(_last["annual_volatility"].iloc[0])}
-        except Exception:  # noqa: BLE001
-            pass
-        for _dd, _cur, _app, _nart in _fresh:
-            _rp = portfolio.write_review_report(
-                _dd, _cur, _app, _rec, _nart, news_lb, model,
-                label=f"{a.acronym.lower()}-curation", title=f"{a.heading} ({a.acronym}) curation")
-            print(f"  report: {_rp}", file=sys.stderr)
     return 0
 
 
