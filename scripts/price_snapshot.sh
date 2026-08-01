@@ -22,7 +22,7 @@ cd "$PROJ"
   .venv/bin/python scripts/refresh_cbs.py || echo "[$(date '+%Y-%m-%d %H:%M:%S')] CBS refresh failed (tolerated)"
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] FT refresh start"
   .venv/bin/python scripts/refresh_cbs.py --run-dir data/curator_runs/forward-ft --out docs/index.html \
-    --heading Forwardtest --acronym FT \
+    --heading Forwardtest --acronym FT --actual-csv data/snapshots.csv \
     || echo "[$(date '+%Y-%m-%d %H:%M:%S')] FT refresh failed (tolerated)"
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] done"
 } >> data/snapshot.log 2>&1

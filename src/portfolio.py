@@ -3784,6 +3784,7 @@ def build_curator_dashboard(
     show_max_articles: bool = True,
     handoff_date: str | None = None,
     compare_backtest_dir: str | None = None,
+    actual_csv: str | None = None,
 ) -> dict[str, Any]:
     """Render a single static HTML dashboard for one curator-backtest run.
 
@@ -3796,6 +3797,14 @@ def build_curator_dashboard(
 
     Also includes a small summary table of curation events. No interactive
     backend - this is one static HTML file readable by any browser.
+
+    ``actual_csv`` (forward paper portfolios only, e.g. FT): path to the REAL
+    ``data/snapshots.csv``. When given, the real portfolio's value is drawn on
+    chart 1 next to the paper replay, rescaled to meet it on their first common
+    date so the two are compared on RETURNS, not on absolute dollars (the real
+    book started at a different size). The gap between the lines is execution
+    drift: what following the recommendations would have produced vs what the
+    user's actual holdings did.
     """
     import plotly.graph_objects as go
     from plotly.subplots import make_subplots
@@ -3899,6 +3908,22 @@ def build_curator_dashboard(
                    mode="lines", line={"color": "#d97706", "width": 2.5}),
         row=1, col=1,
     )
+    # The user's REAL portfolio, when asked for (see actual_csv in the docstring). Rescaled to the paper
+    # curve at their first common date, so both lines start together and every later gap is execution
+    # drift rather than a difference in account size.
+    if actual_csv and Path(actual_csv).exists():
+        _act = pd.read_csv(actual_csv, parse_dates=["date"])
+        _act = _act.groupby("date")["total_value"].first().sort_index()
+        _act = _act[(_act.index >= start) & (_act.index <= end)]
+        _anchor = totals.asof(_act.index[0]) if len(_act) else float("nan")
+        if len(_act) > 1 and pd.notna(_anchor) and float(_act.iloc[0]) > 0:
+            _scale = float(_anchor) / float(_act.iloc[0])
+            fig.add_trace(
+                go.Scatter(x=_act.index, y=(_act * _scale).values, name="Actual (your holdings)",
+                           mode="lines", line={"color": "#111", "width": 1.8, "dash": "dot"},
+                           hovertemplate="%{x|%Y-%m-%d}<br>$%{y:,.0f} (rescaled)<extra></extra>"),
+                row=1, col=1,
+            )
     # Orange box on the curator curve at each quarterly rebalance (one per
     # curator call). y = curator portfolio value as of that date (asof picks
     # the nearest snapshot at/before the quarter-end). This single trace both

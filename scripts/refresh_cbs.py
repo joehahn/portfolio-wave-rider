@@ -35,6 +35,7 @@ def _args(argv=None):
     p.add_argument("--heading", default="Curator Bootstrap")
     p.add_argument("--acronym", default="CBS")
     p.add_argument("--handoff", default="2026-07-22", help="backtest -> forward news boundary marker")
+    p.add_argument("--actual-csv", default="", help="real snapshots.csv to overlay (FT only)")
     return p.parse_args(argv)
 
 
@@ -65,7 +66,7 @@ def main(argv=None) -> int:
     portfolio.build_curator_dashboard(
         backtest_dir=str(RUN / "_backtest"), runs_dir=str(RUN), out_path=a.out,
         benchmarks=["SPY"], heading=a.heading, acronym=a.acronym, show_max_articles=False,
-        handoff_date=a.handoff, compare_backtest_dir=_cmp_dir)
+        handoff_date=a.handoff, compare_backtest_dir=_cmp_dir, actual_csv=(a.actual_csv or None))
     print(f"  {a.acronym} refreshed to {starter['end_date']} -> {a.out}", file=sys.stderr)
     return 0
 

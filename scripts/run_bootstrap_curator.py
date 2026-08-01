@@ -55,6 +55,7 @@ def _args(argv=None):
     p.add_argument("--out", default="docs/curator_bootstrap.html")
     p.add_argument("--heading", default="Curator Bootstrap")
     p.add_argument("--acronym", default="CBS")
+    p.add_argument("--actual-csv", default="", help="real snapshots.csv to overlay (FT only)")
     p.add_argument("--dry-run", action="store_true")
     p.add_argument("--if-due", action="store_true")
     p.add_argument("--force", action="store_true")
@@ -215,7 +216,8 @@ def main(argv=None) -> int:
     portfolio.build_curator_dashboard(
         backtest_dir=str(RUN / "_backtest"), runs_dir=str(RUN), out_path=a.out,
         benchmarks=["SPY"], heading=a.heading, acronym=a.acronym, show_max_articles=False,
-        handoff_date=HANDOFF, compare_backtest_dir=str(ROOT / SEED_SRC / "_backtest"))
+        handoff_date=HANDOFF, compare_backtest_dir=str(ROOT / SEED_SRC / "_backtest"),
+        actual_csv=(a.actual_csv or None))
     print(f"  rendered {a.out}", file=sys.stderr)
     return 0
 
