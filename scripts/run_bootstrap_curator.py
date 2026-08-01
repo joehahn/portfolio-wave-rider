@@ -206,7 +206,11 @@ def main(argv=None) -> int:
             cur = curator.curate(ptext, cur_wl, as_of=dd, model=model, anthropic_cli=cli_a,
                                  max_size=ms, anchors=anchors,
                                  thesis=thesis, exclusions=excl, cadence=fm["rebalance_period"],
-                                 intro=curator.LIVE_INTRO, no_reasoning=True)
+                                 intro=curator.LIVE_INTRO, no_reasoning=True,
+                                 # token usage -> _log/<date>-curator.json, which is what the dashboard's
+                                 # "LLM cost" card sums; without it that card can only read n/a.
+                                 log_path=RUN / "_log" / f"{dd}-curator.json",
+                                 fail_dir=RUN / "_parse_fail")
             for _ in range(2):
                 chk = portfolio.apply_curator_decisions(cur, holdings_path=str(hold), history_path=str(hist),
                       profile_path="investor_profile.md", listing_check=False, as_of_date=dd,
@@ -216,9 +220,11 @@ def main(argv=None) -> int:
                     break
                 fb = "\n".join(f"- {x.get('ticker')} ({x.get('action')}): {x.get('reason')}" for x in rej)
                 cur = curator.curate(ptext, cur_wl, as_of=dd, model=model, anthropic_cli=cli_a,
-                                 max_size=ms, anchors=anchors,
+                                     max_size=ms, anchors=anchors,
                                      thesis=thesis, exclusions=excl, cadence=fm["rebalance_period"],
-                                     intro=curator.LIVE_INTRO, no_reasoning=True, retry_feedback=fb)
+                                     intro=curator.LIVE_INTRO, no_reasoning=True, retry_feedback=fb,
+                                     log_path=RUN / "_log" / f"{dd}-curator.json",
+                                     fail_dir=RUN / "_parse_fail")
             cur["as_of_date"] = dd
             cur_path.write_text(json.dumps(cur, indent=2))
         _applied = portfolio.apply_curator_decisions(

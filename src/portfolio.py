@@ -4568,27 +4568,44 @@ def build_curator_dashboard(
     _last_snap = snaps[snaps["date"] == snaps["date"].max()]
     _final_pos = sorted(_last_snap[_last_snap["value"] > 0]["ticker"].tolist())
 
-    def _card(v, label):
+    def _card(v, label, dim=False):
+        """dim=True greys the card and flags it: the figure is computed but not yet trustworthy."""
+        _col = "#9aa5ab" if dim else "#0b7285"
+        _star = '<span style="color:#c92a2a;font-size:.9em;" title="too few sessions to annualize">*</span>' if dim else ""
         return (f'<div style="display:inline-block;min-width:118px;margin:0 1.4em 0.8em 0">'
-                f'<b style="font-size:1.45em;color:#0b7285">{v}</b><br>'
-                f'<span style="font-size:.78em;color:#555">{_html.escape(label)}</span></div>')
+                f'<b style="font-size:1.45em;color:{_col}">{v}</b>{_star}<br>'
+                f'<span style="font-size:.78em;color:{"#9aa5ab" if dim else "#555"}">'
+                f'{_html.escape(label)}</span></div>')
     _nn = lambda x: x == x  # noqa: E731 (not-NaN)
+    # Annualized / risk-adjusted stats need a real sample. Under ~60 sessions (a quarter) they are
+    # arithmetic, not evidence: a +5% week annualizes past +600%. Show them, greyed and asterisked, so a
+    # short forward run cannot be read as a spectacular one.
+    _n_sessions = int(len(totals))
+    _thin = _n_sessions < 60
     cards_html = (
         '<h2 style="margin:1.4em 0 0.3em;">Summary</h2>'
         '<div style="margin:0.4em 0 0.6em">'
         + (_card(handoff_date, "backtest → WebSearch news handoff") if _show_handoff else "")
         + _card(f"{cur_return * 100:+.0f}%", "total return")
-        + _card(f"{_ann * 100:+.0f}%", "annualized")
+        + _card(f"{_ann * 100:+.0f}%", "annualized", dim=_thin)
         + _card(f"{_maxdd * 100:.0f}%", "max drawdown")
-        + _card(f"{_calmar:.2f}" if _nn(_calmar) else "n/a", "Calmar (ann / |DD|)")
-        + _card(f"{_ir:+.2f}" if _nn(_ir) else "n/a", "Info Ratio vs SPY")
-        + _card(f"{_tstat:+.1f}" if _nn(_tstat) else "n/a", "IR t-stat")
-        + _card(f"{_alpha * 100:+.0f}%" if _nn(_alpha) else "n/a", "ann. alpha vs SPY")
+        + _card(f"{_calmar:.2f}" if _nn(_calmar) else "n/a", "Calmar (ann / |DD|)", dim=_thin)
+        + _card(f"{_ir:+.2f}" if _nn(_ir) else "n/a", "Info Ratio vs SPY", dim=_thin)
+        + _card(f"{_tstat:+.1f}" if _nn(_tstat) else "n/a", "IR t-stat", dim=_thin)
+        + _card(f"{_alpha * 100:+.0f}%" if _nn(_alpha) else "n/a", "ann. alpha vs SPY", dim=_thin)
         + _card(f"{_n_add} / {_n_rem}", "adds / removes")
         + _card(str(len(_final_pos)), "final positions")
         + _card(f"${_cost:,.2f}" if _cost is not None else "n/a",
                 f"LLM cost ({_tin // 1000}K+{_tout // 1000}K tok)" if _cost is not None else "LLM cost")
         + '</div>'
+        + (f'<p style="color:#8a5a00;background:#fff8e6;border-left:3px solid #f0b429;padding:.45em .7em;'
+           f'max-width:820px;margin:.1em 0 .8em;font-size:13.5px;">'
+           f'<b style="color:#c92a2a;">*</b> Greyed cards annualize a {_n_sessions}-session window '
+           f'({totals.index[0].date()} to {totals.index[-1].date()}). Annualized return, Calmar, '
+           f'Information Ratio and alpha are arithmetically valid but statistically meaningless this '
+           f'early &mdash; a good fortnight extrapolates to a spectacular year. Read total return and max '
+           f'drawdown; treat the rest as placeholders until the window passes ~60 sessions.</p>'
+           if _thin else '')
     )
 
     # ---- Bootstrap-vs-backtest KPI table: the SAME canonical config scored two ways over the OVERLAPPING
@@ -5035,6 +5052,7 @@ def build_curator_dashboard(
     # 15. Latest recommended portfolio % — the optimizer's target weights at the final rebalance (mirrors the
     # live dashboard's plot 4), each bar colored by its wave. Read from the run's recommendations.csv.
     _latest_rec_html = ""
+    _reports_html = ""      # section 19; assembled inside the try below
     try:
         _rec = pd.read_csv(Path(backtest_dir) / "recommendations.csv")
         _lr = _rec[_rec["date"] == _rec["date"].max()]
@@ -5308,7 +5326,7 @@ def build_curator_dashboard(
                    '<p style="color:#555;max-width:820px;margin:0 0 .4em;">Enter what '
                    'you have to invest and the table gives the dollars and share count each funded ticker '
                    'implies at these weights. Recommendation only &mdash; nothing here places a trade.</p>'
-                   if _calc else '') + _calc + _reports_html)
+                   if _calc else '') + _calc)
     except Exception:  # noqa: BLE001
         pass
     # Intro news description: CBS (handoff_date set) is a backtest-news -> live-news SPLICE; CBT is plain
@@ -5396,7 +5414,8 @@ def build_curator_dashboard(
         + _author_html
         + _npa_html
         + _latest_rec_html
-        + search_html
+        + search_html          # 18. Curator decisions & search terms
+        + _reports_html        # 19. Curation reports
         + '</body></html>'
     )
     o = Path(out_path)
