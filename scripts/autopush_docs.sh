@@ -1,6 +1,7 @@
 #!/bin/bash
 # Stop-hook auto-push for doc and dashboard changes.
-# Scope: README.md and any *.md at repo root, plus docs/*.html.
+# Scope: README.md and any *.md at repo root, plus docs/*.html and docs/reports/*.html
+# (the browser-readable curation-report twins).
 # Skips .claude/, src/, scripts/, data/, etc.
 # Silent if nothing matches. Exits non-zero only on git failure.
 
@@ -12,7 +13,7 @@ shopt -s nullglob
 # Stage matching paths. Skip gitignored files (e.g., investor_profile.md).
 # git add is a no-op on unchanged files.
 staged=0
-for f in *.md docs/*.html; do
+for f in *.md docs/*.html docs/reports/*.html; do
   [ -e "$f" ] || continue
   git check-ignore -q -- "$f" && continue
   git add -- "$f"
