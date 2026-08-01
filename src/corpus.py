@@ -41,7 +41,8 @@ _TRACK = re.compile(r"^(utm_|fbclid|gclid|mc_|ref$|ref_|referrer|cmpid|ncid|mkt_
 # record is sighting-specific and goes to appearances.jsonl.
 _BODY_FIELDS = ("article_id", "url", "canonical_url", "source_domain", "publisher", "title", "author",
                 "published_date", "language", "snippet", "full_text", "extraction_ok", "content_hash",
-                "image_url", "tickers_mentioned", "first_pulled_at", "first_query", "first_wave")
+                "image_url", "tickers_mentioned", "first_pulled_at", "first_query", "first_wave",
+                "is_article")   # False = quote/landing page: stored, but never fed to a curator
 _APPEARANCE_FIELDS = ("article_id", "pull_id", "pulled_at", "query", "wave", "result_rank", "content_hash")
 
 
@@ -173,36 +174,6 @@ def _seen_ids() -> set[str]:
     return ids
 
 
-def append_pull(pull_id: str, pulled_at: str, retriever: str, retrieval_model: str,
-                sightings: list[dict[str, Any]], query_stats: dict[str, Any],
-                dry_run: bool = False) -> dict[str, Any]:
-    """Persist one pull. `sightings` = one dict per (result) sighting carrying both body and
-    sighting fields (built by the retriever). Dedups bodies by article_id, logs every appearance,
-    and writes a manifest row. Returns a summary dict.
-
-    With ``dry_run=True`` the dedup/counting runs exactly as normal (so the returned summary is
-    accurate) but nothing is written to the corpus files -- for a no-op preview of a pull."""
-    seen = _seen_ids()
-    new_bodies, appearances = [], []
-    n_new = 0
-    for s in sightings:
-        aid = s["article_id"]
-        appearances.append({k: s.get(k) for k in _APPEARANCE_FIELDS})
-        if aid not in seen:
-            new_bodies.append({k: s.get(k) for k in _BODY_FIELDS})
-            seen.add(aid)
-            n_new += 1
-    if not dry_run:
-        _append_jsonl(ARTICLES, new_bodies)
-        _append_jsonl(APPEARANCES, appearances)
-        manifest = {"pull_id": pull_id, "pulled_at": pulled_at, "retriever": retriever,
-                    "retrieval_model": retrieval_model, "n_sightings": len(sightings),
-                    "n_new_articles": n_new, "query_stats": query_stats}
-        _append_jsonl(PULLS, [manifest])
-    return {"pull_id": pull_id, "sightings": len(sightings), "new_articles": n_new,
-            "queries": len(query_stats), "corpus_articles": len(seen), "dry_run": dry_run}
-
-
 # Quote pages, ticker hubs and "latest news" landing pages are not articles: they carry a live price
 # widget and a boilerplate caption, no reporting, and their content changes every time anyone loads them.
 # They enter the corpus because a web_search hit looks like any other URL. Matched on URL shape and on the
@@ -233,6 +204,49 @@ def is_article(a: dict) -> bool:
     """False for quote/landing pages, which are noise in a curator's news pool."""
     return not (_NON_ARTICLE_URL.search(str(a.get("url") or ""))
                 or _NON_ARTICLE_TITLE.search(str(a.get("title") or "")))
+
+
+def append_pull(pull_id: str, pulled_at: str, retriever: str, retrieval_model: str,
+                sightings: list[dict[str, Any]], query_stats: dict[str, Any],
+                dry_run: bool = False) -> dict[str, Any]:
+    """Persist one pull. `sightings` = one dict per (result) sighting carrying both body and
+    sighting fields (built by the retriever). Dedups bodies by article_id, logs every appearance,
+    and writes a manifest row. Returns a summary dict.
+
+    With ``dry_run=True`` the dedup/counting runs exactly as normal (so the returned summary is
+    accurate) but nothing is written to the corpus files -- for a no-op preview of a pull."""
+    seen = _seen_ids()
+    new_bodies, appearances = [], []
+    n_new, n_nonart = 0, 0
+    nonart_by_wave: dict[str, int] = {}
+    for s in sightings:
+        aid = s["article_id"]
+        appearances.append({k: s.get(k) for k in _APPEARANCE_FIELDS})
+        if aid not in seen:
+            # Tag rather than drop: the archive stays complete and reversible (a filter bug can be fixed
+            # and every past pool re-derives), while read_slice keeps quote pages away from the curator.
+            # The per-wave tally is the signal that a wave's query itself needs rewording.
+            _ok = is_article(s)
+            body = {k: s.get(k) for k in _BODY_FIELDS}
+            body["is_article"] = _ok
+            new_bodies.append(body)
+            seen.add(aid)
+            n_new += 1
+            if not _ok:
+                n_nonart += 1
+                _w = str(s.get("first_wave") or s.get("wave") or "?")
+                nonart_by_wave[_w] = nonart_by_wave.get(_w, 0) + 1
+    if not dry_run:
+        _append_jsonl(ARTICLES, new_bodies)
+        _append_jsonl(APPEARANCES, appearances)
+        manifest = {"pull_id": pull_id, "pulled_at": pulled_at, "retriever": retriever,
+                    "retrieval_model": retrieval_model, "n_sightings": len(sightings),
+                    "n_new_articles": n_new, "n_new_non_article": n_nonart,
+                    "non_article_by_wave": nonart_by_wave, "query_stats": query_stats}
+        _append_jsonl(PULLS, [manifest])
+    return {"pull_id": pull_id, "sightings": len(sightings), "new_articles": n_new,
+            "new_non_article": n_nonart, "non_article_by_wave": nonart_by_wave,
+            "queries": len(query_stats), "corpus_articles": len(seen), "dry_run": dry_run}
 
 
 def read_slice(as_of: str, lookback_days: int) -> list[dict[str, Any]]:
