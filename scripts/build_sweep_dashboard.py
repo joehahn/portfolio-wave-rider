@@ -7,7 +7,7 @@ mean-variance REPLAY, not the curator, so we can grid them over the FIXED 2-year
 deterministic, the t-stat tests significance, a block-bootstrap gives an error bar, and an H1/H2 split
 flags whether the winner is a period artifact. Every row is an IN-SAMPLE hypothesis to forward-test.
 
-Usage: python scripts/build_sweep_dashboard.py [--runs-dir data/curator_runs/gkg-2yr-weekly]
+Usage: python scripts/build_sweep_dashboard.py [--runs-dir data/curator_runs/proto-mws16]
 """
 import argparse
 import json
@@ -25,8 +25,8 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 from src import portfolio  # noqa: E402
 
-# INTERIM COMPOUNDER REPOINT (titles+live geosplit proto runs, pending Wayback). Revert CAPS / MWS_SWEEP /
-# NLB_SWEEP / LLM_RUNS / --runs-dir to the gkg-3yr clean runs after the clean re-curation.
+# The proto-* geosplit runs ARE the clean re-curation and are canonical (confirmed 2026-07-31); the older
+# gkg-3yr-mws*/nlb* runs they replaced have been deleted, so there is no repoint pending.
 CAPS = [0.1, 0.25, 0.333, 0.5, 0.667, 0.8, 1.0]   # includes the canonical 0.333
 LAMBDAS = [0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0]   # FUTURE: prepend 0.1 when you want it swept (deferred per user)
 LOOKBACKS = [14, 30, 60, 90, 120, 150]          # calendar days (7d dropped: infeasible — ~5 trading days can't
@@ -62,17 +62,17 @@ MT_SWEEP_MWS = 20   # the min_trade-anchor watchlist size (already fully swept);
 BLUE, GREEN, RED, GREY = "#1f77b4", "#2b8a3e", "#c92a2a", "#adb5bd"
 
 # max_watchlist_size sweep (section 6): unlike cap/lambda/lookback, this knob changes the CURATOR's
-# decisions, so each cap is a separate RE-CURATION (LLM cost), not a free replay. cap 5 = the canonical
-# run; the rest are re-curated into gkg-3yr-mws{cap}. Tests whether more slots let the curator add NVDA.
+# decisions, so each size is a separate RE-CURATION (LLM cost), not a free replay. mws16 = the canonical
+# run; the rest are re-curated into proto-mws{n}. Tests whether more slots let the curator add NVDA.
 MWS_SWEEP = [(4, "data/curator_runs/proto-mws4"), (6, "data/curator_runs/proto-mws6"),
              (8, "data/curator_runs/proto-mws8"), (12, "data/curator_runs/proto-mws12"),
              (16, "data/curator_runs/proto-mws16"), (20, "data/curator_runs/proto-mws20"),
-             (24, "data/curator_runs/proto-mws24")]   # INTERIM: geosplit titles+live proto runs
+             (24, "data/curator_runs/proto-mws24")]   # geosplit re-curations; mws16 is the canonical
 
 # news_lookback_days sweep (section 7): also a CURATOR-param sweep (re-curation), but title-only (no Wayback/
-# live fetch) so it curates on the preserved GKG titles at zero network cost. Each window = a separate
-# re-curation into gkg-3yr-nlb{N}, all at the canonical mws=6 / cap1.0 / λ2.0 / 150d config.
-NLB_SWEEP = []   # INTERIM: no news_lookback re-curations on the geosplit proto runs yet (section 12 omitted)
+# live fetch) so it curates on the preserved GKG titles at zero network cost. Each window would be its own
+# re-curation at the canonical config; none exist on the geosplit runs yet.
+NLB_SWEEP = []   # no news_lookback re-curations exist on the geosplit runs, so section 12 is omitted
 
 
 def _mws_rows():
@@ -1156,7 +1156,7 @@ Current config: {_cur_l2:.0f}/yr.</p>
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("--runs-dir", default="data/curator_runs/proto-mws20")  # INTERIM canonical (mws20 geosplit titles+live)
+    ap.add_argument("--runs-dir", default="data/curator_runs/proto-mws16")  # the canonical run
     ap.add_argument("--out", default=str(ROOT / "docs" / "sweep_pwr.html"))
     ap.add_argument("--recompute", action="store_true", help="re-run the 150 backtests (else use cache)")
     a = ap.parse_args()
