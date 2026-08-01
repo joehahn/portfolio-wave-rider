@@ -12,7 +12,11 @@ htmlcov/
 .DS_Store
 *.log
 data_cache/
-data/reports/
+# reports: session artifacts stay private, but the FT/CBS curation reports are published (the
+# dashboards link them on GitHub). NB excluding `data/reports/` itself would make the negation a
+# no-op -- git cannot re-include a file inside an excluded DIRECTORY -- hence the /* form.
+data/reports/*
+!data/reports/*-curation.md
 data/wave_history.csv
 data/news/
 data/forward_corpus/
