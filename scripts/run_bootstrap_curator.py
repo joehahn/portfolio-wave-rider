@@ -21,7 +21,14 @@ that file (no LLM call, no cost); only dates missing one are curated. Flags:
   --dry-run  print the plan (dates, seed, pool sizes, which dates would be curated) and write nothing.
   --if-due   cron mode: exit immediately when every rebalance date already has a curation.
   --force    delete the pool + curation JSONs first and re-curate the whole window from scratch.
+
+PARAMETERIZED, so the same machinery drives both paper portfolios; they differ only in seed date and news
+source, which is what makes comparing them meaningful:
+  CBS (default) : --since 2026-04-22, backtest-tail GKG pools up to the handoff, forward corpus after.
+  FT            : --forward-only --since 2026-07-22 --run-dir .../forward-ft --out docs/forward_dashboard.html
+                  --heading Forwardtest --acronym FT   (no backtest news at all).
 """
+import argparse
 import json
 import sys
 from datetime import date, timedelta
@@ -33,17 +40,32 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 from src import corpus, curator, portfolio  # noqa: E402
 
-POOL_SRC = "data/curator_runs/gkg-3yr-geosplit"   # backtest-tail NEWS pools (current thesis; SAME as RBS)
-SEED_SRC = "data/curator_runs/proto-mws16"         # the CBT run: day-0 seed weights + starter watchlist come from here
-SINCE = "2026-04-22"       # 3-month backtest-tail start (matches RBS --since; ~3mo before the handoff)
-HANDOFF = "2026-07-22"     # backtest end / forward start (geosplit's last pool date)
-RUN = ROOT / "data" / "curator_runs" / "bootstrap-cbs"
+
+def _args(argv=None):
+    p = argparse.ArgumentParser(description="Curate a forward paper portfolio and render its dashboard.")
+    p.add_argument("--run-dir", default="data/curator_runs/bootstrap-cbs")
+    p.add_argument("--pool-src", default="data/curator_runs/gkg-3yr-geosplit",
+                   help="backtest-tail news pools (ignored with --forward-only)")
+    p.add_argument("--seed-src", default="data/curator_runs/proto-mws16",
+                   help="the canonical CBT run: day-0 seed weights + starter watchlist come from here")
+    p.add_argument("--since", default="2026-04-22", help="day-0 of the paper portfolio")
+    p.add_argument("--handoff", default="2026-07-22", help="last backtest-news date; forward corpus after it")
+    p.add_argument("--forward-only", action="store_true",
+                   help="read EVERY date from the live corpus (no backtest news); FT mode")
+    p.add_argument("--out", default="docs/curator_bootstrap.html")
+    p.add_argument("--heading", default="Curator Bootstrap")
+    p.add_argument("--acronym", default="CBS")
+    p.add_argument("--dry-run", action="store_true")
+    p.add_argument("--if-due", action="store_true")
+    p.add_argument("--force", action="store_true")
+    return p.parse_args(argv)
 
 
-def main() -> int:
-    dry = "--dry-run" in sys.argv
-    if_due = "--if-due" in sys.argv     # cron mode: do nothing unless a rebalance date lacks a curation
-    force = "--force" in sys.argv       # re-curate every date from scratch (throws away the LLM record)
+def main(argv=None) -> int:
+    a = _args(argv)
+    dry, if_due, force = a.dry_run, a.if_due, a.force
+    POOL_SRC, SEED_SRC, SINCE, HANDOFF = a.pool_src, a.seed_src, a.since, a.handoff
+    RUN = ROOT / a.run_dir
     RUN.mkdir(parents=True, exist_ok=True)
     if force and not dry:
         for f in list(RUN.glob("*-pool.json")) + list(RUN.glob("*-curation.json")):
@@ -57,32 +79,37 @@ def main() -> int:
     thesis = portfolio.load_wave_thesis()      # from investor_profile.md (canonical thesis)
     excl = portfolio.load_exclusions()
 
-    # --- Backtest-tail pools: canon14's own biweekly pools in [SINCE, HANDOFF] (14d Wayback news baked in).
-    bt_pools = []
-    for f in sorted((ROOT / POOL_SRC).glob("*-pool.json")):
-        d = f.stem.replace("-pool", "")
-        if SINCE <= d <= HANDOFF:
-            bt_pools.append((d, json.loads(f.read_text()).get("articles", []), "gkg-wayback"))
-    if not bt_pools:
-        print(f"no geosplit pools in [{SINCE}, {HANDOFF}]", file=sys.stderr)
-        return 1
-
-    # --- Forward dates: biweekly continuation from the last backtest date up to today, each read as a
-    #     trailing news_lb window over the live forward corpus (empty until the first forward biweekly date).
-    last_bt = date.fromisoformat(bt_pools[-1][0])
     end = date.today()
+    # --- Backtest-tail pools: the canonical run's own biweekly pools in [SINCE, HANDOFF] (14d Wayback news
+    #     baked in). FT skips these entirely: --forward-only reads every date from the live corpus.
+    bt_pools = []
+    if not a.forward_only:
+        for f in sorted((ROOT / POOL_SRC).glob("*-pool.json")):
+            d = f.stem.replace("-pool", "")
+            if SINCE <= d <= HANDOFF:
+                bt_pools.append((d, json.loads(f.read_text()).get("articles", []), "gkg-wayback"))
+        if not bt_pools:
+            print(f"no pools in [{SINCE}, {HANDOFF}] under {POOL_SRC}", file=sys.stderr)
+            return 1
+
+    # --- Forward dates: biweekly, each read as a trailing news_lb window over the live corpus. In
+    #     --forward-only mode the timeline STARTS at SINCE; otherwise it continues from the last
+    #     backtest-tail date (and is empty until the first forward biweekly date arrives).
     fw_pools = []
-    d = last_bt + timedelta(days=14)
+    d = date.fromisoformat(SINCE) if a.forward_only else date.fromisoformat(bt_pools[-1][0]) + timedelta(days=14)
     while d <= end:
         fw_pools.append((d.isoformat(), corpus.read_slice(d.isoformat(), news_lb), "websearch"))
         d += timedelta(days=14)
 
     pools = bt_pools + fw_pools     # already chronological
     dates = [dd for dd, _, _ in pools]
+    if not dates:
+        print(f"no rebalance dates in [{SINCE}, {end}]", file=sys.stderr)
+        return 1
 
-    # --- Seed: CBT (canon14) RECOMMENDED weights on the nearest rebalance <= SINCE (the portfolio in effect
-    #     when the CBS starts). Anchors (e.g. IAU) stay in the seed weights; they are dropped from the
-    #     curator's starter watchlist (they are optimizer anchors, not curator-managed tickers).
+    # --- Seed: the canonical CBT run's RECOMMENDED weights on the nearest rebalance <= SINCE (the portfolio
+    #     in effect when this paper portfolio starts). Anchors (e.g. IAU) stay in the seed weights; they are
+    #     dropped from the curator's starter watchlist (optimizer anchors, not curator-managed tickers).
     recs = pd.read_csv(ROOT / SEED_SRC / "_backtest" / "recommendations.csv", parse_dates=["date"])
     seed_date = recs[recs.date <= pd.Timestamp(SINCE)]["date"].max()
     seed = recs[(recs["date"] == seed_date) & (recs["weight"] > 1e-6)]
@@ -101,8 +128,8 @@ def main() -> int:
     done = {f.stem.replace("-curation", "") for f in RUN.glob("*-curation.json")}
     missing = [dd for dd in dates if dd not in done]
 
-    print(f"CBS plan: {len(bt_pools)} backtest-tail (biweekly GKG) + {len(fw_pools)} forward (WebSearch) "
-          f"= {len(dates)} rebalances, {len(missing)} needing curation", file=sys.stderr)
+    print(f"{a.acronym} plan: {len(bt_pools)} backtest-tail (biweekly GKG) + {len(fw_pools)} forward "
+          f"(WebSearch) = {len(dates)} rebalances, {len(missing)} needing curation", file=sys.stderr)
     print(f"  window {dates[0]} -> {dates[-1]} (biweekly)  | seed @ {seed_date.date()}: {initial_weights}",
           file=sys.stderr)
     print(f"  starter watchlist: {starter}", file=sys.stderr)
@@ -174,17 +201,17 @@ def main() -> int:
         min_trade_frac=float(fm["min_trade_size_frac"]))
     authors = {}
     for pf in RUN.glob("*-pool.json"):
-        for a in json.loads(pf.read_text()).get("articles", []):
-            if a.get("author"):
-                authors.setdefault(a.get("url", ""), a["author"])
+        for art in json.loads(pf.read_text()).get("articles", []):   # NB: not `a` -- that is the arg namespace
+            if art.get("author"):
+                authors.setdefault(art.get("url", ""), art["author"])
     (RUN / "_authors.json").write_text(json.dumps(authors, indent=1))
-    print(f"\n=== CBS RESULT: {res['realized_return']*100:+.0f}% (final ${res['final_value']:,.0f}) | "
+    print(f"\n=== {a.acronym} RESULT: {res['realized_return']*100:+.0f}% (final ${res['final_value']:,.0f}) | "
           f"SPY {res['benchmark_returns']['SPY']*100:+.0f}% | final {res['final_watchlist']}", file=sys.stderr)
     portfolio.build_curator_dashboard(
-        backtest_dir=str(RUN / "_backtest"), runs_dir=str(RUN), out_path="docs/curator_bootstrap.html",
-        benchmarks=["SPY"], heading="Curator Bootstrap", acronym="CBS", show_max_articles=False,
+        backtest_dir=str(RUN / "_backtest"), runs_dir=str(RUN), out_path=a.out,
+        benchmarks=["SPY"], heading=a.heading, acronym=a.acronym, show_max_articles=False,
         handoff_date=HANDOFF, compare_backtest_dir=str(ROOT / SEED_SRC / "_backtest"))
-    print("  rendered docs/curator_bootstrap.html", file=sys.stderr)
+    print(f"  rendered {a.out}", file=sys.stderr)
     return 0
 
 
