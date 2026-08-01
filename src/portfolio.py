@@ -5497,20 +5497,31 @@ def write_review_report(date, decision, apply_res, rec, n_articles, lookback, mo
             _lede = re.sub(r"\s+", " ", _lede)
             if len(_lede) > 300:
                 _lede = _lede[:300].rsplit(" ", 1)[0] + "…"
+            # Provenance, straight off the record's own shape: a GKG/backtest article carries lede_source
+            # (wayback | live | none); a forward-corpus one carries the web_search query it arrived on and
+            # its lede is whatever trafilatura extracted at ingest.
+            _is_gkg = "lede_source" in _a or "score" in _a
+            _harvest = "gkg" if _is_gkg else "websearch"
+            _ledesrc = (str(_a.get("lede_source") or "none") if _is_gkg
+                        else ("ingest-fetch" if _lede else "none"))
             _rows.append({
                 "date": str(_a.get("date") or _a.get("published_date") or "")[:10],
                 "title": str(_a.get("title") or "").strip(),
                 "source": str(_a.get("source") or _a.get("source_domain") or "").strip(),
                 "author": str(_a.get("author") or "").strip(),
+                "harvest": _harvest, "ledesrc": _ledesrc,
                 "lede": _lede, "url": _u})
         _rows.sort(key=lambda r: r["date"], reverse=True)
 
         def _cite(r):
-            """One article: date · source · byline · linked title, with the lede indented beneath."""
+            """One article: date · source · byline · linked title, then provenance and the lede beneath.
+            Provenance = how it was harvested (websearch | gkg) and where its lede came from
+            (wayback = archived as-of text, live/ingest-fetch = fetched from today's page, none)."""
             _head = " · ".join(x for x in (f"**{r['date'] or 'undated'}**", r["source"], r["author"]) if x)
             _ttl = r["title"] or r["url"] or "(untitled)"
             _line = f"- {_head} · [{_ttl}]({r['url']})" if r["url"] else f"- {_head} · {_ttl}"
-            return _line + (f"\n  {r['lede']}" if r["lede"] else "\n  _(no lede captured)_")
+            _tag = f"`{r['harvest']}` · lede: `{r['ledesrc']}`"
+            return _line + f"\n  {_tag}" + (f" — {r['lede']}" if r["lede"] else " — _(no lede captured)_")
         # Articles the curator actually cited (news_evidence on any add or remove) are listed openly; the
         # rest of the pool is real context but would bury them, so it folds into a <details> block --
         # GitHub renders that inline, so nothing is truncated and nothing is lost.
