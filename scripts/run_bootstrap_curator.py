@@ -59,6 +59,9 @@ def _args(argv=None):
     p.add_argument("--dry-run", action="store_true")
     p.add_argument("--if-due", action="store_true")
     p.add_argument("--force", action="store_true")
+    p.add_argument("--rebalance-now", action="store_true",
+                   help="insert an EXTRA off-grid rebalance today, on top of the regular cadence")
+    p.add_argument("--extra-date", default="", help="insert an extra off-grid rebalance on this date")
     return p.parse_args(argv)
 
 
@@ -105,7 +108,25 @@ def main(argv=None) -> int:
         fw_pools.append((d.isoformat(), corpus.read_slice(d.isoformat(), news_lb), "websearch"))
         d += timedelta(days=14)
 
-    pools = bt_pools + fw_pools     # already chronological
+    # Off-grid manual rebalances. These are EXTRA dates merged into the regular cadence, never a
+    # replacement for it: the biweekly grid still runs from SINCE, so a scheduled date keeps firing on
+    # schedule. They persist in _starter.json (`manual_dates`) because this script rewrites that file on
+    # every run, and `curator_backtest` globs the curation JSONs, so a merged date replays like any other.
+    _prev_manual = []
+    _sp = RUN / "_starter.json"
+    if _sp.exists():
+        try:
+            _prev_manual = list(json.loads(_sp.read_text()).get("manual_dates") or [])
+        except Exception:  # noqa: BLE001
+            pass
+    _manual = sorted({*_prev_manual, *([end.isoformat()] if a.rebalance_now else []),
+                      *([a.extra_date] if a.extra_date else [])})
+    _grid = {dd for dd, _, _ in bt_pools + fw_pools}
+    for _md in _manual:
+        if _md not in _grid and _md <= end.isoformat():
+            fw_pools.append((_md, corpus.read_slice(_md, news_lb), "websearch"))
+
+    pools = sorted(bt_pools + fw_pools, key=lambda r: r[0])
     dates = [dd for dd, _, _ in pools]
     if not dates:
         print(f"no rebalance dates in [{SINCE}, {end}]", file=sys.stderr)
@@ -158,6 +179,7 @@ def main(argv=None) -> int:
          "lookback_years": fm["optimizer_lookback_days"] / 365.0,
          "max_watchlist_size": ms, "start_date": dates[0], "end_date": end.isoformat(),
          "initial_weights": initial_weights, "naive_benchmark": naive_benchmark,
+         "manual_dates": _manual,              # off-grid rebalances, re-merged on every later run
          "seed_src": SEED_SRC}, indent=2))     # remember the CBT run so the daily refresh can build the KPI table
     hist = RUN / "_wf_history.csv"
     hist.write_text("date,action,ticker,wave_bucket,rationale,news_evidence_urls\n")
