@@ -4410,7 +4410,7 @@ def build_curator_dashboard(
         search_html = (
             "<details id='curator-decisions' style='margin-top:2em;'>"
             "<summary style='cursor:pointer;font-size:1.5em;font-weight:bold;color:#111;'>"
-            "16. Curator decisions &amp; search terms</summary>"
+            "17. Curator decisions &amp; search terms</summary>"
             f"<p style='color:#555;max-width:780px;'>One row per {_html.escape(_cadence)} rebalance. "
             "Click to expand the curator's overall rationale, each add/remove with its reason, the cited "
             "<code>news_evidence</code> links, and the wave keywords behind that rebalance's pool "
@@ -5186,7 +5186,8 @@ def build_curator_dashboard(
                 f'rebalance. Each ticker&#39;s wave is labelled beneath it and sets the bar colour. '
                 f'Red dotted line = the concentration_cap ({_rcap:.0%}).{_clock}{_hint}</p>'
                 + _bar_html + _modal
-                + ('<p style="color:#555;max-width:820px;margin:1em 0 .2em;"><b>Position sizes.</b> Enter what '
+                + ('<h2 style="margin:1.6em 0 0.2em;">16. Position sizes</h2>'
+                   '<p style="color:#555;max-width:820px;margin:0 0 .4em;">Enter what '
                    'you have to invest and the table gives the dollars and share count each funded ticker '
                    'implies at these weights. Recommendation only &mdash; nothing here places a trade.</p>'
                    if _calc else '') + _calc)
