@@ -265,6 +265,14 @@ def main(argv: list[str] | None = None) -> int:
                                       f"{fm['rebalance_period']} cadence, need {_pd}d)"}))
                     return 0
             anchors = fm.get("always_include", [])
+            # The live curation stream was retired on 2026-08-01 (FT is the recommendation of record), so
+            # watchlist.csv no longer exists by default. Fail with an instruction instead of a traceback.
+            if not Path("watchlist.csv").exists():
+                raise SystemExit(
+                    "watchlist.csv not found. The live review stream is retired -- the Forwardtest (FT) "
+                    "paper portfolio is the recommendation of record, curated by "
+                    "scripts/run_bootstrap_curator.py. To use `review` anyway, recreate watchlist.csv "
+                    "(one `ticker` column) or seed it with `init-holdings`.")
             all_tk = pd.read_csv("watchlist.csv")["ticker"].astype(str).str.upper().tolist()
             watchlist = [t for t in all_tk if t not in anchors]      # anchors sit outside max_watchlist_size
             lookback = args.news_lookback or fw["news_lookback_days"]
