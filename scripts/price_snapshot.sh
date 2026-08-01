@@ -20,9 +20,9 @@ cd "$PROJ"
   # Live-extend each paper portfolio's equity curve with today's prices. Render-only: re-replays the
   # FIXED curation JSONs through the optimizer and re-renders -- no LLM call, no cost. Tolerated on failure.
   .venv/bin/python scripts/refresh_cbs.py || echo "[$(date '+%Y-%m-%d %H:%M:%S')] CBS refresh failed (tolerated)"
-  echo "[$(date '+%Y-%m-%d %H:%M:%S')] FT refresh start"
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] CFT refresh start"
   .venv/bin/python scripts/refresh_cbs.py --run-dir data/curator_runs/forward-ft --out docs/index.html \
-    --heading Forwardtest --acronym FT --actual-csv data/snapshots.csv \
-    || echo "[$(date '+%Y-%m-%d %H:%M:%S')] FT refresh failed (tolerated)"
+    --heading 'Curator Forwardtest' --acronym CFT --actual-csv data/snapshots.csv \
+    || echo "[$(date '+%Y-%m-%d %H:%M:%S')] CFT refresh failed (tolerated)"
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] done"
 } >> data/snapshot.log 2>&1

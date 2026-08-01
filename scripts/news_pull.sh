@@ -14,5 +14,9 @@ cd "$PROJ"
   # Lives here (not the 16:30 snapshot job) because RBS visualizes the news corpus this job just wrote.
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] RBS refresh start"
   .venv/bin/python scripts/build_bootstrap_dashboard.py || echo "[$(date '+%Y-%m-%d %H:%M:%S')] RBS refresh failed (tolerated)"
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] RFT refresh start"
+  # Retriever Forwardtest: ingest health of the live feed this job just extended. Render-only.
+  .venv/bin/python scripts/build_forward_retrieval_dashboard.py \
+    || echo "[$(date '+%Y-%m-%d %H:%M:%S')] RFT refresh failed (tolerated)"
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] news pull done"
 } >> data/snapshot.log 2>&1

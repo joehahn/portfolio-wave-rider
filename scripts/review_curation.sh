@@ -29,11 +29,11 @@ cd "$PROJ"
   .venv/bin/python scripts/run_bootstrap_curator.py --if-due \
     || echo "[$(date '+%Y-%m-%d %H:%M:%S')] CBS curation failed (tolerated)"
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] CBS curation done"
-  echo "[$(date '+%Y-%m-%d %H:%M:%S')] FT curation (if due) start"
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] CFT curation (if due) start"
   .venv/bin/python scripts/run_bootstrap_curator.py --if-due --forward-only --blend-backtest-news \
     --since 2026-07-22 \
     --run-dir data/curator_runs/forward-ft --out docs/index.html \
-    --heading Forwardtest --acronym FT --actual-csv data/snapshots.csv --report \
-    || echo "[$(date '+%Y-%m-%d %H:%M:%S')] FT curation failed (tolerated)"
-  echo "[$(date '+%Y-%m-%d %H:%M:%S')] FT curation done"
+    --heading 'Curator Forwardtest' --acronym CFT --actual-csv data/snapshots.csv --report \
+    || echo "[$(date '+%Y-%m-%d %H:%M:%S')] CFT curation failed (tolerated)"
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] CFT curation done"
 } >> data/snapshot.log 2>&1
