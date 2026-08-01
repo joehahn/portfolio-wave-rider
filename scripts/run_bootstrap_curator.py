@@ -76,6 +76,9 @@ def main(argv=None) -> int:
     ms = int(fm["max_watchlist_size"])
     news_lb = int(fm["news_lookback_days"])
     model = portfolio.load_forward_config().get("curator_model") or "moonshotai/kimi-k2.5"
+    # claude-* routes through the Anthropic SDK and REQUIRES a client; without it every call raises
+    # AttributeError, burns the retry budget, and silently degrades to a no_changes curation.
+    cli_a = curator.anthropic_client() if model.startswith("claude") else None
     thesis = portfolio.load_wave_thesis()      # from investor_profile.md (canonical thesis)
     excl = portfolio.load_exclusions()
 
@@ -171,7 +174,8 @@ def main(argv=None) -> int:
             tag = "curated"
             cur_wl = portfolio.reconstruct_watchlist_at(dd, starter, str(hist))
             ptext = curator.format_pool(arts)
-            cur = curator.curate(ptext, cur_wl, as_of=dd, model=model, max_size=ms, anchors=anchors,
+            cur = curator.curate(ptext, cur_wl, as_of=dd, model=model, anthropic_cli=cli_a,
+                                 max_size=ms, anchors=anchors,
                                  thesis=thesis, exclusions=excl, cadence=fm["rebalance_period"],
                                  intro=curator.LIVE_INTRO, no_reasoning=True)
             for _ in range(2):
@@ -182,7 +186,8 @@ def main(argv=None) -> int:
                 if not rej:
                     break
                 fb = "\n".join(f"- {x.get('ticker')} ({x.get('action')}): {x.get('reason')}" for x in rej)
-                cur = curator.curate(ptext, cur_wl, as_of=dd, model=model, max_size=ms, anchors=anchors,
+                cur = curator.curate(ptext, cur_wl, as_of=dd, model=model, anthropic_cli=cli_a,
+                                 max_size=ms, anchors=anchors,
                                      thesis=thesis, exclusions=excl, cadence=fm["rebalance_period"],
                                      intro=curator.LIVE_INTRO, no_reasoning=True, retry_feedback=fb)
             cur["as_of_date"] = dd
