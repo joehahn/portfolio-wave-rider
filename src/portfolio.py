@@ -3890,14 +3890,14 @@ def build_curator_dashboard(
         rows=5, cols=1, vertical_spacing=0.06,
         row_heights=[0.22, 0.24, 0.13, 0.12, 0.17],
         subplot_titles=(
-            "2. Realized portfolio value: curator vs baselines vs benchmark",
-            "3. Watchlist composition over time — translucent = watchlisted, solid = funded by optimizer (color = wave bucket)",
-            "4. Cumulative $ gain per holding",
-            "5. Cumulative $ gain per wave bucket",
-            "6. Actual portfolio $ by wave over time",
+            "1. Realized portfolio value: curator vs baselines vs benchmark",
+            "2. Watchlist composition over time — translucent = watchlisted, solid = funded by optimizer (color = wave bucket)",
+            "3. Cumulative $ gain per holding",
+            "4. Cumulative $ gain per wave bucket",
+            "5. Actual portfolio $ by wave over time",
         ),
     )
-    # Style plots 2-6's subplot titles to match the HTML <h2> of plots 7+ (bold, #111, left-aligned, larger).
+    # Style plots 1-5's subplot titles to match the HTML <h2> of the sections below (bold, #111, left, larger).
     # At this point fig.layout.annotations holds exactly the 5 subplot titles (nothing else added yet).
     for _st in fig.layout.annotations:
         _st.update(font={"size": 18, "color": "#111"}, x=0.0, xanchor="left", text=f"<b>{_st.text}</b>")
@@ -4325,7 +4325,7 @@ def build_curator_dashboard(
                 f"<td>{_nret or '—'}</td></tr>"
             )
         log_html = (
-            "<h2 style='margin-top:2em;'>1. Curation log</h2>"
+            "<h2 style='margin-top:2em;'>6. Curation log</h2>"
             f"<p style='color:#555;'>The {_n_active} of {len(log)} {_html.escape(_cadence)} curator calls "
             "that made a change (no-change rebalances are hidden). The <em>Rejections</em> column lists each "
             "add/remove the validator dropped as invalid, as <code>TICKER (action)</code> — hover for the "
@@ -5184,8 +5184,9 @@ def build_curator_dashboard(
         + _cmp_html
         + params_html
         + forward_html
-        + log_html
-        + chart_html
+        + chart_html          # plots 1-5 (equity curve first)
+        + log_html            # 6. Curation log -- sits AFTER the charts it explains
+
         + extra_html
         + _nps_html
         + _author_html
