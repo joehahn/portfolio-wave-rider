@@ -5124,6 +5124,53 @@ def build_curator_dashboard(
                     'else setTimeout(a,150);})();</script>')
             _hint = (" Click any bar to open that ticker&#39;s price history (1Y / 3Y toggle)."
                      if _tkhist else "")
+            # holdings.csv, inlined as a small collapsible table (browsing a linked .csv just triggers a
+            # download prompt). Prices reuse the histories already fetched above; a ticker with no fetched
+            # history shows shares only. Missing/empty file -> nothing rendered.
+            _holdings_html = ""
+            try:
+                _hf = pd.read_csv("holdings.csv")
+                _hf = _hf[pd.to_numeric(_hf["shares"], errors="coerce").fillna(0) > 0]
+                if not _hf.empty:
+                    # Held tickers are often OUTSIDE the recommendation (that is the whole point of the
+                    # comparison), so fetch any the chart did not already price. Failures just leave a dash.
+                    _hpx: dict[str, float] = {}
+                    for _tk3 in {str(t).upper() for t in _hf["ticker"]} - set(_tkhist):
+                        try:
+                            _c3 = fetch_prices([_tk3], period="1y").iloc[:, 0].dropna()
+                            if len(_c3):
+                                _hpx[_tk3] = float(_c3.iloc[-1])
+                        except Exception:  # noqa: BLE001
+                            pass
+                    _hrows, _htot = [], 0.0
+                    for _r in _hf.itertuples():
+                        _tk2 = str(_r.ticker).upper()
+                        _px2 = (float(_tkhist[_tk2]["y"][-1]) if _tk2 in _tkhist
+                                else _hpx.get(_tk2))
+                        _v2 = (float(_r.shares) * _px2) if _px2 else None
+                        _htot += _v2 or 0.0
+                        _hrows.append((_tk2, float(_r.shares), _px2, _v2))
+                    _hbody = "".join(
+                        f'<tr style="border-bottom:1px solid #eee;"><td style="padding:5px;"><b>{t}</b></td>'
+                        f'<td style="padding:5px;">{sh:,.4f}</td>'
+                        f'<td style="padding:5px;">{("$%.2f" % px) if px else "&mdash;"}</td>'
+                        f'<td style="padding:5px;">{("$" + format(v, ",.0f")) if v else "&mdash;"}</td>'
+                        f'<td style="padding:5px;">{(("%.1f%%" % (100 * v / _htot)) if v and _htot else "&mdash;")}'
+                        f'</td></tr>' for t, sh, px, v in _hrows)
+                    _holdings_html = (
+                        '<details style="margin:.6em 0 0;max-width:820px;"><summary style="cursor:pointer;'
+                        'color:#555;font-size:14px;">Your actual holdings (<code>holdings.csv</code>) '
+                        f'&mdash; {len(_hrows)} position(s), ${_htot:,.0f}</summary>'
+                        '<p style="color:#777;font-size:13px;margin:.4em 0 .2em;">Edit that file after you '
+                        'trade; the next daily snapshot picks up the new share counts.</p>'
+                        '<table style="border-collapse:collapse;width:100%;font-size:14px;">'
+                        '<thead><tr style="border-bottom:2px solid #ccc;text-align:left;">'
+                        '<th style="padding:5px;">Ticker</th><th style="padding:5px;">Shares</th>'
+                        '<th style="padding:5px;">Price</th><th style="padding:5px;">Value</th>'
+                        '<th style="padding:5px;">% of book</th></tr></thead>'
+                        f'<tbody>{_hbody}</tbody></table></details>')
+            except Exception:  # noqa: BLE001
+                pass
             # 15b. Position-size calculator: enter a portfolio $ and get the per-ticker $ and share counts
             # implied by the recommended weights. Pure client-side arithmetic on values embedded at render
             # (weight from the optimizer, last close from the same 3Y history the click-popup uses), so the
@@ -5186,13 +5233,10 @@ def build_curator_dashboard(
                 f'rebalance. Each ticker&#39;s wave is labelled beneath it and sets the bar colour. '
                 f'Red dotted line = the concentration_cap ({_rcap:.0%}).{_clock}{_hint}</p>'
                 + _bar_html
-                # Live paper portfolios only (CBS/FT): a hop to the user's own holdings file, so recording a
-                # trade is one click from the recommendation. Relative to docs/, so it resolves when the page
-                # is opened from the working copy; on GitHub Pages it 404s by design, holdings.csv is private.
-                + ('<p style="color:#555;max-width:820px;margin:.5em 0 0;font-size:14px;">After you trade, '
-                   'record the new share counts in <a href="../holdings.csv">holdings.csv</a> '
-                   '<span style="color:#888;">(your local file, never published)</span>.</p>'
-                   if handoff_date else '')
+                # Live paper portfolios only (CBS/FT): what you actually hold, inlined from holdings.csv so
+                # it READS in the page. A plain link to the .csv makes the browser offer a download instead
+                # of showing it. NB this embeds the real share counts in a published file.
+                + (_holdings_html if handoff_date else '')
                 + _modal
                 + ('<h2 style="margin:1.6em 0 0.2em;">16. Position sizes</h2>'
                    '<p style="color:#555;max-width:820px;margin:0 0 .4em;">Enter what '
