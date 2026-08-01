@@ -21,6 +21,7 @@ that file (no LLM call, no cost); only dates missing one are curated. Flags:
   --dry-run  print the plan (dates, seed, pool sizes, which dates would be curated) and write nothing.
   --if-due   cron mode: exit immediately when every rebalance date already has a curation.
   --force    delete the pool + curation JSONs first and re-curate the whole window from scratch.
+  --report   write data/reports/<date>-<acronym>-curation.md for each date curated on this run.
 
 PARAMETERIZED, so the same machinery drives both paper portfolios; they differ only in seed date and news
 source, which is what makes comparing them meaningful:
@@ -62,8 +63,8 @@ def _args(argv=None):
     p.add_argument("--rebalance-now", action="store_true",
                    help="insert an EXTRA off-grid rebalance today, on top of the regular cadence")
     p.add_argument("--extra-date", default="", help="insert an extra off-grid rebalance on this date")
-    p.add_argument("--no-report", action="store_true",
-                   help="skip the markdown report that every fresh curation writes by default")
+    p.add_argument("--report", action="store_true",
+                   help="write a markdown report to data/reports/ for each date curated on this run")
     return p.parse_args(argv)
 
 
@@ -248,10 +249,12 @@ def main(argv=None) -> int:
         actual_csv=(a.actual_csv or None))
     print(f"  rendered {a.out}", file=sys.stderr)
 
-    # One markdown report per date curated on THIS run (cron and manual alike; --no-report opts out).
-    # Same writer and format as the live `cli review` path, so every curation reads the same wherever it
-    # fired from. The recommended weights come from the replay's own last rebalance block.
-    if _fresh and not a.no_report:
+    # One markdown report per date curated on THIS run, only when --report is passed. Off by default
+    # because reporting belongs to the recommendation of record (FT), not to curation in general: CBS is
+    # a comparison portfolio and stays out of data/reports/. Same writer and format as the live
+    # `cli review` path, so every report reads the same wherever it fired from. The recommended weights
+    # come from the replay's own last rebalance block.
+    if _fresh and a.report:
         _rec = {}
         try:
             _rc = pd.read_csv(RUN / "_backtest" / "recommendations.csv")
