@@ -209,8 +209,11 @@ def test_fetch_benchmark_curves_returns_empty_on_yfinance_failure(monkeypatch) -
 def test_fetch_prices_min_history_excludes_recent_ipo(monkeypatch) -> None:
     """A days-old IPO must be dropped before the join so it can't truncate the
     seasoned tickers' estimation window (the SPCX failure mode)."""
-    # ~2.4y of business days ending today, so a 1.5y lookback lands inside.
-    dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=600)
+    # ~2.4y of business days ending on the last business day, so a 1.5y lookback lands inside.
+    # NB: roll back to a weekday first -- bdate_range(end=<a Sat/Sun>) returns periods-1 rows,
+    # which used to make this test fail only on weekends.
+    _end = pd.tseries.offsets.BDay().rollback(pd.Timestamp.today().normalize())
+    dates = pd.bdate_range(end=_end, periods=600)
     seasoned = pd.DataFrame(
         {"AAA": np.linspace(100, 160, 600), "BBB": np.linspace(50, 90, 600)},
         index=dates,
