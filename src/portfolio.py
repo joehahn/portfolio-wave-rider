@@ -4021,7 +4021,11 @@ def build_curator_dashboard(
     # Align plot 2's (equity curve, row 1) x-axis with the [start, end] range used by the other time-axis
     # subplots (row 2 Gantt, row 5 wave-area) so dates — and the handoff line — line up vertically down the stack.
     fig.update_xaxes(range=[start, end], row=1, col=1)
-    if handoff_date:   # CBS: mark the backtest -> forward news handoff on the equity curve. add_vline's own
+    # A handoff marker only means something when there IS backtest news to the left of it. FT's handoff
+    # equals its start date (forward-only), so the line and the 'backtest <- | -> forward news' label
+    # would sit on the y-axis describing a side of the chart that does not exist: suppress it there.
+    _show_handoff = bool(handoff_date) and pd.Timestamp(handoff_date) > start
+    if _show_handoff:   # CBS: mark the backtest -> forward news handoff on the equity curve. add_vline's own
         # annotation breaks on a datetime axis (it averages Timestamps), so draw the line + label separately.
         fig.add_vline(x=pd.Timestamp(handoff_date), line={"dash": "dot", "color": "#888", "width": 1.5},
                       row=1, col=1)
@@ -4204,7 +4208,7 @@ def build_curator_dashboard(
     fig.update_yaxes(title_text="$", tickformat="$,.0f", row=5, col=1)
     fig.update_xaxes(range=[start, end], row=5, col=1)
 
-    if handoff_date:   # plots 3 (Gantt row 2) and 6 (wave-area row 5): draw the handoff marker now that every
+    if _show_handoff:   # plots 3 (Gantt row 2) and 6 (wave-area row 5): draw the handoff marker now that every
         # subplot axis exists, so each shape resolves to its own x-axis (x2, x5) instead of falling back to x.
         for _r in (2, 5):
             fig.add_vline(x=pd.Timestamp(handoff_date), line={"dash": "dot", "color": "#888", "width": 1.5},
@@ -4572,7 +4576,7 @@ def build_curator_dashboard(
     cards_html = (
         '<h2 style="margin:1.4em 0 0.3em;">Summary</h2>'
         '<div style="margin:0.4em 0 0.6em">'
-        + (_card(handoff_date, "backtest → WebSearch news handoff") if handoff_date else "")
+        + (_card(handoff_date, "backtest → WebSearch news handoff") if _show_handoff else "")
         + _card(f"{cur_return * 100:+.0f}%", "total return")
         + _card(f"{_ann * 100:+.0f}%", "annualized")
         + _card(f"{_maxdd * 100:.0f}%", "max drawdown")
@@ -4693,7 +4697,7 @@ def build_curator_dashboard(
     _af.update_layout(template="seaborn", height=400, margin={"t": 20, "l": 80, "r": 30},  # l=80 matches the
                       yaxis={"title": "% of portfolio", "range": [0, 100]},                # main fig so plot 7's
                       xaxis={"range": [start, end]})                                       # x-axis aligns with plot 6
-    if handoff_date:   # plot 7: mark the backtest -> forward news handoff (same dotted line as plots 2/3/6)
+    if _show_handoff:   # plot 7: mark the backtest -> forward news handoff (same dotted line as plots 2/3/6)
         _af.add_vline(x=pd.Timestamp(handoff_date), line={"dash": "dot", "color": "#888", "width": 1.5})
 
     # (b) Gains vs news source / vs keyword: each add's forward price return (add -> next remove / end),
@@ -5191,13 +5195,17 @@ def build_curator_dashboard(
     # Intro news description: CBS (handoff_date set) is a backtest-news -> live-news SPLICE; CBT is plain
     # backtest news. The old intro hardcoded the GKG+Wayback (backtest-only) description for both, which
     # misdescribed the CBS's whole reason to exist.
-    if handoff_date:
+    if _show_handoff:
         _pool_line = (
             f'Before the {handoff_date} handoff (dotted line in chart&nbsp;2) each pool is the backtest&#39;s '
             f'GDELT&nbsp;GKG + Wayback pool (look-ahead-reduced); after it, the live WebSearch forward corpus, '
             f'the same news path <code>/review-portfolio</code> consumes with real money. This backtest-news '
             f'to live-news splice is the point of the CBS; see the <a href="retrieval_bootstrap.html">RBS</a> '
             f'for the news-side view of the same transition. ')
+    elif handoff_date:      # forward-only run (FT): every pool is live WebSearch, no backtest side
+        _pool_line = ('Each pool is the live WebSearch forward corpus for the preceding window &mdash; no '
+                      'backtest news is used; see the <a href="retrieval_bootstrap.html">RBS</a> for the '
+                      'news-side view. ')
     else:
         _pool_line = ('Each pool is built upstream from GDELT&nbsp;GKG + Wayback (look-ahead-reduced); browse '
                       'them in the <a href="pool_browser.html">pool browser</a>. ')
@@ -5206,7 +5214,7 @@ def build_curator_dashboard(
     # segment past the dotted line isn't misread as "the forward regime". The "next due" date uses the median
     # rebalance gap so no cadence->days constant is hardcoded.
     _forward_note = ""
-    if handoff_date:
+    if _show_handoff:
         _reb = (sorted(pd.Timestamp(x) for x in rebalance_dates) if rebalance_dates
                 else sorted(pd.Timestamp(p.stem.replace("-curation", ""))
                             for p in Path(runs_dir).glob("*-curation.json")))
