@@ -5185,7 +5185,15 @@ def build_curator_dashboard(
                 f'left unfunded: the curator judged them worth watching, the math did not fund them this '
                 f'rebalance. Each ticker&#39;s wave is labelled beneath it and sets the bar colour. '
                 f'Red dotted line = the concentration_cap ({_rcap:.0%}).{_clock}{_hint}</p>'
-                + _bar_html + _modal
+                + _bar_html
+                # Live paper portfolios only (CBS/FT): a hop to the user's own holdings file, so recording a
+                # trade is one click from the recommendation. Relative to docs/, so it resolves when the page
+                # is opened from the working copy; on GitHub Pages it 404s by design, holdings.csv is private.
+                + ('<p style="color:#555;max-width:820px;margin:.5em 0 0;font-size:14px;">After you trade, '
+                   'record the new share counts in <a href="../holdings.csv">holdings.csv</a> '
+                   '<span style="color:#888;">(your local file, never published)</span>.</p>'
+                   if handoff_date else '')
+                + _modal
                 + ('<h2 style="margin:1.6em 0 0.2em;">16. Position sizes</h2>'
                    '<p style="color:#555;max-width:820px;margin:0 0 .4em;">Enter what '
                    'you have to invest and the table gives the dollars and share count each funded ticker '
