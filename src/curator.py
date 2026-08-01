@@ -90,13 +90,54 @@ def _llm_complete(model: str, system: str, user: str, max_tokens: int, anthropic
     return txt, u.get("prompt_tokens", 0), u.get("completion_tokens", 0)
 
 
+def _repair_json(block: str) -> str:
+    """Repair the two ways a model breaks JSON when a string value holds prose.
+
+    1. A literal newline/tab inside a string (it wrote markdown bullets, not \\n escapes).
+    2. An unescaped double quote inside a string (it quoted a headline).
+
+    Walk the text tracking string state. A quote inside a string is treated as CLOSING only when the
+    next non-space character is one of ,:}] or end-of-text; otherwise it is escaped as content. That
+    heuristic is what a human reader does, and it is only ever applied as a fallback after a plain
+    json.loads has already failed."""
+    out, in_str, esc = [], False, False
+    for i, ch in enumerate(block):
+        if esc:
+            out.append(ch)
+            esc = False
+            continue
+        if ch == "\\" and in_str:
+            out.append(ch)
+            esc = True
+            continue
+        if ch == '"':
+            if not in_str:
+                in_str = True
+                out.append(ch)
+                continue
+            nxt = next((c for c in block[i + 1:] if not c.isspace()), "")
+            if nxt in (",", ":", "}", "]", ""):
+                in_str = False
+                out.append(ch)
+            else:
+                out.append('\\"')          # a quote inside prose
+            continue
+        if in_str and ch in "\n\r\t":
+            out.append({"\n": "\\n", "\r": "\\r", "\t": "\\t"}[ch])
+            continue
+        out.append(ch)
+    return "".join(out)
+
+
 def _try_parse(txt: str) -> "dict | None":
-    """Extract the curator's JSON object, tolerating a trailing-comma emission. Side-effect-free."""
+    """Extract the curator's JSON object, tolerating a trailing-comma emission and raw newlines inside
+    string values. Side-effect-free."""
     m = re.search(r"\{.*\}", txt, re.S)
     if not m:
         return None
     block = m.group(0)
-    for cand in (block, re.sub(r",(\s*[}\]])", r"\1", block)):
+    _nocomma = re.sub(r",(\s*[}\]])", r"\1", block)
+    for cand in (block, _nocomma, _repair_json(block), _repair_json(_nocomma)):
         try:
             return json.loads(cand)
         except json.JSONDecodeError:
@@ -173,7 +214,7 @@ def build_user_prompt(as_of: str, watchlist: list[str], thesis: str, exclusions:
 news_pool (read it, discover US-listed wave tickers with real catalysts, DISCARD the noise):
 {pool_text}
 
-{action_rule} In rationale_overall, note what noise you filtered. Emit ONLY the JSON object per your output schema."""
+{action_rule} Write rationale_overall as markdown bullets, ONE PER WAVE ('- **wave**: ...'), covering every wave the pool spoke to (including no-action ones), naming the specific tickers and facts and the noise you filtered, and closing with a '- **verdict**: ...' bullet. It is ONE JSON string: separate the bullets with \\n escapes, and use single quotes inside it -- a raw newline or a bare double quote breaks the payload. Emit ONLY the JSON object per your output schema."""
 
 
 def curate(pool_text: str, watchlist: list[str], *, as_of: str, model: str, thesis: str, exclusions: str,

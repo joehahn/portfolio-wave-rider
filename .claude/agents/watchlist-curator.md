@@ -129,7 +129,7 @@ Emit one JSON object as your final message. No surrounding prose, no markdown co
     }
   ],
   "no_changes": false,
-  "rationale_overall": "One short paragraph summarizing the net effect on the watchlist's thematic shape and how it reflects the profile's wave thesis.",
+  "rationale_overall": "Markdown bullets, ONE PER WAVE you assessed this window, each starting with the wave name in bold followed by a colon -- e.g. \"- **nuclear**: <what the news showed, what you did about it and why>\". Cover every wave the pool spoke to, including the ones you took no action on, and name the specific tickers and facts. Close with a final \"- **verdict**: ...\" bullet giving the net effect on the watchlist's thematic shape and how it reflects the profile's wave thesis. Do not write one long paragraph.",
   "search_terms": ["space stocks", "nuclear stocks", "robotics stocks", "quantum computing stocks", "biggest stock gainers", "best performing etf this month", "RKLB recent news", "NUKZ recent news"]
 }
 ```
