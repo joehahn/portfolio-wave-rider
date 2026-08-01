@@ -5280,11 +5280,10 @@ def build_curator_dashboard(
                 f'rebalance. Each ticker&#39;s wave is labelled beneath it and sets the bar colour. '
                 f'Red dotted line = the concentration_cap ({_rcap:.0%}).{_clock}{_hint}</p>'
                 + _bar_html
-                # Live paper portfolios only (CBS/FT): what you actually hold, inlined from holdings.csv so
-                # it READS in the page. A plain link to the .csv makes the browser offer a download instead
-                # of showing it. NB this embeds the real share counts in a published file.
-                + (_holdings_html if handoff_date else '')
+
                 + _modal + _trades_html
+                # the holdings table closes section 16: the trades above are what moves THIS book
+                + (_holdings_html if handoff_date else '')
                 + ('<h2 style="margin:1.6em 0 0.2em;">17. Position sizes</h2>'
                    '<p style="color:#555;max-width:820px;margin:0 0 .4em;">Enter what '
                    'you have to invest and the table gives the dollars and share count each funded ticker '
