@@ -4825,6 +4825,17 @@ def build_curator_dashboard(
         _seed_pnl = sum(_gain_by_ticker.get(t, 0.0) for t in _seed_only)
         for _dct in (_src_ret, _author_ret, _kw_ret, _ledesrc_ret):
             _dct["seed (CBT inheritance)"].append(_seed_pnl)
+    # Inherited-watchlist bucket: tickers the optimizer FUNDED that this run neither added nor seeded --
+    # they arrived on the starter watchlist from the seeding CBT run. Without this bucket their P&L (often
+    # the bulk of a seeded run's gains) is invisible in every attribution plot, so the charts can read as
+    # all-losses while the equity curve is up. Anchors are excluded: they come from the profile, not curation.
+    _anchor_tk = {str(t).upper() for t in (load_financial_model().get("always_include") or [])}
+    _inherited = [t for t, _v in _gain_by_ticker.items()
+                  if t not in _added_tk and t not in _seed_tk and t not in _anchor_tk and abs(_v) > 1e-9]
+    if _inherited:
+        _inh_pnl = sum(_gain_by_ticker.get(t, 0.0) for t in _inherited)
+        for _dct in (_src_ret, _author_ret, _kw_ret, _ledesrc_ret):
+            _dct["inherited (CBT watchlist)"].append(_inh_pnl)
 
     # universe padding: show configured items that produced ZERO with a 0 bar (like the retriever DB) —
     # recognized desks (news_sources.md) for the source plots, all wave keywords for the keyword plot.
@@ -4918,14 +4929,25 @@ def build_curator_dashboard(
 
     # (b2) gain PER ARTICLE: |value| on a LOG axis (sign shown by color, not position), so the wide
     # spread of densities is readable; biggest losers sink to the bottom (ascending signed sort).
-    _gpa = {s: sum(rets) / len(_pool_src[s]) for s, rets in _src_ret.items() if len(_pool_src.get(s, ()))}
+    # The two synthetic buckets (seed / inherited) have no pool-article footprint, so a per-article rate is
+    # undefined for them; plot their TOTAL P&L instead and label it, rather than dropping them and leaving
+    # a chart of nothing but the curator's adds (which can be all-red while the portfolio is up).
+    _SYNTH_BUCKETS = ("seed (CBT inheritance)", "inherited (CBT watchlist)")
+    _gpa = {}
+    for _s2, _rets2 in _src_ret.items():
+        _n2 = len(_pool_src.get(_s2, ()))
+        if _n2:
+            _gpa[_s2] = sum(_rets2) / _n2
+        elif _s2 in _SYNTH_BUCKETS:
+            _gpa[_s2] = sum(_rets2)
     _gain_per_art = ""
     if _gpa:
         _rws = sorted(((k, v, len(_pool_src.get(k, ()))) for k, v in _gpa.items()), key=lambda r: r[1])
         _mags = [abs(r[1]) for r in _rws]
         _floor = (min([m for m in _mags if m > 0] or [0.01])) * 0.5   # keep log(0) safe
         _f = go.Figure(go.Bar(x=[m if m > 0 else _floor for m in _mags],
-                              y=[f"{r[0]} ({r[2]} art.)" for r in _rws], orientation="h",
+                              y=[f"{r[0]} ({r[2]} art.)" if r[2] else f"{r[0]} (total P&L)"
+                                 for r in _rws], orientation="h",
                               marker_color=["#2b8a3e" if r[1] >= 0 else "#c92a2a" for r in _rws],
                               customdata=[r[1] for r in _rws],
                               hovertemplate="%{y}: $%{customdata:,.0f} per article signed<extra></extra>"))
@@ -4939,12 +4961,16 @@ def build_curator_dashboard(
     from collections import Counter as _Ctr
     _pool_ls = _Ctr(_ledesrc_by_key.values())
     _ls_lab = {"wayback": "clean Wayback lede", "live": "live-fallback lede", "none": "title only"}
-    _lsr = sorted(((_ls_lab.get(_k, _k), sum(_v) / _pool_ls[_k], len(_v), _pool_ls[_k])
-                   for _k, _v in _ledesrc_ret.items() if _pool_ls.get(_k)), key=lambda r: r[1])
+    _lsr = sorted(((_ls_lab.get(_k, _k),
+                    (sum(_v) / _pool_ls[_k]) if _pool_ls.get(_k) else sum(_v),
+                    len(_v), _pool_ls.get(_k, 0))
+                   for _k, _v in _ledesrc_ret.items()
+                   if _pool_ls.get(_k) or _k in _SYNTH_BUCKETS), key=lambda r: r[1])
     _gain_ledesrc = ""
     if _lsr:
         _lsf = go.Figure(go.Bar(
-            x=[r[1] for r in _lsr], y=[f"{r[0]} ({r[3]} art.)" for r in _lsr],
+            x=[r[1] for r in _lsr],
+            y=[f"{r[0]} ({r[3]} art.)" if r[3] else f"{r[0]} (total P&L)" for r in _lsr],
             orientation="h", marker_color=["#2b8a3e" if r[1] >= 0 else "#c92a2a" for r in _lsr],
             customdata=[r[2] for r in _lsr],
             hovertemplate="%{y}: $%{x:,.0f} per article (n=%{customdata} adds)<extra></extra>"))
@@ -4966,8 +4992,11 @@ def build_curator_dashboard(
                  'divided by how many articles that source contributed to the pools (its footprint, shown as '
                  '<code>N&nbsp;art.</code>). Signal <b>density</b>: high = a source that produced gains from '
                  'few articles; near-zero/negative with many articles = low-signal, a block-list candidate. '
-                 'The day-0 seed (CBT inheritance) has no pool-article footprint, so it is dropped here: these '
-                 'bars reflect the curator&#39;s news-sourced adds only, not the inherited seed&#39;s P&amp;L.</p>')
+                 'Two bars are not per-article rates: <b>seed (CBT inheritance)</b> (the day-0 weights this run '
+                 'started from) and <b>inherited (CBT watchlist)</b> (tickers the optimizer funded that this run '
+                 'never added, arriving on the starter watchlist). Neither has a pool-article footprint, so they '
+                 'show TOTAL $ P&amp;L and are labelled as such &mdash; without them the chart would show only the '
+                 'curator&#39;s own adds, which can read as all-losses while the portfolio is up.</p>')
     _author_note = ('<p style="color:#555;max-width:820px;margin:0 0 .4em;">Plot&nbsp;8\'s realized <b>$ P&amp;L</b> '
                     'per add, but bucketed by the article <b>author</b> (byline extracted from each cited evidence URL) '
                     'instead of the source domain. Which reporters surfaced winning picks. n = number of adds; a '
