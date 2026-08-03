@@ -217,7 +217,9 @@ def build(corpus_dir: str, out: Path) -> None:
     fig.add_annotation(x=_cut, y=0.92, yref="y domain", yanchor="top", xanchor="right",
                        text=f"older than news_lookback_days = {_news_lb} ", showarrow=False,
                        font={"size": 11, "color": RED}, row=6, col=1)
-    fig.update_xaxes(title_text="days between publication and pull (older &larr; &rarr; fresher)",
+    # NB literal arrows, not HTML entities: plotly renders axis titles as SVG text and would print
+    # "&larr;" verbatim.
+    fig.update_xaxes(title_text="days between publication and pull   ← older · fresher →",
                      row=6, col=1)
     fig.update_yaxes(title_text="articles", row=6, col=1)
     for _st in fig.layout.annotations[:_n_titles]:
