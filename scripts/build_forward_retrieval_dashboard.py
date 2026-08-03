@@ -33,6 +33,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 sys.path.insert(0, str(ROOT))
 import dash_nav  # noqa: E402
 from src import corpus as _corpus  # noqa: E402  is_article / clean_lede: the SAME predicates the curator sees
+from src import portfolio as _pf  # noqa: E402  news_lookback_days, so the window marker is profile-driven
 
 BLUE, GREEN, ORANGE, RED, GREY = "#1f77b4", "#2ca02c", "#ff7f0e", "#e03131", "#adb5bd"
 CURATOR_RUNS = ("forward-ft", "bootstrap-cbs")   # run dirs whose pools are fed by this corpus
@@ -90,6 +91,21 @@ def build(corpus_dir: str, out: Path) -> None:
     lede_by_day = Counter((a.get("first_pulled_at") or "")[:10] for a in arts if a["_lede"])
     auth_by_day = Counter((a.get("first_pulled_at") or "")[:10] for a in arts if (a.get("author") or "").strip())
 
+    # ---- age at pull = first_pulled_at - published_date. A search hit is NOT necessarily fresh: the
+    # engine returns whatever ranks, so this is the distribution of how stale the feed's material is.
+    # Anything older than news_lookback_days is stored but then filtered out of every pool by read_slice.
+    ages = []
+    for a in arts:
+        try:
+            ages.append((date.fromisoformat((a.get("first_pulled_at") or "")[:10])
+                         - date.fromisoformat((a.get("published_date") or "")[:10])).days)
+        except Exception:  # noqa: BLE001 - one of the two dates is missing/unparseable
+            pass
+    _news_lb = int(_pf.load_financial_model().get("news_lookback_days") or 14)
+    _cap = 30
+    age_bins = [str(i) for i in range(_cap + 1)] + [f">{_cap}"]
+    age_counts = [sum(1 for x in ages if x == i) for i in range(_cap + 1)] + [sum(1 for x in ages if x > _cap)]
+
     # ---- pools actually fed to curations (what read_slice returned, per run dir)
     pool_rows = []
     for run in CURATOR_RUNS:
@@ -102,13 +118,14 @@ def build(corpus_dir: str, out: Path) -> None:
                               j.get("as_of_date") or f.stem[:10], int(j.get("n_articles") or 0)))
 
     fig = make_subplots(
-        rows=5, cols=1, vertical_spacing=0.075,
+        rows=6, cols=1, vertical_spacing=0.065,
         subplot_titles=(
             "1. Articles seen per day, and how many were new",
             "2. Non-articles ingested per day",
             "3. Body-text and byline capture rate",
             "4. Articles per wave",
             "5. Pool size per curation",
+            "6. Article age when pulled",
         ))
 
     # 1. new vs sightings
@@ -150,7 +167,7 @@ def build(corpus_dir: str, out: Path) -> None:
                                      mode="lines+markers", line={"color": colour},
                                      legend="legend3"), row=5, col=1)
 
-    fig.update_layout(template="seaborn", height=1500, barmode="overlay",
+    fig.update_layout(template="seaborn", height=1780, barmode="overlay",
                       margin={"t": 60, "l": 70, "r": 190, "b": 60})
     # One legend PER SUBPLOT, parked to the right of its own rows. A single shared legend listed every
     # trace in the figure next to chart 1, which read as though ledes/bylines/pools belonged there.
@@ -171,6 +188,15 @@ def build(corpus_dir: str, out: Path) -> None:
     fig.update_yaxes(title_text="% of the day's new articles", range=[0, 100], row=3, col=1)
     fig.update_yaxes(title_text="articles", row=4, col=1)
     fig.update_yaxes(title_text="articles in pool", row=5, col=1)
+    fig.add_trace(go.Bar(x=age_bins, y=age_counts, marker_color=BLUE, showlegend=False,
+                         hovertemplate="%{x} day(s) old: %{y} articles<extra></extra>"), row=6, col=1)
+    # the curator's window: everything to the right of this line is ingested but never read
+    fig.add_vline(x=_news_lb + 0.5, row=6, col=1, line={"dash": "dash", "color": RED, "width": 1.5})
+    fig.add_annotation(x=_news_lb + 0.5, y=1.0, yref="y6 domain", yanchor="bottom", xanchor="left",
+                       text=f" news_lookback_days = {_news_lb}", showarrow=False,
+                       font={"size": 11, "color": RED}, row=6, col=1)
+    fig.update_xaxes(title_text="days between publication and pull", row=6, col=1)
+    fig.update_yaxes(title_text="articles", row=6, col=1)
     for _st in fig.layout.annotations:
         _st.update(font={"size": 16, "color": "#111"}, x=0.0, xanchor="left", text=f"<b>{_st.text}</b>")
 
@@ -196,6 +222,10 @@ def build(corpus_dir: str, out: Path) -> None:
              + _card(f"{n_non}", "non-articles dropped", warn=n_non / n_art > 0.05)
              + _card(last_gap, "missed pull days", warn=bool(gaps))
              + _card(f"{sum(1 for d in span if pulls_by_day.get(d, 0) > 1)}", "days with >1 pull")
+             + _card(f"{sorted(ages)[len(ages) // 2]}d" if ages else "n/a", "median age at pull")
+             + _card(f"{100 * sum(1 for x in ages if x > _news_lb) / len(ages):.0f}%" if ages else "n/a",
+                     f"older than the {_news_lb}d window",
+                     warn=bool(ages) and sum(1 for x in ages if x > _news_lb) / len(ages) > 0.30)
              + "</div>")
 
     body = (
