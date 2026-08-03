@@ -255,13 +255,20 @@ def read_slice(as_of: str, lookback_days: int) -> list[dict[str, Any]]:
     to its ``first_pulled_at`` (pull date) so recent-but-undated news is not lost, and is flagged with
     ``date_is_pull_fallback: True`` (a per-slice copy -- the stored record is never mutated). The flag lets
     downstream count how often the fallback fired (``sum(a.get("date_is_pull_fallback") for a in slice)``);
-    read_slice also logs that count. Articles with neither a publish nor a pull date are skipped."""
+    read_slice also logs that count. Articles with neither a publish nor a pull date are skipped.
+
+    An article is ALSO excluded when it was first pulled after ``as_of``: publishing before the decision
+    date is not enough, the retriever had to have actually harvested it by then. This is a no-op on a live
+    run (today's pulls are always <= today) and bites only on a REPLAY of a past rebalance, where the
+    corpus has since grown -- without it, replaying 2026-07-22 handed the curator 180 articles when the
+    corpus held 18 that day. That is retrieval look-ahead, and it is exactly what the forward test exists
+    to rule out. Records with no ``first_pulled_at`` (e.g. blended backtest-pool articles) are unaffected."""
     from datetime import date, timedelta
     if not ARTICLES.exists():
         return []
     end = date.fromisoformat(as_of)
     start = end - timedelta(days=lookback_days)
-    out, n_fallback, n_nonart, n_undated = [], 0, 0, 0
+    out, n_fallback, n_nonart, n_undated, n_unpulled = [], 0, 0, 0, 0
     for line in ARTICLES.read_text(encoding="utf-8").splitlines():
         if not line.strip():
             continue
@@ -277,6 +284,11 @@ def read_slice(as_of: str, lookback_days: int) -> list[dict[str, Any]]:
             except Exception:  # noqa: BLE001 - no usable date at all
                 continue
         if start < d <= end:
+            # Harvested by as_of? (see docstring: blocks retrieval look-ahead when replaying a past date)
+            _pulled = (a.get("first_pulled_at") or "")[:10]
+            if _pulled and _pulled > as_of:
+                n_unpulled += 1
+                continue
             if not is_article(a):        # quote page / ticker hub, not reporting
                 n_nonart += 1
                 continue
@@ -291,9 +303,10 @@ def read_slice(as_of: str, lookback_days: int) -> list[dict[str, Any]]:
                 a = {**a, "date_is_pull_fallback": True}
                 n_fallback += 1
             out.append(a)
-    if n_fallback or n_nonart or n_undated:
+    if n_fallback or n_nonart or n_undated or n_unpulled:
         print(f"read_slice({as_of}, {lookback_days}d): {len(out)} articles"
               + (f", {n_fallback} used a pull-date fallback (no publish date)" if n_fallback else "")
               + (f", {n_nonart} quote/landing pages dropped" if n_nonart else "")
-              + (f", {n_undated} undated-and-textless dropped" if n_undated else ""), file=sys.stderr)
+              + (f", {n_undated} undated-and-textless dropped" if n_undated else "")
+              + (f", {n_unpulled} not yet harvested on this date" if n_unpulled else ""), file=sys.stderr)
     return out

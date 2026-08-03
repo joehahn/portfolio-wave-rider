@@ -583,3 +583,30 @@ def test_effective_ticker_wave_falls_back_when_log_missing(tmp_path) -> None:
     # No curation_history.csv -> the map is just the static TICKER_WAVE.
     m = portfolio._effective_ticker_wave(history_path=str(tmp_path / "nope.csv"))
     assert m == portfolio.TICKER_WAVE
+
+
+def test_read_slice_excludes_articles_not_yet_harvested(tmp_path, monkeypatch) -> None:
+    # A REPLAY of a past rebalance must see only what the retriever had actually pulled by then.
+    # Publishing before the decision date is not enough: an article harvested afterwards was not
+    # available to curate on, and admitting it is retrieval look-ahead (the forward test's whole point).
+    from src import corpus
+
+    articles = tmp_path / "articles.jsonl"
+    articles.write_text(
+        # in window, pulled BEFORE the as-of date -> admitted
+        '{"article_id":"a","url":"https://x.com/a","title":"A","published_date":"2026-07-20",'
+        '"first_pulled_at":"2026-07-21T10:00:00","snippet":"real body text here"}\n'
+        # in window by publish date, but pulled AFTER the as-of date -> excluded
+        '{"article_id":"b","url":"https://x.com/b","title":"B","published_date":"2026-07-20",'
+        '"first_pulled_at":"2026-07-25T10:00:00","snippet":"real body text here"}\n'
+        # pulled on the as-of date itself -> admitted (boundary is inclusive)
+        '{"article_id":"c","url":"https://x.com/c","title":"C","published_date":"2026-07-19",'
+        '"first_pulled_at":"2026-07-22T18:00:00","snippet":"real body text here"}\n'
+        # no first_pulled_at at all (a blended backtest-pool article) -> unaffected by the ceiling
+        '{"article_id":"d","url":"https://x.com/d","title":"D","published_date":"2026-07-18",'
+        '"snippet":"real body text here"}\n',
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(corpus, "ARTICLES", articles)
+    got = {a["article_id"] for a in corpus.read_slice("2026-07-22", 14)}
+    assert got == {"a", "c", "d"}, got

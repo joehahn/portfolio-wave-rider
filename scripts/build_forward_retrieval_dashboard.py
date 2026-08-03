@@ -104,7 +104,6 @@ def build(corpus_dir: str, out: Path) -> None:
         except Exception:  # noqa: BLE001 - one of the two dates is missing/unparseable
             pass
     _news_lb = int(_pf.load_financial_model().get("news_lookback_days") or 14)
-    _max_articles = int(_pf.load_backtest_config().get("max_articles") or 0)   # plot 5's cap line
     _cap = 24                       # everything this old or older collapses into one overflow bin
     # oldest on the LEFT, freshest on the right: the eye then travels toward "today", and the
     # news_lookback_days line reads as a cutoff with the unusable material behind it.
@@ -120,6 +119,11 @@ def build(corpus_dir: str, out: Path) -> None:
             try:
                 j = json.loads(f.read_text())
             except Exception:  # noqa: BLE001
+                continue
+            # Only pools THIS corpus fed. CBS re-curates every period back to its 2026-04-27 seed, but
+            # those early pools were built by the backtest's gkg-wayback retriever -- plotting them here
+            # implied the WebSearch corpus reached back to April, when it starts at the 07-22 handoff.
+            if "websearch" not in str(j.get("source") or ""):
                 continue
             pool_rows.append((label, j.get("as_of_date") or f.stem[:10], int(j.get("n_articles") or 0)))
 
@@ -172,21 +176,14 @@ def build(corpus_dir: str, out: Path) -> None:
     _w = wave_n.most_common()
     fig.add_trace(go.Bar(x=[w for w, _ in _w], y=[n for _, n in _w], marker_color=BLUE,
                          showlegend=False), row=4, col=1)
-    # 5. pools per curation. The dashed cap explains the flat CBS run: max_articles truncates a
-    # BACKTEST-retrieval pool, so CBS pinned at the cap means "saturated", not "steady supply". The
-    # forward retriever sets its own result count, so the cap does not bind CFT.
+    # 5. pools per curation. No max_articles cap line here: that knob truncates BACKTEST-retrieval pools,
+    # and every pool plotted above is fed by the forward WebSearch corpus, which sets its own result count.
     for run, colour in (("CFT", BLUE), ("CBS", ORANGE)):
         rows = sorted((r for r in pool_rows if r[0] == run), key=lambda r: r[1])
         if rows:
             fig.add_trace(go.Scatter(x=[r[1] for r in rows], y=[r[2] for r in rows], name=f"{run} pool",
                                      mode="lines+markers", line={"color": colour},
                                      legend="legend3"), row=5, col=1)
-    if pool_rows and _max_articles:
-        _px = sorted({r[1] for r in pool_rows})
-        fig.add_trace(go.Scatter(x=[_px[0], _px[-1]], y=[_max_articles] * 2,
-                                 name=f"max_articles={_max_articles}<br>(backtest pools)",
-                                 mode="lines", line={"color": GREY, "dash": "dash", "width": 1.5},
-                                 hoverinfo="skip", legend="legend3"), row=5, col=1)
 
     fig.update_layout(template="seaborn", height=1780, barmode="overlay",
                       margin={"t": 60, "l": 70, "r": 190, "b": 60})
