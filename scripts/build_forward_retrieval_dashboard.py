@@ -7,10 +7,10 @@ day by day. Deliberately NOT a re-plot of RBS's volume charts -- the questions h
 
   1. is the cron still pulling, and how much is genuinely new?
   2. how much of what it pulls is not an article at all (quote/ticker pages)?
-  3. how much arrives with usable body text (a lede) rather than a bare headline?
+  3. how much arrives with usable body text rather than a bare headline?
   4. how often is an author captured?
   5. which waves are being fed, and which are starving?
-  6. how big was the pool each curation actually read?
+  6. how big was the pool each CFT curation actually read?
 
 Reads data/forward_corpus/{articles,appearances,pulls}.jsonl plus the curator run dirs' pool files.
 Render-only: no LLM call, no network. Refreshed by the daily news_pull.sh cron after the pull.
@@ -36,9 +36,12 @@ from src import corpus as _corpus  # noqa: E402  is_article / clean_lede: the SA
 from src import portfolio as _pf  # noqa: E402  news_lookback_days, so the window marker is profile-driven
 
 BLUE, GREEN, ORANGE, RED, GREY = "#1f77b4", "#2ca02c", "#ff7f0e", "#e03131", "#adb5bd"
-# Run dir -> display label for plot 5. Explicit, NOT derived by stripping the dir prefix: the dir stayed
+# Run dir -> display label for plot 5. CFT only: this dashboard is the FORWARDTEST era end to end
+# (WebSearch retrieval -> the CFT curations it feeds). The bootstrap is a separate experiment with its
+# own pair of dashboards, and RBS already owns its retrieval story across the handoff -- a CBS pool line
+# belongs there, not here. Labels are explicit, NOT derived by stripping the dir prefix: the dir stayed
 # `forward-ft` through the FT -> CFT rename, so a derived label silently went stale on the chart.
-CURATOR_RUNS = {"forward-ft": "CFT", "bootstrap-cbs": "CBS"}
+CURATOR_RUNS = {"forward-ft": "CFT"}
 
 
 def _iso(s):
@@ -120,9 +123,8 @@ def build(corpus_dir: str, out: Path) -> None:
                 j = json.loads(f.read_text())
             except Exception:  # noqa: BLE001
                 continue
-            # Only pools THIS corpus fed. CBS re-curates every period back to its 2026-04-27 seed, but
-            # those early pools were built by the backtest's gkg-wayback retriever -- plotting them here
-            # implied the WebSearch corpus reached back to April, when it starts at the 07-22 handoff.
+            # Only pools THIS corpus fed. A CFT run dir can also hold gkg-wayback pools if --since is
+            # moved back before the handoff; those belong to the backtest era, not the forward one.
             if "websearch" not in str(j.get("source") or ""):
                 continue
             pool_rows.append((label, j.get("as_of_date") or f.stem[:10], int(j.get("n_articles") or 0)))
@@ -137,7 +139,7 @@ def build(corpus_dir: str, out: Path) -> None:
             "2. Non-articles ingested per day",
             "3. Body-text and author capture rate",
             "4. Articles per wave",
-            "5. Pool size per curation",
+            "5. Pool size per CFT curation",
             "6. Article age when pulled",
         ))
 
@@ -178,7 +180,7 @@ def build(corpus_dir: str, out: Path) -> None:
                          showlegend=False), row=4, col=1)
     # 5. pools per curation. No max_articles cap line here: that knob truncates BACKTEST-retrieval pools,
     # and every pool plotted above is fed by the forward WebSearch corpus, which sets its own result count.
-    for run, colour in (("CFT", BLUE), ("CBS", ORANGE)):
+    for run, colour in (("CFT", BLUE),):
         rows = sorted((r for r in pool_rows if r[0] == run), key=lambda r: r[1])
         if rows:
             fig.add_trace(go.Scatter(x=[r[1] for r in rows], y=[r[2] for r in rows], name=f"{run} pool",
