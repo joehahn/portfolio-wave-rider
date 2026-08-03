@@ -97,7 +97,7 @@ def build(corpus_dir: str, out: Path) -> None:
     fig = make_subplots(
         rows=5, cols=1, vertical_spacing=0.075,
         subplot_titles=(
-            "1. Daily pull: new articles vs total sightings — a flat line at zero means the cron stopped",
+            "1. Daily pull: new articles vs sightings — a sighting is one search hit (the same story is returned day after day); a new article is the first time a story enters the corpus. Flat at zero = the cron stopped",
             "2. Non-articles ingested (quote / ticker pages) — never reach the curator, but show query drift",
             "3. Body-text and byline capture rate — how much arrives as more than a headline",
             "4. Articles per wave — which waves the queries are actually feeding",
@@ -131,8 +131,11 @@ def build(corpus_dir: str, out: Path) -> None:
                                      mode="lines+markers", line={"color": colour}), row=5, col=1)
 
     fig.update_layout(template="seaborn", height=1500, barmode="overlay",
-                      margin={"t": 60, "l": 70, "r": 30, "b": 60},
-                      legend={"orientation": "h", "y": 1.03})
+                      margin={"t": 60, "l": 70, "r": 190, "b": 60},
+                      # legend to the RIGHT of the plotting area: these are stacked time series and a
+                      # horizontal legend on top crowds the first subplot's title.
+                      legend={"orientation": "v", "x": 1.01, "xanchor": "left", "y": 1.0,
+                              "yanchor": "top", "bgcolor": "rgba(255,255,255,0.85)"})
     fig.update_yaxes(title_text="count", row=1, col=1)
     fig.update_yaxes(title_text="count", row=2, col=1)
     fig.update_yaxes(title_text="% of the day's new articles", range=[0, 100], row=3, col=1)
