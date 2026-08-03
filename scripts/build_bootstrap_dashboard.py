@@ -184,12 +184,25 @@ def build(canon_dir: str, forward_corpus: str, since: str, out: Path) -> None:
     kw_rows = sorted(((f"[{_kw_group(kw, w)}] {kw}", kw_cnt.get(kw, 0), WAVE_COLOR.get(_kw_group(kw, w), GREY))
                       for kw, w in KW_WAVE.items()), key=lambda r: r[1])
 
+    # ---- pool actually fed to each CBS curation. Plotted here (not on the RFT, which is forwardtest-only)
+    # because the bootstrap is this dashboard's experiment. Marker colour follows the same provenance
+    # scheme as charts 1-3, so CBS crossing the handoff from gkg-wayback to WebSearch is visible as a
+    # colour change rather than something the reader has to infer from the dates.
+    cbs_pools = []
+    for f in sorted((ROOT / "data" / "curator_runs" / "bootstrap-cbs").glob("2*-pool.json")):
+        try:
+            j = json.loads(f.read_text())
+        except Exception:  # noqa: BLE001
+            continue
+        cbs_pools.append((j.get("as_of_date") or f.stem[:10], int(j.get("n_articles") or 0),
+                          GOLD if "websearch" in str(j.get("source") or "") else BLUE))
+
     # ---- 8-row figure (mirrors the RBT) ----
     titles = ("1. Unique articles per month", "2. Unique articles per week", "3. Unique articles per day",
-              "4. Unique articles by day of week", "5. Unique articles by wave",
-              "6. Source utilization", "7. Articles per search keyword")
-    fig = make_subplots(rows=7, cols=1, vertical_spacing=0.025, subplot_titles=titles,
-                        row_heights=[1, 1, 1, 1, 1, 3.6, 2.4])
+              "4. Pool size per CBS curation", "5. Unique articles by day of week",
+              "6. Unique articles by wave", "7. Source utilization", "8. Articles per search keyword")
+    fig = make_subplots(rows=8, cols=1, vertical_spacing=0.025, subplot_titles=titles,
+                        row_heights=[1, 1, 1, 1, 1, 1, 3.6, 2.4])
     # 1-3. volume over time, STACKED by provenance: GKG discovery + Wayback ledes (backtest, blue) vs
     # WebSearch (forward, gold). Legend shown once (row 1); the gold bars begin at the 2026-07-22 handoff.
     fig.add_trace(go.Bar(x=mo_keys, y=[mon_gkg[m] for m in mo_keys], marker_color=BLUE,
@@ -204,24 +217,31 @@ def build(canon_dir: str, forward_corpus: str, since: str, out: Path) -> None:
                          legendgroup="gkg", showlegend=False), row=3, col=1)
     fig.add_trace(go.Bar(x=day_x, y=[day_web[d] for d in day_x], marker_color=GOLD,
                          legendgroup="web", showlegend=False), row=3, col=1)
-    fig.add_trace(go.Bar(x=DOW, y=[dow_g.get(d, 0) for d in DOW], marker_color=BLUE, showlegend=False), row=4, col=1)
+    if cbs_pools:
+        fig.add_trace(go.Scatter(x=[d for d, _, _ in cbs_pools], y=[n for _, n, _ in cbs_pools],
+                                 mode="lines+markers", line={"color": GREY, "width": 1.5},
+                                 marker={"size": 9, "color": [c for _, _, c in cbs_pools]},
+                                 showlegend=False,
+                                 hovertemplate="%{x}: %{y} articles read<extra></extra>"), row=4, col=1)
+    fig.add_trace(go.Bar(x=DOW, y=[dow_g.get(d, 0) for d in DOW], marker_color=BLUE, showlegend=False), row=5, col=1)
     fig.add_trace(go.Bar(x=[v for _, v in wv][::-1], y=[k for k, _ in wv][::-1], orientation="h",
-                         marker_color=GREEN, showlegend=False), row=5, col=1)
+                         marker_color=GREEN, showlegend=False), row=6, col=1)
     fig.add_trace(go.Bar(x=[c if c > 0 else 0.5 for _, c, _ in src_rows], y=[s for s, _, _ in src_rows],
                          orientation="h", marker_color=[col for _, _, col in src_rows], showlegend=False,
                          customdata=[c for _, c, _ in src_rows],
-                         hovertemplate="%{y}: %{customdata} articles<extra></extra>"), row=6, col=1)
+                         hovertemplate="%{y}: %{customdata} articles<extra></extra>"), row=7, col=1)
     fig.add_trace(go.Bar(x=[c if c > 0 else 0.5 for _, c, _ in kw_rows], y=[k for k, _, _ in kw_rows],
                          orientation="h", marker_color=[col for _, _, col in kw_rows], showlegend=False,
                          customdata=[c for _, c, _ in kw_rows],
-                         hovertemplate="%{y}: %{customdata} articles<extra></extra>"), row=7, col=1)
-    for r in (1, 2, 3, 4):
+                         hovertemplate="%{y}: %{customdata} articles<extra></extra>"), row=8, col=1)
+    for r in (1, 2, 3, 5):
         fig.update_yaxes(title_text="articles", row=r, col=1)
-    fig.update_xaxes(title_text="unique articles", row=5, col=1)
-    fig.update_xaxes(title_text="unique articles (log; 0 plotted at 0.5)", type="log", row=6, col=1)
-    fig.update_yaxes(dtick=1, tickfont={"size": 9}, row=6, col=1)
+    fig.update_yaxes(title_text="articles in pool", row=4, col=1)
+    fig.update_xaxes(title_text="unique articles", row=6, col=1)
     fig.update_xaxes(title_text="unique articles (log; 0 plotted at 0.5)", type="log", row=7, col=1)
     fig.update_yaxes(dtick=1, tickfont={"size": 9}, row=7, col=1)
+    fig.update_xaxes(title_text="unique articles (log; 0 plotted at 0.5)", type="log", row=8, col=1)
+    fig.update_yaxes(dtick=1, tickfont={"size": 9}, row=8, col=1)
     fig.update_layout(template="seaborn", height=int(400 * 11.0), barmode="stack", showlegend=True,
                       legend={"orientation": "h", "y": 1.03, "x": 0.5, "xanchor": "center",
                               "yanchor": "bottom", "font": {"size": 12}},
@@ -236,7 +256,7 @@ def build(canon_dir: str, forward_corpus: str, since: str, out: Path) -> None:
     # RELATIVE link (docs/ -> repo root), not an absolute github.com blob URL: the config is gitignored, so
     # it exists only in a working tree. Resolves for anyone viewing a local copy; 404s on published Pages.
     cfg_link = ('<p style="color:#555;max-width:820px;margin:.2em 0 0;">The full per-wave search-term lists '
-                'behind plot 7 live in <a href="../retrieval_config.json"><code>retrieval_config.json</code>'
+                'behind plot 8 live in <a href="../retrieval_config.json"><code>retrieval_config.json</code>'
                 '</a> (<code>wave_keywords</code>), which is gitignored, so this link resolves only when you '
                 'are viewing a local copy of the dashboard. The forward cron queries the same waves.</p>')
 
@@ -249,7 +269,7 @@ def build(canon_dir: str, forward_corpus: str, since: str, out: Path) -> None:
                              marker_color=GOLD))
     _afig.update_layout(template="seaborn", height=560, margin={"t": 10, "l": 250, "r": 20, "b": 40},
                         xaxis_title="unique articles", showlegend=False)
-    author_html = ('<h2 style="margin:1.8em 0 0.2em;">8. Articles per author</h2>'
+    author_html = ('<h2 style="margin:1.8em 0 0.2em;">9. Articles per author</h2>'
                    f'<p style="color:#555;max-width:820px;"><b>{100*len(authors)//max(n_uniq,1)}%</b> of the '
                    f'{n_uniq:,} unique articles ({len(authors):,}) carry a byline (native capture on both sides: '
                    f'Wayback/live extraction on the backtest tail, the WebSearch pull on the forward side).</p>'
@@ -266,8 +286,8 @@ def build(canon_dir: str, forward_corpus: str, since: str, out: Path) -> None:
              + card(f"{pools[0]['as_of_date']} → {pools[-1]['as_of_date']}", "coverage span")
              + card(f"{pct_clean:.0f}%", "CLEAN lede: Wayback + WebSearch (look-ahead-safe)")
              + card(f"{pct_cov:.0f}%", "clean + live-fallback coverage")
-             + card(f"{100*len(authors)//max(n_uniq,1)}%", "unique articles with a byline (plot 8)")
-             + card(f"{n_rec_zero}/{len(rec_rows)}", "configured desks surfaced 0x (plot 6)"))
+             + card(f"{100*len(authors)//max(n_uniq,1)}%", "unique articles with a byline (plot 9)")
+             + card(f"{n_rec_zero}/{len(rec_rows)}", "configured desks surfaced 0x (plot 7)"))
 
     # ---- parameter table (RETRIEVAL knobs, mirrors the RBT) ----
     _fm = _pf.load_financial_model(str(ROOT / "investor_profile.md"))
