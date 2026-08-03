@@ -106,18 +106,18 @@ def build(corpus_dir: str, out: Path) -> None:
 
     # 1. new vs sightings
     fig.add_trace(go.Bar(x=span, y=[sight_by_day.get(d, 0) for d in span], name="sightings",
-                         marker_color=GREY), row=1, col=1)
+                         marker_color=GREY, legend="legend"), row=1, col=1)
     fig.add_trace(go.Bar(x=span, y=[new_by_day.get(d, 0) for d in span], name="new articles",
-                         marker_color=BLUE), row=1, col=1)
+                         marker_color=BLUE, legend="legend"), row=1, col=1)
     # 2. non-articles
     fig.add_trace(go.Bar(x=span, y=[nonart_by_day.get(d, 0) for d in span], name="non-articles",
                          marker_color=RED, showlegend=False), row=2, col=1)
     # 3. capture rates
     _rate = lambda num, d: (100.0 * num.get(d, 0) / new_by_day[d]) if new_by_day.get(d) else None  # noqa: E731
     fig.add_trace(go.Scatter(x=span, y=[_rate(lede_by_day, d) for d in span], name="% with lede",
-                             mode="lines+markers", line={"color": GREEN}), row=3, col=1)
+                             mode="lines+markers", line={"color": GREEN}, legend="legend2"), row=3, col=1)
     fig.add_trace(go.Scatter(x=span, y=[_rate(auth_by_day, d) for d in span], name="% with byline",
-                             mode="lines+markers", line={"color": ORANGE}), row=3, col=1)
+                             mode="lines+markers", line={"color": ORANGE}, legend="legend2"), row=3, col=1)
     # 4. waves
     wave_n = Counter(a.get("first_wave") or "?" for a in arts)
     _w = wave_n.most_common()
@@ -128,14 +128,22 @@ def build(corpus_dir: str, out: Path) -> None:
         rows = sorted((r for r in pool_rows if r[0] == run), key=lambda r: r[1])
         if rows:
             fig.add_trace(go.Scatter(x=[r[1] for r in rows], y=[r[2] for r in rows], name=f"{run} pool",
-                                     mode="lines+markers", line={"color": colour}), row=5, col=1)
+                                     mode="lines+markers", line={"color": colour},
+                                     legend="legend3"), row=5, col=1)
 
     fig.update_layout(template="seaborn", height=1500, barmode="overlay",
-                      margin={"t": 60, "l": 70, "r": 190, "b": 60},
-                      # legend to the RIGHT of the plotting area: these are stacked time series and a
-                      # horizontal legend on top crowds the first subplot's title.
-                      legend={"orientation": "v", "x": 1.01, "xanchor": "left", "y": 1.0,
-                              "yanchor": "top", "bgcolor": "rgba(255,255,255,0.85)"})
+                      margin={"t": 60, "l": 70, "r": 190, "b": 60})
+    # One legend PER SUBPLOT, parked to the right of its own rows. A single shared legend listed every
+    # trace in the figure next to chart 1, which read as though ledes/bylines/pools belonged there.
+    # Each legend is anchored to the TOP of its subplot's y-domain, so it tracks the layout automatically.
+    def _dom_top(row: int) -> float:
+        ax = fig.layout[f"yaxis{'' if row == 1 else row}"]
+        return float(ax.domain[1])
+    _legend_style = {"orientation": "v", "x": 1.01, "xanchor": "left", "yanchor": "top",
+                     "bgcolor": "rgba(255,255,255,0.85)", "font": {"size": 12}}
+    fig.update_layout(legend={**_legend_style, "y": _dom_top(1)},
+                      legend2={**_legend_style, "y": _dom_top(3)},
+                      legend3={**_legend_style, "y": _dom_top(5)})
     fig.update_yaxes(title_text="count", row=1, col=1)
     fig.update_yaxes(title_text="count", row=2, col=1)
     fig.update_yaxes(title_text="% of the day's new articles", range=[0, 100], row=3, col=1)
