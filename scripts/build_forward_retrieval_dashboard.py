@@ -103,8 +103,11 @@ def build(corpus_dir: str, out: Path) -> None:
             pass
     _news_lb = int(_pf.load_financial_model().get("news_lookback_days") or 14)
     _cap = 30
-    age_bins = [str(i) for i in range(_cap + 1)] + [f">{_cap}"]
-    age_counts = [sum(1 for x in ages if x == i) for i in range(_cap + 1)] + [sum(1 for x in ages if x > _cap)]
+    # oldest on the LEFT, freshest on the right: the eye then travels toward "today", and the
+    # news_lookback_days line reads as a cutoff with the unusable material behind it.
+    age_bins = [f">{_cap}"] + [str(i) for i in range(_cap, -1, -1)]
+    age_counts = ([sum(1 for x in ages if x > _cap)]
+                  + [sum(1 for x in ages if x == i) for i in range(_cap, -1, -1)])
 
     # ---- pools actually fed to curations (what read_slice returned, per run dir)
     pool_rows = []
@@ -199,11 +202,14 @@ def build(corpus_dir: str, out: Path) -> None:
     fig.add_trace(go.Bar(x=age_bins, y=age_counts, marker_color=BLUE, showlegend=False,
                          hovertemplate="%{x} day(s) old: %{y} articles<extra></extra>"), row=6, col=1)
     # the curator's window: everything to the right of this line is ingested but never read
-    fig.add_vline(x=_news_lb + 0.5, row=6, col=1, line={"dash": "dash", "color": RED, "width": 1.5})
-    fig.add_annotation(x=_news_lb + 0.5, y=0.92, yref="y domain", yanchor="top", xanchor="left",
-                       text=f" news_lookback_days = {_news_lb}", showarrow=False,
+    # categorical axis: position the cutoff by INDEX, between the ">lookback" and "lookback" categories
+    _cut = age_bins.index(str(_news_lb)) - 0.5
+    fig.add_vline(x=_cut, row=6, col=1, line={"dash": "dash", "color": RED, "width": 1.5})
+    fig.add_annotation(x=_cut, y=0.92, yref="y domain", yanchor="top", xanchor="right",
+                       text=f"older than news_lookback_days = {_news_lb} ", showarrow=False,
                        font={"size": 11, "color": RED}, row=6, col=1)
-    fig.update_xaxes(title_text="days between publication and pull", row=6, col=1)
+    fig.update_xaxes(title_text="days between publication and pull (older &larr; &rarr; fresher)",
+                     row=6, col=1)
     fig.update_yaxes(title_text="articles", row=6, col=1)
     for _st in fig.layout.annotations[:_n_titles]:
         _st.update(font={"size": 16, "color": "#111"}, x=0.0, xanchor="left", text=f"<b>{_st.text}</b>")
