@@ -1,31 +1,23 @@
-# Forwardtest (FT) curation — 2026-08-01
+# Curator Forwardtest (CFT) curation — 2026-08-01
 
-_Curator: claude-sonnet-5 · news window: 14d (123 articles read) · recommendation only, no trades executed._
+_Curator: claude-sonnet-5 · news window: 14d (91 articles read) · recommendation only, no trades executed._
 
 ## Watchlist changes
-- **Adds:** LEU
-- **Removes:** IRDM
-- **Watchlist after this call** (16/16 slots used): AMD, AVAV, AXON, BWXT, CCJ, GOOGL, HWM, KTOS, LEU, LLY, LMT, NVDA, OKLO, RKLB, SMR, VST
+- **Adds:** —
+- **Removes:** —
+- **Watchlist after this call** (16/16 slots used): AMD, AVAV, AXON, BWXT, CCJ, GOOGL, HWM, IRDM, KTOS, LLY, LMT, NVDA, OKLO, RKLB, SMR, VST
 
-- **rockets_spacecraft**: SPCX (SpaceX) dominated coverage post-IPO -- Starship Flight 13 launch, booster failure, stock near all-time lows -- but it IPO'd only weeks ago with extreme volatility and thin price history, so it fails the listing-maturity bar for a mean-variance optimizer; India's Skyroot Vikram-1 orbital debut is not US-listed. Kept RKLB as the clean incumbent exposure (RKLB appeared as a trending mover alongside OKLO); no new rocket add.
-- **nuclear**: Saudi Arabia signed a 30-year US civil nuclear cooperation deal, OKLO and X-Energy shares jumped on a Trump administration AI-power-plant program alongside Microsoft/Nvidia, and Centrus Energy (LEU) was flagged as having 'the edge over SMR' on uranium enrichment/conversion just as the Saudi deal opens fuel-cycle export demand -- a fresh, distinct sub-thesis (enrichment chokepoint) not yet represented in the watchlist. Added LEU.
-- **geo_defense**: Lockheed Martin posted a run of very strong days on a new low-cost PAC-3 ACE interceptor plus a fresh $58.62B multiyear PAC-3 MSE production award and a 12-year SOCOM logistics IDIQ -- all real catalysts, but LMT is already held and has now re-rated sharply this window per the profile's crest-avoidance rule, so no incremental action beyond letting the optimizer's existing LMT weight track it.
-- **geo_drones**: Loitering-munition and hypersonic-missile market reports were pure TAM-projection noise (no specific tradeable catalyst); kept KTOS/AVAV unchanged, no new drone-specific ticker surfaced with a concrete near-term event.
-- **geo_tankers**: No tanker-rate or freight news of substance in this pool beyond a generic sector roundup; no action.
-- **geo_reconstruction**: Middle East reconstruction commentary (Gaza/Syria/Lebanon rebuilding, Gulf Vision-2030) remained thematic/geopolitical analysis with no specific US-listed engineering or materials ticker named; no action.
-- **quantum**: IBM's HRL Labs acquisition and CEO comments on 2028-29 earnings impact, Infleqtion's Chicago qubit deployment, D-Wave's claimed-advantage being matched by a laptop, and Quantinuum/SoftBank's roadmap paper are all incremental progress markers, not stock-moving catalysts for a currently-unheld pure-play; none cleared the bar to displace an existing holding.
-- **robotics**: Samsung's new robotics division, Humanoid's $1.35B Series A, Pudu's Frost & Sullivan ranking, and Hyundai's humanoid dispute are all foreign-private or foreign-listed names with no liquid US ticker; no actionable add.
-- **AI**: Google's efficiency-focused AI chip, Qualcomm's hyperscaler chip deals, and AI-bubble-fear commentary are all noise relative to existing AMD/GOOGL/NVDA holdings; no action.
-- **demographics**: Healthcare REIT commentary (American Healthcare REIT, National Healthcare Properties IPO) remained thematic with no name meeting the liquidity/catalyst bar against an LLY swap; no action.
-- **verdict**: One narrow swap this cycle -- LEU in for IRDM -- reflecting a fresh, wave-specific catalyst (Saudi nuclear fuel-cycle opening) displacing a name with zero news activity, consistent with 'enter early on a rising sub-wave, don't churn on maturity alone.' All other waves held steady; the pool was dominated by noise (SPCX volatility, market-size press releases, foreign private robotics) that did not clear the concrete-catalyst bar.
-
-- **REMOVE IRDM**: Iridium generated zero news coverage across this entire two-week pool -- no catalyst, no wave-relevant development -- while the nuclear/fuel-cycle wave is actively re-rating on fresh Saudi-deal and uranium-conversion catalysts; freeing this slot lets the optimizer rotate into the more active name.
-  - No IRDM-specific news appeared anywhere in the two-week discovery pool despite broad coverage of space, defense, nuclear, quantum, and robotics waves (https://www.benzinga.com/trading-ideas/movers/26/07/60598063/super-micro-computer-rocket-lab-dell-capital-one-and-oklo-why-these-5-stocks-are-on-investors-radars-today)
-
-- **LEU** [nuclear]: Centrus Energy is gaining analyst attention as the cleaner uranium-enrichment/conversion play just as the US-Saudi civil nuclear deal opens a multi-decade export market for US nuclear fuel-cycle technology, a fresher catalyst than anything in the current watchlist's nuclear names this cycle.
-  - Yahoo Finance piece argues LEU may have the edge over SMR (NuScale) on uranium enrichment fundamentals as nuclear moves back into the spotlight (https://finance.yahoo.com/markets/stocks/articles/nuclear-stock-pick-heres-why-182500142.html)
-  - ASP Isotopes and enrichment-chain names highlighted as targeting America's uranium conversion chokepoint just as US-Saudi nuclear deal opens fuel-cycle export demand (https://www.zerohedge.com/energy/asp-isotopes-targets-americas-uranium-conversion-chokepoint)
-  - US signs 30-year civil nuclear cooperation agreement with Saudi Arabia, opening US nuclear technology and enrichment export market (https://www.cnbc.com/2026/07/22/trump-saudi-arabia-nuclear-power.html)
+- **rockets_spacecraft**: SPCX (SpaceX) dominated coverage all window -- IPO'd below $135, sank near-50%, rebounded on the Flight 13 Starship launch (deployed 20 Starlink V3 sats, dual splashdown), then got hammered again on a booster engine failure post-reentry, then recovered off all-time lows. This is a real wave name but it is a single-name earnings-free volatility rollercoaster with no clean catalyst resolution yet, and it is not yet in the watchlist -- adding a stock still finding its post-IPO footing would violate the 'concrete, fresh catalyst, not noise' bar. RKLB (held) got its own positive mention (shares rose after the bell) and continues to be the cleaner buildup vehicle already on the list. Skyroot's Vikram-1 orbital debut (India) is a real milestone but Skyroot is private/unlisted -- no ticker, discard.
+- **nuclear**: OKLO (held) jumped on the Trump administration's $200M AI-power program pairing Oklo and X-Energy with Microsoft/Nvidia -- a fresh, concrete catalyst that reinforces the existing OKLO position rather than calling for a new name. The Saudi civil-nuclear cooperation agreement is a structural tailwind for the whole US nuclear-export complex (BWXT, CCJ, SMR all already held) but names no new investable ticker. NuScale (SMR, held) has an earnings call 8/5 flagged as a catalyst -- nothing actionable yet, wait for the print. LEU (Centrus) got a bullish mention vs SMR but this is a same-wave swap argument, not a new-wave one, and the profile already has broad nuclear coverage via BWXT/CCJ/OKLO/SMR/VST -- adding a fifth nuclear name would over-concentrate the bucket relative to the 4-per-bucket cap headroom without a distinct catalyst. Discard Romania's Nuclearelectrica SMR-review rejection and Korean floating-SMR MoU -- foreign/no clean US-listed pure-play.
+- **AI**: Heavy volume of AI-chip stories (Google's efficiency chip, China's domestic-chip milestone, Qualcomm hyperscaler deals, Nvidia/AMD/Intel share-race pieces, AI-bubble-fear commentary) but nothing here is a fresh catalyst for names not already held -- GOOGL, NVDA, AMD are already on the list and this is confirmation of the current dominant wave, not a buildup signal for a new name. Correctly no action per the 'ride but don't chase what's already crested' rule.
+- **robotics**: Samsung's new RX robotics division, Humanoid's $152M Series A (private, unlisted), Hyundai humanoid dispute, Pudu Robotics ranking, Volkswagen-Horizon Robotics tie-up -- an active wave globally but every concrete corporate action here is either private (Humanoid), foreign-listed without a clean US line (Samsung, Pudu, Horizon), or a labor-dispute non-event (Hyundai). No new investable US-listed robotics ticker surfaced this window.
+- **quantum**: Very high news volume (IBM/HRL acquisition, Infleqtion's Chicago qubit system, Quantinuum-SoftBank white paper, D-Wave's annealer matched by a classical laptop -- a negative technical credibility hit for D-Wave, Rigetti's NSF-funded testbed delivery, IBM's CEO giving 2028-2029 earnings-impact guidance). None of this touches a currently-held name (the watchlist has no quantum-pure-play), and none of the mentioned tickers (IBM, D-Wave, Rigetti, Quantinuum-private) clears the bar for a fresh, timing-worthy buildup catalyst over an existing holding -- D-Wave's news this window is actually negative, IBM's 2028-29 guidance is multi-year-out and not a swap-now trigger. Correctly left off given no paired-remove justification.
+- **geo_defense**: LMT (held) had a genuinely strong run of concrete catalysts -- new low-cost PAC-3 ACE interceptor, a 12-year ~$10.5B SOCOM logistics IDIQ, and a huge $58.62B multiyear PAC-3 MSE production award from the Department of War (7/29). This is confirmation the existing LMT position is in the right place, not a new-name signal. Northrop's space/missile franchise mention and Hanwha Philly Shipyard's $2B missile-tracking vessel award (Golden Defender) are real but Hanwha Philly is a subsidiary without a clean standalone US ticker at the parent level accessible here -- discard as non-actionable.
+- **geo_drones**: Hypersonic-threat-driven missile-defense demand and counter-drone mentions (Thales Germany, Electronics Weekly's 'invisible drone') noted but no US-listed pure-play counter-UAS/drone name with a concrete catalyst surfaced distinct from KTOS/AVAV, both already held.
+- **geo_tankers**: Seatrade tanker-news aggregator flagged continued Iran-port blockade enforcement, consistent with the profile's 'tactical, keep on while reserves driver persists' framing, but no specific new ticker or catalyst -- and no tanker name is currently held to reassess. No action, correctly.
+- **geo_reconstruction**: 'Follow the Cranes' and Middle East energy-reconstruction pieces are thematic scene-setting, and the SimplyWall.st 'infrastructure stocks for Gaza reconstruction' piece names only an ASX materials stock (Emerald Resources), not a US-listed pure play. No actionable ticker this window.
+- **demographics**: no coverage in this pool window.
+- **verdict**: Nothing in this pool clears the bar of a concrete, fresh, un-owned catalyst strong enough to displace a current holding -- the standout stories either reinforce existing positions (OKLO's AI-power program inclusion, LMT's contract haul, RKLB's positive mention) or belong to names that are either private (Humanoid, Skyroot), foreign-only (Samsung robotics, Pudu, Horizon), single-name-volatile without resolution (SPCX), or same-bucket swaps without a clear edge (LEU vs SMR). The watchlist stays full and unchanged this cycle; the optimizer continues re-weighting the existing 16 names on their recent trends.
 
 ## Recommended allocation (mean-variance optimizer)
 | ticker | weight |
@@ -41,19 +33,17 @@ Sharpe 3.55 · E[r] 91.1% · vol 24.5%
 ## Acting on this
 This is a recommendation, not a trade. Execute in your brokerage, then edit `holdings.csv` so the next daily snapshot reflects the new positions.
 
-## News considered (123 unique articles, 2026-07-18 to 2026-07-30)
+## News considered (91 unique articles, 2026-07-18 to 2026-07-31)
 
-**Cited in the decisions above (3):**
-- **2026-07-23** · finance.yahoo.com · Nilanjan Choudhury · [Nuclear Stock Pick: Here's Why LEU May Have the Edge Over SMR](https://finance.yahoo.com/markets/stocks/articles/nuclear-stock-pick-heres-why-182500142.html)
-  `websearch` · lede: `ingest-fetch` — Nuclear power is moving back into the investment spotlight as electricity demand rises, grids face reliability pressure and governments push for more domestic energy security. NuScale Power SMR and Centrus Energy LEU offer very different ways to gain exposure. NuScale is trying to commercialize smal
-- **2026-07-22** · cnbc.com · Spencer Kimball; Pippa Stevens · [U.S. signs nuclear power agreement with Saudi Arabia](https://www.cnbc.com/2026/07/22/trump-saudi-arabia-nuclear-power.html)
-  `websearch` · lede: `ingest-fetch` — The U.S. signed an agreement with Saudi Arabia on Wednesday to develop a civilian nuclear program in the kingdom. The agreement will lay the legal foundation for a decades-long, multibillion-dollar partnership, the Department of Energy said. It will provide U.S. companies with access to Saudi…
-- **2026-07-21** · zerohedge.com · [ASP Isotopes Targets America's Uranium Conversion Chokepoint<!-- -->](https://www.zerohedge.com/energy/asp-isotopes-targets-americas-uranium-conversion-chokepoint)
-  `websearch` · lede: `none` — _(no lede captured)_
+No article was cited: this call proposed no changes, so the whole pool below is context the curator read and set aside.
 
 <details>
-<summary>120 more article(s) in the pool &mdash; click to expand</summary>
+<summary>91 more article(s) in the pool &mdash; click to expand</summary>
 
+- **2026-07-31** · simplywall.st · [3 Infrastructure Stocks Investors Are Watching For Gaza Reconstruction Exposure](https://simplywall.st/stocks/au/materials/asx-emr/emerald-resources-shares/news/3-infrastructure-stocks-investors-are-watching-for-gaza-reco)
+  `websearch` · lede: `ingest-fetch` — Markets are watching the latest Gaza ceasefire and reconstruction talks closely, as any credible progress on disarmament, Israeli withdrawal, and international rebuilding efforts could reshape expectations around stability and future project flows. That kind of shift can change how investors view la
+- **2026-07-31** · simplywall.st · [3 Infrastructure Stocks Investors Are Watching For Gaza Reconstruction Exposure](https://simplywall.st/stocks/au/materials/asx-emr/emerald-resources-shares/news/3-infrastructure-stocks-investors-are-watching-for-gaza-reco/amp)
+  `websearch` · lede: `ingest-fetch` — Markets are watching the latest Gaza ceasefire and reconstruction talks closely, as any credible progress on disarmament, Israeli withdrawal, and international rebuilding efforts could reshape expectations around stability and future project flows. That kind of shift can change how investors view la
 - **2026-07-30** · cnbc.com · Alexa LoMonaco · [IBM CEO says quantum computing will have a 'measurable impact' on earnings by 2028 or 2029](https://www.cnbc.com/2026/07/30/ibm-ceo-quantum-computing-measurable-impact-earnings-2028-2029.html)
   `websearch` · lede: `ingest-fetch` — IBM CEO Arvind Krishna said Thursday investors won't have to wait much longer for quantum computing to become a meaningful business for the technology company known for its mainframes and enterprise software. "I think that in 2028 or 2029, you'll see it have a measurable impact on our top line and b
 - **2026-07-29** · news.lockheedmartin.com · [Department of War Awards Lockheed Martin $58.62B for Multiyear PAC-3 MSE Production to Strengthen the Arsenal of Freedom](https://news.lockheedmartin.com/2026-07-29-Department-of-War-Awards-Lockheed-Martin-58-62B-for-Multiyear-PAC-3-MSE-Production-to-Strengthen-the-Arsenal-of-Freedom)
@@ -116,6 +106,8 @@ This is a recommendation, not a trade. Execute in your brokerage, then edit `hol
   `websearch` · lede: `none` — _(no lede captured)_
 - **2026-07-23** · finance.yahoo.com · James Brumley · [Qualcomm Just Signed Deals With 3 Major Hyperscalers for AI Chips. Is This the "Hidden" AI Stock Wall Street Keeps Overlooking?](https://finance.yahoo.com/technology/ai/articles/qualcomm-just-signed-deals-3-120000027.html)
   `websearch` · lede: `ingest-fetch` — Qualcomm Just Signed Deals With 3 Major Hyperscalers for AI Chips. Is This the "Hidden" AI Stock Wall Street Keeps Overlooking? Since the advent of modern-day artificial intelligence platforms, Nvidia (NASDAQ: NVDA) has been the chip provider of choice thanks to its dominance in data center graphics
+- **2026-07-23** · finance.yahoo.com · Nilanjan Choudhury · [Nuclear Stock Pick: Here's Why LEU May Have the Edge Over SMR](https://finance.yahoo.com/markets/stocks/articles/nuclear-stock-pick-heres-why-182500142.html)
+  `websearch` · lede: `ingest-fetch` — Nuclear power is moving back into the investment spotlight as electricity demand rises, grids face reliability pressure and governments push for more domestic energy security. NuScale Power SMR and Centrus Energy LEU offer very different ways to gain exposure. NuScale is trying to commercialize smal
 - **2026-07-23** · timothysykes.com · Ellis Hobbs · [Lockheed Martin Stock Climbs On Mega Contracts And New Missile Defense](https://timothysykes.com/news/lockheed-martin-corporation-lmt-news-2026_07_23/)
   `websearch` · lede: `ingest-fetch` — Lockheed Martin Corporation stocks have been trading up by 10.2 percent amid optimism over expanding defense contracts and revenue growth. Key Takeaways - A fresh 12-year U.S. Special Operations Command logistics deal with a ceiling around $10.5B extends a Lockheed-managed program dating back to 201
 - **2026-07-23** · stockstotrade.com · Tim Bohen · [Lockheed Martin Stock Jumps As Long-Term Defense Contracts Pile Up](https://stockstotrade.com/news/lockheed-martin-corporation-lmt-news-2026_07_23-3/)
@@ -138,6 +130,8 @@ This is a recommendation, not a trade. Execute in your brokerage, then edit `hol
   `websearch` · lede: `ingest-fetch` — Tesla reported its second-quarter earnings on Wednesday, disclosing far lower profits than expected. The company’s already beleaguered stock, which had fallen about 14% this year to date, dipped further following the earnings report. Elon Musk’s automaker, once the pinnacle of his tech empire, has…
 - **2026-07-22** · morningstar.com · [Volkswagen Strengthens Horizon Robotics Tie-Up to Advance Self-Driving Technology in China](https://www.morningstar.com/news/dow-jones/202607222240/volkswagen-strengthens-horizon-robotics-tie-up-to-advance-self-driving-technology-in-china)
   `websearch` · lede: `none` — _(no lede captured)_
+- **2026-07-22** · cnbc.com · Spencer Kimball; Pippa Stevens · [U.S. signs nuclear power agreement with Saudi Arabia](https://www.cnbc.com/2026/07/22/trump-saudi-arabia-nuclear-power.html)
+  `websearch` · lede: `ingest-fetch` — The U.S. signed an agreement with Saudi Arabia on Wednesday to develop a civilian nuclear program in the kingdom. The agreement will lay the legal foundation for a decades-long, multibillion-dollar partnership, the Department of Energy said. It will provide U.S. companies with access to Saudi…
 - **2026-07-22** · zerohedge.com · Tyler Durden · [Trump Greenlights Saudi Nuclear Deal, Uranium Enrichment In The Kingdom Possible](https://www.zerohedge.com/geopolitical/trump-greenlights-saudi-nuclear-deal-uranium-enrichment-kingdom-possible)
   `websearch` · lede: `ingest-fetch` — President Trump has formally approved a landmark 30-year civil nuclear cooperation agreement with Saudi Arabia that could be worth tens of billions of dollars and put American companies at the center of the kingdom's nuclear buildout, according to the Wall Street Journal. The accord is expected to…
 - **2026-07-22** · forbes.com · Karl Freund · [Infleqtion Adds 50 Logical-Qubit System To Chicago Quantum Hub](https://www.forbes.com/sites/karlfreund/2026/07/22/infleqtion-adds-50-logical-qubit-system-to-chicago-quantum-hub/)
@@ -178,6 +172,8 @@ This is a recommendation, not a trade. Execute in your brokerage, then edit `hol
   `websearch` · lede: `ingest-fetch` — Lockheed Martin announced a new PAC-3 interceptor on Monday that it said costs less than half the price of a regular Patriot missile. The PAC-3 Adapted Capability Effector, or ACE, is "built to defeat a wide range of air and missile threats for less than half the cost of a PAC-3 MSE per unit," the…
 - **2026-07-21** · benzinga.com · Adam Eckert · [Oklo, X-Energy Shares Jump as Trump Program Targets Nuclear Power for AI - Oklo (NYSE:OKLO), X-Energy (NA](https://www.benzinga.com/trading-ideas/movers/26/07/60596529/oklo-x-energy-shares-jump-as-trump-program-targets-nuclear-power-for-ai)
   `websearch` · lede: `ingest-fetch` — - Oklo stock is charging ahead with explosive momentum. What’s driving OKLO stock higher? Oklo, X-Energy To Join Power Plant Program Oklo and X-Energy will join Microsoft and Nvidia in a Trump administration-led effort to accelerate the construction of new power plants for AI data centers,…
+- **2026-07-21** · zerohedge.com · [ASP Isotopes Targets America's Uranium Conversion Chokepoint<!-- -->](https://www.zerohedge.com/energy/asp-isotopes-targets-americas-uranium-conversion-chokepoint)
+  `websearch` · lede: `none` — _(no lede captured)_
 - **2026-07-21** · coindesk.com · Olivier Acuna; Olivier-Acuna · [Crypto giant Galaxy sets up $5 million fund to future-proof Bitcoin security](https://www.coindesk.com/tech/2026/07/21/galaxy-sets-up-usd5-million-fund-to-help-shield-bitcoin-against-quantum-computing-threats)
   `websearch` · lede: `ingest-fetch` — Galaxy sets up $5 million fund to help shield Bitcoin against quantum computing threats The crypto financial services firm is funding developers to strengthen the blockchain's security before quantum computers become powerful enough to steal billions in crypto. - Galaxy Digital set up a $5 million…
 - **2026-07-21** · theverge.com · Thomas Ricker · [NYT recognizes Google Zero.](https://www.theverge.com/ai-artificial-intelligence/968474/nyt-recognizes-google-zero)
@@ -226,73 +222,5 @@ This is a recommendation, not a trade. Execute in your brokerage, then edit `hol
   `websearch` · lede: `none` — _(no lede captured)_
 - **2026-07-18** · breakingdefense.com · Diana Stancy · [New 'Golden Defender' missile monitor ship to be built at Hanwha Philly shipyard](https://breakingdefense.com/2026/07/new-golden-defender-missile-monitor-ship-to-be-built-at-hanwha-philly-shipyard/)
   `gkg` · lede: `wayback` — WASHINGTON — Hanwha Philly Shipyard will construct a new missile range instrumentation vessel, dubbed Golden Defender, to support the Pentagon’s Golden Dome missile shield system, the head of the Office of Management and Budget said today. Russell Vought said that OMB’s shipbuilding team looked at…
-- **undated** · msn.com · [SpaceX’s Starship is set for takeoff — and its floundering stock could use the lift](https://www.msn.com/en-us/money/general/spacex-s-starship-is-set-for-takeoff-and-its-floundering-stock-could-use-the-lift/ar-AA2829fH)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · msn.com · [SpaceX’s stock snaps brutal losing streak ahead of key Starship rocket launch](https://www.msn.com/en-us/money/top-stocks/spacex-s-stock-looks-to-snap-brutal-losing-streak-as-it-heads-for-one-of-its-best-days-yet/ar-AA28oTE7?ocid=finance-verthp-feeds)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · vaneck.com · [Investment Opportunities in SMRs: The Future of Nuclear Power | VanEck](https://www.vaneck.com/us/en/blogs/natural-resources/smr-investing/)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · quantumcomputingreport.com · [News - Quantum Computing Report](https://quantumcomputingreport.com/news/)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · quantummarketcap.com · [Quantum Computing Stock News, Press Releases & IPO Watch](https://quantummarketcap.com/news)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · grandviewresearch.com · [Humanoid Robot Market Size & Share | Industry Report, 2030](https://www.grandviewresearch.com/industry-analysis/humanoid-robot-market-report)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · fortunebusinessinsights.com · [Humanoid Robot Market Size, Share, & Growth Report [2034]](https://www.fortunebusinessinsights.com/humanoid-robots-market-110188)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · openpr.com · [Loitering Munition Market to Reach USD 1.37 Billion by 2035 as Precision Strike, ISR Integration and Autonomous Target Support Redefine Modern Battlefield Operations](https://www.openpr.com/news/4574827/loitering-munition-market-to-reach-usd-1-37-billion-by-2035-as)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · fortunebusinessinsights.com · [Hypersonic Missile Market Size, Share, Growth, Analysis, 2034](https://www.fortunebusinessinsights.com/hypersonic-missile-market-108333)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · sphericalinsights.com · [25 Companies in Supersonic and Hypersonic Weapons Market](https://www.sphericalinsights.com/blogs/top-25-companies-in-global-supersonic-and-hypersonic-weapons-market-strategic-overview-and-future-trends-2026-2035)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · openpr.com · [Hypersonic Weapons Market Set to Boom Rapidly, Witnessing Strong Growth Through 2033 | Lockheed Martin, RTX Corporation, Northrop Grumman](https://www.openpr.com/news/4569732/hypersonic-weapons-market-set-to-boom-rapidly-witnessing)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · openpr.com · [Hypersonic Missiles Market Is Going to Boom | Lockheed Martin, Raytheon Technologies, Northrop Grumman](https://www.openpr.com/news/4506145/hypersonic-missiles-market-is-going-to-boom-lockheed-martin)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · mcknightsseniorliving.com · [American Healthcare REIT ‘bullish’ on long-term care prospects, exec says](https://www.mcknightsseniorliving.com/news/american-healthcare-reit-bullish-on-long-term-care-prospects-exec-says/)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · mcknightsseniorliving.com · [National Healthcare Properties seeks to raise $500.5M to $616M in IPO to capitalize on senior living’s potential - McKnight's Senior Living](https://www.mcknightsseniorliving.com/news/national-healthcare-properties-launches-public-offering/)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · nasdaq.com · [Quantum Computing Inc. Common Stock (QUBT) News, Articles, and Updates | Nasdaq](https://www.nasdaq.com/market-activity/stocks/qubt/news-headlines)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · youtube.com · [BREAKTHROUGH: Startup unveils plan for lower-cost hypersonic missiles - YouTube](https://www.youtube.com/watch?v=rJhYEDa0sbo)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · mcknights.com · [Hot ride continues: Senior care and housing REIT conditions ‘best ever seen’](https://www.mcknights.com/news/hot-ride-continues-senior-care-and-housing-reit-conditions-best-ever-seen/)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · mcknightsseniorliving.com · [Senior housing operating portfolio strategies driving healthcare REIT credit stability, Fitch says](https://www.mcknightsseniorliving.com/news/senior-housing-operating-portfolio-strategies-driving-healthcare-reit-credit-stability-fitch-says/)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · tipranks.com · [Quantum Computing News: Is the Next Big Investment Opportunity Beyond Quantum Chips? - TipRanks.com](https://www.tipranks.com/news/quantum-computing-news-is-the-next-big-investment-opportunity-beyond-quantum-chips)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · msn.com · [2 artificial intelligence (AI) stocks to buy as demand for custom chips soars](https://www.msn.com/en-us/money/topstocks/2-artificial-intelligence-ai-stocks-to-buy-as-demand-for-custom-chips-soars/ar-AA26FKYX?ocid=finance-verthp-feeds)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · openpr.com · [Why Is the Loitering Munition Market Becoming a Strategic Investment Focus Amid Rising Demand for Precision Strike and Autonomous Warfare Systems](https://www.openpr.com/news/4584462/why-is-the-loitering-munition-market-becoming-a-strategic)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · nasdaq.com · [The Longevity Shift: Healthcare REITs to Benefit From Global Aging | Nasdaq](https://www.nasdaq.com/articles/longevity-shift-healthcare-reits-benefit-global-aging)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · sec.gov · [HEALTH CARE REIT INC /DE/ - Form 8-K - FY2007](https://www.sec.gov/Archives/edgar/data/0000766704/000095015207008630/l28638aexv99w1.htm)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · sec.gov · [HEALTH CARE REIT INC /DE/ - Form DEFA14A - FY2007](https://www.sec.gov/Archives/edgar/data/0000766704/000095015207003891/l26018adefa14a.htm)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · sec.gov · [HEALTH CARE REIT INC /DE/ - Form 8-K - FY2005](https://www.sec.gov/Archives/edgar/data/0000766704/000095015205006007/l15072aexv99w1.htm)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · openpr.com · [Hypersonic Weapons Market to Reach USD 31.38 Billion by 2035 as Precision Strike, Missile Penetration and Rapid-Response Warfare Reshape Defense Modernization](https://www.openpr.com/news/4574823/hypersonic-weapons-market-to-reach-usd-31-38-billion-by-2035-as)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · nationaldefensemagazine.org · [Low-Cost Bombs, Rockets Enjoy New Vogue as Drone Warfare Ramps Up](https://www.nationaldefensemagazine.org/articles/2025/8/29/low-cost-bombs-rockets-enjoy-new-vogue-as-drone-warfare-ramps-up)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · gvwire.com · [Hypersonic Weapon Startup Castelion Wins $105 Million Navy Contract for F/A-18 Integration - GV Wire](https://gvwire.com/2026/04/24/hypersonic-weapon-startup-castelion-wins-105-million-navy-contract-for-f-a-18-integration/)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · bloomberg.com · [AI - Bloomberg](https://www.bloomberg.com/ai)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · bloomberg.com · [Bloomberg Middle East](https://www.bloomberg.com/middleeast)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · fortunebusinessinsights.com · [Loitering Munition Systems Market Size, Share | Forecast [2034]](https://www.fortunebusinessinsights.com/loitering-munition-system-market-107013)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · arabnews.com · [Corporate News - World Corporate Industry News | Arab News](https://www.arabnews.com/taxonomy/term/38/i&sa=U&ved=2ahUKEwiVlPXcpp79AhXJRvEDHVzRBvUQ0gJ6BAgKEAc&usg=AOvVaw1hepn6akUJc4Pmkvw6k5Ky?page=390)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · mcknights.com · [National Healthcare Corp. to buy 32 nursing homes from REIT owner - McKnight's Long-Term Care News](https://www.mcknights.com/news/national-healthcare-corp-to-buy-32-nursing-homes/)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · thestreet.com · [IBM claims verifiable quantum advantage, but stock barely moves - TheStreet](https://www.thestreet.com/technology/ibm-quantum-computing-breakthrough)
-  `websearch` · lede: `none` — _(no lede captured)_
 
 </details>

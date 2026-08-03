@@ -261,7 +261,7 @@ def read_slice(as_of: str, lookback_days: int) -> list[dict[str, Any]]:
         return []
     end = date.fromisoformat(as_of)
     start = end - timedelta(days=lookback_days)
-    out, n_fallback, n_nonart = [], 0, 0
+    out, n_fallback, n_nonart, n_undated = [], 0, 0, 0
     for line in ARTICLES.read_text(encoding="utf-8").splitlines():
         if not line.strip():
             continue
@@ -280,12 +280,20 @@ def read_slice(as_of: str, lookback_days: int) -> list[dict[str, Any]]:
             if not is_article(a):        # quote page / ticker hub, not reporting
                 n_nonart += 1
                 continue
+            # An article admitted on the PULL-date fallback has no publication date, so its true age is
+            # unknown -- measured on the live corpus, every such record also failed extraction and carries
+            # no body text, and the set is dominated by market-report mills, hubs and (worst) SEC filings
+            # from 2005-2007 that would enter as "fresh". Require a date OR readable text, never neither.
+            if fallback and not clean_lede(a.get("snippet") or a.get("full_text") or a.get("lede") or ""):
+                n_undated += 1
+                continue
             if fallback:
                 a = {**a, "date_is_pull_fallback": True}
                 n_fallback += 1
             out.append(a)
-    if n_fallback or n_nonart:
+    if n_fallback or n_nonart or n_undated:
         print(f"read_slice({as_of}, {lookback_days}d): {len(out)} articles"
               + (f", {n_fallback} used a pull-date fallback (no publish date)" if n_fallback else "")
-              + (f", {n_nonart} quote/landing pages dropped" if n_nonart else ""), file=sys.stderr)
+              + (f", {n_nonart} quote/landing pages dropped" if n_nonart else "")
+              + (f", {n_undated} undated-and-textless dropped" if n_undated else ""), file=sys.stderr)
     return out

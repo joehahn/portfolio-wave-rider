@@ -1,23 +1,23 @@
-# Forwardtest (FT) curation — 2026-07-22
+# Curator Forwardtest (CFT) curation — 2026-07-22
 
-_Curator: claude-sonnet-5 · news window: 14d (195 articles read) · recommendation only, no trades executed._
+_Curator: claude-sonnet-5 · news window: 14d (180 articles read) · recommendation only, no trades executed._
 
 ## Watchlist changes
 - **Adds:** —
 - **Removes:** —
 - **Watchlist after this call** (16/16 slots used): AMD, AVAV, AXON, BWXT, CCJ, GOOGL, HWM, IRDM, KTOS, LLY, LMT, NVDA, OKLO, RKLB, SMR, VST
 
-- **AI**: Coverage this window is digestion-phase noise, not a fresh buildup catalyst -- China chip rally on Z.AI's domestic-chip milestone, Google/Meta in-house chip development, Nvidia trimming Asian customer access, 'AI investors becoming pickier' pieces. Nothing here displaces AMD/NVDA/GOOGL, which already hold the AI exposure the profile wants; no action.
-- **rockets_spacecraft**: SpaceX (SPCX) dominates the pool -- Starship Flight 13 scrub/abort cycle, stock down ~30% from peak and briefly below its $135 IPO price. That is a busted-IPO, post-crest volatility story, not an early-buildup one, and SPCX is not on the watchlist to begin with; not an add candidate under the profile's 'enter early, trim before crest' rule. China's reusable-rocket landing and India's Skyroot Vikram-1 debut are real milestones but neither has an investable US-listed line. RKLB gets a positive namecheck (Victus Haze demo, 'stock rises after the bell') but is already held -- no incremental action needed.
-- **nuclear**: Genuine multi-front buildup news -- US-Saudi 30-year civil nuclear agreement, and Oklo/X-Energy shares jumping on a Trump administration program pairing them with Microsoft/Nvidia for AI-data-center power plants. This directly validates the SMR/OKLO thesis already on the watchlist (OKLO, SMR, CCJ, BWXT, VST all already held) -- reinforcing, not a new-name signal. Centrus (LEU) DOE contract expansion and NuScale's upcoming Q2 catalyst are noted but neither clears the bar over an existing holding. No action.
-- **quantum**: Heavy volume of pool coverage (Infleqtion's 50-logical-qubit Chicago hub deal, D-Wave's annealer being matched by a classical laptop, Quantinuum/SoftBank white paper, Israel's national quantum hub) but it's diffuse across many small/private/pre-revenue names (QUBT, IonQ-adjacent, D-Wave) with no single name showing a clear, fresh, differentiated commercial inflection strong enough to justify displacing a current holding. Watchlist has no quantum name currently -- an empty slot is fine here per the profile's own quality-gate language; no action.
-- **robotics**: Samsung's new RX robotics division, Hyundai taking full control of Boston Dynamics, Mitsubishi's humanoid deal, and the first-ever humanoid robot labor strike (Hyundai) are all real buildup signals, but every name involved is foreign-listed, private, or a conglomerate subsidiary with no clean US-listed pure-play investable line. No actionable US ticker surfaced.
-- **geo_defense**: Lockheed's cheaper PAC-3 ACE interceptor, European Hydis hypersonic-interceptor concept, and continued Jordan/Iran strike fallout confirm the buildup thesis already reflected via LMT and KTOS on the watchlist. Nothing here is a fresh name-level catalyst distinct from what's already held; no action.
-- **geo_drones**: AeroVironment's $80.5M counter-drone order (Titan MS) and continued Ukraine drone-strike reporting reinforce the thesis behind AVAV and KTOS, both already held. No new name surfaced with a catalyst strong enough to swap in.
-- **geo_tankers**: Persistent Hormuz/Iran tension (renewed strikes, oil price spikes, BofA tanker-trade notes) confirms the tactical thesis, but the current watchlist holds no dedicated tanker ticker and none surfaced with enough specificity (no ticker named in the pool's tanker-adjacent articles) to act on.
-- **geo_reconstruction**: EU's $1B Gaza reconstruction fund and Saudi Vision 2030 SDG review are directional but far too diffuse (no named investable construction/engineering ticker) to act on.
-- **demographics**: Senior-housing REIT commentary (Sabra vs. Welltower, American Healthcare REIT new high) is steady-state maturation, not a fresh catalyst, and none of these names is currently held nor clearly superior to the watchlist's weakest holding; no action.
-- **verdict**: Every wave that produced real news this window (nuclear, geo_defense, geo_drones) reinforced theses already expressed by current holdings (OKLO/SMR/CCJ/BWXT/VST, LMT/KTOS, AVAV/KTOS) rather than surfacing an investable new name with a strong enough fresh catalyst to justify displacing one of the 16 full managed slots. The SpaceX (SPCX) narrative, though voluminous, is a post-IPO-crest volatility story, not a buildup one, and SPCX isn't held. Quantum, robotics, and reconstruction coverage was real but not tied to a clean US-listed pure-play superior to a current holding. Per the profile's own guidance, an empty/unchanged slot beats a forced weak swap -- watchlist stands unchanged this biweekly cycle.
+- **rockets_spacecraft**: Heavy volume on SPCX (SpaceX) IPO drama -- Starship Flight 13 scrubbed twice, stock down ~30% from IPO price, Cathie Wood buying the dip -- but SPCX is not in the pool as a mappable, and more importantly the current watchlist already owns RKLB, which itself popped after-hours on 2026-07-21 (Benzinga) and is running its own Victus Haze government demo with True Anomaly -- no reason to chase a volatile new IPO over an already-held, better-diversified pure-play. China's reusable-rocket landing and India's Skyroot Vikram-1 debut are foreign-listed or private, not investable. No action.
+- **nuclear**: Strong buildup evidence but nothing new to the watchlist: OKLO (already held) jumped again on 2026-07-21 after joining a Trump administration power-plant program alongside X-Energy, Microsoft, Nvidia -- a fresh, concrete federal catalyst that reinforces the existing OKLO position rather than arguing for a swap. Saudi civil-nuclear deal (2026-07-22) is a longer-horizon structural positive for CCJ/BWXT/SMR exposure already held. Centrus (LEU) DOE contract and NuScale (SMR peer, not held) are noted but do not clear the bar of displacing an existing holding -- SMR is already on the list. No action.
+- **quantum**: Pool is thick with quantum coverage (QUBT rally, Infleqtion, Quantinuum/SoftBank, D-Wave, Israel's national hub) but every concrete-catalyst name is either not currently owned nor compelling enough to justify a swap, or is a small speculative name (QUBT) whose 'huge price upside' framing reads as promotional rather than a hard commercial milestone. No current watchlist ticker is a quantum pure-play, so there's no wave-bucket rebalancing pressure here, just an absent slot -- but the instructions are explicit that an empty slot beats a weak forced swap. No action.
+- **AI**: Chip-stock volatility (Nvidia China customer cuts, Google in-house AI chip news, 'AI trade rotating from chips to infrastructure') is noise-level for names already held (NVDA, AMD, GOOGL) -- nothing here rises to a thesis-breaking or thesis-reinforcing event distinct from the ongoing story. No action.
+- **robotics**: Heavy headline volume (Samsung robotics division, Hyundai buys out Boston Dynamics stake, humanoid robot strike, Humanoid Series A, Mitsubishi/Fujitsu tie-ups) but every named mover is foreign-listed, private, or a subsidiary of a larger conglomerate with no clean US-listed pure-play ticker surfaced in this pool. Genuinely interesting wave activity, but nothing investable to add. No action.
+- **geo_defense**: Lockheed's cheaper Patriot interceptor (PAC-3 ACE) and Hanwha Philly Shipyard's $2B missile-tracking vessel award are real catalysts, but LMT is already held and Hanwha Philly is not a clean US-listed liquid ticker. Hypersonic-interceptor and counter-drone stories (AeroVironment $80.5M order) reinforce existing exposure via AVAV/KTOS/LMT rather than arguing for a new name. No action.
+- **geo_drones**: AVAV and KTOS (both held) are explicitly named as rallying on renewed Iran-strike drone demand and FY2027 UAV procurement budget ($74B). This is a reinforcing catalyst for existing holdings, not a new-name signal. No action.
+- **geo_tankers**: Strait of Hormuz strikes continued into mid-July (oil spiking, BofA tanker-trade note) consistent with the profile's tactical thesis, but no clean new US-listed tanker ticker was named in the pool with a fresh catalyst distinct from the macro backdrop already reflected in broad markets. No action.
+- **geo_reconstruction**: EU's $1B Gaza reconstruction fund and Saudi Vision 2030 progress are directional but diffuse -- no specific US-listed engineering/construction/building-materials ticker was named with a concrete order or contract in this pool. No action.
+- **demographics**: Health-care REIT commentary (Sabra, Welltower, American Healthcare REIT hitting 12-month highs) is a real theme but none of these names are on the current watchlist and the coverage reads as maturing/already-run rather than early buildup -- LLY (held) already covers the healthcare angle. No action.
+- **verdict**: A busy two weeks of wave-adjacent news but no ticker cleared the bar of being both (a) not already held and (b) backed by a concrete catalyst strong enough to displace an existing position, given the watchlist is full and every add must be a swap. Existing exposure (OKLO, RKLB, AVAV, KTOS, SMR) was reinforced rather than challenged by this window's headlines. Holding the watchlist unchanged.
 
 ## Recommended allocation (mean-variance optimizer)
 | ticker | weight |
@@ -33,12 +33,12 @@ Sharpe 3.55 · E[r] 91.1% · vol 24.5%
 ## Acting on this
 This is a recommendation, not a trade. Execute in your brokerage, then edit `holdings.csv` so the next daily snapshot reflects the new positions.
 
-## News considered (195 unique articles, 2026-07-08 to 2026-07-22)
+## News considered (180 unique articles, 2026-07-08 to 2026-07-22)
 
 No article was cited: this call proposed no changes, so the whole pool below is context the curator read and set aside.
 
 <details>
-<summary>195 more article(s) in the pool &mdash; click to expand</summary>
+<summary>180 more article(s) in the pool &mdash; click to expand</summary>
 
 - **2026-07-22** · arstechnica.com · Jeremy Hsu · [Hyundai claims humanoid robot plan is not part of talks with striking workers](https://arstechnica.com/ai/2026/07/hyundai-claims-humanoid-robot-plan-is-not-part-of-talks-with-striking-workers/)
   `websearch` · lede: `ingest-fetch` — Hyundai Motor Company’s plan to put humanoid robots to work by 2028 is not part of current negotiations with striking South Korean autoworkers, according to the company. The automaker is disputing news reports that partial labor strikes by the Hyundai Motor union at the world’s largest automotive…
@@ -400,35 +400,5 @@ No article was cited: this call proposed no changes, so the whole pool below is 
   `gkg` · lede: `none` — _(no lede captured)_
 - **2026-07-08** · arabnews.com · [Saudi Arabia showcases Vision 2030 progress at UN's High-Level Political Forum](https://www.arabnews.com/node/2650145/saudi-arabia)
   `gkg` · lede: `wayback` — NEW YORK: Saudi Arabia is participating in the United Nations High-Level Political Forum on Sustainable Development running from July 7-15 in New York, where the Kingdom will present its Voluntary National Review report detailing national progress toward the Sustainable Development Goals under the…
-- **undated** · msn.com · [SpaceX’s Starship is set for takeoff — and its floundering stock could use the lift](https://www.msn.com/en-us/money/general/spacex-s-starship-is-set-for-takeoff-and-its-floundering-stock-could-use-the-lift/ar-AA2829fH)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · msn.com · [SpaceX’s stock snaps brutal losing streak ahead of key Starship rocket launch](https://www.msn.com/en-us/money/top-stocks/spacex-s-stock-looks-to-snap-brutal-losing-streak-as-it-heads-for-one-of-its-best-days-yet/ar-AA28oTE7?ocid=finance-verthp-feeds)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · vaneck.com · [Investment Opportunities in SMRs: The Future of Nuclear Power | VanEck](https://www.vaneck.com/us/en/blogs/natural-resources/smr-investing/)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · quantumcomputingreport.com · [News - Quantum Computing Report](https://quantumcomputingreport.com/news/)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · quantummarketcap.com · [Quantum Computing Stock News, Press Releases & IPO Watch](https://quantummarketcap.com/news)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · grandviewresearch.com · [Humanoid Robot Market Size & Share | Industry Report, 2030](https://www.grandviewresearch.com/industry-analysis/humanoid-robot-market-report)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · fortunebusinessinsights.com · [Humanoid Robot Market Size, Share, & Growth Report [2034]](https://www.fortunebusinessinsights.com/humanoid-robots-market-110188)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · openpr.com · [Loitering Munition Market to Reach USD 1.37 Billion by 2035 as Precision Strike, ISR Integration and Autonomous Target Support Redefine Modern Battlefield Operations](https://www.openpr.com/news/4574827/loitering-munition-market-to-reach-usd-1-37-billion-by-2035-as)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · fortunebusinessinsights.com · [Hypersonic Missile Market Size, Share, Growth, Analysis, 2034](https://www.fortunebusinessinsights.com/hypersonic-missile-market-108333)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · sphericalinsights.com · [25 Companies in Supersonic and Hypersonic Weapons Market](https://www.sphericalinsights.com/blogs/top-25-companies-in-global-supersonic-and-hypersonic-weapons-market-strategic-overview-and-future-trends-2026-2035)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · openpr.com · [Hypersonic Weapons Market Set to Boom Rapidly, Witnessing Strong Growth Through 2033 | Lockheed Martin, RTX Corporation, Northrop Grumman](https://www.openpr.com/news/4569732/hypersonic-weapons-market-set-to-boom-rapidly-witnessing)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · openpr.com · [Hypersonic Missiles Market Is Going to Boom | Lockheed Martin, Raytheon Technologies, Northrop Grumman](https://www.openpr.com/news/4506145/hypersonic-missiles-market-is-going-to-boom-lockheed-martin)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · mcknightsseniorliving.com · [American Healthcare REIT ‘bullish’ on long-term care prospects, exec says](https://www.mcknightsseniorliving.com/news/american-healthcare-reit-bullish-on-long-term-care-prospects-exec-says/)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · mcknightsseniorliving.com · [National Healthcare Properties seeks to raise $500.5M to $616M in IPO to capitalize on senior living’s potential - McKnight's Senior Living](https://www.mcknightsseniorliving.com/news/national-healthcare-properties-launches-public-offering/)
-  `websearch` · lede: `none` — _(no lede captured)_
-- **undated** · nasdaq.com · [Quantum Computing Inc. Common Stock (QUBT) News, Articles, and Updates | Nasdaq](https://www.nasdaq.com/market-activity/stocks/qubt/news-headlines)
-  `websearch` · lede: `none` — _(no lede captured)_
 
 </details>
