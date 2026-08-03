@@ -8,7 +8,7 @@ day by day. Deliberately NOT a re-plot of RBS's volume charts -- the questions h
   1. is the cron still pulling, and how much is genuinely new?
   2. how much of what it pulls is not an article at all (quote/ticker pages)?
   3. how much arrives with usable body text (a lede) rather than a bare headline?
-  4. how often is a byline captured?
+  4. how often is an author captured?
   5. which waves are being fed, and which are starving?
   6. how big was the pool each curation actually read?
 
@@ -129,7 +129,7 @@ def build(corpus_dir: str, out: Path) -> None:
         subplot_titles=(
             "1. Articles seen per day, and how many were new",
             "2. Non-articles ingested per day",
-            "3. Body-text and byline capture rate",
+            "3. Body-text and author capture rate",
             "4. Articles per wave",
             "5. Pool size per curation",
             "6. Article age when pulled",
@@ -163,7 +163,7 @@ def build(corpus_dir: str, out: Path) -> None:
     _rate = lambda num, d: (100.0 * num.get(d, 0) / new_by_day[d]) if new_by_day.get(d) else None  # noqa: E731
     fig.add_trace(go.Scatter(x=span, y=[_rate(lede_by_day, d) for d in span], name="% with lede",
                              mode="lines+markers", line={"color": GREEN}, legend="legend2"), row=3, col=1)
-    fig.add_trace(go.Scatter(x=span, y=[_rate(auth_by_day, d) for d in span], name="% with byline",
+    fig.add_trace(go.Scatter(x=span, y=[_rate(auth_by_day, d) for d in span], name="% with author",
                              mode="lines+markers", line={"color": ORANGE}, legend="legend2"), row=3, col=1)
     # 4. waves
     wave_n = Counter(a.get("first_wave") or "?" for a in arts)
@@ -243,7 +243,7 @@ def build(corpus_dir: str, out: Path) -> None:
              + _card(f"{len(pulls)}", "pulls logged")
              + _card(f"{span[0]} → {span[-1]}", "window")
              + _card(f"{100 * n_lede / n_art:.0f}%", "with body text", warn=n_lede / n_art < 0.6)
-             + _card(f"{100 * n_auth / n_art:.0f}%", "with a byline")
+             + _card(f"{100 * n_auth / n_art:.0f}%", "with an author")
              + _card(f"{n_non}", "non-articles dropped", warn=n_non / n_art > 0.05)
              + _card(last_gap, "missed pull days", warn=bool(gaps))
              + _card(f"{sum(1 for d in span if pulls_by_day.get(d, 0) > 1)}", "days with >1 pull")
