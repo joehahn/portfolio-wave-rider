@@ -3891,7 +3891,7 @@ def build_curator_dashboard(
         row_heights=[0.22, 0.24, 0.13, 0.12, 0.17],
         subplot_titles=(
             "1. Realized portfolio value: curator vs baselines vs benchmark",
-            "2. Watchlist composition over time — translucent = watchlisted, solid = funded by optimizer",
+            "2. Watchlist composition over time",
             "3. Cumulative $ gain per holding",
             "4. Cumulative $ gain per wave bucket",
             "5. Actual portfolio $ by wave over time",
@@ -4974,7 +4974,7 @@ def build_curator_dashboard(
                               hovertemplate="%{y}: $%{customdata:,.0f} per article signed<extra></extra>"))
         _f.update_layout(template="seaborn", height=max(240, 26 * len(_rws) + 120),
                          margin={"t": 20, "l": 230, "r": 30},
-                         xaxis={"title": "|$ P&L per pool article| (log; green = +, red = &minus;)", "type": "log"})
+                         xaxis={"title": "|$ P&L per pool article| (log)", "type": "log"})
         _gain_per_art = _to_html(_f)
 
     # 10. Gain PER ARTICLE by LEDE SOURCE (same metric as plot 9): total forward gain of adds cited from
@@ -5000,7 +5000,7 @@ def build_curator_dashboard(
             customdata=[[r[1], r[2]] for r in _lsr],
             hovertemplate="%{y}: $%{customdata[0]:,.0f} signed (n=%{customdata[1]} adds)<extra></extra>"))
         _lsf.update_layout(template="seaborn", height=240, margin={"t": 20, "l": 210, "r": 40},
-                           xaxis={"title": "|$ P&L per article| (log; green = +, red = &minus;)",
+                           xaxis={"title": "|$ P&L per article| (log)",
                                   "type": "log"})
         _gain_ledesrc = _to_html(_lsf)
     _ledesrc_note = ('<p style="color:#555;max-width:820px;margin:0 0 .4em;">Plot&nbsp;9&#39;s <b>$ P&amp;L per '
@@ -5397,7 +5397,9 @@ def build_curator_dashboard(
         'optimized) over time. The buy-and-hold portfolio has equal amounts of '
         f'<code>[{_html.escape(", ".join(starter_tickers))}]</code> and is held without any '
         'rebalancing across the window. '
-        'Throughout the charts below: <code>general_markets</code> = defensive '
+        'In chart&nbsp;2 a translucent bar means the ticker was on the watchlist and a solid bar means the '
+        'optimizer funded it; bar colour is the wave bucket. Throughout the charts below: '
+        '<code>general_markets</code> = defensive '
         'equity ETFs (broad-market / dividend / utilities / staples); '
         '<code>cashlike</code> = bonds + cash-equivalents + precious metals '
         '(e.g., AGG, BIL, IAU).</p>'

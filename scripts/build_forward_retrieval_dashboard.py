@@ -97,11 +97,11 @@ def build(corpus_dir: str, out: Path) -> None:
     fig = make_subplots(
         rows=5, cols=1, vertical_spacing=0.075,
         subplot_titles=(
-            "1. Daily pull: new articles vs sightings — a sighting is one search hit (the same story is returned day after day); a new article is the first time a story enters the corpus. Flat at zero = the cron stopped",
-            "2. Non-articles ingested (quote / ticker pages) — never reach the curator, but show query drift",
-            "3. Body-text and byline capture rate — how much arrives as more than a headline",
-            "4. Articles per wave — which waves the queries are actually feeding",
-            "5. Pool size fed to each curation — what the curator read on the day it decided",
+            "1. Sightings and new articles per day",
+            "2. Non-articles ingested per day",
+            "3. Body-text and byline capture rate",
+            "4. Articles per wave",
+            "5. Pool size per curation",
         ))
 
     # 1. new vs sightings
@@ -183,9 +183,11 @@ def build(corpus_dir: str, out: Path) -> None:
         '<h1>Retriever Forwardtest (RFT)</h1>'
         + dash_nav.render("retrieval_forward.html")
         + '<p style="color:#555;max-width:860px;">Health of the live WebSearch feed behind the Curator '
-          'Forwardtest (CFT). Every chart is about <b>ingest quality</b>, not market outcome: whether the '
-          'daily cron is running, how much of what it collects is really an article, and how much arrives '
-          'with enough text for the curator to reason over. Sister page: '
+          'Forwardtest (CFT) &mdash; ingest quality, not market outcome. A <b>sighting</b> is one search hit; '
+          'the same story is returned day after day and by several wave queries at once. A <b>new article</b> '
+          'is the first time a story enters the corpus, so the gap between the two bars in chart 1 is '
+          'redundancy, and both bars flat at zero means the daily cron stopped. <b>Non-articles</b> are quote '
+          'and ticker pages: stored, tagged, never fed to a curator. Sister page: '
           '<a href="retrieval_bootstrap.html">RBS</a> covers the bootstrap-era corpus.</p>'
         + cards
         + fig.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False})
