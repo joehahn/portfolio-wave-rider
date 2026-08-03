@@ -243,6 +243,31 @@ def build(corpus_dir: str, out: Path) -> None:
     gaps = [d for d in span if d not in pull_days]
     last_gap = f"{len(gaps)} day(s) with no pull" if gaps else "none"
 
+    # Attrition at the MOST RECENT curation: of the articles sitting in that rebalance's news window and
+    # already harvested, what share actually reached the curator? The shortfall is read_slice's filtering
+    # -- quote/landing pages and (mostly) undated-and-textless records, i.e. extraction failures. Plot 1
+    # counts intake and plot 5 counts survivors; neither shows the gap between them, which is the number
+    # that says whether the feed is healthy. Numerator comes from read_slice itself so the two can't drift;
+    # only the cheap window test is restated here.
+    _reach = None
+    if pool_rows:
+        _asof = max(r[1] for r in pool_rows)
+        try:
+            _end, _lb = date.fromisoformat(_asof), _news_lb
+            _kept = len(_corpus.read_slice(_asof, _lb))
+            _win = 0
+            for a in arts:
+                _p = (a.get("first_pulled_at") or "")[:10]
+                if _p and _p > _asof:          # not yet harvested on that date; not the feed's fault
+                    continue
+                _d = _iso(a.get("published_date")) or _iso(a.get("first_pulled_at"))
+                if _d and _end - timedelta(days=_lb) < _d <= _end:
+                    _win += 1
+            if _win:
+                _reach = (100.0 * _kept / _win, _kept, _win, _asof)
+        except Exception:  # noqa: BLE001 - a card is not worth failing the render over
+            _reach = None
+
     def _card(v, label, warn=False):
         return (f'<div style="display:inline-block;min-width:132px;margin:0 1.4em 0.8em 0">'
                 f'<b style="font-size:1.45em;color:{RED if warn else "#0b7285"}">{v}</b><br>'
@@ -261,6 +286,8 @@ def build(corpus_dir: str, out: Path) -> None:
              + _card(f"{100 * sum(1 for x in ages if x > _news_lb) / len(ages):.0f}%" if ages else "n/a",
                      f"older than the {_news_lb}d window",
                      warn=bool(ages) and sum(1 for x in ages if x > _news_lb) / len(ages) > 0.30)
+             + (_card(f"{_reach[0]:.0f}%", f"reached the curator ({_reach[1]}/{_reach[2]}, {_reach[3]})",
+                      warn=_reach[0] < 70) if _reach else "")
              + "</div>")
 
     body = (
