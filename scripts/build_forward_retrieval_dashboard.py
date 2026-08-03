@@ -204,7 +204,8 @@ def build(corpus_dir: str, out: Path) -> None:
     fig.update_yaxes(title_text="search hits", row=1, col=1, secondary_y=True,
                      showgrid=False, rangemode="tozero")
     fig.update_yaxes(title_text="count", row=2, col=1)
-    fig.update_yaxes(title_text="% of the day's new articles", range=[0, 100], row=3, col=1)
+    # to 105, not 100: a day at full capture sits ON the frame otherwise and reads as clipped
+    fig.update_yaxes(title_text="% of the day's new articles", range=[0, 105], row=3, col=1)
     fig.update_yaxes(title_text="articles", row=4, col=1)
     fig.update_yaxes(title_text="articles in pool", row=5, col=1)
     fig.add_trace(go.Bar(x=age_bins, y=age_counts, marker_color=BLUE, showlegend=False,
