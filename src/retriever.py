@@ -74,6 +74,37 @@ class Retriever(Protocol):
         ...
 
 
+# A pull fires ~80 fetches back-to-back at a handful of domains, which earns 503s from the busier ones
+# (benzinga, zerohedge, businessinsider all showed >50% failure). Measured cause is rate limiting, not
+# paywalls: the same URLs return full text on a later single request. So: browser UA, a short pause
+# between attempts, and two retries with backoff.
+_UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
+       "(KHTML, like Gecko) Chrome/126.0 Safari/537.36")
+_FETCH_TRIES = 3
+_FETCH_BACKOFF = (0.0, 1.5, 4.0)      # seconds before attempt 1, 2, 3
+
+
+def fetch_html(url: str, tries: int = _FETCH_TRIES) -> "str | None":
+    """Page HTML, or None. Retries transient failures; a browser UA keeps naive bot filters quiet."""
+    import time
+    import urllib.request
+    for attempt in range(tries):
+        if _FETCH_BACKOFF[min(attempt, len(_FETCH_BACKOFF) - 1)]:
+            time.sleep(_FETCH_BACKOFF[min(attempt, len(_FETCH_BACKOFF) - 1)])
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": _UA,
+                                                       "Accept-Language": "en-US,en;q=0.9"})
+            with urllib.request.urlopen(req, timeout=25) as r:
+                if 200 <= getattr(r, "status", 200) < 300:
+                    return r.read().decode("utf-8", "ignore")
+        except Exception:  # noqa: BLE001 - 5xx/timeout/reset: worth another try
+            pass
+    try:                                   # last resort: trafilatura's own fetcher
+        return trafilatura.fetch_url(url)
+    except Exception:  # noqa: BLE001
+        return None
+
+
 def _extract_article(url: str, cid: str, res: dict, pulled_at: str, query: str, wave: str) -> dict[str, Any]:
     """Fetch a live page and extract its body + metadata (title, AUTHOR byline, date, full text) via
     trafilatura. Shared by every retriever, so author capture lives in ONE place. A dead/paywalled/JS
@@ -83,7 +114,7 @@ def _extract_article(url: str, cid: str, res: dict, pulled_at: str, query: str, 
         res.get("title", ""), None, None, None, "", "", None, None)
     ok = False
     try:
-        html = trafilatura.fetch_url(url)
+        html = fetch_html(url)
         if html:
             j = trafilatura.extract(html, output_format="json", with_metadata=True,
                                     favor_precision=True, include_comments=False)
@@ -94,7 +125,9 @@ def _extract_article(url: str, cid: str, res: dict, pulled_at: str, query: str, 
                 author = m.get("author")
                 pub_date = m.get("date")
                 language = m.get("language")
-                snippet = (m.get("description") or full_text[:300]).strip()
+                # an error/interstitial page must not be stored as if it were reporting
+                snippet = corpus.clean_lede((m.get("description") or full_text[:300]))
+                full_text = corpus.clean_lede(full_text)
                 image = m.get("image")
                 publisher = m.get("sitename")
                 ok = bool(full_text)
