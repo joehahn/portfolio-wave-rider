@@ -5,12 +5,12 @@ RBS shows the bootstrap-era corpus (backtest tail spliced onto the forward pulls
 different in kind: it watches the health of the LIVE WebSearch feed that the forward curator (CFT) eats,
 day by day. Deliberately NOT a re-plot of RBS's volume charts -- the questions here are:
 
-  1. is the cron still pulling, and how much is genuinely new?
-  2. how much of what it pulls is not an article at all (quote/ticker pages)?
-  3. how much arrives with usable body text rather than a bare headline?
-  4. how often is an author captured?
-  5. which waves are being fed, and which are starving?
-  6. how big was the pool each CFT curation actually read?
+  - is the cron still pulling, and how much is genuinely new?
+  - how much of what it pulls is not an article at all (quote/ticker pages)?
+  - how much arrives with usable body text rather than a bare headline, and with an author?
+  - how big was the pool each CFT curation actually read, and what share of the window reached it?
+  - how stale is the material the search engine returns?
+  - which waves are being fed, and which are starving?
 
 Reads data/forward_corpus/{articles,appearances,pulls}.jsonl plus the curator run dirs' pool files.
 Render-only: no LLM call, no network. Refreshed by the daily news_pull.sh cron after the pull.
@@ -138,9 +138,9 @@ def build(corpus_dir: str, out: Path) -> None:
             "1. Articles seen per day, and how many were new",
             "2. Non-articles ingested per day",
             "3. Body-text and author capture rate",
-            "4. Articles per wave",
-            "5. Pool size per CFT curation",
-            "6. Article age when pulled",
+            "4. Pool size per CFT curation",
+            "5. Article age when pulled",
+            "6. Articles per wave",
         ))
 
     # 1. new vs sightings
@@ -173,19 +173,19 @@ def build(corpus_dir: str, out: Path) -> None:
                              mode="lines+markers", line={"color": GREEN}, legend="legend2"), row=3, col=1)
     fig.add_trace(go.Scatter(x=span, y=[_rate(auth_by_day, d) for d in span], name="% with author",
                              mode="lines+markers", line={"color": ORANGE}, legend="legend2"), row=3, col=1)
-    # 4. waves
-    wave_n = Counter(a.get("first_wave") or "?" for a in arts)
-    _w = wave_n.most_common()
-    fig.add_trace(go.Bar(x=[w for w, _ in _w], y=[n for _, n in _w], marker_color=BLUE,
-                         showlegend=False), row=4, col=1)
-    # 5. pools per curation. No max_articles cap line here: that knob truncates BACKTEST-retrieval pools,
+    # 4. pools per curation. No max_articles cap line here: that knob truncates BACKTEST-retrieval pools,
     # and every pool plotted above is fed by the forward WebSearch corpus, which sets its own result count.
     for run, colour in (("CFT", BLUE),):
         rows = sorted((r for r in pool_rows if r[0] == run), key=lambda r: r[1])
         if rows:
             fig.add_trace(go.Scatter(x=[r[1] for r in rows], y=[r[2] for r in rows], name=f"{run} pool",
                                      mode="lines+markers", line={"color": colour},
-                                     legend="legend3"), row=5, col=1)
+                                     legend="legend3"), row=4, col=1)
+    # 6. waves, last: a census of the whole corpus, not a per-day time series like 1-5.
+    wave_n = Counter(a.get("first_wave") or "?" for a in arts)
+    _w = wave_n.most_common()
+    fig.add_trace(go.Bar(x=[w for w, _ in _w], y=[n for _, n in _w], marker_color=BLUE,
+                         showlegend=False), row=6, col=1)
 
     fig.update_layout(template="seaborn", height=1780, barmode="overlay",
                       margin={"t": 60, "l": 70, "r": 190, "b": 60})
@@ -201,37 +201,37 @@ def build(corpus_dir: str, out: Path) -> None:
                      "bgcolor": "rgba(255,255,255,0.85)", "font": {"size": 12}}
     fig.update_layout(legend={**_legend_style, "y": _dom_top(1)},
                       legend2={**_legend_style, "y": _dom_top(3)},
-                      legend3={**_legend_style, "y": _dom_top(5)})
+                      legend3={**_legend_style, "y": _dom_top(4)})
     fig.update_yaxes(title_text="articles", row=1, col=1, secondary_y=False)
     fig.update_yaxes(title_text="search hits", row=1, col=1, secondary_y=True,
                      showgrid=False, rangemode="tozero")
     fig.update_yaxes(title_text="count", row=2, col=1)
     # to 105, not 100: a day at full capture sits ON the frame otherwise and reads as clipped
     fig.update_yaxes(title_text="% of the day's new articles", range=[0, 105], row=3, col=1)
-    fig.update_yaxes(title_text="articles", row=4, col=1)
-    fig.update_yaxes(title_text="articles in pool", row=5, col=1)
+    fig.update_yaxes(title_text="articles in pool", row=4, col=1)
+    fig.update_yaxes(title_text="articles", row=6, col=1)
     fig.add_trace(go.Bar(x=age_bins, y=age_counts, marker_color=BLUE, showlegend=False,
-                         hovertemplate="%{x} day(s) old: %{y} articles<extra></extra>"), row=6, col=1)
+                         hovertemplate="%{x} day(s) old: %{y} articles<extra></extra>"), row=5, col=1)
     # median line: the typical article, which the long evergreen tail pulls the MEAN far away from
     if _median_age is not None:
         _mlab = str(_median_age) if _median_age < _cap else f"{_cap}+"
         _mx = age_bins.index(_mlab)
-        fig.add_vline(x=_mx, row=6, col=1, line={"dash": "dot", "color": GREEN, "width": 1.5})
+        fig.add_vline(x=_mx, row=5, col=1, line={"dash": "dot", "color": GREEN, "width": 1.5})
         fig.add_annotation(x=_mx, y=0.72, yref="y domain", yanchor="top", xanchor="left",
                            text=f" median = {_median_age}d", showarrow=False,
-                           font={"size": 11, "color": GREEN}, row=6, col=1)
+                           font={"size": 11, "color": GREEN}, row=5, col=1)
     # the curator's window: everything to the right of this line is ingested but never read
     # categorical axis: position the cutoff by INDEX, between the ">lookback" and "lookback" categories
     _cut = age_bins.index(str(_news_lb)) - 0.5
-    fig.add_vline(x=_cut, row=6, col=1, line={"dash": "dash", "color": RED, "width": 1.5})
+    fig.add_vline(x=_cut, row=5, col=1, line={"dash": "dash", "color": RED, "width": 1.5})
     fig.add_annotation(x=_cut, y=0.92, yref="y domain", yanchor="top", xanchor="right",
                        text=f"older than news_lookback_days = {_news_lb} ", showarrow=False,
-                       font={"size": 11, "color": RED}, row=6, col=1)
+                       font={"size": 11, "color": RED}, row=5, col=1)
     # NB literal arrows, not HTML entities: plotly renders axis titles as SVG text and would print
     # "&larr;" verbatim.
     fig.update_xaxes(title_text="days between publication and pull   ← older · fresher →",
-                     row=6, col=1)
-    fig.update_yaxes(title_text="articles", row=6, col=1)
+                     row=5, col=1)
+    fig.update_yaxes(title_text="articles", row=5, col=1)
     for _st in fig.layout.annotations[:_n_titles]:
         _st.update(font={"size": 16, "color": "#111"}, x=0.0, xanchor="left", text=f"<b>{_st.text}</b>")
 
