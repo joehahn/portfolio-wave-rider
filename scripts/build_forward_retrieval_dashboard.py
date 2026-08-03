@@ -161,7 +161,7 @@ def build(corpus_dir: str, out: Path) -> None:
                          marker_color=RED, showlegend=False), row=2, col=1)
     # 3. capture rates
     _rate = lambda num, d: (100.0 * num.get(d, 0) / new_by_day[d]) if new_by_day.get(d) else None  # noqa: E731
-    fig.add_trace(go.Scatter(x=span, y=[_rate(lede_by_day, d) for d in span], name="% with lede",
+    fig.add_trace(go.Scatter(x=span, y=[_rate(lede_by_day, d) for d in span], name="% with body text",
                              mode="lines+markers", line={"color": GREEN}, legend="legend2"), row=3, col=1)
     fig.add_trace(go.Scatter(x=span, y=[_rate(auth_by_day, d) for d in span], name="% with author",
                              mode="lines+markers", line={"color": ORANGE}, legend="legend2"), row=3, col=1)
