@@ -102,12 +102,13 @@ def build(corpus_dir: str, out: Path) -> None:
         except Exception:  # noqa: BLE001 - one of the two dates is missing/unparseable
             pass
     _news_lb = int(_pf.load_financial_model().get("news_lookback_days") or 14)
-    _cap = 30
+    _cap = 24                       # everything this old or older collapses into one overflow bin
     # oldest on the LEFT, freshest on the right: the eye then travels toward "today", and the
     # news_lookback_days line reads as a cutoff with the unusable material behind it.
-    age_bins = [f">{_cap}"] + [str(i) for i in range(_cap, -1, -1)]
-    age_counts = ([sum(1 for x in ages if x > _cap)]
-                  + [sum(1 for x in ages if x == i) for i in range(_cap, -1, -1)])
+    age_bins = [f"{_cap}+"] + [str(i) for i in range(_cap - 1, -1, -1)]
+    age_counts = ([sum(1 for x in ages if x >= _cap)]
+                  + [sum(1 for x in ages if x == i) for i in range(_cap - 1, -1, -1)])
+    _median_age = sorted(ages)[len(ages) // 2] if ages else None
 
     # ---- pools actually fed to curations (what read_slice returned, per run dir)
     pool_rows = []
@@ -201,6 +202,14 @@ def build(corpus_dir: str, out: Path) -> None:
     fig.update_yaxes(title_text="articles in pool", row=5, col=1)
     fig.add_trace(go.Bar(x=age_bins, y=age_counts, marker_color=BLUE, showlegend=False,
                          hovertemplate="%{x} day(s) old: %{y} articles<extra></extra>"), row=6, col=1)
+    # median line: the typical article, which the long evergreen tail pulls the MEAN far away from
+    if _median_age is not None:
+        _mlab = str(_median_age) if _median_age < _cap else f"{_cap}+"
+        _mx = age_bins.index(_mlab)
+        fig.add_vline(x=_mx, row=6, col=1, line={"dash": "dot", "color": GREEN, "width": 1.5})
+        fig.add_annotation(x=_mx, y=0.72, yref="y domain", yanchor="top", xanchor="left",
+                           text=f" median = {_median_age}d", showarrow=False,
+                           font={"size": 11, "color": GREEN}, row=6, col=1)
     # the curator's window: everything to the right of this line is ingested but never read
     # categorical axis: position the cutoff by INDEX, between the ">lookback" and "lookback" categories
     _cut = age_bins.index(str(_news_lb)) - 0.5
