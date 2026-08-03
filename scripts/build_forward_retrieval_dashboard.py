@@ -36,7 +36,9 @@ from src import corpus as _corpus  # noqa: E402  is_article / clean_lede: the SA
 from src import portfolio as _pf  # noqa: E402  news_lookback_days, so the window marker is profile-driven
 
 BLUE, GREEN, ORANGE, RED, GREY = "#1f77b4", "#2ca02c", "#ff7f0e", "#e03131", "#adb5bd"
-CURATOR_RUNS = ("forward-ft", "bootstrap-cbs")   # run dirs whose pools are fed by this corpus
+# Run dir -> display label for plot 5. Explicit, NOT derived by stripping the dir prefix: the dir stayed
+# `forward-ft` through the FT -> CFT rename, so a derived label silently went stale on the chart.
+CURATOR_RUNS = {"forward-ft": "CFT", "bootstrap-cbs": "CBS"}
 
 
 def _iso(s):
@@ -102,6 +104,7 @@ def build(corpus_dir: str, out: Path) -> None:
         except Exception:  # noqa: BLE001 - one of the two dates is missing/unparseable
             pass
     _news_lb = int(_pf.load_financial_model().get("news_lookback_days") or 14)
+    _max_articles = int(_pf.load_backtest_config().get("max_articles") or 0)   # plot 5's cap line
     _cap = 24                       # everything this old or older collapses into one overflow bin
     # oldest on the LEFT, freshest on the right: the eye then travels toward "today", and the
     # news_lookback_days line reads as a cutoff with the unusable material behind it.
@@ -112,14 +115,13 @@ def build(corpus_dir: str, out: Path) -> None:
 
     # ---- pools actually fed to curations (what read_slice returned, per run dir)
     pool_rows = []
-    for run in CURATOR_RUNS:
+    for run, label in CURATOR_RUNS.items():
         for f in sorted((ROOT / "data" / "curator_runs" / run).glob("2*-pool.json")):
             try:
                 j = json.loads(f.read_text())
             except Exception:  # noqa: BLE001
                 continue
-            pool_rows.append((run.replace("forward-", "").replace("bootstrap-", "").upper(),
-                              j.get("as_of_date") or f.stem[:10], int(j.get("n_articles") or 0)))
+            pool_rows.append((label, j.get("as_of_date") or f.stem[:10], int(j.get("n_articles") or 0)))
 
     fig = make_subplots(
         rows=6, cols=1, vertical_spacing=0.065,
@@ -170,13 +172,21 @@ def build(corpus_dir: str, out: Path) -> None:
     _w = wave_n.most_common()
     fig.add_trace(go.Bar(x=[w for w, _ in _w], y=[n for _, n in _w], marker_color=BLUE,
                          showlegend=False), row=4, col=1)
-    # 5. pools per curation
-    for run, colour in (("FT", BLUE), ("CBS", ORANGE)):
+    # 5. pools per curation. The dashed cap explains the flat CBS run: max_articles truncates a
+    # BACKTEST-retrieval pool, so CBS pinned at the cap means "saturated", not "steady supply". The
+    # forward retriever sets its own result count, so the cap does not bind CFT.
+    for run, colour in (("CFT", BLUE), ("CBS", ORANGE)):
         rows = sorted((r for r in pool_rows if r[0] == run), key=lambda r: r[1])
         if rows:
             fig.add_trace(go.Scatter(x=[r[1] for r in rows], y=[r[2] for r in rows], name=f"{run} pool",
                                      mode="lines+markers", line={"color": colour},
                                      legend="legend3"), row=5, col=1)
+    if pool_rows and _max_articles:
+        _px = sorted({r[1] for r in pool_rows})
+        fig.add_trace(go.Scatter(x=[_px[0], _px[-1]], y=[_max_articles] * 2,
+                                 name=f"max_articles={_max_articles}<br>(backtest pools)",
+                                 mode="lines", line={"color": GREY, "dash": "dash", "width": 1.5},
+                                 hoverinfo="skip", legend="legend3"), row=5, col=1)
 
     fig.update_layout(template="seaborn", height=1780, barmode="overlay",
                       margin={"t": 60, "l": 70, "r": 190, "b": 60})
