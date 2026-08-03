@@ -132,6 +132,10 @@ def build(corpus_dir: str, out: Path) -> None:
         ))
 
     # 1. new vs sightings
+    # make_subplots put exactly one annotation per subplot title; anything added later (axis markers) must
+    # NOT be caught by the restyling loop below, which would bold it and drag it to the left margin.
+    _n_titles = len(fig.layout.annotations)
+
     # Bars are ARTICLES (distinct stories); the line is SIGHTINGS (search hits), a different unit, so it
     # gets its own axis. "new to corpus" is a strict subset of "distinct articles seen", drawn on top so
     # the containment is visible rather than implied.
@@ -196,12 +200,12 @@ def build(corpus_dir: str, out: Path) -> None:
                          hovertemplate="%{x} day(s) old: %{y} articles<extra></extra>"), row=6, col=1)
     # the curator's window: everything to the right of this line is ingested but never read
     fig.add_vline(x=_news_lb + 0.5, row=6, col=1, line={"dash": "dash", "color": RED, "width": 1.5})
-    fig.add_annotation(x=_news_lb + 0.5, y=1.0, yref="y domain", yanchor="bottom", xanchor="left",
+    fig.add_annotation(x=_news_lb + 0.5, y=0.92, yref="y domain", yanchor="top", xanchor="left",
                        text=f" news_lookback_days = {_news_lb}", showarrow=False,
                        font={"size": 11, "color": RED}, row=6, col=1)
     fig.update_xaxes(title_text="days between publication and pull", row=6, col=1)
     fig.update_yaxes(title_text="articles", row=6, col=1)
-    for _st in fig.layout.annotations:
+    for _st in fig.layout.annotations[:_n_titles]:
         _st.update(font={"size": 16, "color": "#111"}, x=0.0, xanchor="left", text=f"<b>{_st.text}</b>")
 
     # ---- summary cards
