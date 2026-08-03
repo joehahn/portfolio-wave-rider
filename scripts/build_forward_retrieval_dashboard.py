@@ -79,6 +79,13 @@ def build(corpus_dir: str, out: Path) -> None:
         if k:
             new_by_day[k] += 1
     sight_by_day = Counter((s.get("pulled_at") or "")[:10] for s in apps)
+    # distinct articles seen on a day (a story returned twice by two pulls counts ONCE here). This is the
+    # unit a reader expects, and `new_by_day` is a strict subset of it.
+    _seen_ids_by_day = defaultdict(set)
+    for _s in apps:
+        _seen_ids_by_day[(_s.get("pulled_at") or "")[:10]].add(_s.get("article_id"))
+    distinct_by_day = {d: len(v) for d, v in _seen_ids_by_day.items()}
+    pulls_by_day = Counter((p_.get("pulled_at") or "")[:10] for p_ in pulls)
     nonart_by_day = Counter((a.get("first_pulled_at") or "")[:10] for a in arts if not a.get("is_article"))
     lede_by_day = Counter((a.get("first_pulled_at") or "")[:10] for a in arts if a["_lede"])
     auth_by_day = Counter((a.get("first_pulled_at") or "")[:10] for a in arts if (a.get("author") or "").strip())
@@ -97,7 +104,7 @@ def build(corpus_dir: str, out: Path) -> None:
     fig = make_subplots(
         rows=5, cols=1, vertical_spacing=0.075,
         subplot_titles=(
-            "1. Sightings and new articles per day",
+            "1. Articles seen per day, and how many were new",
             "2. Non-articles ingested per day",
             "3. Body-text and byline capture rate",
             "4. Articles per wave",
@@ -105,10 +112,17 @@ def build(corpus_dir: str, out: Path) -> None:
         ))
 
     # 1. new vs sightings
-    fig.add_trace(go.Bar(x=span, y=[sight_by_day.get(d, 0) for d in span], name="sightings",
-                         marker_color=GREY, legend="legend"), row=1, col=1)
-    fig.add_trace(go.Bar(x=span, y=[new_by_day.get(d, 0) for d in span], name="new articles",
+    # Bars are ARTICLES (distinct stories); the line is SIGHTINGS (search hits), a different unit, so it
+    # gets its own axis. "new to corpus" is a strict subset of "distinct articles seen", drawn on top so
+    # the containment is visible rather than implied.
+    fig.add_trace(go.Bar(x=span, y=[distinct_by_day.get(d, 0) for d in span],
+                         name="distinct articles seen", marker_color=GREY, legend="legend"), row=1, col=1)
+    fig.add_trace(go.Bar(x=span, y=[new_by_day.get(d, 0) for d in span], name="new to corpus",
                          marker_color=BLUE, legend="legend"), row=1, col=1)
+    fig.add_trace(go.Scatter(x=span, y=[sight_by_day.get(d, 0) for d in span], name="sightings (hits)",
+                             mode="lines+markers", line={"color": ORANGE, "width": 1.6, "dash": "dot"},
+                             marker={"size": 5}, yaxis="y6", legend="legend",
+                             hovertemplate="%{x}: %{y} hits<extra></extra>"), row=1, col=1)
     # 2. non-articles
     fig.add_trace(go.Bar(x=span, y=[nonart_by_day.get(d, 0) for d in span], name="non-articles",
                          marker_color=RED, showlegend=False), row=2, col=1)
@@ -144,7 +158,10 @@ def build(corpus_dir: str, out: Path) -> None:
     fig.update_layout(legend={**_legend_style, "y": _dom_top(1)},
                       legend2={**_legend_style, "y": _dom_top(3)},
                       legend3={**_legend_style, "y": _dom_top(5)})
-    fig.update_yaxes(title_text="count", row=1, col=1)
+    fig.update_yaxes(title_text="articles", row=1, col=1)
+    fig.update_layout(yaxis6={"overlaying": "y", "side": "right", "title": "search hits",
+                              "showgrid": False, "rangemode": "tozero",
+                              "domain": list(fig.layout.yaxis.domain)})
     fig.update_yaxes(title_text="count", row=2, col=1)
     fig.update_yaxes(title_text="% of the day's new articles", range=[0, 100], row=3, col=1)
     fig.update_yaxes(title_text="articles", row=4, col=1)
@@ -183,11 +200,12 @@ def build(corpus_dir: str, out: Path) -> None:
         '<h1>Retriever Forwardtest (RFT)</h1>'
         + dash_nav.render("retrieval_forward.html")
         + '<p style="color:#555;max-width:860px;">Health of the live WebSearch feed behind the Curator '
-          'Forwardtest (CFT) &mdash; ingest quality, not market outcome. A <b>sighting</b> is one search hit; '
-          'the same story is returned day after day and by several wave queries at once. A <b>new article</b> '
-          'is the first time a story enters the corpus, so the gap between the two bars in chart 1 is '
-          'redundancy, and both bars flat at zero means the daily cron stopped. <b>Non-articles</b> are quote '
-          'and ticker pages: stored, tagged, never fed to a curator. Sister page: '
+          'Forwardtest (CFT) &mdash; ingest quality, not market outcome. In chart&nbsp;1 the bars count '
+          '<b>articles</b> and the dotted line counts <b>search hits</b> (a different unit, right-hand axis): '
+          'one story returned by three pulls in a day is 3 hits but 1 article. <b>New to corpus</b> is a '
+          'strict subset of <b>distinct articles seen</b> &mdash; the gap between them is stories the feed '
+          'already had. Bars flat at zero means the daily cron stopped. <b>Non-articles</b> are quote and '
+          'ticker pages: stored, tagged, never fed to a curator. Sister page: '
           '<a href="retrieval_bootstrap.html">RBS</a> covers the bootstrap-era corpus.</p>'
         + cards
         + fig.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False})
