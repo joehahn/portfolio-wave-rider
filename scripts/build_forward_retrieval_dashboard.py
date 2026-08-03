@@ -119,10 +119,15 @@ def build(corpus_dir: str, out: Path) -> None:
                          name="distinct articles seen", marker_color=GREY, legend="legend"), row=1, col=1)
     fig.add_trace(go.Bar(x=span, y=[new_by_day.get(d, 0) for d in span], name="new to corpus",
                          marker_color=BLUE, legend="legend"), row=1, col=1)
+    # hits above the bars means the day ran MORE THAN ONE pull (a story is almost never returned twice
+    # inside one pull -- wave queries overlap on ~1% of articles), so the pull count is what explains the
+    # gap. Carried in the hover rather than as another series.
     fig.add_trace(go.Scatter(x=span, y=[sight_by_day.get(d, 0) for d in span], name="sightings (hits)",
                              mode="lines+markers", line={"color": ORANGE, "width": 1.6, "dash": "dot"},
                              marker={"size": 5}, yaxis="y6", legend="legend",
-                             hovertemplate="%{x}: %{y} hits<extra></extra>"), row=1, col=1)
+                             customdata=[pulls_by_day.get(d, 0) for d in span],
+                             hovertemplate="%{x}: %{y} hits from %{customdata} pull(s)<extra></extra>"),
+                  row=1, col=1)
     # 2. non-articles
     fig.add_trace(go.Bar(x=span, y=[nonart_by_day.get(d, 0) for d in span], name="non-articles",
                          marker_color=RED, showlegend=False), row=2, col=1)
@@ -190,6 +195,7 @@ def build(corpus_dir: str, out: Path) -> None:
              + _card(f"{100 * n_auth / n_art:.0f}%", "with a byline")
              + _card(f"{n_non}", "non-articles dropped", warn=n_non / n_art > 0.05)
              + _card(last_gap, "missed pull days", warn=bool(gaps))
+             + _card(f"{sum(1 for d in span if pulls_by_day.get(d, 0) > 1)}", "days with >1 pull")
              + "</div>")
 
     body = (
