@@ -5472,6 +5472,15 @@ def write_review_report(date, decision, apply_res, rec, n_articles, lookback, mo
     L += ["", "## Recommended allocation (mean-variance optimizer)"]
     weights = (rec or {}).get("weights") or {}
     if weights:
+        # An on-demand rebalance can land on a day the optimizer cannot price yet -- a weekend, a holiday,
+        # or before that session's close. The caller then hands back the most recent block it has, which is
+        # the right thing to show (it IS the standing recommendation) but must not masquerade as this
+        # cycle's output: these weights predate the decision above. Say so, with the date they came from.
+        _rd = str((rec or {}).get("as_of") or "")[:10]
+        if _rd and _rd != str(date)[:10]:
+            L.append(f"> Computed **{_rd}**, not {str(date)[:10]}: no trading session had priced this "
+                     f"rebalance yet, so these are the standing weights carried forward. They refresh "
+                     f"automatically on the next weekday snapshot.\n")
         L += ["| ticker | weight |", "|---|---|"]
         for t, w in sorted(weights.items(), key=lambda kv: -kv[1]):
             if w > 0.001:

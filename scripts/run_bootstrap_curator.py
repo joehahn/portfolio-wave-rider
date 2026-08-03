@@ -305,7 +305,11 @@ def main(argv=None) -> int:
             _sel = _rc[_rc["date"] >= _when]
             _blk = _sel[_sel["date"] == _sel["date"].min()] if not _sel.empty else \
                 _rc[_rc["date"] == _rc["date"].max()]
+            # `as_of` = the date these weights were actually computed for. When it predates the decision
+            # (an on-demand rebalance on a day no session has priced yet), the report labels them as
+            # carried forward rather than printing stale weights as if they were this cycle's.
             return {"weights": {str(r.ticker): float(r.weight) for r in _blk.itertuples()},
+                    "as_of": str(_blk["date"].iloc[0])[:10],
                     "sharpe_ratio": float(_blk["sharpe_ratio"].iloc[0]),
                     "expected_annual_return": float(_blk["expected_return"].iloc[0]),
                     "annual_volatility": float(_blk["annual_volatility"].iloc[0])}

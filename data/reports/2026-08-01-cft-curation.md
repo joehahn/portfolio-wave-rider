@@ -20,6 +20,8 @@ _Curator: claude-sonnet-5 · news window: 14d (92 articles read) · recommendati
 - **verdict**: every catalyst this cycle reinforced an already-held name (RKLB, OKLO, LMT, KTOS, GOOGL, NVDA, AMD, SMR/CCJ/BWXT) or pointed to a non-investable/foreign/too-early name (SPCX volatility, Samsung robotics, Humanoid, quantum small-caps scattered across too many tickers to pick one). No candidate cleared the bar of beating the weakest current holding paired with a citable fresh catalyst, so the watchlist stays unchanged this biweekly window.
 
 ## Recommended allocation (mean-variance optimizer)
+> Computed **2026-07-22**, not 2026-08-01: no trading session had priced this rebalance yet, so these are the standing weights carried forward. They refresh automatically on the next weekday snapshot.
+
 | ticker | weight |
 |---|---|
 | LLY | 25.0% |
