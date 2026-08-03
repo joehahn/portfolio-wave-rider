@@ -119,6 +119,9 @@ def build(corpus_dir: str, out: Path) -> None:
 
     fig = make_subplots(
         rows=6, cols=1, vertical_spacing=0.065,
+        # row 1 carries two units (articles as bars, search hits as a line), so it needs a real
+        # secondary axis. Hand-numbering one collides with the subplot axes as rows are added.
+        specs=[[{"secondary_y": True}]] + [[{"secondary_y": False}]] * 5,
         subplot_titles=(
             "1. Articles seen per day, and how many were new",
             "2. Non-articles ingested per day",
@@ -141,10 +144,10 @@ def build(corpus_dir: str, out: Path) -> None:
     # gap. Carried in the hover rather than as another series.
     fig.add_trace(go.Scatter(x=span, y=[sight_by_day.get(d, 0) for d in span], name="sightings (hits)",
                              mode="lines+markers", line={"color": ORANGE, "width": 1.6, "dash": "dot"},
-                             marker={"size": 5}, yaxis="y6", legend="legend",
+                             marker={"size": 5}, legend="legend",
                              customdata=[pulls_by_day.get(d, 0) for d in span],
                              hovertemplate="%{x}: %{y} hits from %{customdata} pull(s)<extra></extra>"),
-                  row=1, col=1)
+                  row=1, col=1, secondary_y=True)
     # 2. non-articles
     fig.add_trace(go.Bar(x=span, y=[nonart_by_day.get(d, 0) for d in span], name="non-articles",
                          marker_color=RED, showlegend=False), row=2, col=1)
@@ -173,17 +176,18 @@ def build(corpus_dir: str, out: Path) -> None:
     # trace in the figure next to chart 1, which read as though ledes/bylines/pools belonged there.
     # Each legend is anchored to the TOP of its subplot's y-domain, so it tracks the layout automatically.
     def _dom_top(row: int) -> float:
-        ax = fig.layout[f"yaxis{'' if row == 1 else row}"]
+        """Top of a subplot's y-domain. NB row 1 owns a secondary axis, so the primary axis for row N is
+        yaxis{N+1} from row 2 on -- read it off the layout rather than assuming yaxis{N}."""
+        ax = fig.layout[f"yaxis{'' if row == 1 else row + 1}"]
         return float(ax.domain[1])
     _legend_style = {"orientation": "v", "x": 1.01, "xanchor": "left", "yanchor": "top",
                      "bgcolor": "rgba(255,255,255,0.85)", "font": {"size": 12}}
     fig.update_layout(legend={**_legend_style, "y": _dom_top(1)},
                       legend2={**_legend_style, "y": _dom_top(3)},
                       legend3={**_legend_style, "y": _dom_top(5)})
-    fig.update_yaxes(title_text="articles", row=1, col=1)
-    fig.update_layout(yaxis6={"overlaying": "y", "side": "right", "title": "search hits",
-                              "showgrid": False, "rangemode": "tozero",
-                              "domain": list(fig.layout.yaxis.domain)})
+    fig.update_yaxes(title_text="articles", row=1, col=1, secondary_y=False)
+    fig.update_yaxes(title_text="search hits", row=1, col=1, secondary_y=True,
+                     showgrid=False, rangemode="tozero")
     fig.update_yaxes(title_text="count", row=2, col=1)
     fig.update_yaxes(title_text="% of the day's new articles", range=[0, 100], row=3, col=1)
     fig.update_yaxes(title_text="articles", row=4, col=1)
@@ -192,7 +196,7 @@ def build(corpus_dir: str, out: Path) -> None:
                          hovertemplate="%{x} day(s) old: %{y} articles<extra></extra>"), row=6, col=1)
     # the curator's window: everything to the right of this line is ingested but never read
     fig.add_vline(x=_news_lb + 0.5, row=6, col=1, line={"dash": "dash", "color": RED, "width": 1.5})
-    fig.add_annotation(x=_news_lb + 0.5, y=1.0, yref="y6 domain", yanchor="bottom", xanchor="left",
+    fig.add_annotation(x=_news_lb + 0.5, y=1.0, yref="y domain", yanchor="bottom", xanchor="left",
                        text=f" news_lookback_days = {_news_lb}", showarrow=False,
                        font={"size": 11, "color": RED}, row=6, col=1)
     fig.update_xaxes(title_text="days between publication and pull", row=6, col=1)
