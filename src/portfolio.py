@@ -361,8 +361,15 @@ def fetch_prices(tickers: list[str], period: str = "3y", interval: str = "1d",
         # Eligible = first trade no later than 5% into the lookback window.
         # A ticker missing more than that would, after the join below, shrink
         # every other ticker's estimation window down to its own start date.
-        window_days = (prices.index[-1] - start).days
-        cutoff = start + pd.Timedelta(days=round(0.05 * window_days))
+        # Both ends are measured off the panel's OWN first session, not off the
+        # requested `start`: `start` is a calendar instant carrying a time of day
+        # (_period_to_start subtracts a fractional year), and on a short lookback
+        # opening over a holiday weekend the first session lands days later than
+        # it. Measuring from `start` then puts EVERY ticker past the cutoff and
+        # empties the universe -- e.g. a 30-day window opening 2026-07-03 (July-4
+        # holiday) grants 2 days of grace but the first bar is 2026-07-06.
+        window_days = (prices.index[-1] - prices.index[0]).days
+        cutoff = prices.index[0] + pd.Timedelta(days=round(0.05 * window_days))
         eligible = [t for t in prices.columns
                     if (fv := prices[t].first_valid_index()) is not None and fv <= cutoff]
         excluded = [t for t in prices.columns if t not in eligible]
@@ -3785,6 +3792,7 @@ def build_curator_dashboard(
     handoff_date: str | None = None,
     compare_backtest_dir: str | None = None,
     actual_csv: str | None = None,
+    plot1_scale: float = 1.0,
 ) -> dict[str, Any]:
     """Render a single static HTML dashboard for one curator-backtest run.
 
@@ -3798,13 +3806,23 @@ def build_curator_dashboard(
     Also includes a small summary table of curation events. No interactive
     backend - this is one static HTML file readable by any browser.
 
-    ``actual_csv`` (forward paper portfolios only, e.g. FT): path to the REAL
+    ``actual_csv`` (forward paper portfolios only, e.g. CFT): path to the REAL
     ``data/snapshots.csv``. When given, the real portfolio's value is drawn on
-    chart 1 next to the paper replay, rescaled to meet it on their first common
-    date so the two are compared on RETURNS, not on absolute dollars (the real
-    book started at a different size). The gap between the lines is execution
-    drift: what following the recommendations would have produced vs what the
-    user's actual holdings did.
+    chart 1 next to the paper replay, in TRUE dollars — today's point is the
+    user's actual account value. Every PAPER curve on chart 1 is instead scaled
+    by the one factor that makes the two meet on their first common date, so the
+    lines start together and are compared on RETURNS, not on account size (the
+    real book started at a different size than the replay's notional $50K). The
+    gap between the lines is execution drift: what following the recommendations
+    would have produced vs what the user's actual holdings did.
+
+    ``plot1_scale`` (forward paper portfolios without a real book, e.g. CBS): a
+    FIXED multiplier on every chart-1 curve, so a run whose replay starts at the
+    profile's notional $50K can be shown at a book size comparable to the user's
+    real money. It is a constant, not a daily re-peg: the curves keep moving with
+    the market after the day it was set. ``actual_csv`` overrides it, since there
+    the real book supplies the anchor itself. Chart 1 only — every other chart and
+    the KPI tables stay in the replay's own dollars.
     """
     import plotly.graph_objects as go
     from plotly.subplots import make_subplots
@@ -3880,8 +3898,9 @@ def build_curator_dashboard(
     fix_final = float(baselines["fixed_total"].dropna().iloc[-1]) if "fixed_total" in baselines else initial
     fix_return = (fix_final / fix_initial) - 1.0
     # Headline buy-and-hold: CBT = equal-weight starter held forever (eq_total, its established headline);
-    # CBS = the naive AAPL/GOOGL/AMZN equal-weight comparator (naive_total), matching its plot-2 blue curve.
-    _bh_hdl = "naive_total" if (acronym == "CBS" and "naive_total" in baselines.columns) else "eq_total"
+    # the forward paper portfolios (CBS/CFT) = the naive AAPL/GOOGL/AMZN equal-weight comparator
+    # (naive_total), matching their plot-1 blue curve. Kept in sync with the _bh_col pick below.
+    _bh_hdl = "naive_total" if (acronym in ("CBS", "CFT") and "naive_total" in baselines.columns) else "eq_total"
     bnh_initial = float(baselines[_bh_hdl].dropna().iloc[0]) if _bh_hdl in baselines else initial
     bnh_final = float(baselines[_bh_hdl].dropna().iloc[-1]) if _bh_hdl in baselines else initial
     bnh_return = (bnh_final / bnh_initial) - 1.0
@@ -3903,27 +3922,36 @@ def build_curator_dashboard(
         _st.update(font={"size": 18, "color": "#111"}, x=0.0, xanchor="left", text=f"<b>{_st.text}</b>")
 
     # Chart 1: equity-curve race.
+    # Real-book anchoring (forward paper portfolios only -- see actual_csv in the docstring). The paper
+    # replay starts at the profile's notional $50K while the real account started at a different size, so
+    # every PAPER curve in chart 1 (curator, rebalance markers, buy-and-hold, benchmarks) is multiplied by
+    # ONE factor `_p1` that lines the replay up with the real book on their first common date. The real
+    # curve is then drawn in TRUE dollars, so its rightmost point is literally today's account value. A
+    # common factor cancels out of every return, so no comparison on this chart changes shape. `_p1` is
+    # chart-1-only: the KPI tables and charts 3-5 stay in the replay's own $50K-based dollars.
+    # Runs with no real book to anchor against (CBS) instead carry a fixed `plot1_scale` from their
+    # _starter.json; a real book, when supplied, wins because it anchors chart 1 on measured dollars.
+    _act = None
+    _p1 = float(plot1_scale)
+    if actual_csv and Path(actual_csv).exists():
+        _a = pd.read_csv(actual_csv, parse_dates=["date"])
+        _a = _a.groupby("date")["total_value"].first().sort_index()
+        _a = _a[(_a.index >= start) & (_a.index <= end)]
+        _anchor = totals.asof(_a.index[0]) if len(_a) else float("nan")
+        if len(_a) > 1 and pd.notna(_anchor) and float(_anchor) > 0:
+            _act, _p1 = _a, float(_a.iloc[0]) / float(_anchor)
     fig.add_trace(
-        go.Scatter(x=totals.index, y=totals.values, name="Curator-driven",
+        go.Scatter(x=totals.index, y=(totals * _p1).values, name="Curator-driven",
                    mode="lines", line={"color": "#d97706", "width": 2.5}),
         row=1, col=1,
     )
-    # The user's REAL portfolio, when asked for (see actual_csv in the docstring). Rescaled to the paper
-    # curve at their first common date, so both lines start together and every later gap is execution
-    # drift rather than a difference in account size.
-    if actual_csv and Path(actual_csv).exists():
-        _act = pd.read_csv(actual_csv, parse_dates=["date"])
-        _act = _act.groupby("date")["total_value"].first().sort_index()
-        _act = _act[(_act.index >= start) & (_act.index <= end)]
-        _anchor = totals.asof(_act.index[0]) if len(_act) else float("nan")
-        if len(_act) > 1 and pd.notna(_anchor) and float(_act.iloc[0]) > 0:
-            _scale = float(_anchor) / float(_act.iloc[0])
-            fig.add_trace(
-                go.Scatter(x=_act.index, y=(_act * _scale).values, name="Actual (your holdings)",
-                           mode="lines", line={"color": "#111", "width": 1.8, "dash": "dot"},
-                           hovertemplate="%{x|%Y-%m-%d}<br>$%{y:,.0f} (rescaled)<extra></extra>"),
-                row=1, col=1,
-            )
+    if _act is not None:
+        fig.add_trace(
+            go.Scatter(x=_act.index, y=_act.values, name="Actual (your holdings)",
+                       mode="lines", line={"color": "#111", "width": 1.8},
+                       hovertemplate="%{x|%Y-%m-%d}<br>$%{y:,.0f} (actual)<extra></extra>"),
+            row=1, col=1,
+        )
     # Orange box on the curator curve at each quarterly rebalance (one per
     # curator call). y = curator portfolio value as of that date (asof picks
     # the nearest snapshot at/before the quarter-end). This single trace both
@@ -3951,7 +3979,7 @@ def build_curator_dashboard(
         _epos = 0 if _pos < 0 else _pos + (0 if _i == 0 else _t_upd)
         if _epos > len(_idx) - 1:
             continue                                             # decided, not yet executed
-        _x, _val = _idx[_epos], float(totals.iloc[_epos])
+        _x, _val = _idx[_epos], float(totals.iloc[_epos]) * _p1   # markers ride the scaled curator curve
         _cj_path = Path(runs_dir) / f"{_d}-curation.json"
         _changed = False
         try:
@@ -3988,27 +4016,30 @@ def build_curator_dashboard(
                                  "<extra></extra>"),
         row=1, col=1,
     )
-    # Blue benchmark curve. CBS = the naive AAPL/GOOGL/AMZN equal-weight buy-and-hold (naive_total) -- a
-    # "what a typical investor might just hold" comparator. CBT keeps its equal-weight starter buy-and-hold
-    # headline (eq_total).
-    _bh_col = "naive_total" if (acronym == "CBS" and "naive_total" in baselines.columns) else "eq_total"
+    # Blue benchmark curve. The forward paper portfolios (CBS/CFT) both use the naive AAPL/GOOGL/AMZN
+    # equal-weight buy-and-hold (naive_total), a "what a typical investor might just hold" comparator, so the
+    # two dashboards' blue curves mean the same thing side by side. CBT keeps its equal-weight starter
+    # buy-and-hold headline (eq_total). Like every paper curve here it is scaled by _p1, so it starts on the
+    # real book's first value rather than the replay's notional $50K.
+    _bh_col = "naive_total" if (acronym in ("CBS", "CFT") and "naive_total" in baselines.columns) else "eq_total"
     _bh_name = "AAPL/GOOGL/AMZN equal-weight (buy-and-hold)" if _bh_col == "naive_total" else "Buy-and-hold"
     if _bh_col in baselines.columns and baselines[_bh_col].notna().any():
         _bh = baselines.dropna(subset=[_bh_col])
         fig.add_trace(
-            go.Scatter(x=_bh["date"], y=_bh[_bh_col],
+            go.Scatter(x=_bh["date"], y=_bh[_bh_col] * _p1,
                        name=_bh_name,
                        mode="lines", line={"color": "#3b82f6", "width": 1.8}),
             row=1, col=1,
         )
     for b, curve in bench_curves.items():
         fig.add_trace(
-            go.Scatter(x=curve.index, y=curve.values, name=f"{b} benchmark",
+            go.Scatter(x=curve.index, y=(curve * _p1).values, name=f"{b} benchmark",
                        mode="lines", line={"color": "#10b981", "width": 1.5, "dash": "dot"}),
             row=1, col=1,
         )
-    if acronym == "CBS":
-        # CBS spans a narrow range ($50-58K), so a linear axis reads cleanly; CBT's $50K->$millions needs log.
+    if acronym in ("CBS", "CFT"):
+        # The forward paper portfolios span a narrow band (weeks, not years: $50-70K), so a linear axis
+        # reads cleanly and small day-to-day gaps stay legible; only CBT's $50K->$567K needs log.
         fig.update_yaxes(title_text="portfolio value ($)", row=1, col=1,
                          tickprefix="$", separatethousands=True)
     else:
@@ -5145,11 +5176,15 @@ def build_curator_dashboard(
             # holdings.csv, inlined as a small collapsible table (browsing a linked .csv just triggers a
             # download prompt). Prices reuse the histories already fetched above; a ticker with no fetched
             # history shows shares only. Missing/empty file -> nothing rendered.
+            # The real book is read ONLY by a run that tracks it, i.e. one given `actual_csv` (CFT). A pure
+            # paper portfolio (CBS) assumes its own recommendation is followed exactly, so holdings.csv is
+            # not its book and must not appear: no holdings table, no section 16. An empty frame here leaves
+            # _hrows/_holdings_html empty, which suppresses both downstream with no further gating.
             _holdings_html = ""
             _hrows: list[tuple] = []
             _htot = 0.0
             try:
-                _hf = pd.read_csv("holdings.csv")
+                _hf = pd.read_csv("holdings.csv") if actual_csv else pd.DataFrame(columns=["ticker", "shares"])
                 _hf = _hf[pd.to_numeric(_hf["shares"], errors="coerce").fillna(0) > 0]
                 if not _hf.empty:
                     # Held tickers are often OUTSIDE the recommendation (that is the whole point of the
@@ -5255,7 +5290,7 @@ def build_curator_dashboard(
                     f'<ul style="margin:.2em 0 0;font-size:14px;">{_rlinks}</ul>')
 
             _trades_html = ""
-            if handoff_date and _hrows and _htot > 0:
+            if _hrows and _htot > 0:      # empty unless this run tracks the real book (see holdings read above)
                 _px_all = {t: px for t, _sh, px, _v in _hrows if px}
                 _px_all.update({t: float(_tkhist[t]["y"][-1]) for t in _tkhist})
                 _cur_sh = {t: sh for t, sh, _px, _v in _hrows}
@@ -5321,7 +5356,7 @@ def build_curator_dashboard(
 
                 + _modal + _trades_html
                 # the holdings table closes section 16: the trades above are what moves THIS book
-                + (_holdings_html if handoff_date else '')
+                + _holdings_html
                 + ('<h2 style="margin:1.6em 0 0.2em;">17. Position sizes</h2>'
                    '<p style="color:#555;max-width:820px;margin:0 0 .4em;">Enter what '
                    'you have to invest and the table gives the dollars and share count each funded ticker '

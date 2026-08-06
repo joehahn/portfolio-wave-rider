@@ -66,7 +66,11 @@ def main(argv=None) -> int:
     portfolio.build_curator_dashboard(
         backtest_dir=str(RUN / "_backtest"), runs_dir=str(RUN), out_path=a.out,
         benchmarks=["SPY"], heading=a.heading, acronym=a.acronym, show_max_articles=False,
-        handoff_date=a.handoff, compare_backtest_dir=_cmp_dir, actual_csv=(a.actual_csv or None))
+        handoff_date=a.handoff, compare_backtest_dir=_cmp_dir, actual_csv=(a.actual_csv or None),
+        # Chart-1-only book-size multiplier, stored per run (not hardcoded here) so a run that has no real
+        # holdings to anchor on can still be plotted at a real-money-comparable size. See the dashboard's
+        # plot1_scale docstring; absent key = 1.0 = the replay's own notional dollars.
+        plot1_scale=float(starter.get("plot1_scale", 1.0)))
     print(f"  {a.acronym} refreshed to {starter['end_date']} -> {a.out}", file=sys.stderr)
     return 0
 
