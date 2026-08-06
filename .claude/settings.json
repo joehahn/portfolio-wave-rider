@@ -6,8 +6,7 @@
       "Bash(mkdir -p data/*)",
       "Bash(rm -f data/state/*.pkl)",
       "Read(//**)",
-      "Write(investor_profile.md)",
-      "Write(data/**)"
+      "Edit(data/**)"
     ]
   }
 }
