@@ -110,9 +110,9 @@ and add the following, editing the `PWR_path` line just once to your actual repo
 ```
 # portfolio-wave-rider: set the repo path once; all jobs below reuse it
 PWR_path=/path/to/portfolio-wave-rider
-# Forward news pull into the corpus, every day incl. weekends, 18:30 local (evening, after the US close)
+# Forward news pull + RBS/RFT dashboard refreshes, every day incl. weekends, 18:30 local (after the US close)
 30 18 * * *  $PWR_path/scripts/news_pull.sh
-# Weekday price snapshot + dashboard refreshes, Mon-Fri 16:30 local
+# Weekday price snapshot + CBS/CFT dashboard refreshes, Mon-Fri 16:30 local
 30 16 * * 1-5  $PWR_path/scripts/price_snapshot.sh
 # Biweekly curation review + report (self-gated by rebalance_period), Mon-Fri 19:00 local
 0 19 * * 1-5  $PWR_path/scripts/review_curation.sh
@@ -120,9 +120,9 @@ PWR_path=/path/to/portfolio-wave-rider
 
 Verify with `crontab -l`. Works the same on macOS and Linux, and leaves any other crontab entries untouched. cron makes the `PWR_path` variable available to every command below it, so it must appear before the job lines. The scripts ship executable, so no `chmod` is needed.
 
-- **Daily at 18:30 local** (`news_pull.sh`, every day including weekends): the forward news pull. It runs your wave queries through Anthropic web_search and appends the raw articles to the frozen corpus under `data/forward_corpus/`. The evening slot (a few hours after the US close) captures the full day including after-hours earnings and evening coverage, freezing each article near its publication date, which keeps the corpus clean for later forward testing.
-- **Weekday at 16:30 local** (`price_snapshot.sh`, Mon to Fri): the price snapshot plus two render-only dashboard refreshes. It snapshots per-ticker prices into `data/snapshots.csv` (well after the 16:00 ET close, so the daily close is final), then re-replays the two paper portfolios against those prices and re-renders them: the Curator Bootstrap (CBS) and the Forwardtest (FT, the landing page). Both run in this one job because they read the same-day snapshot; neither makes an LLM call.
-- **Weekday at 19:00 local** (`review_curation.sh`, Mon to Fri): the self-gating rebalance review. It runs `review --if-due`, which curates the watchlist and writes a fresh recommendation report to `data/reports/` only when a full `rebalance_period` has elapsed since the last review (biweekly at present). The 19:00 slot is after the 18:30 news pull, so the curator reads same-day news; firing every weekday is safe because `--if-due` fires the actual curation only once per period and catches up a missed one on the next weekday. The cadence lives in `investor_profile.md`'s `rebalance_period`, so changing it needs no cron edit.
+- **Daily at 18:30 local** (`news_pull.sh`, every day including weekends): the forward news pull plus two render-only dashboard refreshes. It runs your wave queries through Anthropic web_search and appends the raw articles to the frozen corpus under `data/forward_corpus/`, then re-renders the two retriever dashboards that visualize that corpus, the Retriever Bootstrap (RBS) and the Retriever Forwardtest (RFT). The evening slot (a few hours after the US close) captures the full day including after-hours earnings and evening coverage, freezing each article near its publication date, which keeps the corpus clean for later forward testing.
+- **Weekday at 16:30 local** (`price_snapshot.sh`, Mon to Fri): the price snapshot plus two render-only dashboard refreshes. It snapshots per-ticker prices into `data/snapshots.csv` (well after the 16:00 ET close, so the daily close is final), then re-replays the two paper portfolios against those prices and re-renders them: the Curator Bootstrap (CBS) and the Curator Forwardtest (CFT, the landing page). Both run in this one job because they read the same-day snapshot; neither makes an LLM call.
+- **Weekday at 19:00 local** (`review_curation.sh`, Mon to Fri): the self-gating rebalance curation, and the only cron step that calls the curator LLM. It re-curates each paper portfolio (CBS, then CFT, which also writes a fresh recommendation report to `data/reports/`) only when a full `rebalance_period` has elapsed since that portfolio's last curation (biweekly at present). The 19:00 slot is after the 18:30 news pull, so the curator reads same-day news; firing every weekday is safe because `--if-due` fires the actual curation only once per period and catches up a missed one on the next weekday. The cadence lives in `investor_profile.md`'s `rebalance_period`, so changing it needs no cron edit.
 
 All jobs append timestamped output to `data/snapshot.log`, and all tolerate failures so a web_search or price hiccup never blocks the rest.
 

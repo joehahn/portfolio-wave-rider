@@ -4,7 +4,7 @@ CLI flags, repo layout, architecture, and testing instructions for Portfolio Wav
 
 ## CLI reference
 
-Nine subcommands (`init-holdings`, `analyze`, `snapshot`, `recommend`, `curate`, `backtest`, `dashboard`, `pull-news`, `review`). The daily crons call `pull-news`, `snapshot`, and `dashboard`; the biweekly cron calls `review --if-due`, which curates, applies, re-optimizes, and writes its report in one process. `analyze`, `curate`, and `backtest` are manual spot-check tools. Every subcommand prints a single JSON blob to stdout.
+Nine subcommands (`init-holdings`, `analyze`, `snapshot`, `recommend`, `curate`, `backtest`, `dashboard`, `pull-news`, `review`). The crons call only `pull-news` and `snapshot`; the dashboard refreshes and the biweekly curation run through the `scripts/` helpers (`build_bootstrap_dashboard.py`, `build_forward_retrieval_dashboard.py`, `refresh_cbs.py`, `run_bootstrap_curator.py`), which drive the paper portfolios in `data/curator_runs/`. `analyze`, `curate`, `backtest`, `dashboard`, and `review` are manual tools; `review` curates, applies, re-optimizes, and writes its report for the root portfolio in one process. Every subcommand prints a single JSON blob to stdout.
 
 ```bash
 # Convert a per-ticker dollar allocation into share counts at today's prices, and
@@ -106,9 +106,11 @@ portfolio-wave-rider/
 │   ├── sweep_watchlist_size.py # aggregates per-cap _backtest dirs into the cap-sweep page
 │   ├── walk_forward.py         # robustness check: are sweep winners stable across halves of the window?
 │   ├── run_sweeps.sh           # convenience runner for the three replay sweeps
-│   ├── price_snapshot.sh        # cron entry: snapshot + dashboard, logs to data/snapshot.log
-│   ├── install_cron.sh         # idempotent installer for the cron entry
-│   └── autopush_docs.sh        # auto-pushes docs/ when cron updates docs/index.html
+│   ├── news_pull.sh            # cron entry (daily 18:30): pull-news + RBS/RFT dashboard refreshes
+│   ├── price_snapshot.sh       # cron entry (weekday 16:30): snapshot + CBS/CFT dashboard refreshes
+│   ├── review_curation.sh      # cron entry (weekday 19:00): biweekly CBS + CFT curation, --if-due
+│   ├── install_cron.sh         # idempotent installer for the three cron entries
+│   └── autopush_docs.sh        # Stop hook: pushes root *.md + docs/*.html at the end of a Claude session
 ├── tests/
 ├── data/                       # gitignored except curator_runs/ and backtest_curator_*/
 │   ├── snapshots.csv           # daily, appended (your history)
@@ -155,30 +157,33 @@ The "Profile conflicts" section of any report is the most important thing to rea
 
 ## How it's built
 
-The diagram below shows the `cli review` flow, the recurring path that fires once per rebalance (`scripts/review_curation.sh`, self-gated by `--if-due`). Everything inside `review` runs in-process: read the corpus slice, call the curator, validate and apply its decisions, re-optimize, write the report.
+The diagram below shows the recurring path that fires once per rebalance: `scripts/review_curation.sh` runs `scripts/run_bootstrap_curator.py --if-due` once per paper portfolio (CBS, then CFT). Everything runs in-process: read the corpus slice, call the curator, validate and apply its decisions, re-optimize, re-render the dashboard, and (CFT only, via `--report`) write the report. All state lives inside that portfolio's `data/curator_runs/<run>/` directory, so the root `watchlist.csv` and `data/recommendations.csv` are untouched; the same in-process sequence on the root portfolio is `cli review`, kept for deliberate manual runs.
 
 ```mermaid
 flowchart TD
-    cron([cron: review_curation.sh]) -->|review --if-due| review[CLI: review]
+    cron([cron: review_curation.sh]) -->|run_bootstrap_curator.py --if-due| review[CBS + CFT curation]
     profile[(investor_profile.md)] -.read.-> review
-    watchlist[(watchlist.csv)] -.read.-> review
+    watchlist[(run dir: curation JSONs)] -.read.-> review
     corpus[(forward_corpus)] -.read.-> review
     review --> curator[curator LLM via src/curator.py]
     curator -->|JSON decision| apply[apply_curator_decisions]
-    apply -->|mutates| watchlist_w[watchlist.csv]
-    apply -->|appends| history[(curation_history.csv)]
-    apply --> recommend[recommend_portfolio]
-    recommend -->|appends| recs[(recommendations.csv)]
-    recommend --> report[/review report.md/]
-    snapcron([cron: price_snapshot.sh]) --> dash[CLI: dashboard]
-    dash --> idx[/docs/index.html/]
+    apply -->|writes| watchlist_w[/run dir: date-curation.json/]
+    apply -->|appends| history[(run dir: curation_history.csv)]
+    apply --> recommend[recommend_portfolio replay]
+    recommend -->|appends| recs[(run dir: _backtest/recommendations.csv)]
+    recommend --> report[/CFT: data/reports/date-CFT-curation.md/]
+    recommend --> idx[/docs/index.html + curator_bootstrap.html/]
+    snapcron([cron: price_snapshot.sh]) -->|refresh_cbs.py, render-only| idx
+    newscron([cron: news_pull.sh]) --> pull[CLI: pull-news]
+    pull -->|appends| corpus
+    pull --> rdash[/docs/retrieval_bootstrap.html + retrieval_forward.html/]
 
     classDef agent fill:#e1f0ff,stroke:#3b82f6
     classDef cli fill:#fef3c7,stroke:#d97706
     classDef file fill:#f3f4f6,stroke:#6b7280
     class curator agent
-    class review,apply,recommend,dash cli
-    class report,idx,history,recs file
+    class review,apply,recommend,pull cli
+    class report,idx,rdash,history,recs,watchlist_w file
 ```
 
 One LLM call (blue) sits inside a chain of Python steps (yellow). The profile is the source of truth; the curator decides composition; the optimizer decides weights.
@@ -280,15 +285,23 @@ Tested whether putting GBTC (the spot-BTC trust, full 2021→2026 price history)
 
 ## Automation (cron, cross-platform)
 
-One cron entry handles daily price snapshots and dashboard refresh. Install with:
+Three cron entries drive the forward loop. Install with:
 
 ```bash
 ./scripts/install_cron.sh
 ```
 
-The helper appends one line to your crontab (preserving anything else there) that fires `scripts/price_snapshot.sh` Mon-Fri at 16:30 local. Works the same on macOS and Linux. Both scripts resolve their own location, so there's no `PROJ` variable to maintain. `install_cron.sh` is idempotent (re-running is safe). To uninstall: `crontab -e` and delete the matching line.
+The helper appends three jobs to your crontab, preserving anything else there:
 
-Each fire runs `snapshot` then `dashboard`, appending timestamped output to `data/snapshot.log`. cron only fires while the machine is awake; missed runs do not auto-replay. Use `--date YYYY-MM-DD` on `snapshot` to backfill a missed day.
+| When | Script | What it does |
+| --- | --- | --- |
+| Daily 18:30 (incl. weekends) | `news_pull.sh` | `pull-news` into `data/forward_corpus/`, then re-render RBS (`docs/retrieval_bootstrap.html`) and RFT (`docs/retrieval_forward.html`) |
+| Weekday 16:30 | `price_snapshot.sh` | `snapshot --force` into `data/snapshots.csv`, then re-replay and re-render CBS (`docs/curator_bootstrap.html`) and CFT (`docs/index.html`) |
+| Weekday 19:00 | `review_curation.sh` | `run_bootstrap_curator.py --if-due` for CBS then CFT; self-gates to `rebalance_period`, so the curator LLM fires once per period |
+
+The dashboard refreshes in the first two jobs are render-only (no LLM, no API cost); the 19:00 job is the only one that calls the curator. Works the same on macOS and Linux. Every script resolves its own location, so there's no `PROJ` variable to maintain. `install_cron.sh` is idempotent (re-running is safe). To uninstall: `crontab -e` and delete the matching lines.
+
+All three append timestamped output to `data/snapshot.log`. cron only fires while the machine is awake; missed runs do not auto-replay. Use `--date YYYY-MM-DD` on `snapshot` to backfill a missed day. Every other page under `docs/` (the backtest, sweep, diagnostics, and pool-browser renders) is built manually.
 
 The cron refreshes `docs/index.html`. The file is git-tracked but cron does not push — `git status` will show it modified after each run, and a manual `git add docs/index.html && git commit && git push` publishes the refresh.
 
