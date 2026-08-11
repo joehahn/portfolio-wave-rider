@@ -107,6 +107,40 @@ def build(corpus_dir: str, out: Path) -> None:
         except Exception:  # noqa: BLE001 - one of the two dates is missing/unparseable
             pass
     _news_lb = int(_pf.load_financial_model().get("news_lookback_days") or 14)
+
+    # ---- query health. Every query's outcome is logged per pull, but the pull TOLERATES per-query errors
+    # so a query can fail silently forever: arstechnica.com blocking Anthropic's crawler 400'd the whole
+    # specialty sweep (half the queries) from 2026-07-22 to 08-11 with no visible symptom. Plotted as
+    # counts, not a rate, so a shrinking query budget is as obvious as a failing one.
+    q_ok, q_zero, q_err = Counter(), Counter(), Counter()
+    for p in pulls:
+        _pd = (p.get("pulled_at") or "")[:10]
+        for k, v in (p.get("query_stats") or {}).items():
+            if str(k).startswith("_") or not isinstance(v, dict):
+                continue                      # per-pull diagnostics (_lede_sources, ...), not queries
+            if "error" in v:
+                q_err[_pd] += 1
+            elif int(v.get("results") or 0) > 0:
+                q_ok[_pd] += 1
+            else:
+                q_zero[_pd] += 1
+
+    # ---- staleness OVER TIME, across every article the engine returned that day (repeats included, since
+    # the question is how old the result SET is, not how old the new arrivals are). The all-time histogram
+    # below cannot show a drift: a slide from 9d to 32d just widens it. A median over ~80 items a day is
+    # steady enough to read as a trend, where a median over the 2-7 genuinely new ones is pure noise.
+    _by_id = {a.get("article_id"): a for a in arts}
+    med_age_by_day, pct_fresh_by_day = {}, {}
+    for _d, _ids in _seen_ids_by_day.items():          # DISTINCT per day: two pulls must not double-count
+        _at = _iso(_d)
+        _xs = sorted((_at - _iso(_by_id[i].get("published_date"))).days
+                     for i in _ids
+                     if _at and i in _by_id and _iso(_by_id[i].get("published_date")))
+        if not _xs:
+            continue
+        med_age_by_day[_d] = _xs[len(_xs) // 2]
+        pct_fresh_by_day[_d] = 100.0 * sum(1 for x in _xs if x <= _news_lb) / len(_xs)
+
     _cap = 24                       # everything this old or older collapses into one overflow bin
     # oldest on the LEFT, freshest on the right: the eye then travels toward "today", and the
     # news_lookback_days line reads as a cutoff with the unusable material behind it.
@@ -130,17 +164,20 @@ def build(corpus_dir: str, out: Path) -> None:
             pool_rows.append((label, j.get("as_of_date") or f.stem[:10], int(j.get("n_articles") or 0)))
 
     fig = make_subplots(
-        rows=6, cols=1, vertical_spacing=0.065,
-        # row 1 carries two units (articles as bars, search hits as a line), so it needs a real
-        # secondary axis. Hand-numbering one collides with the subplot axes as rows are added.
-        specs=[[{"secondary_y": True}]] + [[{"secondary_y": False}]] * 5,
+        rows=8, cols=1, vertical_spacing=0.05,
+        # rows 1 and 7 each carry two units (articles vs search hits; days vs percent), so they need real
+        # secondary axes. Hand-numbering them collides with the subplot axes as rows are added.
+        specs=([[{"secondary_y": True}]] + [[{"secondary_y": False}]] * 5
+               + [[{"secondary_y": True}]] + [[{"secondary_y": False}]]),
         subplot_titles=(
             "1. Articles seen per day, and how many were new",
-            "2. Non-articles ingested per day",
-            "3. Body-text and author capture rate",
-            "4. Pool size per CFT curation",
-            "5. Article age when pulled",
-            "6. Articles per wave",
+            "2. Query outcomes per day",
+            "3. Non-articles ingested per day",
+            "4. Body-text and author capture rate",
+            "5. Pool size per CFT curation",
+            "6. Article age when pulled",
+            "7. Age of the day's results, by day",
+            "8. Articles per wave",
         ))
 
     # 1. new vs sightings
@@ -164,15 +201,29 @@ def build(corpus_dir: str, out: Path) -> None:
                              customdata=[pulls_by_day.get(d, 0) for d in span],
                              hovertemplate="%{x}: %{y} hits from %{customdata} pull(s)<extra></extra>"),
                   row=1, col=1, secondary_y=True)
-    # 2. non-articles
+    # 2. query health. Reads as a stack -- full bar = the day's query budget, coloured bands = its outcomes
+    # -- but barmode is figure-wide and row 1 needs `overlay` (new is a SUBSET of seen, not a layer on it).
+    # So the bands are drawn as CUMULATIVE overlaid bars, tallest first, each one painting over the last.
+    _q_tot = [q_ok.get(d, 0) + q_zero.get(d, 0) + q_err.get(d, 0) for d in span]
+    _q_okz = [q_ok.get(d, 0) + q_zero.get(d, 0) for d in span]
+    fig.add_trace(go.Bar(x=span, y=_q_tot, name="errored", marker_color=RED, legend="legend2",
+                         customdata=[q_err.get(d, 0) for d in span],
+                         hovertemplate="%{x}: %{customdata} errored<extra></extra>"), row=2, col=1)
+    fig.add_trace(go.Bar(x=span, y=_q_okz, name="zero results", marker_color=GREY, legend="legend2",
+                         customdata=[q_zero.get(d, 0) for d in span],
+                         hovertemplate="%{x}: %{customdata} returned nothing<extra></extra>"), row=2, col=1)
+    fig.add_trace(go.Bar(x=span, y=[q_ok.get(d, 0) for d in span], name="returned results",
+                         marker_color=GREEN, legend="legend2",
+                         hovertemplate="%{x}: %{y} returned results<extra></extra>"), row=2, col=1)
+    # 3. non-articles
     fig.add_trace(go.Bar(x=span, y=[nonart_by_day.get(d, 0) for d in span], name="non-articles",
-                         marker_color=RED, showlegend=False), row=2, col=1)
-    # 3. capture rates
+                         marker_color=RED, showlegend=False), row=3, col=1)
+    # 4. capture rates
     _rate = lambda num, d: (100.0 * num.get(d, 0) / new_by_day[d]) if new_by_day.get(d) else None  # noqa: E731
     fig.add_trace(go.Scatter(x=span, y=[_rate(lede_by_day, d) for d in span], name="% with body text",
-                             mode="lines+markers", line={"color": GREEN}, legend="legend2"), row=3, col=1)
+                             mode="lines+markers", line={"color": GREEN}, legend="legend3"), row=4, col=1)
     fig.add_trace(go.Scatter(x=span, y=[_rate(auth_by_day, d) for d in span], name="% with author",
-                             mode="lines+markers", line={"color": ORANGE}, legend="legend2"), row=3, col=1)
+                             mode="lines+markers", line={"color": ORANGE}, legend="legend3"), row=4, col=1)
     # 4. pools per curation. No max_articles cap line here: that knob truncates BACKTEST-retrieval pools,
     # and every pool plotted above is fed by the forward WebSearch corpus, which sets its own result count.
     for run, colour in (("CFT", BLUE),):
@@ -180,58 +231,77 @@ def build(corpus_dir: str, out: Path) -> None:
         if rows:
             fig.add_trace(go.Scatter(x=[r[1] for r in rows], y=[r[2] for r in rows], name=f"{run} pool",
                                      mode="lines+markers", line={"color": colour},
-                                     legend="legend3"), row=4, col=1)
-    # 6. waves, last: a census of the whole corpus, not a per-day time series like 1-5.
+                                     legend="legend4"), row=5, col=1)
+    # 7. the same staleness as chart 6, but with the time axis kept: a slow drift is a TREND, and the
+    # all-time histogram averages it away. Two units, so the share rides a secondary axis.
+    _ag_x = [d for d in span if d in med_age_by_day]
+    fig.add_trace(go.Scatter(x=_ag_x, y=[med_age_by_day[d] for d in _ag_x], name="median age",
+                             mode="lines+markers", line={"color": BLUE}, legend="legend5",
+                             hovertemplate="%{x}: median %{y}d old<extra></extra>"), row=7, col=1)
+    fig.add_trace(go.Scatter(x=_ag_x, y=[pct_fresh_by_day[d] for d in _ag_x],
+                             name=f"% inside the {_news_lb}d window", mode="lines+markers",
+                             line={"color": GREEN, "dash": "dot"}, legend="legend5",
+                             hovertemplate="%{x}: %{y:.0f}% usable<extra></extra>"),
+                  row=7, col=1, secondary_y=True)
+    # 8. waves, last: a census of the whole corpus, not a per-day time series like 1-7.
     wave_n = Counter(a.get("first_wave") or "?" for a in arts)
     _w = wave_n.most_common()
     fig.add_trace(go.Bar(x=[w for w, _ in _w], y=[n for _, n in _w], marker_color=BLUE,
-                         showlegend=False), row=6, col=1)
+                         showlegend=False), row=8, col=1)
 
-    fig.update_layout(template="seaborn", height=1780, barmode="overlay",
+    fig.update_layout(template="seaborn", height=2360, barmode="overlay",
                       margin={"t": 60, "l": 70, "r": 190, "b": 60})
     # One legend PER SUBPLOT, parked to the right of its own rows. A single shared legend listed every
     # trace in the figure next to chart 1, which read as though ledes/bylines/pools belonged there.
     # Each legend is anchored to the TOP of its subplot's y-domain, so it tracks the layout automatically.
     def _dom_top(row: int) -> float:
-        """Top of a subplot's y-domain. NB row 1 owns a secondary axis, so the primary axis for row N is
-        yaxis{N+1} from row 2 on -- read it off the layout rather than assuming yaxis{N}."""
-        ax = fig.layout[f"yaxis{'' if row == 1 else row + 1}"]
-        return float(ax.domain[1])
+        """Top of a subplot's y-domain. Asked of the subplot itself, not of a hand-computed yaxis index:
+        every secondary_y row shifts that numbering, so index arithmetic breaks as rows are added."""
+        return float(fig.get_subplot(row, 1).yaxis.domain[1])
     _legend_style = {"orientation": "v", "x": 1.01, "xanchor": "left", "yanchor": "top",
                      "bgcolor": "rgba(255,255,255,0.85)", "font": {"size": 12}}
     fig.update_layout(legend={**_legend_style, "y": _dom_top(1)},
-                      legend2={**_legend_style, "y": _dom_top(3)},
-                      legend3={**_legend_style, "y": _dom_top(4)})
+                      legend2={**_legend_style, "y": _dom_top(2)},
+                      legend3={**_legend_style, "y": _dom_top(4)},
+                      legend4={**_legend_style, "y": _dom_top(5)},
+                      legend5={**_legend_style, "y": _dom_top(7)})
     fig.update_yaxes(title_text="articles", row=1, col=1, secondary_y=False)
     fig.update_yaxes(title_text="search hits", row=1, col=1, secondary_y=True,
                      showgrid=False, rangemode="tozero")
-    fig.update_yaxes(title_text="count", row=2, col=1)
+    fig.update_yaxes(title_text="queries", row=2, col=1)
+    fig.update_yaxes(title_text="count", row=3, col=1)
     # to 105, not 100: a day at full capture sits ON the frame otherwise and reads as clipped
-    fig.update_yaxes(title_text="% of the day's new articles", range=[0, 105], row=3, col=1)
-    fig.update_yaxes(title_text="articles in pool", row=4, col=1)
-    fig.update_yaxes(title_text="articles", row=6, col=1)
+    fig.update_yaxes(title_text="% of the day's new articles", range=[0, 105], row=4, col=1)
+    fig.update_yaxes(title_text="articles in pool", row=5, col=1)
+    fig.update_yaxes(title_text="days old (median)", rangemode="tozero", row=7, col=1, secondary_y=False)
+    fig.update_yaxes(title_text=f"% within {_news_lb}d", range=[0, 105], showgrid=False,
+                     row=7, col=1, secondary_y=True)
+    fig.update_yaxes(title_text="articles", row=8, col=1)
     fig.add_trace(go.Bar(x=age_bins, y=age_counts, marker_color=BLUE, showlegend=False,
-                         hovertemplate="%{x} day(s) old: %{y} articles<extra></extra>"), row=5, col=1)
+                         hovertemplate="%{x} day(s) old: %{y} articles<extra></extra>"), row=6, col=1)
     # median line: the typical article, which the long evergreen tail pulls the MEAN far away from
     if _median_age is not None:
         _mlab = str(_median_age) if _median_age < _cap else f"{_cap}+"
         _mx = age_bins.index(_mlab)
-        fig.add_vline(x=_mx, row=5, col=1, line={"dash": "dot", "color": GREEN, "width": 1.5})
+        fig.add_vline(x=_mx, row=6, col=1, line={"dash": "dot", "color": GREEN, "width": 1.5})
         fig.add_annotation(x=_mx, y=0.72, yref="y domain", yanchor="top", xanchor="left",
                            text=f" median = {_median_age}d", showarrow=False,
-                           font={"size": 11, "color": GREEN}, row=5, col=1)
+                           font={"size": 11, "color": GREEN}, row=6, col=1)
     # the curator's window: everything to the right of this line is ingested but never read
     # categorical axis: position the cutoff by INDEX, between the ">lookback" and "lookback" categories
     _cut = age_bins.index(str(_news_lb)) - 0.5
-    fig.add_vline(x=_cut, row=5, col=1, line={"dash": "dash", "color": RED, "width": 1.5})
+    fig.add_vline(x=_cut, row=6, col=1, line={"dash": "dash", "color": RED, "width": 1.5})
     fig.add_annotation(x=_cut, y=0.92, yref="y domain", yanchor="top", xanchor="right",
                        text=f"older than news_lookback_days = {_news_lb} ", showarrow=False,
-                       font={"size": 11, "color": RED}, row=5, col=1)
+                       font={"size": 11, "color": RED}, row=6, col=1)
     # NB literal arrows, not HTML entities: plotly renders axis titles as SVG text and would print
     # "&larr;" verbatim.
     fig.update_xaxes(title_text="days between publication and pull   ← older · fresher →",
-                     row=5, col=1)
-    fig.update_yaxes(title_text="articles", row=5, col=1)
+                     row=6, col=1)
+    fig.update_yaxes(title_text="articles", row=6, col=1)
+    # same cutoff on the time series, so the two staleness charts read against one number
+    fig.add_hline(y=_news_lb, row=7, col=1, secondary_y=False,
+                  line={"dash": "dash", "color": RED, "width": 1.5})
     for _st in fig.layout.annotations[:_n_titles]:
         _st.update(font={"size": 16, "color": "#111"}, x=0.0, xanchor="left", text=f"<b>{_st.text}</b>")
 
@@ -281,6 +351,10 @@ def build(corpus_dir: str, out: Path) -> None:
              + _card(f"{100 * n_auth / n_art:.0f}%", "with an author")
              + _card(f"{n_non}", "non-articles dropped", warn=n_non / n_art > 0.05)
              + _card(last_gap, "missed pull days", warn=bool(gaps))
+             # last pull only: a stale all-time count would keep flagging a fault that is already fixed
+             + _card(f"{q_err.get(pull_days[-1], 0)}/"
+                     f"{q_ok.get(pull_days[-1], 0) + q_zero.get(pull_days[-1], 0) + q_err.get(pull_days[-1], 0)}",
+                     "queries errored on the last pull day", warn=bool(q_err.get(pull_days[-1], 0)))
              + _card(f"{sum(1 for d in span if pulls_by_day.get(d, 0) > 1)}", "days with >1 pull")
              + _card(f"{sorted(ages)[len(ages) // 2]}d" if ages else "n/a", "median age at pull")
              + _card(f"{100 * sum(1 for x in ages if x > _news_lb) / len(ages):.0f}%" if ages else "n/a",
@@ -302,7 +376,11 @@ def build(corpus_dir: str, out: Path) -> None:
           '<b>articles</b> and the dotted line counts <b>search hits</b> (a different unit, right-hand axis): '
           'one story returned by three pulls in a day is 3 hits but 1 article. <b>New to corpus</b> is a '
           'strict subset of <b>distinct articles seen</b> &mdash; the gap between them is stories the feed '
-          'already had. Bars flat at zero means the daily cron stopped. <b>Non-articles</b> are quote and '
+          'already had. Bars flat at zero means the daily cron stopped. Chart&nbsp;2 is the query budget '
+          'and what became of it: a red band is queries that cost a round trip and returned nothing. '
+          'Chart&nbsp;7 is the drift chart &mdash; a search engine that keeps handing back the same pages '
+          'shows up as a median age climbing past <code>news_lookback_days</code>, at which point the '
+          'typical result is already too old for the curator to read. <b>Non-articles</b> are quote and '
           'ticker pages: stored, tagged, never fed to a curator. Sister page: '
           '<a href="retrieval_bootstrap.html">RBS</a> covers the bootstrap-era corpus.</p>'
         + cards
