@@ -369,8 +369,9 @@ def build(corpus_dir: str, out: Path) -> None:
         '<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>'
         '<style>body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;max-width:1180px;'
         'margin:0 auto;padding:0 1.5em;color:#222;line-height:1.5;}h1,h2{color:#111;}</style></head><body>'
-        '<h1>Retriever Forwardtest (RFT)</h1>'
+        # nav ABOVE the title, matching RBS and the rest of the family
         + dash_nav.render("retrieval_forward.html")
+        + '<h1>Retriever Forwardtest (RFT)</h1>'
         + '<p style="color:#555;max-width:860px;">Health of the live WebSearch feed behind the Curator '
           'Forwardtest (CFT) &mdash; ingest quality, not market outcome. In chart&nbsp;1 the bars count '
           '<b>articles</b> and the dotted line counts <b>search hits</b> (a different unit, right-hand axis): '
