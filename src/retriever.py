@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import json
 import re
+from datetime import date, timedelta
 from pathlib import Path
 from typing import Any, Protocol
 from urllib.parse import urlsplit
@@ -26,10 +27,35 @@ from . import corpus
 
 ROOT = Path(__file__).resolve().parent.parent
 
+def _month_span(as_of: str, lookback_days: int) -> str:
+    """Calendar months touched by the curator's news window, e.g. "August 2026" or, when the window
+    straddles a boundary, "July 2026 and August 2026". Derived from news_lookback_days rather than
+    fixed at the current month, so the first days of a month still name the month most of the window
+    actually lives in."""
+    end = date.fromisoformat(as_of[:10])
+    m, names = (end - timedelta(days=lookback_days)).replace(day=1), []
+    while m <= end:
+        names.append(m.strftime("%B %Y"))
+        m = date(m.year + m.month // 12, m.month % 12 + 1, 1)   # first of the next month
+    return " and ".join(names)
+
+
 # Fixed per-wave query template. Low agency on purpose: the executor model just runs this string through
 # web_search, so the corpus is reproducible and the model's "cleverness" never steers what gets collected.
-def _wave_query(keywords: list[str]) -> str:
-    return "recent business and stock-market news about " + ", ".join(keywords[:6])
+#
+# The date is load-bearing, not decoration. The original template said "recent ... news about X" and the
+# engine read "recent" as topic vocabulary, not as a filter: by 2026-08-10 it was returning a 32-day-old
+# median and repeating ~90% of the previous day's URLs. A same-day A/B over all ten waves (open pass, 10
+# results each) measured naming the month against two alternatives:
+#     "recent ... about X"                  82 results,   0% unseen, median page_age 14d, 54% <= 14d
+#     "... from August 2026 about X"        77 results,  53% unseen, median page_age  6d, 82% <= 14d
+#     "... published in the past week ..."  80 results,  26% unseen, median page_age 14d, 56% <= 14d
+# "past week" is the MORE explicitly temporal phrasing and it scored like "recent", so what works is a
+# literal date string that appears on the page, not a phrase meaning recency. Both args are required:
+# a default would let a caller silently fall back to the undated template that caused this.
+def _wave_query(keywords: list[str], as_of: str, lookback_days: int) -> str:
+    return (f"business and stock-market news from {_month_span(as_of, lookback_days)} about "
+            + ", ".join(keywords[:6]))
 
 # light ticker detector (a hint for coverage analysis; the curator does the real extraction)
 _TICKER_RE = re.compile(r"\((?:NYSE|NASDAQ|NYSE ?American|NYSEARCA|OTC|Nasdaq|CBOE)[:\s]+([A-Z]{1,5})\)|\$([A-Z]{1,5})\b")
@@ -159,9 +185,13 @@ def _extract_article(url: str, cid: str, res: dict, pulled_at: str, query: str, 
 
 
 class WebSearchRetriever:
-    def __init__(self, model: str, waves: dict[str, list[str]], max_results_per_query: int | None = None):
+    def __init__(self, model: str, waves: dict[str, list[str]], news_lookback_days: int,
+                 max_results_per_query: int | None = None):
         self.model = model
         self.waves = waves
+        # profile-driven, and REQUIRED: it sets which calendar months the query names, so a default here
+        # would silently decouple what we search for from the window the curator actually reads.
+        self.news_lookback_days = int(news_lookback_days)
         self.cap = max_results_per_query
         self.blocked = blocked_domains()   # news_sources.md source_block -> web_search blocked_domains
         self.specialty = corpus.specialty_domains()   # preferred desks -> a per-wave allowed_domains sweep
@@ -225,7 +255,7 @@ class WebSearchRetriever:
         query_stats: dict[str, Any] = {}
         bodies: dict[str, dict] = {}   # fetch each unique article once per pull, log every sighting
         for wave, keywords in self.waves.items():
-            query = _wave_query(keywords)
+            query = _wave_query(keywords, pulled_at, self.news_lookback_days)
             # Per wave: an OPEN search (source_block excluded), plus a SPECIALTY sweep restricted to the
             # preferred desks (news_sources.md prose) so their deep coverage isn't buried by open ranking.
             passes = [(query, None)]

@@ -245,7 +245,8 @@ def main(argv: list[str] | None = None) -> int:
                     waves = dict(list(waves.items())[: args.limit_waves])
                 pull_id = f"pull-{pulled_at.replace(':', '').replace('-', '')}"
                 model = args.model or fw["retrieval_model"]
-                r = retriever.WebSearchRetriever(model, waves, max_results_per_query=args.max_results)
+                r = retriever.WebSearchRetriever(model, waves, fw["news_lookback_days"],
+                                                 max_results_per_query=args.max_results)
                 sightings, query_stats = r.pull(pull_id, pulled_at)
                 result = corpus.append_pull(pull_id, pulled_at, fw["retriever"], model, sightings, query_stats,
                                             dry_run=args.dry_run)
