@@ -52,6 +52,15 @@ def _env(key: str) -> str:
     return ""
 
 
+def _uncrawlable(msg: str) -> set[str]:
+    """Domains named by a web_search 400 as unreachable by Anthropic's crawler. The message reads
+    "The following domains are not accessible to our user agent: ['arstechnica.com']". Returns an empty
+    set for any other error, so only this one failure mode takes the retry path."""
+    import re
+    m = re.search(r"not accessible to our user agent: \[([^\]]*)\]", msg)
+    return {d.strip().strip("'\"") for d in m.group(1).split(",") if d.strip()} if m else set()
+
+
 def blocked_domains() -> list[str]:
     """Domains to exclude from the forward pull, from news_sources.md's `source_block` front matter
     (the same low-signal / PR-mill list the backtest GKG path drops). Missing file/section -> []."""
@@ -156,6 +165,7 @@ class WebSearchRetriever:
         self.cap = max_results_per_query
         self.blocked = blocked_domains()   # news_sources.md source_block -> web_search blocked_domains
         self.specialty = corpus.specialty_domains()   # preferred desks -> a per-wave allowed_domains sweep
+        self.dropped_domains: set[str] = set()        # specialty desks the API says it cannot crawl
         import anthropic
         k = _env("ANTHROPIC_API_KEY")
         if not k:
@@ -164,7 +174,27 @@ class WebSearchRetriever:
 
     def _search(self, query: str, allowed: "list[str] | None" = None) -> list[dict[str, Any]]:
         """Run one web_search and return ALL results (url, title, page_age). With `allowed`, restrict to
-        those domains (the specialty sweep); otherwise an open search excluding source_block domains."""
+        those domains (the specialty sweep); otherwise an open search excluding source_block domains.
+
+        A domain that blocks Anthropic's crawler makes the API reject the WHOLE request with a 400 naming
+        it, so one such domain silently kills the specialty sweep for every wave (arstechnica.com did
+        exactly that from 2026-07-22 to 08-11). Rather than hardcode a denylist that goes stale, we let the
+        error teach us: drop the domains it names, remember them on the instance so later waves in this
+        pull skip the round trip, and retry once."""
+        try:
+            return self._call(query, allowed)
+        except Exception as e:  # noqa: BLE001 - only the uncrawlable-domain 400 is retryable here
+            named = _uncrawlable(str(e))
+            if not (allowed and named):
+                raise
+            self.dropped_domains |= named
+            self.specialty = [d for d in self.specialty if d not in self.dropped_domains]
+            if not self.specialty:
+                raise
+            return self._call(query, self.specialty)
+
+    def _call(self, query: str, allowed: "list[str] | None") -> list[dict[str, Any]]:
+        """One web_search round trip. Split out of _search so the retry path is a plain second call."""
         tool = {"type": "web_search_20250305", "name": "web_search", "max_uses": 1}
         if allowed:
             tool["allowed_domains"] = allowed        # specialty sweep: restrict to preferred desks
@@ -218,6 +248,8 @@ class WebSearchRetriever:
                         bodies[cid] = _extract_article(url, cid, res, pulled_at, query, wave)
                     sightings.append({**bodies[cid], "pull_id": pull_id, "pulled_at": pulled_at,
                                       "query": qkey, "wave": wave, "result_rank": rank})
+        if self.dropped_domains:   # record the self-heal in the manifest so the loss is visible, not silent
+            query_stats["_uncrawlable_specialty_domains"] = sorted(self.dropped_domains)
         return sightings, query_stats
 
 

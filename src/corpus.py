@@ -244,9 +244,12 @@ def append_pull(pull_id: str, pulled_at: str, retriever: str, retrieval_model: s
                     "n_new_articles": n_new, "n_new_non_article": n_nonart,
                     "non_article_by_wave": nonart_by_wave, "query_stats": query_stats}
         _append_jsonl(PULLS, [manifest])
+    # Underscore keys in query_stats are per-pull diagnostics (_lede_sources, _uncrawlable_specialty_domains),
+    # not queries, so they must not inflate the query count.
+    n_queries = sum(1 for k in query_stats if not str(k).startswith("_"))
     return {"pull_id": pull_id, "sightings": len(sightings), "new_articles": n_new,
             "new_non_article": n_nonart, "non_article_by_wave": nonart_by_wave,
-            "queries": len(query_stats), "corpus_articles": len(seen), "dry_run": dry_run}
+            "queries": n_queries, "corpus_articles": len(seen), "dry_run": dry_run}
 
 
 def read_slice(as_of: str, lookback_days: int) -> list[dict[str, Any]]:
