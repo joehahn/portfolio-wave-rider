@@ -188,6 +188,12 @@ def build(canon_dir: str, forward_corpus: str, since: str, out: Path) -> None:
     # because the bootstrap is this dashboard's experiment. Marker colour follows the same provenance
     # scheme as charts 1-3, so CBS crossing the handoff from gkg-wayback to WebSearch is visible as a
     # colour change rather than something the reader has to infer from the dates.
+    # Profile knobs, loaded here rather than at the parameter table below: max_articles caps the BACKTEST
+    # side of chart 4 and so has to be known before the figure is drawn.
+    _fm = _pf.load_financial_model(str(ROOT / "investor_profile.md"))
+    _bt = _pf.load_backtest_config(str(ROOT / "investor_profile.md"))
+    _maxart = int(_bt["max_articles"])
+
     cbs_pools = []
     for f in sorted((ROOT / "data" / "curator_runs" / "bootstrap-cbs").glob("2*-pool.json")):
         try:
@@ -223,6 +229,14 @@ def build(canon_dir: str, forward_corpus: str, since: str, out: Path) -> None:
                                  marker={"size": 9, "color": [c for _, _, c in cbs_pools]},
                                  showlegend=False,
                                  hovertemplate="%{x}: %{y} articles read<extra></extra>"), row=4, col=1)
+        # The step down at the handoff is partly a change of UNITS, not a retrieval collapse: the blue
+        # (backtest) points are ranked pools truncated at max_articles, so they sit ON this cap by
+        # construction, while the gold (forward) points are however much the corpus yielded in the window.
+        # Without the line a reader reads 100 -> ~60 as the forward feed failing by 40%.
+        fig.add_hline(y=_maxart, row=4, col=1, line={"dash": "dot", "color": BLUE, "width": 1.5})
+        fig.add_annotation(x=0.995, xref="x domain", y=_maxart, yanchor="bottom", xanchor="right",
+                           text=f"backtest pools truncated at max_articles = {_maxart} ", showarrow=False,
+                           font={"size": 11, "color": BLUE}, row=4, col=1)
     fig.add_trace(go.Bar(x=DOW, y=[dow_g.get(d, 0) for d in DOW], marker_color=BLUE, showlegend=False), row=5, col=1)
     fig.add_trace(go.Bar(x=[v for _, v in wv][::-1], y=[k for k, _ in wv][::-1], orientation="h",
                          marker_color=GREEN, showlegend=False), row=6, col=1)
@@ -289,10 +303,6 @@ def build(canon_dir: str, forward_corpus: str, since: str, out: Path) -> None:
              + card(f"{100*len(authors)//max(n_uniq,1)}%", "unique articles with a byline (plot 9)")
              + card(f"{n_rec_zero}/{len(rec_rows)}", "configured desks surfaced 0x (plot 7)"))
 
-    # ---- parameter table (RETRIEVAL knobs, mirrors the RBT) ----
-    _fm = _pf.load_financial_model(str(ROOT / "investor_profile.md"))
-    _bt = _pf.load_backtest_config(str(ROOT / "investor_profile.md"))
-
     def _prow(label, value):
         return (f"<tr><td style='padding:5px 14px 5px 0;color:#555;white-space:nowrap;'>{label}</td>"
                 f"<td style='padding:5px 0;font-weight:600;'>{value}</td></tr>")
@@ -323,7 +333,11 @@ def build(canon_dir: str, forward_corpus: str, since: str, out: Path) -> None:
         '(2026-07-22): the backtest&#39;s last ~3 months of ranked <b>top-100</b> pools (GKG discovery + '
         'look-ahead-clean <b>Wayback</b> ledes) spliced onto the forward cron&#39;s daily <b>WebSearch</b> '
         'pulls. Both Wayback and WebSearch ledes are look-ahead-safe (WebSearch because the forward news is '
-        'genuinely current); the backtest-only <b>live-fallback</b> is the single look-ahead-biased provenance.</p>'
+        'genuinely current); the backtest-only <b>live-fallback</b> is the single look-ahead-biased provenance. '
+        'In chart&nbsp;4, read the step down at the handoff as a change of <b>units</b> before reading it as a '
+        f'change of supply: the blue points are ranked pools truncated at <code>max_articles</code> = {_maxart}, '
+        'so they sit on that cap by construction, while the gold points are whatever the forward corpus held '
+        'inside the news window.</p>'
         f'<div style="margin:1em 0 1.5em">{cards}</div>' + _params + chart_html + cfg_link + author_html
         + '</body></html>')
     out.write_text(page)
