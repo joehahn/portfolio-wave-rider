@@ -22,6 +22,7 @@ that file (no LLM call, no cost); only dates missing one are curated. Flags:
   --if-due   cron mode: exit immediately when every rebalance date already has a curation.
   --force    delete the pool + curation JSONs first and re-curate the whole window from scratch.
   --report   write data/reports/<date>-<acronym>-curation.md for each date curated on this run.
+  --grid-anchor  re-phase the forward cadence onto this date's weekday, keeping curated history in place.
 
 PARAMETERIZED, so the same machinery drives both paper portfolios; they differ only in seed date and news
 source, which is what makes comparing them meaningful:
@@ -51,6 +52,10 @@ def _args(argv=None):
                    help="the canonical CBT run: day-0 seed weights + starter watchlist come from here")
     p.add_argument("--since", default="2026-04-22", help="day-0 of the paper portfolio")
     p.add_argument("--handoff", default="2026-07-22", help="last backtest-news date; forward corpus after it")
+    p.add_argument("--grid-anchor", default="",
+                   help="re-phase the forward biweekly cadence onto this date's weekday (e.g. a Sunday, so\n"
+                        "the curation lands the evening before a Monday-morning rebalance). Already-curated\n"
+                        "dates before the anchor are kept as-is, so no history is re-curated.")
     p.add_argument("--forward-only", action="store_true",
                    help="read EVERY date from the live corpus (no backtest news); FT mode")
     p.add_argument("--blend-backtest-news", action="store_true",
@@ -131,12 +136,30 @@ def main(argv=None) -> int:
                   if _lo <= _ad <= _iso and str(x.get("url") or "") not in _have]
         return _live + _extra
 
-    fw_pools = []
+    fw_dates = []
     d = date.fromisoformat(SINCE) if a.forward_only else date.fromisoformat(bt_pools[-1][0]) + timedelta(days=14)
     while d <= end:
-        _iso = d.isoformat()
-        fw_pools.append((_iso, _blend(_iso, corpus.read_slice(_iso, news_lb)), "websearch"))
+        fw_dates.append(d)
         d += timedelta(days=14)
+
+    # Re-phase onto --grid-anchor's weekday. The cadence stays biweekly (from the profile); only its PHASE
+    # moves, so CBS and CFT -- which are anchored on different seed dates and would otherwise interleave on
+    # alternating weeks -- land on the SAME day and can be curated by one cron firing.
+    # History is frozen: a pre-anchor date that already has a curation JSON keeps its old slot, so nothing is
+    # re-curated and the replayed equity curve is untouched. A pre-anchor date with NO curation is dropped --
+    # either it is the date the anchor supersedes (curating it a day or two before the anchor would double up)
+    # or it is a firing the machine slept through, and a stale catch-up is worth less than a clean phase.
+    if a.grid_anchor:
+        _anchor = date.fromisoformat(a.grid_anchor)
+        _curated = {f.stem.replace("-curation", "") for f in RUN.glob("*-curation.json")}
+        fw_dates = [x for x in fw_dates if x < _anchor and x.isoformat() in _curated]
+        d = _anchor
+        while d <= end:
+            fw_dates.append(d)
+            d += timedelta(days=14)
+
+    fw_pools = [(x.isoformat(), _blend(x.isoformat(), corpus.read_slice(x.isoformat(), news_lb)), "websearch")
+                for x in fw_dates]
 
     # Off-grid manual rebalances. These are EXTRA dates merged into the regular cadence, never a
     # replacement for it: the biweekly grid still runs from SINCE, so a scheduled date keeps firing on
