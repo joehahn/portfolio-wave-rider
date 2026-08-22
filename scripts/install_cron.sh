@@ -27,9 +27,8 @@ SNAP="$PROJ/scripts/price_snapshot.sh"
 REVIEW="$PROJ/scripts/review_curation.sh"
 PULL_LINE=$'# PWR: Forward news pull + RBS/RFT dashboard refreshes, every day (incl. weekends) 18:30 local\n'"30 18 * * *  $PULL"
 SNAP_LINE=$'# PWR: Weekday price snapshot + CBS/CFT dashboard refreshes, Mon-Fri 16:30 local\n'"30 16 * * 1-5  $SNAP"
-# Two firings, one block: Sunday evening is the real slot, Monday morning is the overslept-Sunday catch-up.
-# Both are added together because add_line() dedupes on the script path, which they share.
-REVIEW_LINE=$'# PWR: Biweekly CBS + CFT curation + report (self-gated by --if-due), Sun 19:00 + Mon 08:00 catch-up\n'"0 19 * * 0  $REVIEW"$'\n'"0 8 * * 1   $REVIEW"
+# Two firings, added as one block because add_line() dedupes on the script path, which they share.
+REVIEW_LINE=$'# PWR: CBS then CFT curation, every other Sunday 19:00 local\n'"0 19 * * 0  $REVIEW"$'\n'$'# PWR: CBS + CFT catch-up, Mon 08:00 local, only if Sunday was missed\n'"0 8 * * 1   $REVIEW"
 
 command -v crontab >/dev/null 2>&1 || { echo "error: crontab not found. Install it via your package manager." >&2; exit 1; }
 for s in "$PULL" "$SNAP" "$REVIEW"; do

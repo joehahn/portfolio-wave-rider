@@ -114,16 +114,9 @@ PWR_path=/path/to/portfolio-wave-rider
 30 18 * * *  $PWR_path/scripts/news_pull.sh
 # Weekday price snapshot + CBS/CFT dashboard refreshes, Mon-Fri 16:30 local
 30 16 * * 1-5  $PWR_path/scripts/price_snapshot.sh
-#
-# CBS + CFT curation. BOTH paper portfolios are curated by this one job, back to back, on the SAME
-# every-other-Sunday schedule, and each Sunday curation becomes the following MONDAY's rebalance, so the
-# fresh recommendation and dashboard are ready before you trade Monday morning. The only cron job that
-# calls the curator LLM; the dashboard refreshes above are render-only and free.
-#
-# Sunday 19:00 is the real slot (it follows that day's 18:30 news pull, so the curator reads same-day
-# news). Monday 08:00 only catches a Sunday the machine slept through -- --if-due self-gates on the
-# profile's biweekly rebalance_period, so it is a no-op whenever Sunday's already ran.
+# CBS then CFT curation, every other Sunday 19:00 local
 0 19 * * 0  $PWR_path/scripts/review_curation.sh
+# CBS + CFT catch-up, Mon 08:00 local, only if Sunday was missed
 0 8 * * 1   $PWR_path/scripts/review_curation.sh
 ```
 
