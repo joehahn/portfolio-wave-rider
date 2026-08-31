@@ -140,7 +140,7 @@ def main() -> int:
             # pool browser is a backtest-only artifact -> drop its intro-paragraph link on the forward page.
             ("; browse them in the <a href=\"pool_browser.html\">pool browser</a>", "")):
         html = html.replace(_old, _new)   # targeted (h1 tag / full title) so the nav-link labels stay intact
-    DASH.write_text(html)
+    DASH.write_text(portfolio._stamp(html))
 
     print(f"\nforward test: {len(dates)} weekly rebalances {dates[0]}..{dates[-1]} "
           f"({n_curated} newly curated)  |  realized {res['realized_return']*100:+.1f}% "

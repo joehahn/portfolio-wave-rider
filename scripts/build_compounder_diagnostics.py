@@ -83,14 +83,14 @@ def write_page(out_path: Path, title: str, body_html: str) -> None:
     """Wrap body in the same document shell / font as the canonical BTS (sweep_pwr.html)."""
     ts = datetime.now().strftime("%Y-%m-%d %H:%M")
     nav = dash_nav.render("", built=False)
-    out_path.write_text(
+    out_path.write_text(dash_nav.stamp(
         f'<!doctype html><html><head><meta charset="utf-8"><title>{title}</title>\n'
         '<style>body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;max-width:1180px;'
         'margin:0 auto;padding:0 1.5em;color:#222;line-height:1.5}h1,h2{color:#111}'
         'table{border-collapse:collapse;font-size:13px;width:100%}'
         'th{text-align:right;padding:6px 10px;border-bottom:2px solid #ccc;white-space:nowrap}'
         'th:first-child{text-align:left}.built{position:absolute;top:8px;right:16px;font-size:12px;color:#888}'
-        f'</style></head><body><div class="built">dashboard built {ts}</div>{nav}{body_html}</body></html>')
+        f'</style></head><body><div class="built">dashboard built {ts}</div>{nav}{body_html}</body></html>'))
 
 
 def _wave_map():

@@ -388,7 +388,7 @@ def build(corpus_dir: str, out: Path) -> None:
         + fig.to_html(full_html=False, include_plotlyjs=False, config={"displayModeBar": False})
         + '</body></html>')
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(body, encoding="utf-8")
+    out.write_text(dash_nav.stamp(body), encoding="utf-8")
     print(f"wrote {out}  ({n_art} articles | {len(pulls)} pulls | {n_non} non-articles)", file=sys.stderr)
 
 

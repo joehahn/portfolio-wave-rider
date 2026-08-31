@@ -398,7 +398,7 @@ def build(run_rel, out):
         f'clean/live/none split), plus <code>_corpus/</code> (full gathering, one file per day).</p>'
         + f'<div style="margin:1em 0 1.5em">{cards}</div>' + _params + chartA_html + comp_html + chartB_html + cfg_link + author_html + '</body></html>'
     )
-    out.write_text(page)
+    out.write_text(dash_nav.stamp(page))
     print(f"wrote {out}")
     print(f"  corpus {corpus_total:,} gathered | {len(pools)} pools | {n_uniq:,} unique shown | "
           f"clean {pct_clean:.0f}% + live {100.0*n_live/max(n_uniq,1):.0f}% = {pct_cov:.0f}% covered "

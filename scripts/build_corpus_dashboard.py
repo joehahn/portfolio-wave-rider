@@ -262,7 +262,7 @@ only genuinely new articles. This is the forward analog of that backtest DB; the
 <a href="../data/forward_corpus/pulls.jsonl">pulls.jsonl</a></p>
 {charts}
 </body></html>"""
-    OUT.write_text(page)
+    OUT.write_text(dash_nav.stamp(page))
     print(f"wrote {OUT}  ({n} articles, {len(pulls)} pulls, {len(gaps)} gap-days)")
 
 

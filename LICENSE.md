@@ -1,4 +1,4 @@
-Required Notice: Copyright 2026 Joe Hahn (https://github.com/joehahn/portfolio-wave-rider)
+Required Notice: Copyright 2026 Joseph M. Hahn, JMH DataSciences (https://jmh-datasciences.com)
 
 # PolyForm Noncommercial License 1.0.0
 

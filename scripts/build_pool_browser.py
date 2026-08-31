@@ -104,7 +104,7 @@ document.getElementById('wk').addEventListener('change', render);
 document.querySelectorAll('input[name=f]').forEach(el => el.addEventListener('change', render));
 render();
 </script></body></html>"""
-    out.write_text(page)
+    out.write_text(dash_nav.stamp(page))
     print(f"wrote {out}  ({len(weeks)} weeks, {total:,} rows, {len(data_json)//1024} KB embedded)")
 
 

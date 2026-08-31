@@ -35,6 +35,7 @@ import plotly.graph_objects as go
 from src.portfolio import (
     _fetch_benchmark_curves,
     _nav_strip,
+    _stamp,
     curator_backtest,
     load_backtest_config,
     load_financial_model,
@@ -280,7 +281,7 @@ def main() -> int:
     )
     out_path = Path("docs/sweep_max_watchlist_size.html")
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(page, encoding="utf-8")
+    out_path.write_text(_stamp(page), encoding="utf-8")
     print(f"wrote {out_path}", file=sys.stderr)
     return 0
 

@@ -1144,7 +1144,7 @@ Current config: {_cur_l2:.0f}/yr.</p>
 {model_html}
 {llm4_html}
 </body></html>"""
-    out.write_text(page)
+    out.write_text(dash_nav.stamp(page))
     top = max(rows, key=lambda r: r["ir"] if r["ir"] == r["ir"] else -9e9)
     print(f"wrote {out}  ({len(rows)} configs)")
     print(f"  best IR: cap {top['cap']} / λ {top['lam']} / {top['lb']}d -> IR {top['ir']:+.2f} "

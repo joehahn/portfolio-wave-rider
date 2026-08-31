@@ -33,7 +33,7 @@ import plotly.graph_objects as go
 RISK_FREE_RATE = 0.04  # matches portfolio.py default
 
 from src.portfolio import (
-    curator_backtest, _fetch_benchmark_curves, _nav_strip,
+    curator_backtest, _fetch_benchmark_curves, _nav_strip, _stamp,
     load_financial_model, load_backtest_config,
 )
 
@@ -348,7 +348,7 @@ def main(argv: list[str] | None = None) -> int:
             + '</body></html>'
         )
         out_path.parent.mkdir(parents=True, exist_ok=True)
-        out_path.write_text(page, encoding="utf-8")
+        out_path.write_text(_stamp(page), encoding="utf-8")
         print(f"wrote {out_path}", file=sys.stderr)
     finally:
         shutil.rmtree(tmp, ignore_errors=True)

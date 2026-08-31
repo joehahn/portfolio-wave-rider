@@ -340,7 +340,7 @@ def build(canon_dir: str, forward_corpus: str, since: str, out: Path) -> None:
         'inside the news window.</p>'
         f'<div style="margin:1em 0 1.5em">{cards}</div>' + _params + chart_html + cfg_link + author_html
         + '</body></html>')
-    out.write_text(page)
+    out.write_text(dash_nav.stamp(page))
     print(f"wrote {out}  ({n_uniq} unique | {len(bt)} backtest + {len(fw)} forward pools | "
           f"clean {pct_clean:.0f}% + live {100.0*n_live/max(n_uniq,1):.0f}% = {pct_cov:.0f}% covered)")
 

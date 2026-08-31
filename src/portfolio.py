@@ -2393,6 +2393,15 @@ def _nav(current: str) -> str:
     return dash_nav.render(current)
 
 
+def _stamp(html: str) -> str:
+    """Add the shared attribution/licence footer to a finished dashboard page. Same single source of
+    truth as _nav: scripts/dash_nav.py. Idempotent, so a page that already carries it is unchanged."""
+    import sys as _sys
+    _sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
+    import dash_nav
+    return dash_nav.stamp(html)
+
+
 def _nav_strip(current: str, pages: "list[tuple[str, str]] | None" = None) -> str:
     """Legacy per-page nav (superseded by _nav / dash_nav). Kept only so any un-migrated caller still
     renders; the live dashboards all use _nav now.
@@ -3696,7 +3705,7 @@ def build_dashboard(
         + live_search +
         '</body></html>'
     )
-    o_path.write_text(page, encoding="utf-8")
+    o_path.write_text(_stamp(page), encoding="utf-8")
 
     return {
         "out_path": str(o_path),
@@ -5455,7 +5464,7 @@ def build_curator_dashboard(
     )
     o = Path(out_path)
     o.parent.mkdir(parents=True, exist_ok=True)
-    o.write_text(page, encoding="utf-8")
+    o.write_text(_stamp(page), encoding="utf-8")
     return {
         "out_path": str(o),
         "n_tickers_ever_held": len(seen),

@@ -1,12 +1,15 @@
 [project]
 name = "portfolio-wave-rider"
 version = "0.2.0"
-description = "Claude Code demo: subagents + skills optimizing a portfolio against a user-authored investor profile."
+description = "An AI agent reads an unstructured news feed and curates a watchlist while a mechanical optimizer sizes the portfolio. Research project by JMH DataSciences."
 readme = "README.md"
 requires-python = ">=3.11"
 authors = [
-    { name = "Joseph M. Hahn" },
+    { name = "Joseph M. Hahn", email = "jmh.datasciences@gmail.com" },
 ]
+# Dual-licensed: README.md, GLOSSARY.md and docs/ are CC BY 4.0 (see LICENSE-docs.md);
+# the code and internal docs are PolyForm Noncommercial (see LICENSE.md). This field
+# names the license the packaged CODE ships under.
 license = { text = "PolyForm-Noncommercial-1.0.0" }
 
 dependencies = [

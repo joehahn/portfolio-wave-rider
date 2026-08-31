@@ -1,10 +1,14 @@
 # Portfolio Wave Rider
 
-**Author:** Joe Hahn  
-**Email:** jmh.datasciences@gmail.com  
-**Date:** 2026-May-14 <br>
-**branch:** main <br>
-**License:** [PolyForm Noncommercial 1.0.0](LICENSE.md), free for noncommercial use; [commercial rights reserved](#license)
+**An AI agent reads a continuous feed of unstructured news and makes a routine judgment call a person would otherwise make by hand, while deterministic code handles everything that has to be auditable.** The domain here is investing; the pattern is not. Any recurring decision that today requires a person to read the latest unstructured input and re-judge has this shape. The AI names the candidates and rules on whether a thesis still holds; it never sizes a position, because a standard mechanical optimizer does that.
+
+Built end-to-end with [Claude Code](https://claude.com/claude-code) by **Joseph M. Hahn, Ph.D.**, an independent AI and machine learning consultant:
+[jmh-datasciences.com](https://jmh-datasciences.com) · [LinkedIn](https://www.linkedin.com/in/hahnjoe/) · jmh.datasciences@gmail.com
+
+> **Not investment advice.** This is a research project and a demonstration of automated decisioning. Nothing here is a recommendation to buy or sell any security, and every backtested figure below is a hindsight upper bound rather than realized return.
+
+**License:** writing and dashboards [CC BY 4.0](LICENSE-docs.md), free for any use including commercial; code and internal docs [PolyForm Noncommercial](LICENSE.md), [details](#license)  
+**Author:** Joe Hahn · **Started:** 2026-May-14 · **branch:** main
 
 This project uses AI to manage a curated watchlist of tickers. You declare your goals, constraints, and an investment thesis (what you think will drive future returns), then initialize a starter watchlist you want exposure to. The solution is a three-stage pipeline with a deliberate division of labor, with only the middle stage making judgment calls:
 
@@ -228,14 +232,37 @@ The backtest runs biweekly across 2023 to 2026 against an equal-weight `[AAPL, G
 
 This project was developed with [Claude Code](https://claude.com/claude-code). See [CLAUDE.md](CLAUDE.md) for the rules Claude follows when operating in this repo. CLI flags, repo layout, output files, architecture overview, and testing instructions live in [REFERENCE.md](REFERENCE.md). Finance and stats terms are defined in [GLOSSARY.md](GLOSSARY.md).
 
+## About the author
+
+I am Joseph M. Hahn, Ph.D., an independent AI and machine learning consultant. Through **JMH DataSciences** I build production AI and machine learning systems for clients who need a real decision automated, rather than a demo. Before going independent I spent eight years inside Oracle's AI Center of Excellence delivering AI systems for enterprise clients in manufacturing, oil and gas, public sector, and retail, and before that four years building machine learning systems on large data platforms.
+
+This repo is one of several demonstrations of the same underlying pattern: **an AI reads a stream of unstructured input and automates a routine decision, while deterministic code handles whatever has to be auditable.** The hard part is rarely the model. It is drawing the line between the judgment worth delegating and the arithmetic that has to stay reproducible, and then building the scaffolding that proves the system is not fooling itself, which is most of what the [Findings](#findings-so-far) section above is about. If that shape matches a problem in your business, the work I do and what it costs are at [jmh-datasciences.com](https://jmh-datasciences.com).
+
+**Related work:**
+
+- [**geo-herd-rider**](https://github.com/joehahn/geo-herd-rider): this project's successor. Instead of a watchlist it tracks discrete *events*, one AI agent per event, each holding a basket of tickers driven by the same catalyst and arguing each week whether that catalyst has resolved.
+- [**diplomacy-A2A**](https://github.com/joehahn/diplomacy-A2A): seven Claude-powered agents play *Diplomacy*, the classic seven-player negotiation board game, against each other: forming alliances, bargaining, and betraying each other over the A2A protocol.
+- [**chicago_crime_forecast**](https://github.com/joehahn/chicago_crime_forecast): monthly Chicago crime counts by type and ward, via an skforecast recursive multi-series forecaster over the city's public dataset.
+
 ## Disclaimer
 
 Technical demo. Not financial advice. Historical performance is not predictive. Do not trade real money on this output without independent verification.
 
 ## License
 
-[PolyForm Noncommercial License 1.0.0](LICENSE.md), effective 2026-07-30. Free to use, modify, and share for any noncommercial purpose: research, experimentation, education, personal projects, and use by nonprofit or government organizations. Commercial use is not granted by this license.
+This repository is **dual-licensed**, split by what a file is for.
 
-Commercial rights are reserved by the author. If you want to use this work commercially, email jmh.datasciences@gmail.com and we will talk.
+| What | License | Commercial use |
+|---|---|---|
+| **The public writeup and the published pages**: [`README.md`](README.md), [`GLOSSARY.md`](GLOSSARY.md), and everything under [`docs/`](https://joehahn.github.io/portfolio-wave-rider/) (the rendered dashboards and the figures they display) | [CC BY 4.0](LICENSE-docs.md) | **Yes**, with attribution |
+| **Everything else**: `src/`, `scripts/`, `data/`, config, and the internal docs [`REFERENCE.md`](REFERENCE.md) and [`CLAUDE.md`](CLAUDE.md) | [PolyForm Noncommercial 1.0.0](LICENSE.md) | No, [ask](https://jmh-datasciences.com) |
 
-Versions published before 2026-07-30 were MIT and remain MIT; the terms above govern this commit onward.
+The writeup and the dashboards are meant to travel. Quote them, adapt them, screenshot a chart into your slide deck, commercially or not, as long as you credit the source. The requested form is *Joseph M. Hahn, Ph.D., JMH DataSciences, https://jmh-datasciences.com, from the `portfolio-wave-rider` project*.
+
+The code and the internal docs are free to use, modify, and share for any noncommercial purpose: research, experimentation, education, personal projects, and use by nonprofit or government organizations. Commercial rights to them are reserved. If you want to use this work commercially, or want it adapted to a decision in your own business, get in touch at [jmh-datasciences.com](https://jmh-datasciences.com) or jmh.datasciences@gmail.com and we will talk.
+
+Code samples embedded in a CC BY document stay under the code license, so a snippet lifted from this README carries the same terms as the file it came from.
+
+**Third-party content.** `data/` and parts of the dashboards contain headlines, snippets, and URLs from published news articles. That material belongs to its publishers, is included here for research and commentary, and is not licensed by the author under either license above.
+
+Effective 2026-08-31; the PolyForm terms took effect 2026-07-30. Versions published before 2026-07-30 were MIT and remain MIT for anyone who obtained a copy under it; the terms above govern this commit onward.

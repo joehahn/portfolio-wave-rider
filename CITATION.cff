@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: "If you reference this work, please cite it as below."
+title: "portfolio-wave-rider: an AI agent that curates a watchlist from a news feed while a mechanical optimizer sizes it"
+abstract: >-
+  A research project in automated decisioning. A deterministic retriever gathers a
+  date-stamped pool of news articles, an LLM curator reads that pool against a
+  user-authored thesis and decides which tickers enter and leave the watchlist,
+  citing the articles behind every change, and a standard mean-variance optimizer
+  then sets the portfolio weights from trailing returns and covariances. The LLM
+  never forecasts a return and never sizes a position, so every number is auditable
+  and reproducible from code. Dual-licensed: the public writeup and the published
+  dashboards under CC BY 4.0, the software and internal documentation under
+  PolyForm Noncommercial 1.0.0.
+type: software
+authors:
+  - family-names: Hahn
+    given-names: "Joseph M."
+    email: jmh.datasciences@gmail.com
+    affiliation: "JMH DataSciences"
+    website: "https://jmh-datasciences.com"
+repository-code: "https://github.com/joehahn/portfolio-wave-rider"
+url: "https://jmh-datasciences.com"
+license:
+  - CC-BY-4.0
+  - PolyForm-Noncommercial-1.0.0
+keywords:
+  - ai-agents
+  - agentic-ai
+  - large-language-models
+  - automated-decisioning
+  - news-analysis
+  - portfolio-optimization
+  - backtesting
