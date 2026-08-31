@@ -112,7 +112,7 @@ crontab -e
 and add the following, editing the `PWR_path` line just once to your actual repository path:
 
 ```
-# portfolio-wave-rider: set the repo path once; all three jobs below reuse it
+# portfolio-wave-rider: set the repo path once; all four jobs below reuse it
 PWR_path=/path/to/portfolio-wave-rider
 # Forward news pull + RBS/RFT dashboard refreshes, every day incl. weekends, 18:30 local (after the US close)
 30 18 * * *  $PWR_path/scripts/news_pull.sh
@@ -132,7 +132,9 @@ Verify with `crontab -l`. Works the same on macOS and Linux, and leaves any othe
 
 All jobs append timestamped output to `data/snapshot.log`, and all tolerate failures so a web_search or price hiccup never blocks the rest.
 
-cron only fires while the machine is awake and does not replay missed runs. Backfill a missed price snapshot with `.venv/bin/python -m src.cli snapshot --date YYYY-MM-DD`. A missed news pull cannot be cleanly backfilled, because re-querying web_search about a past day reintroduces hindsight, so a laptop that sleeps through 18:30 leaves a gap in the corpus (recorded in the manifest at `data/forward_corpus/pulls.jsonl`).
+cron only fires while the machine is awake and does not replay missed runs. The price snapshot heals itself within a week: each run backfills any session inside its 7-day price window that the file is missing, so a snapshot lost to a sleeping laptop or a rate-limited fetch is filled in by the next weekday run. Anything older than that window needs `.venv/bin/python -m src.cli snapshot --date YYYY-MM-DD` by hand. Note that a backfilled row is priced with the shares currently in `holdings.csv`, so it is only correct if the position did not change in between.
+
+The snapshot refuses to write a date it cannot fully price. yfinance rate-limits by IP and returns an empty result rather than an error, so a partially priced day would otherwise record the missing positions as $0 and show up as a crash on every chart that reads `total_value` (this happened on 2026-08-31: three of four holdings were throttled out and the book read $16,392 against the prior close's $64,700). The fetch retries with backoff first, and a day that still cannot be priced is left absent for the next run to backfill. A missed news pull cannot be cleanly backfilled, because re-querying web_search about a past day reintroduces hindsight, so a laptop that sleeps through 18:30 leaves a gap in the corpus (recorded in the manifest at `data/forward_corpus/pulls.jsonl`).
 
 To publish refreshed dashboards to GitHub Pages: `git add docs/ && git commit -m "Refresh dashboards" && git push`, since cron does not auto-push.
 
