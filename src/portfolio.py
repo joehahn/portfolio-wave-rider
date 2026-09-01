@@ -321,6 +321,51 @@ def _period_to_start(period: str) -> pd.Timestamp | None:
     return pd.Timestamp.today().normalize() - pd.Timedelta(days=days)
 
 
+# yfinance is an unauthenticated public endpoint that rate-limits by IP, so a burst from ANY process
+# on this machine -- including a sibling repo's ad-hoc price pulls -- makes calls here fail for tens of
+# minutes. Two things make it nasty: it usually returns an EMPTY frame with a "possibly delisted" notice
+# instead of raising, and it rotates across tickers rather than failing all at once. On 2026-08-31 the
+# 16:30 snapshot priced 1 of 4 holdings, wrote the other three as $0, and the dashboard showed a $49K
+# phantom crash; a plain retry loop resolved it in three attempts over ~4 minutes. Hence: retry, and
+# treat "some tickers came back" as failure rather than success.
+_YF_ATTEMPTS, _YF_BACKOFF_S = 4, 20        # waits 20s, 40s, 60s -> ~2 min of patience, then gives up
+
+
+def _yf_download(tickers: list[str], require: list[str] | None = None, **kw) -> pd.DataFrame:
+    """``yf.download`` with backoff. Retries on an exception, on an empty frame, and -- when
+    ``require`` names tickers -- while any of them is still missing or entirely NaN.
+
+    ``require`` is the difference between the two callers. The snapshot passes it, because a
+    partially-priced day is exactly the failure that corrupts the equity curve. ``fetch_prices``
+    leaves it None, so a genuinely dead ticker costs one retry cycle rather than one per ticker.
+    Returns the last frame obtained; judging whether it is good enough is the caller's job."""
+    import time
+    data = pd.DataFrame()
+    for attempt in range(_YF_ATTEMPTS):
+        try:
+            data = yf.download(tickers, **kw)
+        except Exception:  # noqa: BLE001 - throttling surfaces as YFRateLimitError; retry it
+            if attempt == _YF_ATTEMPTS - 1:
+                raise
+            data = pd.DataFrame()
+        if not data.empty and not _yf_missing(data, require):
+            return data
+        if attempt < _YF_ATTEMPTS - 1:
+            time.sleep(_YF_BACKOFF_S * (attempt + 1))
+    return data
+
+
+def _yf_missing(data: pd.DataFrame, require: list[str] | None) -> list[str]:
+    """Which of `require` carry no usable close in `data`. Empty list when `require` is None."""
+    if not require:
+        return []
+    closes = data["Close"] if isinstance(data.columns, pd.MultiIndex) else data
+    if not isinstance(closes, pd.DataFrame):        # single ticker -> a Series
+        return [] if closes.notna().any() else list(require)
+    return [t for t in require
+            if t not in closes.columns or not closes[t].notna().any()]
+
+
 def fetch_prices(tickers: list[str], period: str = "3y", interval: str = "1d",
                  min_history: bool = False) -> pd.DataFrame:
     """Download adjusted-close prices for the given tickers via yfinance.
@@ -343,11 +388,11 @@ def fetch_prices(tickers: list[str], period: str = "3y", interval: str = "1d",
     start = _period_to_start(period)
     if start is not None:
         end = pd.Timestamp.today().normalize() + pd.Timedelta(days=1)
-        data = yf.download(clean, start=start, end=end, interval=interval,
-                           auto_adjust=True, progress=False, group_by="column")
+        data = _yf_download(clean, start=start, end=end, interval=interval,
+                            auto_adjust=True, progress=False, group_by="column")
     else:
-        data = yf.download(clean, period=period, interval=interval,
-                           auto_adjust=True, progress=False, group_by="column")
+        data = _yf_download(clean, period=period, interval=interval,
+                            auto_adjust=True, progress=False, group_by="column")
     if data.empty:
         raise RuntimeError(f"yfinance returned no data for {clean} over {period}")
 
@@ -673,29 +718,66 @@ def snapshot_holdings(
                     "reason": "snapshot already exists; pass force=True to overwrite"}
         existing = existing[existing["date"] != str(snap_date)]
 
-    # Pull a short window so a stale weekend/holiday still resolves to a real close.
+    # Pull a short window so a stale weekend/holiday still resolves to a real close -- and so any
+    # session the file is missing can be backfilled from the same download (see below).
     tickers = holdings["ticker"].tolist()
-    raw = yf.download(tickers, period="7d", interval="1d",
-                      auto_adjust=True, progress=False, group_by="column")
+    raw = _yf_download(tickers, require=tickers, period="7d", interval="1d",
+                       auto_adjust=True, progress=False, group_by="column")
     if raw.empty:
         raise RuntimeError(f"yfinance returned no data for {tickers}")
     closes = raw["Close"] if isinstance(raw.columns, pd.MultiIndex) \
         else raw[["Close"]].rename(columns={"Close": tickers[0]})
-    last_close = closes.ffill().iloc[-1]
+    closes = closes.ffill()
 
-    rows = []
-    total = 0.0
-    for _, row in holdings.iterrows():
-        price = float(last_close.get(row["ticker"], float("nan")))
-        value = price * row["shares"] if not np.isnan(price) else 0.0
-        total += value
-        rows.append({"date": str(snap_date), "ticker": row["ticker"],
-                     "shares": row["shares"], "price": price, "value": value})
-    for r in rows:
-        r["total_value"] = total
+    # FAIL LOUD ON A PARTIALLY PRICED DAY. This used to fall back to value=0.0 for any ticker
+    # yfinance did not return, which in the CSV is indistinguishable from a position that really
+    # is worth nothing: on 2026-08-31 three of four holdings were rate-limited out and
+    # total_value read $16,392 against the prior close's $64,700, with no error raised anywhere.
+    # A MISSING date is recoverable -- the next run backfills it, or --date does -- while a
+    # ZEROED date silently corrupts total_value and every chart downstream. So refuse the write.
+    unpriced = _yf_missing(raw, tickers)
+    if unpriced:
+        raise RuntimeError(
+            f"yfinance returned no price for {unpriced} (of {tickers}); refusing to write a "
+            f"partially-priced snapshot for {snap_date}. This is usually IP rate limiting and "
+            f"clears on its own -- rerun later, or backfill with --date {snap_date}.")
+
+    def _rows_for(day: Any, prices: pd.Series) -> list[dict]:
+        """One row per holding for `day`, priced off `prices` (that session's per-ticker close)."""
+        out_rows, total = [], 0.0
+        for _, row in holdings.iterrows():
+            price = float(prices.get(row["ticker"], float("nan")))
+            total += price * row["shares"]
+            out_rows.append({"date": str(day), "ticker": row["ticker"], "shares": row["shares"],
+                             "price": price, "value": price * row["shares"]})
+        for r in out_rows:
+            r["total_value"] = total
+        return out_rows
+
+    rows = _rows_for(snap_date, closes.iloc[-1])
+    total = rows[0]["total_value"] if rows else 0.0
+
+    # SELF-HEALING BACKFILL. cron runs unattended, so a throttled afternoon or a closed laptop
+    # would otherwise leave a permanent hole that only a hand-run --date ever fills. Any session
+    # inside the window just downloaded that the file does not already have is written too, which
+    # makes the fail-loud refusal above cheap: the next run repairs what this one declined.
+    # Shares come from the CURRENT holdings.csv, so a backfilled row is only right if the position
+    # did not change in between -- the same caveat --date has always carried, and the reason this
+    # reaches back days rather than months.
+    have = set(existing["date"].astype(str)) if existing is not None else set()
+    backfilled = []
+    for ts in closes.index:
+        day = ts.date()
+        if day >= snap_date or str(day) in have:
+            continue
+        rows.extend(_rows_for(day, closes.loc[ts]))
+        backfilled.append(str(day))
 
     new_rows = pd.DataFrame(rows)
     out = pd.concat([existing, new_rows], ignore_index=True) if existing is not None else new_rows
+    # Stable sort by date so a backfilled session lands in sequence rather than at the end. The
+    # per-date ticker order (holdings.csv order) is preserved.
+    out = out.sort_values("date", kind="stable").reset_index(drop=True)
     o_path.parent.mkdir(parents=True, exist_ok=True)
     out.to_csv(o_path, index=False)
 
@@ -704,6 +786,7 @@ def snapshot_holdings(
         "tickers": tickers,
         "total_value": total,
         "n_rows_appended": len(new_rows),
+        "backfilled_dates": backfilled,
         "out_path": str(o_path),
     }
 
@@ -5123,13 +5206,13 @@ def build_curator_dashboard(
             # Two-line x labels: ticker on top, its wave bucket below (fed the most-recent-bucket map so the
             # sub-label matches each bar's wave color), same format as plot 4. Hover/click still key on the
             # plain ticker (the x value), so the 1Y/3Y popup is unaffected.
-            _rwmap = dict(zip(_tickers, _rw))
-            _rf.update_xaxes(tickmode="array", tickvals=_tickers,
-                             ticktext=[_ticker_label(str(t), _rwmap) for t in _tickers])
             # Click-to-inspect: fetch each recommended ticker's 3-year daily closes (independently, so a
             # short-history IPO doesn't truncate the others) and embed them, so clicking a bar opens a modal
             # with that ticker's price line and a 1Y/3Y toggle (1Y is sliced client-side from the 3Y series).
-            # Fetched at render; a yfinance failure just omits the popup.
+            # Fetched at render, so a yfinance outage can leave a bar with no series behind it -- FRO, added
+            # at the 2026-08-30 curation, rendered that way during an IP rate-limit window. That is marked
+            # (dagger on the tick label, and a message in the modal) rather than left as a click that does
+            # nothing, which reads as a broken page instead of a missing fetch.
             _tkhist: dict[str, dict] = {}
             for _tk in _tickers:
                 try:
@@ -5140,6 +5223,15 @@ def build_curator_dashboard(
                                         "y": [round(float(v), 2) for v in _col.values]}
                 except Exception:  # noqa: BLE001
                     pass
+            _rwmap = dict(zip(_tickers, _rw))
+
+            def _rec_label(t: str) -> str:
+                """Two-line tick label, daggered when this bar has no embedded price history."""
+                lbl = _ticker_label(t, _rwmap)
+                return lbl if t in _tkhist else lbl.replace("<br>", "<sup>&dagger;</sup><br>", 1)
+
+            _rf.update_xaxes(tickmode="array", tickvals=_tickers,
+                             ticktext=[_rec_label(str(t)) for t in _tickers])
             _barid = "rec15chart"
             _bar_html = _rf.to_html(full_html=False, include_plotlyjs=False,
                                     config={"displayModeBar": False}, div_id=_barid)
@@ -5174,8 +5266,15 @@ def build_curator_dashboard(
                     'b="border:none;border-radius:4px;padding:3px 12px;margin-right:6px;cursor:pointer;font-size:13px;";'
                     'document.getElementById("tkb1").style.cssText=b+(_curYrs==1?on:off);'
                     'document.getElementById("tkb3").style.cssText=b+(_curYrs==3?on:off);}'
-                    'window._showTkHist=function(tk){if(!_TKHIST[tk])return;_curTk=tk;_curYrs=1;'
-                    'document.getElementById("tkmodal").style.display="block";_tkdraw();};'
+                    # A bar whose fetch failed at render used to swallow the click entirely, which reads
+                    # as a broken page. Say what happened instead; the dagger on the tick label warns first.
+                    'window._showTkHist=function(tk){_curTk=tk;_curYrs=1;'
+                    'document.getElementById("tkmodal").style.display="block";'
+                    "if(!_TKHIST[tk]){document.getElementById('tkmodal_chart').innerHTML="
+                    "'<p style=\"padding:26px 10px;color:#555;line-height:1.55\">No price history embedded "
+                    "for <b>'+tk+'</b>.<br>The fetch failed while this page was rendered, usually yfinance "
+                    "IP rate limiting. It returns on the next render.</p>';return;}"
+                    '_tkdraw();};'
                     'window._setTkYrs=function(y){_curYrs=y;_tkdraw();};'
                     '(function a(){var g=document.getElementById("' + _barid + '");'
                     'if(g&&g.on){g.on("plotly_click",function(ev){window._showTkHist(ev.points[0].x);});}'
