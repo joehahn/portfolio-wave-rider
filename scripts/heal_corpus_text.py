@@ -7,6 +7,13 @@ single request. `src/retriever.fetch_html` now retries with backoff, but the rec
 still have no text, and every one of them reaches the curator as a bare headline (or is dropped by
 read_slice's date-or-text rule). This walks those records once, politely, and repairs what it can.
 
+LARGELY SUPERSEDED as of 2026-08-31: `corpus.append_pull` now performs this repair AT THE SOURCE. The
+retriever already re-fetches every unique URL on every pull, including ones already stored, so when a
+body-less record is re-sighted the fresh extraction is in hand and is used to fill the empty fields (it
+never overwrites a stored value). 70 of 89 body-less records had been re-sighted at least once, so most
+heal on their own now. This script remains useful only for a ONE-OFF sweep of records that predate that
+change and are not being re-sighted -- it fetches independently rather than waiting for a pull.
+
 Safe to re-run: it only touches records whose text is still missing, and it rewrites articles.jsonl
 atomically. Nothing is deleted -- a record that stays unreachable is left exactly as it was.
 

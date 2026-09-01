@@ -62,6 +62,51 @@ _TICKER_RE = re.compile(r"\((?:NYSE|NASDAQ|NYSE ?American|NYSEARCA|OTC|Nasdaq|CB
 _NOT_TICKER = {"CEO", "CFO", "AI", "US", "USA", "GDP", "IPO", "SEC", "FDA", "ETF", "EV", "UK", "EU"}
 
 
+# Publish-date fallbacks, tried only when trafilatura found no date on the page. Both are free: the URL
+# is already in hand, and `page_age` rides along on every web_search result. Dropping them is what left
+# 84 of 833 corpus articles undated, and read_slice's "a date OR readable text, never neither" rule then
+# withholds the undated-and-textless ones from the curator entirely. Coarse by design: a fallback date is
+# only ever consulted for an article that would otherwise have none, never to override a real one.
+_URL_DATE = re.compile(r"/(20\d\d)[/-](\d{1,2})[/-](\d{1,2})(?:[/-]|\b)")
+
+
+def _url_date(url: str) -> str | None:
+    """Publish date from the URL path alone, e.g. /2026/07/07/ -> 2026-07-07. None if absent."""
+    m = _URL_DATE.search(url or "")
+    if not m:
+        return None
+    y, mo, d = m.groups()
+    return f"{y}-{int(mo):02d}-{int(d):02d}"
+
+
+def _page_age_date(page_age: Any, ref: "date | None" = None) -> str | None:
+    """A web_search result's ``page_age`` -> YYYY-MM-DD, with no fetch. Handles both forms it arrives
+    in: relative ('3 days ago', 'yesterday') resolved against `ref`, and absolute ('March 4, 2026').
+    Returns None if unparseable or in the future, so a bad string can never date an article forward."""
+    if not page_age:
+        return None
+    s = str(page_age).strip().lower()
+    ref = ref or date.today()
+    if s in ("today", "just now", "now"):
+        return ref.isoformat()
+    if s == "yesterday":
+        return (ref - timedelta(days=1)).isoformat()
+    m = re.match(r"(\d+)\s+(hour|day|week|month|year)s?\s+ago", s)
+    if m:
+        n, unit = int(m.group(1)), m.group(2)
+        days = {"hour": n / 24.0, "day": n, "week": 7 * n, "month": 30 * n, "year": 365 * n}[unit]
+        return (ref - timedelta(days=round(days))).isoformat()
+    try:
+        import pandas as pd
+        d = pd.to_datetime(str(page_age), errors="coerce")
+    except Exception:  # noqa: BLE001
+        return None
+    if d is None or str(d) == "NaT":
+        return None
+    out = d.date().isoformat()
+    return out if "2000-01-01" < out <= ref.isoformat() else None
+
+
 def _tickers(text: str) -> list[str]:
     out = []
     for a, b in _TICKER_RE.findall(text or ""):
@@ -175,7 +220,15 @@ def _extract_article(url: str, cid: str, res: dict, pulled_at: str, query: str, 
         "article_id": cid, "url": url, "canonical_url": corpus.canon_url(url),
         "source_domain": host, "source_tier": corpus.source_tier(host),
         "publisher": publisher or host, "title": title, "author": author,
-        "published_date": (pub_date or res.get("date") or "")[:10] or None, "language": language,
+        # Date chain, best source first: the page's own metadata, then whatever the retriever supplied,
+        # then the two free fallbacks. The last two only ever fire for an article that would otherwise
+        # carry no date at all and so be withheld from the curator by read_slice's date-or-text rule.
+        "published_date": ((pub_date or res.get("date") or "")[:10]
+                           or _url_date(url) or _page_age_date(res.get("page_age")) or None),
+        "date_source": ("page" if pub_date else "retriever" if res.get("date")
+                        else "url" if _url_date(url)
+                        else "page_age" if _page_age_date(res.get("page_age")) else None),
+        "language": language,
         "snippet": snippet, "full_text": full_text, "extraction_ok": ok,
         "content_hash": hashlib.sha1(blob.encode("utf-8")).hexdigest()[:16],
         "image_url": image, "tickers_mentioned": _tickers(title + " " + full_text),

@@ -23,6 +23,7 @@ import hashlib
 import json
 import re
 import sys
+from collections import Counter as _Counter
 from pathlib import Path
 from typing import Any
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
@@ -42,7 +43,12 @@ _TRACK = re.compile(r"^(utm_|fbclid|gclid|mc_|ref$|ref_|referrer|cmpid|ncid|mkt_
 _BODY_FIELDS = ("article_id", "url", "canonical_url", "source_domain", "publisher", "title", "author",
                 "published_date", "language", "snippet", "full_text", "extraction_ok", "content_hash",
                 "image_url", "tickers_mentioned", "first_pulled_at", "first_query", "first_wave",
-                "is_article")   # False = quote/landing page: stored, but never fed to a curator
+                "is_article",     # False = quote/landing page: stored, but never fed to a curator
+                # page_age is what web_search reports about the result ('3 days ago'); date_source names
+                # which rung of retriever._extract_article's chain supplied published_date. Both were
+                # being computed and then dropped here, which is why 84 of 833 articles had no date at
+                # all: the field existed on the record and never survived the copy into articles.jsonl.
+                "page_age", "date_source")
 _APPEARANCE_FIELDS = ("article_id", "pull_id", "pulled_at", "query", "wave", "result_rank", "content_hash")
 
 
@@ -160,8 +166,33 @@ def _append_jsonl(path: Path, rows: list[dict]) -> None:
             f.write(json.dumps(r, ensure_ascii=False) + "\n")
 
 
+def _stored_bodies() -> dict[str, dict]:
+    """Every stored body, keyed by article_id (so a re-sighted article's body is stored once, and an
+    incomplete one can be upgraded in place -- see ingest_pull)."""
+    if not ARTICLES.exists():
+        return {}
+    out: dict[str, dict] = {}
+    for line in ARTICLES.read_text(encoding="utf-8").splitlines():
+        if line.strip():
+            try:
+                r = json.loads(line)
+                out[r["article_id"]] = r
+            except Exception:  # noqa: BLE001
+                continue
+    return out
+
+
+def _rewrite_articles(bodies: dict[str, dict], order: list[str]) -> None:
+    """Rewrite articles.jsonl atomically, preserving first-seen order. Used only when an existing
+    record is upgraded; new records still append, so the file stays append-mostly."""
+    tmp = ARTICLES.with_suffix(".jsonl.tmp")
+    tmp.write_text("\n".join(json.dumps(bodies[i], ensure_ascii=False) for i in order) + "\n",
+                   encoding="utf-8")
+    tmp.replace(ARTICLES)
+
+
 def _seen_ids() -> set[str]:
-    """article_ids already in the corpus (so a re-sighted article's body is stored once)."""
+    """article_ids already in the corpus."""
     if not ARTICLES.exists():
         return set()
     ids = set()
@@ -215,14 +246,16 @@ def append_pull(pull_id: str, pulled_at: str, retriever: str, retrieval_model: s
 
     With ``dry_run=True`` the dedup/counting runs exactly as normal (so the returned summary is
     accurate) but nothing is written to the corpus files -- for a no-op preview of a pull."""
-    seen = _seen_ids()
+    stored = _stored_bodies()
+    order = list(stored)                       # first-seen order, preserved across any rewrite
     new_bodies, appearances = [], []
-    n_new, n_nonart = 0, 0
+    n_new, n_nonart, n_upgraded = 0, 0, 0
     nonart_by_wave: dict[str, int] = {}
+    upgraded_fields: dict[str, int] = {}
     for s in sightings:
         aid = s["article_id"]
         appearances.append({k: s.get(k) for k in _APPEARANCE_FIELDS})
-        if aid not in seen:
+        if aid not in stored:
             # Tag rather than drop: the archive stays complete and reversible (a filter bug can be fixed
             # and every past pool re-derives), while read_slice keeps quote pages away from the curator.
             # The per-wave tally is the signal that a wave's query itself needs rewording.
@@ -230,26 +263,76 @@ def append_pull(pull_id: str, pulled_at: str, retriever: str, retrieval_model: s
             body = {k: s.get(k) for k in _BODY_FIELDS}
             body["is_article"] = _ok
             new_bodies.append(body)
-            seen.add(aid)
+            stored[aid] = body
+            order.append(aid)
             n_new += 1
             if not _ok:
                 n_nonart += 1
                 _w = str(s.get("first_wave") or s.get("wave") or "?")
                 nonart_by_wave[_w] = nonart_by_wave.get(_w, 0) + 1
+        else:
+            # UPGRADE AN INCOMPLETE RECORD. The retriever re-fetches every unique URL on every pull,
+            # including ones already stored, so on a re-sighting we already hold a fresh extraction --
+            # and used to throw it away, because the first write won permanently. When that first
+            # write lost a race with a 503 or a paywall it stored a body-less, dateless record, and no
+            # later sighting could ever repair it: 70 of 89 body-less articles had been seen again,
+            # 69 of them still undated, all of them withheld from the curator by read_slice's
+            # date-or-text rule. Only ever fills a field that is EMPTY -- a stored value is never
+            # overwritten, so this cannot rewrite history, only complete it. This is what
+            # scripts/heal_corpus_text.py does after the fact; doing it here is the same repair at
+            # the source, on data already in hand, with no extra fetch.
+            cur = stored[aid]
+            for _f in ("full_text", "snippet", "published_date", "author", "page_age", "date_source"):
+                if not cur.get(_f) and s.get(_f):
+                    cur[_f] = s[_f]
+                    upgraded_fields[_f] = upgraded_fields.get(_f, 0) + 1
+                    if _f == "full_text":
+                        cur["extraction_ok"] = True
+                    n_upgraded += 1
     if not dry_run:
-        _append_jsonl(ARTICLES, new_bodies)
+        if upgraded_fields:                    # an in-place edit forces a rewrite; new rows still append
+            _rewrite_articles(stored, order)
+        else:
+            _append_jsonl(ARTICLES, new_bodies)
         _append_jsonl(APPEARANCES, appearances)
+        # FUNNEL COUNTS, not just totals. "5 new articles" has several unrelated causes -- a quiet news
+        # day, a throttled engine, every result already stored -- and they are indistinguishable from
+        # outside. Recording where articles landed, and which ones still carry no date, is what makes a
+        # silent regression visible in a day instead of a month.
+        # Judged on the STORED record's final state, after any upgrade above -- a re-sighting that comes
+        # back dateless is not interesting when we already hold a date for that article.
+        undated = [{"url": s.get("url"), "source": s.get("source_domain"),
+                    "title": (s.get("title") or "")[:160], "had_text": bool(s.get("full_text")),
+                    "had_page_age": bool(s.get("page_age"))}
+                   for s in sightings if not stored.get(s["article_id"], s).get("published_date")]
         manifest = {"pull_id": pull_id, "pulled_at": pulled_at, "retriever": retriever,
                     "retrieval_model": retrieval_model, "n_sightings": len(sightings),
                     "n_new_articles": n_new, "n_new_non_article": n_nonart,
-                    "non_article_by_wave": nonart_by_wave, "query_stats": query_stats}
+                    "non_article_by_wave": nonart_by_wave,
+                    "n_upgraded_fields": n_upgraded, "upgraded_by_field": upgraded_fields,
+                    "n_undated": len({u["url"] for u in undated}),
+                    "date_sources": dict(_Counter(str(s.get("date_source") or "none")
+                                                  for s in sightings)),
+                    "query_stats": query_stats}
         _append_jsonl(PULLS, [manifest])
+        if undated:    # write the drops down, don't merely count them: a page we never fetched (no text,
+            # no date) is a retrieval failure worth chasing; one we read that carries no machine-readable
+            # date is not, and a bare tally cannot tell them apart.
+            _seen_u, _rows = set(), []
+            for u in undated:
+                if u["url"] not in _seen_u:
+                    _seen_u.add(u["url"])
+                    _rows.append({"pull_id": pull_id, "pulled_at": pulled_at, **u})
+            _append_jsonl(CORPUS_DIR / "undateable.jsonl", _rows)
     # Underscore keys in query_stats are per-pull diagnostics (_lede_sources, _uncrawlable_specialty_domains),
     # not queries, so they must not inflate the query count.
     n_queries = sum(1 for k in query_stats if not str(k).startswith("_"))
     return {"pull_id": pull_id, "sightings": len(sightings), "new_articles": n_new,
             "new_non_article": n_nonart, "non_article_by_wave": nonart_by_wave,
-            "queries": n_queries, "corpus_articles": len(seen), "dry_run": dry_run}
+            "upgraded_fields": n_upgraded, "upgraded_by_field": upgraded_fields,
+            "undated": len({s.get("url") for s in sightings
+                            if not stored.get(s["article_id"], s).get("published_date")}),
+            "queries": n_queries, "corpus_articles": len(stored), "dry_run": dry_run}
 
 
 def read_slice(as_of: str, lookback_days: int) -> list[dict[str, Any]]:
