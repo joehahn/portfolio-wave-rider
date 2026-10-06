@@ -3,7 +3,7 @@
 **An AI agent reads a continuous feed of unstructured news and makes a routine judgment call a person would otherwise make by hand, while deterministic code handles everything that has to be auditable.** The domain here is investing; the pattern is not. Any recurring decision that today requires a person to read the latest unstructured input and re-judge has this shape. The AI names the candidates and rules on whether a thesis still holds; it never sizes a position, because a standard mechanical optimizer does that.
 
 Built end-to-end with [Claude Code](https://claude.com/claude-code) by **Joseph M. Hahn, Ph.D.**, an independent AI and machine learning consultant:
-[jmh-datasciences.com](https://jmh-datasciences.com) · [LinkedIn](https://www.linkedin.com/in/hahnjoe/) · jmh.datasciences@gmail.com
+[jmh-datasciences.com](https://jmh-datasciences.com) · [LinkedIn](https://www.linkedin.com/in/hahnjoe/) · joe.hahn@jmh-datasciences.com
 
 > **Not investment advice.** This is a research project and a demonstration of automated decisioning. Nothing here is a recommendation to buy or sell any security, and every backtested figure below is a hindsight upper bound rather than realized return.
 
@@ -261,7 +261,7 @@ This repository is **dual-licensed**, split by what a file is for.
 
 The writeup and the dashboards are meant to travel. Quote them, adapt them, screenshot a chart into your slide deck, commercially or not, as long as you credit the source. The requested form is *Joseph M. Hahn, Ph.D., JMH DataSciences, https://jmh-datasciences.com, from the `portfolio-wave-rider` project*.
 
-The code and the internal docs are free to use, modify, and share for any noncommercial purpose: research, experimentation, education, personal projects, and use by nonprofit or government organizations. Commercial rights to them are reserved. If you want to use this work commercially, or want it adapted to a decision in your own business, get in touch at [jmh-datasciences.com](https://jmh-datasciences.com) or jmh.datasciences@gmail.com and we will talk.
+The code and the internal docs are free to use, modify, and share for any noncommercial purpose: research, experimentation, education, personal projects, and use by nonprofit or government organizations. Commercial rights to them are reserved. If you want to use this work commercially, or want it adapted to a decision in your own business, get in touch at [jmh-datasciences.com](https://jmh-datasciences.com) or joe.hahn@jmh-datasciences.com and we will talk.
 
 Code samples embedded in a CC BY document stay under the code license, so a snippet lifted from this README carries the same terms as the file it came from.
 
