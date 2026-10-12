@@ -239,7 +239,7 @@ def is_article(a: dict) -> bool:
 
 def append_pull(pull_id: str, pulled_at: str, retriever: str, retrieval_model: str,
                 sightings: list[dict[str, Any]], query_stats: dict[str, Any],
-                dry_run: bool = False) -> dict[str, Any]:
+                dry_run: bool = False, as_of: str | None = None) -> dict[str, Any]:
     """Persist one pull. `sightings` = one dict per (result) sighting carrying both body and
     sighting fields (built by the retriever). Dedups bodies by article_id, logs every appearance,
     and writes a manifest row. Returns a summary dict.
@@ -313,7 +313,10 @@ def append_pull(pull_id: str, pulled_at: str, retriever: str, retrieval_model: s
                     "n_undated": len({u["url"] for u in undated}),
                     "date_sources": dict(_Counter(str(s.get("date_source") or "none")
                                                   for s in sightings)),
-                    "query_stats": query_stats}
+                    "query_stats": query_stats,
+                    # The day this pull was SCHEDULED for. Differs from pulled_at[:10] when the machine
+                    # slept through the cron firing and the pull finished the next day.
+                    "as_of": as_of or pulled_at[:10]}
         _append_jsonl(PULLS, [manifest])
         if undated:    # write the drops down, don't merely count them: a page we never fetched (no text,
             # no date) is a retrieval failure worth chasing; one we read that carries no machine-readable

@@ -74,7 +74,11 @@ def build(corpus_dir: str, out: Path) -> None:
     if not arts:
         print("empty forward corpus; nothing to render", file=sys.stderr)
         return
-    pull_days = sorted({(p.get("pulled_at") or "")[:10] for p in pulls if p.get("pulled_at")})
+    # A pull counts for the day it was SCHEDULED (`as_of`), so one the machine slept through and finished
+    # the next morning does not read as a missed day plus a double day.
+    for p in pulls:
+        p["_day"] = p.get("as_of") or (p.get("pulled_at") or "")[:10]
+    pull_days = sorted({p["_day"] for p in pulls if p["_day"]})
     d0, d1 = _iso(pull_days[0]), _iso(pull_days[-1])
     span = [(d0 + timedelta(days=i)).isoformat() for i in range((d1 - d0).days + 1)]
 
@@ -91,7 +95,7 @@ def build(corpus_dir: str, out: Path) -> None:
     for _s in apps:
         _seen_ids_by_day[(_s.get("pulled_at") or "")[:10]].add(_s.get("article_id"))
     distinct_by_day = {d: len(v) for d, v in _seen_ids_by_day.items()}
-    pulls_by_day = Counter((p_.get("pulled_at") or "")[:10] for p_ in pulls)
+    pulls_by_day = Counter(p_["_day"] for p_ in pulls)
     nonart_by_day = Counter((a.get("first_pulled_at") or "")[:10] for a in arts if not a.get("is_article"))
     lede_by_day = Counter((a.get("first_pulled_at") or "")[:10] for a in arts if a["_lede"])
     auth_by_day = Counter((a.get("first_pulled_at") or "")[:10] for a in arts if (a.get("author") or "").strip())
@@ -114,7 +118,7 @@ def build(corpus_dir: str, out: Path) -> None:
     # counts, not a rate, so a shrinking query budget is as obvious as a failing one.
     q_ok, q_zero, q_err = Counter(), Counter(), Counter()
     for p in pulls:
-        _pd = (p.get("pulled_at") or "")[:10]
+        _pd = p["_day"]
         for k, v in (p.get("query_stats") or {}).items():
             if str(k).startswith("_") or not isinstance(v, dict):
                 continue                      # per-pull diagnostics (_lede_sources, ...), not queries

@@ -7,9 +7,10 @@
 set -euo pipefail
 PROJ="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$PROJ"
+AS_OF="$(date '+%Y-%m-%d')"   # the scheduled day, fixed now so a sleep mid-pull cannot roll it to tomorrow
 {
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] news pull start"
-  .venv/bin/python -m src.cli pull-news || echo "[$(date '+%Y-%m-%d %H:%M:%S')] pull-news failed (tolerated)"
+  .venv/bin/python -m src.cli pull-news --as-of "$AS_OF" || echo "[$(date '+%Y-%m-%d %H:%M:%S')] pull-news failed (tolerated)"
   # Refresh the Retriever Bootstrap (RBS) dashboard off the just-updated forward corpus (render-only, no LLM).
   # Lives here (not the 16:30 snapshot job) because RBS visualizes the news corpus this job just wrote.
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] RBS refresh start"

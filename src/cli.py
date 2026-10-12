@@ -238,7 +238,7 @@ def main(argv: list[str] | None = None) -> int:
                 r = retriever.GkgWaybackRetriever(days=args.days, max_articles=args.max_results or 160)
                 sightings, query_stats = r.pull(pull_id, pulled_at)
                 result = corpus.append_pull(pull_id, pulled_at, "gkg-wayback-backfill", f"{args.days}d",
-                                            sightings, query_stats, dry_run=args.dry_run)
+                                            sightings, query_stats, dry_run=args.dry_run, as_of=as_of)
             else:
                 waves = json.loads(Path("retrieval_config.json").read_text()).get("wave_keywords", {})
                 if args.limit_waves:
@@ -249,7 +249,7 @@ def main(argv: list[str] | None = None) -> int:
                                                  max_results_per_query=args.max_results)
                 sightings, query_stats = r.pull(pull_id, pulled_at)
                 result = corpus.append_pull(pull_id, pulled_at, fw["retriever"], model, sightings, query_stats,
-                                            dry_run=args.dry_run)
+                                            dry_run=args.dry_run, as_of=as_of)
             result["as_of"] = as_of
         elif args.cmd == "review":
             from datetime import datetime
