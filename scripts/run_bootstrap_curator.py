@@ -165,11 +165,13 @@ def main(argv=None) -> int:
     # replacement for it: the biweekly grid still runs from SINCE, so a scheduled date keeps firing on
     # schedule. They persist in _starter.json (`manual_dates`) because this script rewrites that file on
     # every run, and `curator_backtest` globs the curation JSONs, so a merged date replays like any other.
-    _prev_manual = []
+    # `plot1_scale` (chart-1 book-size multiplier, hand-set) is carried forward the same way.
+    _prev_manual, _prev_scale = [], None
     _sp = RUN / "_starter.json"
     if _sp.exists():
         try:
-            _prev_manual = list(json.loads(_sp.read_text()).get("manual_dates") or [])
+            _prev = json.loads(_sp.read_text())
+            _prev_manual, _prev_scale = list(_prev.get("manual_dates") or []), _prev.get("plot1_scale")
         except Exception:  # noqa: BLE001
             pass
     _manual = sorted({*_prev_manual, *([end.isoformat()] if a.rebalance_now else []),
@@ -233,7 +235,8 @@ def main(argv=None) -> int:
          "max_watchlist_size": ms, "start_date": dates[0], "end_date": end.isoformat(),
          "initial_weights": initial_weights, "naive_benchmark": naive_benchmark,
          "manual_dates": _manual,              # off-grid rebalances, re-merged on every later run
-         "seed_src": SEED_SRC}, indent=2))     # remember the CBT run so the daily refresh can build the KPI table
+         "seed_src": SEED_SRC,                 # remember the CBT run so the daily refresh can build the KPI table
+         **({"plot1_scale": _prev_scale} if _prev_scale is not None else {})}, indent=2))
     hist = RUN / "_wf_history.csv"
     hist.write_text("date,action,ticker,wave_bucket,rationale,news_evidence_urls\n")
     hold = RUN / "_wf_holdings.csv"
