@@ -720,9 +720,13 @@ def snapshot_holdings(
 
     # Pull a short window so a stale weekend/holiday still resolves to a real close -- and so any
     # session the file is missing can be backfilled from the same download (see below).
+    # An explicit `date` pulls the window ENDING on that date (yfinance's `end` is exclusive), so the
+    # row is priced at that session's close rather than today's.
     tickers = holdings["ticker"].tolist()
-    raw = _yf_download(tickers, require=tickers, period="7d", interval="1d",
-                       auto_adjust=True, progress=False, group_by="column")
+    window = ({"start": str(snap_date - pd.Timedelta(days=10)), "end": str(snap_date + pd.Timedelta(days=1))}
+              if date else {"period": "7d"})
+    raw = _yf_download(tickers, require=tickers, interval="1d",
+                       auto_adjust=True, progress=False, group_by="column", **window)
     if raw.empty:
         raise RuntimeError(f"yfinance returned no data for {tickers}")
     closes = raw["Close"] if isinstance(raw.columns, pd.MultiIndex) \
@@ -754,6 +758,7 @@ def snapshot_holdings(
             r["total_value"] = total
         return out_rows
 
+    closes = closes[closes.index.date <= snap_date]   # never price a date with a later session's close
     rows = _rows_for(snap_date, closes.iloc[-1])
     total = rows[0]["total_value"] if rows else 0.0
 
